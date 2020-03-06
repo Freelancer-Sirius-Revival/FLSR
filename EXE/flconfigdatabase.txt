@@ -1,0 +1,1792 @@
+//
+// Freelancer Config Database
+//
+//  SceneRenderer				// Scene based renderer (eg: PowerVR, Kyro etc...)
+//  NoAlphaTest					// Disable alpha test (conflicts with other modes)
+//  oTriLinear					// Do not attempt trilinear filtering
+//  NoTripleBuffer				// Do not attempt triple buffering
+//  DefaultBltNotFlip				// In full screen mode, use BLT
+//  NoFog					// Do not attempt fog
+//  TextureOffset				// Texel offset for fonts is done on x,y's not u,v (eg: Riva128)
+//  BrokenAlphaTest				// Cards that cannot do Alpha test without ALPHABLEND being enabled (eg: ATI Rage)
+//  RenderEqualZ				// Render bit depth must equal Z bit depth (eg: nVidia cards)
+//  NoParallelism				// Lock the back buffer after rendering (eg: Voodoo3 - queueing up too many blits)
+//  BadMouse					// Card can never use GDI mouse (eg: Voodoo)
+//  NoMipMap					// Disable mipmaps
+//  Bad4444					// Disable 4444 textures  (eg: Chromatic Mpact)
+//  NoDisablePerspective			// Disable disabling perspective correct texturing (eg: Voodoo cards)
+//  LimitTextureSize				// Limit texture size to 256*256 to correct bad caps
+//  ForceSquareTextures				// Do not allow non-square textures
+//  NoStretchTexture				// Force system memory stretch blit to square up textures
+//  SlowDisplayModeChange			// Prevent video drivers that take a while before sending the WM_DISPLAYCHANGE msg from getting stuck in an endless loop of display mode changes (eg: Savage 4)
+//  Bad8888					// Disable 32 bit textures (eg: Voodoo)
+//
+//  Disable1600x1200
+//  Enable1680x1050
+
+// Freelancer specific:
+// FL_BAD_WFOG					// card doesnt work well w/ freelancer's w-fog
+// FL_BAD_ENVMAP				// card doesnt work well w/ freelancer's envmapping
+// FL_BAD_MOD2X					// card doesnt work well w/ freelancer's detail mapping
+// FL_BAD_DXTN					// card doesnt work well w/ freelancer's dtxn texture loader
+
+///////////////////////////////////////////////////
+//
+// 3DFX
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1142  "3dfx"
+Vendor = 0x10d9  "3dfx"
+Vendor = 0x121a  "3dfx"
+
+0x643d = "Rush (Alliance)"
+0x8626 = "Rush (Macronix)"
+	UnsupportedHardware
+	NoAlphaTest
+	NoTripleBuffer
+	NoFog
+	break
+
+0x0001 = "Voodoo 1"
+	UnsupportedHardware
+	NoTripleBuffer
+	BadMouse
+	break
+
+0x0002 = "Voodoo 2"
+	UnsupportedHardware
+	NoDisablePerspective
+	NoParallelism
+	NoTripleBuffer
+	BadMouse
+	break
+
+0x0003 = "Banshee"
+0x0004 = "Banshee"
+	UnsupportedHardware
+	NoParallelism
+	NoMipMap
+	break
+
+//
+// Voodoo 3
+//
+0x0005 = "Voodoo 3"
+	NoParallelism
+	Disable1600x1200
+	if os > win2k
+		if driver < 5.0.3545.28
+			NoFog
+			Bad4444
+			LimitTextureSize
+			ForceSquareTextures
+			Bad8888
+			FL_BAD_WFOG
+			FL_BAD_ENVMAP
+			FL_BAD_MOD2X
+			FL_BAD_DXTN
+			UnsupportedHardware
+		endif
+	endif
+	if os == win2k
+		if driver < 5.0.2195.232
+			UnsupportedDriver
+		endif
+	if os < win2k
+		if driver < 4.12.1.666
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+//
+// Voodoo 4 and 5
+//
+
+0x0007 = "Voodoo 4"
+0x0009 = "Voodoo 5"
+	if os > win2k
+		if driver < 5.0.3545.28
+			UnsupportedDriver
+		endif
+	if os == win2k
+		if driver < 5.0.2195.31 
+			UnsupportedDriver
+		endif
+	if os < win2k
+		if driver < 4.13.1.28
+			UnsupportedDriver
+		endif
+	endif
+	break
+	
+///////////////////////////////////////////////////
+//
+// ST MICROELECTRONICS
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x104a  "ST Microelectronics"
+
+0x0010 = "Kyro I/II"
+	SceneRenderer
+
+	if os > win2k
+		if driver < 6.13.10.6122
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.13.1.6122
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.01.6270
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+///////////////////////////////////////////////////
+//
+// ATI
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1002  "ATI"
+	
+//
+// RAGE 128 CLASS CARDS
+//
+0x4d46 = "Rage Mobility 128"
+0x4d4c = "Rage Mobility 128"
+0x5041 = "Rage 128 Pro PA"
+0x5042 = "Rage 128 Pro PB"
+0x5043 = "Rage 128 Pro PC"
+0x5044 = "Rage 128 Pro PD"
+0x5045 = "Rage 128 Pro PE"
+0x5047 = "Rage 128 Pro PG"
+0x5048 = "Rage 128 Pro PH"
+0x5049 = "Rage 128 Pro PI"
+0x504a = "Rage 128 Pro PJ"
+0x504b = "Rage 128 Pro PK"
+0x504c = "Rage 128 Pro PL"
+0x504d = "Rage 128 Pro PM"
+0x504e = "Rage 128 Pro PN"
+0x504f = "Rage 128 Pro PO"
+0x5050 = "Rage 128 Pro PP"
+0x5051 = "Rage 128 Pro PQ"
+0x5052 = "Rage 128 Pro PR"
+0x5053 = "Rage 128 Pro PS"
+0x5054 = "Rage 128 Pro PT"
+0x5055 = "Rage 128 Pro PU"
+0x5056 = "Rage 128 Pro PV"
+0x5057 = "Rage 128 Pro PW"
+0x5058 = "Rage 128 Pro PX"
+0x5245 = "Rage 128 RE/SG"
+0x5246 = "Rage 128 RF/SG"
+0x5247 = "Rage 128 RG"
+0x524b = "Rage 128 RK/VR"
+0x524c = "Rage 128 RL/VR"
+0x5345 = "Rage 128 SE"
+0x5346 = "Rage 128 SF"
+0x5347 = "Rage 128 SG"
+0x5348 = "Rage 128 SH"
+0x534b = "Rage 128 SK"
+0x534c = "Rage 128 SL"
+0x534d = "Rage 128 SM"
+0x534e = "Rage 128"
+0x5354 = "Mach 64 VT"
+0x5446 = "Rage 128 Pro Ultra TF"
+0x544c = "Rage 128 Pro Ultra TL"
+0x5452 = "Rage 128 Pro Ultra TR"
+0x5453 = "Rage 128 Pro Ultra TS"
+0x5454 = "Rage 128 Pro Ultra TT"
+0x5455 = "Rage 128 Pro Ultra TU"
+	if os > win2k
+		if driver < 6.13.3279.0
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.13.1.3279
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.1.7192
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x5046 = "Rage Fury Pro/MAXX PF"
+	NoParallelism
+	if os > win2k
+		if driver < 6.13.3279.0
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.13.1.3279
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.12.1.61	//	Last available MAXX driver
+			 UnsupportedDriver
+		 endif
+	endif
+	break
+
+//
+// OLDER RAGE CLASS
+//
+0x4742 = "Rage Pro Turbo"
+	DefaultBltNotFlip
+0x4744 = "Rage Pro Turbo"
+0x4747 = "Rage Pro"
+0x4749 = "Rage Pro"
+0x474c = "Rage XC"
+0x474d = "Rage XL"
+0x474e = "Rage XC"
+0x474f = "Rage XL"
+0x4750 = "Rage Pro Turbo (215 GP)"
+0x4751 = "Rage Pro (215 GQ)"
+0x4752 = "Rage XL"
+0x4753 = "Rage XC"
+0x4754 = "Rage I/II (215 GT)"
+0x4755 = "Rage II+ (215 GTB)"
+0x4756 = "Rage IIC (215 IIC)"
+0x4757 = "Rage IIC"
+0x4759 = "Rage IIC"
+0x475a = "Rage IIC"
+	TextureOffset
+0x4c42 = "Rage LT Pro"
+0x4c44 = "Rage LT Pro"
+0x4c47 = "Rage LT-G (215 LG)"
+0x4c49 = "Rage LT Pro"
+0x4c50 = "Rage LT Pro"
+0x4c51 = "Rage LT Pro"
+	MaxOverallGraphicDetail = 1
+	DisableCompositeTerrainTextures = true
+	if os > win2k
+		if driver < 6.13.10.7192
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.13.1.7192
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.1.7192
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x4c45 = "Rage Mobility"
+0x4c46 = "Rage Mobility"
+0x4c4d = "Rage Mobility P/M"
+0x4c4e = "Rage Mobility L"
+0x4c52 = "Rage Mobility P/M"
+0x4c53 = "Rage Mobility L"
+0x4d46 = "Rage Mobility (M4)"				// added by Louva-Deus
+0x4d4c = "Rage Mobility (M4)"				// added by Louva-Deus
+	BrokenAlphaTest
+	break
+
+//
+// LEGACY
+//
+0x4158 = "Mach 32 (68800 AX)"
+0x4354 = "Mach 64 (215 CT)"
+0x4358 = "Mach 64 (210888 CX)"
+0x4554 = "Mach 64 (210888 ET)"
+0x4654 = "Mach 64 (?? VT)"
+0x4758 = "Mach 64 (210888 GX)"
+0x4c54 = "Mach 64 (264 LT)"
+0x5654 = "Mach 64 VT (264 VT)"
+0x5655 = "Mach 64 VT3 (264 VT3)"
+0x5656 = "Mach 64 VT4 (264 VT4)"
+	UnsupportedHardware
+	BrokenAlphaTest
+	TextureOffset
+	break
+
+//
+// RADEON CLASS CARDS
+//
+
+// Series (0x3e--)
+0x3e50 = "Radeon X600 (R380)"				// added by Louva-Deus
+0x3e54 = "FireGL V3200 (R380)"				// added by Louva-Deus
+0x3e70 = "Radeon X600 Secondary (R380)"			// added by Louva-Deus
+
+// A Series (0x41--)
+0x4144 = "Radeon 9500 Pro (R300 AD)"			// added by Louva-Deus
+0x4164 = "Radeon 9500 Pro Secondary (R300 AD)"		// added by Louva-Deus
+0x4145 = "Radeon 9700 Pro (R300 AE)"			// added by Louva-Deus
+0x4165 = "Radeon 9700 Pro Secondary (R300 AE)"		// added by Louva-Deus
+0x4146 = "Radeon 9700 Pro (R300 AF)"			// added by Louva-Deus
+0x4166 = "Radeon 9700 Pro Secondary (R300 AF)"		// added by Louva-Deus
+0x4147 = "FireGL Z1/X1 (R300 AG)"			// added by Louva-Deus
+0x4148 = "Radeon 9800 SE (R350 AH)"			// added by Louva-Deus
+0x4168 = "Radeon 9800 SE Secondary (R350 AH)"		// added by Louva-Deus
+0x4149 = "Radeon 9800 Pro (R350 AI)"			// added by Louva-Deus
+0x414A = "Radeon 9800 (R350 AJ)"			// added by Louva-Deus
+0x414B = "FireGL X2 (R350 AK)"				// added by Louva-Deus
+0x4150 = "Radeon 9600 Pro (RV350 AP)"			// added by Louva-Deus
+0x4170 = "Radeon 9600 Pro Secondary (RV350 AP)"		// added by Louva-Deus
+0x4151 = "Radeon 9600 SE (RV350 AQ)"			// added by Louva-Deus
+0x4171 = "Radeon 9600 SE Secondary (RV350 AQ)"		// added by Louva-Deus
+0x4152 = "Radeon 9600 XT (RV350 AR)"			// added by Louva-Deus
+0x4172 = "Radeon 9600 XT Secondary (RV350 AR)"		// added by Louva-Deus
+0x4153 = "Radeon 9550 (RV350 AS)"			// added by Louva-Deus
+0x4173 = "Radeon 9550 Secondary (RV350 AS)"		// added by Louva-Deus
+0x4154 = "FireGL T2 (RV350 AT)"				// added by Louva-Deus
+0x4155 = "FireGL T2 (RV350 AU)"				// added by Louva-Deus
+0x4156 = "FireGL T2 (RV350 AV)"				// added by Louva-Deus
+0x4157 = "FireGL T2 (RV350 AW)"				// added by Louva-Deus
+
+// B Series (0x42--)
+0x4242 = "Radeon 8500 DV (R200 BB)"
+0x4243 = "Radeon 8500 (R200 BC)"
+
+// I Series (0x49--)
+0x4964 = "Radeon 9000 (RV250 ID)"			// added by Louva-Deus
+0x4965 = "Radeon 9000 (RV250 IE)"			// added by Louva-Deus
+0x4966 = "Radeon 9000/9000 Pro (RV250 IF)"
+0x4967 = "Radeon 9000 (RV250 IG)"			// added by Louva-Deus
+0x496e = "Radeon 9000/9000 Pro Secondary (RV250 IN)"	// added by Louva-Deus
+0x496f = "Radeon 9000 (R250 IO)"			// added by Louva-Deus
+
+// J Series (0x4a--)
+0x4a48 = "Radeon X800 Series (R420)"			// added by Louva-Deus
+0x4a49 = "Radeon X800 Pro (R420)"			// added by Louva-Deus
+0x4a4a = "Radeon X800 SE - Secondary (R420)"		// added by Louva-Deus
+0x4a4b = "Radeon X800 XT - Secondary (R420)"		// added by Louva-Deus
+0x4a4c = "Radeon X800 Series - Secondary (R420)"	// added by Louva-Deus
+0x4a4d = "FireGL X3 (R420)"				// added by Louva-Deus
+0x4a4f = "Radeon X800 SE - Secondary (R42)"		// added by Louva-Deus
+0x4a50 = "Radeon X800 XT Platinum - Secondary (R420)"	// added by Louva-Deus
+0x4a68 = "Radeon X800 Series - Secondary (R420)"	// added by Louva-Deus
+0x4a69 = "Radeon X800 XT (R420)"			// added by Louva-Deus
+0x4a6a = "Radeon X800 XT Platinum (R420)"		// added by Louva-Deus
+0x4a6b = "Radeon X800 SE (R420)"			// added by Louva-Deus
+0x4a6c = "Radeon X800 Pro (R420)"			// added by Louva-Deus
+0x4a6f = "Radeon X800 Series (R420)"			// added by Louva-Deus
+0x4a70 = "Radeon X800 SE (R420)"			// added by Louva-Deus
+
+// K Series (0x4b--)
+0x4b49 = "Radeon X850 XT (R480 KI)"			// added by Louva-Deus
+0x4b69 = "Radeon X850 XT Secondary (R480 KI)"		// added by Louva-Deus
+
+// L Series (0x4c--)
+0x4c66 = "FireGL 9000 (R250 LF)"
+
+// N Series (0x4e--)
+0x4e44 = "Radeon 9700 Pro (R300 ND)"
+0x4e64 = "Radeon 9700 Pro Secondary (R300 ND)"
+0x4e45 = "Radeon 9500 Pro (R300 NE)"			// added by Louva-Deus
+0x4e65 = "Radeon 9500 Pro Secondary (R300 NE)"		// added by Louva-Deus
+0x4e46 = "Radeon 9600 (RV350 NF)"			// added by Louva-Deus
+0x4e66 = "Radeon 9600 Secondary (RV350 NF)"		// added by Louva-Deus
+0x4e47 = "FireGL X1 (R300 NG)"				// added by Louva-Deus
+0x4e67 = "FireGL X1 Secondary (R300 NG)"		// added by Louva-Deus
+0x4e48 = "Radeon 9800 Pro (R350 NH)"			// added by Louva-Deus
+0x4e68 = "Radeon 9800 Pro Secondary (R350 NH)"		// added by Louva-Deus
+0x4e49 = "Radeon 9800 (R350 NI)"			// added by Louva-Deus
+0x4e69 = "Radeon 9800 Secondary (R350 NI)"		// added by Louva-Deus
+0x4e4a = "Radeon 9800 XT (RV350 NJ)"			// added by Louva-Deus
+0x4e6a = "Radeon 9800 XT Secondary (RV350 NJ)"		// added by Louva-Deus
+0x4e4b = "FireGL X2 (R350 NK)"				// added by Louva-Deus
+0x4e6b = "FireGL X2 Secondary (R350 NK)"		// added by Louva-Deus
+
+// Q Series (0x51--)
+0x5144 = "Radeon 7200 (R100 QD)"
+0x5145 = "Radeon (R100 QE)"
+0x5146 = "Radeon (R100 QF)"
+0x5147 = "Radeon (R100 QG)"
+0x5148 = "Radeon 8500 (R200 QH)"
+0x5168 = "Radeon 8500 Secondary (R200 QH)"		// added by Louva-Deus
+0x5149 = "Radeon 8500 (R200 QI)"			// added by Louva-Deus
+0x5169 = "Radeon 8500 Secondary (R200 QI)"		// added by Louva-Deus
+0x514a = "Radeon 8500 (R200 QJ)"			// added by Louva-Deus
+0x516a = "Radeon 8500 Secondary (R200 QJ)"		// added by Louva-Deus
+0x514b = "Radeon 8500 (R200 QK)"			// added by Louva-Deus
+0x516b = "Radeon 8500 Secondary (R200 QK)"		// added by Louva-Deus
+0x514c = "Radeon 8500 LE (R200 QL)"
+0x516c = "Radeon 8500 LE Secondary (R200 QL)"
+0x514d = "Radeon 9100 (R200 QM)"			// added by Louva-Deus
+0x516d = "Radeon 9100 Secondary (R200 QM)"		// added by Louva-Deus
+0x514e = "Radeon 8500 LE (R200 QN)"
+0x514f = "Radeon 8500 LE (R200 QO)"
+0x5154 = "Radeon 8500 (R200 QT)"			// added by Louva-Deus
+0x5155 = "Radeon 9100 (R200 QU)"			// added by Louva-Deus
+0x5157 = "Radeon 7500 (RV200 QW)"
+0x5158 = "Radeon 7500 (RV200 QX)"			// added by Louva-Deus
+0x5159 = "Radeon 7000/VE (RV100 QY)"
+0x515a = "Radeon 7000/VE (RV100 QZ)"
+
+// U Series (0x54--)
+0x5460 = "Radeon X300/X600 (??)"			// added by Louva-Deus
+
+// U Series (0x55--)
+0x5548 = "Radeon X800 PCX (R423 UH)"			// added by Louva-Deus
+0x5549 = "Radeon X800 Pro PCX (R423 UI)"		// added by Louva-Deus
+0x554a = "Radeon X800 LE PCX (R423 UJ)"			// added by Louva-Deus
+0x554b = "Radeon X800 SE PCX (R423 UK)"			// added by Louva-Deus
+0x556b = "Radeon X800 SE PCX Secondary (R423 UK)"	// added by Louva-Deus
+0x554c = "Radeon X800 XL PCX (R430 UL)"			// added by Louva-Deus
+0x554d = "Radeon X800 XL PCX (R430 UM)"			// added by Louva-Deus
+0x556d = "Radeon X800 XL PCX Secondary (R430 UM)"	// added by Louva-Deus
+0x5551 = "FireGL V5100 PCX (R423 UQ)"			// added by Louva-Deus
+0x5571 = "FireGL V5100 PCX Secondary (R423 UQ)"		// added by Louva-Deus
+0x5552 = "FireGL V5100 PCX (R423 UR)"			// added by Louva-Deus
+0x5554 = "FireGL V7100 PCX (R423 UT)"			// added by Louva-Deus
+
+// Series (0x59--)
+0x5940 = "Radeon 9200 Pro/9250 Secondary (RV280)"	// added by Louva-Deus
+0x5941 = "Radeon 9200 Secondary (RV280)"		// added by Louva-Deus
+0x5944 = "Radeon 9200 SE PCI (RV280)"			// added by Louva-Deus
+0x5954 = "Radeon XPRESS 200 (RS480)"			// added by Louva-Deus
+0x5960 = "Radeon 9200 Pro/9250 (RV280)"			// added by Louva-Deus
+0x5961 = "Radeon 9200 SE (RV280)"			// added by Louva-Deus
+0x5962 = "Radeon 9200 (RV280)"				// added by Louva-Deus
+0x5964 = "Radeon 9200 SE (RV280)"			// added by Louva-Deus
+0x5974 = "Radeon XPRESS 200 (RS482)"			// added by Louva-Deus
+
+// Series (0x5a--)
+// http://pci-ids.ucw.cz/iii/?i=1002
+// http://blogs.msdn.com/winbr/rss.aspx
+0x5a33 = "Radeon XPRESS 200 (RC410)"			// added by Louva-Deus
+0x5a61 = "Radeon XPRESS 200 (RC410)"			// added by Louva-Deus
+
+// Series (0x5b--)
+0x5b60 = "Radeon X300 PCX (RV370)"			// added by Louva-Deus
+0x5b62 = "Radeon X600 PCX (RV370)"			// added by Louva-Deus
+0x5b63 = "Radeon X550 PCX (RV370)"			// added by Louva-Deus
+0x5b64 = "FireGL V3100 PCX (RV370)"			// added by Louva-Deus
+0x5b65 = "FireGL D1100 PCX (RV370)"			// added by Louva-Deus
+0x5b70 = "Radeon X300 (RV370)"				// added by Louva-Deus
+0x5b72 = "Radeon X600 (RV370)"				// added by Louva-Deus
+0x5b73 = "Radeon X550 (RV370)"				// added by Louva-Deus
+
+// Series (0x5d--)
+0x5d44 = "Radeon 9200 SE Secondary (RV280)"		// added by Louva-Deus
+0x5d4d = "Radeon XT850 XT Platinum PCX (R480)"		// added by Louva-Deus
+0x5d4f = "Radeon XT800 XT PCX (R480)"			// added by Louva-Deus
+0x5d6d = "Radeon XT850 XT Platinum PCX Secondary (R480)"// added by Louva-Deus
+0x5d52 = "Radeon XT850 XT PCX (R480)"			// added by Louva-Deus
+0x5d72 = "Radeon XT850 XT PCX Secondary (R480)"		// added by Louva-Deus
+0x5d57 = "Radeon X800 XT PCX (R423)"			// added by Louva-Deus
+0x5d77 = "Radeon X800 XT PCX Secondary (R423)"		// added by Louva-Deus
+0x5d79 = "Radeon X850 XT PE (R480)"			// added by Raumpirat
+0x5d81 = "Radeon X850 XT  (R480)"			// added by Raumpirat
+0x5d83 = "Radeon X850 Pro  (R480)"			// added by Raumpirat
+0x5d85 = "Radeon X800 GTO (R480)"			// added by Raumpirat
+0x5d87 = "Radeon X800 GT (R480)"			// added by Raumpirat
+
+// Series (0x5e--)
+0x5e4a = "Radeon X700 XT PCX (RV410)"			// added by Louva-Deus
+0x5e6a = "Radeon X700 XT PCX - Secondary (RV410)"	// added by Louva-Deus
+0x5e4b = "Radeon X700 Pro PCX (RV410)"			// added by Louva-Deus
+0x5e6b = "Radeon X700 Pro PCX - Secondary (RV410)"	// added by Louva-Deus
+0x5e4c = "Radeon X700 SE PCX (RV410)"			// added by Louva-Deus
+0x5e6c = "Radeon X700 SE PCX - Secondary (RV410)"	// added by Louva-Deus
+0x5e4d = "Radeon X700 PCX (RV410)"			// added by Louva-Deus
+0x5e6d = "Radeon X700 PCX - Secondary (RV410)"		// added by Louva-Deus
+0x5e4f = "Radeon X700 PCX (RV410)"			// added by Louva-Deus
+0x5e6f = "Radeon X800 Pro PCX (R420)"			// added by Louva-Deus
+0x5e4g = "Radeon X800 PE (R420)"			// added by Raumpirat
+0x5e6g = "Radeon X800 XT (R420)"			// added by Raumpirat
+0x5e4h = "Radeon X800 XL (R430)"			// added by Raumpirat
+
+// Series (0x67--)
+0x6738 = "Radeon 6870 HD PCX (HD6870)" 			// added by elcapitain44
+
+// Series (0x71--)
+// http://pci-ids.ucw.cz/iii/?i=1002
+// http://blogs.msdn.com/winbr/rss.aspx
+0x7109 = "Radeon X1800 Series (R520)"			// added by Louva-Deus
+
+// Series (0x78--)
+0x7833 = "Radeon 9100 Pro (RS350)"			// added by Louva-Deus
+
+// Series (0x7c--)
+0x7c37 = "Radeon 9600 SE (RV350 AQ)"			// added by Louva-Deus
+
+// Series
+	if os > win2k
+		if driver < 6.13.10.6218
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.13.1.6166
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver <= 4.13.1.9069
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+// Series (0x31--)
+0x3150 = "Radeon Mobility X600 (M24 1P)"		// added by Louva-Deus
+0x3154 = "FireGL Mobility (M24 1T)"			// added by Louva-Deus
+
+// A Series (0x41--)
+0x4136 = "Radeon IGP (R320)"				// added by Louva-Deus
+0x4137 = "Radeon IGP (R330/340/350)"			// added by Louva-Deus
+
+// B Series (0x42--)
+0x4237 = "Radeon Mobility 7000 IGP (??)"		// added by Louva-Deus
+
+// C Series (0x43--)
+0x4336 = "Radeon Mobility ?? (?? U1)"			// added by Louva-Deus
+0x4337 = "Radeon Mobility IGP (R330/340/350)"		// added by Louva-Deus
+
+// D Series (0x44--)
+0x4437 = "Radeon Mobility 7000 IGP (??)"		// added by Louva-Deus
+
+// J Series (0x4a--)
+0x4a4e = "Radeon Mobility 9800 (M18 JN)"		// added by Louva-Deus
+
+// L Series (0x4c--)
+0x4c45 = "Radeon Mobility ?? (M3)"			// added by Louva-Deus
+0x4c46 = "Radeon Mobility ?? (M3)"			// added by Louva-Deus
+0x4c57 = "Radeon Mobility 7500 (M7 LW)"
+0x4c58 = "FireGL Mobility 7800 (M7 RV200 LX)"
+0x4c59 = "Radeon Mobility VE (M6 LY)"
+0x4c5a = "Radeon Mobility VE (M6 LZ)"
+0x4c64 = "Radeon Mobility 9000 (M9 R250 LD)"		// added by Louva-Deus
+0x4c65 = "Radeon Mobility 9000 (M9 R250 LE)"		// added by Louva-Deus
+0x4c67 = "Radeon Mobility 9000 (M9 R250 LG)"		// added by Louva-Deus
+0x4c6e = "Radeon Mobility 9000 Secondary (M9 R250 LN)"	// added by Louva-Deus
+
+// N Series (0x4e--)
+0x4e50 = "Radeon Mobility 9600 (M10 RV350)"		// added by Louva-Deus
+0x4e51 = "Radeon Mobility 9600 (M10 NQ)"		// added by Louva-Deus
+0x4e52 = "Radeon Mobility 9600 (M10 RV350)"		// added by Louva-Deus
+0x4e53 = "Radeon Mobility 9600 (M10 NS)"		// added by Louva-Deus
+0x4e54 = "FireGL Mobility T2 (M10 NT)"			// added by Louva-Deus
+0x4e56 = "FireGL Mobility T2e (M11 NV)"			// added by Louva-Deus
+0x4e71 = "Radeon Mobility 9600 (M10)"			// added by Louva-Deus
+
+// T Series (0x54--)
+0x5460 = "Radeon Mobility 300 (M22)"			// added by Louva-Deus
+0x5462 = "Radeon Mobility X600 SE (M??)"		// added by Louva-Deus
+0x5464 = "FireGL Mobility (M22)"			// added by Louva-Deus
+
+// V Series (0x56--)
+0x5653 = "Radeon Mobility X700 PCX"			// added by Louva-Deus
+
+// X Series (0x58--)
+0x5834 = "Radeon 9100 IGP"				// added by Louva-Deus
+0x5835 = "Radeon Mobility 9100 IGP (RS300)"		// added by Louva-Deus
+0x5838 = "Radeon 9100 IGP (RS300)"			// added by Louva-Deus
+
+// Series (0x59--)
+0x5955 = "Radeon Mobility XPRESS 200 (??)"		// added by Louva-Deus
+
+// Series (0x5a--)
+0x5a42 = "Radeon Mobility Xpress 200M (??)"		// added by Louva-Deus
+
+// Series (0x5c--)
+0x5c61 = "Radeon Mobility 9200 (M9+)"			// added by Louva-Deus
+0x5c63 = "Radeon Mobility 9200 (M9+)"			// added by Louva-Deus
+
+// Series (0x5d--)
+0x5d4a = "Radeon Mobility X800"				// added by Louva-Deus
+
+// Series (0x71--)
+0x7149 = "Radeon Mobility X1300 64MB (M52-64)"		// added by Louva-Deus
+
+// Series (0x78--)
+0x7834 = "Radeon 9100 Pro IGP"				// added by Louva-Deus
+0x7835 = "Radeon Mobility 9200 IGP"			// added by Louva-Deus
+	BrokenAlphaTest // ?
+	break
+
+// Series (0x77--)
+0x7701 = "Radeon HD 4870 X2 (2x RV770)"			// added by Raumpirat
+0x7702 = "Radeon HD 4850 x2 (2x RV770)"			// added by Raumpirat
+0x7703 = "Radeon HD 4850 (RV770)"			// added by Raumpirat
+0x7704 = "Radeon HD 4870 (RV770)"			// added by Raumpirat
+0x7705 = "Radeon HD 4830 (RV770)"			// added by Raumpirat
+
+// Serier (0x67--)
+0x6701 = "Radeon HD 3870 X2 (2x RV670)"			// added by Raumpirat
+0x6702 = "Radeon HD 3870 (RV670)"			// added by Raumpirat
+0x6703 = "Radeon HD 3850 (RV670)"			// added by Raumpirat
+
+// Series (0x60--)
+0x6001 = "Radeon HD 2900 XT (R600)"			// added by Raumpirat
+0x6002 = "Radeon HD 2900 Pro (R600)"			// added by Raumpirat
+0x6003 = "Radeon HD 2900 GT (R600)"			// added by Raumpirat
+
+// Series (0x73--)
+0x7301 = "Radeon HD 4670 (RV730)"			// added by Raumpirat
+0x7302 = "Radeon HD 4650 (RV730)"			// added by Raumpirat
+
+// Series (0x58a-)
+0x58a1 = "Radeon X1950 XTX (R580+)"			// added by Raumpirat
+0x58a2 = "Radeon X1950 XT (R580+)"			// added by Raumpirat
+
+// Series (0x58b-)
+0x58b1 = "Radeon X1900 XTX (R580)"			// added by Raumpirat
+0x58b2 = "Radeon X1900 XT (R580)"			// added by Raumpirat
+0x58b3 = "Radeon X1900 CF (R580)"			// added by Raumpirat
+0x58b4 = "Radeon X1900 GT (R580)"			// added by Raumpirat
+
+// Series (0x57--)
+0x5701 = " Radeon X 1950 Pro (RV570)"			// added by Raumpirat
+
+//Series (0x52--)
+0x5201 = "Radeon X1800 XT (R520)"			// added by Raumpirat
+0x5202 = "Radeon X1800 GTO (R520)"			// added by Raumpirat
+
+//Series (0x71a-)
+0x71a1 = "Radeon HD 4550 (RV710)"			// added by Raumpirat
+0x71a2 = "Radeon HD 4350 (RV710)"			// added by Raumpirat
+
+// Series (0x63b-)
+0x63b1 = "Radeon HD 3650 (RV635)"			// added by Raumpirat
+
+// Series (0x63a-)
+0x63a1 = "Radeon HD 2600 XT (RV630)"			// added by Raumpirat
+
+// Series (0x56--)
+0x5601 = "Radeon X1650 XT (R560)"			// added by Raumpirat
+
+// Series (0x62--)
+0x6215 = "Radeon HD 3470 (RV620)"			// added by Raumpirat
+0x6216 = "Radeon HD 3450 (RV620)"			// added by Raumpirat
+
+// Series (0x61--)
+0x6135 = "Radeon HD 2400 (RV610)"			// added by Raumpirat
+
+// Series (0x53--)
+0x5331 = "Radeon X1600 XT (RV530)"			// added by Raumpirat
+0x5332 = "Radeon X1650 Pro (RV530)"			// added by Raumpirat
+0x5333 = "Radeon X1600 Pro (RV530)"			// added by Raumpirat
+0x5334 = "Radeon X1300 XT (RV530)"			// added by Raumpirat
+0x5335 = "Radeon X1300 Pro (RV515)"			// added by Raumpirat
+0x5336 = "Radeon X1300 (RV515)"				// added by Raumpirat
+
+
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// 3D Labs
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x104c  "3D Labs"
+Vendor = 0x10ba  "3D Labs"
+Vendor = 0x3d3d  "3D Labs"
+Vendor = 0x1048  "3D Labs"
+
+0x0001 = "GLiNT 300SX"
+0x0002 = "GLiNT 500TX"
+0x0003 = "GLiNT"
+0x0004 = "Permedia"
+0x0005 = "Permedia"
+0x0006 = "GLiNT MX"
+0x0007 = "Permedia 2"
+0x8901 = "GLiNT"
+0x0008 = "GLiNT G1"
+0x0009 = "Permedia 2"
+0x000a = "Permedia 3"
+0x000b = "Oxygen Series R3"
+0x000c = "Permedia 4"
+0x000d = "Oxygen Series R4"
+0x000e = "Oxygen Series Gamma2"
+	UnsupportedHardware
+	break
+0x0100 = "Permedia 2"
+	UnsupportedHardware
+	DefaultBltNotFlip
+	NoMipMap
+0x0301 = "Permedia 2"
+	UnsupportedHardware
+	TextureOffset
+	break
+0x1004 = "Permedia"
+	UnsupportedHardware
+	break
+0x3d04 = "Permedia 1"
+0x3d07 = "Permedia 2"
+	UnsupportedHardware
+	TextureOffset
+	DefaultBltNotFlip
+	NoMipMap
+	break
+
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// SiS
+//
+// http://www.sis.com/products/product_000001.htm
+// http://www.sis.com/products/product_000002.htm
+//
+// SiS671 & SiS771 series use SiS UniVGA5 graphics driver on Windows Vista.
+// SiS66x/SiS76x & SiS671/SiS771 series use SiS UniVGA3 graphics driver.
+// SiS650 & SiS740 series use SiS UniVGA3 graphics driver or SiSUniVGA2 graphics driver.
+// SiS630 & SiS730 series use SiS UniVGA graphics driver.
+//
+// 6xxx & 3xx series are GPUs
+// 5xx, 5xxx, 6xx, 7xx, & 9xx series are IGPs
+//
+// 4 digit model numbers are the older models
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1039  "SiS"
+
+//
+// LEGACY
+//
+	// 5598, 5596	older IGPs
+	// 6201, 6202, 6225	older GPUs
+0x0205 = "6205"					// GPU
+0x0204 = "6215"					// GPU
+0x6236 = "6236 3D-AGP"				// GPU	added by Louva-Deus (too old?)
+0x6326 = "6326"					// GPU
+	break
+
+//
+// NEWER IGP/GPU MODELS
+//
+0x0300 = "300/305 PCI/AGP VGA Display Adapter"	// GPU	added by Louva-Deus (too old?)
+0x0305 = "305"					// GPU
+	break
+0x0310 = "315H PCI/AGP VGA Display Adapter"	// GPU	added by Louva-Deus (too old?)
+0x0315 = "315 PCI/AGP VGA Display Adapter"	// GPU
+0x0325 = "315PRO PCI/AGP VGA Display Adapter"	// GPU	315 or 330?
+	if os < win2k
+		if driver < 4.13.01.3030
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x0330 = "330Xabre PCI/AGP VGA Display Adapter"	// GPU
+	break
+
+0x6306 = "530/620 PCI/AGP VGA Display Adapter"	// IGP Integrated 3D SVGA Controller
+0x5300 = "540 PCI Display Adapter"		// IGP	added by Louva-Deus (too old?)
+0x5315 = "550 PCI/AGP VGA Display Adapter"	// IGP	added by Louva-Deus
+0x6300 = "630/730 PCI/AGP VGA Display Adapter"	// IGP	added by Louva-Deus
+	TextureOffset
+	break
+
+0x6325 = "65x/M650/740 PCI/AGP VGA Display Adapter"	// IGP 650?
+0x6330 = "661/741/760 PCI/AGP or 662/761Gx PCIE VGA Display Adapter" // IGP	added by Louva-Deus
+0x6350 = "770/670 PCIE VGA Display Adapter"	// IGP	added by Louva-Deus
+0x6351 = "771/671 PCIE VGA Display Adapter"	// IGP	added by Louva-Deus
+0x6225 = "950"					// IGP	added by Louva-Deus
+	break
+
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// S3
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x5333  "S3"
+
+//
+// SAVAGE
+//		
+0x8a22 = "Savage 3D S4"
+0x8a23 = "Savage 3D S4"
+	Disable1600x1200
+	FL_BAD_WFOG
+	FL_BAD_DXTN
+	FL_BAD_MOD2X
+	NoParallelism
+	NoTriLinear
+
+	if os >= win2k
+		if driver < 5.12.01.8012
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver <= 5.12.01.8012
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.12.1.8228
+			UnsupportedDriver
+		endif
+	endif
+
+	break
+
+0x8a25 = "Savage4 ProSavage"
+0x8a26 = "ProSavage"
+	Disable1600x1200
+	FL_BAD_WFOG
+	FL_BAD_DXTN
+	FL_BAD_MOD2X
+	NoParallelism
+	NoTriLinear
+
+	if os >= win2k
+		if driver < 5.12.1.8012
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.1.3043
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+//
+// UNTESTED
+//
+0x8c10 = "Savage MX"
+0x8c12 = "Savage IX"
+0x8c22 = "SuperSavage 128 MX"
+0x8c2a = "SuperSavage 128 IX"
+0x8c2b = "SuperSavage 128 IX DDR"
+0x8c2c = "SuperSavage IX"
+0x8c2d = "SuperSavage IX DDR"
+0x8c2e = "SuperSavage IXC SDR"
+0x8c2f = "SuperSavage IXC DDR"
+0x8d04 = "ProSavage"
+	UnknownHardware
+	Disable1600x1200
+	FL_BAD_WFOG
+	FL_BAD_DXTN
+	FL_BAD_MOD2X
+	DefaultBltNotFlip
+	TextureOffset
+	NoParallelism
+	SlowDisplayModeChange
+	break
+	
+//
+// LEGACY
+//
+0x9102 = "Savage 2000"
+0x8a20 = "Savage 3D"
+0x8a21 = "Savage 3D S3"
+	UnsupportedHardware
+	FL_BAD_WFOG
+	FL_BAD_DXTN
+	FL_BAD_MOD2X
+	DefaultBltNotFlip
+	TextureOffset
+	NoParallelism
+	SlowDisplayModeChange
+	break
+
+0x5631 = "Virge"
+0x8811 = "Trio 64"
+0x8812 = "Trio 64"
+0x8814 = "Trio 64 Plus"
+0x8815 = "Aurora 128"
+0x883d = "Virge"
+0x8880 = "Virge"
+0x88c0 = "Virge"
+0x88c1 = "Virge"
+0x88d0 = "Virge"
+0x88d1 = "Virge"
+0x88f0 = "Virge"
+0x8901 = "Trio 64 DX"
+0x8904 = "Trio 3D"
+0x8a01 = "Virge DXGX"
+0x8a10 = "Virge GX2"
+0x8a13 = "Trio3D"
+0x8c00 = "Virge MX"
+0x8c01 = "Virge MX"
+0x8c02 = "Virge MXC"
+0x8c03 = "Virge MX"
+	UnsupportedHardware
+	break 
+	
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// MATROX
+//
+//////////////////////////////////////////////////
+
+//
+// LEGACY
+//
+Vendor = 0x102b  "Matrox"
+0x0518 = "Millennium"
+0x0519 = "Millennium"
+0x051a = "Mystique"
+0x051b = "Millennium II"
+0x051f = "Millennium II"
+0x0d10 = "Mystique"
+0x1000 = "G100 PCI"
+0x1001 = "G100 AGP"
+	UnsupportedHardware
+	break
+
+
+0x0520 = "G200 PCI"
+0x0521 = "G200 AGP"
+	if os > win2k
+		if driver < 5.12.01.1720
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.12.01.1720
+			UnsupportedDriver
+		endif
+	if os < win2k
+		if driver < 5.12.01.1720
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+//
+// >= G400
+//
+
+0x1525 = "Fusion G450"
+0x0525 = "G400/450"
+	Disable1600x1200
+	if os > win2k
+		if driver < 5.01.2001.1241
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.12.1.1201
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.12.1.2120
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x1527 = "Fusion G800"
+0x2007 = "Mistral"
+0x2527 = "G550"
+	Disable1600x1200
+	if os > win2k
+		if driver < 5.12.1.1221
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.10.1.1361
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.12.1.1320
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x0527 = "Parhelia 128"
+	if os >= win2k
+		if driver < 5.13.1.1065
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+			UnsupportedDriver
+	endif
+	break
+
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// NVIDIA
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x14Af  "Guillemot"
+Vendor = 0x10b4  "nVidia"
+Vendor = 0x12d2  "nVidia"
+Vendor = 0x10de  "nVidia"
+
+// Unsupported nVidia products
+0x0008 = "NV 1"
+0x0009 = "NV 1"
+0x0010 = "NV 2"
+0x0018 = "Riva 128"
+0x0019 = "Riva 128 ZX"
+0x1B1D = "Riva 128"
+	UnsupportedHardware
+	break
+
+//
+// TNT
+//
+0x0020 = "TNT"
+0x0028 = "TNT2"
+0x0029 = "TNT2 Ultra"
+0x002A = "TNT2"
+0x002B = "TNT2"
+0x002C = "TNT Vanta"
+0x002D = "TNT2 M64"
+0x002E = "TNT Vanta"
+0x002F = "TNT Vanta"
+0x00A0 = "TNT2 Aladdin"
+0x4D20 = "TNT2 M64"
+0x5008 = "TNT Vanta"
+0x5020 = "GeForce 256"
+0x5620 = "TNT2 M64"
+0x5810 = "TNT2"
+0x5820 = "TNT2 Ultra"
+	if os > win2k
+		if driver < 6.13.10.3087
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.13.10.3087
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.01.3087
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+//
+// GeForce
+//
+0x0040 = "GeForce 6800 Ultra (NV40.0)"			// added by Louva-Deus
+0x0041 = "GeForce 6800 (NV40.1)"			// added by Louva-Deus
+0x0042 = "GeForce 6800 LE (NV40.2)"			// added by Louva-Deus
+0x0043 = "GeForce 6??? (NV40.3)"			// added by Louva-Deus
+0x0045 = "GeForce 6800 GT (NV40.5)"			// added by Louva-Deus
+0x0046 = "GeForce 6800 GT (??)"				// added by Louva-Deus
+0x0048 = "GeForce 6800 XT (??)"				// added by Louva-Deus
+0x0049 = "Quadro FX (NV40GL)"				// added by Louva-Deus
+0x004E = "Quadro FX 4000 (NV40GL)"			// added by Louva-Deus
+// 0090 is a new series G70
+0x0091 = "GeForce 7800 GTX (??)"			// added by Louva-Deus
+0x0092 = "GeForce 7800 GT (??)"				// added by Louva-Deus
+// 0093-0094 is a new series G70
+0x0098 = "GeForce Go7800 (??)"				// added by Louva-Deus
+0x0099 = "GeForce Go7800 GTX (??)"			// added by Louva-Deus
+0x009C = "Quadro FX 350M (??)"				// added by Louva-Deus
+0x009D = "Quadro FX 4500 (??)"				// added by Louva-Deus
+// 009E is a new series G70GL
+0x00C0 = "GeForce 6800 Ultra? (NV41.0)"			// added by Louva-Deus
+0x00C1 = "GeForce 6800 (NV41.1)"			// added by Louva-Deus
+0x00C2 = "GeForce 6800 LE (NV41.2)"			// added by Louva-Deus
+0x00C3 = "GeForce 6800 XT (??)"				// added by Louva-Deus
+0x00C8 = "GeForce Go6800 (NV41.8)"			// added by Louva-Deus
+0x00C9 = "GeForce Go6800 Ultra (NV41.9)"		// added by Louva-Deus
+0x00CC = "Quadro FX Go1400 (NV41)"			// added by Louva-Deus
+0x00CD = "Quadro FX 3450/4000 SDI (NV41)"		// added by Louva-Deus
+0x00CE = "Quadro FX 1400 (NV41GL)"			// added by Louva-Deus
+// 01D0-01DF is a new series G72 & G72GL
+0x00F0 = "GeForce 6800/GeForce 6800 Ultra (NV40)"	// added by Louva-Deus
+0x00F1 = "GeForce 6600/GeForce 6600 GT (NV43)"		// added by Louva-Deus
+0x00F2 = "GeForce 6600/GeForce 6600 GT (NV43)"		// added by Louva-Deus
+0x00F3 = "GeForce 6200 (NV43)"				// added by Louva-Deus
+0x00F4 = "GeForce 6600 LE (??)"				// added by Louva-Deus
+0x00F5 = "GeForce 7800 GS (G71)"			// added by Louva-Deus
+0x00F8 = "Quadro FX 3400/4400 (NV45GL)"			// added by Louva-Deus
+0x00F9 = "GeForce 6800 Ultra/GeForce 6800 GT (NV40)"	// added by Louva-Deus
+0x00FA = "GeForce 5750 PCX (NV36)"			// added by Louva-Deus
+0x00FB = "GeForce 5900 PCX (NV35)"			// added by Louva-Deus
+0x00FC = "Quadro FX 330/GeForce PCX 5300 (NV37GL)"	// added by Louva-Deus
+0x00FD = "Quadro FX 330 (NV37GL)"			// added by Louva-Deus
+0x00FE = "Quadro FX 1300 (NV38GL)"			// added by Louva-Deus
+0x00FF = "GeForce PCX 4300 (NV18)"			// added by Louva-Deus
+0x0100 = "GeForce 256 SDR (NV10)"
+0x0101 = "GeForce 256 DDR (NV10DDR)"
+0x0102 = "GeForce 256 Ultra (NV10)"
+0x0103 = "Quadro (NV10GL)"
+0x0110 = "GeForce2 MX 400 (NV11)"
+0x0111 = "GeForce2 MX 100/200 DDR (NV11DDR)"
+0x0112 = "GeForce2 Go/MX Ultra (NV11)"
+0x0113 = "Quadro2 MXR/EX/Go (NV11GL)"
+0x0140 = "GeForce 6600 GT (NV43)"			// added by Louva-Deus
+0x0141 = "GeForce 6600 (NV43)"				// added by Louva-Deus
+0x0142 = "GeForce 6600 LE (NV43)"			// added by Louva-Deus
+0x0143 = "GeForce 6??? (NV43)"				// added by Louva-Deus
+0x0144 = "GeForce Go6600 (NV43)"			// added by Louva-Deus
+0x0145 = "GeForce 6610 XL (NV43)"			// added by Louva-Deus
+0x0146 = "GeForce Go6600 TE/6200 TE (NV43)"		// added by Louva-Deus
+0x0147 = "GeForce 6700 (NV43)"				// added by Louva-Deus
+0x0148 = "GeForce Go6600 (NV43)"			// added by Louva-Deus
+0x0149 = "GeForce 6600? (NV43)"				// added by Louva-Deus
+0x014A = "Quadro NVS 440 (??)"				// added by Louva-Deus
+0x014B = "GeForce 6??? (NV43)"				// added by Louva-Deus
+0x014C = "Quadro FX (NV43GL)"
+0x014D = "Quadro FX (NV43GL)"				// added by Louva-Deus
+0x014E = "Quadro FX 540 (NV43GL)"			// added by Louva-Deus
+0x014F = "GeForce 6200 (NV43)"				// added by Louva-Deus
+0x0150 = "GeForce2 GTS/Pro (NV15)"
+0x0151 = "GeForce2 Ti (NV15DDR)"
+0x0152 = "GeForce2 Ultra (NV15BR)"
+0x0153 = "Quadro2 Pro (NV15GL)"
+0x0160 = "GeForce 6500 (NV44)"				// added by Louva-Deus
+0x0161 = "GeForce 6200 TurboCache (NV44)"		// added by Louva-Deus
+0x0162 = "GeForce 6200 SE TurboCache (NV44)"		// added by Louva-Deus
+0x0163 = "GeForce 6200 LE (NV44)"			// added by Louva-Deus
+0x0164 = "GeForce Go6200 (NV44)"			// added by Louva-Deus
+0x0165 = "Quadro NVS 285 (NV44)"			// added by Louva-Deus
+0x0166 = "GeForce Go6250 (??)"				// added by Louva-Deus
+0x0167 = "GeForce Go6200 TurboCache (NV44M)"		// added by Louva-Deus
+0x0168 = "GeForce Go6400 (??)"				// added by Louva-Deus
+0x0169 = "GeForce Go6250 (NV44M)"			// added by Louva-Deus
+0x016A = "GeForce 6??? (NV44)"				// added by Louva-Deus
+0x016B = "Quadro FX (NV44GLM)"
+0x016C = "Quadro FX (NV44GLM)"
+0x016D = "Quadro FX (NV44GLM)"
+0x016E = "Quadro FX (NV44GL)"				// added by Louva-Deus
+0x0170 = "GeForce4 MX 460 (NV17.1)"
+0x0171 = "GeForce4 MX 440 (NV17.2)"
+0x0172 = "GeForce4 MX 420 (NV17.3)"
+0x0173 = "GeForce4 MX 440SE (NV17.4)"
+0x0174 = "GeForce4 Go440 (NV17M)"
+0x0175 = "GeForce4 Go420 (NV17M)"
+0x0176 = "GeForce4 Go420 32M (NV17M)"
+0x0177 = "GeForce4 Go460 (NV17M)"			// added by Louva-Deus
+0x0178 = "Quadro4 500/550 XGL (NV17GL.1)"
+0x0179 = "GeForce4 Go440 64M (NV17M)"
+0x017A = "Quadro4 NVS 200/400 (NV17GL.2)"
+0x017B = "Quadro4 550 XGL (NV17GL.3)"
+0x017C = "Quadro4 500 GoGL (NV17M-GL)"
+0x017D = "GeForce4 Go410 16M (NV17)"			// added by Louva-Deus
+0x0181 = "GeForce4 MX 440 with AGP8X (NV18)"		// added by Louva-Deus
+0x0182 = "GeForce4 MX 440SE with AGP8X (NV18.3)"	// added by Louva-Deus
+0x0183 = "GeForce4 MX 420 with AGP8X (NV18.4)"		// added by Louva-Deus
+0x0185 = "GeForce4 MX 4000 with AGP8X (NV18.5)"		// added by Louva-Deus
+0x0186 = "GeForce4 Go448 (NV18M)"			// added by Louva-Deus
+0x0187 = "GeForce4 Go488 (NV18M)"			// added by Louva-Deus
+0x0188 = "Quadro4 580 XGL (NV18GL)"			// added by Louva-Deus
+0x018A = "Quadro4 NVS with AGP8X (NV18GL)"		// added by Louva-Deus
+0x018B = "Quadro4 380 XGL (NV18GL)"			// added by Louva-Deus
+0x018D = "GeForce4 Go448 (NV18M)"			// added by Louva-Deus
+0x01A0 = "GeForce2 Integrated GPU (NVCrush11)"
+0x01D1 = "GeForce 7300 LE (??)"				// added by Louva-Deus
+0x01D6 = "GeForce Go7200 (??)"				// added by Louva-Deus
+0x01D7 = "GeForce Go7300 (??)"				// added by Louva-Deus
+0x01D8 = "GeForce Go7400 (??)"				// added by Louva-Deus
+0x01DC = "Quadro FX 350M (??)"				// added by Louva-Deus
+0x01DF = "GeForce 7300 GS (??)"				// added by Louva-Deus
+0x01F0 = "GeForce4 MX Integrated GPU (NV18)"		// added by Louva-Deus
+0x0200 = "GeForce3 (NV20)"
+0x0201 = "GeForce3 Ti200 (NV20)"
+0x0202 = "GeForce3 Ti500 (NV20)"
+0x0203 = "Quadro DCC (NV20DCC)"
+// 0210 is a new card (NV48) ??
+0x0211 = "GeForce 6800 (??)"				// added by Louva-Deus
+0x0212 = "GeForce 6800 LE (??)"				// added by Louva-Deus
+0x0215 = "GeFOrce 6800 GT (??)"				// added by Louva-Deus
+0x0220 = "GeForce 6??? (NV44)"				// added by Louva-Deus
+0x0221 = "GeForce 6200 (NV44)"				// added by Louva-Deus
+0x0222 = "GeForce 6??? (NV44)"				// added by Louva-Deus
+0x0228 = "GeForce Go6??? (NV44M)"			// added by Louva-Deus
+0x0240 = "GeForce 6150 (??)"				// added by Louva-Deus
+0x0241 = "GeForce 6150 LE (??)"				// added by Louva-Deus
+0x0242 = "GeFOrce 6100 Integrated GPU (??)"		// added by Louva-Deus
+// 0243-024F is a new series
+0x0250 = "GeForce4 Ti4600 (NV25)"
+0x0251 = "GeForce4 Ti4400 (NV25.2)"
+0x0252 = "GeForce4 Ti (NV25)"				// added by Louva-Deus
+0x0253 = "GeForce4 Ti4200 64M (NV25)"
+0x0258 = "Quadro4 900 XGL (NV25GL.1)"
+0x0259 = "Quadro4 750 XGL (NV25GL.2)"
+0x025B = "Quadro4 700 XGL (NV25GL.4)"
+0x0280 = "GeForce4 Ti4800 (NV28.1)"			// added by Louva-Deus
+0x0281 = "GeForce4 Ti4200 with AGP8X (NV28.2)"		// added by Louva-Deus
+0x0282 = "GeForce4 Ti4800 SE (NV28.3)"			// added by Louva-Deus
+0x0286 = "GeForce4 Go4200 with AGP8X (NV28)"		// added by Louva-Deus
+0x0288 = "Quadro4 980 XGL (NV28GL.1)"			// added by Louva-Deus
+0x0289 = "Quadro4 780 XGL (NV28GL.2)"			// added by Louva-Deus
+0x028C = "Quadro4 700 GoGL (NV28GLM)"			// added by Louva-Deus
+0x0290 = "GeForce 7900 GTX (G71)"			// added by Louva-Deus
+0x0291 = "GeForce 7900 GT (G71)"		        // added by Louva-Deus
+0x02A0 = "GeForce3 Integrated GPU (NV2A-XBOX)"
+0x0300 = "GeForceFX (NV30.1)"				// added by Louva-Deus
+0x0301 = "GeForceFX 5800 Ultra (NV30.2)"		// added by Louva-Deus
+0x0302 = "GeForceFX 5800 (NV30.3)"			// added by Louva-Deus
+0x0308 = "Quadro FX 2000 (NV30GL.1)"			// added by Louva-Deus
+0x0309 = "Quadro FX 1000 (NV30GL.2)"			// added by Louva-Deus
+0x030A = "ICE FX 2000 (NV30GL)"				// added by Louva-Deus
+0x0311 = "GeForceFX 5600 Ultra (NV31.1)"		// added by Louva-Deus
+0x0312 = "GeForceFX 5600 (NV31.2)"			// added by Louva-Deus
+0x0313 = "GeForceFX 5??? (NV31?)"			// added by Louva-Deus
+0x0314 = "GeForceFX 5600 XT (NV31)"			// added by Louva-Deus
+0x0316 = "GeForceFX Go5??? (NV31M)"			// added by Louva-Deus
+0x0317 = "GeForceFX 5??? Pro (NV31M)"			// added by Louva-Deus
+0x0318 = "Quadro FX (NV31GL.1)"				// added by Louva-Deus
+0x0319 = "Quadro FX (NV31GL.2)"				// added by Louva-Deus
+0x031A = "GeForceFX Go5600 (NV31M)"			// added by Louva-Deus
+0x031B = "GeForceFX Go5650 (NV31M)"			// added by Louva-Deus
+0x031C = "Quadro FX Go700 (NV31GLM)"			// added by Louva-Deus
+0x031D = "Quadro FX (NV31GLM)"				// added by Louva-Deus
+0x031E = "Quadro FX Pro (NV31GLM)"			// added by Louva-Deus
+0x031F = "Quadro FX Pro (NV31GLM)"			// added by Louva-Deus
+0x0320 = "GeForceFX 5200 (NV34)"			// added by Louva-Deus
+0x0321 = "GeForceFX 5200 Ultra (NV34.2)"		// added by Louva-Deus
+0x0322 = "GeForceFX 5200 (NV34.3)"			// added by Louva-Deus
+0x0323 = "GeForceFX 5200 LE (NV34.4)"			// added by Louva-Deus
+0x0324 = "GeForceFX Go5200 (NV34M)"			// added by Louva-Deus
+0x0325 = "GeForceFX Go5250 (NV34M)"			// added by Louva-Deus
+0x0326 = "GeForceFX 5500 (NV34.6)"			// added by Louva-Deus
+0x0327 = "GeForceFX 5100 (NV34.7)"			// added by Louva-Deus
+0x0328 = "GeForceFX Go5200 32M/64M (NV34M)"		// added by Louva-Deus
+0x0329 = "GeForceFX Go5200 (NV34M)"			// added by Louva-Deus
+0x032A = "Quadro FX NVS 280 PCI (NV34GL.3)"		// added by Louva-Deus
+0x032B = "Quadro FX 500/600 PCI (NV34GL.4)"		// added by Louva-Deus
+0x032C = "GeForceFX Go5300 (NV34GLM)"			// added by Louva-Deus
+0x032D = "GeForceFX Go5100 (NV34)"			// added by Louva-Deus
+0x032F = "Quadro FX (NV34GL)"				// added by Louva-Deus
+0x0330 = "GeForceFX 5900 Ultra (NV35)"			// added by Louva-Deus
+0x0331 = "GeForceFX 5900 (NV35)"			// added by Louva-Deus
+0x0332 = "GeForceFX 5900 XT (NV35)"			// added by Louva-Deus
+0x0333 = "GeForceFX 5950 Ultra (NV38)"			// added by Louva-Deus
+0x0334 = "GeForceFX 5900 ZT (NV35.4)"			// added by Louva-Deus
+0x0338 = "Quadro FX 3000 (NV35GL)"			// added by Louva-Deus
+0x033F = "Quadro FX 700 (NV35GL)"			// added by Louva-Deus
+0x0341 = "GeForceFX 5700 Ultra (NV36.1)"		// added by Louva-Deus
+0x0342 = "GeForceFX 5700 (NV36.2)"			// added by Louva-Deus
+0x0343 = "GeForceFX 5700 LE (NV36.3)"			// added by Louva-Deus
+0x0344 = "GeForceFX 5700 VE (NV36.4)"			// added by Louva-Deus
+0x0345 = "GeForceFX 5??? (NV36.5)"			// added by Louva-Deus
+0x0347 = "GeForceFX Go5700 (NV36)"			// added by Louva-Deus
+0x0348 = "GeForceFX Go5700 (NV36)"			// added by Louva-Deus
+0x0349 = "GeForceFX 5??? Pro (NV36M)"			// added by Louva-Deus
+0x034B = "Quadro FX? (NV36MAP)"				// added by Louva-Deus
+0x034C = "Quadro FX Go1000 (NV36)"			// added by Louva-Deus
+0x034E = "Quadro FX 1100 (NV36GL)"			// added by Louva-Deus
+0x034F = "Quadro FX (NV36GL)"				// added by Louva-Deus
+0x0391 = "GeForce 7600 GT (G72)"			// added by Louva-Deus
+0x0392 = "GeForce 7600 GS (??)"				// added by Louva-Deus
+0x0398 = "GeForce Go7600 (??)"				// added by Louva-Deus
+0x0399 = "GeForce 8400 GS (G86)"                        // added by Raumpirat
+0x0400 = "GeForce 8500 GT (G86)"                        // added by Raumpirat
+0x0401 = "GeForce 8600 GT (G84)"                        // added by Raumpirat
+0x0402 = "GeForce 8600 GTS (G84)"                       // added by Raumpirat
+0x0403 = "GeForce 8800 GS (G92)"                        // added by Raumpirat
+0x0404 = "GeForce 8800 GTS 320 (G80)"                   // added by Raumpirat
+0x0405 = "GeForce 8800 GTS 640 (G80)"                   // added by Raumpirat
+0x0406 = "GeForce 8800 GTS (G92)"                       // added by Raumpirat
+0x0407 = "GeForce 8800 GT (G92)"                        // added by Raumpirat
+0x0408 = "GeForce 8800 GTX (G80)"                       // added by Raumpirat
+0x0409 = "GeForce 8800 Ultra (G80)"                     // added by Raumpirat
+0x0410 = "GeForce 9600 GT (G94)"                        // added by Raumpirat
+0x0411 = "GeForce 9800 GX2 (2x G92)"                    // added by Raumpirat
+0x0412 = "GeForce 9800 GTX (G92)"                       // added by Raumpirat
+0x0413 = "GeForce GTX 260 (GT200)"                      // added by Raumpirat
+0x0414 = "GeForce GTX 280 (GT200)"                      // added by Raumpirat
+0x0415 = "GeForce 8300 GS (??)"                         // added by Raumpirat
+0x0416 = "GeForce 9400 GT (G96)"                        // added by Raumpirat
+0x0417 = "GeForce 9500 GT (G96)"                        // added by Raumpirat
+0x0418 = "GeForce 9600 GSO (G92)"                       // added by Raumpirat
+0x0419 = "GeForce 9800 GTX+ (G92)"                      // added by Raumpirat
+0x0420 = "GeForce 9800 GT (G92)"                        // added by Raumpirat
+0x0421 = "GeForce 8600 GS (??)"                         // added by Raumpirat
+0x0422 = "GeForce 9600 GS (??)"                         // added by Raumpirat
+0x0423 = "GeForce GTX 295 (2x GT200b)"                  // added by Raumpirat
+0x0424 = "GeForce GTX 285 (GT200b)"                     // added by Raumpirat
+0x0425 = "GeForce 8800 GTS 512 (G92)"                   // added by Raumpirat
+0x0426 = "GeForce 7950 GX2 (G71)"                       // added by Raumpirat
+0x0427 = "GeForce 7900 GTO (G71)"                       // added by Raumpirat
+0x0428 = "GeForce 7800 GTX (G70)"                       // added by Raumpirat
+0x0429 = "GeForce 7950 GT (G71)"                        // added by Raumpirat
+0x0430 = "GeForce 7900 GS (G71)"                        // added by Raumpirat
+0x0431 = "GeForce 7800 GT (G70)"                        // added by Raumpirat
+0x0432 = "GeForce 7800 GS (G70)"                        // added by J.R.
+0x1401 = "GeForce GTX 960 (GM206)"                      // added by J.R.
+0x13c2 = "GeForce GTX 970 (GM204)"                      // added by J.R.
+0x13c0 = "GeForce GTX 980 (GM204)"                      // added by J.R.
+0x0ded = "GeForce GT 520M (GF108)"                      // added by J.R.
+0x0df7 = "GeForce GT 520M (GF108)"                      // added by J.R.
+0x1050 = "GeForce GT 520M (GF119)"                      // added by J.R.
+0x1052 = "GeForce GT 520M (GF119)"                      // added by J.R.
+0x1051 = "GeForce GT 520MX (GF119)"                      // added by J.R.
+
+
+	if os > win2k
+		if driver < 6.13.10.4072
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.13.10.4072
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.01.4072
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// INTEL
+//
+// IGP Support Page: http://support.intel.com/support/graphics/
+// Chipset Locator: http://www.intel.com/support/graphics/sb/CS-009481.htm
+// Driver Version Chart: http://support.intel.com/support/graphics/sb/cs-009479.htm
+//
+// Intel Graphics (830M): http://www.intel.com/support/graphics/intel830m/
+	// XP/2K Drivers: http://downloadfinder.intel.com/scripts-df-external/Filter_Results.aspx?strOSs=44&strTypes=all&ProductID=669&OSFullName=Windows*%20XP%20Professional&lang=eng&sType=prev
+// Extreme Graphics 1 (845G/GE/GV/GL): http://support.intel.com/products/chipsets/eg1/index.htm
+// Extreme Graphics 2 (852GME,855GM/GME,865G/GV): http://support.intel.com/products/chipsets/eg2/index.htm
+// Graphics Media Accelerator 900 (910GL,915G/GV; Mobile: 910GML,915GM/GMS): http://www.intel.com/products/chipsets/gma900/index.htm
+// Graphics Media Accelerator 950 (945G): http://www.intel.com/products/chipsets/gma950/index.htm
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x8086  "Intel"
+
+// Discontinued products
+0x7800 = "740"
+0x1240 = "752"
+	Bad8888
+	NoMipMap
+	ForceSquareTextures
+	LimitTextureSize
+	UnsupportedHardware
+	break
+
+0x7121 = "810 Graphics Controller"
+0x7123 = "810-DC100 Graphics Controller"
+0x7124 = "810E"
+0x7125 = "810E Graphics Controller"
+0x7126 = "810"
+0x7127 = "810"
+0x1132 = "815 Graphics Controller"
+	// Corrupted text fix for Intel chipsets 810-815--discovered by KinyaJuu 4/1/2003
+	// http://www.lancersreactor.com/t/forum/topic.asp?topic_id=12550&forum_id=20&Topic_Title=%2AFIX%2A+Text+Problems&forum_title=Freelancer+Technical+Issues&cat_title=Freelancer&M=True
+	// Additional text fixes:
+		// Re-install Freelancer fonts from CD--discovered by Venom? 5/26/2003
+		// Re-install MS XML Parser from CD--discovered by Lich 2/3/2004
+	TextureOffset		// Added
+	Bad8888
+	NoMipMap
+	//ForceSquareTextures	// Commented Out
+	LimitTextureSize
+	
+	if os > win2k
+		if driver < 6.13.1.3196		// XP Default: 6.13.01.3198 06/08/2001
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 5.13.1.3196
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.13.1.3196
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x3577 = "830M Graphics Controller"					// added by Louva-Deus 4/16/2007
+ 	if os > win2k
+		if driver < 6.14.10.3762	// Was 6.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.14.10.3762	// Was 5.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.14.10.3732	// Was 4.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x2560 = "845G"
+0x2562 = "845G/GL/GE/PE/GV Graphics Controller"				// Was 845
+ 	if os > win2k
+		if driver < 6.14.10.4342	// Was 6.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.14.10.4342	// Was 5.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.14.10.3732	// Was 4.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x3580 = "852"
+0x3582 = "852/855 GM/GME Graphics Controller"				// added by Louva-Deus 4/16/2007
+ 	if os > win2k
+		if driver < 6.14.10.4497	// Was 6.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.14.10.4497	// Was 5.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.14.10.3732	// Was 4.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x2572 = "865G Graphics Controller"					// added by Louva-Deus 4/16/2007
+ 	if os > win2k
+		if driver < 6.14.10.4396	// Was 6.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.14.10.4396	// Was 5.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		if driver < 4.14.10.3732	// Was 4.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+// 9xx series not supported under 9X or ME
+0x2582 = "915G/GV/910GL Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x2782 = "915G/GV/910GL Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x2592 = "915GM/GMS,910GML Mobile Express Chipset Family"		// added by Louva-Deus 4/16/2007
+0x2792 = "915GM/GMS,910GML Mobile Express Chipset Family"		// added by Louva-Deus 4/16/2007
+ 	if os > win2k
+		if driver < 6.14.10.4764	// Was 6.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.14.10.4764	// Was 5.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		//if driver < 4.13.1.3413
+		//	UnsupportedDriver
+		//endif
+		UnsupportedHardware
+	endif
+	break
+
+// 9xx series not supported under 9X or ME
+0x2772 = "945G Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x2776 = "945G Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x27A2 = "945GM Mobile Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x27A6 = "945GM Mobile Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x2972 = "946GZ Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x2973 = "946GZ Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x2982 = "G965 Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x2983 = "G965 Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x2992 = "Q965/Q963 Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x2993 = "Q965/Q963 Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x29A2 = "G965 Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x29A3 = "G965 Express Chipset Family"					// added by Louva-Deus 4/16/2007
+0x2A02 = "965 Mobile Express Chipset Family"				// added by Louva-Deus 4/16/2007
+0x2A03 = "965 Mobile Express Chipset Family"				// added by Louva-Deus 4/16/2007
+ 	if os > win2k
+		if driver < 6.14.10.4785	// Was 6.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os == win2k
+		if driver < 6.14.10.4785	// Was 5.13.1.3413
+			UnsupportedDriver
+		endif
+	endif
+	if os < win2k
+		//if driver < 4.13.1.3413
+		//	UnsupportedDriver
+		//endif
+		UnsupportedHardware
+	endif
+	break
+
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// VIDEOLOGIC
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1033  "VideoLogic"
+	SceneRenderer
+
+0x0046 = "PowerVR"
+0x0067 = "PowerVR2"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// TRIDENT
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1023  "Trident"
+0x8420 = "CyberBlade i7"
+0x9320 = "Cyber9320"
+0x9388 = "Cyber9388"
+0x9397 = "Cyber9397"
+0x939A = "Cyber9397 DVD"
+0x9440 = "Cyber"
+0x9520 = "Cyber9520"
+0x9525 = "Cyber9520 DVD"
+0x9540 = "CyberBlade E4"
+0x9660 = "Cyber9385"
+0x9880 = "Blade 3D"
+0x9910 = "CyberBlade XP"
+0x9930 = "CyberBlade XPm"
+	if os < win2k
+		if driver < 4.12.01.2309
+			UnsupportedDriver
+		endif
+	endif
+	break
+
+0x9750 = "975"
+0x9754 = "9753"
+0x9850 = "3D Image"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// NUMBER NINE
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x105d  "Number Nine"
+0x493d = "Revolution 3D"
+0x5348 = "Revolution IV"
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// SILICON MOTION
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x126f  "Silicon Motion"
+0x720  = "Lynx 3DM"
+0x820  = "Lynx 3D"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+///////////////////////////////////////////////////
+//
+// CIRRUS
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1013  "Cirrus"
+0x0038 = "GD7548"
+0x00a0 = "GD5430"
+0x00a8 = "GD5434"
+0x00ac = "GD5436"
+0x00b8 = "GD5446"
+0x00bc = "GD5480"
+0x00d0 = "CL5462"
+0x00d4 = "GD5464"
+0x00d6 = "GD5465"
+0x0301 = "GD5446"
+0x1100 = "CL6729"
+0x1202 = "GD7543"
+0x6001 = "CL4610"
+0x6003 = "CL4614"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// RENDITION
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1163  "Rendition"
+0x0001 = "Verite 1000"
+0x2000 = "Verite 2100"
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// CHROMATIC
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x110b  "Chromatic"
+0x0004 = "MPact"
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	Bad4444
+	break
+
+
+///////////////////////////////////////////////////
+//
+// WEITEK
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x100e  "Weitek"
+0x9001 = "P9000"
+0x9100 = "P9100"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// COMPAQ
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x0e11  "Compaq"
+0x3032 = "QVision"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// DIGITAL
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x1011  "Digital"
+0x0004 = "TGA"
+0x000d = "TGA2"
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// NEOMAGIC
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x10c8  "NeoMagic"
+0x0001 = "128"
+0x0002 = "128"
+0x0003 = "128ZV"
+0x0004 = "128XD"
+0x0005 = "256AV"
+0x0006 = "256ZX"
+0x0016 = "256XL"
+	UnsupportedHardware
+	NoMipMap
+	ForceSquareTextures
+	LimitTextureSize
+	break
+0x0025 = "256AV"
+0x0083 = "128ZV"
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// TSENG
+//
+//////////////////////////////////////////////////
+
+Vendor = 0x100c  "Tseng Labs"
+0x3202 = "ET4000"
+0x3205 = "ET4000"
+0x3206 = "ET4000"
+0x3207 = "ET4000"
+0x3208 = "ET6000"
+0x4702 = "ET6300"
+unknown = "**UNIDENTIFIED**"
+	UnsupportedHardware
+	break
+
+
+///////////////////////////////////////////////////
+//
+// UnknownHardware
+//
+//////////////////////////////////////////////////
+
+Vendor = unknown
+unknown = "**UNIDENTIFIED**"
+	UnknownHardware
+	break
+

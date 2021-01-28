@@ -65,12 +65,12 @@ Die geheimen Abteilungen aller Kolonien sind, gerade seit dem Nomadenkrieg, best
 
 Systeme:	Skotty, Imhotep, Digital Anvil
 Stationen:	Imhotep, Skotty
-Modelle:	Skotty, Digital Anvil
+Modelle:	Skotty, Treewyrm, Digital Anvil
 Texturen:	Skotty, Digital Anvil, |~Râdîant~|, Hunor
 Plugins:	adoxa, M0tha, w0dk4
 Hacks:		adoxa, M0tha, w0dk4
 Sounds/Musik:	Half-Life 2 Episode 1 & 2
-Effekte:	Why485, Skotty, XxSARGExX
+Effekte:	Why485, Skotty, XxSARGExX, Treewyrm
 Beratung:	Imhotep
 
 

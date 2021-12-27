@@ -35,7 +35,7 @@ General
     Big ships use mooring points on planets and stations
     Ship sale with 75% of the original value
     Death Penalty based on ship, equipment and cargo value
-    Increased repair costs
+    Decreased repair costs
     NPCs spawn and unspawn at 5k distance (original 2.5k)
     Enemy jump gates cannot be docked at
     NPC scan cargo much earlier and leave less time to flee

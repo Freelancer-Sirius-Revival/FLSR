@@ -6,14 +6,14 @@ CREDITS
 
 This mod is possible thanks to the great work of many individuals, even those not named here by giving input and suggestions over the years. Thank you!
 
-    Adoxa, for many useful plugins and hacks
+    Adoxa, M0tah and many others, for many useful plugins and hacks
     Imhotep, for designing some space stations
-    Treewyrm, for the great Nomad ship models, texture and effects
+    Treewyrm, for the great Nomad ships
     |~Râdîant~|, for HD textures of planets
     DAVENAT0R, for the new HUD looks and system backgrounds
     Valve and Digital Anvil, for some sound effects from their games
     Why485, for some effects
-    Thaddeus, for the reworked improvde Trade Lane Ring
+    Thaddeus and Eagle-Vulture, for reworked and fixed models
     Jeider and WhiskasTM, for the advanced HUD (3d-targeting of ships, weapon groups)
     XxSARGExX979, for all the NPC and equipment balancing, and many new effects
     Skotty, for the initial mod and general work on every corner of it

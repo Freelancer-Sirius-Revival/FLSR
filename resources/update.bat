@@ -1,2 +1,3 @@
+ResourcesParser.exe
 cd frc
-frc ../FLSR.frc ../../EXE/FLSR.dll
+frc -c ../FLSR.frc ../../EXE/FLSR.dll

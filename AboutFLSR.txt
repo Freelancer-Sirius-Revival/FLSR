@@ -14,6 +14,7 @@ This mod is possible thanks to the great work of many individuals, even those no
     Why485, for some effects
     Thaddeus and Eagle-Vulture, for reworked, fixed. and new models
     Jeider and WhiskasTM, for the advanced HUD (3d-targeting of ships, weapon groups)
+    Jeider for upscaled textures for many stations.
     XxSARGExX979, for all the NPC and equipment balancing, and many new effects
     Skotty, for the initial mod and general work on every corner of it
 	BC46 for fixed texts, and literally almost all upscaled textures and many more bugfixes

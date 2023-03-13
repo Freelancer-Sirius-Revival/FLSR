@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\plugins\$(ProjectName)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>FLHook.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep />
+    <PostBuildEvent>
+      <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)*.ini" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)*.cfg" "$(DistDir)flhook_plugins\"
+
+if "$(FLHOOK_COPY_PATH)" NEQ "" (
+xcopy /y  "$(OutDir)$(TargetName).dll" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
+xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

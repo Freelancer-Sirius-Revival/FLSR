@@ -1,0 +1,2 @@
+﻿  Main.cpp
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\stats_plugin\Main.h(15,10): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "nlohmann/json.hpp": No such file or directory

@@ -1,0 +1,39 @@
+﻿  AntiJumpDisconnect.cpp
+  CargoDrop.cpp
+  CrashCatcher.cpp
+  EquipmentUtilities.cpp
+  Givecash.cpp
+  HyperJump.cpp
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\HyperJump.cpp(123,9): warning C4996: '_snwprintf': This function or variable may be unsafe. Consider using _snwprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\HyperJump.cpp(624,25): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\HyperJump.cpp(820,17): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\HyperJump.cpp(842,17): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  IPBan.cpp
+  Mail.cpp
+  Main.cpp
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\Main.cpp(315,22): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\Main.cpp(1169,25): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\Main.cpp(1177,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Message.cpp
+C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\playercntl_plugin\src\Message.cpp(185,5): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  MiscCmds.cpp
+  PimpShip.cpp
+  PlayerInfo.cpp
+  PurchaseRestrictions.cpp
+  Rename.cpp
+  RepFixer.cpp
+  Restart.cpp
+  StartupCache.cpp
+  SystemSensor.cpp
+  Wardrobe.cpp
+  Code wird generiert...
+     Bibliothek "C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Player Control\playercntl.lib" und Objekt "C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Player Control\playercntl.exp" werden erstellt.
+  Player Control Plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\Player Control\playercntl.dll
+  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Player Control\playercntl.dll
+  1 Datei(en) kopiert
+  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Player Control\playercntl.pdb
+  1 Datei(en) kopiert
+  0 Datei(en) kopiert
+  Datei *.ini nicht gefunden
+  Datei *.cfg nicht gefunden
+  0 Datei(en) kopiert

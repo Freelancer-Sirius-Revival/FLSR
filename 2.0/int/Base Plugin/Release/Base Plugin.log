@@ -1,0 +1,21 @@
+﻿  BuildModule.cpp
+  ClientCommands.cpp
+  CoreModule.cpp
+  DefenseModule.cpp
+  FactoryModule.cpp
+  Main.cpp
+  PlayerBase.cpp
+  PlayerCommands.cpp
+  SaveFiles.cpp
+  ShieldModule.cpp
+  StorageModule.cpp
+  Code wird generiert...
+  Base Plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\Base Plugin\base.dll
+  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.dll
+  1 Datei(en) kopiert
+  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.pdb
+  1 Datei(en) kopiert
+  Datei *.ini nicht gefunden
+  0 Datei(en) kopiert
+  Datei *.cfg nicht gefunden
+  0 Datei(en) kopiert

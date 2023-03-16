@@ -1697,6 +1697,11 @@ void __stdcall MissionResponse(unsigned int p1, unsigned long p2, bool p3,
             (unsigned int p1, unsigned long p2, bool p3, unsigned int iClientID),
             (p1, p2, p3, iClientID));
     }
+    else {
+		std::string scdata = "MISSIONBUG-TRIGGER: " + std::to_string(p1) + ", " + std::to_string(p2) + ", " + std::to_string(p3) + ", " + std::to_string(iClientID);
+        AddLog(scdata.c_str());
+
+    }
 }
 
 /**************************************************************************************************************

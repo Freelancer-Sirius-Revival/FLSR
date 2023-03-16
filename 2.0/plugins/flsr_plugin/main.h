@@ -103,6 +103,7 @@ namespace Commands {
     void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
+    void UserCmd_Tag(uint iClientID, const std::wstring& wscParam);
     
     typedef void (*_UserCmdProc)(uint, const std::wstring &);
     struct USERCMD {
@@ -182,6 +183,9 @@ namespace Tools {
 	};
    
 
+
+
+
     extern std::list <CMPDump_Exception> lCMPUpdateExceptions;
     void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId);
     void HkClearMissionBug(int clientID);
@@ -194,8 +198,6 @@ namespace Tools {
     std::vector<std::string> HkGetCollisionGroups(uint iClientID, bool bOnly);
     bool startsWith(std::string_view str, std::string_view prefix);
     bool endsWith(std::string_view str, std::string_view suffix);
-    void get_surfiles(const std::filesystem::path &path);
-    void update_surdumps();
     std::vector<std::string> GetHardpointsFromCollGroup(uint iClientID);
     float CalcDisabledHardpointWorth(uint iClientID);
     void replace_first(std::string &s, std::string const &toReplace,std::string const &replaceWith);
@@ -210,8 +212,52 @@ namespace Tools {
     void get_cmpfiles(const std::filesystem::path& path);
     void get_cmpExceptions();
     std::vector<std::string> getHardpoints(std::string scParent, std::list<CMPDump_Entry> CMPList);
+
+    //Reputation Stuff
+    //Reputation callback struct
+    struct RepCB
+    {
+        uint iGroup;
+        uint iNameLen;
+        char szName[16];
+    };
+    typedef bool(__stdcall* _RepCallback)(RepCB* rep);
+
+    extern std::list<RepCB> lstTagFactions;
+
+    bool __stdcall RepCallback(RepCB* rep);
+    std::list<RepCB> HkGetFactions();
+    bool __stdcall RepEnumCallback(RepCB* rep);
+    void HkEnumFactions(_RepCallback callback);
+    uint GetiGroupOfFaction(std::wstring wscParam);
+
+
+    //Shortest Path
+
+    // Definition for a graph node
+    struct Node {
+        std::string system;
+        int distance;
+        std::string previous;
+
+        bool operator>(const Node& other) const {
+            return distance > other.distance;
+        }
+    };
+
+    // Definition for a graph edge
+    struct Edge {
+        std::string start;
+        std::string end;
+        int distance;
+    };
+    
+    std::vector<std::string> FindShortestPath(const std::vector<Edge>& edges, const std::string& start, const std::string& end);
+    void ParsePathsFromFile(std::vector<Edge>& edges);
+    std::vector<std::string> GetShortestPath(std::string start, std::string end);
+    int CountShortestPath(std::string start, std::string end);
  
-    }
+}
 
 namespace Docking {
    
@@ -846,6 +892,45 @@ namespace FuseControl {
     
     extern IMPORT ClientFuse FuseControl[MAX_CLIENT_ID + 1];
     extern std::map<uint, Fuse> mFuseMap;
+}
+
+
+namespace PlayerHunt {
+
+	enum HuntState {
+		HUNT_STATE_NONE,
+        HUNT_STATE_DISCONNECTED,
+        HUNT_STATE_WON,
+		HUNT_STATE_HUNTING
+	};
+
+	struct ServerHuntInfo {
+		std::wstring wscCharname;
+		uint iTargetBase;
+        uint iTargetSystem;
+		HuntState eState;
+		mstime tmHuntTime;
+        uint iCredits;
+	};
+
+	struct LastPlayerHuntWinners {
+		std::wstring wscCharname;
+		uint iBaseID;
+		mstime tmHuntTime;
+        uint Credits;
+	};
+    
+    extern float set_fPlayerHuntMulti;
+	extern float set_fPlayerHuntUpdateTick;
+    extern float set_fPlayerHuntRestartDelay;
+	extern int set_iPlayerHuntMinSystems;
+    
+	extern std::list <LastPlayerHuntWinners> lLastPlayerHuntWinners;
+	extern ServerHuntInfo ServerHuntData;
+    
+    uint getRandomSysteminRange(uint iClientID);
+    uint getRandomBaseInSystem(uint iSystemID, uint iClientID);
+
 }
 
 #endif

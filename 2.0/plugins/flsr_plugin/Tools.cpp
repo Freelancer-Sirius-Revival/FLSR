@@ -1,6 +1,7 @@
 #include "Main.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <queue>
 
 
 namespace Tools {
@@ -830,5 +831,235 @@ namespace Tools {
 			return false;
 		}        
     }
-    
+
+	//Thanks to the original author of this function, I just modified it to fit my needs.
+    std::list<RepCB> lstTagFactions;
+    std::list<RepCB>* lstSaveFactions;
+    _RepCallback saveCallback;
+
+    bool __stdcall RepCallback(RepCB* rep)
+    {
+        __asm push ecx
+        lstSaveFactions->push_back(*rep);
+        __asm pop ecx
+        return true;
+    }
+
+    std::list<RepCB> HkGetFactions()
+    {
+        std::list<RepCB> lstFactions;
+        lstSaveFactions = &lstFactions;
+        void* callback = (void*)RepCallback;
+        void** obj = &callback;
+        Reputation::enumerate((Reputation::RepGroupCB*)&obj);
+        return lstFactions;
+    }
+
+    bool __stdcall RepEnumCallback(RepCB* rep)
+    {
+        __asm push ecx
+        bool bRet = saveCallback(rep);
+        __asm pop ecx
+        return bRet;
+    }
+
+    void HkEnumFactions(_RepCallback callback)
+    {
+        saveCallback = callback;
+        void* enumCallback = (void*)RepEnumCallback;
+        void** obj = &enumCallback;
+        Reputation::enumerate((Reputation::RepGroupCB*)&obj);
+    }
+
+
+
+    uint GetiGroupOfFaction(std::wstring wscParam)
+    {
+        lstTagFactions = HkGetFactions();
+		//ConPrint(L"Factions: " + std::to_wstring(lstTagFactions.size()) + L"\n");
+        uint iGroup = 0;
+
+        //While List
+        std::list<RepCB>::iterator iterFactions = lstTagFactions.begin();
+        HkLoadStringDLLs();
+        while (iterFactions != lstTagFactions.end()) {
+            
+            uint iIDS = Reputation::get_short_name(iterFactions->iGroup);
+            std::wstring wscFaction = HkGetWStringFromIDS(iIDS);
+            wscFaction = ToLower(wscFaction);
+            //ConPrint(wscFaction + L"\n");
+            if (wscFaction == wscParam)
+            {
+                iGroup = iterFactions->iGroup;
+                break;
+            }
+            else
+            {
+                iIDS = Reputation::get_name(iterFactions->iGroup);
+                wscFaction = HkGetWStringFromIDS(iIDS);
+                wscFaction = ToLower(wscFaction);
+                if (wscFaction == wscParam)
+                {
+                    iGroup = iterFactions->iGroup;
+                    break;
+                }
+            }
+
+            iterFactions++;
+        }
+        
+		return iGroup;
+    }
+
+//ShortestPath Stuff start @@@@@@@@@@@@@@@
+
+    // Calculates the shortest path between two systems in a graph
+    std::vector<std::string> FindShortestPath(const std::vector<Edge>& edges, const std::string& start, const std::string& end) {
+        // Create a map of all nodes and their edges
+        std::unordered_map<std::string, std::vector<Edge>> graph;
+        for (const auto& edge : edges) {
+            graph[edge.start].push_back(edge);
+            graph[edge.end].push_back({ edge.end, edge.start, edge.distance });
+        }
+
+        // Create a priority queue for the nodes to visit, with the starting node as the first element
+        std::priority_queue<Node, std::vector<Node>, std::greater<Node>> queue;
+        queue.push({ start, 0, "" });
+
+        // Create a map to keep track of the shortest distances found so far
+        std::unordered_map<std::string, int> distances;
+        distances[start] = 0;
+
+        // Create a map to keep track of the previous node on the shortest path found so far
+        std::unordered_map<std::string, std::string> previous;
+
+        // Visit each node in the queue until the end node is found or the queue is empty
+        while (!queue.empty()) {
+            Node current = queue.top();
+            queue.pop();
+
+            if (current.system == end) {
+                // The end node has been found, so backtrack to construct the shortest path
+                std::vector<std::string> path;
+                while (current.system != start) {
+                    path.push_back(current.system);
+                    current.system = previous[current.system];
+                }
+                path.push_back(start);
+                std::reverse(path.begin(), path.end());
+                return path;
+            }
+
+            // Visit each neighboring node
+            for (const auto& edge : graph[current.system]) {
+                std::string neighbor = edge.end;
+                int distance = current.distance + edge.distance;
+                if (!distances.count(neighbor) || distance < distances[neighbor]) {
+                    distances[neighbor] = distance;
+                    previous[neighbor] = current.system;
+                    queue.push({ neighbor, distance, current.system });
+                }
+            }
+        }
+
+        // The end node was not found, so return an empty path
+        return {};
+    }
+
+    void ParsePathsFromFile(std::vector<Edge>& edges) {
+        std::string filename = std::string(DATADIR) + "\\UNIVERSE\\shortest_legal_path.ini";
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            ConPrint(L"ParsePathsFromFile-Error: Could not open file " + stows(filename));
+            return;
+        }
+
+        std::vector<std::string> whitelist = {
+        "Hi01", "Li05", "Li01", "Li03", "Rh05", "Rh01", "Rh03", "Br06", "Br04", "Br02",
+        "Ku06", "Ku04", "Ku02", "Iw06", "Iw04", "Iw02", "Bw10", "Bw08", "Bw06", "Bw04",
+        "Bw02", "Ew04", "Ew02", "Hi02", "Li04", "Li02", "Rh04", "Rh02", "Br05", "Br03",
+        "Br01", "Ku07", "Ku05", "Ku03", "Ku01", "Iw05", "Iw03", "Iw01", "Bw11", "Bw09",
+        "Bw07", "Bw05", "Bw03", "Bw01", "Ew03", "Ew01"
+        };
+
+        std::string line;
+
+        while (std::getline(file, line)) {
+
+            //Check Whitelist
+            for (std::vector<std::string>::iterator t = whitelist.begin(); t != whitelist.end(); ++t)
+            {
+                if (~line.find(*t) != std::string::npos) {
+                    continue;
+                }
+            }
+
+            //cout line
+            if (line.substr(0, 7) == "Path = ") {
+
+                // Extract the start and end points
+                std::string start = line.substr(7, line.find(',', 7) - 7);
+                std::string end = line.substr(line.find_last_of(',') + 2);
+
+                // Extract the systems along this path
+                std::string systems_str = line.substr(line.find_first_of(',') + 2, line.find_last_of(',') - line.find_first_of(',') - 2);
+
+
+
+
+
+
+
+                size_t pos = 0;
+                std::string token;
+                std::vector<std::string> systems;
+                while ((pos = systems_str.find(',')) != std::string::npos) {
+                    token = systems_str.substr(0, pos);
+                    systems.push_back(token);
+                    systems_str.erase(0, pos + 2);
+                }
+                systems.push_back(systems_str);
+
+                // Remove start and end points from system list
+                if (systems.size() > 2) {
+                    systems.erase(systems.begin());
+                    systems.erase(systems.begin());
+                }
+
+                // Create a new edge for each pair of systems
+                for (size_t i = 0; i < systems.size() - 1; ++i) {
+                    Edge e = { systems[i], systems[i + 1], 1 };
+                    edges.push_back(e);
+                }
+            }
+        }
+
+        file.close();
+    }
+
+    std::vector<std::string> GetShortestPath(std::string start, std::string end)
+    {
+        std::vector<std::string> shortest_path;
+        std::vector<Edge> edges;
+        ParsePathsFromFile(edges);
+
+        if (edges.size() == 0)
+            return shortest_path;
+
+        shortest_path = FindShortestPath(edges, start, end);
+
+        return shortest_path;
+
+    }
+
+    int CountShortestPath(std::string start, std::string end)
+    {
+        std::vector<std::string> shortest_path = GetShortestPath(start,end);
+        int numSystems = shortest_path.size();
+        return numSystems;
+
+    }
+
+//ShortestPath Stuff end @@@@@@@@@@@@@@@
+
 }

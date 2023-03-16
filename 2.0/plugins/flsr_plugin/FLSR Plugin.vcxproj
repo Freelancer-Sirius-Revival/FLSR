@@ -74,6 +74,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="PathSelection.cpp" />
+    <ClCompile Include="PlayerHunt.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="ClientController.cpp" />
     <ClCompile Include="Insurance.cpp" />

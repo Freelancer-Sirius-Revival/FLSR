@@ -257,6 +257,7 @@ HK_ERROR HkGetBaseStatus(const std::wstring &wscBasename, float &fHealth,
 
     Universe::IBase *base = Universe::get_base(iBaseID);
     pub::SpaceObj::GetHealth(base->lSpaceObjID, fHealth, fMaxHealth);
+
     return HKE_OK;
 }
 

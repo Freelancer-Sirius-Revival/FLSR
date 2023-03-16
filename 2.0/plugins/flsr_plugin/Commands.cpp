@@ -81,6 +81,53 @@ namespace Commands {
         
     }
 
+    void UserCmd_Tag(uint iClientID, const std::wstring& wscParam)
+    {
+        std::wstring wscError[] =
+        {
+            L"Error: Invalid parameters",
+            L"Usage: /tag <faction name>"
+        };     
+
+		std::wstring wscParameters = wscParam;
+        wscParameters = Trim(wscParameters);
+
+        if (wscParameters.length())
+        {
+            wscParameters = ToLower(wscParameters);
+            uint iGroup = Tools::GetiGroupOfFaction(wscParameters);
+      
+            
+            
+            if (iGroup)
+            {
+                int iRep;
+                pub::Player::GetRep(iClientID, iRep);
+                uint iIDS = Reputation::get_name(iGroup);
+                std::wstring wscFaction = HkGetWStringFromIDS(iIDS);
+                float fRep;
+                pub::Reputation::GetGroupFeelingsTowards(iRep, iGroup, fRep);
+                if (fRep < 0.6f)
+                {
+                    PrintUserCmdText(iClientID, L"Error: your reputation of %g to " + wscFaction + L" is less than the required %g.", fRep, 0.6f);
+                }
+                else
+                {
+                    pub::Reputation::SetAffiliation(iRep, iGroup);
+                    PrintUserCmdText(iClientID, L"Affiliation changed to " + wscFaction);
+                }
+            }
+            else
+            {
+                PrintUserCmdText(iClientID, L"Error: could not find faction");
+            }
+        }
+        else
+        {
+            PrintUserCmdText(iClientID, L"Error: could not find faction");
+        }
+    }
+    
     void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("CloakModule"))
         {
@@ -996,6 +1043,8 @@ namespace Commands {
         {L"/cloak", UserCmd_CLOAK},
 		{L"/uncloak", UserCmd_UNCLOAK},
         {L"/help", UserCmd_HELP},
+        {L"/tag", UserCmd_Tag},
+
         
 		//Test Commands
         /*{L"/testcloak", UserCmd_testcloak},

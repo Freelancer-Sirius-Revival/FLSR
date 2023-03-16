@@ -178,6 +178,7 @@ void LoadSettings() {
         PathSelection::LoadPathSelectionSettings();
         ConPrint(L"Module loaded: PathSelection with " + std::to_wstring(PathSelection::lBlockedGates.size()) + L" BlockedGates and " + std::to_wstring(PathSelection::lReputations.size()) + L" Reputations\n");
     }
+
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {

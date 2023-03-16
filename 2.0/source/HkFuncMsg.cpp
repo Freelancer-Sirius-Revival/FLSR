@@ -408,8 +408,14 @@ void HkLoadStringDLLs() {
 }
 
 std::wstring HkGetWStringFromIDS(uint iIDS) {
-    wchar_t wszBuf[1024];
-    if (LoadStringW(vDLLs[iIDS >> 16], iIDS & 0xFFFF, wszBuf, 1024))
+    if (!iIDS)
+        return L"";
+
+    uint iDLL = iIDS / 0x10000;
+    iIDS -= iDLL * 0x10000;
+
+    wchar_t wszBuf[512];
+    if (LoadStringW(vDLLs[iDLL], iIDS, wszBuf, 512))
         return wszBuf;
     return L"";
 }

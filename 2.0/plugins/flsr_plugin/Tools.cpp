@@ -974,20 +974,14 @@ namespace Tools {
             return;
         }
 
-        std::vector<std::string> whitelist = {
-        "Hi01", "Li05", "Li01", "Li03", "Rh05", "Rh01", "Rh03", "Br06", "Br04", "Br02",
-        "Ku06", "Ku04", "Ku02", "Iw06", "Iw04", "Iw02", "Bw10", "Bw08", "Bw06", "Bw04",
-        "Bw02", "Ew04", "Ew02", "Hi02", "Li04", "Li02", "Rh04", "Rh02", "Br05", "Br03",
-        "Br01", "Ku07", "Ku05", "Ku03", "Ku01", "Iw05", "Iw03", "Iw01", "Bw11", "Bw09",
-        "Bw07", "Bw05", "Bw03", "Bw01", "Ew03", "Ew01"
-        };
+
 
         std::string line;
 
         while (std::getline(file, line)) {
 
             //Check Whitelist
-            for (std::vector<std::string>::iterator t = whitelist.begin(); t != whitelist.end(); ++t)
+            for (std::vector<std::string>::iterator t = PlayerHunt::SystemWhitelist.begin(); t != PlayerHunt::SystemWhitelist.end(); ++t)
             {
                 if (~line.find(*t) != std::string::npos) {
                     continue;

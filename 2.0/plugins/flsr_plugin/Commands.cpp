@@ -61,6 +61,7 @@ namespace Commands {
 
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
 
+        
         //Create Popup struct
         PopUp::PopUpBox NewPopUpBox;
         NewPopUpBox.iClientID = iClientID;

@@ -565,11 +565,13 @@ struct DATA_MARKETITEM {
     float fRep;
 };
 
-struct BASE_INFO {
-    uint iBaseID;
-    std::string scBasename;
-    uint iObjectID;
-    bool bDestroyed;
+struct BASE_INFO
+{
+    uint	iBaseID;
+    std::string	scBasename;
+    uint	iObjectID;
+    bool	bDestroyed;
+    uint	iSystemID;
     std::list<DATA_MARKETITEM> lstMarketMisc;
 };
 

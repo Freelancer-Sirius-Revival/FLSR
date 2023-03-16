@@ -4,9 +4,16 @@ namespace PlayerHunt {
 
 	float set_fPlayerHuntMulti;
 	float set_fPlayerHuntTick;
-	int set_iPlayerHuntMinSystems;
+	int set_iPlayerHuntMinSystems = 4;
+	std::vector<std::string> SystemWhitelist = {
+	"Hi01", "Li05", "Li01", "Li03", "Rh05", "Rh01", "Rh03", "Br06", "Br04", "Br02",
+	"Ku06", "Ku04", "Ku02", "Iw06", "Iw04", "Iw02", "Bw10", "Bw08", "Bw06", "Bw04",
+	"Bw02", "Ew04", "Ew02", "Hi02", "Li04", "Li02", "Rh04", "Rh02", "Br05", "Br03",
+	"Br01", "Ku07", "Ku05", "Ku03", "Ku01", "Iw05", "Iw03", "Iw01", "Bw11", "Bw09",
+	"Bw07", "Bw05", "Bw03", "Bw01", "Ew03", "Ew01"
+	};
 	ServerHuntInfo ServerHuntData;
-	
+
 	uint getRandomSysteminRange(uint iClientID)
 	{
 		//Get player system
@@ -21,7 +28,22 @@ namespace PlayerHunt {
 		std::vector<std::string> systems;
 		struct Universe::ISystem* sysinfo = Universe::GetFirstSystem();
 		while (sysinfo) {
-			systems.push_back(sysinfo->nickname);
+			//Check Whitelist
+			bool bWhitelisted = false;
+			for (std::vector<std::string>::iterator t = SystemWhitelist.begin(); t != SystemWhitelist.end(); ++t)
+			{
+				std::string scSystemNickname = sysinfo->nickname;
+				if (scSystemNickname.find(*t) != std::string::npos) {
+					//ConPrint(stows(scSystemNickname) + L" is whitelisted\n");
+					bWhitelisted = true;
+					continue;
+				}
+				
+			}
+
+			if (bWhitelisted)
+				systems.push_back(sysinfo->nickname);
+			
 			sysinfo = Universe::GetNextSystem();
 		}
 
@@ -37,89 +59,113 @@ namespace PlayerHunt {
 		return Universe::get_system_id(randomSystem.c_str());
 	}
 
-	uint getRandomBaseInSystem(uint iSystemID, uint iClientID)
+	BaseData getRandomBaseInSystem(uint iPlayerSystemID, uint iClientID)
 	{
 		//Get Factions fpr Reputation Check
 		std::list<Tools::RepCB> lstTagFactions = Tools::HkGetFactions();
 
-
-
-
 		//Get all bases of System
-		std::vector<uint> bases;
-		struct Universe::IBase* baseinfo = Universe::GetFirstBase();
-		while (baseinfo) {
+		std::vector<BaseData> bases;
+		//ConPrint(L"loopstart\n");
+
+		for (auto& baseinfo : lstBases) {
+			
 			// Check if base is in system
-			if (baseinfo->iSystemID == iSystemID) {
+			if (baseinfo.iSystemID == iPlayerSystemID)
+			{
 				// Check if player has access to base
 
 
-				BASE_INFO* bi = 0;
-				for (auto& base : lstBases) {
-					if (base.iBaseID == baseinfo->iBaseID) {
-						bi = &base;
-						break;
-					}
-				}
+				BASE_INFO bi;
+				bi.bDestroyed = false;
+				bi.iObjectID = baseinfo.iObjectID;
+				bi.scBasename = baseinfo.scBasename;
+				bi.iBaseID = CreateID(baseinfo.scBasename.c_str());
 				
 				// get base rep
 				int iSolarRep;
-				pub::SpaceObj::GetSolarRep(bi->iObjectID, iSolarRep);
+				pub::SpaceObj::GetSolarRep(bi.iObjectID, iSolarRep);
 				uint iBaseRep;
 				pub::Reputation::GetAffiliation(iSolarRep, iBaseRep);
-				if (iBaseRep == -1)
-					continue; // rep can't be determined yet(space object not created yet?)
-
-				// get player rep
-				int iRepID;
-				pub::Player::GetRep(iClientID, iRepID);
-
-				// check if rep is sufficient
-				float fPlayerRep;
-				pub::Reputation::GetGroupFeelingsTowards(iRepID, iBaseRep, fPlayerRep);
-				
-				//Check if Player has access to base (-0,4 min rep)
-				if (fPlayerRep >= -0.4f)
+				// rep can't be determined yet(space object not created yet?)
+				if (iBaseRep != -1)
 				{
-					uint iBaseID = 0;
-					std::wstring wscBasename = stows(bi->scBasename);
+					// get player rep
+					int iRepID;
+					pub::Player::GetRep(iClientID, iRepID);
 
-					//Check if base is Valid to Dock
-					typedef int (*_GetString)(LPVOID, uint, wchar_t*, uint);
-					_GetString GetString = (_GetString)0x4176b0;
-					Universe::IBase* pBase = Universe::GetFirstBase();
-					while (pBase) {
-						wchar_t buf[1024];
-						GetString(NULL, pBase->iBaseIDS, buf, 1024);
-						if (wcsstr(buf, wscBasename.c_str())) {
-							// Ignore the intro bases.
-							if (_strnicmp("intro", (char*)pBase->iDunno2, 5) != 0) {
-								iBaseID = pBase->iBaseID;
-								break;
-							}
-						}
-						pBase = Universe::GetNextBase();
-					}
+					// check if rep is sufficient
+					float fPlayerRep;
+					pub::Reputation::GetGroupFeelingsTowards(iRepID, iBaseRep, fPlayerRep);
 
-					ConPrint(L"Base to list:" + wscBasename + L"\n");
-
-					
-					if (iBaseID != 0)
+					//Check if Player has access to base (-0,4 min rep)
+					if (fPlayerRep >= -0.4f)
 					{
-						bases.push_back(baseinfo->iBaseID);
-						ConPrint(L"Base added to list:" + wscBasename + L"\n");
+						std::string scBasename = bi.scBasename;
+						std::string scLowerBase = ToLower(scBasename);
+
+
+
+						if (scLowerBase.find("base") != std::string::npos)
+						{
+							BaseData NewBase;
+							NewBase.iBaseID = baseinfo.iBaseID;
+							NewBase.iSystemID = baseinfo.iSystemID;
+							NewBase.scBaseNickname = bi.scBasename;
+
+
+							bases.push_back(NewBase);
+							//ConPrint(L"Base added to list:" + stows(scBasename) + L"\n");
+
+
+						}
 					}
 				}
-
+				else {
+					// rep can't be determined yet(space object not created yet?)
+					//ConPrint(L"rep can't be determined yet(space object not created yet?\n");
+				}
 			}
-			baseinfo = Universe::GetNextBase();
 		}
+		//ConPrint(L"loopend\n");
 
-		//Get random base
-		int random = rand() % bases.size();
-		return bases[random];
+		if (bases.size() == 0)
+		{
+			ConPrint(L"No bases found\n");
+			return BaseData();
+		}
+		else
+		{
+			//Get random base
+			int random = rand() % bases.size();
+			return bases[random];
+		}
 	}
 
+	BaseData getTargetBase(uint iClientID)
+	{
+		BaseData TargetBase;
+
+		while (TargetBase.scBaseNickname == "")
+		{
+			//Get random system in range
+			uint iSysID = getRandomSysteminRange(iClientID);
+
+			//Get random base in system
+			BaseData tempBase = getRandomBaseInSystem(iSysID, iClientID);
+
+			//Check if TargetBase has data
+			if (tempBase.scBaseNickname != "")
+			{
+				TargetBase = tempBase;
+			}
+		}
+	
+		ConPrint(stows(TargetBase.scBaseNickname) + L" done\n");
+		
+		return TargetBase;
+	}
+	
 	/*
 	void Start_PlayerHunt(uint iClientID)
 	{

@@ -897,6 +897,8 @@ namespace FuseControl {
 
 namespace PlayerHunt {
 
+    extern std::vector<std::string> SystemWhitelist;
+
 	enum HuntState {
 		HUNT_STATE_NONE,
         HUNT_STATE_DISCONNECTED,
@@ -920,6 +922,13 @@ namespace PlayerHunt {
         uint Credits;
 	};
     
+	struct BaseData {
+		uint iBaseID;
+		uint iSystemID;
+        std::string scBaseNickname;
+
+	};
+    
     extern float set_fPlayerHuntMulti;
 	extern float set_fPlayerHuntUpdateTick;
     extern float set_fPlayerHuntRestartDelay;
@@ -929,7 +938,8 @@ namespace PlayerHunt {
 	extern ServerHuntInfo ServerHuntData;
     
     uint getRandomSysteminRange(uint iClientID);
-    uint getRandomBaseInSystem(uint iSystemID, uint iClientID);
+    BaseData getRandomBaseInSystem(uint iSystemID, uint iClientID);
+    BaseData getTargetBase(uint iClientID);
 
 }
 

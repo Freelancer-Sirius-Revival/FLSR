@@ -1198,6 +1198,7 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2) {
 
         bi.scBasename = szBaseName;
         bi.iBaseID = CreateID(szBaseName);
+		bi.iSystemID = base->iSystemID;
         lstBases.push_back(bi);
         pub::System::LoadSystem(base->iSystemID);
 

@@ -104,6 +104,7 @@ namespace Commands {
     void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
     void UserCmd_Tag(uint iClientID, const std::wstring& wscParam);
+    void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam);
     
     typedef void (*_UserCmdProc)(uint, const std::wstring &);
     struct USERCMD {
@@ -902,7 +903,6 @@ namespace PlayerHunt {
 	enum HuntState {
 		HUNT_STATE_NONE,
         HUNT_STATE_DISCONNECTED,
-        HUNT_STATE_WON,
 		HUNT_STATE_HUNTING
 	};
 
@@ -910,8 +910,10 @@ namespace PlayerHunt {
 		std::wstring wscCharname;
 		uint iTargetBase;
         uint iTargetSystem;
+		std::wstring wscTargetSystem;
+		std::wstring wscTargetBase;
 		HuntState eState;
-		mstime tmHuntTime;
+		uint tmHuntTime;
         uint iCredits;
 	};
 
@@ -929,10 +931,10 @@ namespace PlayerHunt {
 
 	};
     
-    extern float set_fPlayerHuntMulti;
-	extern float set_fPlayerHuntUpdateTick;
-    extern float set_fPlayerHuntRestartDelay;
-	extern int set_iPlayerHuntMinSystems;
+    extern float set_fRewardMultiplicator;
+	extern int set_iMultiplicatorTriggerTime;
+	extern int set_iMinTargetSystemDistance;
+    extern int set_iMinCredits;
     
 	extern std::list <LastPlayerHuntWinners> lLastPlayerHuntWinners;
 	extern ServerHuntInfo ServerHuntData;
@@ -940,7 +942,14 @@ namespace PlayerHunt {
     uint getRandomSysteminRange(uint iClientID);
     BaseData getRandomBaseInSystem(uint iSystemID, uint iClientID);
     BaseData getTargetBase(uint iClientID);
-
+    void Start_PlayerHunt(uint iClientID, const std::wstring& wscParam);
+    void PlayerHuntTimer();
+    void CalcReward();
+    void CheckSystemReached(uint iClientID, uint iPlayerSystemID);
+    void CheckDock(uint iBaseID, uint iClientID);
+    void CheckDisConnect(uint iClientID);
+    void CheckDied(uint iClientID, uint iKillerID);
+    void LoadPlayerHuntSettings();
 }
 
 #endif

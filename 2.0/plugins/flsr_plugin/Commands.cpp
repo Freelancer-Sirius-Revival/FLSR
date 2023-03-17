@@ -59,6 +59,12 @@ namespace Commands {
     */
 	
 
+    void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
+
+		PlayerHunt::Start_PlayerHunt(iClientID, wscParam);
+
+    }
+
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
 
         
@@ -1045,6 +1051,7 @@ namespace Commands {
 		{L"/uncloak", UserCmd_UNCLOAK},
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
+        {L"/playerhunt", UserCmd_PLAYERHUNT},
 
         
 		//Test Commands

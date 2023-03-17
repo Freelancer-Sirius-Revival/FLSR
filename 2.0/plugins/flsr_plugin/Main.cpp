@@ -179,6 +179,14 @@ void LoadSettings() {
         ConPrint(L"Module loaded: PathSelection with " + std::to_wstring(PathSelection::lBlockedGates.size()) + L" BlockedGates and " + std::to_wstring(PathSelection::lReputations.size()) + L" Reputations\n");
     }
 
+
+    //PlayerHunt     #############################################################################
+    if (Modules::GetModuleState("PlayerHunt"))
+    {
+		//Load PlayerHunt
+		PlayerHunt::LoadPlayerHuntSettings();
+		ConPrint(L"Module loaded: PlayerHunt - RewardMultiplicator: " + std::to_wstring(PlayerHunt::set_fRewardMultiplicator) + L", MultiplicatorTriggerTime (Seconds): " + std::to_wstring(PlayerHunt::set_iMultiplicatorTriggerTime) + L", MinTargetSystemDistance: " + std::to_wstring(PlayerHunt::set_iMinTargetSystemDistance) + L", MinCredits: " + std::to_wstring(PlayerHunt::set_iMinCredits) + L"\n");
+	}
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {

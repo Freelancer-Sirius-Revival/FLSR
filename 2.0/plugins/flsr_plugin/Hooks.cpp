@@ -130,44 +130,52 @@ namespace Hooks {
             // Get iClientID
             CShip *cship = (CShip *)ecx[4];
             iClientID = cship->GetOwnerPlayer();
+
+        
+            if (iKill) 
+            {
+
+
+                // Get Killer ID if there is one
+                uint iKillerID = 0;
+                if (iClientID) {
+                    DamageList dmg;
+                    if (!dmg.get_cause())
+                        dmg = ClientInfo[iClientID].dmgLast;
+                    iKillerID = HkGetClientIDByShip(dmg.get_inflictor_id());
+                }
+
+                //PlayerHunt
+                if (Modules::GetModuleState("PlayerHunt"))
+                {
+                    PlayerHunt::CheckDied(iClientID, iKillerID);
+                }
+
+                // Insurance-PlayerDied
+                if (iClientID != 0) {
+				    if (Modules::GetModuleState("InsuranceModule"))
+				    {
+					    Insurance::PlayerDiedEvent(true, iClientID);
+				    }
+                }
+			
+                //EquipWhiteList
+                if (Modules::GetModuleState("EquipWhiteListModule"))
+                {
+                    uint iShipArchIDPlayer;
+                    pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
+                    EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
+                }
+
+                if (Modules::GetModuleState("CloakModule"))
+                {
+                    Commands::UserCmd_UNCLOAK(iClientID, L"");
+                    ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
+                }
+            }
+        
         }
         catch (...) {}
-
-        if (iKill) {
-
-
-            // Get Killer ID if there is one
-            uint iKillerID = 0;
-            if (iClientID) {
-                DamageList dmg;
-                if (!dmg.get_cause())
-                    dmg = ClientInfo[iClientID].dmgLast;
-                iKillerID = HkGetClientIDByShip(dmg.get_inflictor_id());
-            }
-
-
-            // Insurance-PlayerDied
-            if (iClientID != 0) {
-				if (Modules::GetModuleState("InsuranceModule"))
-				{
-					Insurance::PlayerDiedEvent(true, iClientID);
-				}
-            }
-			
-            //EquipWhiteList
-            if (Modules::GetModuleState("EquipWhiteListModule"))
-            {
-                uint iShipArchIDPlayer;
-                pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-                EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
-            }
-
-            if (Modules::GetModuleState("CloakModule"))
-            {
-                Commands::UserCmd_UNCLOAK(iClientID, L"");
-                ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-            }
-        }
     }
 
     //BaseEnter_AFTER
@@ -197,6 +205,12 @@ namespace Hooks {
             AntiCheat::SpeedAC::Init(iClientID);
             AntiCheat::TimingAC::Init(iClientID);
         }	
+
+        //PlayerHunt
+        if (Modules::GetModuleState("PlayerHunt"))
+        {
+			PlayerHunt::CheckDock(iBaseID, iClientID);
+        }
 
         //EquipWhiteList
         if (Modules::GetModuleState("EquipWhiteListModule"))
@@ -319,6 +333,12 @@ namespace Hooks {
             AntiCheat::TimingAC::Init(iClientID);
             AntiCheat::PowerAC::Init(iClientID);
         }
+
+        //PlayerHunt
+        if (Modules::GetModuleState("PlayerHunt"))
+        {
+			PlayerHunt::CheckSystemReached(iClientID, iSystemID);
+        }
     }
 	
     void __stdcall SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID) {
@@ -330,7 +350,7 @@ namespace Hooks {
             AntiCheat::SpeedAC::vDunno2(iClientID);
             AntiCheat::SpeedAC::vDunno1(iClientID, 20000);
         }
-        
+
 		//CarrierModul
 		if (Modules::GetModuleState("CarrierModule"))
 		{
@@ -564,8 +584,11 @@ namespace Hooks {
             catch (...) {}
         }
         
-        ClearClientInfo(iClientID);
-
+        //PlayerHunt
+        if (Modules::GetModuleState("PlayerHunt"))
+        {
+            PlayerHunt::CheckDisConnect(iClientID);
+        }
     }
     
     void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID) {

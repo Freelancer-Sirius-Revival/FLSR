@@ -120,36 +120,95 @@ namespace Hooks {
         // PrintUserCmdText(iDmgTo, L"HIT");
     }
 
+    void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller) {
+        returncode = DEFAULT_RETURNCODE;
+
+        //ConPrint(wscMsg + L"\n");
+
+        std::wstring victim, killer, type;
+
+        // Extract victim and type from the death message
+        if (wscMsg.find(L" was killed by ") != std::wstring::npos) {
+            size_t victimStart = wscMsg.find(L"Death: ") + 7;
+            size_t victimEnd = wscMsg.find(L" was killed by ");
+            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+
+            size_t killerStart = victimEnd + 15; // length of " was killed by "
+            size_t killerEnd = wscMsg.find(L" (", killerStart);
+            killer = wscMsg.substr(killerStart, killerEnd - killerStart);
+
+            size_t typeStart = killerEnd + 2; // skip the " ("
+            size_t typeEnd = wscMsg.find(L")", typeStart);
+            type = wscMsg.substr(typeStart, typeEnd - typeStart);
+        }
+        else if (wscMsg.find(L"killed himself") != std::wstring::npos) {
+            size_t victimStart = wscMsg.find(L"Death: ") + 7;
+            size_t victimEnd = wscMsg.find(L" killed himself");
+            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+
+            size_t typeStart = wscMsg.find_last_of(L"(") + 1;
+            size_t typeEnd = wscMsg.find_last_of(L")");
+            type = wscMsg.substr(typeStart, typeEnd - typeStart);
+        }
+        else if (wscMsg.find(L"was killed by an NPC") != std::wstring::npos) {
+            size_t victimStart = wscMsg.find(L"Death: ") + 7;
+            size_t victimEnd = wscMsg.find(L" was killed by an NPC");
+            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+            type = L"NPC";
+        }
+        else if (wscMsg.find(L"committed suicide") != std::wstring::npos) {
+            size_t victimStart = wscMsg.find(L"Death: ") + 7;
+            size_t victimEnd = wscMsg.find(L" committed suicide");
+            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+            type = L"suicide";
+        }
+        else if (wscMsg.find(L"was killed by an admin") != std::wstring::npos) {
+            size_t victimStart = wscMsg.find(L"Death: ") + 7;
+            size_t victimEnd = wscMsg.find(L" was killed by an admin");
+            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+            type = L"admin";
+        }
+
+        // Remove whitespaces from victim
+        victim.erase(std::remove_if(victim.begin(), victim.end(), [](unsigned char c) { return std::isspace(c); }), victim.end());
+    
+        // Remove whitespaces from killer
+        killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());
+
+        // Remove whitespaces from type
+        type.erase(std::remove_if(type.begin(), type.end(), [](unsigned char c) { return std::isspace(c); }), type.end());
+
+        // Get the victim's and killer's client IDs
+        uint victimClientID = HkGetClientIdFromCharname(victim);
+        uint killerClientID = HkGetClientIdFromCharname(killer);
+
+		// Print the victim's and killer's client IDs for testing
+		//ConPrint(L"Victim Client ID: " + std::to_wstring(victimClientID) + L"\n");
+		//ConPrint(L"Killer Client ID: " + std::to_wstring(killerClientID) + L"\n");
+        
+
+        if (Modules::GetModuleState("PlayerHunt"))
+        {
+			PlayerHunt::CheckDied(victimClientID, killerClientID);
+        }
+
+        
+    }
+
+
+
+    
     //ShipDestroyed
     void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
         returncode = DEFAULT_RETURNCODE;
 
-        uint iClientID = 0;
-        try 
-        {
-            // Get iClientID
-            CShip *cship = (CShip *)ecx[4];
-            iClientID = cship->GetOwnerPlayer();
 
-        
-            if (iKill) 
-            {
+      
+   
+            CShip* cship = (CShip*)ecx[4];
+            uint iClientID = cship->GetOwnerPlayer();
 
-
-                // Get Killer ID if there is one
-                uint iKillerID = 0;
-                if (iClientID) {
-                    DamageList dmg;
-                    if (!dmg.get_cause())
-                        dmg = ClientInfo[iClientID].dmgLast;
-                    iKillerID = HkGetClientIDByShip(dmg.get_inflictor_id());
-                }
-
-                //PlayerHunt
-                if (Modules::GetModuleState("PlayerHunt"))
-                {
-                    PlayerHunt::CheckDied(iClientID, iKillerID);
-                }
+            if (iClientID) { // a player was killed
 
                 // Insurance-PlayerDied
                 if (iClientID != 0) {
@@ -174,8 +233,7 @@ namespace Hooks {
                 }
             }
         
-        }
-        catch (...) {}
+        
     }
 
     //BaseEnter_AFTER

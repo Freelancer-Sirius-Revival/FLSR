@@ -282,28 +282,24 @@ namespace PlayerHunt {
 		}
 	}
 
-	void CheckDied(uint iClientID,uint iKillerID)
+	void CheckDied(uint iClientID,uint iClientKillerID)
 	{
-		//No Killer
-		if (iKillerID == 0)
-			return;
-
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
 		{
 			//Check is Player has a Hunt
 			// Get the current character name
-			std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-			std::wstring wscCharnameNew = (const wchar_t*)Players.GetActiveCharacterName(iKillerID);
+			std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+			std::wstring wscCharnameKiller = (const wchar_t*)Players.GetActiveCharacterName(iClientKillerID);
 
-			if (ServerHuntData.wscCharname == wscCharname)
+			if (ServerHuntData.wscCharname == wscCharnameClient)
 			{
 				//We have the Hunt
 
 				//Update the Hunt
-				ServerHuntData.wscCharname = wscCharnameNew;
+				ServerHuntData.wscCharname = wscCharnameKiller;
 
-				HkMsgU(ServerHuntData.wscCharname + L" died! The hunted player is now " + wscCharnameNew + L"!");
+				HkMsgU(wscCharnameClient + L" died! The hunted player is now " + wscCharnameKiller + L"!");
 				HkMsgU(L"Hunt the player to get the reward of " + std::to_wstring(ServerHuntData.iCredits) + L" Credits yourself!");
 				PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in System " + ServerHuntData.wscTargetSystem + L" alive!");
 			}
@@ -321,9 +317,26 @@ namespace PlayerHunt {
 		
 		// Get the current character name
 		std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+	
+		//Get Online Players
+		uint iPlayersCount = 0;
+		struct PlayerData* pPD = 0;
+		while (pPD = Players.traverse_active(pPD)) {
+			uint ipClientID = HkGetClientIdFromPD(pPD);
+			if (HkIsInCharSelectMenu(ipClientID)) {
+				continue;
+			}
+			iPlayersCount++;
+		}
+		
+		if (iPlayersCount < 2)
+		{
+			PrintUserCmdText(iClientID, L"Sorry you need at least 2 players online to start a hunt!");
+			return;
+		}
 		
 		//Check HUNT_STATE_DISCONNECTED
-		if (ServerHuntData.eState != HUNT_STATE_DISCONNECTED)
+		if (ServerHuntData.eState == HUNT_STATE_NONE)
 		{
 			//Get cash from the user command.
 			std::wstring wscCash = GetParam(wscParam, L' ', 0);
@@ -372,7 +385,7 @@ namespace PlayerHunt {
 				//Check if player is docked
 				if (iBaseIDPlayer == 0) {
 					//Player is not in a base
-					PrintUserCmdText(iClientID, L"ERR You are not docked!");
+					PrintUserCmdText(iClientID, L"You are not docked!");
 					return;
 				}
 
@@ -417,6 +430,11 @@ namespace PlayerHunt {
 				HkMsgU(wscCharname + L" has started a PlayerHunt! The target System is " + wscSystemname);
 				HkMsgU(L"Hunt the player to get the reward of " + std::to_wstring(cash) +  L" Credits yourself!");				
 				PrintUserCmdText(iClientID, L"Reach "+wscBasename+L" in System " + wscSystemname + L" alive!");
+
+				//Discord Chat
+				std::wstring wscMessage = wscCharname + L" has started a PlayerHunt! The target System is " + wscSystemname;
+				ShellExecute(NULL, "open", DISCORD_WEBHOOK_UVCHAT_FILE, wstos(L"FLSR: " + wscMessage).c_str(), NULL, NULL);
+
 				
 				return;
 			}
@@ -430,7 +448,7 @@ namespace PlayerHunt {
 				//Check if player is docked
 				if (iBaseIDPlayer == 0) {
 					//Player is not in a base
-					PrintUserCmdText(iClientID, L"ERR You are not docked!");
+					PrintUserCmdText(iClientID, L"You are not docked!");
 					return;
 				}
 
@@ -466,8 +484,14 @@ namespace PlayerHunt {
 			}
 			case HUNT_STATE_HUNTING:
 			{
-				//We must wait for the next hunt
-				PrintUserCmdText(iClientID, L"ERR A Hunt is active alredy! Kill " + ServerHuntData.wscCharname + L" to get the reward!");
+				if (wscCharname == ServerHuntData.wscCharname)
+				{
+					PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in System " + ServerHuntData.wscTargetSystem + L" alive!");
+				}
+				else {
+					//We must wait for the next hunt
+					PrintUserCmdText(iClientID, L"A Hunt is active already! Kill " + ServerHuntData.wscCharname + L" to get the reward!");
+				}
 				return;
 			}
 		}		

@@ -44,7 +44,7 @@ uint set_iDefaultBaseID = 0;
 PLUGIN_RETURNCODE returncode;
 
 /// Clear client info when a client connects.
-void ClearClientInfo(uint iClientID) {
+void ClearClientInfo(ClientId iClientID) {
     transferFlags[iClientID] = CLIENT_STATE_NONE;
 }
 

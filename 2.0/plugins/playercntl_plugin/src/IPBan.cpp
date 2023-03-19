@@ -31,7 +31,7 @@ struct INFO {
 static std::map<uint, INFO> mapInfo;
 
 /// Return true if this client is on a banned IP range.
-static bool IsBanned(uint iClientID) {
+static bool IsBanned(ClientId iClientID) {
     std::wstring wscIP;
     HkGetPlayerIP(iClientID, wscIP);
     std::string scIP = wstos(wscIP);
@@ -125,7 +125,7 @@ static bool IsBanned(uint iClientID) {
 /// Return true if this client is has a "Authenticated" file in the
 /// account directory indicating that the client can connect even if
 /// they are otherwise on a restricted IP range.
-static bool IsAuthenticated(uint iClientID) {
+static bool IsAuthenticated(ClientId iClientID) {
     CAccount *acc = Players.FindAccountFromClientID(iClientID);
     if (!acc)
         return false;
@@ -201,7 +201,7 @@ void IPBans::LoadSettings(const std::string &scPluginCfgFile) {
     ReloadLoginIDBans();
 }
 
-void IPBans::PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
+void IPBans::PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
     if (!mapInfo[iClientID].bIPChecked) {
         mapInfo[iClientID].bIPChecked = true;
         if (IsBanned(iClientID) && !IsAuthenticated(iClientID)) {
@@ -213,7 +213,7 @@ void IPBans::PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
     }
 }
 
-void IPBans::BaseEnter(unsigned int iBaseID, unsigned int iClientID) {
+void IPBans::BaseEnter(unsigned int iBaseID,  ClientId iClientID) {
     if (!mapInfo[iClientID].bIPChecked) {
         mapInfo[iClientID].bIPChecked = true;
         if (IsBanned(iClientID) && !IsAuthenticated(iClientID)) {
@@ -256,7 +256,7 @@ void IPBans::AdminCmd_AuthenticateChar(CCmds *cmds,
     cmds->Print(L"OK\n");
 }
 
-void IPBans::ClearClientInfo(uint iClientID) {
+void IPBans::ClearClientInfo(ClientId iClientID) {
     mapInfo[iClientID].bIPChecked = false;
 }
 

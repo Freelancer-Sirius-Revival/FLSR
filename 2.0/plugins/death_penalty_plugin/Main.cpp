@@ -110,7 +110,7 @@ void LoadSettings() {
     }
 
     // This will return a vector of CollisionGroups
-    std::vector<std::string> HkGetCollisionGroups(uint iClientID, bool bOnly) {
+    std::vector<std::string> HkGetCollisionGroups(ClientId iClientID, bool bOnly) {
         std::vector<std::string> vecString;
         std::vector<int> vecLine;
         std::wstring wscRet = L"";
@@ -153,7 +153,7 @@ void LoadSettings() {
     }
     
 	// This will return a vector of Hardpoints from Damaged Collision Groups
-    std::vector<std::string> GetHardpointsFromCollGroup(uint iClientID) {
+    std::vector<std::string> GetHardpointsFromCollGroup(ClientId iClientID) {
 
 
         std::vector<std::string> vDamagedHardPoints;
@@ -352,7 +352,7 @@ void LoadSettings() {
     }
 
 
-    float CaclDestroyedHardpointWorth(uint iClientID) {
+    float CaclDestroyedHardpointWorth(ClientId iClientID) {
         std::vector<std::string> DamagedHardPoints = GetHardpointsFromCollGroup(iClientID);
 
         // Player cargo
@@ -399,13 +399,13 @@ void LoadSettings() {
 
 //Nekura END
 
-void ClearClientInfo(uint iClientID) {
+void ClearClientInfo(ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     MapClients.erase(iClientID);
 }
 
 // Is the player is a system that is excluded from death penalty?
-bool bExcludedSystem(uint iClientID) {
+bool bExcludedSystem(ClientId iClientID) {
     // Get System ID
     uint iSystemID;
     pub::Player::GetSystem(iClientID, iSystemID);
@@ -417,7 +417,7 @@ bool bExcludedSystem(uint iClientID) {
 // This returns the override for the specific ship as defined in the cfg file.
 // If there is not override it returns the default value defined as
 // "DeathPenaltyFraction" in the cfg file
-float fShipFractionOverride(uint iClientID) {
+float fShipFractionOverride(ClientId iClientID) {
     // Get ShipArchID
     uint iShipArchID;
     pub::Player::GetShipID(iClientID, iShipArchID);
@@ -435,7 +435,7 @@ float fShipFractionOverride(uint iClientID) {
 
 // Hook on Player Launch. Used to work out the death penalty and display a
 // message to the player warning them of such
-void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
+void __stdcall PlayerLaunch_AFTER(unsigned int iShip,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     
@@ -471,7 +471,7 @@ void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
     }
 }
 
-void LoadUserCharSettings(uint iClientID) {
+void LoadUserCharSettings(ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // Get Account directory then flhookuser.ini file
@@ -493,7 +493,7 @@ void LoadUserCharSettings(uint iClientID) {
 }
 
 // Function that will apply the death penalty on a player death
-void PenalizeDeath(uint iClientID, uint iKillerID) {
+void PenalizeDeath(ClientId iClientID, uint iKillerID) {
     if (!set_fDeathPenalty)
         return;
 
@@ -540,7 +540,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
 
     if (iKill == 1) {
         CShip* cship = (CShip*)ecx[4];
-        uint iClientID = cship->GetOwnerPlayer();
+        ClientId iClientID = cship->GetOwnerPlayer();
         
         uint iKillerID = 0;
         if (iClientID) {
@@ -562,7 +562,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
 
 // This will save whether the player wants to receieve the /dp notice or not to
 // the flhookuser.ini file
-void SaveDPNoticeToCharFile(uint iClientID, std::string value) {
+void SaveDPNoticeToCharFile(ClientId iClientID, std::string value) {
     std::wstring wscDir, wscFilename;
     CAccount *acc = Players.FindAccountFromClientID(iClientID);
     if (HKHKSUCCESS(HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename)) &&
@@ -579,7 +579,7 @@ void SaveDPNoticeToCharFile(uint iClientID, std::string value) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // /dp command. Shows information about death penalty
-bool UserCmd_DP(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_DP(ClientId iClientID, const std::wstring &wscCmd,
                 const std::wstring &wscParam, const wchar_t *usage) {
 
     // If there is no death penalty, no point in having death penalty commands
@@ -628,7 +628,7 @@ bool UserCmd_DP(uint iClientID, const std::wstring &wscCmd,
 }
 
 // Additional information related to the plugin when the /help command is used
-void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
     returncode = DEFAULT_RETURNCODE;
     PrintUserCmdText(iClientID, L"/dp");
 }
@@ -643,7 +643,7 @@ USERCMD UserCmds[] = {
 };
 
 // Process user input
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     try {

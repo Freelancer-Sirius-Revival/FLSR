@@ -20,7 +20,7 @@
 #include "Main.h"
 
 namespace HyperJump {
-bool InitJumpDriveInfo(uint iClientID);
+bool InitJumpDriveInfo(ClientId iClientID);
 
 // Check that the item is a ship, cargo or equipment item is valid
 static uint CreateValidID(const char *nickname) {
@@ -137,7 +137,7 @@ static void EncryptDecrypt(char *ibuf, char *obuf) {
     }
 }
 
-void SwitchSystem(uint iClientID, uint system, Vector pos, Matrix ornt) {
+void SwitchSystem(ClientId iClientID, uint system, Vector pos, Matrix ornt) {
     mapDeferredJumps[iClientID].system = system;
     mapDeferredJumps[iClientID].pos = pos;
     mapDeferredJumps[iClientID].ornt = ornt;
@@ -238,7 +238,7 @@ void HyperJump::LoadSettings(const std::string &scPluginCfgFile) {
     ConPrint(L"Jumpdrive [%d]\n", mapJumpDriveArch.size());
 }
 
-void SetFuse(uint iClientID, uint fuse) {
+void SetFuse(ClientId iClientID, uint fuse) {
     JUMPDRIVE &jd = mapJumpDrives[iClientID];
     if (jd.active_fuse) {
         IObjInspectImpl *obj = HkGetInspect(iClientID);
@@ -257,7 +257,7 @@ void SetFuse(uint iClientID, uint fuse) {
     }
 }
 
-void AddChargeFuse(uint iClientID, uint fuse) {
+void AddChargeFuse(ClientId iClientID, uint fuse) {
     IObjInspectImpl *obj = HkGetInspect(iClientID);
     if (obj) {
         mapJumpDrives[iClientID].active_charge_fuse.push_back(fuse);
@@ -265,7 +265,7 @@ void AddChargeFuse(uint iClientID, uint fuse) {
     }
 }
 
-void StopChargeFuses(uint iClientID) {
+void StopChargeFuses(ClientId iClientID) {
     IObjInspectImpl *obj = HkGetInspect(iClientID);
     if (obj) {
         for (auto &fuse : mapJumpDrives[iClientID].active_charge_fuse)
@@ -279,7 +279,7 @@ void HyperJump::Timer() {
 
     // Handle survey charging
     for (auto &iter : mapSurvey) {
-        uint iClientID = iter.first;
+        ClientId iClientID = iter.first;
 
         uint iShip;
         pub::Player::GetShip(iClientID, iShip);
@@ -373,7 +373,7 @@ void HyperJump::Timer() {
 
     // Handle jump drive charging
     for (auto &iter : mapJumpDrives) {
-        uint iClientID = iter.first;
+        ClientId iClientID = iter.first;
 
         uint iShip;
         pub::Player::GetShip(iClientID, iShip);
@@ -577,7 +577,7 @@ void HyperJump::Timer() {
 
     // Handle testbot jumping.
     for (auto &iter : mapTestBots) {
-        uint iClientID = iter.first;
+        ClientId iClientID = iter.first;
         TESTBOT &tb = iter.second;
 
         if (tb.bBaseTest) {
@@ -680,7 +680,7 @@ void HyperJump::SendDeathMsg(const std::wstring &wscMsg, uint iSystem,
 }
 
 bool HyperJump::SystemSwitchOutComplete(unsigned int iShip,
-                                        unsigned int iClientID) {
+                                         ClientId iClientID) {
     static PBYTE SwitchOut = 0;
     if (!SwitchOut) {
         SwitchOut = (PBYTE)hModServer + 0xf600;
@@ -744,7 +744,7 @@ bool HyperJump::SystemSwitchOutComplete(unsigned int iShip,
     return false;
 }
 
-void HyperJump::ClearClientInfo(uint iClientID) {
+void HyperJump::ClearClientInfo(ClientId iClientID) {
     mapTestBots.erase(iClientID);
     mapDeferredJumps.erase(iClientID);
     mapJumpDrives.erase(iClientID);
@@ -998,7 +998,7 @@ void HyperJump::AdminCmd_TestBot(CCmds *cmds, const std::wstring &wscSystemNick,
     cmds->Print(L"ERR System or base not found\n");
 }
 
-bool InitJumpDriveInfo(uint iClientID) {
+bool InitJumpDriveInfo(ClientId iClientID) {
     // Initialise the drive parameters for this ship
     if (mapJumpDrives.find(iClientID) == mapJumpDrives.end()) {
         mapJumpDrives[iClientID].arch.nickname = 0;
@@ -1042,7 +1042,7 @@ bool InitJumpDriveInfo(uint iClientID) {
     return true;
 }
 
-bool InitSurveyInfo(uint iClientID) {
+bool InitSurveyInfo(ClientId iClientID) {
     // Initialise the drive parameters for this ship
     if (mapSurvey.find(iClientID) == mapSurvey.end()) {
         mapSurvey[iClientID].arch.nickname = 0;
@@ -1071,7 +1071,7 @@ bool InitSurveyInfo(uint iClientID) {
     return true;
 }
 
-bool HyperJump::UserCmd_Survey(uint iClientID, const std::wstring &wscCmd,
+bool HyperJump::UserCmd_Survey(ClientId iClientID, const std::wstring &wscCmd,
                                const std::wstring &wscParam,
                                const wchar_t *usage) {
     // If no ship, report a warning
@@ -1108,7 +1108,7 @@ bool HyperJump::UserCmd_Survey(uint iClientID, const std::wstring &wscCmd,
     }
 }
 
-bool HyperJump::UserCmd_SetCoords(uint iClientID, const std::wstring &wscCmd,
+bool HyperJump::UserCmd_SetCoords(ClientId iClientID, const std::wstring &wscCmd,
                                   const std::wstring &wscParam,
                                   const wchar_t *usage) {
     if (!InitJumpDriveInfo(iClientID)) {
@@ -1183,7 +1183,7 @@ bool HyperJump::UserCmd_SetCoords(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool HyperJump::UserCmd_ChargeJumpDrive(uint iClientID,
+bool HyperJump::UserCmd_ChargeJumpDrive(ClientId iClientID,
                                         const std::wstring &wscCmd,
                                         const std::wstring &wscParam,
                                         const wchar_t *usage) {
@@ -1240,7 +1240,7 @@ bool HyperJump::UserCmd_ChargeJumpDrive(uint iClientID,
     return true;
 }
 
-bool HyperJump::UserCmd_ActivateJumpDrive(uint iClientID,
+bool HyperJump::UserCmd_ActivateJumpDrive(ClientId iClientID,
                                           const std::wstring &wscCmd,
                                           const std::wstring &wscParam,
                                           const wchar_t *usage) {
@@ -1331,7 +1331,7 @@ time_t filetime_to_timet(const FILETIME &ft) {
 
 // Move the ship's starting position randomly if it has been logged out in
 // space.
-void HyperJump::PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
+void HyperJump::PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
     static const uint MAX_DRIFT = 50000;
 
     // Find the time this ship was last online.
@@ -1376,7 +1376,7 @@ void HyperJump::PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
     pub::Player::SetInitialPos(iClientID, pos);
 }
 
-void HyperJump::MissileTorpHit(uint iClientID, DamageList *dmg) {
+void HyperJump::MissileTorpHit(ClientId iClientID, DamageList *dmg) {
     if (mapSurvey.find(iClientID) != mapSurvey.find(iClientID)) {
         if (dmg->get_cause() == 6 || dmg->get_cause() == 0x15) {
             mapSurvey[iClientID].curr_charge = 0;

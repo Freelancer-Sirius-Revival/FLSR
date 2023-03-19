@@ -35,7 +35,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     return true;
 }
 
-void UserCmd_MarkObj(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_MarkObj(ClientId iClientID, const std::wstring &wscParam) {
     uint iShip, iTargetShip;
     pub::Player::GetShip(iClientID, iShip);
     pub::SpaceObj::GetTarget(iShip, iTargetShip);
@@ -58,7 +58,7 @@ void UserCmd_MarkObj(uint iClientID, const std::wstring &wscParam) {
     }
 }
 
-void UserCmd_UnMarkObj(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_UnMarkObj(ClientId iClientID, const std::wstring &wscParam) {
     uint iShip, iTargetShip;
     pub::Player::GetShip(iClientID, iShip);
     pub::SpaceObj::GetTarget(iShip, iTargetShip);
@@ -79,12 +79,12 @@ void UserCmd_UnMarkObj(uint iClientID, const std::wstring &wscParam) {
     }
 }
 
-void UserCmd_UnMarkAllObj(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_UnMarkAllObj(ClientId iClientID, const std::wstring &wscParam) {
     HkUnMarkAllObjects(iClientID);
     // PRINT_OK()
 }
 
-void UserCmd_MarkObjGroup(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_MarkObjGroup(ClientId iClientID, const std::wstring &wscParam) {
     uint iShip, iTargetShip;
     pub::Player::GetShip(iClientID, iShip);
     pub::SpaceObj::GetTarget(iShip, iTargetShip);
@@ -109,7 +109,7 @@ void UserCmd_MarkObjGroup(uint iClientID, const std::wstring &wscParam) {
     }
 }
 
-void UserCmd_UnMarkObjGroup(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_UnMarkObjGroup(ClientId iClientID, const std::wstring &wscParam) {
     uint iShip, iTargetShip;
     pub::Player::GetShip(iClientID, iShip);
     pub::SpaceObj::GetTarget(iShip, iTargetShip);
@@ -128,7 +128,7 @@ void UserCmd_UnMarkObjGroup(uint iClientID, const std::wstring &wscParam) {
     }
 }
 
-void UserCmd_SetIgnoreGroupMark(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_SetIgnoreGroupMark(ClientId iClientID, const std::wstring &wscParam) {
     std::wstring wscError[] = {
         L"Error: Invalid parameters",
         L"Usage: /ignoregroupmarks <on|off>",
@@ -165,7 +165,7 @@ void UserCmd_SetIgnoreGroupMark(uint iClientID, const std::wstring &wscParam) {
     }
 }
 
-void UserCmd_AutoMark(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_AutoMark(ClientId iClientID, const std::wstring &wscParam) {
     if (set_fAutoMarkRadius <= 0.0f) // automarking disabled
     {
         PRINT_DISABLED();
@@ -270,7 +270,7 @@ void UserCmd_AutoMark(uint iClientID, const std::wstring &wscParam) {
     }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-char HkMarkObject(uint iClientID, uint iObject) {
+char HkMarkObject(ClientId iClientID, uint iObject) {
     if (!iObject)
         return 1;
 
@@ -316,7 +316,7 @@ char HkMarkObject(uint iClientID, uint iObject) {
     return 0;
 }
 
-char HkUnMarkObject(uint iClientID, uint iObject) {
+char HkUnMarkObject(ClientId iClientID, uint iObject) {
     if (!iObject)
         return 1;
 
@@ -369,7 +369,7 @@ char HkUnMarkObject(uint iClientID, uint iObject) {
     return 2;
 }
 
-void HkUnMarkAllObjects(uint iClientID) {
+void HkUnMarkAllObjects(ClientId iClientID) {
     for (uint i = 0; i < Mark[iClientID].vMarkedObjs.size(); i++) {
         pub::Player::MarkObj(iClientID, (Mark[iClientID].vMarkedObjs[i]), 0);
     }
@@ -390,7 +390,7 @@ std::string ftos(float f) {
     return szBuf;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ClearClientMark(uint iClientID) {
+void ClearClientMark(ClientId iClientID) {
     Mark[iClientID].bMarkEverything = false;
     Mark[iClientID].vMarkedObjs.clear();
     Mark[iClientID].vDelayedSystemMarkedObjs.clear();
@@ -549,7 +549,7 @@ void HkTimerMarkDelay() {
             // for all players
             struct PlayerData *pPD = 0;
             while (pPD = Players.traverse_active(pPD)) {
-                uint iClientID = HkGetClientIdFromPD(pPD);
+                ClientId iClientID = HkGetClientIdFromPD(pPD);
                 if (Players[iClientID].iSystemID == iItemSystem) {
                     pub::SpaceObj::GetLocation(Players[iClientID].iShipID,
                                                vPlayer, mTemp);
@@ -568,7 +568,7 @@ void HkTimerMarkDelay() {
 namespace HkIServerImpl {
 EXPORT void __stdcall JumpInComplete(unsigned int iSystemID,
                                      unsigned int iShip) {
-    uint iClientID = HkGetClientIDByShip(iShip);
+    ClientId iClientID = HkGetClientIDByShip(iShip);
     if (!iClientID)
         return;
     std::vector<uint> vTempMark;
@@ -610,7 +610,7 @@ EXPORT void __stdcall JumpInComplete(unsigned int iSystemID,
 }
 
 EXPORT void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip) {
-    uint iClientID = HkGetClientIDByShip(iShip);
+    ClientId iClientID = HkGetClientIDByShip(iShip);
     if (!iClientID)
         return;
     for (uint i = 0; i < Mark[iClientID].vMarkedObjs.size(); i++) {
@@ -628,7 +628,7 @@ EXPORT void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip) {
     }
 }
 
-EXPORT void __stdcall BaseEnter(unsigned int iBaseID, unsigned int iClientID) {
+EXPORT void __stdcall BaseEnter(unsigned int iBaseID,  ClientId iClientID) {
     Mark[iClientID].vAutoMarkedObjs.clear();
     Mark[iClientID].vDelayedAutoMarkedObjs.clear();
 }
@@ -664,14 +664,14 @@ EXPORT int __stdcall Update() {
     return 0;
 }
 
-EXPORT void __stdcall DisConnect(unsigned int iClientID,
+EXPORT void __stdcall DisConnect( ClientId iClientID,
                                  enum EFLConnection p2) {
     returncode = DEFAULT_RETURNCODE;
     ClearClientMark(iClientID);
 }
 } // namespace HkIServerImpl
 
-EXPORT void LoadUserCharSettings(uint iClientID) {
+EXPORT void LoadUserCharSettings(ClientId iClientID) {
     CAccount *acc = Players.FindAccountFromClientID(iClientID);
     std::wstring wscDir;
     HkGetAccountDirName(acc, wscDir);
@@ -688,7 +688,7 @@ EXPORT void LoadUserCharSettings(uint iClientID) {
         IniGetF(scUserFile, scSection, "automarkradius", set_fAutoMarkRadius);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-EXPORT void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+EXPORT void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
     PrintUserCmdText(iClientID, L"/mark /m ");
     PrintUserCmdText(
         iClientID,
@@ -731,7 +731,7 @@ USERCMD UserCmds[] = {
     {L"/automark", UserCmd_AutoMark},
 };
 
-EXPORT bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+EXPORT bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     std::wstring wscCmdLower = ToLower(wscCmd);
     for (uint i = 0; (i < sizeof(UserCmds) / sizeof(USERCMD)); i++) {
         if (wscCmdLower.find(ToLower(UserCmds[i].wszCmd)) == 0) {

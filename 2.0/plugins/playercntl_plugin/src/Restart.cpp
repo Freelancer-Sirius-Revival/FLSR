@@ -59,7 +59,7 @@ void Restart::LoadSettings(const std::string &scPluginCfgFile) {
     }
 }
 
-bool Restart::UserCmd_ShowRestarts(uint iClientID, const std::wstring &wscCmd,
+bool Restart::UserCmd_ShowRestarts(ClientId iClientID, const std::wstring &wscCmd,
                                    const std::wstring &wscParam,
                                    const wchar_t *usage) {
     WIN32_FIND_DATA FileData;
@@ -107,7 +107,7 @@ struct RESTART {
 };
 std::list<RESTART> pendingRestarts;
 
-bool Restart::UserCmd_Restart(uint iClientID, const std::wstring &wscCmd,
+bool Restart::UserCmd_Restart(ClientId iClientID, const std::wstring &wscCmd,
                               const std::wstring &wscParam,
                               const wchar_t *usage) {
     std::wstring wscFaction = GetParam(wscParam, ' ', 0);

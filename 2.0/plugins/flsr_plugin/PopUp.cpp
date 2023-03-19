@@ -11,7 +11,7 @@ namespace PopUp {
 
     std::map<std::wstring, PopUpBox> mPopUpBox;
 
-	void WelcomeBox(uint iClientID) 
+	void WelcomeBox(ClientId iClientID) 
 	{
         if (Modules::GetModuleState("WelcomeMSG")) {
             std::wstring wscCharnameWelcomePopUp = (wchar_t *)Players.GetActiveCharacterName(iClientID);
@@ -44,11 +44,16 @@ namespace PopUp {
         }
 	}
 
-    void OpenPopUp(uint iClientID)
+    void OpenPopUp(ClientId iClientID)
     {
         //Get Data
+      //  std::wstring wscCharFileName;
+       // HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+
+
+        std::wstring CharFileName = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
         std::wstring wscCharFileName;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+        HkGetCharFileName(CharFileName, wscCharFileName);
 
         //Get PopUpBox
         PopUpBox NewPopUpBox = PopUp::mPopUpBox[wscCharFileName];
@@ -69,7 +74,7 @@ namespace PopUp {
 
     }
     
-    void HandleButtonClick(uint iClientID, uint buttonClicked)
+    void HandleButtonClick(ClientId iClientID, uint buttonClicked)
     {
         //Not used
         return;
@@ -77,7 +82,11 @@ namespace PopUp {
         
         //Get Data
         std::wstring wscCharFileName;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+
+        std::wstring charname =
+            (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscFilename;
+        HkGetCharFileName(charname, wscCharFileName);
 
         //Get PopUpBox
         PopUpBox NewPopUpBox = PopUp::mPopUpBox[wscCharFileName];

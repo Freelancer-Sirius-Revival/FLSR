@@ -126,9 +126,9 @@ void LoadSettings() {
 
 }
 
-void ClearClientInfo(uint iClientID) { mapClientsCloak.erase(iClientID); }
+void ClearClientInfo(ClientId iClientID) { mapClientsCloak.erase(iClientID); }
 
-void SetCloak(uint iClientID, uint iShipID, bool bOn) {
+void SetCloak(ClientId iClientID, uint iShipID, bool bOn) {
     XActivateEquip ActivateEq;
     ActivateEq.bActivate = bOn;
     ActivateEq.iSpaceID = iShipID;
@@ -136,7 +136,7 @@ void SetCloak(uint iClientID, uint iShipID, bool bOn) {
     Server.ActivateEquip(iClientID, ActivateEq);
 }
 
-void SetState(uint iClientID, uint iShipID, int iNewState) {
+void SetState(ClientId iClientID, uint iShipID, int iNewState) {
     if (mapClientsCloak[iClientID].iState != iNewState) {
         mapClientsCloak[iClientID].iState = iNewState;
         mapClientsCloak[iClientID].tmCloakTime = timeInMS();
@@ -164,7 +164,7 @@ void SetState(uint iClientID, uint iShipID, int iNewState) {
 }
 
 // Returns false if the ship has no fuel to operate its cloaking device.
-static bool ProcessFuel(uint iClientID, CLOAK_INFO &info) {
+static bool ProcessFuel(ClientId iClientID, CLOAK_INFO &info) {
     if (info.bAdmin)
         return true;
 
@@ -183,7 +183,7 @@ static bool ProcessFuel(uint iClientID, CLOAK_INFO &info) {
     return false;
 }
 
-void PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
+void PlayerLaunch_AFTER(unsigned int iShip,  ClientId iClientID) {
     mapClientsCloak[iClientID].bCanCloak = false;
     mapClientsCloak[iClientID].bAdmin = false;
 
@@ -225,7 +225,7 @@ void PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
     }
 }
 
-void BaseEnter(unsigned int iBaseID, unsigned int iClientID) {
+void BaseEnter(unsigned int iBaseID,  ClientId iClientID) {
     mapClientsCloak.erase(iClientID);
 }
 
@@ -234,7 +234,7 @@ void HkTimerCheckKick() {
 
     for (map<uint, CLOAK_INFO>::iterator ci = mapClientsCloak.begin();
          ci != mapClientsCloak.end(); ++ci) {
-        uint iClientID = ci->first;
+        ClientId iClientID = ci->first;
         uint iShipID = Players[iClientID].iShipID;
         CLOAK_INFO &info = ci->second;
 
@@ -279,7 +279,7 @@ void HkTimerCheckKick() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool UserCmd_Cloak(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_Cloak(ClientId iClientID, const std::wstring &wscCmd,
                    const std::wstring &wscParam, const wchar_t *usage) {
     uint iShip;
     pub::Player::GetShip(iClientID, iShip);
@@ -344,7 +344,7 @@ This function is called by FLHook when a user types a chat std::string. We look
 at the std::string they've typed and see if it starts with one of the above
 commands. If it does we try to process it.
 */
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     std::wstring wscCmdLineLower = ToLower(wscCmd);
@@ -386,7 +386,7 @@ bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd) {
     if (IS_CMD("cloak")) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 
-        uint iClientID = HkGetClientIdFromCharname(cmds->GetAdminName());
+        ClientId iClientID = HkGetClientIdFromCharname(cmds->GetAdminName());
         if (iClientID == -1) {
             cmds->Print(L"ERR On console");
             return true;

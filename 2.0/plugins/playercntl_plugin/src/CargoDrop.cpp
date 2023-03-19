@@ -232,12 +232,12 @@ void CargoDrop::SendDeathMsg(const std::wstring &wscMsg, uint iSystem,
     }
 }
 
-void CargoDrop::ClearClientInfo(unsigned int iClientID) {
+void CargoDrop::ClearClientInfo( ClientId iClientID) {
     mapInfo.erase(iClientID);
 }
 
 void CargoDrop::SPObjUpdate(struct SSPObjUpdateInfo const &ui,
-                            unsigned int iClientID) {
+                             ClientId iClientID) {
     mapInfo[iClientID].dLastTimestamp = ui.fTimestamp;
     mapInfo[iClientID].vLastPosition = ui.vPos;
     mapInfo[iClientID].vLastDir = ui.vDir;

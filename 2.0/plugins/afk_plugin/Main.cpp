@@ -10,7 +10,7 @@ std::set<uint> afks;
 void LoadSettings() { returncode = DEFAULT_RETURNCODE; }
 
 // This text mimics the "New Player" messages
-bool RedText(uint iClientID, std::wstring message, std::wstring message2) {
+bool RedText(ClientId iClientID, std::wstring message, std::wstring message2) {
 
     std::wstring charname =
         (const wchar_t *)Players.GetActiveCharacterName(iClientID);
@@ -32,7 +32,7 @@ bool RedText(uint iClientID, std::wstring message, std::wstring message2) {
     // Send to all players in system
     struct PlayerData *pPD = 0;
     while (pPD = Players.traverse_active(pPD)) {
-        uint iClientID = HkGetClientIdFromPD(pPD);
+        ClientId iClientID = HkGetClientIdFromPD(pPD);
         uint iClientSystemID = 0;
         pub::Player::GetSystem(iClientID, iClientSystemID);
 
@@ -43,7 +43,7 @@ bool RedText(uint iClientID, std::wstring message, std::wstring message2) {
 }
 
 // This command is called when a player types /afk
-bool UserCmd_AFK(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_AFK(ClientId iClientID, const std::wstring &wscCmd,
                  const std::wstring &wscParam, const wchar_t *usage) {
     afks.insert(iClientID);
     RedText(iClientID, L"", L" is now away from keyboard.");
@@ -54,7 +54,7 @@ bool UserCmd_AFK(uint iClientID, const std::wstring &wscCmd,
 }
 
 // This function welcomes the player back and removes their afk status
-void Back(uint iClientID) {
+void Back(ClientId iClientID) {
     if (afks.count(iClientID) > 0) {
         afks.erase(iClientID);
         std::wstring message =
@@ -69,14 +69,14 @@ void Back(uint iClientID) {
 }
 
 // This command is called when a player types /back
-bool UserCmd_Back(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_Back(ClientId iClientID, const std::wstring &wscCmd,
                   const std::wstring &wscParam, const wchar_t *usage) {
     Back(iClientID);
     return true;
 }
 
 // Clean up when a client disconnects
-void DisConnect_AFTER(uint iClientID) {
+void DisConnect_AFTER(ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     if (afks.count(iClientID) > 0)
@@ -85,7 +85,7 @@ void DisConnect_AFTER(uint iClientID) {
 
 // Hook on chat being sent (This gets called twice with the iClientID and iTo
 // swapped
-void __stdcall HkCb_SendChat(uint iClientID, uint iTo, uint iSize, void *pRDL) {
+void __stdcall HkCb_SendChat(ClientId iClientID, uint iTo, uint iSize, void *pRDL) {
     returncode = DEFAULT_RETURNCODE;
 
     if (HkIsValidClientID(iTo) && afks.count(iClientID) > 0)
@@ -108,7 +108,7 @@ USERCMD UserCmds[] = {
     {L"/back", UserCmd_Back, L"Usage: /back"},
 };
 
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     std::wstring wscCmdLineLower = ToLower(wscCmd);
@@ -144,7 +144,7 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
 }
 
 // Hook on /help
-EXPORT void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+EXPORT void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
     PrintUserCmdText(iClientID, L"/afk ");
     PrintUserCmdText(iClientID,
                      L"Sets the player to AFK. If any other player messages "

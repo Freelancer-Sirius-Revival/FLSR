@@ -4,7 +4,7 @@ namespace Hooks {
 
 
     //PopUpDialog
-    void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked) {
+    void __stdcall PopUpDialog( ClientId iClientID, unsigned int buttonClicked) {
         returncode = DEFAULT_RETURNCODE;
 
         //ConPrint(L"PopUpDialog %u %u\n", iClientID, buttonClicked);
@@ -12,7 +12,7 @@ namespace Hooks {
     }
 
     //CharacterSelect
-    void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID) {
+    void __stdcall CharacterSelect(struct CHARACTER_ID const &cId,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
 
         //NewPlayerMessage
@@ -44,7 +44,7 @@ namespace Hooks {
         returncode = DEFAULT_RETURNCODE;
 
         //Get ClientID
-        uint iClientID = HkGetClientIDByShip(iShip);
+        ClientId iClientID = HkGetClientIDByShip(iShip);
         if (!iClientID)
             return;
 
@@ -211,7 +211,7 @@ namespace Hooks {
       
    
             CShip* cship = (CShip*)ecx[4];
-            uint iClientID = cship->GetOwnerPlayer();
+            ClientId iClientID = cship->GetOwnerPlayer();
 
             if (iClientID) { // a player was killed
 
@@ -242,7 +242,7 @@ namespace Hooks {
     }
 
     //BaseEnter_AFTER
-    void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID) {
+    void __stdcall BaseEnter_AFTER(unsigned int iBaseID, ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
         //Insurance
         if (Modules::GetModuleState("InsuranceModule"))
@@ -301,7 +301,7 @@ namespace Hooks {
     }
 
 	//SPObjUpdate
-    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui, unsigned int iClientID) {
+    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
         //AC
         if (Modules::GetModuleState("ACModule"))
@@ -322,7 +322,7 @@ namespace Hooks {
     int __cdecl Dock_Call(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response) {
         returncode = DEFAULT_RETURNCODE;
 		
-        uint iClientID = HkGetClientIDByShip(iShip);
+        ClientId iClientID = HkGetClientIDByShip(iShip);
         if (HkIsValidClientID(iClientID)) {
             //AC
             if (Modules::GetModuleState("ACModule"))
@@ -354,7 +354,7 @@ namespace Hooks {
         return 0;
     }
     
-    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID)
+    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5,  ClientId iClientID)
     {
         returncode = DEFAULT_RETURNCODE;
         
@@ -369,7 +369,7 @@ namespace Hooks {
     }
 	
     // Called when a gun hits something
-    void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci, unsigned int iClientID) {
+    void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
 
         //AC
@@ -383,7 +383,7 @@ namespace Hooks {
     void __stdcall JumpInComplete(unsigned int iSystemID, unsigned int iShipID) {
         returncode = DEFAULT_RETURNCODE;
 
-        uint iClientID = HkGetClientIDByShip(iShipID);
+        ClientId iClientID = HkGetClientIDByShip(iShipID);
         if (!iClientID)
             return;
 
@@ -404,7 +404,7 @@ namespace Hooks {
         }
     }
 	
-    void __stdcall SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID) {
+    void __stdcall SystemSwitchOutComplete(unsigned int iShip,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
         		
 		//AC
@@ -480,7 +480,7 @@ namespace Hooks {
     }
 
     /// Clear client info when a client connects.
-    void __stdcall ClearClientInfo(unsigned int iClientID) {
+    void __stdcall ClearClientInfo( ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
 
 		//AC
@@ -512,7 +512,7 @@ namespace Hooks {
 		catch (...) {}
     }
 
-    void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn) {
+    void __stdcall FireWeapon( ClientId iClientID, struct XFireWeaponInfo const& wpn) {
         returncode = DEFAULT_RETURNCODE;
 		
 		//AC
@@ -531,7 +531,7 @@ namespace Hooks {
         }
     }
 
-    void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID) {
+    void __stdcall PlayerLaunch_After(unsigned int iShip,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
 
         //AC
@@ -571,7 +571,7 @@ namespace Hooks {
         ClientController::Send_ControlMsg(false, iClientID, L"_InSpaceState");
     }
 
-    void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count,float status, bool mounted, uint iClientID) {
+    void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count,float status, bool mounted, ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
         
 		//EquipWhiteList
@@ -588,7 +588,7 @@ namespace Hooks {
         }
     }
 
-    void __stdcall ReqShipArch_AFTER(unsigned int iArchID, unsigned int iClientID) {
+    void __stdcall ReqShipArch_AFTER(unsigned int iArchID,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
 		
         //EquipWhiteList
@@ -605,7 +605,7 @@ namespace Hooks {
         }
     }
 
-    void __stdcall ReqEquipment(class EquipDescList const& edl, unsigned int iClientID) {
+    void __stdcall ReqEquipment(class EquipDescList const& edl,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
 		
         //EquipWhiteList
@@ -618,7 +618,7 @@ namespace Hooks {
 		
     }
 
-    void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl) {
+    void __stdcall GoTradelane( ClientId iClientID, struct XGoTradelane const& gtl) {
         returncode = DEFAULT_RETURNCODE;
 		
         //CloakModule
@@ -632,7 +632,7 @@ namespace Hooks {
 
     }
 	
-    void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state) {
+    void __stdcall DisConnect( ClientId iClientID, enum EFLConnection state) {
         returncode = DEFAULT_RETURNCODE;
 		
 		//CloakModule
@@ -654,7 +654,7 @@ namespace Hooks {
         }
     }
     
-    void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID) {
+    void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si,  ClientId iClientID) {
         returncode = DEFAULT_RETURNCODE;
         /*
         std::wstring wscCharname(si.wszCharname);

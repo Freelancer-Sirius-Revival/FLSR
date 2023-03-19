@@ -55,7 +55,7 @@ static std::wstring IniGetLongWS(const std::string &scFile,
     return wscValue;
 }
 
-bool PlayerInfo::UserCmd_ShowInfo(uint iClientID, const std::wstring &wscCmd,
+bool PlayerInfo::UserCmd_ShowInfo(ClientId iClientID, const std::wstring &wscCmd,
                                   const std::wstring &wscParam,
                                   const wchar_t *usage) {
     const wchar_t *wszTargetName = 0;
@@ -124,7 +124,7 @@ static int CurrLength(const std::string &scFilePath) {
     return iCount;
 }
 
-bool PlayerInfo::UserCmd_SetInfo(uint iClientID, const std::wstring &wscCmd,
+bool PlayerInfo::UserCmd_SetInfo(ClientId iClientID, const std::wstring &wscCmd,
                                  const std::wstring &wscParam,
                                  const wchar_t *usage) {
     uint iPara = ToInt(GetParam(wscParam, ' ', 0));

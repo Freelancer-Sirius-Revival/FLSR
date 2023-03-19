@@ -117,7 +117,7 @@ void RepFixer::LoadSettings(const std::string &scPluginCfgFile) {
 
 /// For the specified client ID check and reset any factions that have
 /// reputations that are greater than the allowed value.
-static void CheckReps(unsigned int iClientID) {
+static void CheckReps( ClientId iClientID) {
     std::wstring wscCharName =
         (const wchar_t *)Players.GetActiveCharacterName(iClientID);
 
@@ -178,12 +178,12 @@ static void CheckReps(unsigned int iClientID) {
     }
 }
 
-void RepFixer::PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
+void RepFixer::PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
     if (set_bEnableRepFixUpdates)
         CheckReps(iClientID);
 }
 
-void RepFixer::BaseEnter(unsigned int iBaseID, unsigned int iClientID) {
+void RepFixer::BaseEnter(unsigned int iBaseID,  ClientId iClientID) {
     if (set_bEnableRepFixUpdates)
         CheckReps(iClientID);
 }

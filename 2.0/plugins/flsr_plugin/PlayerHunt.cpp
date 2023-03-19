@@ -31,7 +31,7 @@ namespace PlayerHunt {
 
 	}
 
-	uint getRandomSysteminRange(uint iClientID)
+	uint getRandomSysteminRange(ClientId iClientID)
 	{
 		//Get player system
 		uint iSysIDPlayer;
@@ -76,7 +76,7 @@ namespace PlayerHunt {
 		return Universe::get_system_id(randomSystem.c_str());
 	}
 
-	BaseData getRandomBaseInSystem(uint iPlayerSystemID, uint iClientID)
+	BaseData getRandomBaseInSystem(uint iPlayerSystemID, ClientId iClientID)
 	{
 		//Get Factions fpr Reputation Check
 		std::list<Tools::RepCB> lstTagFactions = Tools::HkGetFactions();
@@ -159,7 +159,7 @@ namespace PlayerHunt {
 		}
 	}
 
-	BaseData getTargetBase(uint iClientID)
+	BaseData getTargetBase(ClientId iClientID)
 	{
 		BaseData TargetBase;
 
@@ -232,7 +232,7 @@ namespace PlayerHunt {
 		
 	}
 	
-	void CheckSystemReached(uint iClientID, uint iPlayerSystemID)
+	void CheckSystemReached(ClientId iClientID, uint iPlayerSystemID)
 	{
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
@@ -258,7 +258,7 @@ namespace PlayerHunt {
 		}
 	}
 
-	void CheckDock(uint iBaseID, uint iClientID)
+	void CheckDock(uint iBaseID, ClientId iClientID)
 	{
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
@@ -289,7 +289,7 @@ namespace PlayerHunt {
 		}
 	}
 
-	void CheckDisConnect(uint iClientID)
+	void CheckDisConnect(ClientId iClientID)
 	{
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
@@ -308,7 +308,7 @@ namespace PlayerHunt {
 		}
 	}
 
-	void CheckDied(uint iClientID,uint iClientKillerID)
+	void CheckDied(ClientId iClientID,uint iClientKillerID)
 	{
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
@@ -336,7 +336,7 @@ namespace PlayerHunt {
 
 	}
 	
-	void Start_PlayerHunt(uint iClientID, const std::wstring& wscParam)
+	void Start_PlayerHunt(ClientId iClientID, const std::wstring& wscParam)
 	{
 		// The last error.
 		HK_ERROR err;

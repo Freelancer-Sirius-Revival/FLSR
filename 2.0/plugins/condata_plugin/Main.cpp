@@ -65,7 +65,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ClearConData(uint iClientID) {
+void ClearConData(ClientId iClientID) {
     ConData[iClientID].iAverageLoss = 0;
     ConData[iClientID].iAveragePing = 0;
     ConData[iClientID].iLastLoss = 0;
@@ -86,7 +86,7 @@ void ClearConData(uint iClientID) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EXPORT void ClearClientInfo(uint iClientID) {
+EXPORT void ClearClientInfo(ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     ClearConData(iClientID);
@@ -94,7 +94,7 @@ EXPORT void ClearClientInfo(uint iClientID) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EXPORT void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+EXPORT void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
 
     if (set_bPingCmd) {
         PrintUserCmdText(iClientID, L"/ping");
@@ -111,7 +111,7 @@ EXPORT void HkTimerCheckKick() {
         // for all players
         struct PlayerData *pPD = 0;
         while (pPD = Players.traverse_active(pPD)) {
-            uint iClientID = HkGetClientIdFromPD(pPD);
+            ClientId iClientID = HkGetClientIdFromPD(pPD);
             if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
                 continue;
 
@@ -199,7 +199,7 @@ void TimerUpdatePingData() {
     // for all players
     struct PlayerData *pPD = 0;
     while (pPD = Players.traverse_active(pPD)) {
-        uint iClientID = HkGetClientIdFromPD(pPD);
+        ClientId iClientID = HkGetClientIdFromPD(pPD);
         if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
             continue;
 
@@ -252,7 +252,7 @@ void TimerUpdateLossData() {
     uint iNewSent;
     struct PlayerData *pPD = 0;
     while (pPD = Players.traverse_active(pPD)) {
-        uint iClientID = HkGetClientIdFromPD(pPD);
+        ClientId iClientID = HkGetClientIdFromPD(pPD);
         if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
             continue;
 
@@ -341,7 +341,7 @@ EXPORT int __stdcall Update() {
         // check for logged in players and reset their connection data
         struct PlayerData *pPD = 0;
         while (pPD = Players.traverse_active(pPD)) {
-            uint iClientID = pPD->iOnlineID;
+            ClientId iClientID = pPD->iOnlineID;
             if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
                 continue;
 
@@ -364,7 +364,7 @@ EXPORT int __stdcall Update() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EXPORT void __stdcall PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
+EXPORT void __stdcall PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
 
     ConData[iClientID].tmLastObjUpdate = 0;
 }
@@ -372,7 +372,7 @@ EXPORT void __stdcall PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EXPORT void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,
-                                  unsigned int iClientID) {
+                                   ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // lag detection
@@ -428,7 +428,7 @@ EXPORT void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void UserCmd_Ping(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_Ping(ClientId iClientID, const std::wstring &wscParam) {
     if (!set_bPingCmd) {
         PRINT_DISABLED();
         return;
@@ -498,7 +498,7 @@ void UserCmd_Ping(uint iClientID, const std::wstring &wscParam) {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void UserCmd_PingTarget(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_PingTarget(ClientId iClientID, const std::wstring &wscParam) {
     if (!set_bPingCmd) {
         PRINT_DISABLED();
         return;
@@ -604,7 +604,7 @@ USERCMD UserCmds[] = {
     {L"/pingtarget", UserCmd_PingTarget},
 };
 
-EXPORT bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+EXPORT bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
 
     std::wstring wscCmdLower = ToLower(wscCmd);
 
@@ -673,7 +673,7 @@ EXPORT bool ExecuteCommandString_Callback(CCmds *classptr,
     if (IS_CMD("getstats")) {
         struct PlayerData *pPD = 0;
         while (pPD = Players.traverse_active(pPD)) {
-            uint iClientID = HkGetClientIdFromPD(pPD);
+            ClientId iClientID = HkGetClientIdFromPD(pPD);
             if (HkIsInCharSelectMenu(iClientID))
                 continue;
 
@@ -705,7 +705,7 @@ EXPORT bool ExecuteCommandString_Callback(CCmds *classptr,
         classptr->Print(L"OK\n");
 
         // If the client is still active then force the disconnect.
-        uint iClientID = HkGetClientIdFromAccount(acc);
+        ClientId iClientID = HkGetClientIdFromAccount(acc);
         if (iClientID != -1) {
             classptr->Print(L"Forcing logout on iClientID=%d\n", iClientID);
             Players.logout(iClientID);

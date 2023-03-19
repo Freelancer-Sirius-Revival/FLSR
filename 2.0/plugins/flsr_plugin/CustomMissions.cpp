@@ -117,7 +117,7 @@ namespace CustomMissions {
 	}
 
 	
-	void Send_WPs(uint iClientID, std::list <CustomMissions::PlayerWaypoint> lWP, bool bBestPath)
+	void Send_WPs(ClientId iClientID, std::list <CustomMissions::PlayerWaypoint> lWP, bool bBestPath)
 	{	
 		int iCountWaypoints = lWP.size();
 		std::string DataToSend;

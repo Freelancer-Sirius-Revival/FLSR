@@ -89,22 +89,22 @@ namespace Commands {
     void AdminCmd_Stalk(CCmds *cmds, std::wstring Charname = L"");
     void CmdHelp_Callback(CCmds *classptr);
     bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd);
-    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_DOCKACCEPT(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_ENABLECARRIER(uint iClientID, const std::wstring &wscParam);
-    void UserCmd_MODREQUEST(uint iClientID, const std::wstring &wscParam);
-    bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd);
-    void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam);
-    void UserCmd_UV(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_INSURANCE_AUTOSAVE(uint iClientID, const std::wstring &wscParam);
-    void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_Tag(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam);
+    void UserCMD_Clear(ClientId iClientID, const std::wstring &wscParam);
+    void UserCMD_Contributor(ClientId iClientID, const std::wstring &wscParam);
+    void UserCMD_DOCKACCEPT(ClientId iClientID, const std::wstring &wscParam);
+    void UserCMD_DOCKREQUEST(ClientId iClientID, const std::wstring &wscParam);
+    void UserCMD_ENABLECARRIER(ClientId iClientID, const std::wstring &wscParam);
+    void UserCmd_MODREQUEST(ClientId iClientID, const std::wstring &wscParam);
+    bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd);
+    void UserCMD_SendCash$(ClientId iClientID, const std::wstring &wscParam);
+    void UserCMD_SendCash(ClientId iClientID, const std::wstring &wscParam);
+    void UserCmd_UV(ClientId iClientID, const std::wstring &wscParam);
+    void UserCMD_INSURANCE_AUTOSAVE(ClientId iClientID, const std::wstring &wscParam);
+    void UserCmd_CLOAK(ClientId iClientID, const std::wstring& wscParam);
+    void UserCmd_UNCLOAK(ClientId iClientID, const std::wstring& wscParam);
+    void UserCmd_HELP(ClientId iClientID, const std::wstring& wscParam);
+    void UserCmd_Tag(ClientId iClientID, const std::wstring& wscParam);
+    void UserCmd_PLAYERHUNT(ClientId iClientID, const std::wstring& wscParam);
     
     typedef void (*_UserCmdProc)(uint, const std::wstring &);
     struct USERCMD {
@@ -135,9 +135,9 @@ namespace PopUp {
     extern uint iWMsg_Head;
     extern uint iWMsg_Body;
 
-    void WelcomeBox(uint iClientID);
-    void OpenPopUp(uint iClientID);
-    void HandleButtonClick(uint iClientID, uint buttonClicked);
+    void WelcomeBox(ClientId iClientID);
+    void OpenPopUp(ClientId iClientID);
+    void HandleButtonClick(ClientId iClientID, uint buttonClicked);
 
     enum PopUpType {
 		PopUpType_Help
@@ -188,7 +188,7 @@ namespace Tools {
 
 
     extern std::list <CMPDump_Exception> lCMPUpdateExceptions;
-    void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId);
+    void HkNewPlayerMessage(ClientId iClientID, struct CHARACTER_ID const &cId);
     void HkClearMissionBug(int clientID);
     extern std::wstring CS_wscCharBefore;
     extern std::string base64_chars;
@@ -196,11 +196,11 @@ namespace Tools {
     static inline bool is_base64(unsigned char c);
     std::string base64_encode(unsigned char const *bytes_to_encode, unsigned int in_len);
     std::string base64_decode(std::string const &encoded_string);
-    std::vector<std::string> HkGetCollisionGroups(uint iClientID, bool bOnly);
+    std::vector<std::string> HkGetCollisionGroups(ClientId iClientID, bool bOnly);
     bool startsWith(std::string_view str, std::string_view prefix);
     bool endsWith(std::string_view str, std::string_view suffix);
-    std::vector<std::string> GetHardpointsFromCollGroup(uint iClientID);
-    float CalcDisabledHardpointWorth(uint iClientID);
+    std::vector<std::string> GetHardpointsFromCollGroup(ClientId iClientID);
+    float CalcDisabledHardpointWorth(ClientId iClientID);
     void replace_first(std::string &s, std::string const &toReplace,std::string const &replaceWith);
     std::string StringBetween(std::string str, std::string first, std::string last);
     bool GetB(std::string svalue);
@@ -209,7 +209,7 @@ namespace Tools {
     Matrix Rz(float angleDeg);
     HK_ERROR FLSR_HkFLIniGet(const std::wstring& wscCharname, const std::wstring& wscKey, std::wstring& wscRet);
     HK_ERROR FLSR_HkFLIniWrite(const std::wstring & wscCharname, const std::wstring & wscKey, const std::wstring & wscValue);
-    bool IsPlayerInRange(uint iClientID, uint iClientID2, float fDistance);
+    bool IsPlayerInRange(ClientId iClientID, uint iClientID2, float fDistance);
     void get_cmpfiles(const std::filesystem::path& path);
     void get_cmpExceptions();
     std::vector<std::string> getHardpoints(std::string scParent, std::list<CMPDump_Entry> CMPList);
@@ -423,44 +423,44 @@ namespace Docking {
     extern float fDockRange;
 
 
-    void ClearCarrier(uint iClientID);
-    void HandleUndocking(uint iClientID);
+    void ClearCarrier(ClientId iClientID);
+    void HandleUndocking(ClientId iClientID);
     void DockRequest3000ms();
-    bool FLSR_SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID, unsigned int iSystem, bool bstalkmode = false);
-    void DockOnProxyCarrierBase(std::string scBasename, uint iClientID, std::string scCarrierBase, uint iCarrierID);
-    void UndockProxyBase(uint iCarrierId, uint iClientID, float fx_Undock, float fy_Undock, float fz_Undock, bool bstalkmode = false);
-    void DOCKACCEPT_ALL(uint iClientID);
+    bool FLSR_SystemSwitchOutComplete(unsigned int iShip,  ClientId iClientID, unsigned int iSystem, bool bstalkmode = false);
+    void DockOnProxyCarrierBase(std::string scBasename, ClientId iClientID, std::string scCarrierBase, uint iCarrierID);
+    void UndockProxyBase(uint iCarrierId, ClientId iClientID, float fx_Undock, float fy_Undock, float fz_Undock, bool bstalkmode = false);
+    void DOCKACCEPT_ALL(ClientId iClientID);
 }
 
 namespace Hooks {
-    void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
-    void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
+    void __stdcall PopUpDialog( ClientId iClientID, unsigned int buttonClicked);
+    void __stdcall CharacterSelect(struct CHARACTER_ID const &cId,  ClientId iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
     void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1, float damage, enum DamageEntry::SubObjFate fate);
     void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill);
-    void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID);
-    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui, unsigned int iClientID);
+    void __stdcall BaseEnter_AFTER(unsigned int iBaseID,  ClientId iClientID);
+    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,  ClientId iClientID);
     void __stdcall SubmitChat(CHAT_ID cId, unsigned long lP1, void const *rdlReader, CHAT_ID cIdTo, int iP2);
     int __cdecl Dock_Call(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response);
-	void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci, unsigned int iClientID);
+	void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci,  ClientId iClientID);
     void __stdcall JumpInComplete(unsigned int iSystemID, unsigned int iShipID);
-	void __stdcall SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID);
-    void __stdcall ClearClientInfo(unsigned int iClientID);
-    void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn);
-    void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID);
-    void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID);
-    void __stdcall ReqShipArch_AFTER(unsigned int iArchID, unsigned int iClientID);
-	void __stdcall ReqEquipment(class EquipDescList const& edl, unsigned int iClientID);
-	void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
-    void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state);
-    void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
-    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
+	void __stdcall SystemSwitchOutComplete(unsigned int iShip,  ClientId iClientID);
+    void __stdcall ClearClientInfo( ClientId iClientID);
+    void __stdcall FireWeapon( ClientId iClientID, struct XFireWeaponInfo const& wpn);
+    void __stdcall PlayerLaunch_After(unsigned int iShip,  ClientId iClientID);
+    void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, ClientId iClientID);
+    void __stdcall ReqShipArch_AFTER(unsigned int iArchID,  ClientId iClientID);
+	void __stdcall ReqEquipment(class EquipDescList const& edl,  ClientId iClientID);
+	void __stdcall GoTradelane( ClientId iClientID, struct XGoTradelane const& gtl);
+    void __stdcall DisConnect( ClientId iClientID, enum EFLConnection state);
+    void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si,  ClientId iClientID);
+    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5,  ClientId iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
 
     }
 
 namespace ClientController {
-    void Send_ControlMsg(bool sHook, uint iClientID, std::wstring wscText, ...);
+    void Send_ControlMsg(bool sHook, ClientId iClientID, std::wstring wscText, ...);
     void Handle_ClientControlMsg(CHAT_ID cId, unsigned long lP1, void const* rdlReader, CHAT_ID cIdTo, int iP2);
 }
 
@@ -469,16 +469,16 @@ namespace Insurance {
     extern float set_fCostPercent;
     
     extern bool Insurance_Module;
-    void CreateNewInsurance(uint iClientID, bool bFreeItem);
-    void UseInsurance(uint iClientID);
-    void PlayerDiedEvent(bool bDied, uint iClientID);
-    bool CheckPlayerDied(uint iClientID);
+    void CreateNewInsurance(ClientId iClientID, bool bFreeItem);
+    void UseInsurance(ClientId iClientID);
+    void PlayerDiedEvent(bool bDied, ClientId iClientID);
+    bool CheckPlayerDied(ClientId iClientID);
     bool FindHardpointCargolist(std::list<CARGO_INFO> &cargolist, CacheString &hardpoint);   
-    void BookInsurance(uint iClientID, bool bFreeItem);
-    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID);
-    std::wstring CalcInsurance(uint iClientID, bool bPlayerCMD, bool bFreeInsurance);
+    void BookInsurance(ClientId iClientID, bool bFreeItem);
+    std::pair<bool, bool> CheckInsuranceBooked(ClientId iClientID);
+    std::wstring CalcInsurance(ClientId iClientID, bool bPlayerCMD, bool bFreeInsurance);
     bool insurace_exists(const std::string &name);
-    void ReNewInsurance(uint iClientID);
+    void ReNewInsurance(ClientId iClientID);
 
     extern struct PlayerDied {
 
@@ -536,34 +536,34 @@ namespace Insurance {
 namespace AntiCheat {
 
     namespace TimingAC {    
-        void Init(unsigned int iClientID);
-        void CheckTimeStamp(struct SSPObjUpdateInfo const &pObjInfo, unsigned int iClientID);       
+        void Init( ClientId iClientID);
+        void CheckTimeStamp(struct SSPObjUpdateInfo const &pObjInfo,  ClientId iClientID);       
     }
         
     namespace SpeedAC {
-		void Init(uint iClientID);
-        void UpdateShipSpeed(uint iClientID);
-        float GetPlayerAllowedSpeed(uint iClientID, enum ENGINE_STATE state);
-        bool CheckClientSpeed(uint iClientID, std::vector<float>& vecTimes, std::vector<float>& vecDistances, enum ENGINE_STATE engineState);
-        void vDunno1(uint iClientID, mstime delay);
-        void vDunno2(uint iClientID);
+		void Init(ClientId iClientID);
+        void UpdateShipSpeed(ClientId iClientID);
+        float GetPlayerAllowedSpeed(ClientId iClientID, enum ENGINE_STATE state);
+        bool CheckClientSpeed(ClientId iClientID, std::vector<float>& vecTimes, std::vector<float>& vecDistances, enum ENGINE_STATE engineState);
+        void vDunno1(ClientId iClientID, mstime delay);
+        void vDunno2(ClientId iClientID);
         int iDunno3(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response);
-        void CheckSpeedCheat(struct SSPObjUpdateInfo const& pObjInfo, unsigned int iClientID);
+        void CheckSpeedCheat(struct SSPObjUpdateInfo const& pObjInfo,  ClientId iClientID);
     }
 
     namespace PowerAC {
-        void Init(unsigned int iClientID);
-        void Setup(unsigned int iClientID);
-        void FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const wpn);
+        void Init( ClientId iClientID);
+        void Setup( ClientId iClientID);
+        void FireWeapon( ClientId iClientID, struct XFireWeaponInfo const wpn);
     }
  
     namespace Reporting {
-        void ReportCheater(uint iClientID, std::string scType, std::string sData);
-        std::string CreateReport(uint iClientID, std::wstring wscType,std::wstring wscTime, std::wstring wscDETAILS);
+        void ReportCheater(ClientId iClientID, std::string scType, std::string sData);
+        std::string CreateReport(ClientId iClientID, std::wstring wscType,std::wstring wscTime, std::wstring wscDETAILS);
     }
     
     namespace DataGrab {
-        void CharnameToFLHOOKUSER_FILE(uint iClientID);
+        void CharnameToFLHOOKUSER_FILE(ClientId iClientID);
     }
 
     struct AC_INFO {
@@ -686,29 +686,29 @@ namespace CustomMissions {
     extern std::list<CustomMission> lCustomMission;
 
     void LoadMissions();
-    void Send_WPs(uint iClientID, std::list <CustomMissions::PlayerWaypoint> lWP, bool bBestPath);
+    void Send_WPs(ClientId iClientID, std::list <CustomMissions::PlayerWaypoint> lWP, bool bBestPath);
 
 }
 
 namespace Cloak {
 
 
-    void InstallCloak(uint iClientID);
+    void InstallCloak(ClientId iClientID);
 	void CloakInstallTimer2000ms();
     void WarmUpCloakTimer1000ms();
     void DoCloakingTimer250ms();
-	void UncloakGroup(uint iClientID);
+	void UncloakGroup(ClientId iClientID);
     void LoadCloakSettings();
     bool Check_Dock_Call(uint iShip, uint iDockTarget, uint iCancel, enum DOCK_HOST_RESPONSE response);
-    bool Check_GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
-    bool Check_Cloak(uint iClientID);
-    void StartCloakPlayer(uint iClientID);
-    void DoCloak(uint iClientID);
-    void UncloakPlayer(uint iClientID);
+    bool Check_GoTradelane( ClientId iClientID, struct XGoTradelane const& gtl);
+    bool Check_Cloak(ClientId iClientID);
+    void StartCloakPlayer(ClientId iClientID);
+    void DoCloak(ClientId iClientID);
+    void UncloakPlayer(ClientId iClientID);
     void UpdateShipEnergyTimer();
-    bool Check_RequestEventFormaDocking(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
-    void CloakSync(uint iClientID);
-    void KillShield(uint iClientID);
+    bool Check_RequestEventFormaDocking(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5,  ClientId iClientID);
+    void CloakSync(ClientId iClientID);
+    void KillShield(ClientId iClientID);
 
     struct CloakDeviceInfo {
 		
@@ -775,8 +775,8 @@ namespace EquipWhiteList {
     extern std::list<EquipWhiteListEntry> lEquipWhiteList;
 
     void LoadEquipWhiteList();
-    bool ReqAddItem_CheckEquipWhiteList(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID);
-    void SendList(uint iShipArch, uint iClientID, bool oldShip);
+    bool ReqAddItem_CheckEquipWhiteList(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, ClientId iClientID);
+    void SendList(uint iShipArch, ClientId iClientID, bool oldShip);
 }
 
 namespace SQL {
@@ -814,9 +814,9 @@ namespace Depot {
 
     void LoadDepotData();
     std::string GetEquipNicknameFromID(uint goodID);
-    std::list<PlayerDepotItem> GetEquipFromBaseDepot(uint iClientID, bool bPrint);
-    void PlayerDepotOpen(uint iClientID);
-    void GetPlayerEquip(uint iClientID);
+    std::list<PlayerDepotItem> GetEquipFromBaseDepot(ClientId iClientID, bool bPrint);
+    void PlayerDepotOpen(ClientId iClientID);
+    void GetPlayerEquip(ClientId iClientID);
 
     extern std::list<PlayerDepot> lPlayerDepot;	
 }
@@ -858,8 +858,8 @@ namespace PathSelection {
 
     void LoadPathSelectionSettings();
     bool Check_BlockedGate(uint iShip);
-    void Install_Unlawful(uint iClientID);
-    void SetUnlawful(uint iClientID, std::string scCharname, std::string scState);
+    void Install_Unlawful(ClientId iClientID);
+    void SetUnlawful(ClientId iClientID, std::string scCharname, std::string scState);
     void ModUnlawfulChar500ms();
 
 }
@@ -940,16 +940,16 @@ namespace PlayerHunt {
 	extern std::list <LastPlayerHuntWinners> lLastPlayerHuntWinners;
 	extern ServerHuntInfo ServerHuntData;
     
-    uint getRandomSysteminRange(uint iClientID);
-    BaseData getRandomBaseInSystem(uint iSystemID, uint iClientID);
-    BaseData getTargetBase(uint iClientID);
-    void Start_PlayerHunt(uint iClientID, const std::wstring& wscParam);
+    uint getRandomSysteminRange(ClientId iClientID);
+    BaseData getRandomBaseInSystem(uint iSystemID, ClientId iClientID);
+    BaseData getTargetBase(ClientId iClientID);
+    void Start_PlayerHunt(ClientId iClientID, const std::wstring& wscParam);
     void PlayerHuntTimer();
     void CalcReward();
-    void CheckSystemReached(uint iClientID, uint iPlayerSystemID);
-    void CheckDock(uint iBaseID, uint iClientID);
-    void CheckDisConnect(uint iClientID);
-    void CheckDied(uint iClientID, uint iKillerID);
+    void CheckSystemReached(ClientId iClientID, uint iPlayerSystemID);
+    void CheckDock(uint iBaseID, ClientId iClientID);
+    void CheckDisConnect(ClientId iClientID);
+    void CheckDied(ClientId iClientID, uint iKillerID);
     void LoadPlayerHuntSettings();
 }
 

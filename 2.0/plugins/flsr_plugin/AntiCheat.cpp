@@ -7,7 +7,7 @@ namespace AntiCheat {
      
      // Timing CheatDetection
     namespace TimingAC {
-        void CheckTimeStamp(struct SSPObjUpdateInfo const &pObjInfo, unsigned int iClientID) {
+        void CheckTimeStamp(struct SSPObjUpdateInfo const &pObjInfo,  ClientId iClientID) {
 
             if (AC_Info[iClientID].dServerTimestamp == 0.0) 
             {
@@ -42,7 +42,7 @@ namespace AntiCheat {
             }
         }
 
-        void Init(unsigned int iClientID)
+        void Init( ClientId iClientID)
         {
             AC_Info[iClientID].dServerTimestamp = 0.0;
             AC_Info[iClientID].dClientTimestamp = 0.0;
@@ -54,7 +54,7 @@ namespace AntiCheat {
     // Speed CheatDetecion
     namespace SpeedAC {
 
-        void Init(uint iClientID)
+        void Init(ClientId iClientID)
         {
             AC_Info[iClientID].tmSpeedExceptionTimeout = GetTimeInMS() + 60000;
             AC_Info[iClientID].fLastSpeedTimestamp = 0.0f;
@@ -70,7 +70,7 @@ namespace AntiCheat {
             AC_Info[iClientID].iSpeedDetections = 0;
         }
 
-        void UpdateShipSpeed(uint iClientID)
+        void UpdateShipSpeed(ClientId iClientID)
         {
 
 	        IObjInspectImpl *obj = HkGetInspect(iClientID);
@@ -114,7 +114,7 @@ namespace AntiCheat {
 	        }
         }
 
-        float GetPlayerAllowedSpeed(uint iClientID, enum ENGINE_STATE state) {
+        float GetPlayerAllowedSpeed(ClientId iClientID, enum ENGINE_STATE state) {
             switch (state) {
             case ES_CRUISE:
                 return AC_Info[iClientID].fAllowedCruiseSpeed;      
@@ -129,7 +129,7 @@ namespace AntiCheat {
             }
         }
     
-        bool CheckClientSpeed(uint iClientID, std::vector<float>& vecTimes, std::vector<float>& vecDistances, enum ENGINE_STATE engineState)
+        bool CheckClientSpeed(ClientId iClientID, std::vector<float>& vecTimes, std::vector<float>& vecDistances, enum ENGINE_STATE engineState)
         {
             float fMaxSpeed = GetPlayerAllowedSpeed(iClientID, engineState);
 
@@ -171,7 +171,7 @@ namespace AntiCheat {
         }
 
         // vDunno
-        void vDunno1(uint iClientID, mstime delay)
+        void vDunno1(ClientId iClientID, mstime delay)
         {
             mstime tmNewSpeedExceptionTimeout = GetTimeInMS() + delay;
             if (AC_Info[iClientID].tmSpeedExceptionTimeout < tmNewSpeedExceptionTimeout)
@@ -182,14 +182,14 @@ namespace AntiCheat {
         }
 
         // vDunno
-        void vDunno2(uint iClientID)
+        void vDunno2(ClientId iClientID)
         {
             AC_Info[iClientID].tmSpeedExceptionTimeout = 0;
         }
 
         int iDunno3(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response)
         {
-            uint iClientID = HkGetClientIDByShip(iShip);
+            ClientId iClientID = HkGetClientIDByShip(iShip);
             if (iClientID)
             {
                 uint iTypeID;
@@ -211,7 +211,7 @@ namespace AntiCheat {
 
 		
 
-        void CheckSpeedCheat(struct SSPObjUpdateInfo const& pObjInfo, unsigned int iClientID)
+        void CheckSpeedCheat(struct SSPObjUpdateInfo const& pObjInfo,  ClientId iClientID)
         {
             mstime now = GetTimeInMS();
 
@@ -302,12 +302,12 @@ namespace AntiCheat {
     // Power CheatDetection
     namespace PowerAC {
 		
-        void Init(unsigned int iClientID)
+        void Init( ClientId iClientID)
         {
             AC_Info[iClientID].bSetupPowerCheatDet = false;
         }
 
-        void Setup(unsigned int iClientID)
+        void Setup( ClientId iClientID)
         {
             AC_Info[iClientID].bSetupPowerCheatDet = true;
             AC_Info[iClientID].fMaxCapacity = 0.0f;
@@ -343,7 +343,7 @@ namespace AntiCheat {
 
         }		
 
-        void FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const wpn)
+        void FireWeapon( ClientId iClientID, struct XFireWeaponInfo const wpn)
         {
             if (!AC_Info[iClientID].bSetupPowerCheatDet)
             {
@@ -410,7 +410,7 @@ namespace AntiCheat {
 	
     // AC Reporting
     namespace Reporting {
-	    void ReportCheater(uint iClientID, std::string scType, std::string sData) 
+	    void ReportCheater(ClientId iClientID, std::string scType, std::string sData) 
 	    {
 		    std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
             std::wstring wscType = stows(scType);
@@ -444,7 +444,7 @@ namespace AntiCheat {
 	
 	    }
 
-        std::string CreateReport(uint iClientID, std::wstring wscType,std::wstring wscTime, std::wstring wscDETAILS)
+        std::string CreateReport(ClientId iClientID, std::wstring wscType,std::wstring wscTime, std::wstring wscDETAILS)
         {
             //FLPath
             char szCurDir[MAX_PATH];
@@ -459,7 +459,8 @@ namespace AntiCheat {
             std::string Charname = wstos(wscCharname);
             std::string sTime = wstos(wscTime);
             std::wstring wscFilename;
-            HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
+            std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+            HkGetCharFileName(charname, wscFilename);
             std::string scFilename = wstos(wscFilename);
             scACFile = scACFile + scFilename + "_" + sTime + ".html";
             std::ifstream RTPL(std::string(szCurDir) + AC_REPORT_TPL);
@@ -529,7 +530,7 @@ namespace AntiCheat {
 
     // AC Tools
     namespace DataGrab {
-        void CharnameToFLHOOKUSER_FILE(uint iClientID) {
+        void CharnameToFLHOOKUSER_FILE(ClientId iClientID) {
             std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
             std::string scCharname = wstos(wscCharname);
             std::string scBase64Charname = "-> " + Tools::base64_encode((const unsigned char *)scCharname.c_str(), scCharname.length());

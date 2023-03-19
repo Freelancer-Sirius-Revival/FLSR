@@ -16,12 +16,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     return true;
 }
 
-EXPORT void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+EXPORT void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
     PrintUserCmdText(iClientID, L"/kills <player name>");
     PrintUserCmdText(iClientID, L"/kills$ <player id>");
 }
 
-void UserCmd_Kills(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_Kills(ClientId iClientID, const std::wstring &wscParam) {
     std::wstring wscClientID = GetParam(wscParam, ' ', 0);
     int iNumKills;
     std::wstring mainrank;
@@ -85,7 +85,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
 
     if (iKill == 1) {
         CShip *cship = (CShip *)ecx[4];
-        uint iClientID = cship->GetOwnerPlayer();
+        ClientId iClientID = cship->GetOwnerPlayer();
         if (iClientID) {
             DamageList dmg;
             if (!dmg.get_cause())
@@ -105,7 +105,7 @@ USERCMD UserCmds[] = {
     {L"/kills", UserCmd_Kills},
 };
 
-EXPORT bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+EXPORT bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     std::wstring wscCmdLower = ToLower(wscCmd);
     for (uint i = 0; (i < sizeof(UserCmds) / sizeof(USERCMD)); i++) {
         if (wscCmdLower.find(ToLower(UserCmds[i].wszCmd)) == 0) {

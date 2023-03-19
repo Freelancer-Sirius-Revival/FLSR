@@ -113,7 +113,7 @@ void LoadSettings() {
         struct PlayerData* pPD = 0;
         while (pPD = Players.traverse_active(pPD))
         {
-            uint iClientID = HkGetClientIdFromPD(pPD);
+            ClientId iClientID = HkGetClientIdFromPD(pPD);
             AntiCheat::SpeedAC::Init(iClientID);
             AntiCheat::TimingAC::Init(iClientID);
             AntiCheat::PowerAC::Init(iClientID);

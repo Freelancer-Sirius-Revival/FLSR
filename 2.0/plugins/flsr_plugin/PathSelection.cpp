@@ -55,7 +55,7 @@ namespace PathSelection {
 
 	bool Check_BlockedGate(uint iShip)
 	{
-		uint iClientID = HkGetClientIDByShip(iShip);
+		ClientId iClientID = HkGetClientIDByShip(iShip);
 		//Check if Player is Unlawful
 		if (!UnlawfulPlayerData[iClientID].bisUnlawful)
 			return true;
@@ -88,7 +88,7 @@ namespace PathSelection {
 		}
 	}
 
-	void Install_Unlawful(uint iClientID)
+	void Install_Unlawful(ClientId iClientID)
 	{
 		//Get Paths
 		CAccount* acc = Players.FindAccountFromClientID(iClientID);
@@ -138,7 +138,7 @@ namespace PathSelection {
 		}		
 	}
 
-	void SetUnlawful(uint iClientID, std::string scCharname, std::string scState)
+	void SetUnlawful(ClientId iClientID, std::string scCharname, std::string scState)
 	{
 		//Get Paths
 		CAccount* acc = Players.FindAccountFromClientID(iClientID);

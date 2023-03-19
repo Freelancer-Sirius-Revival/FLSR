@@ -163,7 +163,7 @@ void LoadSettings() {
 }
 
 /** Clean up when a client disconnects */
-void ClearClientInfo(uint iClientID) {
+void ClearClientInfo(ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     MiscCmds::ClearClientInfo(iClientID);
     HyperJump::ClearClientInfo(iClientID);
@@ -218,7 +218,7 @@ void __stdcall HkCb_AddDmgEntry(DamageList *dmgList, unsigned short p1,
     returncode = DEFAULT_RETURNCODE;
 }
 
-static bool IsDockingAllowed(uint iShip, uint iDockTarget, uint iClientID) {
+static bool IsDockingAllowed(uint iShip, uint iDockTarget, ClientId iClientID) {
     // If the player's rep is less/equal -0.55 to the owner of the station
     // then refuse the docking request
     int iSolarRep;
@@ -251,7 +251,7 @@ int __cdecl Dock_Call(unsigned int const &iShip,
                       enum DOCK_HOST_RESPONSE response) {
     returncode = DEFAULT_RETURNCODE;
 
-    uint iClientID = HkGetClientIDByShip(iShip);
+    ClientId iClientID = HkGetClientIDByShip(iShip);
     if (iClientID && response == PROCEED_DOCK) {
         uint iTypeID;
         pub::SpaceObj::GetType(iDockTarget, iTypeID);
@@ -294,7 +294,7 @@ bool __stdcall Startup(struct SStartupInfo const &p1) {
 
 // The startup cache disables reading of the banned file. Check this manually on
 // login and boot the player if they are banned.
-void __stdcall Login(struct SLoginInfo const &li, unsigned int iClientID) {
+void __stdcall Login(struct SLoginInfo const &li,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // Player sound when player logs in (if enabled)
@@ -330,7 +330,7 @@ void __stdcall Login(struct SLoginInfo const &li, unsigned int iClientID) {
 }
 
 void __stdcall CreateNewCharacter(struct SCreateCharacterInfo const &si,
-                                  unsigned int iClientID) {
+                                   ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (Rename::CreateNewCharacter(si, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -340,7 +340,7 @@ void __stdcall CreateNewCharacter(struct SCreateCharacterInfo const &si,
 
 void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip,
                             unsigned int iDockTarget, unsigned int p4,
-                            unsigned long p5, unsigned int iClientID) {
+                            unsigned long p5,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (iClientID) {
         if (!iIsFormationRequest) {
@@ -360,7 +360,7 @@ void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip,
     }
 }
 
-void __stdcall PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
+void __stdcall PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // TODO if the player is kicked abort processing.
@@ -373,11 +373,11 @@ void __stdcall PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
     SystemSensor::PlayerLaunch(iShip, iClientID);
 }
 
-void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
+void __stdcall PlayerLaunch_AFTER(unsigned int iShip,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 }
 
-void __stdcall BaseEnter(unsigned int iBaseID, unsigned int iClientID) {
+void __stdcall BaseEnter(unsigned int iBaseID,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     IPBans::BaseEnter(iBaseID, iClientID);
     RepFixer::BaseEnter(iBaseID, iClientID);
@@ -387,7 +387,7 @@ void __stdcall BaseEnter(unsigned int iBaseID, unsigned int iClientID) {
     MiscCmds::BaseEnter(iBaseID, iClientID);
 }
 
-void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID) {
+void __stdcall BaseEnter_AFTER(unsigned int iBaseID,  ClientId iClientID) {
     float fValue;
     if (HKGetShipValue(
             (const wchar_t *)Players.GetActiveCharacterName(iClientID),
@@ -402,18 +402,18 @@ void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID) {
     }
 }
 
-void __stdcall LocationEnter(unsigned int iLocationID, unsigned int iClientID) {
+void __stdcall LocationEnter(unsigned int iLocationID,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     PimpShip::LocationEnter(iLocationID, iClientID);
 }
 
-void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state) {
+void __stdcall DisConnect( ClientId iClientID, enum EFLConnection state) {
     returncode = DEFAULT_RETURNCODE;
     ClearClientInfo(iClientID);
 }
 
 void __stdcall CharacterSelect_AFTER(struct CHARACTER_ID const &charId,
-                                     unsigned int iClientID) {
+                                      ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     ClearClientInfo(iClientID);
     Rename::CharacterSelect_AFTER(charId, iClientID);
@@ -421,7 +421,7 @@ void __stdcall CharacterSelect_AFTER(struct CHARACTER_ID const &charId,
 
 void __stdcall JumpInComplete_AFTER(unsigned int iSystem, unsigned int iShip) {
     returncode = DEFAULT_RETURNCODE;
-    uint iClientID = HkGetClientIDByShip(iShip);
+    ClientId iClientID = HkGetClientIDByShip(iShip);
     if (iClientID) {
         AntiJumpDisconnect::JumpInComplete(iSystem, iShip, iClientID);
         SystemSensor::JumpInComplete(iSystem, iShip, iClientID);
@@ -432,7 +432,7 @@ void __stdcall JumpInComplete_AFTER(unsigned int iSystem, unsigned int iShip) {
 }
 
 void __stdcall SystemSwitchOutComplete(unsigned int iShip,
-                                       unsigned int iClientID) {
+                                        ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     // Make player invincible to fix JHs/JGs near mine fields sometimes
     // exploding player while jumping (in jump tunnel)
@@ -443,7 +443,7 @@ void __stdcall SystemSwitchOutComplete(unsigned int iShip,
 }
 
 void __stdcall SPObjCollision(struct SSPObjCollisionInfo const &ci,
-                              unsigned int iClientID) {
+                               ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // If spin protection is off, do nothing.
@@ -485,7 +485,7 @@ void __stdcall SPObjCollision(struct SSPObjCollisionInfo const &ci,
 }
 
 void __stdcall GFGoodBuy(struct SGFGoodBuyInfo const &gbi,
-                         unsigned int iClientID) {
+                          ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::GFGoodBuy(gbi, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -493,7 +493,7 @@ void __stdcall GFGoodBuy(struct SGFGoodBuyInfo const &gbi,
 }
 
 void __stdcall ReqAddItem(unsigned int goodID, char const *hardpoint, int count,
-                          float status, bool mounted, uint iClientID) {
+                          float status, bool mounted, ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::ReqAddItem(goodID, hardpoint, count, status,
                                          mounted, iClientID)) {
@@ -501,14 +501,14 @@ void __stdcall ReqAddItem(unsigned int goodID, char const *hardpoint, int count,
     }
 }
 
-void __stdcall ReqChangeCash(int iMoneyDiff, unsigned int iClientID) {
+void __stdcall ReqChangeCash(int iMoneyDiff,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::ReqChangeCash(iMoneyDiff, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
     }
 }
 
-void __stdcall ReqSetCash(int iMoney, unsigned int iClientID) {
+void __stdcall ReqSetCash(int iMoney,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::ReqSetCash(iMoney, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -516,21 +516,21 @@ void __stdcall ReqSetCash(int iMoney, unsigned int iClientID) {
 }
 
 void __stdcall ReqEquipment(class EquipDescList const &eqDesc,
-                            unsigned int iClientID) {
+                             ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::ReqEquipment(eqDesc, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
     }
 }
 
-void __stdcall ReqHullStatus(float fStatus, unsigned int iClientID) {
+void __stdcall ReqHullStatus(float fStatus,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::ReqHullStatus(fStatus, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
     }
 }
 
-void __stdcall ReqShipArch(unsigned int iArchID, unsigned int iClientID) {
+void __stdcall ReqShipArch(unsigned int iArchID,  ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (PurchaseRestrictions::ReqShipArch(iArchID, iClientID)) {
         returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -542,7 +542,7 @@ std::map<uint, mstime> mapSaveTimes;
 void Timer() {
     mstime currTime = GetTimeInMS();
     for (auto &t : mapSaveTimes) {
-        uint iClientID = t.first;
+        ClientId iClientID = t.first;
         if (t.second != 0 && t.second < currTime) {
             if (HkIsValidClientID(iClientID) &&
                 !HkIsInCharSelectMenu(iClientID))
@@ -553,7 +553,7 @@ void Timer() {
 }
 
 // Save after a tractor to prevent cargo duplication loss on crash
-void __stdcall TractorObjects(unsigned int iClientID,
+void __stdcall TractorObjects( ClientId iClientID,
                               struct XTractorObjects const &objs) {
     returncode = DEFAULT_RETURNCODE;
     if (mapSaveTimes[iClientID] == 0) {
@@ -562,7 +562,7 @@ void __stdcall TractorObjects(unsigned int iClientID,
 }
 
 // Save after jettison to reduce chance of duplication on crash
-void __stdcall JettisonCargo(unsigned int iClientID,
+void __stdcall JettisonCargo( ClientId iClientID,
                              struct XJettisonCargo const &objs) {
     if (mapSaveTimes[iClientID] == 0) {
         mapSaveTimes[iClientID] = GetTimeInMS() + 60000;
@@ -574,7 +574,7 @@ void __stdcall SetTarget(uint uClientID, struct XSetTarget const &p2) {
     Message::SetTarget(uClientID, p2);
 }
 
-void __stdcall CharacterInfoReq(unsigned int iClientID, bool p2) {
+void __stdcall CharacterInfoReq( ClientId iClientID, bool p2) {
     returncode = DEFAULT_RETURNCODE;
     Message::CharacterInfoReq(iClientID, p2);
     AntiJumpDisconnect::CharacterInfoReq(iClientID, p2);
@@ -598,27 +598,27 @@ void __stdcall SubmitChat(struct CHAT_ID cId, unsigned long lP1,
     }
 }
 
-void __stdcall GoTradelane(unsigned int iClientID,
+void __stdcall GoTradelane( ClientId iClientID,
                            struct XGoTradelane const &xgt) {
     returncode = DEFAULT_RETURNCODE;
     SystemSensor::GoTradelane(iClientID, xgt);
 }
 
-void __stdcall StopTradelane(unsigned int iClientID, unsigned int p1,
+void __stdcall StopTradelane( ClientId iClientID, unsigned int p1,
                              unsigned int p2, unsigned int p3) {
     returncode = DEFAULT_RETURNCODE;
     SystemSensor::StopTradelane(iClientID, p1, p2, p3);
 }
 
 void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,
-                           unsigned int iClientID) {
+                            ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     if (set_bEnableCargoDrop)
         CargoDrop::SPObjUpdate(ui, iClientID);
 }
 } // namespace HkIServerImpl
 
-void __stdcall HkCb_SendChat(uint iClientID, uint iTo, uint iSize, void *pRDL) {
+void __stdcall HkCb_SendChat(ClientId iClientID, uint iTo, uint iSize, void *pRDL) {
     returncode = DEFAULT_RETURNCODE;
 
     if (Message::HkCb_SendChat(iClientID, iTo, iSize, pRDL)) {
@@ -823,7 +823,7 @@ This function is called by FLHook when a user types a chat std::string. We look
 at the std::string they've typed and see if it starts with one of the above
 commands. If it does we try to process it.
 */
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     try {
@@ -868,7 +868,7 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
 
 std::list<uint> npcs;
 
-void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
     returncode = DEFAULT_RETURNCODE;
     PrintUserCmdText(iClientID, L"/pos");
     PrintUserCmdText(iClientID, L"/stuck");

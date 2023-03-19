@@ -68,7 +68,7 @@ void MiscCmds::LoadSettings(const std::string &scPluginCfgFile) {
 }
 
 /** Clean up when a client disconnects */
-void MiscCmds::ClearClientInfo(uint iClientID) {
+void MiscCmds::ClearClientInfo(ClientId iClientID) {
     if (mapInfo[iClientID].bSelfDestruct) {
         mapInfo[iClientID].bSelfDestruct = false;
         uint dummy[3] = {0};
@@ -78,7 +78,7 @@ void MiscCmds::ClearClientInfo(uint iClientID) {
     mapInfo.erase(iClientID);
 }
 
-void MiscCmds::CharacterInfoReq(unsigned int iClientID, bool p2) {
+void MiscCmds::CharacterInfoReq( ClientId iClientID, bool p2) {
     if (mapInfo[iClientID].bSelfDestruct) {
         mapInfo[iClientID].bSelfDestruct = false;
         uint dummy[3] = {0};
@@ -105,7 +105,7 @@ void MiscCmds::Timer() {
 }
 
 /** Print current position */
-bool MiscCmds::UserCmd_Pos(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_Pos(ClientId iClientID, const std::wstring &wscCmd,
                            const std::wstring &wscParam, const wchar_t *usage) {
     HKPLAYERINFO p;
     if (HkGetPlayerInfo(
@@ -131,7 +131,7 @@ bool MiscCmds::UserCmd_Pos(uint iClientID, const std::wstring &wscCmd,
 }
 
 /** Move a ship a little if it is stuck in the base */
-bool MiscCmds::UserCmd_Stuck(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_Stuck(ClientId iClientID, const std::wstring &wscCmd,
                              const std::wstring &wscParam,
                              const wchar_t *usage) {
     std::wstring wscCharname =
@@ -167,7 +167,7 @@ bool MiscCmds::UserCmd_Stuck(uint iClientID, const std::wstring &wscCmd,
 }
 
 /** A command to help remove any affiliation that you might have */
-bool MiscCmds::UserCmd_DropRep(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_DropRep(ClientId iClientID, const std::wstring &wscCmd,
                                const std::wstring &wscParam,
                                const wchar_t *usage) {
     HK_ERROR err;
@@ -279,7 +279,7 @@ void MiscCmds::AdminCmd_SmiteAll(CCmds *cmds) {
     struct PlayerData *pPD = 0;
     while (pPD = Players.traverse_active(pPD)) {
         // Get the this player's current system and location in the system.
-        uint iClientID = HkGetClientIdFromPD(pPD);
+        ClientId iClientID = HkGetClientIdFromPD(pPD);
         if (iClientID == adminPlyr.iClientID)
             continue;
 
@@ -322,7 +322,7 @@ void MiscCmds::AdminCmd_SmiteAll(CCmds *cmds) {
     return;
 }
 
-static void SetLights(uint iClientID, bool bOn) {
+static void SetLights(ClientId iClientID, bool bOn) {
     uint iShip;
     pub::Player::GetShip(iClientID, iShip);
     if (!iShip) {
@@ -350,7 +350,7 @@ static void SetLights(uint iClientID, bool bOn) {
         PrintUserCmdText(iClientID, L"Light control not available");
 }
 
-bool MiscCmds::UserCmd_Lights(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_Lights(ClientId iClientID, const std::wstring &wscCmd,
                               const std::wstring &wscParam,
                               const wchar_t *usage) {
     mapInfo[iClientID].bLightsOn = !mapInfo[iClientID].bLightsOn;
@@ -358,9 +358,9 @@ bool MiscCmds::UserCmd_Lights(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-void MiscCmds::BaseEnter(unsigned int iBaseID, unsigned int iClientID) {}
+void MiscCmds::BaseEnter(unsigned int iBaseID,  ClientId iClientID) {}
 
-bool MiscCmds::UserCmd_SelfDestruct(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_SelfDestruct(ClientId iClientID, const std::wstring &wscCmd,
                                     const std::wstring &wscParam,
                                     const wchar_t *usage) {
     IObjInspectImpl *obj = HkGetInspect(iClientID);
@@ -386,7 +386,7 @@ bool MiscCmds::UserCmd_SelfDestruct(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool MiscCmds::UserCmd_Screenshot(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_Screenshot(ClientId iClientID, const std::wstring &wscCmd,
                                   const std::wstring &wscParam,
                                   const wchar_t *usage) {
     Message::UserCmd_Time(iClientID, L"", L"", L"");
@@ -394,7 +394,7 @@ bool MiscCmds::UserCmd_Screenshot(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool MiscCmds::UserCmd_Shields(uint iClientID, const std::wstring &wscCmd,
+bool MiscCmds::UserCmd_Shields(ClientId iClientID, const std::wstring &wscCmd,
                                const std::wstring &wscParam,
                                const wchar_t *usage) {
     mapInfo[iClientID].bShieldsDown = !mapInfo[iClientID].bShieldsDown;

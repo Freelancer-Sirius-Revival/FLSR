@@ -83,7 +83,7 @@ void LoadSettings(const std::string &scPluginCfgFile) {
     }
 }
 
-bool UserCmd_Net(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_Net(ClientId iClientID, const std::wstring &wscCmd,
                  const std::wstring &wscParam, const wchar_t *usage) {
     std::wstring wscMode = ToLower(GetParam(wscParam, ' ', 0));
     if (wscMode.size() == 0) {
@@ -114,7 +114,7 @@ bool UserCmd_Net(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool UserCmd_ShowScan(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_ShowScan(ClientId iClientID, const std::wstring &wscCmd,
                       const std::wstring &wscParam, const wchar_t *usage) {
     std::wstring wscTargetCharname = GetParam(wscParam, ' ', 0);
     if (wscCmd.find(L"/showscan$ ") == 0) {
@@ -176,9 +176,9 @@ bool UserCmd_ShowScan(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-void ClearClientInfo(uint iClientID) { mapInfo.erase(iClientID); }
+void ClearClientInfo(ClientId iClientID) { mapInfo.erase(iClientID); }
 
-static void EnableSensorAccess(uint iClientID) {
+static void EnableSensorAccess(ClientId iClientID) {
     // Retrieve the location and cargo list.
     int iHoldSize;
     std::list<CARGO_INFO> lstCargo;
@@ -217,11 +217,11 @@ static void EnableSensorAccess(uint iClientID) {
     }
 }
 
-void PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
+void PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
     EnableSensorAccess(iClientID);
 }
 
-static void DumpSensorAccess(uint iClientID, const std::wstring &wscType,
+static void DumpSensorAccess(ClientId iClientID, const std::wstring &wscType,
                              uint iType) {
     unsigned int iSystemID;
     pub::Player::GetSystem(iClientID, iSystemID);
@@ -268,7 +268,7 @@ static void DumpSensorAccess(uint iClientID, const std::wstring &wscType,
 // Record jump type.
 void Dock_Call(unsigned int const &iShip, unsigned int const &iDockTarget,
                int iCancel, enum DOCK_HOST_RESPONSE response) {
-    uint iClientID = HkGetClientIDByShip(iShip);
+    ClientId iClientID = HkGetClientIDByShip(iShip);
     if (iClientID && (response == PROCEED_DOCK || response == DOCK) &&
         !iCancel) {
         uint iTypeID;
@@ -282,7 +282,7 @@ void Dock_Call(unsigned int const &iShip, unsigned int const &iDockTarget,
 }
 
 void JumpInComplete(unsigned int iSystem, unsigned int iShip,
-                    unsigned int iClientID) {
+                     ClientId iClientID) {
     EnableSensorAccess(iClientID);
     if (mapInfo[iClientID].bInJumpGate) {
         mapInfo[iClientID].bInJumpGate = false;
@@ -290,11 +290,11 @@ void JumpInComplete(unsigned int iSystem, unsigned int iShip,
     }
 }
 
-void GoTradelane(unsigned int iClientID, struct XGoTradelane const &xgt) {
+void GoTradelane( ClientId iClientID, struct XGoTradelane const &xgt) {
     DumpSensorAccess(iClientID, L"entered tradelane", MODE_TRADELANE);
 }
 
-void StopTradelane(unsigned int iClientID, unsigned int p1, unsigned int p2,
+void StopTradelane( ClientId iClientID, unsigned int p1, unsigned int p2,
                    unsigned int p3) {
     DumpSensorAccess(iClientID, L"exited tradelane", MODE_TRADELANE);
 }

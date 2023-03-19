@@ -967,7 +967,7 @@ namespace Tools {
     }
 
     void ParsePathsFromFile(std::vector<Edge>& edges) {
-        std::string filename = std::string(DATADIR) + "\\UNIVERSE\\shortest_legal_path.ini";
+        std::string filename = std::string(DATADIR) + "\\UNIVERSE\\systems_shortest_path.ini";
         std::ifstream file(filename);
         if (!file.is_open()) {
             ConPrint(L"ParsePathsFromFile-Error: Could not open file " + stows(filename));
@@ -997,13 +997,7 @@ namespace Tools {
 
                 // Extract the systems along this path
                 std::string systems_str = line.substr(line.find_first_of(',') + 2, line.find_last_of(',') - line.find_first_of(',') - 2);
-
-
-
-
-
-
-
+            
                 size_t pos = 0;
                 std::string token;
                 std::vector<std::string> systems;

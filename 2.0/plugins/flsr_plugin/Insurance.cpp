@@ -58,6 +58,7 @@ namespace Insurance {
 
                         fValue += fItemValue;
 
+                        
 
                         //Save
                         if (iPrice <= 0) {

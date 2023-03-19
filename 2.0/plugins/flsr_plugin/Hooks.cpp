@@ -21,6 +21,11 @@ namespace Hooks {
 		//InfoCardUpdate
         ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE CharacterSelect");
 
+        //PlayerHunt
+        if (Modules::GetModuleState("PlayerHunt"))
+        {
+            PlayerHunt::CheckDisConnect(iClientID);
+        }
 
         //CloakModule
         if (Modules::GetModuleState("CloakModule"))

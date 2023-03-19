@@ -3,7 +3,6 @@
 namespace PlayerHunt {
 
 	float set_fRewardMultiplicator;
-	int set_iMultiplicatorTriggerTime;
 	int set_iMinCredits;
 	int set_iMinTargetSystemDistance;
 
@@ -16,7 +15,7 @@ namespace PlayerHunt {
 	};
 
 	ServerHuntInfo ServerHuntData;
-
+	
 	void LoadPlayerHuntSettings()
 	{
 		// Konfigpfad
@@ -25,7 +24,6 @@ namespace PlayerHunt {
 		std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
 
 		set_fRewardMultiplicator = IniGetF(scPluginCfgFile, "PlayerHunt", "RewardMultiplicator", 0.5f);
-		set_iMultiplicatorTriggerTime = IniGetI(scPluginCfgFile, "PlayerHunt", "MultiplicatorTriggerTime", 600);
 		set_iMinTargetSystemDistance = IniGetI(scPluginCfgFile, "PlayerHunt", "MinTargetSystemDistance", 4);
 		set_iMinCredits = IniGetI(scPluginCfgFile, "PlayerHunt", "MinCredits", 50000);
 
@@ -150,7 +148,7 @@ namespace PlayerHunt {
 
 		if (bases.size() == 0)
 		{
-			ConPrint(L"No bases found\n");
+			//ConPrint(L"No bases found\n");
 			return BaseData();
 		}
 		else
@@ -190,27 +188,48 @@ namespace PlayerHunt {
 		ServerHuntData.iCredits = iReward;
 	}
 	
-	void PlayerHuntTimer()
+	void PlayerHuntMulti(uint iClientID, uint iPlayerSystemID)
 	{
-		//Check for Modul
-		if (Modules::GetModuleState("PlayerHunt"))
+		//Check if Hunt is active
+		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
 		{
-			//Check if Hunt is active
-			if (ServerHuntData.eState == HUNT_STATE_HUNTING)
-			{
-				uint now = timeInMS();
-				uint iNextUpdate = ServerHuntData.tmHuntTime + (set_iMultiplicatorTriggerTime * 1000);
-
-				if (now > iNextUpdate)
+			//Calc only once per System
+			//Get Player System
+			char szSystemnamePlayer[1024] = "";
+			pub::GetSystemNickname(szSystemnamePlayer, sizeof(szSystemnamePlayer), iPlayerSystemID);
+			std::string scSystemnamePlayer = szSystemnamePlayer;
+			
+			//While List
+			std::list<std::string>::iterator iterSystems = ServerHuntData.lSystems.begin();
+			bool bSystemFound = false;
+			while (iterSystems != ServerHuntData.lSystems.end()) {
+				if (*iterSystems == scSystemnamePlayer)
 				{
-					ServerHuntData.tmHuntTime = timeInMS();
-					CalcReward();
-
-					HkMsgU(L"The new PlayerHunt reward is " + std::to_wstring(ServerHuntData.iCredits) + L" credits!");
-					HkMsgU(L"Hunt the player " + ServerHuntData.wscCharname + L" and get the reward!");
+					bSystemFound = true;
+					break;
 				}
+				iterSystems++;
+			}
+
+			//PayReward
+			if (!bSystemFound)
+			{
+				//Get RealName
+				HkLoadStringDLLs();
+
+				const struct Universe::ISystem* sysinfo = Universe::get_system(iPlayerSystemID);
+				std::wstring wscClearSystemname = HkGetWStringFromIDS(sysinfo->strid_name);
+
+				CalcReward();
+				
+				//The new PlayerHunt reward is 20,000 credits!
+				HkMsgU(L"The new PlayerHunt reward is " + ToMoneyStr(ServerHuntData.iCredits) + L" credits!");
+				//Hunt down the player Peter in Sigma 19 and get the reward!
+				HkMsgU(L"Hunt down the player " + ServerHuntData.wscCharname + L" in " + wscClearSystemname + L" and get the reward!");
+				ServerHuntData.lSystems.push_back(scSystemnamePlayer);
 			}
 		}
+		
 	}
 	
 	void CheckSystemReached(uint iClientID, uint iPlayerSystemID)
@@ -228,9 +247,13 @@ namespace PlayerHunt {
 				if (ServerHuntData.iTargetSystem == iPlayerSystemID)
 				{
 					//We are now in the TargetSystem
-					HkMsgU(ServerHuntData.wscCharname + L" has reached " + ServerHuntData.wscTargetSystem + L" kill the player before he docks at " + ServerHuntData.wscTargetBase);
-					PrintUserCmdText(iClientID, L"You have reached the target system be careful players could be near!");					
+					//Peter has reached System Blubber, kill the player before he docks at Planet Blab.
+					HkMsgU(ServerHuntData.wscCharname + L" has reached system " + ServerHuntData.wscTargetSystem + L", kill the player before he docks at " + ServerHuntData.wscTargetBase + L".");
+					//You have reached the target system. Be careful, players could be near!
+					PrintUserCmdText(iClientID, L"You have reached the target system. Be careful, players could be near!");
 				}
+
+				PlayerHuntMulti(iClientID, iPlayerSystemID);
 			}
 		}
 	}
@@ -256,7 +279,9 @@ namespace PlayerHunt {
 					HkAddCash(wscCharname, ServerHuntData.iCredits);
 
 					//Print Announcement
-					HkMsgU(ServerHuntData.wscCharname + L" has reached " + ServerHuntData.wscTargetBase + L"! The player has received a reward of " + std::to_wstring(ServerHuntData.iCredits) + L" credits!");
+					//Peter has reached Planet Blab! The player has received a reward of 12 credits!
+					HkMsgU(ServerHuntData.wscCharname + L" has reached " + ServerHuntData.wscTargetBase + L"! The player has received a reward of " + ToMoneyStr(ServerHuntData.iCredits) + L" credits!");
+					//You have survived!
 					PrintUserCmdText(iClientID, L"You have survived!");
 					ServerHuntData.eState = HUNT_STATE_NONE;
 				}
@@ -275,7 +300,8 @@ namespace PlayerHunt {
 			if (ServerHuntData.wscCharname == wscCharname)
 			{
 				//We have the Hunt
-				HkMsgU(ServerHuntData.wscCharname + L" has disconnected! Dock at a base and take over the mission with /playerhunt!");
+				//Peter has disconnected! Dock at a base and take over the mission with /playerhunt
+				HkMsgU(ServerHuntData.wscCharname + L" has disconnected! Dock at a base and take over the mission with /playerhunt");
 				ServerHuntData.eState = HUNT_STATE_DISCONNECTED;
 
 			}
@@ -299,9 +325,12 @@ namespace PlayerHunt {
 				//Update the Hunt
 				ServerHuntData.wscCharname = wscCharnameKiller;
 
+				//Peter died! The hunted player is now Ursula!
 				HkMsgU(wscCharnameClient + L" died! The hunted player is now " + wscCharnameKiller + L"!");
-				HkMsgU(L"Hunt the player to get the reward of " + std::to_wstring(ServerHuntData.iCredits) + L" Credits yourself!");
-				PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in System " + ServerHuntData.wscTargetSystem + L" alive!");
+				//Hunt the player to get the reward of 235 credits yourself!
+				HkMsgU(L"Hunt the player to get the reward of " + ToMoneyStr(ServerHuntData.iCredits) + L" credits yourself!");
+				//Reach Suppe in system Kapser alive!
+				PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in system " + ServerHuntData.wscTargetSystem + L" alive!");
 			}
 		}
 
@@ -329,11 +358,52 @@ namespace PlayerHunt {
 			iPlayersCount++;
 		}
 		
-		if (iPlayersCount < 2)
+		if (iPlayersCount < 1)
 		{
-			PrintUserCmdText(iClientID, L"Sorry you need at least 2 players online to start a hunt!");
+			//At least four players must be online to start a hunt! 
+			PrintUserCmdText(iClientID, L"At least four players must be online to start a hunt!");
 			return;
 		}
+		
+		
+		//Get player system
+		uint iSysIDPlayer;
+		pub::Player::GetSystem(iClientID, iSysIDPlayer);
+
+		//Get player system nickname
+		char szSystemnamePlayer[1024] = "";
+		pub::GetSystemNickname(szSystemnamePlayer, sizeof(szSystemnamePlayer), iSysIDPlayer);
+		std::string scSystemNicknamePlayer = szSystemnamePlayer;
+		
+		if (scSystemNicknamePlayer == "start")
+		{
+			//You can't use this command in the start system.
+			PrintUserCmdText(iClientID, L"You can't use this command in the start system.");
+			return;
+		}
+		
+		//Check Whitelist
+		bool bWhitelisted = false;
+		for (std::vector<std::string>::iterator t = SystemWhitelist.begin(); t != SystemWhitelist.end(); ++t)
+		{
+			
+			if (scSystemNicknamePlayer.find(*t) != std::string::npos) {
+				//ConPrint(stows(scSystemNicknamePlayer) + L" is whitelisted\n");
+				bWhitelisted = true;
+				continue;
+			}
+
+		}
+
+		if (!bWhitelisted)
+		{
+			//You can't use this command in this system.
+			PrintUserCmdText(iClientID, L"You can't use this command in this system.");
+			return;
+		}
+		
+		//ConPrint bWhitelisted
+		//ConPrint(L"bWhitelisted: " + stows(std::to_string(bWhitelisted)) + L"\n");
 		
 		//Check HUNT_STATE_DISCONNECTED
 		if (ServerHuntData.eState == HUNT_STATE_NONE)
@@ -345,8 +415,8 @@ namespace PlayerHunt {
 			wscCash = ReplaceStr(wscCash, L"$", L"");
 			cash = ToInt(wscCash);
 			if (cash <= 0) {
-				PrintUserCmdText(iClientID, L"ERR Invalid parameter");
-				PrintUserCmdText(iClientID, L"/playerhunt <credits>");
+				//ERR: Invalid parameter: /playerhunt <credits>
+				PrintUserCmdText(iClientID, L"ERR: Invalid parameter: /playerhunt <credits>");
 				return;
 			}
 
@@ -354,15 +424,17 @@ namespace PlayerHunt {
 			// and check that the character has enough cash.
 			int iCash = 0;
 			if ((err = HkGetCash(wscCharname, iCash)) != HKE_OK) {
-				PrintUserCmdText(iClientID, L"ERR " + HkErrGetText(err));
+				PrintUserCmdText(iClientID, L"ERR: " + HkErrGetText(err));
 				return;
 			}
 			if (cash < set_iMinCredits || cash < 0) {
-				PrintUserCmdText(iClientID, L"ERR PlayerHunt amount too small, minimum amount " + ToMoneyStr(set_iMinCredits) + L" credits");
+				//ERR: The PlayerHunt amount is too small. The minimum amount is 10 credits.
+				PrintUserCmdText(iClientID, L"ERR: The PlayerHunt amount is too small. The minimum amount is " + ToMoneyStr(set_iMinCredits) + L" credits.");
 				return;
 			}
 			if (iCash < cash) {
-				PrintUserCmdText(iClientID, L"ERR Insufficient credits");
+				//ERR: Insufficient credits.
+				PrintUserCmdText(iClientID, L"ERR: Insufficient credits.");
 				return;
 			}
 		}
@@ -378,24 +450,13 @@ namespace PlayerHunt {
 			{
 				//We can start a hunt
 
-				//Get Base of Player
-				uint iBaseIDPlayer;
-				pub::Player::GetBase(iClientID, iBaseIDPlayer);
-
-				//Check if player is docked
-				if (iBaseIDPlayer == 0) {
-					//Player is not in a base
-					PrintUserCmdText(iClientID, L"You are not docked!");
-					return;
-				}
-
 				//Generate new TargetBase
 				BaseData TargetBase = getTargetBase(iClientID);
 
 				//Get RealName
 				HkLoadStringDLLs();
 
-				struct Universe::IBase* baseinfo = Universe::get_base(TargetBase.iBaseID);
+				const struct Universe::IBase* baseinfo = Universe::get_base(TargetBase.iBaseID);
 				std::wstring wscBasename = HkGetWStringFromIDS(baseinfo->iBaseIDS);
 
 				const struct Universe::ISystem* sysinfo = Universe::get_system(TargetBase.iSystemID);
@@ -405,13 +466,12 @@ namespace PlayerHunt {
 				// Remove cash from current character and save it checking that the
 				// save completes
 				if ((err = HkAddCash(wscCharname, 0 - cash)) != HKE_OK) {
-					PrintUserCmdText(iClientID,
-						L"ERR Remove cash failed err=" + HkErrGetText(err));
+					PrintUserCmdText(iClientID,L"ERR: Remove cash failed err=" + HkErrGetText(err));
 					return;
 				}
 
 				if (HkAntiCheat(iClientID) != HKE_OK) {
-					PrintUserCmdText(iClientID, L"ERR Transfer failed");
+					PrintUserCmdText(iClientID, L"ERR: payment failed");
 					return;
 				}
 				HkSaveChar(iClientID);
@@ -423,16 +483,21 @@ namespace PlayerHunt {
 				ServerHuntData.wscTargetBase = wscBasename;
 				ServerHuntData.iTargetSystem = TargetBase.iSystemID;
 				ServerHuntData.wscTargetSystem = wscSystemname;
-				ServerHuntData.tmHuntTime = timeInMS();
 				ServerHuntData.wscCharname = wscCharname;
+				ServerHuntData.lSystems.push_back(scSystemNicknamePlayer);
 
 				//Print Announcement
-				HkMsgU(wscCharname + L" has started a PlayerHunt! The target System is " + wscSystemname);
-				HkMsgU(L"Hunt the player to get the reward of " + std::to_wstring(cash) +  L" Credits yourself!");				
-				PrintUserCmdText(iClientID, L"Reach "+wscBasename+L" in System " + wscSystemname + L" alive!");
+				//Peter has started a player hunt! The target system is New Tokyo.
+				HkMsgU(wscCharname + L" has started a player hunt! The target system is " + wscSystemname + L".");
+				//
+				//Hunt the player to get the reward of 235 credits yourself!
+				HkMsgU(L"Hunt the player to get the reward of " + ToMoneyStr(cash) +  L" credits yourself!");
+
+				//Reach Suppe in system Kapser alive!
+				PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in system " + ServerHuntData.wscTargetSystem + L" alive!");
 
 				//Discord Chat
-				std::wstring wscMessage = wscCharname + L" has started a PlayerHunt! The target System is " + wscSystemname;
+				std::wstring wscMessage = wscCharname + L" has started a player hunt! The target system is " + wscSystemname + L"!";
 				ShellExecute(NULL, "open", DISCORD_WEBHOOK_UVCHAT_FILE, wstos(L"FLSR: " + wscMessage).c_str(), NULL, NULL);
 
 				
@@ -448,7 +513,7 @@ namespace PlayerHunt {
 				//Check if player is docked
 				if (iBaseIDPlayer == 0) {
 					//Player is not in a base
-					PrintUserCmdText(iClientID, L"You are not docked!");
+					PrintUserCmdText(iClientID, L"You need to be docked to take over the hunt!");
 					return;
 				}
 
@@ -458,7 +523,7 @@ namespace PlayerHunt {
 				//Get RealName
 				HkLoadStringDLLs();
 
-				struct Universe::IBase* baseinfo = Universe::get_base(TargetBase.iBaseID);
+				const struct Universe::IBase* baseinfo = Universe::get_base(TargetBase.iBaseID);
 				std::wstring wscBasename = HkGetWStringFromIDS(baseinfo->iBaseIDS);
 
 				const struct Universe::ISystem* sysinfo = Universe::get_system(TargetBase.iSystemID);
@@ -472,13 +537,18 @@ namespace PlayerHunt {
 				ServerHuntData.wscTargetBase = wscBasename;
 				ServerHuntData.iTargetSystem = TargetBase.iSystemID;
 				ServerHuntData.wscTargetSystem = wscSystemname;
-				ServerHuntData.tmHuntTime = timeInMS();
 				ServerHuntData.wscCharname = wscCharname;
+				ServerHuntData.lSystems.push_back(scSystemNicknamePlayer);
 
 				//Print Announcement
-				HkMsgU(wscCharname + L" has captured the Hunt! The new target system is " + wscSystemname);
-				HkMsgU(L"Hunt the player to get the reward of " + std::to_wstring(cash) + L" Credits yourself!");
-				PrintUserCmdText(iClientID, L"Reach " + wscBasename + L" in System " + wscSystemname + L" alive!");
+				//Peter has started a player hunt! The target system is New Tokyo.
+				HkMsgU(wscCharname + L" has taken over the hunt! The target system is " + wscSystemname + L".");
+
+				//Hunt the player to get the reward of 235 credits yourself!
+				HkMsgU(L"Hunt the player to get the reward of " + ToMoneyStr(cash) + L" credits yourself!");
+
+				//Reach Suppe in system Kapser alive!
+				PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in system " + ServerHuntData.wscTargetSystem + L" alive!");
 
 				return;
 			}
@@ -486,11 +556,12 @@ namespace PlayerHunt {
 			{
 				if (wscCharname == ServerHuntData.wscCharname)
 				{
-					PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in System " + ServerHuntData.wscTargetSystem + L" alive!");
+					//Reach Suppe in system Kapser alive!
+					PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in system " + ServerHuntData.wscTargetSystem + L" alive!");
 				}
 				else {
-					//We must wait for the next hunt
-					PrintUserCmdText(iClientID, L"A Hunt is active already! Kill " + ServerHuntData.wscCharname + L" to get the reward!");
+					//A hunt is active already! Kill Bobbel to get the reward!
+					PrintUserCmdText(iClientID, L"A hunt is active already! Kill " + ServerHuntData.wscCharname + L" to get the reward!");
 				}
 				return;
 			}

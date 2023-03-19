@@ -914,14 +914,13 @@ namespace PlayerHunt {
 		std::wstring wscTargetSystem;
 		std::wstring wscTargetBase;
 		HuntState eState;
-		uint tmHuntTime;
         uint iCredits;
+        std::list<std::string> lSystems;
 	};
 
 	struct LastPlayerHuntWinners {
 		std::wstring wscCharname;
 		uint iBaseID;
-		mstime tmHuntTime;
         uint Credits;
 	};
     
@@ -933,7 +932,6 @@ namespace PlayerHunt {
 	};
     
     extern float set_fRewardMultiplicator;
-	extern int set_iMultiplicatorTriggerTime;
 	extern int set_iMinTargetSystemDistance;
     extern int set_iMinCredits;
     
@@ -944,7 +942,7 @@ namespace PlayerHunt {
     BaseData getRandomBaseInSystem(uint iSystemID, uint iClientID);
     BaseData getTargetBase(uint iClientID);
     void Start_PlayerHunt(uint iClientID, const std::wstring& wscParam);
-    void PlayerHuntTimer();
+    void PlayerHuntMulti(uint iClientID, uint iPlayerSystemID);
     void CalcReward();
     void CheckSystemReached(uint iClientID, uint iPlayerSystemID);
     void CheckDock(uint iBaseID, uint iClientID);

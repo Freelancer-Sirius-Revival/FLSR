@@ -399,6 +399,7 @@ struct BASE_INFO
 	std::string	scBasename;
 	uint	iObjectID;
 	bool	bDestroyed;
+	uint	iSystemID;
 	std::list<DATA_MARKETITEM> lstMarketMisc;
 };
 

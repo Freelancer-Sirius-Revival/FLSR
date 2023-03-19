@@ -49,14 +49,14 @@ void HkTimer() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Demo command
-bool UserCmd_Template(ClientId iClientID, const std::wstring &wscCmd,
+bool UserCmd_Template(uint iClientID, const std::wstring &wscCmd,
                       const std::wstring &wscParam, const wchar_t *usage) {
     PrintUserCmdText(iClientID, L"OK");
     return true;
 }
 
 // Additional information related to the plugin when the /help command is used
-void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
+void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
     returncode = DEFAULT_RETURNCODE;
     PrintUserCmdText(iClientID, L"/template");
 }
@@ -71,7 +71,7 @@ USERCMD UserCmds[] = {
 };
 
 // Process user input
-bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     try {

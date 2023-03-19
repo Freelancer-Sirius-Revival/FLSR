@@ -31,7 +31,7 @@ namespace Depot {
         }
 	}
 	
-    std::list<PlayerDepotItem> GetEquipFromBaseDepot(ClientId iClientID, bool bPrint)
+    std::list<PlayerDepotItem> GetEquipFromBaseDepot(uint iClientID, bool bPrint)
     {
 		//List of Equip
 		std::list<PlayerDepotItem> lPlayerDepotItem;
@@ -110,7 +110,7 @@ namespace Depot {
         
     }
 
-    void PlayerDepotOpen(ClientId iClientID)
+    void PlayerDepotOpen(uint iClientID)
     {
 		//GetEquip in Depot
         std::list<PlayerDepotItem> lPlayerDepotItem = GetEquipFromBaseDepot(iClientID, false);
@@ -146,7 +146,7 @@ namespace Depot {
         GetPlayerEquip(iClientID);
     }
 
-    void GetPlayerEquip(ClientId iClientID)
+    void GetPlayerEquip(uint iClientID)
     {
 		//Create New List of Equip
 		std::list<PlayerCargoItem> lPlayerCargoItem;

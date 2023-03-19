@@ -69,14 +69,10 @@ namespace Cloak {
 		}
 	}
 
-	void InstallCloak(ClientId iClientID)
+	void InstallCloak(uint iClientID)
 	{
 		std::wstring wscCharFileName;
-		std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-		HkGetCharFileName(charname, wscCharFileName);
-
-
-		//HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 		
 		
 		mPlayerCloakData[wscCharFileName].bCanCloak = false;
@@ -142,10 +138,9 @@ namespace Cloak {
 		{
 			struct PlayerData* pd = 0;
 			while (pd = Players.traverse_active(pd)) {
-				ClientId iClientID = HkGetClientIdFromPD(pd);
+				uint iClientID = HkGetClientIdFromPD(pd);
 				std::wstring wscCharFileName;
-				std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-				HkGetCharFileName(charname, wscCharFileName);
+				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 				
 				if (mPlayerCloakData[wscCharFileName].bInitialCloak) {
 					ClientController::Send_ControlMsg(true, iClientID, L"_cloakoff");
@@ -173,11 +168,10 @@ namespace Cloak {
 		{
 			struct PlayerData* pd = 0;
 			while (pd = Players.traverse_active(pd)) {
-				ClientId iClientID = HkGetClientIdFromPD(pd);
+				uint iClientID = HkGetClientIdFromPD(pd);
 				
 				std::wstring wscCharFileName;
-				std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-				HkGetCharFileName(charname, wscCharFileName);
+				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
 				//Check if Cloak is allowed (Cooldown) after iCloakEffectDuration (in seconds)
 				mstime now = timeInMS();
@@ -231,12 +225,10 @@ namespace Cloak {
 	}
 
 	//Cloak.
-	void DoCloak(ClientId iClientID) {
-
+	void DoCloak(uint iClientID) {
 
 		std::wstring wscCharFileName;
-		std::wstring charname =(const wchar_t*)Players.GetActiveCharacterName(iClientID);
-		HkGetCharFileName(charname, wscCharFileName);
+		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 		
 		//Send MaxEnergy to Client
 		int iMaxEnergy = static_cast<int>(mPlayerCloakData[wscCharFileName].PlayerCloakData.fCloakCapacity);
@@ -272,12 +264,10 @@ namespace Cloak {
 	}
 
 	//Start Cloak Process
-	void StartCloakPlayer(ClientId iClientID) {
-
+	void StartCloakPlayer(uint iClientID) {
 
 		std::wstring wscCharFileName;
-		std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-		HkGetCharFileName(charname, wscCharFileName);
+		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 		
 		//Check for Cloak
 		if (!mPlayerCloakData[wscCharFileName].bInitialCloak)
@@ -373,12 +363,10 @@ namespace Cloak {
 		{
 			struct PlayerData* pd = 0;
 			while (pd = Players.traverse_active(pd)) {
-				ClientId iClientID = HkGetClientIdFromPD(pd);
-
+				uint iClientID = HkGetClientIdFromPD(pd);
 
 				std::wstring wscCharFileName;
-				std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-				HkGetCharFileName(charname, wscCharFileName);
+				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
 				uint iShip;
 				pub::Player::GetShip(iClientID, iShip);
@@ -404,12 +392,10 @@ namespace Cloak {
 		{
 			struct PlayerData* pd = 0;
 			while (pd = Players.traverse_active(pd)) {
-				ClientId iClientID = HkGetClientIdFromPD(pd);
-
+				uint iClientID = HkGetClientIdFromPD(pd);
 
 				std::wstring wscCharFileName;
-				std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-				HkGetCharFileName(charname, wscCharFileName);
+				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
 				uint iShip;
 				pub::Player::GetShip(iClientID, iShip);
@@ -530,12 +516,10 @@ namespace Cloak {
 		}
 	}
 	
-	void UncloakPlayer(ClientId iClientID) {
+	void UncloakPlayer(uint iClientID) {
 		
 		std::wstring wscCharFileName;
-		std::wstring charname =
-			(const wchar_t*)Players.GetActiveCharacterName(iClientID);
-		HkGetCharFileName(charname, wscCharFileName);
+		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 		
 		if (mPlayerCloakData[wscCharFileName].bCloaked && mPlayerCloakData[wscCharFileName].bAllowUncloak) {
 			ClientController::Send_ControlMsg(true, iClientID, L"_cloakoff");
@@ -557,7 +541,7 @@ namespace Cloak {
 		}
 	}
 
-	void UncloakGroup(ClientId iClientID) {
+	void UncloakGroup(uint iClientID) {
 			
 		//Get Group Members
 		std::list<GROUP_MEMBER> lstMembers;
@@ -567,8 +551,7 @@ namespace Cloak {
 		for (auto& m : lstMembers)
 		{
 			std::wstring wscCharFileName;
-			std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(m.iClientID);
-			HkGetCharFileName(charname, wscCharFileName);
+			HkGetCharFileName(ARG_CLIENTID(m.iClientID), wscCharFileName);
 			
 			if (mPlayerCloakData[wscCharFileName].bIsCloaking) {
 				ClientController::Send_ControlMsg(true, m.iClientID, L"_cloakoff");
@@ -581,7 +564,7 @@ namespace Cloak {
 	}
 
 	bool Check_Dock_Call(uint iShip,uint iDockTarget,uint iCancel, enum DOCK_HOST_RESPONSE response) {
-		ClientId iClientID = HkGetClientIDByShip(iShip);
+		uint iClientID = HkGetClientIDByShip(iShip);
 		if (iClientID) {
 			// If no target then ignore the request.
 			uint iTargetShip;
@@ -596,8 +579,7 @@ namespace Cloak {
 				return true;
 
 			std::wstring wscCharFileName;
-			std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-			HkGetCharFileName(charname, wscCharFileName);
+			HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
 			if (mPlayerCloakData[wscCharFileName].bCloaked)
 			{
@@ -613,7 +595,7 @@ namespace Cloak {
 		}	
 	}
 
-	bool Check_RequestEventFormaDocking(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5,  ClientId iClientID)
+	bool Check_RequestEventFormaDocking(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID)
 	{
 		if (iClientID)
 		{
@@ -626,8 +608,7 @@ namespace Cloak {
 					return true;
 
 				std::wstring wscCharFileName;
-				std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-				HkGetCharFileName(charname, wscCharFileName);
+				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 				
 				if (mPlayerCloakData[wscCharFileName].bCloaked)
 				{
@@ -644,10 +625,9 @@ namespace Cloak {
 		}
 	}
 
-	bool Check_GoTradelane( ClientId iClientID, struct XGoTradelane const& gtl) {
+	bool Check_GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl) {
 		std::wstring wscCharFileName;
-		std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-		HkGetCharFileName(charname, wscCharFileName);
+		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 		
 		if (mPlayerCloakData[wscCharFileName].bCloaked || mPlayerCloakData[wscCharFileName].bIsCloaking || mPlayerCloakData[wscCharFileName].bWantsCloak || mPlayerCloakData[wscCharFileName].bCanCloak)
 		{
@@ -674,24 +654,21 @@ namespace Cloak {
 		
 	}
 	
-	bool Check_Cloak(ClientId iClientID)
+	bool Check_Cloak(uint iClientID)
 	{
-
 		std::wstring wscCharFileName;
-		std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-		HkGetCharFileName(charname, wscCharFileName);
+		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 		
 		return mPlayerCloakData[wscCharFileName].bCloaked || mPlayerCloakData[wscCharFileName].bIsCloaking;
 	}
 
-	void CloakSync(ClientId iClientID)
+	void CloakSync(uint iClientID)
 	{
 		struct PlayerData* pd = 0;
 		while (pd = Players.traverse_active(pd)) {
 
 			std::wstring wscCharFileName;
-			std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-			HkGetCharFileName(charname, wscCharFileName);
+			HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 			
 			if (Tools::IsPlayerInRange(iClientID, pd->iOnlineID, 20000.0f))
 				
@@ -715,7 +692,7 @@ namespace Cloak {
 	}
 
 	//KillShield if Player has Shield
-	void KillShield(ClientId iClientID)
+	void KillShield(uint iClientID)
 	{
 		//Player cargo
 		int iRemHoldSize;

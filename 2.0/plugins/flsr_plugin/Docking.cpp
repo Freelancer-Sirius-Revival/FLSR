@@ -12,7 +12,7 @@ namespace Docking {
     std::list<UndockRelocate> lUndockRelocate;
 
     //Thanks Disco
-    bool FLSR_SystemSwitchOutComplete(unsigned int iShip,  ClientId iClientID,unsigned int iSystem,bool bstalkmode) {
+    bool FLSR_SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID,unsigned int iSystem,bool bstalkmode) {
         static PBYTE SwitchOut = 0;
         if (!SwitchOut) {
             SwitchOut = (PBYTE)hModServer + 0xf600;
@@ -74,7 +74,7 @@ namespace Docking {
 
 
     // DockOnProxyCarrierBase Beam
-    void DockOnProxyCarrierBase(std::string scBasename, ClientId iClientID, std::string scCarrierBase, uint iCarrierID) {
+    void DockOnProxyCarrierBase(std::string scBasename, uint iClientID, std::string scCarrierBase, uint iCarrierID) {
         // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
@@ -82,20 +82,14 @@ namespace Docking {
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
-        HkGetCharFileName(wscCharname, wscFilename);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
         std::string scFilename = wstos(wscFilename);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
         std::wstring wscCharnameCarrier = (wchar_t *)Players.GetActiveCharacterName(iCarrierID);
         std::string CharnameCarrier = wstos(wscCharnameCarrier);
         //std::string base64_CharnameCarrier = Tools::base64_encode((const unsigned char *)CharnameCarrier.c_str(), CharnameCarrier.length());
         std::wstring wscCarrierFilename;
-       // HkGetCharFileName(ARG_CLIENTID(iCarrierID), wscCarrierFilename);
-        std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iCarrierID);
-        HkGetCharFileName(charname, wscCarrierFilename);
-
-
-
-
+        HkGetCharFileName(ARG_CLIENTID(iCarrierID), wscCarrierFilename);
         std::string scCarrierFilename = wstos(wscCarrierFilename);
         
 
@@ -120,11 +114,7 @@ namespace Docking {
             Server.BaseEnter(iBaseID, iClientID);
             Server.BaseExit(iBaseID, iClientID);
             std::wstring wscCharFileName;
-
-            std::wstring charname =
-                (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-            std::wstring wscFilename;
-            HkGetCharFileName(charname, wscCharFileName);
+            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
             wscCharFileName += L".fl";
             CHARACTER_ID cID;
             strcpy(cID.szCharFilename, wstos(wscCharFileName.substr(0, 14)).c_str());
@@ -134,7 +124,7 @@ namespace Docking {
     }
 
     // UndockProxyCarrierBase
-    void UndockProxyBase(uint iCarrierId, ClientId iClientID, float fx_Undock, float fy_Undock, float fz_Undock, bool bstalkmode) {
+    void UndockProxyBase(uint iCarrierId, uint iClientID, float fx_Undock, float fy_Undock, float fz_Undock, bool bstalkmode) {
         // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
@@ -143,8 +133,7 @@ namespace Docking {
         std::string Charname = wstos(wscCharname);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
         std::wstring wscFilename;
-        std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        HkGetCharFileName(charname, wscFilename);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
         std::string scFilename = wstos(wscFilename);
         std::string IniNamePlayer = "Carrier-Docked_" + scFilename;
         std::wstring wscCharnameCarrier = (wchar_t *)Players.GetActiveCharacterName(iCarrierId);
@@ -271,7 +260,7 @@ namespace Docking {
         }
     }
 
-    void HandleUndocking(ClientId iClientID)
+    void HandleUndocking(uint iClientID)
     {
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
@@ -280,8 +269,7 @@ namespace Docking {
         std::string Charname = wstos(wscCharname);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
         std::wstring wscFilename;
-        std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        HkGetCharFileName(charname, wscFilename);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
         std::string scFilename = wstos(wscFilename);
 
         //Überprüfe ob der Spieler an einer Carrier-Proxy Base gedockt ist
@@ -415,7 +403,7 @@ namespace Docking {
     }
 
 
-    void DOCKACCEPT_ALL(ClientId iClientID) {
+    void DOCKACCEPT_ALL(uint iClientID) {
         if (Modules::GetModuleState("CarrierModule")) {
 			uint iClientCarrierID = iClientID;
 
@@ -492,7 +480,7 @@ namespace Docking {
     }
 
     
-    void ClearCarrier(ClientId iClientID)
+    void ClearCarrier(uint iClientID)
     {
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
@@ -501,8 +489,7 @@ namespace Docking {
         std::string Charname = wstos(wscCharname);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
         std::wstring wscFilename;
-        std::wstring charname =(const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        HkGetCharFileName(charname, wscFilename);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
         std::string scFilename = wstos(wscFilename);
 
         //Überprüfe ob der Spieler an einer Carrier-Proxy Base gedockt ist

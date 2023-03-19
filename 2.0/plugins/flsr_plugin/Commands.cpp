@@ -4,26 +4,26 @@ namespace Commands {
     
     //Test Commands
     /*
-    void UserCmd_TESTAC(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCmd_TESTAC(uint iClientID, const std::wstring &wscParam) {
         std::wstring wscType = wscParam;
         std::string scType = wstos(wscType);
         AntiCheat::Reporting::ReportCheater(iClientID, scType, "");
     }
 
-    void UserCmd_TESTCC(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_TESTCC(uint iClientID, const std::wstring& wscParam) {
         std::wstring wscMsg = wscParam;
         ClientController::Send_ControlMsg(false, iClientID, wscMsg);
     }
 
-    void UserCmd_TESTDEPOT(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_TESTDEPOT(uint iClientID, const std::wstring& wscParam) {
         Depot::PlayerDepotOpen(iClientID); 
     }
 
-    void UserCmd_TESTINSURANCE(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_TESTINSURANCE(uint iClientID, const std::wstring& wscParam) {
         Tools::GetHardpointsFromCollGroup(iClientID);
     }
 
-    void UserCmd_TESTWP(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_TESTWP(uint iClientID, const std::wstring& wscParam) {
         std::wstring wscMsg = wscParam;
         std::list <CustomMissions::PlayerWaypoint> lWP;
         uint iSysID;
@@ -52,20 +52,20 @@ namespace Commands {
         CustomMissions::Send_WPs(iClientID, lWP, true);
     }
     
-      void UserCmd_testcloak(ClientId iClientID, const std::wstring& wscParam) {
+      void UserCmd_testcloak(uint iClientID, const std::wstring& wscParam) {
         ClientController::Send_ControlMsg(true, iClientID, L"_cloaktoggle");
 
     }
     */
 	
 
-    void UserCmd_PLAYERHUNT(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
 
 		PlayerHunt::Start_PlayerHunt(iClientID, wscParam);
 
     }
 
-    void UserCmd_HELP(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
 
         
         //Create Popup struct
@@ -78,11 +78,7 @@ namespace Commands {
         NewPopUpBox.iButton = POPUPDIALOG_BUTTONS_CENTER_OK;
         
         std::wstring wscCharFileName;
-
-        std::wstring charname =
-            (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        std::wstring wscFilename;
-        HkGetCharFileName(charname, wscCharFileName);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
         //Setup New Popup
 		PopUp::mPopUpBox[wscCharFileName] = NewPopUpBox;
@@ -92,7 +88,7 @@ namespace Commands {
         
     }
 
-    void UserCmd_Tag(ClientId iClientID, const std::wstring& wscParam)
+    void UserCmd_Tag(uint iClientID, const std::wstring& wscParam)
     {
         std::wstring wscError[] =
         {
@@ -139,13 +135,12 @@ namespace Commands {
         }
     }
     
-    void UserCmd_CLOAK(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("CloakModule"))
         {
             
             std::wstring wscCharFileName;
-            std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-            HkGetCharFileName(charname, wscCharFileName);
+            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
             uint iShip = 0;
             pub::Player::GetShip(iClientID, iShip);
@@ -172,7 +167,7 @@ namespace Commands {
         }
     }
 
-    void UserCmd_UNCLOAK(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("CloakModule"))
         {
             Cloak::UncloakPlayer(iClientID);
@@ -182,14 +177,14 @@ namespace Commands {
         }
     }
 	
-    void UserCMD_INSURANCE_CALC(ClientId iClientID, const std::wstring& wscParam) {
+    void UserCMD_INSURANCE_CALC(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("InsuranceModule"))
         {
             Insurance::CalcInsurance(iClientID, true, false);
         }
 	}
 
-    void UserCMD_INSURANCE_AUTOSAVE(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_INSURANCE_AUTOSAVE(uint iClientID, const std::wstring &wscParam) {
         if (Modules::GetModuleState("InsuranceModule"))
         {
             uint ship;
@@ -202,10 +197,8 @@ namespace Commands {
             std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
             std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
             std::string Charname = wstos(wscCharname);
-
             std::wstring wscFilename;
-            HkGetCharFileName(wscCharname, wscFilename);
-
+            HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
             std::string scFilename = wstos(wscFilename);
             std::string sAutoInsurance = IniGetS(scUserFile, scFilename, "INSURANCE-State", "no");
 
@@ -241,14 +234,14 @@ namespace Commands {
         }
     }
 
-    void UserCmd_UV(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCmd_UV(uint iClientID, const std::wstring &wscParam) {
         std::wstring Chat = wscParam;
         std::wstring Charname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         Chat::HkSendUChat(Charname, Chat);
         ShellExecute(NULL, "open", DISCORD_WEBHOOK_UVCHAT_FILE, wstos(Charname + L": " + Chat).c_str(), NULL, NULL);
     }
 
-    void UserCmd_MODREQUEST(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCmd_MODREQUEST(uint iClientID, const std::wstring &wscParam) {
         std::wstring Chat = wscParam;
         std::wstring Charname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         // HkSendUChat(Charname, Chat);
@@ -256,7 +249,7 @@ namespace Commands {
         PrintUserCmdText(iClientID, L"Request send!");
     }
 
-    void UserCMD_ENABLECARRIER(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_ENABLECARRIER(uint iClientID, const std::wstring &wscParam) {
         if (Modules::GetModuleState("CarrierModule")) {
             bool bLastBaseUsed = false;
             
@@ -343,7 +336,7 @@ namespace Commands {
         }
     }
 
-    void UserCMD_DOCKREQUEST(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam) {
         if (Modules::GetModuleState("CarrierModule")) {
 
             // Überprüfe ob Spieler im Space ist
@@ -453,7 +446,7 @@ namespace Commands {
         }
     }
 
-    void UserCMD_DOCKACCEPT(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_DOCKACCEPT(uint iClientID, const std::wstring &wscParam) {
         if (Modules::GetModuleState("CarrierModule")) {
 
             std::wstring Charname = wscParam;
@@ -530,7 +523,7 @@ namespace Commands {
     }
 
     /** Process a give cash command */
-    void UserCMD_SendCash(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam) {
         // The last error.
         HK_ERROR err;
 
@@ -748,7 +741,7 @@ namespace Commands {
         return;
     }
 
-    void UserCMD_SendCash$(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam) {
         // The last error.
         HK_ERROR err;
 
@@ -977,14 +970,14 @@ namespace Commands {
     }
 
     // MissionGroup Bug
-    void UserCMD_Clear(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam) {
 
         Tools::HkClearMissionBug(iClientID);
         return;
     }
 
     // Contributor TextBox
-    void UserCMD_Contributor(ClientId iClientID, const std::wstring &wscParam) {
+    void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam) {
         ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE Contributor");
 
         FmtStr caption(0, 0);
@@ -1013,7 +1006,7 @@ namespace Commands {
         }
 
         // Hole ClientID
-        ClientId iClientID = HkGetClientIdFromCharname(cmds->GetAdminName());
+        uint iClientID = HkGetClientIdFromCharname(cmds->GetAdminName());
 
         PrintUserCmdText(iClientID, Charname);
 
@@ -1072,7 +1065,7 @@ namespace Commands {
     };
 
     // User command processing
-    bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
+    bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
         std::wstring wscCmdLower = ToLower(wscCmd);
         for (uint i = 0; (i < sizeof(UserCmds) / sizeof(USERCMD)); i++) {
             if (wscCmdLower.find(ToLower(UserCmds[i].wszCmd)) == 0) {

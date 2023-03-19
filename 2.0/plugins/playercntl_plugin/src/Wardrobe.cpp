@@ -18,7 +18,7 @@ struct RESTART {
 
 std::list<RESTART> pendingRestarts;
 
-bool Wardrobe::UserCmd_ShowWardrobe(ClientId iClientID, const std::wstring &wscCmd,
+bool Wardrobe::UserCmd_ShowWardrobe(uint iClientID, const std::wstring &wscCmd,
                                     const std::wstring &wscParam,
                                     const wchar_t *usage) {
     if (!set_bEnableWardrobe)
@@ -44,7 +44,7 @@ bool Wardrobe::UserCmd_ShowWardrobe(ClientId iClientID, const std::wstring &wscC
     return true;
 }
 
-bool Wardrobe::UserCmd_ChangeCostume(ClientId iClientID, const std::wstring &wscCmd,
+bool Wardrobe::UserCmd_ChangeCostume(uint iClientID, const std::wstring &wscCmd,
                                      const std::wstring &wscParam,
                                      const wchar_t *usage) {
     if (!set_bEnableWardrobe)

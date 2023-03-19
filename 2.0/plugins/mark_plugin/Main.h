@@ -23,10 +23,10 @@ struct USERCMD {
 
 #define IS_CMD(a) !wscCmd.compare(L##a)
 
-void ClearClientMark(ClientId iClientID);
-void HkUnMarkAllObjects(ClientId iClientID);
-char HkUnMarkObject(ClientId iClientID, uint iObject);
-char HkMarkObject(ClientId iClientID, uint iObject);
+void ClearClientMark(uint iClientID);
+void HkUnMarkAllObjects(uint iClientID);
+char HkUnMarkObject(uint iClientID, uint iObject);
+char HkMarkObject(uint iClientID, uint iObject);
 
 struct MARK_INFO {
     bool bMarkEverything;

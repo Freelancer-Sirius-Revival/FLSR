@@ -8,7 +8,7 @@ namespace Tools {
 
     std::list <CMPDump_Exception> lCMPUpdateExceptions;
 
-    float CaclDestroyedHardpointWorth(ClientId iClientID) {
+    float CaclDestroyedHardpointWorth(uint iClientID) {
         std::vector<std::string> DamagedHardPoints =  Tools::GetHardpointsFromCollGroup(iClientID);
 
         // Player cargo
@@ -51,7 +51,7 @@ namespace Tools {
         return fValue;
     }
 
-    std::vector<std::string> GetHardpointsFromCollGroup(ClientId iClientID) {
+    std::vector<std::string> GetHardpointsFromCollGroup(uint iClientID) {
 
             
         std::vector<std::string> vDamagedHardPoints;
@@ -290,7 +290,7 @@ namespace Tools {
     }
 
     // This will return a vector of CollisionGroups
-    std::vector<std::string> HkGetCollisionGroups(ClientId iClientID, bool bOnly) {
+    std::vector<std::string> HkGetCollisionGroups(uint iClientID, bool bOnly) {
         std::vector<std::string> vecString;
         std::vector<int> vecLine;
         std::wstring wscRet = L"";
@@ -466,7 +466,7 @@ namespace Tools {
     
 
     std::wstring CS_wscCharBefore;
-    void HkNewPlayerMessage(ClientId iClientID, struct CHARACTER_ID const &cId) {
+    void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId) {
         const wchar_t *wszCharname =
             (wchar_t *)Players.GetActiveCharacterName(iClientID);
         CS_wscCharBefore =
@@ -796,7 +796,7 @@ namespace Tools {
         return HKE_OK;
     }
 
-    bool IsPlayerInRange(ClientId iClientID, uint iClientID2, float fDistance) 
+    bool IsPlayerInRange(uint iClientID, uint iClientID2, float fDistance) 
     {
         uint iShip;
         pub::Player::GetShip(iClientID, iShip);

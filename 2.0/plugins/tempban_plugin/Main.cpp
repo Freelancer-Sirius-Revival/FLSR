@@ -64,7 +64,7 @@ HK_ERROR HkTempBan(const std::wstring &wscCharname, uint _duration) {
     return HKE_OK;
 }
 
-bool HkTempBannedCheck(ClientId iClientID) {
+bool HkTempBannedCheck(uint iClientID) {
     CAccount *acc;
     acc = Players.FindAccountFromClientID(iClientID);
 
@@ -83,7 +83,7 @@ bool HkTempBannedCheck(ClientId iClientID) {
 namespace HkIServerImpl {
 
 EXPORT void __stdcall Login(struct SLoginInfo const &li,
-                             ClientId iClientID) {
+                            unsigned int iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // check for tempban

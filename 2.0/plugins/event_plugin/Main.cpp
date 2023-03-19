@@ -204,7 +204,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
 }
 
 void __stdcall GFGoodBuy(struct SGFGoodBuyInfo const &gbi,
-                          ClientId iClientID) {
+                         unsigned int iClientID) {
     uint iBase;
     pub::Player::GetBase(iClientID, iBase);
 
@@ -221,7 +221,7 @@ void __stdcall GFGoodBuy(struct SGFGoodBuyInfo const &gbi,
 }
 
 void __stdcall GFGoodSell(const struct SGFGoodSellInfo &gsi,
-                           ClientId iClientID) {
+                          unsigned int iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     uint iBase;

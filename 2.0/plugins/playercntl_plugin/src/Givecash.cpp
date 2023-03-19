@@ -40,7 +40,7 @@ It checks character's givecash history and prints out any received cash
 messages. Also fixes the money fix list, we can do this because this plugin is
 called before the money fix list is accessed.
 */
-static void CheckTransferLog(ClientId iClientID) {
+static void CheckTransferLog(uint iClientID) {
     std::wstring wscCharname =
         ToLower((const wchar_t *)Players.GetActiveCharacterName(iClientID));
 
@@ -112,7 +112,7 @@ static bool InBlockedSystem(const std::wstring &wscCharname) {
         return false;
 
     // If the char is logged in we can check in memory.
-    ClientId iClientID = HkGetClientIdFromCharname(wscCharname);
+    uint iClientID = HkGetClientIdFromCharname(wscCharname);
     if (iClientID != -1) {
         uint iSystem = 0;
         pub::Player::GetSystem(iClientID, iSystem);
@@ -144,18 +144,18 @@ void GiveCash::LoadSettings(const std::string &scPluginCfgFile) {
 
 /// Check for cash transfer while this char was offline whenever they
 /// enter or leave a base.
-void GiveCash::PlayerLaunch(uint iShip,  ClientId iClientID) {
+void GiveCash::PlayerLaunch(uint iShip, unsigned int iClientID) {
     CheckTransferLog(iClientID);
 }
 
 /// Check for cash transfer while this char was offline whenever they
 /// enter or leave a base. */
-void GiveCash::BaseEnter(uint iBaseID, ClientId iClientID) {
+void GiveCash::BaseEnter(uint iBaseID, uint iClientID) {
     CheckTransferLog(iClientID);
 }
 
 /** Process a give cash command */
-bool GiveCash::UserCmd_GiveCash(ClientId iClientID, const std::wstring &wscCmd,
+bool GiveCash::UserCmd_GiveCash(uint iClientID, const std::wstring &wscCmd,
                                 const std::wstring &wscParam,
                                 const wchar_t *usage) {
     // The last error.
@@ -380,7 +380,7 @@ bool GiveCash::UserCmd_GiveCash(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 /** Process a set cash code command */
-bool GiveCash::UserCmd_SetCashCode(ClientId iClientID, const std::wstring &wscCmd,
+bool GiveCash::UserCmd_SetCashCode(uint iClientID, const std::wstring &wscCmd,
                                    const std::wstring &wscParam,
                                    const wchar_t *usage) {
     std::wstring wscCharname =
@@ -405,7 +405,7 @@ bool GiveCash::UserCmd_SetCashCode(ClientId iClientID, const std::wstring &wscCm
 }
 
 /** Process a show cash command **/
-bool GiveCash::UserCmd_ShowCash(ClientId iClientID, const std::wstring &wscCmd,
+bool GiveCash::UserCmd_ShowCash(uint iClientID, const std::wstring &wscCmd,
                                 const std::wstring &wscParam,
                                 const wchar_t *usage) {
     // The last error.
@@ -453,7 +453,7 @@ bool GiveCash::UserCmd_ShowCash(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 /** Process a draw cash command **/
-bool GiveCash::UserCmd_DrawCash(ClientId iClientID, const std::wstring &wscCmd,
+bool GiveCash::UserCmd_DrawCash(uint iClientID, const std::wstring &wscCmd,
                                 const std::wstring &wscParam,
                                 const wchar_t *usage) {
     // The last error.

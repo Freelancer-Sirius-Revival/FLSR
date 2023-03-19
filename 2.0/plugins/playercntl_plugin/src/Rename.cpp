@@ -129,7 +129,7 @@ void SaveSettings() {
 }
 
 bool CreateNewCharacter(struct SCreateCharacterInfo const &si,
-                         ClientId iClientID) {
+                        unsigned int iClientID) {
     if (set_bCharnameTags) {
         // If this ship name starts with a restricted tag then the ship may only
         // be created using rename and the faction password
@@ -167,7 +167,7 @@ bool CreateNewCharacter(struct SCreateCharacterInfo const &si,
 // indicate that this tag is in use. If a tag is not used after 60 days, remove
 // it.
 void CharacterSelect_AFTER(struct CHARACTER_ID const &charId,
-                            ClientId iClientID) {
+                           unsigned int iClientID) {
     if (set_bCharnameTags) {
         std::wstring wscCharname =
             (const wchar_t *)Players.GetActiveCharacterName(iClientID);
@@ -181,7 +181,7 @@ void CharacterSelect_AFTER(struct CHARACTER_ID const &charId,
     }
 }
 
-bool UserCmd_MakeTag(ClientId iClientID, const std::wstring &wscCmd,
+bool UserCmd_MakeTag(uint iClientID, const std::wstring &wscCmd,
                      const std::wstring &wscParam, const wchar_t *usage) {
     if (set_bCharnameTags) {
         // Indicate an error if the command does not appear to be formatted
@@ -273,7 +273,7 @@ bool UserCmd_MakeTag(ClientId iClientID, const std::wstring &wscCmd,
     return false;
 }
 
-bool UserCmd_DropTag(ClientId iClientID, const std::wstring &wscCmd,
+bool UserCmd_DropTag(uint iClientID, const std::wstring &wscCmd,
                      const std::wstring &wscParam, const wchar_t *usage) {
     if (set_bCharnameTags) {
         // Indicate an error if the command does not appear to be formatted
@@ -312,7 +312,7 @@ bool UserCmd_DropTag(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 // Make tag password
-bool UserCmd_SetTagPass(ClientId iClientID, const std::wstring &wscCmd,
+bool UserCmd_SetTagPass(uint iClientID, const std::wstring &wscCmd,
                         const std::wstring &wscParam, const wchar_t *usage) {
     if (set_bCharnameTags) {
         // Indicate an error if the command does not appear to be formatted
@@ -506,7 +506,7 @@ void Timer() {
     }
 }
 
-bool UserCmd_RenameMe(ClientId iClientID, const std::wstring &wscCmd,
+bool UserCmd_RenameMe(uint iClientID, const std::wstring &wscCmd,
                       const std::wstring &wscParam, const wchar_t *usage) {
     HK_ERROR err;
 
@@ -661,7 +661,7 @@ bool UserCmd_RenameMe(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 /** Process a set the move char code command */
-bool Rename::UserCmd_SetMoveCharCode(ClientId iClientID, const std::wstring &wscCmd,
+bool Rename::UserCmd_SetMoveCharCode(uint iClientID, const std::wstring &wscCmd,
                                      const std::wstring &wscParam,
                                      const wchar_t *usage) {
     // Don't indicate an error if moving is disabled.
@@ -716,7 +716,7 @@ static bool IsBanned(std::wstring charname) {
 /**
  Move a character from a remote account into this one.
 */
-bool Rename::UserCmd_MoveChar(ClientId iClientID, const std::wstring &wscCmd,
+bool Rename::UserCmd_MoveChar(uint iClientID, const std::wstring &wscCmd,
                               const std::wstring &wscParam,
                               const wchar_t *usage) {
     HK_ERROR err;

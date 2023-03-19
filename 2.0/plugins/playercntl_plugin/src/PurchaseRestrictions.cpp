@@ -66,7 +66,7 @@ struct INFO {
 static std::map<uint, INFO> mapInfo;
 
 /// Log items of interest so we can see what cargo cheats people are using.
-static void LogItemsOfInterest(ClientId iClientID, uint iGoodID,
+static void LogItemsOfInterest(uint iClientID, uint iGoodID,
                                const std::string &details) {
     auto iter = set_mapItemsOfInterest.find(iGoodID);
     if (iter != set_mapItemsOfInterest.end()) {
@@ -146,7 +146,7 @@ void PurchaseRestrictions::LoadSettings(const std::string &scPluginCfgFile) {
 
 /// Check that this client is allowed to buy/mount this piece of equipment or
 /// ship Return true if the equipment is mounted to allow this good.
-bool CheckIDEquipRestrictions(ClientId iClientID, uint iGoodID) {
+bool CheckIDEquipRestrictions(uint iClientID, uint iGoodID) {
     std::list<CARGO_INFO> lstCargo;
     int iRemainingHoldSize;
     HkEnumCargo((const wchar_t *)Players.GetActiveCharacterName(iClientID),
@@ -174,23 +174,23 @@ bool CheckIDEquipRestrictions(ClientId iClientID, uint iGoodID) {
     return false;
 }
 
-void PurchaseRestrictions::ClearClientInfo( ClientId iClientID) {
+void PurchaseRestrictions::ClearClientInfo(unsigned int iClientID) {
     mapInfo[iClientID].bSuppressBuy = false;
 }
 
 void PurchaseRestrictions::PlayerLaunch(unsigned int iShip,
-                                         ClientId iClientID) {
+                                        unsigned int iClientID) {
     mapInfo[iClientID].bSuppressBuy = false;
 }
 
 void PurchaseRestrictions::BaseEnter(unsigned int iBaseID,
-                                      ClientId iClientID) {
+                                     unsigned int iClientID) {
     mapInfo[iClientID].bSuppressBuy = false;
 }
 
 /// Suppress the buying of goods.
 bool PurchaseRestrictions::GFGoodBuy(struct SGFGoodBuyInfo const &gbi,
-                                      ClientId iClientID) {
+                                     unsigned int iClientID) {
     mapInfo[iClientID].bSuppressBuy = false;
     LogItemsOfInterest(iClientID, gbi.iGoodID, "good-buy");
 
@@ -268,7 +268,7 @@ bool PurchaseRestrictions::GFGoodBuy(struct SGFGoodBuyInfo const &gbi,
 bool PurchaseRestrictions::ReqAddItem(unsigned int goodID,
                                       char const *hardpoint, int count,
                                       float status, bool mounted,
-                                      ClientId iClientID) {
+                                      uint iClientID) {
     LogItemsOfInterest(iClientID, goodID, "add-item");
     if (mapInfo[iClientID].bSuppressBuy) {
         return true;
@@ -278,7 +278,7 @@ bool PurchaseRestrictions::ReqAddItem(unsigned int goodID,
 
 /// Suppress the buying of goods.
 bool PurchaseRestrictions::ReqChangeCash(int iMoneyDiff,
-                                          ClientId iClientID) {
+                                         unsigned int iClientID) {
     if (mapInfo[iClientID].bSuppressBuy) {
         mapInfo[iClientID].bSuppressBuy = false;
         return true;
@@ -287,7 +287,7 @@ bool PurchaseRestrictions::ReqChangeCash(int iMoneyDiff,
 }
 
 /// Suppress ship purchases
-bool PurchaseRestrictions::ReqSetCash(int iMoney,  ClientId iClientID) {
+bool PurchaseRestrictions::ReqSetCash(int iMoney, unsigned int iClientID) {
     if (mapInfo[iClientID].bSuppressBuy) {
         return true;
     }
@@ -296,7 +296,7 @@ bool PurchaseRestrictions::ReqSetCash(int iMoney,  ClientId iClientID) {
 
 /// Suppress ship purchases
 bool PurchaseRestrictions::ReqEquipment(class EquipDescList const &eqDesc,
-                                         ClientId iClientID) {
+                                        unsigned int iClientID) {
     if (mapInfo[iClientID].bSuppressBuy) {
         return true;
     }
@@ -305,7 +305,7 @@ bool PurchaseRestrictions::ReqEquipment(class EquipDescList const &eqDesc,
 
 /// Suppress ship purchases
 bool PurchaseRestrictions::ReqShipArch(unsigned int iArchID,
-                                        ClientId iClientID) {
+                                       unsigned int iClientID) {
     if (mapInfo[iClientID].bSuppressBuy) {
         return true;
     }
@@ -314,7 +314,7 @@ bool PurchaseRestrictions::ReqShipArch(unsigned int iArchID,
 
 /// Suppress ship purchases
 bool PurchaseRestrictions::ReqHullStatus(float fStatus,
-                                          ClientId iClientID) {
+                                         unsigned int iClientID) {
     if (mapInfo[iClientID].bSuppressBuy) {
         mapInfo[iClientID].bSuppressBuy = false;
         return true;

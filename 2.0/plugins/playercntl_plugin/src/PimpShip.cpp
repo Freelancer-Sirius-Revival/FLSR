@@ -145,7 +145,7 @@ void PimpShip::LoadSettings(const std::string &scPluginCfgFile) {
 // On entering a room check to see if we're in a valid ship dealer room (or base
 // if a ShipDealer is not defined). If we are then print the intro text
 // otherwise do nothing.
-void PimpShip::LocationEnter(unsigned int iLocationID,  ClientId iClientID) {
+void PimpShip::LocationEnter(unsigned int iLocationID, unsigned int iClientID) {
     if (!set_bEnablePimpShip)
         return;
 
@@ -166,7 +166,7 @@ void PimpShip::LocationEnter(unsigned int iLocationID,  ClientId iClientID) {
         PrintUserCmdText(iClientID, L"%s", set_wscIntroMsg2.c_str());
 }
 
-bool PimpShip::UserCmd_PimpShip(ClientId iClientID, const std::wstring &wscCmd,
+bool PimpShip::UserCmd_PimpShip(uint iClientID, const std::wstring &wscCmd,
                                 const std::wstring &wscParam,
                                 const wchar_t *usage) {
     if (!set_bEnablePimpShip)
@@ -231,7 +231,7 @@ bool PimpShip::UserCmd_PimpShip(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 /// Show the setup of the player's ship.
-bool PimpShip::UserCmd_ShowSetup(ClientId iClientID, const std::wstring &wscCmd,
+bool PimpShip::UserCmd_ShowSetup(uint iClientID, const std::wstring &wscCmd,
                                  const std::wstring &wscParam,
                                  const wchar_t *usage) {
     if (!mapInfo[iClientID].bInPimpDealer || !set_bEnablePimpShip)
@@ -250,7 +250,7 @@ bool PimpShip::UserCmd_ShowSetup(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 /// Show the items that may be changed.
-bool PimpShip::UserCmd_ShowItems(ClientId iClientID, const std::wstring &wscCmd,
+bool PimpShip::UserCmd_ShowItems(uint iClientID, const std::wstring &wscCmd,
                                  const std::wstring &wscParam,
                                  const wchar_t *usage) {
     if (!mapInfo[iClientID].bInPimpDealer || !set_bEnablePimpShip)
@@ -269,7 +269,7 @@ bool PimpShip::UserCmd_ShowItems(ClientId iClientID, const std::wstring &wscCmd,
 }
 
 /// Change the item on the Slot ID to the specified item.
-bool PimpShip::UserCmd_ChangeItem(ClientId iClientID, const std::wstring &wscCmd,
+bool PimpShip::UserCmd_ChangeItem(uint iClientID, const std::wstring &wscCmd,
                                   const std::wstring &wscParam,
                                   const wchar_t *usage) {
     if (!mapInfo[iClientID].bInPimpDealer || !set_bEnablePimpShip)
@@ -294,7 +294,7 @@ bool PimpShip::UserCmd_ChangeItem(ClientId iClientID, const std::wstring &wscCmd
     return UserCmd_ShowSetup(iClientID, wscCmd, wscParam, usage);
 }
 
-bool PimpShip::UserCmd_BuyNow(ClientId iClientID, const std::wstring &wscCmd,
+bool PimpShip::UserCmd_BuyNow(uint iClientID, const std::wstring &wscCmd,
                               const std::wstring &wscParam,
                               const wchar_t *usage) {
     HK_ERROR err;

@@ -26,7 +26,7 @@ static const int MAX_MAIL_MSGS = 40;
 void MailShow(const std::wstring &wscCharname, const std::string &scExtension,
               int iFirstMsg) {
     // Make sure the character is logged in.
-    ClientId iClientID = HkGetClientIdFromCharname(wscCharname);
+    uint iClientID = HkGetClientIdFromCharname(wscCharname);
     if (iClientID == -1)
         return;
 
@@ -90,7 +90,7 @@ int MailCount(const std::wstring &wscCharname, const std::string &scExtension) {
 void MailCheckLog(const std::wstring &wscCharname,
                   const std::string &scExtension) {
     // Make sure the character is logged in.
-    ClientId iClientID = HkGetClientIdFromCharname(wscCharname);
+    uint iClientID = HkGetClientIdFromCharname(wscCharname);
     if (iClientID == -1)
         return;
 

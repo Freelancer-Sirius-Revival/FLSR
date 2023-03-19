@@ -11,7 +11,7 @@ namespace Insurance {
     std::map<std::wstring, std::list<PriceList>> mPriceList;
     float set_fCostPercent;
 
-	void CreateNewInsurance(ClientId iClientID, bool bFreeInsurance) {
+	void CreateNewInsurance(uint iClientID, bool bFreeInsurance) {
         HK_ERROR err;
         int iCountEquip = 0;
 
@@ -20,8 +20,7 @@ namespace Insurance {
         
         //Player CharfileName
         std::wstring wscCharFileName;
-        std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        HkGetCharFileName(charname, wscCharFileName);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
         //New PriceList
         std::list<PriceList> lPriceList;
@@ -29,7 +28,7 @@ namespace Insurance {
         //Player cargo
         int iRemHoldSize;
         std::list<CARGO_INFO> lstCargo;
-        HkEnumCargo(charname, lstCargo, iRemHoldSize);
+        HkEnumCargo(ARG_CLIENTID(iClientID), lstCargo, iRemHoldSize);
 
         //Add mounted Equip to list
         std::list<CARGO_INFO> lstMounted;
@@ -147,8 +146,7 @@ namespace Insurance {
             std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
             std::string Charname = wstos(wscCharname);
             std::wstring wscFilename;
-            std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-            HkGetCharFileName(charname, wscFilename);
+            HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
             std::string scFilename = wstos(wscFilename);
             
             // Remove Cash
@@ -208,7 +206,7 @@ namespace Insurance {
         return;
 	}
 
-    void UseInsurance(ClientId iClientID) {
+    void UseInsurance(uint iClientID) {
         HK_ERROR err;
 
 
@@ -219,7 +217,7 @@ namespace Insurance {
         std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
-        HkGetCharFileName(wscCharname, wscFilename);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
         std::string scFilename = wstos(wscFilename);
 
 
@@ -379,7 +377,7 @@ namespace Insurance {
         }
     }
 
-    void PlayerDiedEvent(bool bDied, ClientId iClientID) {
+    void PlayerDiedEvent(bool bDied, uint iClientID) {
         // New PlayerDied Event
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         bool Playerfound = false;
@@ -419,7 +417,7 @@ namespace Insurance {
         }
     }
 
-    bool CheckPlayerDied(ClientId iClientID) {
+    bool CheckPlayerDied(uint iClientID) {
         // New PlayerDied Event
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         bool bReturn = false;
@@ -451,7 +449,7 @@ namespace Insurance {
     }
 
     //Book Insurance
-    void BookInsurance(ClientId iClientID, bool bFreeItem) {
+    void BookInsurance(uint iClientID, bool bFreeItem) {
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         bool Playerfound = false;
 
@@ -485,7 +483,7 @@ namespace Insurance {
     }
 
     //CheckInsuranceBooked
-    std::pair<bool, bool> CheckInsuranceBooked(ClientId iClientID) {
+    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID) {
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         bool bReturn = false;
         bool bFreeItem = true;
@@ -503,7 +501,7 @@ namespace Insurance {
         return std::make_pair(bReturn, bFreeItem);
     }
 
-    std::wstring CalcInsurance(ClientId iClientID, bool bPlayerCMD, bool bFreeInsurance)
+    std::wstring CalcInsurance(uint iClientID, bool bPlayerCMD, bool bFreeInsurance)
     {
         HK_ERROR err;
         int iCountEquip = 0;
@@ -512,18 +510,9 @@ namespace Insurance {
         //ConPrint(L"NewInsurance\n");
 
         //Player CharfileName
-       // std::wstring wscCharFileName;
-       // HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-        
         std::wstring wscCharFileName;
-
-        std::wstring charname =
-            (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        std::wstring wscFilename;
-        HkGetCharFileName(charname, wscCharFileName);
-
-
-
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+        
         //New PriceList
         std::list<PriceList> lPriceList;
 
@@ -654,7 +643,7 @@ namespace Insurance {
         return (stat(name.c_str(), &buffer) == 0);
     }
 
-    void ReNewInsurance(ClientId iClientID) {
+    void ReNewInsurance(uint iClientID) {
         uint ship;
         pub::Player::GetShip(iClientID, ship);
 
@@ -666,7 +655,7 @@ namespace Insurance {
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
-        HkGetCharFileName(wscCharname, wscFilename);
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
         std::string scFilename = wstos(wscFilename);
 
 

@@ -50,7 +50,7 @@ namespace EquipWhiteList {
 		}
 	}
 
-	bool ReqAddItem_CheckEquipWhiteList(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, ClientId iClientID)
+	bool ReqAddItem_CheckEquipWhiteList(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID)
 	{
 		//Check for WhiteListEquip
 		uint iShipArchIDPlayer;
@@ -105,7 +105,7 @@ namespace EquipWhiteList {
 		return false;
 	}
 
-	void SendList(uint iShipArch, ClientId iClientID, bool boldShip)
+	void SendList(uint iShipArch, uint iClientID, bool boldShip)
 	{
 		//Check for WhiteListEquip
 		uint iShipArchIDPlayer = iShipArch;

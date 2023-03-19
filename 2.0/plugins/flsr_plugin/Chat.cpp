@@ -6,7 +6,7 @@ namespace Chat {
         // only for players with matching setting
         struct PlayerData *pPD = 0;
         while (pPD = Players.traverse_active(pPD)) {
-            ClientId iClientID = HkGetClientIdFromPD(pPD);
+            uint iClientID = HkGetClientIdFromPD(pPD);
             uchar cFormat;
             // adjust chatsize
             switch (ClientInfo[iClientID].chatSize) {

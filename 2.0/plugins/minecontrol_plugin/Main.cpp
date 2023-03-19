@@ -191,7 +191,7 @@ static float GetBonus(uint iRep, uint iShipID, std::list<CARGO_INFO> lstCargo,
     return 0.0f;
 }
 
-void CheckClientSetup(ClientId iClientID) {
+void CheckClientSetup(uint iClientID) {
     if (!mapClients[iClientID].bSetup) {
         if (set_iPluginDebug > 1)
             ConPrint(L"NOTICE: iClientID=%d setup bonuses\n", iClientID);
@@ -286,7 +286,7 @@ EXPORT void HkTimerCheckKick() {
 }
 
 /// Clear client info when a client connects.
-EXPORT void ClearClientInfo(ClientId iClientID) {
+EXPORT void ClearClientInfo(uint iClientID) {
     mapClients[iClientID].bSetup = false;
     mapClients[iClientID].mapLootBonus.clear();
     mapClients[iClientID].mapLootAmmoLst.clear();
@@ -511,7 +511,7 @@ EXPORT void LoadSettings() {
 
     struct PlayerData *pPD = 0;
     while (pPD = Players.traverse_active(pPD)) {
-        ClientId iClientID = HkGetClientIdFromPD(pPD);
+        uint iClientID = HkGetClientIdFromPD(pPD);
         ClearClientInfo(iClientID);
     }
 }
@@ -526,14 +526,14 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     return true;
 }
 
-void __stdcall PlayerLaunch(unsigned int iShip,  ClientId iClientID) {
+void __stdcall PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
     returncode = DEFAULT_RETURNCODE;
     ClearClientInfo(iClientID);
 }
 
 /// Called when a gun hits something
 void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const &ci,
-                                    ClientId iClientID) {
+                                   unsigned int iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
     // If this is not a lootable rock, do no other processing.
@@ -716,7 +716,7 @@ void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const &ci,
 /// client.
 void __stdcall MineAsteroid(uint iClientSystemID, class Vector const &vPos,
                             uint iCrateID, uint iLootID, uint iCount,
-                            ClientId iClientID) {
+                            uint iClientID) {
     mapClients[iClientID].iPendingMineAsteroidEvents += 4;
     //	ConPrint(L"mine_asteroid %d %d %d\n", iCrateID, iLootID, iCount);
     returncode = SKIPPLUGINS_NOFUNCTIONCALL;

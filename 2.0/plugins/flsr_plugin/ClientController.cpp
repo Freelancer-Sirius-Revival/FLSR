@@ -6,7 +6,7 @@ namespace ClientController {
     std::list<PathSelection::OpenUnlawfulMod> lOpenUnlawfulMods;
 
     // Client Controller
-    void Send_ControlMsg(bool sHook, ClientId iClientID, std::wstring wscText, ...) {
+    void Send_ControlMsg(bool sHook, uint iClientID, std::wstring wscText, ...) {
         wchar_t wszBuf[1024 * 8] = L"";
         va_list marker;
         va_start(marker, wscText);
@@ -40,7 +40,7 @@ namespace ClientController {
         rdl.extract_text_from_buffer((unsigned short*)wszBuf, sizeof(wszBuf), iRet1, (const char*)rdlReader, lP1);
         std::wstring wscBuf = wszBuf;
 		std::string scBuf = wstos(wscBuf);
-        ClientId iClientID = cId.iID;
+        uint iClientID = cId.iID;
 
         //ConPrint(L"Triggered %s\n", wscBuf);
         
@@ -77,11 +77,8 @@ namespace ClientController {
                 if (Tools::startsWith(scData, "Power: "))
                 {
                     //GetCharfile
-
                     std::wstring wscCharFileName;
-                    std::wstring charname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-                    HkGetCharFileName(charname, wscCharFileName);
-                   // HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+                    HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
                     
 					//Get Data
 					std::string scEnergy = scData.substr(7);

@@ -69,7 +69,7 @@ void processFFA(uint iClientIDVictim) {
                 } else {
                     struct PlayerData *pPD = 0;
                     while (pPD = Players.traverse_active(pPD)) {
-                        uint iClientID = HkGetClientIdFromPD(pPD);
+                        ClientId iClientID = HkGetClientIdFromPD(pPD);
                         uint iClientSystemID = 0;
                         pub::Player::GetSystem(iClientID, iClientSystemID);
                         if (iSystem == iClientSystemID)
@@ -87,7 +87,7 @@ void processFFA(uint iClientIDVictim) {
 
 // This method is called when a player types /ffa in an attempt to start a pvp
 // event
-bool UserCmd_StartFFA(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_StartFFA(ClientId iClientID, const std::wstring &wscCmd,
                       const std::wstring &wscParam, const wchar_t *usage) {
     HK_ERROR err;
 
@@ -178,7 +178,7 @@ bool UserCmd_StartFFA(uint iClientID, const std::wstring &wscCmd,
 }
 
 // This method is called when a player types /acceptffa
-bool UserCmd_AcceptFFA(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_AcceptFFA(ClientId iClientID, const std::wstring &wscCmd,
                        const std::wstring &wscParam, const wchar_t *usage) {
     // Is player in space?
     uint iShip;
@@ -238,7 +238,7 @@ bool UserCmd_AcceptFFA(uint iClientID, const std::wstring &wscCmd,
 }
 
 // Removes any bets with this iClientID and handles payouts.
-void processDuel(uint iClientID) {
+void processDuel(ClientId iClientID) {
     for (std::list<BET>::iterator iter = bets.begin(); iter != bets.end();) {
         uint iClientIDKiller = 0;
 
@@ -278,7 +278,7 @@ void processDuel(uint iClientID) {
 }
 
 // This method is called when a player types /duel in an attempt to start a duel
-bool UserCmd_Duel(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_Duel(ClientId iClientID, const std::wstring &wscCmd,
                   const std::wstring &wscParam, const wchar_t *usage) {
     // Get the object the player is targetting
     uint iShip, iTargetShip;
@@ -369,7 +369,7 @@ bool UserCmd_Duel(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool UserCmd_AcceptDuel(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_AcceptDuel(ClientId iClientID, const std::wstring &wscCmd,
                         const std::wstring &wscParam, const wchar_t *usage) {
     // Is player in space?
     uint iShip;
@@ -420,7 +420,7 @@ bool UserCmd_AcceptDuel(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool UserCmd_Cancel(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_Cancel(ClientId iClientID, const std::wstring &wscCmd,
                     const std::wstring &wscParam, const wchar_t *usage) {
     processFFA(iClientID);
     processDuel(iClientID);
@@ -444,7 +444,7 @@ This function is called by FLHook when a user types a chat string. We look at
 the string they've typed and see if it starts with one of the above commands. If
 it does we try to process it.
 */
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     std::wstring wscCmdLineLower = ToLower(wscCmd);
@@ -486,7 +486,7 @@ int __cdecl Dock_Call(unsigned int const &iShip,
                       unsigned int const &iDockTarget, int iCancel,
                       enum DOCK_HOST_RESPONSE response) {
     returncode = DEFAULT_RETURNCODE;
-    uint iClientID = HkGetClientIDByShip(iShip);
+    ClientId iClientID = HkGetClientIDByShip(iShip);
     if (HkIsValidClientID(iClientID)) {
         processFFA(iClientID);
         processDuel(iClientID);
@@ -494,13 +494,13 @@ int __cdecl Dock_Call(unsigned int const &iShip,
     return 0;
 }
 
-void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state) {
+void __stdcall DisConnect( ClientId iClientID, enum EFLConnection state) {
     returncode = DEFAULT_RETURNCODE;
     processFFA(iClientID);
     processDuel(iClientID);
 }
 
-void __stdcall CharacterInfoReq(unsigned int iClientID, bool p2) {
+void __stdcall CharacterInfoReq( ClientId iClientID, bool p2) {
     returncode = DEFAULT_RETURNCODE;
     processFFA(iClientID);
     processDuel(iClientID);

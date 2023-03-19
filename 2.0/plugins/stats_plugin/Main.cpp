@@ -109,7 +109,7 @@ void exportJSON() {
 }
 
 // Hooks for updating stats
-void __stdcall DisConnect_AFTER(unsigned int iClientID,
+void __stdcall DisConnect_AFTER( ClientId iClientID,
                                 enum EFLConnection state) {
     returncode = DEFAULT_RETURNCODE;
     exportJSON();
@@ -121,7 +121,7 @@ void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int client) {
 }
 
 void __stdcall CharacterSelect_AFTER(struct CHARACTER_ID const &charId,
-                                     unsigned int iClientID) {
+                                      ClientId iClientID) {
     returncode = DEFAULT_RETURNCODE;
     exportJSON();
 }

@@ -37,7 +37,7 @@ void RemoveBountyHunt(BOUNTY_HUNT b) {
     }
 }
 
-void PrintBountyHunts(uint iClientID) {
+void PrintBountyHunts(ClientId iClientID) {
     if (lstBountyHunt.begin() != lstBountyHunt.end()) {
         PrintUserCmdText(iClientID, L"Offered Bounty Hunts:");
         for (auto &it : lstBountyHunt) {
@@ -49,7 +49,7 @@ void PrintBountyHunts(uint iClientID) {
     }
 }
 
-bool UserCmd_BountyHunt(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_BountyHunt(ClientId iClientID, const std::wstring &wscCmd,
                         const std::wstring &wscParam, const wchar_t *usage) {
     if (!set_bBhEnabled) {
         PRINT_DISABLED();
@@ -121,7 +121,7 @@ bool UserCmd_BountyHunt(uint iClientID, const std::wstring &wscCmd,
     return true;
 }
 
-bool UserCmd_BountyHuntId(uint iClientID, const std::wstring &wscCmd,
+bool UserCmd_BountyHuntId(ClientId iClientID, const std::wstring &wscCmd,
                           const std::wstring &wscParam, const wchar_t *usage) {
     if (!set_bBhEnabled) {
         PRINT_DISABLED();
@@ -226,7 +226,7 @@ void SendDeathMsg(const std::wstring &wscMsg, uint iSystemID,
     }
 }
 
-void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state) {
+void __stdcall DisConnect( ClientId iClientID, enum EFLConnection state) {
     returncode = DEFAULT_RETURNCODE;
     for (auto &it : lstBountyHunt) {
         if (it.uiTargetID == iClientID) {
@@ -247,7 +247,7 @@ USERCMD UserCmds[] = {
      L"Usage: /bountyhuntid <id> <credits> <time>"},
 };
 
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(ClientId iClientID, const std::wstring &wscCmd) {
     returncode = DEFAULT_RETURNCODE;
 
     std::wstring wscCmdLineLower = ToLower(wscCmd);
@@ -282,7 +282,7 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
     return false;
 }
 
-EXPORT void UserCmd_Help(uint iClientID, const std::wstring &wscParam) {
+EXPORT void UserCmd_Help(ClientId iClientID, const std::wstring &wscParam) {
     PrintUserCmdText(iClientID,
                      L"/bountyhunt <charname> <credits> [<minutes>]");
     PrintUserCmdText(iClientID, L"/bountyhuntid <id> <credits> [<minutes>]");

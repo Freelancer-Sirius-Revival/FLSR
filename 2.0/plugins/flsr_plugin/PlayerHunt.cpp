@@ -223,7 +223,7 @@ namespace PlayerHunt {
 				CalcReward();
 				
 				//The new PlayerHunt reward is 20,000 credits!
-				HkMsgU(L"The new PlayerHunt reward is " + ToMoneyStr(ServerHuntData.iCredits) + L" credits!");
+				HkMsgU(L"The new player hunt reward is " + ToMoneyStr(ServerHuntData.iCredits) + L" credits!");
 				//Hunt down the player Peter in Sigma 19 and get the reward!
 				HkMsgU(L"Hunt down the player " + ServerHuntData.wscCharname + L" in " + wscClearSystemname + L" and get the reward!");
 				ServerHuntData.lSystems.push_back(scSystemnamePlayer);
@@ -429,7 +429,7 @@ namespace PlayerHunt {
 			}
 			if (cash < set_iMinCredits || cash < 0) {
 				//ERR: The PlayerHunt amount is too small. The minimum amount is 10 credits.
-				PrintUserCmdText(iClientID, L"ERR: The PlayerHunt amount is too small. The minimum amount is " + ToMoneyStr(set_iMinCredits) + L" credits.");
+				PrintUserCmdText(iClientID, L"ERR: The player hunt amount is too small. The minimum amount is " + ToMoneyStr(set_iMinCredits) + L" credits.");
 				return;
 			}
 			if (iCash < cash) {

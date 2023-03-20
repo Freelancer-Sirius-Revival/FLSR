@@ -35,7 +35,7 @@ void LoadSettings() {
     //SQL-Module ################################################################################
     if (Modules::GetModuleState("SQLModule"))
     {
-        SQL::InitializePlayerDB();
+        SQL::InitializeDB();
 
         ConPrint(L"Module loaded: SQL\n");
     }
@@ -150,13 +150,19 @@ void LoadSettings() {
     {
         if (Modules::GetModuleState("SQLModule"))
         {
-            Depot::LoadDepotData();
+            if (Depot::LoadDepotData())
+            {
+                ConPrint(L"Module loaded: Depot (" + stows(std::to_string(Depot::lPlayerDepot.size())) + L" entries loaded)\n");                
+            }
+            else {
+                ConPrint(L"Module failed to load: DepotModule\n");
+                Modules::SwitchModuleState("DepotModule");
+            }
 
-            ConPrint(L"Module loaded: Depot (" + stows(std::to_string(Depot::lPlayerDepot.size())) + L" entries loaded)\n");
         }
         else
         {
-            ConPrint(L"Depot Module not loaded! Necessary Module not loaded: SQL \n");
+            ConPrint(L"Depot Module not loaded! Necessary Module not loaded: SQL\n");
         }
     }
 

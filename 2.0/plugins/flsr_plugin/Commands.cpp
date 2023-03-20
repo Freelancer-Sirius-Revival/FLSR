@@ -2,6 +2,11 @@
 
 namespace Commands {
     
+    void UserCmd_TESTDEPOT(uint iClientID, const std::wstring& wscParam) {
+        Depot::PlayerDepotOpen(iClientID);
+        
+    }
+
     //Test Commands
     /*
     void UserCmd_TESTAC(uint iClientID, const std::wstring &wscParam) {
@@ -15,9 +20,7 @@ namespace Commands {
         ClientController::Send_ControlMsg(false, iClientID, wscMsg);
     }
 
-    void UserCmd_TESTDEPOT(uint iClientID, const std::wstring& wscParam) {
-        Depot::PlayerDepotOpen(iClientID); 
-    }
+
 
     void UserCmd_TESTINSURANCE(uint iClientID, const std::wstring& wscParam) {
         Tools::GetHardpointsFromCollGroup(iClientID);
@@ -1052,13 +1055,13 @@ namespace Commands {
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
-
+        {L"/testdepot", UserCmd_TESTDEPOT},
         
 		//Test Commands
         /*{L"/testcloak", UserCmd_testcloak},
         {L"/testac", UserCmd_TESTAC},
         {L"/testcc", UserCmd_TESTCC},
-        {L"/testdepot", UserCmd_TESTDEPOT},
+
         {L"/testins", UserCmd_TESTINSURANCE},
         */
 

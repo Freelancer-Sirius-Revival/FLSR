@@ -83,7 +83,6 @@ namespace Timers {
         {Cloak::UpdateShipEnergyTimer, 1500, 0},
         {TimerUpdate1000ms, 1000, 0},
         {Docking::DockRequest3000ms, 3000, 0},
-        {SQL::Timer2000ms, 2000, 0},
         {PathSelection::ModUnlawfulChar500ms, 500, 0},
 
         //{Docking::DoRelocate300ms, 300, 0},

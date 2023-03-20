@@ -3,65 +3,83 @@
 namespace Depot {
 	
 	std::list<PlayerDepot> lPlayerDepot;
-	
-	void LoadDepotData() {
-        std::string query;
 
+    bool LoadDepotData() {
         //Read Depot-List
         try
         {
-            query = R"(SELECT * FROM "FLSR"."PlayerDepot";)";
-            pqxx::result rPlayerDepot = SQL::CommitQuery(query);
-			
-            for (auto row : rPlayerDepot)
+            // Open a database file
+            SQLite::Database db(SQL::scDbName);
+
+            // Compile a SQL query, containing one parameter (index 1)
+            SQLite::Statement query(db, R"(SELECT * FROM "PlayerDepot";)");
+
+
+            // Loop to execute the query step by step, to get rows of result
+            while (query.executeStep())
             {
-				PlayerDepot NewDepot;
-				NewDepot.iDepotID = row["id"].as<int>();
-                NewDepot.iBaseID = row["baseid"].as<uint>();
-                NewDepot.scAccountName = row["account_name"].as<std::string>();
-                NewDepot.iCapacity = row["capacity"].as<int>();
-				lPlayerDepot.push_back(NewDepot);
+
+
+                PlayerDepot NewDepot;
+                NewDepot.iDepotID = query.getColumn(0);
+                NewDepot.iBaseID = query.getColumn(1);
+                const char* szAccountName = query.getColumn(2);
+                std::string scAccountName = szAccountName;
+                NewDepot.scAccountName = scAccountName;
+                NewDepot.iCapacity = query.getColumn(3);
+                lPlayerDepot.push_back(NewDepot);
             }
-			
+            
+            return true;
         }
-        catch (const std::exception& e)
+        catch (std::exception& e)
         {
             std::string error = e.what();
             ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+            return false;
         }
-	}
-	
+    }
+
+
     std::list<PlayerDepotItem> GetEquipFromBaseDepot(uint iClientID, bool bPrint)
     {
-		//List of Equip
-		std::list<PlayerDepotItem> lPlayerDepotItem;
+        //List of Equip
+        std::list<PlayerDepotItem> lPlayerDepotItem;
 
-		//Get Depot From Accountname
+        //Get Depot From Accountname
         CAccount* acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
-		std::string scAccountName = wstos(wscAccDir);
+        std::string scAccountName = wstos(wscAccDir);
         uint iBase = 0;
         pub::Player::GetBase(iClientID, iBase);
-        std::string query;
         uint iDepotID;
         //GetPlayer Depot on base
         try
         {
-            query = R"(SELECT * FROM "FLSR"."PlayerDepot" WHERE  "account_name" = ')" + scAccountName + R"(' AND "baseid" = ')" + std::to_string(iBase) + R"(';)";
-            pqxx::result rPlayerDepot = SQL::CommitQuery(query);
-			if (rPlayerDepot.size() == 0)
-			{
-				if (bPrint)
+            // Open a database file
+            SQLite::Database db(SQL::scDbName);
+
+            // Compile a SQL query, containing one parameter (index 1)
+            SQLite::Statement query(db, R"(SELECT * FROM "PlayerDepot" WHERE  "AccountName" = ')" + scAccountName + R"(' AND "BaseID" = ')" + std::to_string(iBase) + R"(';)");
+            
+            ConPrint(stows(R"(SELECT * FROM "PlayerDepot" WHERE  "AccountName" = ')" + scAccountName + R"(' AND "BaseID" = ')" + std::to_string(iBase) + R"(';)") + L"\n");
+
+            // Loop to execute the query step by step, to get rows of result
+            query.executeStep();
+            
+            //Check Results
+            if (!query.hasRow())
+            {
+                if (bPrint)
                     PrintUserCmdText(iClientID, L"You dont have a Depot on this Base!");
                 return lPlayerDepotItem;
             }
             else {
-                iDepotID = rPlayerDepot[0]["id"].as<int>();
+               iDepotID = query.getColumn(0);
                 if (bPrint)
-                    PrintUserCmdText(iClientID, L"DepotID: %u", iDepotID);
-            }
-			
+                    PrintUserCmdText(iClientID, L"DepotID: %u", iDepotID);                  
+            }         
         }
         catch (const std::exception& e)
         {
@@ -73,33 +91,66 @@ namespace Depot {
         //Get Equip in Depot
         try
         {
-            query = R"(SELECT * FROM "FLSR"."DepotStore" WHERE  "playerdepot" = ')" + std::to_string(iDepotID) + R"(';)";
-            pqxx::result rDepotStore = SQL::CommitQuery(query);
-            if (rDepotStore.size() == 0)
+            // Open a database file
+            SQLite::Database db(SQL::scDbName);
+
+            // Compile a SQL query, containing one parameter (index 1)
+            SQLite::Statement query(db, R"(SELECT * FROM "DepotStore" WHERE  "PlayerDepot" = ')" + std::to_string(iDepotID) + R"(';)");
+            
+            ConPrint(stows(R"(SELECT * FROM "DepotStore" WHERE  "PlayerDepot" = ')" + std::to_string(iDepotID) + R"(';)") + L"\n");
+            
+            bool bEquipfound = false;
+            
+
+            // Loop to execute the query step by step, to get rows of result
+            while (query.executeStep())
+			{
+
+                uint iArchID = query.getColumn(2);
+				uint iAmount = query.getColumn(3);
+                
+                std::wstring wscEquipNick = stows(GetEquipNicknameFromID(iArchID));
+                std::wstring wscAmount = std::to_wstring(iAmount);
+                
+                if (bPrint)
+                    PrintUserCmdText(iClientID, L"Equipment: " + wscEquipNick + L" Amount: " + wscAmount);
+
+
+                PlayerDepotItem NewDepotItem;
+                NewDepotItem.iDepotID = iDepotID;
+                NewDepotItem.iGoodID = iArchID;
+                NewDepotItem.iAmount = iAmount;
+                
+                //Get only Equipment/Goods
+                const GoodInfo* gi = GoodList_get()->find_by_id(iArchID);
+                if (gi)
+                {
+                    NewDepotItem.iIDSName = gi->iIDSName;
+
+                }
+                else {
+                    // Check Archtype
+                    Archetype::Equipment* eq = Archetype::GetEquipment(iArchID);
+                    NewDepotItem.iIDSName = eq->iIdsName;
+                }                
+                
+                lPlayerDepotItem.push_back(NewDepotItem);   
+
+                bEquipfound = true;
+            }
+            
+            //Check Results
+            if (!bEquipfound)
             {
                 if (bPrint)
                     PrintUserCmdText(iClientID, L"You dont have any stored Equipment!");
                 return lPlayerDepotItem;
             }
             else {
-                for (auto row : rDepotStore)
-                {
-                    std::wstring wscEquipNick = stows(GetEquipNicknameFromID(row["goodid"].as<uint>()));
-                    std::wstring wscAmount = std::to_wstring(row["amount"].as<int>());
-                    if (bPrint)
-                        PrintUserCmdText(iClientID, L"Equipment: " + wscEquipNick + L" Amount: " + wscAmount);
-
-					PlayerDepotItem NewDepotItem;
-					NewDepotItem.iDepotID = row["playerdepot"].as<int>();
-					NewDepotItem.iGoodID = row["goodid"].as<uint>();
-					NewDepotItem.iAmount = row["amount"].as<int>();
-					lPlayerDepotItem.push_back(NewDepotItem);
-                }
-                
-                //Return List
+                PrintUserCmdText(iClientID, L"Equip found!");
                 return lPlayerDepotItem;
             }
-
+            
         }
         catch (const std::exception& e)
         {
@@ -107,13 +158,13 @@ namespace Depot {
             ConPrint(L"SQLERROR: " + stows(error) + L"\n");
             return lPlayerDepotItem;
         }
-        
+
     }
 
     void PlayerDepotOpen(uint iClientID)
     {
-		//GetEquip in Depot
-        std::list<PlayerDepotItem> lPlayerDepotItem = GetEquipFromBaseDepot(iClientID, false);
+        //GetEquip in Depot
+        std::list<PlayerDepotItem> lPlayerDepotItem = GetEquipFromBaseDepot(iClientID, true);
 
         //Prepare Data
         std::wstring wscCCMessage = L"DEPOTDATA={";
@@ -121,83 +172,85 @@ namespace Depot {
         //While List of Equip
         std::list<PlayerDepotItem>::iterator iterPlayerDepotItem = lPlayerDepotItem.begin();
         while (iterPlayerDepotItem != lPlayerDepotItem.end()) {
-			//Get Equip Data
+            //Get Equip Data
+            std::wstring wscIDSName = std::to_wstring(iterPlayerDepotItem->iIDSName);
             std::wstring wscGoodID = std::to_wstring(iterPlayerDepotItem->iGoodID);
-			std::wstring wscAmount = std::to_wstring(iterPlayerDepotItem->iAmount);
-            
+            std::wstring wscAmount = std::to_wstring(iterPlayerDepotItem->iAmount);
+
             //Set Data
-            wscCCMessage = wscCCMessage + wscGoodID + L"-" + wscAmount;
-            
+            wscCCMessage = wscCCMessage + wscIDSName + L"-" + wscGoodID + L"-" + wscAmount;
+
 
             //Get last item of List
-			if (iterPlayerDepotItem != --lPlayerDepotItem.end())
+            if (iterPlayerDepotItem != --lPlayerDepotItem.end())
             {
                 wscCCMessage = wscCCMessage + L",";
             }
-            
+
             iterPlayerDepotItem++;
         }
 
-		wscCCMessage = wscCCMessage + L"}";
+        wscCCMessage = wscCCMessage + L"}";
 
-		//Send to Client
+        //Send to Client
         ConPrint(wscCCMessage + L"\n");
-        ClientController::Send_ControlMsg(false, iClientID, wscCCMessage); 
+        ClientController::Send_ControlMsg(false, iClientID, wscCCMessage);
         GetPlayerEquip(iClientID);
     }
-
+ 
     void GetPlayerEquip(uint iClientID)
     {
-		//Create New List of Equip
-		std::list<PlayerCargoItem> lPlayerCargoItem;
+        //Create New List of Equip
+        std::list<PlayerCargoItem> lPlayerCargoItem;
 
-		//Get Player Equip
+        //Get Player Equip
         std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
 
         std::list<CARGO_INFO> lstEquipment;
         int iRemaining;
         HkEnumCargo(wscCharname, lstEquipment, iRemaining);
 
-		//Create List of Equip
+        //Create List of Equip
         std::list<CARGO_INFO> lstMounted;
-        for (auto& cargo : lstEquipment) {       
-			if (!cargo.bMounted && cargo.fStatus == 1.0f) 
+        for (auto& cargo : lstEquipment) {
+            if (!cargo.bMounted && cargo.fStatus == 1.0f)
             {
-                //Get only Equipment and commodity_credits
-                const GoodInfo* gi = GoodList_get()->find_by_id(cargo.iArchID);
-                if (gi) {
-                    gi = GoodList::find_by_id(gi->iArchID);
-                    if (gi) {
-						if (gi->iType != 0 || GetEquipNicknameFromID(cargo.iArchID) == "commodity_credits") {
-                            //New PlayerCargoItem
-							PlayerCargoItem NewPlayerCargoItem;
-							NewPlayerCargoItem.iGoodID = cargo.iArchID;
-							NewPlayerCargoItem.iAmount = cargo.iCount;
-							lPlayerCargoItem.push_back(NewPlayerCargoItem);   
+                //New PlayerCargoItem
+                PlayerCargoItem NewPlayerCargoItem;
+                NewPlayerCargoItem.iGoodID = cargo.iArchID;
+                NewPlayerCargoItem.iAmount = cargo.iCount;
 
-                            //Debug
-							//std::wstring wscGoodID = std::to_wstring(cargo.iArchID);
-							//std::wstring wscAmount = std::to_wstring(cargo.iCount);
-							//ConPrint(L"GoodID: " + wscGoodID + L" Amount: " + wscAmount + L"\n");
-                        }
-                    }
+                //Get only Equipment/Goods
+                const GoodInfo* gi = GoodList_get()->find_by_id(cargo.iArchID);
+                if (gi)
+                {
+                    NewPlayerCargoItem.iIDSName = gi->iIDSName;
+
                 }
+                else {
+                    // Check Archtype
+                    Archetype::Equipment* eq = Archetype::GetEquipment(cargo.iArchID);
+                    NewPlayerCargoItem.iIDSName = eq->iIdsName;
+                }
+
+                lPlayerCargoItem.push_back(NewPlayerCargoItem);
             }
         }
 
         //Send List to Client
         //Prepare Data
         std::wstring wscCCMessage = L"CARGODATA={";
-       
+
         //While List of Equip
         std::list<PlayerCargoItem>::iterator iterPlayerCargoItem = lPlayerCargoItem.begin();
         while (iterPlayerCargoItem != lPlayerCargoItem.end()) {
             //Get Equip Data
+			std::wstring wscIDSName = std::to_wstring(iterPlayerCargoItem->iIDSName);
             std::wstring wscGoodID = std::to_wstring(iterPlayerCargoItem->iGoodID);
             std::wstring wscAmount = std::to_wstring(iterPlayerCargoItem->iAmount);
 
             //Set Data
-            wscCCMessage = wscCCMessage + wscGoodID + L"-" + wscAmount;
+            wscCCMessage = wscCCMessage + wscIDSName + L"-" + wscGoodID + L"-" + wscAmount;
 
 
             //Get last item of List
@@ -214,20 +267,19 @@ namespace Depot {
         //Send to Client
         ConPrint(wscCCMessage + L"\n");
         ClientController::Send_ControlMsg(false, iClientID, wscCCMessage);
-        
+
     }
-	
+
     std::string GetEquipNicknameFromID(uint goodID) {
-    
+
         Tools::HashMap NewHash = Tools::mNicknameHashMap[goodID];
         return NewHash.scNickname;
 
-       // Archetype::Ship* ship = Archetype::GetShip(2820316814);
-       // std::wstring test = HkGetWStringFromI  b  b  DS(459545).c_str();
+        // Archetype::Ship* ship = Archetype::GetShip(2820316814);
+        // std::wstring test = HkGetWStringFromI  b  b  DS(459545).c_str();
 
-        //ConPrint(test+L"\n");		
+         //ConPrint(test+L"\n");		
     }
-
-
+    
 
 }

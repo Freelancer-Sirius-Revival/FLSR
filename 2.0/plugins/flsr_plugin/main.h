@@ -16,7 +16,8 @@
 #include <filesystem>
 #include <sstream>
 #include <numeric>
-#include <pqxx/pqxx>
+#include <SQLiteCpp/SQLiteCpp.h>
+#include <SQLiteCpp/VariadicBind.h>
 
 //Plugin Stuff
 extern PLUGIN_RETURNCODE returncode;
@@ -780,16 +781,11 @@ namespace EquipWhiteList {
 }
 
 namespace SQL {
+    
 
-    extern bool InitializeedServerData;
 
-    void InitializePlayerDB();
-    void InitializeServerData();
-    void Timer2000ms();
-    void Thread2000ms();
-    pqxx::connection Connect();
-    pqxx::result CommitQuery(std::string query);
-	
+   extern std::string scDbName;
+    void InitializeDB();
 }
 
 namespace Depot {
@@ -805,14 +801,16 @@ namespace Depot {
 		uint iDepotID;
 		uint iGoodID;
 		uint iAmount;
+        uint iIDSName;
 	};
 
     struct PlayerCargoItem {
         uint iGoodID;
         uint iAmount;
+        uint iIDSName;
     };
 
-    void LoadDepotData();
+    bool LoadDepotData();
     std::string GetEquipNicknameFromID(uint goodID);
     std::list<PlayerDepotItem> GetEquipFromBaseDepot(uint iClientID, bool bPrint);
     void PlayerDepotOpen(uint iClientID);

@@ -122,11 +122,11 @@ namespace ClientController {
             {
                 if (Tools::startsWith(scData, "DEPOTOPEN"))
                 {
-					Depot::PlayerDepotOpen(iClientID);
+					//Depot::PlayerDepotOpen(iClientID);
                 }
                 if (Tools::startsWith(scData, "GET_CARGO"))
                 {
-                    Depot::GetPlayerEquip(iClientID);
+                   // Depot::GetPlayerEquip(iClientID);
                 }
             }
             //PathSelection

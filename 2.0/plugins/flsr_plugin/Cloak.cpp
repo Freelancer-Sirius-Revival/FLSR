@@ -71,9 +71,18 @@ namespace Cloak {
 
 	void InstallCloak(uint iClientID)
 	{
+		HK_ERROR err;
+
+
+		if (!HkIsValidClientID(iClientID)) {
+			return;
+		}
+		if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+			return;
 		std::wstring wscCharFileName;
-		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-		
+		if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+			return;
+		}
 		
 		mPlayerCloakData[wscCharFileName].bCanCloak = false;
 
@@ -134,13 +143,27 @@ namespace Cloak {
 	//Uncloak at Spawn (every 2000ms Check)
 	void CloakInstallTimer2000ms() {
 		//CloakModule
+		HK_ERROR err;
+
+
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			struct PlayerData* pd = 0;
 			while (pd = Players.traverse_active(pd)) {
 				uint iClientID = HkGetClientIdFromPD(pd);
+				
+				if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+					continue;
+
+				if (!HkIsValidClientID(iClientID)) {
+					continue;
+				}
+				if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+					continue;
 				std::wstring wscCharFileName;
-				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+				if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+					continue;
+				}
 				
 				if (mPlayerCloakData[wscCharFileName].bInitialCloak) {
 					ClientController::Send_ControlMsg(true, iClientID, L"_cloakoff");
@@ -161,7 +184,8 @@ namespace Cloak {
 
 	//Check for CloakWarmUp (every 1000ms)
 	void WarmUpCloakTimer1000ms() {
-		
+		HK_ERROR err;
+
 
 		//CloakModule
 		if (Modules::GetModuleState("CloakModule"))
@@ -170,9 +194,18 @@ namespace Cloak {
 			while (pd = Players.traverse_active(pd)) {
 				uint iClientID = HkGetClientIdFromPD(pd);
 				
-				std::wstring wscCharFileName;
-				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+				if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+					continue;
 
+				if (!HkIsValidClientID(iClientID)) {
+					continue;
+				}
+				if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+					continue;
+				std::wstring wscCharFileName;
+				if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+					continue;
+				}
 				//Check if Cloak is allowed (Cooldown) after iCloakEffectDuration (in seconds)
 				mstime now = timeInMS();
 				if (mPlayerCloakData[wscCharFileName].tmUnCloakTime + mPlayerCloakData[wscCharFileName].PlayerCloakData.iUncloakEffectDuration < now && !mPlayerCloakData[wscCharFileName].bCloaked && !mPlayerCloakData[wscCharFileName].bIsCloaking && !mPlayerCloakData[wscCharFileName].bAllowCloak)
@@ -226,10 +259,19 @@ namespace Cloak {
 
 	//Cloak.
 	void DoCloak(uint iClientID) {
+		HK_ERROR err;
 
+
+
+		if (!HkIsValidClientID(iClientID)) {
+			return;
+		}
+		if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+			return;
 		std::wstring wscCharFileName;
-		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-		
+		if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+			return;
+		}
 		//Send MaxEnergy to Client
 		int iMaxEnergy = static_cast<int>(mPlayerCloakData[wscCharFileName].PlayerCloakData.fCloakCapacity);
 		ClientController::Send_ControlMsg(false, iClientID, L"MaxEnergy(" + std::to_wstring(iMaxEnergy) + L")");
@@ -265,10 +307,19 @@ namespace Cloak {
 
 	//Start Cloak Process
 	void StartCloakPlayer(uint iClientID) {
+		HK_ERROR err;
+
+
+		if (!HkIsValidClientID(iClientID)) {
+			return;
+		}
+		if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+			return;
 
 		std::wstring wscCharFileName;
-		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-		
+		if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+			return;
+		}
 		//Check for Cloak
 		if (!mPlayerCloakData[wscCharFileName].bInitialCloak)
 		{
@@ -358,19 +409,28 @@ namespace Cloak {
 
 	//Update EnergyData
 	void UpdateShipEnergyTimer() {
+		HK_ERROR err;
+
+
 		//CloakModule
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			struct PlayerData* pd = 0;
 			while (pd = Players.traverse_active(pd)) {
-				uint iClientID = HkGetClientIdFromPD(pd);
+				uint iClientID = HkGetClientIdFromPD(pd);		
 
-				std::wstring wscCharFileName;
-				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+				if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+					continue;
+				if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+					continue;
 
 				uint iShip;
 				pub::Player::GetShip(iClientID, iShip);
 				if (!iShip) {
+					continue;
+				}
+				std::wstring wscCharFileName;
+				if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
 					continue;
 				}
 				
@@ -387,6 +447,9 @@ namespace Cloak {
 
 	//Check for CloakWarmUp (every 250ms)
 	void DoCloakingTimer250ms() {
+		HK_ERROR err;
+
+
 		//CloakModule
 		if (Modules::GetModuleState("CloakModule"))
 		{
@@ -394,12 +457,23 @@ namespace Cloak {
 			while (pd = Players.traverse_active(pd)) {
 				uint iClientID = HkGetClientIdFromPD(pd);
 
-				std::wstring wscCharFileName;
-				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+				if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+					continue;
 
+				if (!HkIsValidClientID(iClientID)) {
+					continue;
+				}
+				if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+					continue;
+				
 				uint iShip;
 				pub::Player::GetShip(iClientID, iShip);
 				if (!iShip) {
+					continue;
+				}
+				
+				std::wstring wscCharFileName;
+				if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
 					continue;
 				}
 
@@ -518,8 +592,26 @@ namespace Cloak {
 	
 	void UncloakPlayer(uint iClientID) {
 		
+		HK_ERROR err;
+
+
+		if (!HkIsValidClientID(iClientID)) {
+			return;
+		}
+		if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+			return;
+
+
+		uint iShip;
+		pub::Player::GetShip(iClientID, iShip);
+		if (!iShip) {
+			return;
+		}
+		
 		std::wstring wscCharFileName;
-		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+		if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+			return;
+		}
 		
 		if (mPlayerCloakData[wscCharFileName].bCloaked && mPlayerCloakData[wscCharFileName].bAllowUncloak) {
 			ClientController::Send_ControlMsg(true, iClientID, L"_cloakoff");
@@ -543,6 +635,8 @@ namespace Cloak {
 
 	void UncloakGroup(uint iClientID) {
 			
+		HK_ERROR err;		
+
 		//Get Group Members
 		std::list<GROUP_MEMBER> lstMembers;
 		HkGetGroupMembers((const wchar_t*)Players.GetActiveCharacterName(iClientID), lstMembers);
@@ -550,8 +644,16 @@ namespace Cloak {
 		//Uncloak Members
 		for (auto& m : lstMembers)
 		{
+
 			std::wstring wscCharFileName;
-			HkGetCharFileName(ARG_CLIENTID(m.iClientID), wscCharFileName);
+			if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+				continue;
+			}
+			if (!HkIsValidClientID(iClientID)) {
+				continue;
+			}
+			if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+				continue;
 			
 			if (mPlayerCloakData[wscCharFileName].bIsCloaking) {
 				ClientController::Send_ControlMsg(true, m.iClientID, L"_cloakoff");
@@ -564,6 +666,9 @@ namespace Cloak {
 	}
 
 	bool Check_Dock_Call(uint iShip,uint iDockTarget,uint iCancel, enum DOCK_HOST_RESPONSE response) {
+
+		HK_ERROR err;
+
 		uint iClientID = HkGetClientIDByShip(iShip);
 		if (iClientID) {
 			// If no target then ignore the request.
@@ -578,9 +683,17 @@ namespace Cloak {
 			if (iType == OBJ_JUMP_HOLE)
 				return true;
 
+			if (!HkIsValidClientID(iClientID)) {
+				return true;
+			}
+			if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+				return true;
+			
 			std::wstring wscCharFileName;
-			HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-
+			if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+				return true;
+			}
+			
 			if (mPlayerCloakData[wscCharFileName].bCloaked)
 			{
 				PrintUserCmdText(iClientID, L"Docking with activated Cloak not possible.");
@@ -601,14 +714,25 @@ namespace Cloak {
 		{
 			if (!iIsFormationRequest)
 			{	
+				HK_ERROR err;
+
+
 				//Check for JumpHole
 				uint iTargetTypeID;
 				pub::SpaceObj::GetType(iDockTarget, iTargetTypeID);
 				if (iTargetTypeID == OBJ_JUMP_HOLE)
 					return true;
 
+				if (!HkIsValidClientID(iClientID)) {
+					return true;
+				}
+				if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+					return true;
+
 				std::wstring wscCharFileName;
-				HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+				if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+					return true;
+				}
 				
 				if (mPlayerCloakData[wscCharFileName].bCloaked)
 				{
@@ -626,8 +750,20 @@ namespace Cloak {
 	}
 
 	bool Check_GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl) {
+		HK_ERROR err;
+
+		
+
+		if (!HkIsValidClientID(iClientID)) {
+			return true;
+		}
+		if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+			return true;
+
 		std::wstring wscCharFileName;
-		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+		if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+			return true;
+		}
 		
 		if (mPlayerCloakData[wscCharFileName].bCloaked || mPlayerCloakData[wscCharFileName].bIsCloaking || mPlayerCloakData[wscCharFileName].bWantsCloak || mPlayerCloakData[wscCharFileName].bCanCloak)
 		{
@@ -656,20 +792,48 @@ namespace Cloak {
 	
 	bool Check_Cloak(uint iClientID)
 	{
-		std::wstring wscCharFileName;
-		HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+		HK_ERROR err;
+
+
+
+		if (!HkIsValidClientID(iClientID)) {
+			return false;
+		}
+		if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+			return false;
 		
+		std::wstring wscCharFileName;
+		if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+			return false;
+		}
+
 		return mPlayerCloakData[wscCharFileName].bCloaked || mPlayerCloakData[wscCharFileName].bIsCloaking;
 	}
 
 	void CloakSync(uint iClientID)
 	{
+		HK_ERROR err;
+
+		
 		struct PlayerData* pd = 0;
 		while (pd = Players.traverse_active(pd)) {
 
+			if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+				continue;
+
+
+			if (!HkIsValidClientID(iClientID)) {
+				continue;
+			}
+			if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+				continue;
+
 			std::wstring wscCharFileName;
-			HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-			
+			if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+				continue;
+			}
+
+
 			if (Tools::IsPlayerInRange(iClientID, pd->iOnlineID, 20000.0f))
 				
 			

@@ -18,10 +18,19 @@ namespace Timers {
             iPlayers = 0;
             struct PlayerData *pPD = 0;
             while (pPD = Players.traverse_active(pPD)) {
+                
                 uint ipClientID = HkGetClientIdFromPD(pPD);
-                if (HkIsInCharSelectMenu(ipClientID)) {
+
+                HK_ERROR err;
+
+                if (ipClientID == -1 || HkIsInCharSelectMenu(ipClientID))
+                    continue;
+                std::wstring wscCharFileName;
+                if ((err = HkGetCharFileName(ARG_CLIENTID(ipClientID), wscCharFileName)) != HKE_OK) {
                     continue;
                 }
+
+
                 std::wstring wscCharname =
                     (wchar_t *)Players.GetActiveCharacterName(ipClientID);
                 std::string scCharname = wstos(wscCharname);
@@ -77,15 +86,13 @@ namespace Timers {
     }
 
     TIMER Timers[] = {
-        {Cloak::CloakInstallTimer2000ms, 2000, 0},
-	    {Cloak::WarmUpCloakTimer1000ms, 1000, 0},
-        {Cloak::DoCloakingTimer250ms, 250, 0},
-        {Cloak::UpdateShipEnergyTimer, 1500, 0},
-        {TimerUpdate1000ms, 1000, 0},
-        {Docking::DockRequest3000ms, 3000, 0},
-        {PathSelection::ModUnlawfulChar500ms, 500, 0},
-
-        //{Docking::DoRelocate300ms, 300, 0},
+       {Cloak::CloakInstallTimer2000ms, 2000, 0},
+	   {Cloak::WarmUpCloakTimer1000ms, 1000, 0},
+       {Cloak::DoCloakingTimer250ms, 250, 0},
+       {Cloak::UpdateShipEnergyTimer, 1500, 0},
+       {TimerUpdate1000ms, 1000, 0},
+       {Docking::DockRequest3000ms, 3000, 0},
+       {PathSelection::ModUnlawfulChar500ms, 500, 0},
 
     };
 
@@ -95,8 +102,13 @@ namespace Timers {
         // call timers
         for (uint i = 0; (i < sizeof(Timers) / sizeof(TIMER)); i++) {
             if ((timeInMS() - Timers[i].tmLastCall) >= Timers[i].tmIntervallMS) {
-                Timers[i].tmLastCall = timeInMS();
-                Timers[i].proc();
+              
+  
+                    Timers[i].tmLastCall = timeInMS();
+                    Timers[i].proc();
+ 
+                
+   
             }
         }
 

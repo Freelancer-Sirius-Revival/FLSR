@@ -481,35 +481,26 @@ namespace Hooks {
 
     /// Clear client info when a client connects.
     void __stdcall ClearClientInfo(unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-
 		//AC
         if (Modules::GetModuleState("ACModule"))
         {
-            try {
-                AntiCheat::SpeedAC::Init(iClientID);
-                AntiCheat::TimingAC::Init(iClientID);
-                AntiCheat::PowerAC::Init(iClientID);
-			}
-            catch (...) {}
+          AntiCheat::SpeedAC::Init(iClientID);
+          AntiCheat::TimingAC::Init(iClientID);
+          AntiCheat::PowerAC::Init(iClientID);
+
         }
 
         //Cloak
         if (Modules::GetModuleState("CloakModule"))
         {
-            try {
-                Cloak::InstallCloak(iClientID);
-                Commands::UserCmd_UNCLOAK(iClientID, L"");
-                ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-            }
-			catch (...) {}
+    
+          Cloak::InstallCloak(iClientID);
+          Commands::UserCmd_UNCLOAK(iClientID, L"");
+          ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
+
         }
 
-        try
-        {
-            ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE ClearClientInfo");
-        }
-		catch (...) {}
+        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE ClearClientInfo");
     }
 
     void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn) {

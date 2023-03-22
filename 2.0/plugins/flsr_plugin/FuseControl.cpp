@@ -122,6 +122,7 @@ namespace FuseControl {
             FuseIni.close();
         }
         
+
         return bReturn;
     }
 

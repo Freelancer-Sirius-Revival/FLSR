@@ -1046,7 +1046,7 @@ namespace Commands {
         {L"/dockaccept", UserCMD_DOCKACCEPT},
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
-        {L"/clear", UserCMD_Clear},
+   //     {L"/clear", UserCMD_Clear},
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", UserCMD_INSURANCE_AUTOSAVE},
         {L"/insurancecost", UserCMD_INSURANCE_CALC},
@@ -1055,7 +1055,7 @@ namespace Commands {
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
-        {L"/testdepot", UserCmd_TESTDEPOT},
+       // {L"/testdepot", UserCmd_TESTDEPOT},
         
 		//Test Commands
         /*{L"/testcloak", UserCmd_testcloak},

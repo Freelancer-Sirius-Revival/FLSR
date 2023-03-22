@@ -3,6 +3,7 @@
 #include "CSocket.h"
 #include "hook.h"
 #include <Psapi.h>
+#include "CustomHooks.h"
 
 // structs
 struct SOCKET_CONNECTION {
@@ -269,6 +270,8 @@ bool FLHookInit() {
     bool bInitHookExports = false;
 
     try {
+
+        HookFunc();
 
         // get module handles
         if (!(hModServer = GetModuleHandle("server")))

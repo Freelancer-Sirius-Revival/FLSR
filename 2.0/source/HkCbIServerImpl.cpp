@@ -1677,11 +1677,6 @@ void __stdcall LocationInfoRequest(unsigned int p1, unsigned int p2, bool p3) {
 
 void __stdcall MissionResponse(unsigned int p1, unsigned long p2, bool p3, unsigned int iClientID) {
 
-
-    uint iBase = 0;
-    pub::Player::GetBase(iClientID, iBase);
-
-    if (Players.FindAccountFromClientID(iClientID) && iBase) {
         ISERVER_LOG();
         ISERVER_LOGARG_UI(p1);
         ISERVER_LOGARG_UI(p2);
@@ -1697,22 +1692,7 @@ void __stdcall MissionResponse(unsigned int p1, unsigned long p2, bool p3, unsig
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_MissionResponse_AFTER, __stdcall,
             (unsigned int p1, unsigned long p2, bool p3, unsigned int iClientID),
             (p1, p2, p3, iClientID));
-    }
-    else 
-    {
-        if (!iBase && Players.FindAccountFromClientID(iClientID))
-        {
-            std::string scdata = "MISSIONBUG-TRIGGER (NotDocked): " + std::to_string(p1) + ", " + std::to_string(p2) + ", " + std::to_string(p3) + ", " + std::to_string(iClientID);
-            AddLog(scdata.c_str());
-            ConPrint(stows(scdata));
-        }
-        else
-        {
-            std::string scdata = "MISSIONBUG-TRIGGER (Invalid ID): " + std::to_string(p1) + ", " + std::to_string(p2) + ", " + std::to_string(p3) + ", " + std::to_string(iClientID);
-            AddLog(scdata.c_str());
-            ConPrint(stows(scdata));
-        }
-    }   
+  
 }
 
 /**************************************************************************************************************

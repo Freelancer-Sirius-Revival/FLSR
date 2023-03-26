@@ -364,7 +364,7 @@ namespace PlayerHunt {
 			iPlayersCount++;
 		}
 		
-		if (iPlayersCount < 1)
+		if (iPlayersCount < 4)
 		{
 			//At least four players must be online to start a hunt! 
 			PrintUserCmdText(iClientID, L"At least four players must be online to start a hunt!");

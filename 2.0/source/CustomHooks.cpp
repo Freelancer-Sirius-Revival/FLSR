@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include "hook.h"
 
 
 DWORD jmbk;
@@ -116,6 +117,7 @@ void isValidPtr(DWORD DestroyMission)
 	if (IsBadMemPtr(0, (void*)DestroyMission, 4))
 	{
 		flag_z = 1;
+		AddLog("MISSIBUGFIX Triggered");
 	}
 }
 

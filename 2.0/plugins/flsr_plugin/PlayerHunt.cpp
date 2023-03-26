@@ -23,7 +23,7 @@ namespace PlayerHunt {
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
 		std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
 
-		set_fRewardMultiplicator = IniGetF(scPluginCfgFile, "PlayerHunt", "RewardMultiplicator", 0.5f);
+		set_fRewardMultiplicator = IniGetF(scPluginCfgFile, "PlayerHunt", "RewardMultiplicator", 0.15f);
 		set_iMinTargetSystemDistance = IniGetI(scPluginCfgFile, "PlayerHunt", "MinTargetSystemDistance", 4);
 		set_iMinCredits = IniGetI(scPluginCfgFile, "PlayerHunt", "MinCredits", 50000);
 
@@ -284,6 +284,9 @@ namespace PlayerHunt {
 					//You have survived!
 					PrintUserCmdText(iClientID, L"You have survived!");
 					ServerHuntData.eState = HUNT_STATE_NONE;
+					
+					//Reset List
+					ServerHuntData.lSystems.clear();
 				}
 			}
 		}
@@ -304,6 +307,9 @@ namespace PlayerHunt {
 				HkMsgU(ServerHuntData.wscCharname + L" has disconnected! Dock at a base and take over the mission with /playerhunt");
 				ServerHuntData.eState = HUNT_STATE_DISCONNECTED;
 
+				//Reset List
+				ServerHuntData.lSystems.clear();
+				
 			}
 		}
 	}

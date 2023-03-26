@@ -271,6 +271,7 @@ bool FLHookInit() {
 
     try {
 
+        //CustomHooks
         HookFunc();
 
         // get module handles

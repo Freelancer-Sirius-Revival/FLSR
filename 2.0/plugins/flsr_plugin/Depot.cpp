@@ -281,5 +281,87 @@ namespace Depot {
          //ConPrint(test+L"\n");		
     }
     
+    //Not tested:
+
+    void StoreEquipInDatabase(uint iClientID, uint goodID)
+    {
+        // Überprüfe, ob der Spieler das angegebene Equip im Cargo hat
+        bool bHasEquip = false;
+        std::list<CARGO_INFO> lstCargo;
+        int iRemaining;
+        HkEnumCargo(ARG_CLIENTID(iClientID), lstCargo, iRemaining);
+        for (auto& cargo : lstCargo)
+        {
+            if (cargo.iArchID == goodID)
+            {
+                bHasEquip = true;
+                break;
+            }
+        }
+
+        if (!bHasEquip)
+        {
+            PrintUserCmdText(iClientID, L"Du hast dieses Equip nicht im Cargo!");
+            return;
+        }
+
+        // Finde das Depot des Spielers auf der Basis
+        uint iBase = 0;
+        pub::Player::GetBase(iClientID, iBase);
+        CAccount* acc = Players.FindAccountFromClientID(iClientID);
+        std::wstring wscAccDir;
+        HkGetAccountDirName(acc, wscAccDir);
+        std::string scAccountName = wstos(wscAccDir);
+        uint iDepotID;
+
+        try
+        {
+            // Öffne die Datenbankdatei
+            SQLite::Database db(SQL::scDbName);
+
+            // Führe eine SQL-Abfrage aus, um das Depot des Spielers auf der Basis zu finden
+            SQLite::Statement query(db, R"(SELECT * FROM "PlayerDepot" WHERE  "AccountName" = ')" + scAccountName + R"(' AND "BaseID" = ')" + std::to_string(iBase) + R"(';)");
+            query.executeStep();
+
+            // Überprüfe die Ergebnisse
+            if (!query.hasRow())
+            {
+                PrintUserCmdText(iClientID, L"Du hast kein Depot auf dieser Basis!");
+                return;
+            }
+            else {
+                iDepotID = query.getColumn(0);
+                PrintUserCmdText(iClientID, L"DepotID: %u", iDepotID);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+            return;
+        }
+
+        // Füge das Equip in das Depot ein
+        try
+        {
+            // Öffne die Datenbankdatei
+            SQLite::Database db(SQL::scDbName);
+
+            // Führe eine SQL-Abfrage aus, um das Equip in das Depot einzufügen
+            SQLite::Statement query(db, R"(INSERT INTO "PlayerDepotEquip" ("DepotID", "GoodID") VALUES (')" + std::to_string(iDepotID) + R"(', ')" + std::to_string(goodID) + R"(');)");
+            query.executeStep();
+
+            PrintUserCmdText(iClientID, L"Equip wurde erfolgreich eingelagert!");
+
+            // Entferne das Equip aus dem Cargo des Spielers
+            HkRemoveCargo(ARG_CLIENTID(iClientID), goodID, 1);
+        }
+        catch (const std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+            return;
+        }
+    }
 
 }

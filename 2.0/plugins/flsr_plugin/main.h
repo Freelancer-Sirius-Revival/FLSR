@@ -949,4 +949,26 @@ namespace PlayerHunt {
     void LoadPlayerHuntSettings();
 }
 
+
+namespace PVP {
+
+    enum PVPType {
+        PVPTYPE_DUEL,
+        PVPTYPE_FFA,
+        PVPTYPE_RANKED
+        
+    };
+
+    struct Member {
+        std::string wscCharFileName;
+        uint iKills;
+    };
+    
+    struct Fights {
+        std::list <Member> lMembers;
+		PVPType ePVPType;       
+    };
+    
+}
+
 #endif

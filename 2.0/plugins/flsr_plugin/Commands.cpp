@@ -2,13 +2,14 @@
 
 namespace Commands {
     
+
+    //Test Commands
+    /*
     void UserCmd_TESTDEPOT(uint iClientID, const std::wstring& wscParam) {
         Depot::PlayerDepotOpen(iClientID);
         
     }
 
-    //Test Commands
-    /*
     void UserCmd_TESTAC(uint iClientID, const std::wstring &wscParam) {
         std::wstring wscType = wscParam;
         std::string scType = wstos(wscType);
@@ -64,8 +65,10 @@ namespace Commands {
 
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
 
-		PlayerHunt::Start_PlayerHunt(iClientID, wscParam);
-
+        if (Modules::GetModuleState("PlayerHunt"))
+        {
+            PlayerHunt::Start_PlayerHunt(iClientID, wscParam);
+        }
     }
 
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
@@ -972,13 +975,6 @@ namespace Commands {
         return;
     }
 
-    // MissionGroup Bug
-    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam) {
-
-        Tools::HkClearMissionBug(iClientID);
-        return;
-    }
-
     // Contributor TextBox
     void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam) {
         ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE Contributor");
@@ -995,7 +991,18 @@ namespace Commands {
         return;
     }
 
+    //Not used commands
 
+    /*
+    
+        // MissionGroup Bug
+    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam) {
+
+        Tools::HkClearMissionBug(iClientID);
+        return;
+    }
+
+    */
     
     //ADMIN COMMANDS
     
@@ -1046,7 +1053,6 @@ namespace Commands {
         {L"/dockaccept", UserCMD_DOCKACCEPT},
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
-   //     {L"/clear", UserCMD_Clear},
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", UserCMD_INSURANCE_AUTOSAVE},
         {L"/insurancecost", UserCMD_INSURANCE_CALC},
@@ -1055,13 +1061,19 @@ namespace Commands {
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
-       // {L"/testdepot", UserCmd_TESTDEPOT},
+
+        //Not Used Commands
+        /*
         
+         {L"/clear", UserCMD_Clear},
+
+        */
+
 		//Test Commands
         /*{L"/testcloak", UserCmd_testcloak},
         {L"/testac", UserCmd_TESTAC},
         {L"/testcc", UserCmd_TESTCC},
-
+        {L"/testdepot", UserCmd_TESTDEPOT},
         {L"/testins", UserCmd_TESTINSURANCE},
         */
 

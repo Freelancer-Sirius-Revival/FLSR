@@ -31,6 +31,9 @@
     <Filter Include="sdk\Header Files">
       <UniqueIdentifier>{2628365d-27aa-463b-a04a-a8cb569b374c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FLSR">
+      <UniqueIdentifier>{ae33d886-6aa8-4f1c-907e-2559ffa233f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\flcodec.cpp">
@@ -119,6 +122,9 @@
     <ClCompile Include="..\source\Tools.cpp" />
     <ClCompile Include="..\source\Exceptions.cpp" />
     <ClCompile Include="..\source\ZoneUtilities.cpp" />
+    <ClCompile Include="..\source\CustomHooks.cpp">
+      <Filter>FLSR</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\flcodec.h">
@@ -180,6 +186,9 @@
       <Filter>sdk</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ExceptionInfo.h" />
+    <ClInclude Include="..\source\CustomHooks.h">
+      <Filter>FLSR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\misc\FLHook.ini" />

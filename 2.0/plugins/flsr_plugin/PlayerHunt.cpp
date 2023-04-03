@@ -4,7 +4,9 @@ namespace PlayerHunt {
 
 	float set_fRewardMultiplicator;
 	int set_iMinCredits;
+	int set_iMaxCredits;
 	int set_iMinTargetSystemDistance;
+	int set_iMinPlayer;
 
 	std::vector<std::string> SystemWhitelist = {
 	"Hi01", "Li05", "Li01", "Li03", "Rh05", "Rh01", "Rh03", "Br06", "Br04", "Br02",
@@ -23,16 +25,21 @@ namespace PlayerHunt {
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
 		std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
 
-		set_fRewardMultiplicator = IniGetF(scPluginCfgFile, "PlayerHunt", "RewardMultiplicator", 0.15f);
+		set_fRewardMultiplicator = IniGetF(scPluginCfgFile, "PlayerHunt", "RewardMultiplicator", 0.5f);
 		set_iMinTargetSystemDistance = IniGetI(scPluginCfgFile, "PlayerHunt", "MinTargetSystemDistance", 4);
 		set_iMinCredits = IniGetI(scPluginCfgFile, "PlayerHunt", "MinCredits", 50000);
+		set_iMaxCredits = IniGetI(scPluginCfgFile, "PlayerHunt", "MaxCredits", 100000000);
+		set_iMinPlayer = IniGetI(scPluginCfgFile, "PlayerHunt", "MinPlayer", 4);
+
 
 
 
 	}
 
 	uint getRandomSysteminRange(uint iClientID)
-	{
+	{	
+		uint iLoop;
+
 		//Get player system
 		uint iSysIDPlayer;
 		pub::Player::GetSystem(iClientID, iSysIDPlayer);
@@ -44,7 +51,8 @@ namespace PlayerHunt {
 		//Get all systems
 		std::vector<std::string> systems;
 		struct Universe::ISystem* sysinfo = Universe::GetFirstSystem();
-		while (sysinfo) {
+		iLoop = 0;
+		while (sysinfo && iLoop < 25) {
 			//Check Whitelist
 			bool bWhitelisted = false;
 			for (std::vector<std::string>::iterator t = SystemWhitelist.begin(); t != SystemWhitelist.end(); ++t)
@@ -61,19 +69,27 @@ namespace PlayerHunt {
 			if (bWhitelisted)
 				systems.push_back(sysinfo->nickname);
 			
+			iLoop++;
 			sysinfo = Universe::GetNextSystem();
 		}
 
 		//Get random system in min Range
 		int range = 0;
 		std::string randomSystem;
-		while (range <= set_iMinTargetSystemDistance) {
+		iLoop = 0;
+		while (range <= set_iMinTargetSystemDistance && iLoop < 25) {
 			int random = rand() % systems.size();
 			randomSystem = systems[random];
 			range = Tools::CountShortestPath(szSystemnamePlayer, randomSystem);
-
+			iLoop++;
 		}			
-		return Universe::get_system_id(randomSystem.c_str());
+
+		if (randomSystem == "")
+			return 0;
+		
+		uint iSystemID = Universe::get_system_id(randomSystem.c_str());
+		
+		return iSystemID;
 	}
 
 	BaseData getRandomBaseInSystem(uint iPlayerSystemID, uint iClientID)
@@ -85,6 +101,13 @@ namespace PlayerHunt {
 		std::vector<BaseData> bases;
 		//ConPrint(L"loopstart\n");
 
+		if (iPlayerSystemID == 0)
+		{
+			//ConPrint(L"No bases found\n");
+			return BaseData();
+		}
+
+		
 		for (auto& baseinfo : lstBases) {
 			
 			// Check if base is in system
@@ -162,8 +185,8 @@ namespace PlayerHunt {
 	BaseData getTargetBase(uint iClientID)
 	{
 		BaseData TargetBase;
-
-		while (TargetBase.scBaseNickname == "")
+		uint iLoop = 0;
+		while (TargetBase.scBaseNickname == "" && iLoop < 25)
 		{
 			//Get random system in range
 			uint iSysID = getRandomSysteminRange(iClientID);
@@ -176,6 +199,8 @@ namespace PlayerHunt {
 			{
 				TargetBase = tempBase;
 			}
+			
+			iLoop++;
 		}
 			
 		return TargetBase;
@@ -183,9 +208,8 @@ namespace PlayerHunt {
 
 	void CalcReward()
 	{
-		int iCredits = ServerHuntData.iCredits;
-		int iReward = iCredits + (iCredits * set_fRewardMultiplicator);
-		ServerHuntData.iCredits = iReward;
+		int iReward = ServerHuntData.iReward + (ServerHuntData.iHuntCredits * set_fRewardMultiplicator);
+		ServerHuntData.iReward = iReward;
 	}
 	
 	void PlayerHuntMulti(uint iClientID, uint iPlayerSystemID)
@@ -223,7 +247,7 @@ namespace PlayerHunt {
 				CalcReward();
 				
 				//The new PlayerHunt reward is 20,000 credits!
-				HkMsgU(L"The new player hunt reward is " + ToMoneyStr(ServerHuntData.iCredits) + L" credits!");
+				HkMsgU(L"The new player hunt reward is " + ToMoneyStr(ServerHuntData.iReward) + L" credits!");
 				//Hunt down the player Peter in Sigma 19 and get the reward!
 				HkMsgU(L"Hunt down the player " + ServerHuntData.wscCharname + L" in " + wscClearSystemname + L" and get the reward!");
 				ServerHuntData.lSystems.push_back(scSystemnamePlayer);
@@ -276,11 +300,11 @@ namespace PlayerHunt {
 
 					//Win!
 					// Add cash to target character
-					HkAddCash(wscCharname, ServerHuntData.iCredits);
+					HkAddCash(wscCharname, ServerHuntData.iReward);
 
 					//Print Announcement
 					//Peter has reached Planet Blab! The player has received a reward of 12 credits!
-					HkMsgU(ServerHuntData.wscCharname + L" has reached " + ServerHuntData.wscTargetBase + L"! The player has received a reward of " + ToMoneyStr(ServerHuntData.iCredits) + L" credits!");
+					HkMsgU(ServerHuntData.wscCharname + L" has reached " + ServerHuntData.wscTargetBase + L"! The player has received a reward of " + ToMoneyStr(ServerHuntData.iReward) + L" credits!");
 					//You have survived!
 					PrintUserCmdText(iClientID, L"You have survived!");
 					ServerHuntData.eState = HUNT_STATE_NONE;
@@ -297,6 +321,10 @@ namespace PlayerHunt {
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
 		{
+			if (!Tools::isValidPlayer(iClientID, false))
+				return;
+				
+
 			//Check is Player has a Hunt
 			// Get the current character name
 			std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
@@ -305,40 +333,90 @@ namespace PlayerHunt {
 				//We have the Hunt
 				//Peter has disconnected! Dock at a base and take over the mission with /playerhunt
 				HkMsgU(ServerHuntData.wscCharname + L" has disconnected! Dock at a base and take over the mission with /playerhunt");
-				ServerHuntData.eState = HUNT_STATE_DISCONNECTED;
-
-				//Reset List
-				ServerHuntData.lSystems.clear();
+				ServerHuntData.eState = HUNT_STATE_LOST;
 				
 			}
 		}
 	}
 
-	void CheckDied(uint iClientID,uint iClientKillerID)
+	void CheckDied(uint iClientID,uint iClientKillerID, Tools::eDeathTypes DeathType)
 	{
-		//Check if Hunt is active
-		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
+
+		//Check for DeathType - PVE Kill
+		if (DeathType == Tools::PVE)
 		{
-			//Check is Player has a Hunt
-			// Get the current character name
-			std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-			std::wstring wscCharnameKiller = (const wchar_t*)Players.GetActiveCharacterName(iClientKillerID);
-
-			if (ServerHuntData.wscCharname == wscCharnameClient)
+			ConPrint(L"PVEKILL\n");
+			//Check if Hunt is active
+			if (ServerHuntData.eState == HUNT_STATE_HUNTING && Tools::isValidPlayer(iClientID, true))
 			{
-				//We have the Hunt
 
-				//Update the Hunt
-				ServerHuntData.wscCharname = wscCharnameKiller;
-
-				//Peter died! The hunted player is now Ursula!
-				HkMsgU(wscCharnameClient + L" died! The hunted player is now " + wscCharnameKiller + L"!");
-				//Hunt the player to get the reward of 235 credits yourself!
-				HkMsgU(L"Hunt the player to get the reward of " + ToMoneyStr(ServerHuntData.iCredits) + L" credits yourself!");
-				//Reach Suppe in system Kapser alive!
-				PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in system " + ServerHuntData.wscTargetSystem + L" alive!");
+				//Check is Player has a Hunt
+				// Get the current character name
+				std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+				if (ServerHuntData.wscCharname == wscCharname)
+				{
+					//We have the Hunt
+					//Peter has been killed by an NPC! Dock at a base and take over the mission with /playerhunt
+					HkMsgU(ServerHuntData.wscCharname + L" has been killed by an NPC! Dock at a base and take over the mission with /playerhunt");
+					ServerHuntData.eState = HUNT_STATE_LOST;
+					return;
+					
+				}
 			}
 		}
+		
+		//Check for DeathType - Suicide Kill
+		if (DeathType == Tools::SUICIDE || DeathType == Tools::KILLEDHIMSELF || DeathType == Tools::HASDIED)
+		{
+
+			//Check if Hunt is active
+			if (ServerHuntData.eState == HUNT_STATE_HUNTING && Tools::isValidPlayer(iClientID, true))
+			{
+
+				//Check is Player has a Hunt
+				// Get the current character name
+				std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+				if (ServerHuntData.wscCharname == wscCharname)
+				{
+					//We have the Hunt
+					//Peter has committed suicide! Dock at a base and take over the mission with /playerhunt
+					HkMsgU(wscCharname + L" has committed suicide! Dock at a base and take over the mission with /playerhunt");
+					ServerHuntData.eState = HUNT_STATE_LOST;
+					return;
+
+				}
+			}
+		}
+
+		//Check for DeathType - PVP Kill
+		if (DeathType == Tools::PVP)
+		{
+
+			if (ServerHuntData.eState == HUNT_STATE_HUNTING && Tools::isValidPlayer(iClientID, true) && Tools::isValidPlayer(iClientKillerID, true))
+			{
+				//Check is Player has a Hunt
+				// Get the current character name
+				std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+				std::wstring wscCharnameKiller = (const wchar_t*)Players.GetActiveCharacterName(iClientKillerID);
+
+				if (ServerHuntData.wscCharname == wscCharnameClient)
+				{
+					//We have the Hunt
+
+					//Update the Hunt
+					ServerHuntData.wscCharname = wscCharnameKiller;
+
+					//Peter died! The hunted player is now Ursula!
+					HkMsgU(wscCharnameClient + L" died! The hunted player is now " + wscCharnameKiller + L"!");
+					//Hunt the player to get the reward of 235 credits yourself!
+					HkMsgU(L"Hunt the player to get the reward of " + ToMoneyStr(ServerHuntData.iReward) + L" credits yourself!");
+					//Reach Suppe in system Kapser alive!
+					PrintUserCmdText(iClientID, L"Reach " + ServerHuntData.wscTargetBase + L" in system " + ServerHuntData.wscTargetSystem + L" alive!");
+					return;
+				}
+			}
+		}
+
 
 	}
 	
@@ -364,10 +442,10 @@ namespace PlayerHunt {
 			iPlayersCount++;
 		}
 		
-		if (iPlayersCount < 4)
+		if (iPlayersCount < set_iMinPlayer)
 		{
 			//At least four players must be online to start a hunt! 
-			PrintUserCmdText(iClientID, L"At least four players must be online to start a hunt!");
+			PrintUserCmdText(iClientID, L"At least " + std::to_wstring(set_iMinPlayer) + L" players must be online to start a hunt!");
 			return;
 		}
 		
@@ -434,8 +512,13 @@ namespace PlayerHunt {
 				return;
 			}
 			if (cash < set_iMinCredits || cash < 0) {
-				//ERR: The PlayerHunt amount is too small. The minimum amount is 10 credits.
+				//ERR: The PlayerHunt amount is too small. The minimum amount is [min credits] credits.
 				PrintUserCmdText(iClientID, L"ERR: The player hunt amount is too small. The minimum amount is " + ToMoneyStr(set_iMinCredits) + L" credits.");
+				return;
+			}
+			if (cash > set_iMaxCredits) {
+				// ERROR: The player hunt amount is too high. The maximum amount is [max credits].
+				PrintUserCmdText(iClientID, L"ERR: The player hunt amount is too high. The maximum amount is " + ToMoneyStr(set_iMaxCredits) + L" credits.");
 				return;
 			}
 			if (iCash < cash) {
@@ -445,7 +528,7 @@ namespace PlayerHunt {
 			}
 		}
 		else {
-			cash = ServerHuntData.iCredits;
+			cash = ServerHuntData.iReward;
 		}
 
 
@@ -484,7 +567,8 @@ namespace PlayerHunt {
 
 				//Save Data
 				ServerHuntData.eState = HUNT_STATE_HUNTING;
-				ServerHuntData.iCredits = cash;
+				ServerHuntData.iHuntCredits = cash;
+				ServerHuntData.iReward = cash;
 				ServerHuntData.iTargetBase = TargetBase.iBaseID;
 				ServerHuntData.wscTargetBase = wscBasename;
 				ServerHuntData.iTargetSystem = TargetBase.iSystemID;
@@ -509,7 +593,7 @@ namespace PlayerHunt {
 				
 				return;
 			}
-			case HUNT_STATE_DISCONNECTED:
+			case HUNT_STATE_LOST:
 			{
 				//We can capture the hunt
 				//Get Base of Player
@@ -538,7 +622,7 @@ namespace PlayerHunt {
 
 				//Save Data
 				ServerHuntData.eState = HUNT_STATE_HUNTING;
-				ServerHuntData.iCredits = cash;
+				ServerHuntData.iReward = cash;
 				ServerHuntData.iTargetBase = TargetBase.iBaseID;
 				ServerHuntData.wscTargetBase = wscBasename;
 				ServerHuntData.iTargetSystem = TargetBase.iSystemID;

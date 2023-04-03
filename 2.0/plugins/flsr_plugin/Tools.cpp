@@ -468,8 +468,17 @@ namespace Tools {
 
     std::wstring CS_wscCharBefore;
     void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId) {
-        const wchar_t *wszCharname =
-            (wchar_t *)Players.GetActiveCharacterName(iClientID);
+
+        //Valid ID
+        HK_ERROR err;
+        if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+            return;
+
+        if (!HkIsValidClientID(iClientID)) {
+            return;
+        }
+
+        const wchar_t *wszCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         CS_wscCharBefore =
             wszCharname ? (wchar_t *)Players.GetActiveCharacterName(iClientID)
                         : L"";
@@ -479,6 +488,7 @@ namespace Tools {
             // New Player
             std::wstring wscCharFilenameBefore;
             HkGetCharFileName(CS_wscCharBefore, wscCharFilenameBefore);
+
             wscCharFilenameBefore += L".fl";
             std::wstring wscCharFilename = stows((std::string)cId.szCharFilename);
             char *pAddress = ((char *)hModRemoteClient + ADDR_CLIENT_NEWPLAYER);
@@ -853,6 +863,7 @@ namespace Tools {
         void* callback = (void*)RepCallback;
         void** obj = &callback;
         Reputation::enumerate((Reputation::RepGroupCB*)&obj);
+        
         return lstFactions;
     }
 
@@ -1047,6 +1058,36 @@ namespace Tools {
         int numSystems = shortest_path.size();
         return numSystems;
 
+    }
+
+
+    bool isValidPlayer(uint iClientID, bool bCharfile)
+    {
+        HK_ERROR err;
+
+        
+        if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+            return false;
+
+        if (!HkIsValidClientID(iClientID)) {
+            return false;
+        }
+
+        if (bCharfile)
+        {
+        
+            if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+                return false;
+            std::wstring wscCharFileName;
+            if ((err = HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName)) != HKE_OK) {
+                return false;
+            }
+        
+        }
+    
+        
+        return true;
+    
     }
 
 //ShortestPath Stuff end @@@@@@@@@@@@@@@

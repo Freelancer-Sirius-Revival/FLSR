@@ -60,7 +60,23 @@ namespace Commands {
         ClientController::Send_ControlMsg(true, iClientID, L"_cloaktoggle");
 
     }
-    */
+        */
+
+        void UserCmd_testduel(uint iClientID, const std::wstring& wscParam) {
+
+        PVP::CmdDuel(iClientID, wscParam);
+
+    }
+
+    void UserCmd_accept(uint iClientID, const std::wstring& wscParam) {
+
+        PVP::CmdAcceptPVP(iClientID, wscParam);
+
+    }
+    
+
+
+
 	
 
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
@@ -1061,6 +1077,9 @@ namespace Commands {
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
+        {L"/testduel", UserCmd_testduel},
+        {L"/accept", UserCmd_accept},
+
 
         //Not Used Commands
         /*

@@ -18,6 +18,7 @@
 #include <numeric>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
+#include <unordered_map>
 
 //Plugin Stuff
 extern PLUGIN_RETURNCODE returncode;
@@ -49,10 +50,6 @@ extern PLUGIN_RETURNCODE returncode;
 #define PLAYERONLINE_FILE "C:\\Caddy\\files\\Server.ini"
 #define CHEATREPORT_STORE "C:\\Caddy\\files\\cheater\\"
 #define DISCORD_CHAT_FILE "C:\\DiscordBot\\Chat.ini"
-
-//SQL
-#define SQLDATA "host=localhost port=5432 dbname=FLSR user=postgres password=flsr"
-
 
 //AntiCheat
 typedef void(__stdcall *_CRCAntiCheat)();
@@ -162,6 +159,15 @@ namespace PopUp {
 
 namespace Tools {
 
+    enum eDeathTypes {
+        PVP,
+        SUICIDE,
+        PVE,
+        KILLEDHIMSELF,
+        ADMIN,
+        HASDIED
+    };
+
     struct HashMap {
         std::string scNickname;
         uint iResID;
@@ -214,6 +220,8 @@ namespace Tools {
     void get_cmpfiles(const std::filesystem::path& path);
     void get_cmpExceptions();
     std::vector<std::string> getHardpoints(std::string scParent, std::list<CMPDump_Entry> CMPList);
+
+    bool isValidPlayer(uint iClientID, bool bCharfile);
 
     //Reputation Stuff
     //Reputation callback struct
@@ -901,7 +909,7 @@ namespace PlayerHunt {
 
 	enum HuntState {
 		HUNT_STATE_NONE,
-        HUNT_STATE_DISCONNECTED,
+        HUNT_STATE_LOST,
 		HUNT_STATE_HUNTING
 	};
 
@@ -912,7 +920,8 @@ namespace PlayerHunt {
 		std::wstring wscTargetSystem;
 		std::wstring wscTargetBase;
 		HuntState eState;
-        uint iCredits;
+        uint iReward;
+        uint iHuntCredits;
         std::list<std::string> lSystems;
 	};
 
@@ -932,6 +941,8 @@ namespace PlayerHunt {
     extern float set_fRewardMultiplicator;
 	extern int set_iMinTargetSystemDistance;
     extern int set_iMinCredits;
+    extern int set_iMaxCredits;
+    extern int set_iMinPlayer;
     
 	extern std::list <LastPlayerHuntWinners> lLastPlayerHuntWinners;
 	extern ServerHuntInfo ServerHuntData;
@@ -945,7 +956,7 @@ namespace PlayerHunt {
     void CheckSystemReached(uint iClientID, uint iPlayerSystemID);
     void CheckDock(uint iBaseID, uint iClientID);
     void CheckDisConnect(uint iClientID);
-    void CheckDied(uint iClientID, uint iKillerID);
+    void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
     void LoadPlayerHuntSettings();
 }
 
@@ -953,22 +964,52 @@ namespace PlayerHunt {
 namespace PVP {
 
     enum PVPType {
+        PVPTYPE_NONE,
         PVPTYPE_DUEL,
         PVPTYPE_FFA,
         PVPTYPE_RANKED
         
     };
 
+    enum DisconnectReason {
+		CHARSWITCH,
+        DISCONNECTED
+    };
+    
     struct Member {
-        std::string wscCharFileName;
+        std::wstring wscCharname;
         uint iKills;
+        bool bIsInDuel = false;
+
     };
     
+    static uint nextFightID = 1;
+
     struct Fights {
-        std::list <Member> lMembers;
-		PVPType ePVPType;       
+        uint iFightID;
+        std::list<Member> lMembers;
+        uint iGambleValue;
+        PVPType ePVPType;
+        uint iFights;
+        uint iFightsRemaining;
+
+        Fights() {
+            iFightID = nextFightID;
+            ++nextFightID;
+        }
     };
     
+    extern std::list<Fights> ServerFightData;
+
+    uint IsInFight(uint iClientID);
+    PVPType GetPVPType(uint iClientID);
+    Member GetPVPMember(uint iClientID);
+    void HandleKill(uint iClientKillerID);
+    void CmdAcceptPVP(uint iClientID, const std::wstring& wscParam);
+    void CmdDuel(uint iClientID, const std::wstring& wscParam);
+    void AcceptFight(PVP::Fights& fight, uint iClientID);
+    void CheckDisConnect(uint iClientID, DisconnectReason reason);
+    void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
 }
 
 #endif

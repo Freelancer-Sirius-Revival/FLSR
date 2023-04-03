@@ -139,6 +139,7 @@ setx FLHOOK_SDK_PATH "$(SolutionDir)..\FLHookSDK\\"</Command>
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\CustomHooks.cpp" />
     <ClCompile Include="..\source\Exceptions.cpp" />
     <ClCompile Include="..\source\flcodec.cpp" />
     <ClCompile Include="..\source\HkError.cpp" />
@@ -187,6 +188,7 @@ setx FLHOOK_SDK_PATH "$(SolutionDir)..\FLHookSDK\\"</Command>
     <ClInclude Include="..\FLHookSDK\include\plugin.h" />
     <ClInclude Include="..\FLHookSDK\include\plugin_comms.h" />
     <ClInclude Include="..\FLHookSDK\include\st6.h" />
+    <ClInclude Include="..\source\CustomHooks.h" />
     <ClInclude Include="..\source\ExceptionInfo.h" />
     <ClInclude Include="..\source\flcodec.h" />
     <ClInclude Include="..\source\Hook.h" />

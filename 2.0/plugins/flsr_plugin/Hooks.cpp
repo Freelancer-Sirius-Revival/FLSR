@@ -14,17 +14,29 @@ namespace Hooks {
     //CharacterSelect
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID) {
         returncode = DEFAULT_RETURNCODE;
+      
+
+        //InfoCardUpdate
+        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE CharacterSelect");
+
+        //Update BaseState
+        ClientController::Send_ControlMsg(false, iClientID, L"_ResetBaseState");       
 
         //NewPlayerMessage
         Tools::HkNewPlayerMessage(iClientID, cId);
 		
-		//InfoCardUpdate
-        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE CharacterSelect");
+	
 
         //PlayerHunt
         if (Modules::GetModuleState("PlayerHunt"))
         {
             PlayerHunt::CheckDisConnect(iClientID);
+        }
+
+        //PVP
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
         }
 
         //CloakModule
@@ -33,9 +45,6 @@ namespace Hooks {
             Commands::UserCmd_UNCLOAK(iClientID, L"");
             ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
         }
-        
-        //Update BaseState
-        ClientController::Send_ControlMsg(false, iClientID, L"_ResetBaseState");
 
     }
 
@@ -130,10 +139,23 @@ namespace Hooks {
 
         //ConPrint(wscMsg + L"\n");
 
-        std::wstring victim, killer, type;
-
+        std::wstring victim, killer;
+		Tools::eDeathTypes DeathType;
         // Extract victim and type from the death message
-        if (wscMsg.find(L" was killed by ") != std::wstring::npos) {
+        if (wscMsg.find(L"was killed by an NPC") != std::wstring::npos) {
+                    size_t victimStart = wscMsg.find(L"Death: ") + 7;
+                    size_t victimEnd = wscMsg.find(L" was killed by an NPC");
+                    victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+                    DeathType = Tools::PVE;
+
+        }
+        else if (wscMsg.find(L"was killed by an admin") != std::wstring::npos) {
+            size_t victimStart = wscMsg.find(L"Death: ") + 7;
+            size_t victimEnd = wscMsg.find(L" was killed by an admin");
+            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
+            DeathType = Tools::ADMIN;
+        }
+        else if (wscMsg.find(L" was killed by ") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
             size_t victimEnd = wscMsg.find(L" was killed by ");
             victim = wscMsg.substr(victimStart, victimEnd - victimStart);
@@ -144,7 +166,7 @@ namespace Hooks {
 
             size_t typeStart = killerEnd + 2; // skip the " ("
             size_t typeEnd = wscMsg.find(L")", typeStart);
-            type = wscMsg.substr(typeStart, typeEnd - typeStart);
+            DeathType = Tools::PVP;
         }
         else if (wscMsg.find(L"killed himself") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
@@ -153,26 +175,22 @@ namespace Hooks {
 
             size_t typeStart = wscMsg.find_last_of(L"(") + 1;
             size_t typeEnd = wscMsg.find_last_of(L")");
-            type = wscMsg.substr(typeStart, typeEnd - typeStart);
-        }
-        else if (wscMsg.find(L"was killed by an NPC") != std::wstring::npos) {
-            size_t victimStart = wscMsg.find(L"Death: ") + 7;
-            size_t victimEnd = wscMsg.find(L" was killed by an NPC");
-            victim = wscMsg.substr(victimStart, victimEnd - victimStart);
-            type = L"NPC";
+            DeathType = Tools::KILLEDHIMSELF;
+
         }
         else if (wscMsg.find(L"committed suicide") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
             size_t victimEnd = wscMsg.find(L" committed suicide");
             victim = wscMsg.substr(victimStart, victimEnd - victimStart);
-            type = L"suicide";
+            DeathType = Tools::SUICIDE;
         }
-        else if (wscMsg.find(L"was killed by an admin") != std::wstring::npos) {
+        else if (wscMsg.find(L" has died") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
-            size_t victimEnd = wscMsg.find(L" was killed by an admin");
+            size_t victimEnd = wscMsg.find(L" has died");
             victim = wscMsg.substr(victimStart, victimEnd - victimStart);
-            type = L"admin";
+            DeathType = Tools::HASDIED;
         }
+
 
         // Remove whitespaces from victim
         victim.erase(std::remove_if(victim.begin(), victim.end(), [](unsigned char c) { return std::isspace(c); }), victim.end());
@@ -180,21 +198,24 @@ namespace Hooks {
         // Remove whitespaces from killer
         killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());
 
-        // Remove whitespaces from type
-        type.erase(std::remove_if(type.begin(), type.end(), [](unsigned char c) { return std::isspace(c); }), type.end());
-
         // Get the victim's and killer's client IDs
-        uint victimClientID = HkGetClientIdFromCharname(victim);
-        uint killerClientID = HkGetClientIdFromCharname(killer);
+        //uint victimClientID = HkGetClientIdFromCharname(victim);
+       // uint killerClientID = HkGetClientIdFromCharname(killer);
 
 		// Print the victim's and killer's client IDs for testing
 		//ConPrint(L"Victim Client ID: " + std::to_wstring(victimClientID) + L"\n");
 		//ConPrint(L"Killer Client ID: " + std::to_wstring(killerClientID) + L"\n");
         
-
+        //PlayerHunt
         if (Modules::GetModuleState("PlayerHunt"))
         {
-			PlayerHunt::CheckDied(victimClientID, killerClientID);
+			PlayerHunt::CheckDied(iClientIDVictim, iClientIDKiller, DeathType);
+		}
+        
+        //PVP
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CheckDied(iClientIDVictim, iClientIDKiller, DeathType);
         }
 
         
@@ -642,6 +663,11 @@ namespace Hooks {
         if (Modules::GetModuleState("PlayerHunt"))
         {
             PlayerHunt::CheckDisConnect(iClientID);
+        }
+        //PVP
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::DISCONNECTED);
         }
     }
     

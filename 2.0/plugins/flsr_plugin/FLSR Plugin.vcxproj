@@ -85,7 +85,7 @@
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h" />
+    <ClInclude Include="Main.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">

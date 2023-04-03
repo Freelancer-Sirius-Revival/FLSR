@@ -834,7 +834,7 @@ namespace Cloak {
 			}
 
 
-			if (Tools::IsPlayerInRange(iClientID, pd->iOnlineID, 20000.0f))
+			if (Tools::IsPlayerInRange(iClientID, pd->iOnlineID, 40000.0f))
 				
 			
 			//Cloak or Uncloak iClient

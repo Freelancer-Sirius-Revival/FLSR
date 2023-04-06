@@ -4,7 +4,7 @@
 
 struct HK_ERROR_INFO {
     HK_ERROR hkErr;
-    wchar_t *wszText;
+    const wchar_t *wszText;
 };
 
 HK_ERROR_INFO hkErrors[] = {

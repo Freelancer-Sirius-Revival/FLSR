@@ -325,7 +325,7 @@ void BaseDestroyed(uint iObject, uint iClientIDBy) {
     pub::SpaceObj::GetDockingTarget(iObject, iID);
     Universe::IBase *base = Universe::get_base(iID);
 
-    char *szBaseName = "";
+     std::string szBaseName = "";
     if (base) {
         __asm {
             pushad

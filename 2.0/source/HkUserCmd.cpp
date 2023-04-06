@@ -22,7 +22,7 @@
 typedef void (*_UserCmdProc)(uint, const std::wstring &);
 
 struct USERCMD {
-    wchar_t *wszCmd;
+    const wchar_t *wszCmd;
     _UserCmdProc proc;
 };
 

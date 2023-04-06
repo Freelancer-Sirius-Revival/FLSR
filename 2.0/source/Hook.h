@@ -388,6 +388,32 @@ enum EQ_TYPE {
     ET_LIGHT
 };
 
+
+
+enum class LogLevel : int
+{
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Err,
+    Critical
+};
+
+enum class LogType : int
+{
+    Normal,
+    Cheater,
+    Kick,
+    Connects,
+    AdminCmds,
+    UserLogCmds,
+    SocketCmds,
+    PerfTimers
+};
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // structs
 
@@ -554,7 +580,7 @@ struct PATCH_INFO_ENTRY {
 };
 
 struct PATCH_INFO {
-    char *szBinName;
+    const char *szBinName;
     ulong pBaseAddress;
 
     PATCH_INFO_ENTRY piEntries[128];
@@ -741,8 +767,11 @@ EXPORT void HkSaveChar(uint iClientID);
         AddLog(s, __VA_ARGS__);                                                \
         AddDebugLog(s, __VA_ARGS__);                                           \
     }
-EXPORT void AddDebugLog(const char *szString, ...);
-EXPORT void AddLog(const char *szString, ...);
+
+
+EXPORT bool InitLogs();
+EXPORT void AddDebugLog(const std::string& szString, ...);
+EXPORT void AddLog(const std::string& szString, ...);
 EXPORT void HkHandleCheater(uint iClientID, bool bBan, std::wstring wscReason,
                             ...);
 EXPORT bool HkAddCheaterLog(const std::wstring &wscCharname,

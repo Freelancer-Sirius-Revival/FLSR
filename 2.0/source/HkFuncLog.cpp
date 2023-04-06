@@ -1,60 +1,158 @@
 ﻿#include "hook.h"
+#define SPDLOG_USE_STD_FORMAT
+
+#include <spdlog/async.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/msvc_sink.h>
+#include <spdlog/spdlog.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void AddDebugLog(const char *szString, ...) {
-    if (!set_bDebug || (!fLogDebug && !IsDebuggerPresent()))
-        return;
 
-    char szBufString[1024];
-    va_list marker;
-    va_start(marker, szString);
-    _vsnprintf_s(szBufString, sizeof(szBufString) - 1, szString, marker);
 
-    if (fLogDebug) {
-        if (ftell(fLogDebug) > ((int)set_iDebugMaxSize << 10)) {
-            fclose(fLogDebug);
-            _unlink(sDebugLog.c_str());
-            fopen_s(&fLogDebug, sDebugLog.c_str(), "at");
+std::shared_ptr<spdlog::logger> FLHookLog = nullptr;
+std::shared_ptr<spdlog::logger> CheaterLog = nullptr;
+std::shared_ptr<spdlog::logger> KickLog = nullptr;
+std::shared_ptr<spdlog::logger> ConnectsLog = nullptr;
+std::shared_ptr<spdlog::logger> AdminCmdsLog = nullptr;
+std::shared_ptr<spdlog::logger> SocketCmdsLog = nullptr;
+std::shared_ptr<spdlog::logger> UserCmdsLog = nullptr;
+std::shared_ptr<spdlog::logger> PerfTimersLog = nullptr;
+std::shared_ptr<spdlog::logger> FLHookDebugLog = nullptr;
+std::shared_ptr<spdlog::logger> WinDebugLog = nullptr;
+
+
+bool InitLogs()
+{
+    try
+    {
+        FLHookLog = spdlog::basic_logger_mt<spdlog::async_factory>("FLHook", "logs/FLHook.log");
+        CheaterLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_cheaters", "logs/flhook_cheaters.log");
+        KickLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_kicks", "logs/flhook_kicks.log");
+        ConnectsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_connects", "logs/flhook_connects.log");
+        AdminCmdsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_admincmds", "logs/flhook_admincmds.log");
+        SocketCmdsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_socketcmds", "logs/flhook_socketcmds.log");
+        UserCmdsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_usercmds", "logs/flhook_usercmds.log");
+        PerfTimersLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_perftimers", "logs/flhook_perftimers.log");
+
+        spdlog::flush_on(spdlog::level::err);
+        spdlog::flush_every(std::chrono::seconds(3));
+
+        if (IsDebuggerPresent())
+        {
+            WinDebugLog = spdlog::create_async<spdlog::sinks::msvc_sink_mt>("windows_debug");
+            WinDebugLog->set_level(spdlog::level::debug);
         }
 
-        char szBuf[64];
-        time_t tNow = time(0);
-        tm t;
-        localtime_s(&t, &tNow);
-        strftime(szBuf, sizeof(szBuf), "%d.%m.%Y %H:%M:%S", &t);
-        fprintf(fLogDebug, "[%s] %s\n", szBuf, szBufString);
-        fflush(fLogDebug);
+        if (fLogDebug)
+        {
+            char szDate[64];
+            time_t tNow = time(nullptr);
+            tm t;
+            localtime_s(&t, &tNow);
+            strftime(szDate, sizeof szDate, "%d.%m.%Y_%H.%M", &t);
+
+            std::string sDebugLog = "./logs/debug/FLHookDebug_" + (std::string)szDate;
+            sDebugLog += ".log";
+
+            FLHookDebugLog = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", sDebugLog);
+            FLHookDebugLog->set_level(spdlog::level::debug);
+        }
     }
-    if (IsDebuggerPresent()) {
-        OutputDebugString(
-            ("[DEBUG] " + std::string(szBufString) + "\n").c_str());
+    catch (const spdlog::spdlog_ex& ex)
+    {
+        ConPrint(L"ERROR FAILED TO RUN LOGGER");
+        return false;
     }
+    return true;
+}
+
+
+
+void AddLog_s(LogType LogType, LogLevel lvl, const std::string& str)
+{
+    auto level = static_cast<spdlog::level::level_enum>(lvl);
+
+    switch (LogType)
+    {
+    case LogType::Cheater:
+        CheaterLog->log(level, str);
+        break;
+    case LogType::Kick:
+        KickLog->log(level, str);
+        break;
+    case LogType::Connects:
+        ConnectsLog->log(level, str);
+        break;
+    case LogType::AdminCmds:
+        AdminCmdsLog->log(level, str);
+        break;
+    case LogType::UserLogCmds:
+        UserCmdsLog->log(level, str);
+        break;
+    case LogType::SocketCmds:
+        SocketCmdsLog->log(level, str);
+        break;
+    case LogType::PerfTimers:
+        PerfTimersLog->log(level, str);
+        break;
+    case LogType::Normal:
+        switch (level)
+        {
+        case spdlog::level::debug:
+            //Console::ConDebug(str);
+            break;
+        case spdlog::level::info:
+            //Console::ConInfo(str);
+            break;
+        case spdlog::level::warn:
+           // Console::ConWarn(str);
+            break;
+        case spdlog::level::critical:
+        case spdlog::level::err:
+           // Console::ConErr(str);
+            break;
+        default:;
+        }
+
+        FLHookLog->log(level, str);
+        break;
+    default:
+        break;
+    }
+
+    if (lvl == LogLevel::Debug && FLHookDebugLog)
+    {
+        FLHookDebugLog->debug(str);
+    }
+
+    if (IsDebuggerPresent() && WinDebugLog)
+    {
+        WinDebugLog->debug(str);
+    }
+
+    if (lvl == LogLevel::Critical)
+    {
+        // Ensure all is flushed!
+        spdlog::shutdown();
+    }
+}
+
+
+
+
+
+
+void AddDebugLog(const std::string& szString, ...) {
+ 
+    AddLog_s(LogType::Normal, LogLevel::Debug, szString);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void AddLog(const char *szString, ...) {
-    if (!fLog && !IsDebuggerPresent())
-        return;
+void AddLog(const std::string& szString, ...) {
 
-    char szBufString[1024];
-    va_list marker;
-    va_start(marker, szString);
-    _vsnprintf_s(szBufString, sizeof(szBufString) - 1, szString, marker);
-
-    if (fLog) {
-        char szBuf[64];
-        time_t tNow = time(0);
-        tm t;
-        localtime_s(&t, &tNow);
-        strftime(szBuf, sizeof(szBuf), "%d.%m.%Y %H:%M:%S", &t);
-        fprintf(fLog, "[%s] %s\n", szBuf, szBufString);
-        fflush(fLog);
-    }
-    if (IsDebuggerPresent()) {
-        OutputDebugString(("[LOG] " + std::string(szBufString) + "\n").c_str());
-    }
+    AddLog_s(LogType::Normal, LogLevel::Info, szString);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

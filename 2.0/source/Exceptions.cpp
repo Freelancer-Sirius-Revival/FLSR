@@ -115,8 +115,8 @@ void AddExceptionInfoLog(SEHException *ex) {
                 iOffset = iAddr - (uint)hModExc;
                 GetModuleFileName(hModExc, szModName, sizeof(szModName));
             }
-            AddBothLog("Code=%x Offset=%x Module=\"%s\"", iCode, iOffset,
-                       szModName);
+            AddBothLog(std::format("Code={:x} Offset={:x} Module=\"{}\"", iCode, iOffset,
+                       szModName));
             if (iCode == 0xE06D7363 &&
                 exception->NumberParameters == 3) // C++ exception
             {
@@ -153,22 +153,21 @@ void AddExceptionInfoLog(SEHException *ex) {
                                           sizeof(szModName));
                     }
                 }
-                AddBothLog("Name=\"%s\" Message=\"%s\" Offset=%x Module=\"%s\"",
+                AddBothLog(std::format("Name=\"{}\" Message=\"{}\" Offset={:x} Module=\"{}\"",
                            szName, szMessage, iOffset,
-                           strrchr(szModName, '\\') + 1);
+                           strrchr(szModName, '\\') + 1));
             }
 
             void *callers[62];
             int count = CaptureStackBackTrace(0, 62, callers, NULL);
             for (int i = 0; i < count; i++)
-                AddBothLog("%08x called from %08X", i, callers[i]);
+                AddBothLog(std::format("{} called from {}", i, callers[i]));
         } else
             AddBothLog("No exception information available");
         if (reg) {
-            AddBothLog("eax=%x ebx=%x ecx=%x edx=%x edi=%x esi=%x ebp=%x "
-                       "eip=%x esp=%x",
+            AddBothLog(std::format("eax={:x} ebx={:x} ecx={:x} edx={:x} edi={:x} esi={:x} ebp={:x} eip={:x} esp={:x}",
                        reg->Eax, reg->Ebx, reg->Ecx, reg->Edx, reg->Edi,
-                       reg->Esi, reg->Ebp, reg->Eip, reg->Esp);
+                       reg->Esi, reg->Ebp, reg->Eip, reg->Esp));
         } else {
             AddBothLog("No register information available");
         }

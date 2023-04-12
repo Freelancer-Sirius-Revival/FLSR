@@ -100,7 +100,7 @@ void AddLog_s(LogType LogType, LogLevel lvl, const std::string& str)
         switch (level)
         {
         case spdlog::level::debug:
-            //Console::ConDebug(str);
+        //    ConPrint(L"debug logs!! \n");
             break;
         case spdlog::level::info:
             //Console::ConInfo(str);

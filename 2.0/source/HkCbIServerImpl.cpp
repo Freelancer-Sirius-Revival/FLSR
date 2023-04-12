@@ -435,9 +435,8 @@ for (auto& chat : set_setChatSuppress) {
             ui.vDir.y * ui.vDir.y + ui.vDir.z * ui.vDir.z;
         if (n > 1.21f || n < 0.81f) {
             AddLog(
-                "ERROR: Non-normalized quaternion found in " __FUNCTION__ " for "
-                "id=%u",
-                iClientID);
+                std::format("ERROR: Non-normalized quaternion found in {} for id={}",
+                    __FUNCTION__ ,iClientID));
             HkKick(Players[iClientID].Account);
             return;
         }

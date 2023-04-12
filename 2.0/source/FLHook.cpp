@@ -279,7 +279,7 @@ bool FLHookInit() {
     try {
 
         //CustomHooks
-        HookFunc();
+       // HookFunc();
 
         // get module handles
         if (!(hModServer = GetModuleHandle("server")))

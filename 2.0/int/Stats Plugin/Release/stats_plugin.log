@@ -1,2 +1,11 @@
 ﻿  Main.cpp
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\stats_plugin\Main.h(15,10): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "nlohmann/json.hpp": No such file or directory
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Stats Plugin\stats.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Stats Plugin\stats.exp" werden erstellt.
+  stats_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Stats Plugin\stats.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Stats Plugin\stats.dll
+  1 Datei(en) kopiert
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Stats Plugin\stats.pdb
+  1 Datei(en) kopiert
+  Datei *.ini nicht gefunden
+  0 Datei(en) kopiert
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Stats Plugin\stats.cfg
+  1 Datei(en) kopiert

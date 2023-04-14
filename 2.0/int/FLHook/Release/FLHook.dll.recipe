@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\FLHook.dll</FullPath>
+      <FullPath>C:\FLSR-Hook\2.0\bin\Release\FLHook.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

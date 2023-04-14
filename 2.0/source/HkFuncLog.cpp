@@ -368,76 +368,41 @@ static void AddLog(FILE *fLog, const char *szString, ...) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HkAddAdminCmdLog(const char *szString, ...) {
-    char szBufString[1024];
-    va_list marker;
-    va_start(marker, szString);
-    _vsnprintf_s(szBufString, sizeof(szBufString) - 1, szString, marker);
+void HkAddAdminCmdLog(std::string scString, ...) {
 
-    FILE *f;
-    fopen_s(&f, ("./flhook_logs/flhook_admincmds.log"), "at");
-    if (!f)
-        return;
+    AddLog_s(LogType::AdminCmds, LogLevel::Info, "AdminCmd (" + scString + ")\n");
 
-    AddLog(f, "%s", szBufString);
 
-    fclose(f);
     return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HkAddSocketCmdLog(const char *szString, ...) {
-    char szBufString[1024];
-    va_list marker;
-    va_start(marker, szString);
-    _vsnprintf_s(szBufString, sizeof(szBufString) - 1, szString, marker);
+void HkAddSocketCmdLog(std::string scString, ...) {
 
-    FILE *f;
-    fopen_s(&f, ("./flhook_logs/flhook_socketcmds.log"), "at");
-    if (!f)
-        return;
+    AddLog_s(LogType::UserLogCmds, LogLevel::Info, "SocketCmd (" + scString + ")\n");
 
-    AddLog(f, "%s", szBufString);
 
-    fclose(f);
     return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HkAddUserCmdLog(const char *szString, ...) {
-    char szBufString[1024];
-    va_list marker;
-    va_start(marker, szString);
-    _vsnprintf_s(szBufString, sizeof(szBufString) - 1, szString, marker);
+void HkAddUserCmdLog(std::string scString, ...) {
+   
 
-    FILE *f;
-    fopen_s(&f, ("./flhook_logs/flhook_usercmds.log"), "at");
-    if (!f)
-        return;
+    AddLog_s(LogType::UserLogCmds, LogLevel::Info, "UserCmd (" + scString + ")\n");
 
-    AddLog(f, "%s", szBufString);
 
-    fclose(f);
     return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void HkAddPerfTimerLog(const char *szString, ...) {
-    char szBufString[1024];
-    va_list marker;
-    va_start(marker, szString);
-    _vsnprintf_s(szBufString, sizeof(szBufString) - 1, szString, marker);
+void HkAddPerfTimerLog(std::string scString, ...) {
 
-    FILE *f;
-    fopen_s(&f, ("./flhook_logs/flhook_perftimers.log"), "at");
-    if (!f)
-        return;
+    AddLog_s(LogType::PerfTimers, LogLevel::Info, "PerfTimer (" + scString + ")\n");
 
-    AddLog(f, "%s", szBufString);
 
-    fclose(f);
     return;
 }

@@ -1,8 +1,9 @@
 ﻿  Main.cpp
-  pvp_plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\PvP Plugin\pvp.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.dll
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.exp" werden erstellt.
+  pvp_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\PvP Plugin\pvp.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert

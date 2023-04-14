@@ -142,9 +142,10 @@ bool HkIsInCharSelectMenu(uint iClientID) {
 
 bool HkIsValidClientID(uint iClientID) {
 
-    struct PlayerData *pPD = 0;
-    while (pPD = Players.traverse_active(pPD)) {
-        if (pPD->iOnlineID == iClientID)
+    PlayerData* playerDb = nullptr;
+    while ((playerDb = Players.traverse_active(playerDb)))
+    {
+        if (playerDb->iOnlineID == iClientID)
             return true;
     }
 

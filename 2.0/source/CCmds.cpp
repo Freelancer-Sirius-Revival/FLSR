@@ -963,19 +963,16 @@ void CCmds::ExecuteCommandString(const std::wstring& wscCmdStr) {
         if (bSocket) {
             if (bLocalSocket) {
                 if (set_bLogLocalSocketCmds)
-                    HkAddSocketCmdLog("%s: %s", wstos(wscAdminName).c_str(),
-                        wstos(wscCmdStr).c_str());
+                    HkAddSocketCmdLog(wstos(wscAdminName) + ": " + wstos(wscCmdStr));
             }
             else {
                 if (set_bLogSocketCmds)
-                    HkAddSocketCmdLog("%s: %s", wstos(wscAdminName).c_str(),
-                        wstos(wscCmdStr).c_str());
+                    HkAddSocketCmdLog(wstos(wscAdminName) + ": " + wstos(wscCmdStr));
             }
         }
         else {
             if (set_bLogAdminCmds)
-                HkAddAdminCmdLog("%s: %s", wstos(wscAdminName).c_str(),
-                    wstos(wscCmdStr).c_str());
+                HkAddAdminCmdLog(wstos(wscAdminName) + ": " + wstos(wscCmdStr));
         }
 
         bID = false;

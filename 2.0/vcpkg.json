@@ -4,6 +4,7 @@
   "version": "2.1.0",
   "dependencies": [
     "nlohmann-json",
-	"sqlitecpp"
+	"sqlitecpp",
+	"spdlog"
   ]
 }

@@ -19,13 +19,12 @@ uint CTimer::stop() {
 
         // log
         if (set_bPerfTimer)
-            HkAddPerfTimerLog("Spent %d ms in %s, longest so far.", iDelta,
-                              sFunction.c_str());
+            HkAddPerfTimerLog("Spent " + std::to_string(iDelta) + " ms in " + sFunction + ", longest so far.");
         iMax = iDelta;
     } else if (iDelta > set_iTimerDebugThreshold &&
                set_iTimerDebugThreshold > 0) {
         if (set_bPerfTimer)
-            HkAddPerfTimerLog("Spent %d ms in %s", iDelta, sFunction.c_str());
+            HkAddPerfTimerLog("Spent " + std::to_string(iDelta) + " ms in " + sFunction + ", longest so far.");
     }
 
     return iDelta;

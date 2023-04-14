@@ -692,11 +692,16 @@ USERCMD UserCmds[] = {
 
 bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
 
-    CALL_PLUGINS(PLUGIN_UserCmd_Process, bool, ,
-                 (uint iClientID, const std::wstring &wscCmd),
-                 (iClientID, wscCmd));
+    if (set_bLogUserCmds) {
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+        HkAddUserCmdLog(wstos(wscCharname) + ": " + wstos(wscCmd));
+    }
+
+    CALL_PLUGINS(PLUGIN_UserCmd_Process, bool, ,(uint iClientID, const std::wstring &wscCmd),(iClientID, wscCmd));
 
     std::wstring wscCmdLower = ToLower(wscCmd);
+
+
 
     for (uint i = 0; (i < sizeof(UserCmds) / sizeof(USERCMD)); i++) {
         if (wscCmdLower.find(UserCmds[i].wszCmd) == 0) {
@@ -705,14 +710,6 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
                 if (wscCmd[wcslen(UserCmds[i].wszCmd)] != ' ')
                     continue;
                 wscParam = wscCmd.substr(wcslen(UserCmds[i].wszCmd) + 1);
-            }
-
-            // addlog
-            if (set_bLogUserCmds) {
-                std::wstring wscCharname =
-                    (wchar_t *)Players.GetActiveCharacterName(iClientID);
-                HkAddUserCmdLog("%s: %s", wstos(wscCharname).c_str(),
-                                wstos(wscCmd).c_str());
             }
 
             try {

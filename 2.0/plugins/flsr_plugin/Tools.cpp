@@ -1065,7 +1065,6 @@ namespace Tools {
     {
         HK_ERROR err;
 
-        
         if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
             return false;
 

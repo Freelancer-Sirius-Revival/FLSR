@@ -1,26 +1,27 @@
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\bin\release\plugins\base plugin\base.lib
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\bin\release\plugins\base plugin\base.exp
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\vc142.pdb
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\storagemodule.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\shieldmodule.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\savefiles.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\playercommands.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\playerbase.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\main.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\factorymodule.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\defensemodule.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\coremodule.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\clientcommands.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\buildmodule.obj
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\bin\release\plugins\base plugin\base.ilk
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\bin\release\plugins\base plugin\base.dll
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\bin\release\plugins\base plugin\base.pdb
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\project\..\bin\release\plugins\base plugin\base.pdb
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\project\..\bin\release\plugins\base plugin\base.ilk
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\base plugin.write.1u.tlog
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\cl.command.1.tlog
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\cl.read.1.tlog
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\cl.write.1.tlog
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.command.1.tlog
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.read.1.tlog
-c:\users\mara\source\repos\freelancer-sirius-revival\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.write.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\vc143.pdb
+c:\flsr-hook\2.0\int\base plugin\release\storagemodule.obj
+c:\flsr-hook\2.0\int\base plugin\release\shieldmodule.obj
+c:\flsr-hook\2.0\int\base plugin\release\savefiles.obj
+c:\flsr-hook\2.0\int\base plugin\release\playercommands.obj
+c:\flsr-hook\2.0\int\base plugin\release\playerbase.obj
+c:\flsr-hook\2.0\int\base plugin\release\main.obj
+c:\flsr-hook\2.0\int\base plugin\release\factorymodule.obj
+c:\flsr-hook\2.0\int\base plugin\release\defensemodule.obj
+c:\flsr-hook\2.0\int\base plugin\release\coremodule.obj
+c:\flsr-hook\2.0\int\base plugin\release\clientcommands.obj
+c:\flsr-hook\2.0\int\base plugin\release\buildmodule.obj
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.ilk
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.dll
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.pdb
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.lib
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.exp
+c:\flsr-hook\2.0\project\..\bin\release\plugins\base plugin\base.pdb
+c:\flsr-hook\2.0\project\..\bin\release\plugins\base plugin\base.ilk
+c:\flsr-hook\2.0\project\..\int\base plugin\release\base plugin.vcxproj.filelistabsolute.txt
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\cl.command.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\cl.read.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\cl.write.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.command.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.read.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.write.1.tlog
+c:\flsr-hook\2.0\int\base plugin\release\base plugin.tlog\link.write.2u.tlog

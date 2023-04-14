@@ -780,10 +780,10 @@ EXPORT bool HkAddCheaterLog(const uint &iClientID,
                             const std::wstring &wscReason);
 EXPORT bool HkAddKickLog(uint iClientID, std::wstring wscReason, ...);
 EXPORT bool HkAddConnectLog(uint iClientID, std::wstring wscReason, ...);
-EXPORT void HkAddAdminCmdLog(const char *szString, ...);
-EXPORT void HkAddSocketCmdLog(const char *szString, ...);
-EXPORT void HkAddUserCmdLog(const char *szString, ...);
-EXPORT void HkAddPerfTimerLog(const char *szString, ...);
+EXPORT void HkAddAdminCmdLog(std::string scString, ...);
+EXPORT void HkAddSocketCmdLog(std::string scString, ...);
+EXPORT void HkAddUserCmdLog(std::string scString, ...);
+EXPORT void HkAddPerfTimerLog(std::string scString, ...);
 
 // HkFuncOther
 EXPORT void HkGetPlayerIP(uint iClientID, std::wstring &wscIP);

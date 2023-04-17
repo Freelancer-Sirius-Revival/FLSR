@@ -25,27 +25,12 @@ namespace Hooks {
         //NewPlayerMessage
         Tools::HkNewPlayerMessage(iClientID, cId);
 		
-	
-
-        //PlayerHunt
-        if (Modules::GetModuleState("PlayerHunt"))
-        {
-            PlayerHunt::CheckDisConnect(iClientID);
-        }
-
-        //PVP
-        if (Modules::GetModuleState("PVP"))
-        {
-            PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
-        }
-
         //CloakModule
         if (Modules::GetModuleState("CloakModule"))
         {
             Commands::UserCmd_UNCLOAK(iClientID, L"");
             ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
         }
-
     }
 
     // LaunchComplete

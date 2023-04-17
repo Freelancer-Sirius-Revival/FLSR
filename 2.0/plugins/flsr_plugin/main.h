@@ -222,6 +222,7 @@ namespace Tools {
     std::vector<std::string> getHardpoints(std::string scParent, std::list<CMPDump_Entry> CMPList);
 
     bool isValidPlayer(uint iClientID, bool bCharfile);
+    void CharSelectMenu();
 
     //Reputation Stuff
     //Reputation callback struct

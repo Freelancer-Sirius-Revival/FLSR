@@ -318,6 +318,9 @@ namespace PlayerHunt {
 
 	void CheckDisConnect(uint iClientID)
 	{
+		
+
+
 		//Check if Hunt is active
 		if (ServerHuntData.eState == HUNT_STATE_HUNTING)
 		{
@@ -326,8 +329,11 @@ namespace PlayerHunt {
 				
 
 			//Check is Player has a Hunt
-			// Get the current character name
+			// Get the character name
+
 			std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+	
+
 			if (ServerHuntData.wscCharname == wscCharname)
 			{
 				//We have the Hunt

@@ -409,7 +409,8 @@ enum class LogType : int
     AdminCmds,
     UserLogCmds,
     SocketCmds,
-    PerfTimers
+    PerfTimers,
+    Chat
 };
 
 
@@ -784,6 +785,7 @@ EXPORT void HkAddAdminCmdLog(std::string scString, ...);
 EXPORT void HkAddSocketCmdLog(std::string scString, ...);
 EXPORT void HkAddUserCmdLog(std::string scString, ...);
 EXPORT void HkAddPerfTimerLog(std::string scString, ...);
+EXPORT void HkAddUserChatLog(std::string scString, ...);
 
 // HkFuncOther
 EXPORT void HkGetPlayerIP(uint iClientID, std::wstring &wscIP);

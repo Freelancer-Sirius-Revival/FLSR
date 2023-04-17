@@ -549,6 +549,7 @@ IMPORT bool HkAddConnectLog(ClientId iClientID, std::wstring wscReason, ...);
 IMPORT void HkAddAdminCmdLog(std::string scString, ...);
 IMPORT void HkAddUserCmdLog(std::string scString, ...);
 IMPORT void HkAddPerfTimerLog(std::string scString, ...);
+IMPORT void HkAddUserChatLog(std::string scString, ...);
 
 // HkFuncOther
 IMPORT void HkGetPlayerIP(ClientId iClientID, std::wstring& wscIP);

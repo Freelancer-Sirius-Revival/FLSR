@@ -17,6 +17,7 @@ std::shared_ptr<spdlog::logger> ConnectsLog = nullptr;
 std::shared_ptr<spdlog::logger> AdminCmdsLog = nullptr;
 std::shared_ptr<spdlog::logger> SocketCmdsLog = nullptr;
 std::shared_ptr<spdlog::logger> UserCmdsLog = nullptr;
+std::shared_ptr<spdlog::logger> UserChatLog = nullptr;
 std::shared_ptr<spdlog::logger> PerfTimersLog = nullptr;
 std::shared_ptr<spdlog::logger> FLHookDebugLog = nullptr;
 std::shared_ptr<spdlog::logger> WinDebugLog = nullptr;
@@ -33,6 +34,7 @@ bool InitLogs()
         AdminCmdsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_admincmds", "logs/flhook_admincmds.log");
         SocketCmdsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_socketcmds", "logs/flhook_socketcmds.log");
         UserCmdsLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_usercmds", "logs/flhook_usercmds.log");
+        UserChatLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_userchat", "logs/flhook_userchat.log");
         PerfTimersLog = spdlog::basic_logger_mt<spdlog::async_factory>("flhook_perftimers", "logs/flhook_perftimers.log");
 
         spdlog::flush_on(spdlog::level::err);
@@ -75,6 +77,9 @@ void AddLog_s(LogType LogType, LogLevel lvl, const std::string& str)
 
     switch (LogType)
     {
+    case LogType::Chat:
+        UserChatLog->log(level, str);
+        break;
     case LogType::Cheater:
         CheaterLog->log(level, str);
         break;
@@ -402,6 +407,16 @@ void HkAddUserCmdLog(std::string scString, ...) {
 void HkAddPerfTimerLog(std::string scString, ...) {
 
     AddLog_s(LogType::PerfTimers, LogLevel::Info, "PerfTimer (" + scString + ")\n");
+
+
+    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void HkAddUserChatLog(std::string scString, ...) {
+
+    AddLog_s(LogType::Chat, LogLevel::Info, "Chat (" + scString + ")\n");
 
 
     return;

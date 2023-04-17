@@ -1060,6 +1060,8 @@ namespace Tools {
 
     }
 
+    //ShortestPath Stuff end @@@@@@@@@@@@@@@
+
 
     bool isValidPlayer(uint iClientID, bool bCharfile)
     {
@@ -1089,6 +1091,39 @@ namespace Tools {
     
     }
 
-//ShortestPath Stuff end @@@@@@@@@@@@@@@
+    void CharSelectMenu()
+    {
+        //Check CharSelectMenu
+        struct PlayerData* pPD = 0;
+        while (pPD = Players.traverse_active(pPD)) {
+            uint iClientID = HkGetClientIdFromPD(pPD);
+
+
+            if (!isValidPlayer(iClientID, false))
+                continue;
+
+            if (HkIsInCharSelectMenu(iClientID))
+            {
+                //PlayerHunt
+                if (Modules::GetModuleState("PlayerHunt"))
+                {
+                    PlayerHunt::CheckDisConnect(iClientID);
+                }
+
+                //PVP
+                if (Modules::GetModuleState("PVP"))
+                {
+                    PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
+                }
+
+                //ConPrint (std::to_wstring(iClientID) + L" is in CharSelectMenu\n");
+            }
+
+
+
+        }
+
+    }
+
 
 }

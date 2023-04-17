@@ -299,10 +299,20 @@ namespace PVP {
     //Hooks
     void CheckDisConnect(uint iClientID, DisconnectReason reason)
     {
+        std::wstring wscCharname = L"";
+
         if (!Tools::isValidPlayer(iClientID, false))
             return;
         
-        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        //Check if there are fights
+        if (ServerFightData.size() == 0)
+			return;
+
+        // Get the character name of the player if Player is not in CharSelect
+        if (!HkIsInCharSelectMenu(iClientID))
+        {
+            wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        }
 
         // Check if player was in a fight
         for (auto& fight : ServerFightData) {
@@ -326,6 +336,7 @@ namespace PVP {
                         wscWinnerMsg += L" through character switch of the last opponent!";
                     }
                     for (auto& member : fight.lMembers) {
+                        ConPrint(L"Member: " + member.wscCharname + L"\n");
                         uint MemberClientID = HkGetClientIdFromCharname(member.wscCharname);
                         if (MemberClientID != -1) {
                             PrintUserCmdText(MemberClientID, wscWinnerMsg.c_str());

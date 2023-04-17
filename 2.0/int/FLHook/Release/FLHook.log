@@ -21,11 +21,11 @@
   HkFuncOther.cpp
   HkFuncPlayers.cpp
   HkFuncTools.cpp
-C:\FLSR-Hook\2.0\source\HkFuncMsg.cpp(351,25): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
   HkDataBaseMarket.cpp
+C:\FLSR-Hook\2.0\source\HkFuncLog.cpp(64,37): warning C4101: "ex": Unreferenzierte lokale Variable
+C:\FLSR-Hook\2.0\source\HkFuncMsg.cpp(351,25): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
   wildcards.cpp
   CCmds.cpp
-C:\FLSR-Hook\2.0\source\HkFuncLog.cpp(62,37): warning C4101: "ex": Unreferenzierte lokale Variable
   CConsole.cpp
   CInGame.cpp
   CSocket.cpp

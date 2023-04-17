@@ -690,18 +690,13 @@ USERCMD UserCmds[] = {
     {L"/help", UserCmd_Help},
 };
 
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(uint iClientID, const std::wstring& wscCmd) {
 
-    if (set_bLogUserCmds) {
-        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-        HkAddUserCmdLog(wstos(wscCharname) + ": " + wstos(wscCmd));
-    }
-
-    CALL_PLUGINS(PLUGIN_UserCmd_Process, bool, ,(uint iClientID, const std::wstring &wscCmd),(iClientID, wscCmd));
+    CALL_PLUGINS(PLUGIN_UserCmd_Process, bool, ,
+        (uint iClientID, const std::wstring & wscCmd),
+        (iClientID, wscCmd));
 
     std::wstring wscCmdLower = ToLower(wscCmd);
-
-
 
     for (uint i = 0; (i < sizeof(UserCmds) / sizeof(USERCMD)); i++) {
         if (wscCmdLower.find(UserCmds[i].wszCmd) == 0) {
@@ -712,11 +707,18 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
                 wscParam = wscCmd.substr(wcslen(UserCmds[i].wszCmd) + 1);
             }
 
+            // addlog
+            if (set_bLogUserCmds) {
+                std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+                HkAddUserCmdLog(wstos(wscCharname) + ": " + wstos(wscCmd));
+            }
+
             try {
                 UserCmds[i].proc(iClientID, wscParam);
                 if (set_bLogUserCmds)
                     HkAddUserCmdLog("finished");
-            } catch (...) {
+            }
+            catch (...) {
                 if (set_bLogUserCmds)
                     HkAddUserCmdLog("exception");
             }
@@ -727,3 +729,4 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
 
     return false;
 }
+

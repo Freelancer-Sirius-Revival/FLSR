@@ -1,6 +1,6 @@
 ﻿  AntiCheat.cpp
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(5,14): warning C4273: "AntiCheat::AC_Info": Inkonsistente DLL-Bindung.
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(611,27): message : Siehe vorherige Definition von "AC_Info"
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(612,27): message : Siehe vorherige Definition von "AC_Info"
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(14,77): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(15,71): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
   Chat.cpp
@@ -16,7 +16,7 @@ C:\FLSR-Hook\2.0\plugins\flsr_plugin\EquipWhiteList.cpp(154,18): warning C4018: 
   FuseControl.cpp
   Hooks.cpp
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xmemory(2071,24): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(196,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(181,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
           with
           [
               _FwdIt=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
@@ -31,7 +31,7 @@ C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.3221
               _Fn=Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>,
               _Pr=Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>
           ]
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(196,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(181,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
           with
           [
               _FwdIt=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
@@ -42,10 +42,10 @@ C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(196,114): message : Siehe Verweis
   Modules.cpp
   PathSelection.cpp
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\PathSelection.cpp(11,17): warning C4273: "PathSelection::UnlawfulPlayerData": Inkonsistente DLL-Bindung.
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(861,34): message : Siehe vorherige Definition von "UnlawfulPlayerData"
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(862,34): message : Siehe vorherige Definition von "UnlawfulPlayerData"
   PlayerHunt.cpp
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\PlayerHunt.cpp(211,15): warning C4244: "Initialisierung": Konvertierung von "float" in "int", möglicher Datenverlust
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\PlayerHunt.cpp(445,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\PlayerHunt.cpp(451,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
   PopUp.cpp
   ClientController.cpp
   Insurance.cpp

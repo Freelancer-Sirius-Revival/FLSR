@@ -125,7 +125,14 @@ namespace PVP {
             uint MemberClientID = HkGetClientIdFromCharname(member.wscCharname);
             if (MemberClientID != -1) {
                 std::wstring wscNotifyMsg = wscJoinerName + wscMsg;
-                PrintUserCmdText(MemberClientID, wscNotifyMsg.c_str());
+                if (MemberClientID == iClientID)
+                {
+                    PrintUserCmdText(MemberClientID, L"You joined the fight!");
+                }
+                else
+                {
+                    PrintUserCmdText(MemberClientID, wscNotifyMsg.c_str());
+                }
             }
         }
 

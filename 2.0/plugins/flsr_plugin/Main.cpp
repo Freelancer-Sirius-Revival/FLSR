@@ -193,6 +193,14 @@ void LoadSettings() {
 		PlayerHunt::LoadPlayerHuntSettings();
 		ConPrint(L"Module loaded: PlayerHunt - RewardMultiplicator: " + std::to_wstring(PlayerHunt::set_fRewardMultiplicator) + L", MinTargetSystemDistance: " + std::to_wstring(PlayerHunt::set_iMinTargetSystemDistance) + L", MinCredits: " + std::to_wstring(PlayerHunt::set_iMinCredits) + L"\n");
 	}
+
+    //PVP     #############################################################################
+    if (Modules::GetModuleState("PVP"))
+    {
+        //Load PVP
+        //PlayerHunt::LoadPlayerHuntSettings();
+        ConPrint(L"Module loaded: PVP \n");
+    }
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {

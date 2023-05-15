@@ -1,11 +1,45 @@
 ﻿  AntiCheat.cpp
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(5,14): warning C4273: "AntiCheat::AC_Info": Inkonsistente DLL-Bindung.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(5,40): warning C4273: "AntiCheat::AC_Info": Inkonsistente DLL-Bindung.
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(612,27): message : Siehe vorherige Definition von "AC_Info"
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(14,77): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(15,71): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
   Chat.cpp
   Cloak.cpp
   Commands.cpp
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1069,10): error C2440: "Initialisierung": "const wchar_t [4]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1069,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1070,10): error C2440: "Initialisierung": "const wchar_t [12]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1070,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1071,10): error C2440: "Initialisierung": "const wchar_t [15]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1071,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1072,10): error C2440: "Initialisierung": "const wchar_t [13]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1072,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1073,10): error C2440: "Initialisierung": "const wchar_t [12]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1073,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1074,10): error C2440: "Initialisierung": "const wchar_t [10]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1074,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1075,10): error C2440: "Initialisierung": "const wchar_t [11]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1075,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1076,10): error C2440: "Initialisierung": "const wchar_t [13]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1076,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1077,10): error C2440: "Initialisierung": "const wchar_t [15]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1077,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1078,10): error C2440: "Initialisierung": "const wchar_t [15]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1078,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1079,10): error C2440: "Initialisierung": "const wchar_t [7]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1079,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1080,4): error C2440: "Initialisierung": "const wchar_t [9]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1080,4): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1081,10): error C2440: "Initialisierung": "const wchar_t [6]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1081,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1082,10): error C2440: "Initialisierung": "const wchar_t [5]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1082,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1083,10): error C2440: "Initialisierung": "const wchar_t [12]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1083,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1084,10): error C2440: "Initialisierung": "const wchar_t [10]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1084,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1085,10): error C2440: "Initialisierung": "const wchar_t [8]" kann nicht in "wchar_t *" konvertiert werden
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Commands.cpp(1085,10): message : Bei der Konvertierung von Zeichenfolgenliteral geht der Konstantenqualifizierer verloren (siehe /Zc:strictStrings)
   CustomMissions.cpp
   Depot.cpp
   Docking.cpp
@@ -15,33 +49,33 @@ C:\FLSR-Hook\2.0\plugins\flsr_plugin\EquipWhiteList.cpp(118,17): warning C4018: 
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\EquipWhiteList.cpp(154,18): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
   FuseControl.cpp
   Hooks.cpp
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xmemory(2071,24): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(181,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xmemory(1985,24): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(181): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_1>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
           with
           [
               _FwdIt=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
               _Elem=wchar_t,
-              _Pr=Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>
+              _Pr=Hooks::SendDeathMsg::<lambda_1>
           ]
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xutility(5993,19): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xmemory(2067,1): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_InIt std::find_if<wchar_t*,_Fn>(_InIt,const _InIt,_Pr)" der Funktions-Vorlage.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(5532,19): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xmemory(1981): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_InIt std::find_if<wchar_t*,_Fn>(_InIt,const _InIt,_Pr)" der Funktions-Vorlage.
           with
           [
               _InIt=wchar_t *,
-              _Fn=Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>,
-              _Pr=Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>
+              _Fn=Hooks::SendDeathMsg::<lambda_1>,
+              _Pr=Hooks::SendDeathMsg::<lambda_1>
           ]
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(181,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(181): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_1>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
           with
           [
               _FwdIt=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
               _Elem=wchar_t,
-              _Pr=Hooks::SendDeathMsg::<lambda_c27d059f8af981ff0dc565d1d5950a97>
+              _Pr=Hooks::SendDeathMsg::<lambda_1>
           ]
   Main.cpp
   Modules.cpp
   PathSelection.cpp
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\PathSelection.cpp(11,17): warning C4273: "PathSelection::UnlawfulPlayerData": Inkonsistente DLL-Bindung.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\PathSelection.cpp(11,54): warning C4273: "PathSelection::UnlawfulPlayerData": Inkonsistente DLL-Bindung.
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(862,34): message : Siehe vorherige Definition von "UnlawfulPlayerData"
   PlayerHunt.cpp
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\PlayerHunt.cpp(211,15): warning C4244: "Initialisierung": Konvertierung von "float" in "int", möglicher Datenverlust
@@ -68,13 +102,3 @@ C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(609,69): warning C4267: "=": Konv
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(732,24): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
   Code wird generiert...
 C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(45): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
-     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.exp" werden erstellt.
-  FLSR Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\FLSR Plugin\FLSR.dll
-  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.dll
-  1 Datei(en) kopiert
-  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.pdb
-  1 Datei(en) kopiert
-  Datei *.ini nicht gefunden
-  0 Datei(en) kopiert
-  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR-PathSelection.cfg
-  1 Datei(en) kopiert

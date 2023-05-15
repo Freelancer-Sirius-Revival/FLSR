@@ -20,15 +20,47 @@ namespace PVP {
         // Get the current character name
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
+        uint ireturn = 0;
+
         for (const auto& fight : ServerFightData) {
             for (const auto& member : fight.lMembers) {
                 if (member.bIsInDuel && member.wscCharname == wscCharname) {
-                    return fight.iFightID;
+                    ireturn = fight.iFightID;
                 }
+
+                //ConPrint (L"Member: %s\n", member.wscCharname.c_str());
             }
         }
-        return 0;
+        return ireturn;
     }
+
+    bool IsInSameFight(uint iClientID, uint iClientID2)
+    {
+        std::wstring wscCharname1 = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharname2 = (const wchar_t*)Players.GetActiveCharacterName(iClientID2);
+
+        for (const auto& fight : ServerFightData) {
+            bool found1 = false;
+            bool found2 = false;
+            for (const auto& member : fight.lMembers) {
+                if (!found1 && member.bIsInDuel && member.wscCharname == wscCharname1) {
+                    found1 = true;
+                }
+                if (!found2 && member.bIsInDuel && member.wscCharname == wscCharname2) {
+                    found2 = true;
+                }
+                // Optional: Wenn beide IDs bereits gefunden wurden, kann die Schleife vorzeitig beendet werden, um die Leistung zu verbessern.
+                if (found1 && found2) {
+                    break;
+                }
+            }
+            if (found1 && found2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     
     PVPType GetPVPType(uint iClientID)
     {
@@ -45,7 +77,7 @@ namespace PVP {
         return PVPTYPE_NONE;
     }
     
-    Member GetPVPMember(uint iClientID)
+   std::list<Member> GetPVPMember(uint iClientID)
     {
         // Get the current character name
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
@@ -53,38 +85,32 @@ namespace PVP {
         for (const auto& fight : ServerFightData) {
             for (const auto& member : fight.lMembers) {
                 if (member.bIsInDuel && member.wscCharname == wscCharname) {
-                    return member;
+                    return fight.lMembers;
                 }
             }
         }
-		return Member();
+		return std::list<PVP::Member>();
     }
     
     void HandleKill(uint iClientKillerID) {
         std::wstring killerCharName = (const wchar_t*)Players.GetActiveCharacterName(iClientKillerID);
-        //While Fights
-        // Update the fight in the ServerFightData
-        for (auto& f : ServerFightData) {
-			//While Members
-			// Update the member in the ServerFightData
-			for (auto& m : f.lMembers) {
-				if (m.wscCharname == killerCharName) {
-					m.iKills++;
-                    
-					//Update the Changed Member
-					m = f.lMembers.back();
+        
 
-                    
-				}
+        ConPrint (L"Killer: %s\n", killerCharName.c_str());
+        std::list<Member> PVPMembers = GetPVPMember (iClientKillerID);
+        for (auto& member : PVPMembers) {
+            if (member.wscCharname == killerCharName) {
+				ConPrint (L"Found killer\n");
+                ConPrint(L"Member: %s\n", member.wscCharname.c_str());
+
+				member.iKills++;
+                ConPrint (L"Kills: %u\n", member.iKills);
+
+				break;
 			}
+		}
 
-			//Update the Changed Fight if Fight is not a FFA
-			if (f.ePVPType != PVPTYPE_FFA) {
-			    f.iFightsRemaining = f.iFightsRemaining - 1;
-            }
-			f = ServerFightData.back();
-            
-		}        
+        ConPrint(L"TESTDEATH-HandleKill\n");
 
     }
     
@@ -398,23 +424,37 @@ namespace PVP {
 
         }
 
+        //Debug
+        ConPrint(L"TESTDEATH\n");
+
         //Check for DeathType - PVP Kill
         if (DeathType == Tools::PVP)
         {
+            ConPrint(L"TESTDEATH1\n");
+
             // The iClientKillerID must be a valid player
             if (!Tools::isValidPlayer(iClientKillerID, false))
                 return;
 
-            // Check if player is in the same fight
-            uint iFightIDKiller = IsInFight(iClientKillerID);
-            if (iFightIDClient == iFightIDKiller)
+            ConPrint(L"TESTDEATH1.1\n");
+
+
+
+            if (!IsInSameFight(iFightIDClient, iClientKillerID))
             {
                 //No Death in a Fight
+                ConPrint(L"NO DEATH in a FIGHT\n");
                 return;
             }
 
+
+            ConPrint(L"TESTDEATH1.2\n");
+
             //HandleKill
+            //Debug
             HandleKill(iClientKillerID);
+            ConPrint(L"TESTDEATH2\n");
+
         }
 
     }

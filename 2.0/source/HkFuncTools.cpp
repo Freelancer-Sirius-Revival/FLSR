@@ -142,9 +142,10 @@ bool HkIsInCharSelectMenu(uint iClientID) {
 
 bool HkIsValidClientID(uint iClientID) {
 
-    struct PlayerData *pPD = 0;
-    while (pPD = Players.traverse_active(pPD)) {
-        if (pPD->iOnlineID == iClientID)
+    PlayerData* playerDb = nullptr;
+    while ((playerDb = Players.traverse_active(playerDb)))
+    {
+        if (playerDb->iOnlineID == iClientID)
             return true;
     }
 
@@ -217,9 +218,9 @@ uint HkGetClientIDByShip(uint iShip) {
 
 HK_ERROR HkGetAccountDirName(CAccount *acc, std::wstring &wscDir) {
     _GetFLName GetFLName = (_GetFLName)((char *)hModServer + 0x66370);
-
-    char szDir[1024] = "";
-    GetFLName(szDir, acc->wszAccID);
+    std::string szDir;
+    szDir.reserve(1024);
+    GetFLName(szDir.data(), acc->wszAccID);
     wscDir = stows(szDir);
     return HKE_OK;
 }
@@ -248,14 +249,15 @@ HK_ERROR HkGetCharFileName(const std::wstring &wscCharname,
     if (!GetFLName)
         GetFLName = (_GetFLName)((char *)hModServer + 0x66370);
 
-    char szBuf[1024] = "";
+    std::string szBuf;
+    szBuf.reserve(1024);
 
     HK_GET_CLIENTID_OR_LOGGED_OUT(iClientID, wscCharname);
     if (iClientID != -1) {
-        GetFLName(szBuf,
+        GetFLName(szBuf.data(),
                   (const wchar_t *)Players.GetActiveCharacterName(iClientID));
     } else {
-        GetFLName(szBuf, wscCharname.c_str());
+        GetFLName(szBuf.data(), wscCharname.c_str());
     }
 
     wscFilename = stows(szBuf);
@@ -265,16 +267,34 @@ HK_ERROR HkGetCharFileName(const std::wstring &wscCharname,
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::wstring HkGetBaseNickByID(uint iBaseID) {
-    char szBasename[1024] = "";
-    pub::GetBaseNickname(szBasename, sizeof(szBasename), iBaseID);
+   
+    std::string szBasename;
+    szBasename.resize(1024);
+    pub::GetBaseNickname(szBasename.data(), szBasename.capacity(), iBaseID);
+    szBasename.resize(1024);
+
+    if (szBasename.empty())
+    {
+        return L"";
+    }
     return stows(szBasename);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::wstring HkGetSystemNickByID(uint iSystemID) {
-    char szSystemname[1024] = "";
-    pub::GetSystemNickname(szSystemname, sizeof(szSystemname), iSystemID);
+
+
+    std::string szSystemname;
+    szSystemname.resize(1024);
+    pub::GetSystemNickname(szSystemname.data(), szSystemname.capacity(), iSystemID);
+    szSystemname.resize(1024);
+
+    if (szSystemname.empty())
+    {
+        return L"";
+    }
+
     return stows(szSystemname);
 }
 
@@ -283,9 +303,7 @@ std::wstring HkGetSystemNickByID(uint iSystemID) {
 std::wstring HkGetPlayerSystem(uint iClientID) {
     uint iSystemID;
     pub::Player::GetSystem(iClientID, iSystemID);
-    char szSystemname[1024] = "";
-    pub::GetSystemNickname(szSystemname, sizeof(szSystemname), iSystemID);
-    return stows(szSystemname);
+    return HkGetSystemNickByID(iSystemID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

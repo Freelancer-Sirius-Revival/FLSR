@@ -10,10 +10,11 @@
   ShieldModule.cpp
   StorageModule.cpp
   Code wird generiert...
-  Base Plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\Base Plugin\base.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.dll
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.exp" werden erstellt.
+  Base Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Base Plugin\base.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert

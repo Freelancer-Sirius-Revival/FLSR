@@ -1185,7 +1185,7 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2) {
         BASE_INFO bi;
         bi.bDestroyed = false;
         bi.iObjectID = base->lSpaceObjID;
-        char *szBaseName = "";
+        const char * szBaseName = "";
         __asm {
             pushad
             mov ecx, [base]
@@ -1195,6 +1195,8 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2) {
             mov [szBaseName], eax
             popad
         }
+
+        //ConPrint(L"base:" + stows(szBaseName) + L"\n");
 
         bi.scBasename = szBaseName;
         bi.iBaseID = CreateID(szBaseName);

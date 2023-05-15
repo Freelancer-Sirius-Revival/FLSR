@@ -1,0 +1,78 @@
+Package: vcpkg-cmake-config
+Version: 2022-02-06
+Port-Version: 1
+Architecture: x64-windows
+Multi-Arch: same
+Abi: f3ef9e805c26f6635e6743b0b0046843b0e4b230e65a07caed529dc8f12e14b5
+Type: Port
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2022-10-30
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 265919c7912e0a2954dd363c6c6ce424b3a14d434e5b15b5791ed373f8dc3477
+Type: Port
+Status: install ok installed
+
+Package: nlohmann-json
+Version: 3.11.2
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: c9db514c78c846d10fbe404fda222f4a7296e4a6650e7eb37de0bfcea0d15d3d
+Description: JSON for Modern C++
+Type: Port
+Status: install ok installed
+
+Package: fmt
+Version: 9.1.0
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: da4aad88447a442932811c03273b29de5e38f13943c23a9c6469b7533a839220
+Description: Formatting library for C++. It can be used as a safe alternative to printf or as a fast alternative to IOStreams.
+Type: Port
+Status: install ok installed
+
+Package: spdlog
+Version: 1.11.0
+Depends: fmt, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: fbe8f09303e078995e0463604a3b67d2db11a5c6d49d54317bf5553372d2a9e5
+Description: Very fast, header only, C++ logging library
+Type: Port
+Status: install ok installed
+
+Package: sqlite3
+Version: 3.40.0
+Port-Version: 1
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: b8c038e45c48d59c8b1a18379ed260f0ea904df129720973363ce7fe6487b926
+Description: SQLite is a software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine.
+Type: Port
+Status: install ok installed
+
+Package: sqlitecpp
+Version: 3.2.0
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 303fa818ed1e7d1ff920b9b4649fa8669e20fc3c94d4bf4c72455bb24e1d9ee0
+Description: SQLiteC++ (SQLiteCpp) is a smart and easy to use C++ SQLite3 wrapper.
+Type: Port
+Default-Features: sqlite
+Status: install ok installed
+
+Package: sqlitecpp
+Feature: sqlite
+Depends: sqlite3
+Architecture: x86-windows
+Multi-Arch: same
+Description: Use the (unofficial) sqlite3 port of vcpkg
+Type: Port
+Status: install ok installed
+

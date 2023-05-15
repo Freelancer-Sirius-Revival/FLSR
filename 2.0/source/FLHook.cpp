@@ -255,8 +255,15 @@ void FLHookInit_Pre() {
         // load settings
         LoadSettings();
 
-        if (set_bDebug && !fLogDebug)
-            fopen_s(&fLogDebug, sDebugLog.c_str(), "at");
+       // if (set_bDebug && !fLogDebug)
+           // fopen_s(&fLogDebug, sDebugLog.c_str(), "at");
+
+        if (!InitLogs())
+            throw std::runtime_error("Log files cannot be created.");
+
+        // Setup needed debug tools
+        DebugTools::i()->Init();
+
 
         CALL_PLUGINS_NORET(PLUGIN_LoadSettings, , (), ());
 
@@ -272,7 +279,7 @@ bool FLHookInit() {
     try {
 
         //CustomHooks
-        HookFunc();
+       // HookFunc();
 
         // get module handles
         if (!(hModServer = GetModuleHandle("server")))
@@ -572,6 +579,23 @@ void ConPrint(std::wstring wscText, ...) {
     WriteConsole(hConsoleOut, scText.c_str(), (DWORD)scText.length(),
                  &iCharsWritten, 0);
 }
+
+
+/*
+void ConError(std::wstring wscText, ...) {
+    wchar_t wszBuf[1024 * 8] = L"";
+    va_list marker;
+    va_start(marker, wscText);
+
+    _vsnwprintf_s(wszBuf, (sizeof(wszBuf) / 2) - 1, wscText.c_str(), marker);
+
+    DWORD iCharsWritten;
+    std::string scText = "Error:" + wstos(wszBuf);
+    WriteConsole(hConsoleOut, scText.c_str(), (DWORD)scText.length(),
+        &iCharsWritten, 0);
+}
+*/
+
 
 /**************************************************************************************************************
 send event to all sockets which are in eventmode

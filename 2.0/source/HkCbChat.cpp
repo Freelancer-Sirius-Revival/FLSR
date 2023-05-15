@@ -14,7 +14,7 @@ void __stdcall HkCb_SendChat(uint iClientID, uint iTo, uint iSize, void* pRDL) {
         if (HkIServerImpl::g_bInSubmitChat && (iTo != 0x10004)) {
             std::wstring wszBuf;
             wszBuf.resize(iSize);
-            ConPrint(L"size:%u\n", iSize);
+            //ConPrint(L"size:%u\n", iSize);
             // extract text from rdlReader
             BinaryRDLReader rdl;
             uint iRet;
@@ -23,8 +23,11 @@ void __stdcall HkCb_SendChat(uint iClientID, uint iTo, uint iSize, void* pRDL) {
                                          (const char*)pRDL, iSize);
             wszBuf.erase(std::find(wszBuf.begin(), wszBuf.end(), '\0'), wszBuf.end());
 
-            ConPrint(L"wscBuf:%s\n", wszBuf);
+           // ConPrint(L"wscBuf:%s\n", wszBuf);
+            
             std::wstring wscBuf = wszBuf;
+            HkAddUserChatLog(wstos(wscBuf));
+
             std::wstring wscSender = wscBuf.substr(
                 0, wscBuf.length() - HkIServerImpl::g_iTextLen - 2);
             std::wstring wscText =

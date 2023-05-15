@@ -1575,7 +1575,7 @@ std::wstring GetLocation(unsigned int iClientID) {
     pub::Player::GetShip(iClientID, iShip);
     if (!iSystemID || !iShip) {
         PrintUserCmdText(iClientID, L"ERR Not in space");
-        return false;
+        return L"false";
     }
 
     Vector pos;

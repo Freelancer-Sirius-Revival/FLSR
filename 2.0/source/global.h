@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string>
 #include <windows.h>
+#include "Singleton.h"
 
 typedef void *(*st6_malloc_t)(size_t);
 typedef void (*st6_free_t)(void *);
@@ -74,6 +75,7 @@ EXPORT void ReadProcMem(void *pAddress, void *pMem, int iSize);
 EXPORT int ToInt(const std::wstring &wscStr);
 EXPORT uint ToUInt(const std::wstring &wscStr);
 EXPORT void ConPrint(std::wstring wscText, ...);
+EXPORT void ConError(std::wstring wscText, ...);
 EXPORT std::wstring XMLText(const std::wstring &wscText);
 EXPORT std::wstring GetParam(const std::wstring &wscLine, wchar_t wcSplitChar,
                              uint iPos);
@@ -306,5 +308,19 @@ EXPORT bool InDeathZone(uint systemID, const Vector &pos, ZONE &rlz);
 EXPORT SYSTEMINFO *GetSystemInfo(uint systemID);
 EXPORT void PrintZones();
 } // namespace ZoneUtilities
+
+
+class DebugTools : public Singleton<DebugTools>
+{
+    static std::map<std::string, uint> hashMap;
+
+    std::allocator<BYTE> allocator;
+
+    static uint CreateIdDetour(const char* str);
+
+public:
+    DebugTools() = default;
+    void Init();
+};
 
 #endif

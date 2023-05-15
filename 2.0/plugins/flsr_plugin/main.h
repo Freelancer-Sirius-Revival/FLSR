@@ -106,7 +106,7 @@ namespace Commands {
     
     typedef void (*_UserCmdProc)(uint, const std::wstring &);
     struct USERCMD {
-        wchar_t *wszCmd;
+        const  wchar_t* wszCmd;
         _UserCmdProc proc;
     };
 
@@ -222,6 +222,7 @@ namespace Tools {
     std::vector<std::string> getHardpoints(std::string scParent, std::list<CMPDump_Entry> CMPList);
 
     bool isValidPlayer(uint iClientID, bool bCharfile);
+    void CharSelectMenu();
 
     //Reputation Stuff
     //Reputation callback struct
@@ -956,6 +957,7 @@ namespace PlayerHunt {
     void CheckSystemReached(uint iClientID, uint iPlayerSystemID);
     void CheckDock(uint iBaseID, uint iClientID);
     void CheckDisConnect(uint iClientID);
+    bool IsInSameFight(uint iClientID, uint iClientID2);
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
     void LoadPlayerHuntSettings();
 }
@@ -1003,7 +1005,7 @@ namespace PVP {
 
     uint IsInFight(uint iClientID);
     PVPType GetPVPType(uint iClientID);
-    Member GetPVPMember(uint iClientID);
+    std::list<Member> GetPVPMember(uint iClientID);
     void HandleKill(uint iClientKillerID);
     void CmdAcceptPVP(uint iClientID, const std::wstring& wscParam);
     void CmdDuel(uint iClientID, const std::wstring& wscParam);

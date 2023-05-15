@@ -4,6 +4,7 @@
 #include "global.h"
 #include "flcodec.h"
 #include <plugin.h>
+#include <format>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // defines
@@ -89,21 +90,20 @@ EXPORT void AddExceptionInfoLog(SEHException *ex);
     catch (SEHException & ex) {                                                \
         e;                                                                     \
         AddBothLog(                                                            \
-            "ERROR: SEH Exception in %s on line %d; minidump may contain "     \
-            "more information.",                                               \
-            __FUNCTION__, __LINE__);                                           \
+            std::format("ERROR: SEH Exception in {} on line {}; minidump may contain more information.",                                               \
+            __FUNCTION__, __LINE__));                                           \
         AddExceptionInfoLog(&ex);                                              \
     }                                                                          \
     catch (std::exception & ex) {                                              \
         e;                                                                     \
-        AddBothLog("ERROR: STL Exception in %s on line %d: %s.", __FUNCTION__, \
-                   __LINE__, ex.what());                                       \
+        AddBothLog(std::format("ERROR: STL Exception in {} on line {}: {}.", __FUNCTION__, \
+                   __LINE__, ex.what()));                                       \
         AddExceptionInfoLog(0);                                                \
     }                                                                          \
     catch (...) {                                                              \
         e;                                                                     \
-        AddBothLog("ERROR: Exception in %s on line %d.", __FUNCTION__,         \
-                   __LINE__);                                                  \
+        AddBothLog(std::format("ERROR: Exception in {} on line {}.", __FUNCTION__,         \
+                   __LINE__));                                                  \
         AddExceptionInfoLog();                                                 \
     }
 #else
@@ -111,7 +111,7 @@ EXPORT void AddExceptionInfoLog(SEHException *ex);
 #define CATCH_HOOK(e)                                                          \
     catch (...) {                                                              \
         e;                                                                     \
-        AddLog("ERROR: Exception in %s", __FUNCTION__);                        \
+        AddLog(std::format("ERROR: Exception in {}", __FUNCTION__));                        \
     }
 #endif
 
@@ -181,13 +181,13 @@ struct PLUGIN_SORTCRIT {
                                            arg_types)plugin.pFunc)args;        \
                     }                                                          \
                     CATCH_HOOK({                                               \
-                        AddLog("ERROR: Exception in plugin '%s' in %s",        \
-                               plugin.sName.c_str(), __FUNCTION__);            \
+                        AddDebugLog(std::format("ERROR: Exception in plugin {} in {}",        \
+                               plugin.sName.c_str(), __FUNCTION__));            \
                     })                                                         \
                     timer.stop();                                              \
                 } else                                                         \
-                    AddLog("ERROR: Plugin '%s' does not export %s [%s]",       \
-                           plugin.sName.c_str(), __FUNCTION__, __FUNCDNAME__); \
+                    AddDebugLog(std::format("ERROR: Plugin '%s' does not export {} [{}]",       \
+                           plugin.sName.c_str(), __FUNCTION__, __FUNCDNAME__)); \
                 if (*plugin.ePluginReturnCode == SKIPPLUGINS_NOFUNCTIONCALL) { \
                     bPluginReturn = true;                                      \
                     break;                                                     \
@@ -198,7 +198,7 @@ struct PLUGIN_SORTCRIT {
                     break;                                                     \
             }                                                                  \
         }                                                                      \
-        CATCH_HOOK({ AddLog("ERROR: Exception %s", __FUNCTION__); })           \
+        CATCH_HOOK({ AddDebugLog(std::format("ERROR: Exception {}", __FUNCTION__)); })           \
         if (bPluginReturn)                                                     \
             return vPluginRet;                                                 \
     }
@@ -220,13 +220,13 @@ struct PLUGIN_SORTCRIT {
                             args;                                              \
                     }                                                          \
                     CATCH_HOOK({                                               \
-                        AddLog("ERROR: Exception in plugin '%s' in %s",        \
-                               plugin.sName.c_str(), __FUNCTION__);            \
+                        AddDebugLog(std::format("ERROR: Exception in plugin {} in {}",        \
+                               plugin.sName.c_str(), __FUNCTION__));            \
                     })                                                         \
                     timer.stop();                                              \
                 } else                                                         \
-                    AddLog("ERROR: Plugin '%s' does not export %s [%s]",       \
-                           plugin.sName.c_str(), __FUNCTION__, __FUNCDNAME__); \
+                    AddDebugLog(std::format("ERROR: Plugin {} does not export {} [{}]",       \
+                           plugin.sName.c_str(), __FUNCTION__, __FUNCDNAME__)); \
                 if (*plugin.ePluginReturnCode == SKIPPLUGINS_NOFUNCTIONCALL) { \
                     bPluginReturn = true;                                      \
                     break;                                                     \
@@ -237,7 +237,7 @@ struct PLUGIN_SORTCRIT {
                     break;                                                     \
             }                                                                  \
         }                                                                      \
-        CATCH_HOOK({ AddLog("ERROR: Exception %s", __FUNCTION__); })           \
+        CATCH_HOOK({ AddDebugLog(std::format("ERROR: Exception {}", __FUNCTION__)); })           \
         if (bPluginReturn)                                                     \
             return;                                                            \
     }
@@ -387,6 +387,33 @@ enum EQ_TYPE {
     ET_TRACTOR,
     ET_LIGHT
 };
+
+
+
+enum class LogLevel : int
+{
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Err,
+    Critical
+};
+
+enum class LogType : int
+{
+    Normal,
+    Cheater,
+    Kick,
+    Connects,
+    AdminCmds,
+    UserLogCmds,
+    SocketCmds,
+    PerfTimers,
+    Chat
+};
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // structs
@@ -554,7 +581,7 @@ struct PATCH_INFO_ENTRY {
 };
 
 struct PATCH_INFO {
-    char *szBinName;
+    const char *szBinName;
     ulong pBaseAddress;
 
     PATCH_INFO_ENTRY piEntries[128];
@@ -741,8 +768,11 @@ EXPORT void HkSaveChar(uint iClientID);
         AddLog(s, __VA_ARGS__);                                                \
         AddDebugLog(s, __VA_ARGS__);                                           \
     }
-EXPORT void AddDebugLog(const char *szString, ...);
-EXPORT void AddLog(const char *szString, ...);
+
+
+EXPORT bool InitLogs();
+EXPORT void AddDebugLog(const std::string& szString, ...);
+EXPORT void AddLog(const std::string& szString, ...);
 EXPORT void HkHandleCheater(uint iClientID, bool bBan, std::wstring wscReason,
                             ...);
 EXPORT bool HkAddCheaterLog(const std::wstring &wscCharname,
@@ -751,10 +781,11 @@ EXPORT bool HkAddCheaterLog(const uint &iClientID,
                             const std::wstring &wscReason);
 EXPORT bool HkAddKickLog(uint iClientID, std::wstring wscReason, ...);
 EXPORT bool HkAddConnectLog(uint iClientID, std::wstring wscReason, ...);
-EXPORT void HkAddAdminCmdLog(const char *szString, ...);
-EXPORT void HkAddSocketCmdLog(const char *szString, ...);
-EXPORT void HkAddUserCmdLog(const char *szString, ...);
-EXPORT void HkAddPerfTimerLog(const char *szString, ...);
+EXPORT void HkAddAdminCmdLog(std::string scString, ...);
+EXPORT void HkAddSocketCmdLog(std::string scString, ...);
+EXPORT void HkAddUserCmdLog(std::string scString, ...);
+EXPORT void HkAddPerfTimerLog(std::string scString, ...);
+EXPORT void HkAddUserChatLog(std::string scString, ...);
 
 // HkFuncOther
 EXPORT void HkGetPlayerIP(uint iClientID, std::wstring &wscIP);

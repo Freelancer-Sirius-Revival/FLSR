@@ -1,2 +1,2 @@
-PlatformToolSet=v142:VCToolArchitecture=Native32Bit:VCToolsVersion=14.29.30133:VCServicingVersionMFC=14.29.30136:TargetPlatformVersion=10.0.19041.0:
-Release|Win32|C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\|
+PlatformToolSet=v143:VCToolArchitecture=Native32Bit:VCToolsVersion=14.35.32215:TargetPlatformVersion=10.0.22621.0:VcpkgTriplet=x86-windows:
+Release|Win32|C:\FLSR-Hook\2.0\project\|

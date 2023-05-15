@@ -1,8 +1,9 @@
 ﻿  Main.cpp
-  Conn Plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\Conn Plugin\conn.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Conn Plugin\conn.dll
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Conn Plugin\conn.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Conn Plugin\conn.exp" werden erstellt.
+  Conn Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Conn Plugin\conn.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Conn Plugin\conn.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Conn Plugin\conn.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Conn Plugin\conn.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert

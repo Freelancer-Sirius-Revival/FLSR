@@ -22,7 +22,7 @@
 typedef void (*_UserCmdProc)(uint, const std::wstring &);
 
 struct USERCMD {
-    wchar_t *wszCmd;
+    const wchar_t *wszCmd;
     _UserCmdProc proc;
 };
 
@@ -690,11 +690,11 @@ USERCMD UserCmds[] = {
     {L"/help", UserCmd_Help},
 };
 
-bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+bool UserCmd_Process(uint iClientID, const std::wstring& wscCmd) {
 
     CALL_PLUGINS(PLUGIN_UserCmd_Process, bool, ,
-                 (uint iClientID, const std::wstring &wscCmd),
-                 (iClientID, wscCmd));
+        (uint iClientID, const std::wstring & wscCmd),
+        (iClientID, wscCmd));
 
     std::wstring wscCmdLower = ToLower(wscCmd);
 
@@ -709,17 +709,16 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
 
             // addlog
             if (set_bLogUserCmds) {
-                std::wstring wscCharname =
-                    (wchar_t *)Players.GetActiveCharacterName(iClientID);
-                HkAddUserCmdLog("%s: %s", wstos(wscCharname).c_str(),
-                                wstos(wscCmd).c_str());
+                std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+                HkAddUserCmdLog(wstos(wscCharname) + ": " + wstos(wscCmd));
             }
 
             try {
                 UserCmds[i].proc(iClientID, wscParam);
                 if (set_bLogUserCmds)
                     HkAddUserCmdLog("finished");
-            } catch (...) {
+            }
+            catch (...) {
                 if (set_bLogUserCmds)
                     HkAddUserCmdLog("exception");
             }
@@ -730,3 +729,4 @@ bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
 
     return false;
 }
+

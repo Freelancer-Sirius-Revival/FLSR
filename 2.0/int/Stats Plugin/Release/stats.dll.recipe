@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\FLHOOK-ORG\FLHook\bin\Release\FLHook.dll</FullPath>
+      <FullPath>C:\FLSR-Hook\2.0\bin\Release\FLHook.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>C:\FLHOOK-ORG\FLHook\bin\Release\plugins\Stats Plugin\stats.dll</FullPath>
+      <FullPath>C:\FLSR-Hook\2.0\bin\Release\plugins\Stats Plugin\stats.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

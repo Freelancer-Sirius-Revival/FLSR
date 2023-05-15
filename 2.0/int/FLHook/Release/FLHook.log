@@ -1,12 +1,13 @@
-﻿  FLHook.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\FLHook.dll
+﻿  The vcpkg manifest was disabled, but we found a manifest file in C:\FLSR-Hook\2.0\. You may want to enable vcpkg manifests in your properties page or pass /p:VcpkgEnableManifest=true to the msbuild invocation.
+  FLHook.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\FLHook.dll
   Performing Custom Build Step
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\FLHook.lib
+  C:\FLSR-Hook\2.0\project\..\bin\Release\FLHook.lib
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\FLHook.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\FLHook.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\FLHook.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\FLHook.pdb
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\FLHook.ini
+  C:\FLSR-Hook\2.0\project\..\bin\Release\FLHook.ini
   1 Datei(en) kopiert
   
   ERFOLGREICH: Angegebener Wert wurde gespeichert.

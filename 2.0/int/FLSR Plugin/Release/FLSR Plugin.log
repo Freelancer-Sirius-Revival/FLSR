@@ -1,36 +1,28 @@
 ﻿  AntiCheat.cpp
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(5,40): warning C4273: "AntiCheat::AC_Info": Inkonsistente DLL-Bindung.
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(390,27): message : Siehe vorherige Definition von "AC_Info"
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(14,77): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(15,71): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-  Chat.cpp
-  Commands.cpp
-  CustomMission.cpp
-  Docking.cpp
-  Hooks.cpp
-  Main.cpp
-  PopUp.cpp
-  ClientController.cpp
-  Insurance.cpp
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(436,18): warning C4101: "err": Unreferenzierte lokale Variable
-  Solar.cpp
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(5,14): warning C4273: "AntiCheat::AC_Info": Inkonsistente DLL-Bindung.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(612,27): message : Siehe vorherige Definition von "AC_Info"
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(14,77): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\AntiCheat.cpp(15,71): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+  PathSelection.cpp
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\PathSelection.cpp(11,17): warning C4273: "PathSelection::UnlawfulPlayerData": Inkonsistente DLL-Bindung.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\main.h(862,34): message : Siehe vorherige Definition von "UnlawfulPlayerData"
+  PVP.cpp
   SendCash.cpp
-  Timers.cpp
   Tools.cpp
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(322,73): warning C4267: "=": Konvertierung von "size_t" nach "unsigned char", Datenverlust möglich
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(342,69): warning C4267: "=": Konvertierung von "size_t" nach "unsigned char", Datenverlust möglich
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(473,18): warning C4101: "err": Unreferenzierte lokale Variable
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(589,73): warning C4267: "=": Konvertierung von "size_t" nach "unsigned char", Datenverlust möglich
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(609,69): warning C4267: "=": Konvertierung von "size_t" nach "unsigned char", Datenverlust möglich
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(732,24): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
   Code wird generiert...
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(38): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(465): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(45): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(244): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
-     Bibliothek "C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.lib" und Objekt "C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.exp" werden erstellt.
-  FLSR Plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\FLSR Plugin\FLSR.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.dll
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Tools.cpp(45): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\PathSelection.cpp(89): warning C4715: "PathSelection::Check_BlockedGate": Nicht alle Codepfade geben einen Wert zurück.
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.exp" werden erstellt.
+  FLSR Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\FLSR Plugin\FLSR.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert
-  Datei *.cfg nicht gefunden
-  0 Datei(en) kopiert
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR-PathSelection.cfg
+  1 Datei(en) kopiert

@@ -53,9 +53,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
+    <IncludePath>..\include\ext;..\include\Tools;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgTriplet>
@@ -87,6 +88,7 @@ setx FLHOOK_SDK_PATH "$(SolutionDir)..\FLHookSDK\\"</Command>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader />
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Ws2_32.lib;psapi.lib;dbghelp.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -125,6 +127,10 @@ setx FLHOOK_SDK_PATH "$(SolutionDir)..\FLHookSDK\\"</Command>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Ws2_32.lib;psapi.lib;dbghelp.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -140,6 +146,7 @@ setx FLHOOK_SDK_PATH "$(SolutionDir)..\FLHookSDK\\"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\source\CustomHooks.cpp" />
+    <ClCompile Include="..\source\Debug.cpp" />
     <ClCompile Include="..\source\Exceptions.cpp" />
     <ClCompile Include="..\source\flcodec.cpp" />
     <ClCompile Include="..\source\HkError.cpp" />

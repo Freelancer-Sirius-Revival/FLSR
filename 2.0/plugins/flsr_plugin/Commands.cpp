@@ -62,15 +62,19 @@ namespace Commands {
     }
         */
 
-        void UserCmd_testduel(uint iClientID, const std::wstring& wscParam) {
+    void UserCmd_testduel(uint iClientID, const std::wstring& wscParam) {
 
-        PVP::CmdDuel(iClientID, wscParam);
-
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CmdDuel(iClientID, wscParam);
+        }
     }
 
     void UserCmd_accept(uint iClientID, const std::wstring& wscParam) {
-
-        PVP::CmdAcceptPVP(iClientID, wscParam);
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CmdAcceptPVP(iClientID, wscParam);
+        }
 
     }
     

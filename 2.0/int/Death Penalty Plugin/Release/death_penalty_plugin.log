@@ -1,12 +1,14 @@
-﻿  Main.cpp
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\death_penalty_plugin\Main.cpp(296,94): warning C4244: "Argument": Konvertierung von "float" in "uint", möglicher Datenverlust
-C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\plugins\death_penalty_plugin\Main.cpp(227): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
-  death_penalty_plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\Death Penalty Plugin\deathpenalty.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.dll
+﻿  The vcpkg manifest was disabled, but we found a manifest file in C:\FLSR-Hook\2.0\. You may want to enable vcpkg manifests in your properties page or pass /p:VcpkgEnableManifest=true to the msbuild invocation.
+  Main.cpp
+C:\FLSR-Hook\2.0\plugins\death_penalty_plugin\Main.cpp(460,94): warning C4244: "Argument": Konvertierung von "float" in "uint", möglicher Datenverlust
+C:\FLSR-Hook\2.0\plugins\death_penalty_plugin\Main.cpp(388): warning C4700: Die nicht initialisierte lokale Variable "fValue" wurde verwendet.
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.exp" werden erstellt.
+  death_penalty_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Death Penalty Plugin\deathpenalty.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.cfg
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Death Penalty Plugin\deathpenalty.cfg
   1 Datei(en) kopiert

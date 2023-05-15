@@ -1,8 +1,9 @@
 ﻿  Main.cpp
-  PluginTemplate.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\PluginTemplate\$safeprojectname$.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\PluginTemplate\$safeprojectname$.dll
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PluginTemplate\$safeprojectname$.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PluginTemplate\$safeprojectname$.exp" werden erstellt.
+  PluginTemplate.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\PluginTemplate\$safeprojectname$.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PluginTemplate\$safeprojectname$.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\PluginTemplate\$safeprojectname$.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PluginTemplate\$safeprojectname$.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert

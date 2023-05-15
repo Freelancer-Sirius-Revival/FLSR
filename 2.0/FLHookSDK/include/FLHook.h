@@ -48,7 +48,7 @@ struct SEHException
 		: code(code), record(*ep->ExceptionRecord), context(*ep->ContextRecord)
 	{ }
 
-    SEHException() = default;
+	SEHException() = default;
 
 	uint code;
 	EXCEPTION_RECORD record;
@@ -75,7 +75,7 @@ catch (...) { e; AddBothLog("ERROR: Exception in %s on line %d.", __FUNCTION__, 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef void*(*st6_malloc_t)(size_t);
+typedef void* (*st6_malloc_t)(size_t);
 typedef void(*st6_free_t)(void*);
 
 extern IMPORT st6_malloc_t st6_malloc;
@@ -89,13 +89,15 @@ extern IMPORT st6_free_t st6_free;
 
 #include "plugin.h"
 
-typedef void (__stdcall *_RCSendChatMsg)(uint iId, uint iTo, uint iSize, void *pRDL);
-typedef void (__stdcall *_CRCAntiCheat)();
-typedef void (__stdcall *_CreateChar)(const wchar_t *wszName);
-typedef int (__cdecl *_GetFLName)(char *szBuf, const wchar_t *wszStr);
-typedef bool (__cdecl *_GetShipInspect)(uint &iShip, IObjInspectImpl* &inspect, uint &iDunno);
+typedef void(__stdcall* _RCSendChatMsg)(uint iId, uint iTo, uint iSize, void* pRDL);
+typedef void(__stdcall* _CRCAntiCheat)();
+typedef void(__stdcall* _CreateChar)(const wchar_t* wszName);
+typedef int(__cdecl* _GetFLName)(char* szBuf, const wchar_t* wszStr);
+typedef bool(__cdecl* _GetShipInspect)(uint& iShip, IObjInspectImpl*& inspect, uint& iDunno);
 
 extern IMPORT _GetShipInspect GetShipInspect;
+
+using ClientId = const uint;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // enums
@@ -222,7 +224,7 @@ struct MONEY_FIX
 
 	bool operator==(MONEY_FIX mf1)
 	{
-		if(!wscCharname.compare(mf1.wscCharname))
+		if (!wscCharname.compare(mf1.wscCharname))
 			return true;
 
 		return false;
@@ -239,7 +241,7 @@ struct IGNORE_INFO
 // resolver
 struct RESOLVE_IP
 {
-	uint iClientID;
+	ClientId iClientID;
 	uint iConnects;
 	std::wstring wscIP;
 	std::wstring wscHostname;
@@ -247,52 +249,52 @@ struct RESOLVE_IP
 
 struct CLIENT_INFO
 {
-// kill msgs
+	// kill msgs
 	uint		iShip;
 	uint		iShipOld;
 	mstime		tmSpawnTime;
 
 	DamageList	dmgLast;
 
-// money cmd
+	// money cmd
 	std::list<MONEY_FIX> lstMoneyFix;
 
-// anticheat
+	// anticheat
 	uint		iTradePartner;
 
-// change cruise disruptor behaviour
+	// change cruise disruptor behaviour
 	bool		bCruiseActivated;
 	bool		bThrusterActivated;
 	bool		bEngineKilled;
 	bool		bTradelane;
 
-// idle kicks
+	// idle kicks
 	uint		iBaseEnterTime;
 	uint		iCharMenuEnterTime;
 
-// msg, wait and kick
+	// msg, wait and kick
 	mstime		tmKickTime;
 
-// eventmode
+	// eventmode
 	uint		iLastExitedBaseID;
 	bool		bDisconnected;
 
-// f1 laming
+	// f1 laming
 	bool		bCharSelected;
 	mstime		tmF1Time;
 	mstime		tmF1TimeDisconnect;
 
-// ignore usercommand
+	// ignore usercommand
 	std::list<IGNORE_INFO> lstIgnore;
 
-// user settings
+	// user settings
 	DIEMSGTYPE	dieMsg;
 	CHATSIZE	dieMsgSize;
 	CHATSTYLE	dieMsgStyle;
 	CHATSIZE	chatSize;
 	CHATSTYLE	chatStyle;
 
-// autobuy
+	// autobuy
 	bool		bAutoBuyMissiles;
 	bool		bAutoBuyMines;
 	bool		bAutoBuyTorps;
@@ -300,16 +302,16 @@ struct CLIENT_INFO
 	bool		bAutoBuyCM;
 	bool		bAutoBuyReload;
 
-// MultiKillMessages
+	// MultiKillMessages
 	uint		iKillsInARow;
 
-// bans
+	// bans
 	uint		iConnects; // incremented when player connects
 
-// Group
-    uint iGroupID;
+	// Group
+	uint iGroupID;
 
-// other
+	// other
 	std::wstring		wscHostname;
 
 	bool		bSpawnProtected;
@@ -330,31 +332,31 @@ struct MULTIKILLMESSAGE
 };
 
 // taken from directplay
-typedef struct _DPN_CONNECTION_INFO{
-    DWORD   dwSize;
-    DWORD   dwRoundTripLatencyMS;
-    DWORD   dwThroughputBPS;
-    DWORD   dwPeakThroughputBPS;
-    DWORD   dwBytesSentGuaranteed;
-    DWORD   dwPacketsSentGuaranteed;
-    DWORD   dwBytesSentNonGuaranteed;
-    DWORD   dwPacketsSentNonGuaranteed;
-    DWORD   dwBytesRetried;
-    DWORD   dwPacketsRetried;
-    DWORD   dwBytesDropped;   
-    DWORD   dwPacketsDropped; 
-    DWORD   dwMessagesTransmittedHighPriority;
-    DWORD   dwMessagesTimedOutHighPriority;
-    DWORD   dwMessagesTransmittedNormalPriority;
-    DWORD   dwMessagesTimedOutNormalPriority;
-    DWORD   dwMessagesTransmittedLowPriority;
-    DWORD   dwMessagesTimedOutLowPriority;
-    DWORD   dwBytesReceivedGuaranteed;
-    DWORD   dwPacketsReceivedGuaranteed;
-    DWORD   dwBytesReceivedNonGuaranteed;
-    DWORD   dwPacketsReceivedNonGuaranteed;
-    DWORD   dwMessagesReceived;
-} DPN_CONNECTION_INFO, *PDPN_CONNECTION_INFO;
+typedef struct _DPN_CONNECTION_INFO {
+	DWORD   dwSize;
+	DWORD   dwRoundTripLatencyMS;
+	DWORD   dwThroughputBPS;
+	DWORD   dwPeakThroughputBPS;
+	DWORD   dwBytesSentGuaranteed;
+	DWORD   dwPacketsSentGuaranteed;
+	DWORD   dwBytesSentNonGuaranteed;
+	DWORD   dwPacketsSentNonGuaranteed;
+	DWORD   dwBytesRetried;
+	DWORD   dwPacketsRetried;
+	DWORD   dwBytesDropped;
+	DWORD   dwPacketsDropped;
+	DWORD   dwMessagesTransmittedHighPriority;
+	DWORD   dwMessagesTimedOutHighPriority;
+	DWORD   dwMessagesTransmittedNormalPriority;
+	DWORD   dwMessagesTimedOutNormalPriority;
+	DWORD   dwMessagesTransmittedLowPriority;
+	DWORD   dwMessagesTimedOutLowPriority;
+	DWORD   dwBytesReceivedGuaranteed;
+	DWORD   dwPacketsReceivedGuaranteed;
+	DWORD   dwBytesReceivedNonGuaranteed;
+	DWORD   dwPacketsReceivedNonGuaranteed;
+	DWORD   dwMessagesReceived;
+} DPN_CONNECTION_INFO, * PDPN_CONNECTION_INFO;
 
 struct HKPLAYERINFO
 {
@@ -373,15 +375,15 @@ struct HKPLAYERINFO
 struct PATCH_INFO_ENTRY
 {
 	ulong pAddress;
-	void *pNewValue;
+	void* pNewValue;
 	uint iSize;
-	void *pOldValue;
+	void* pOldValue;
 	bool bAlloced;
 };
 
 struct PATCH_INFO
 {
-	char	*szBinName;
+	char* szBinName;
 	ulong	pBaseAddress;
 
 	PATCH_INFO_ENTRY piEntries[128];
@@ -405,7 +407,7 @@ struct BASE_INFO
 
 struct GROUP_MEMBER
 {
-	uint iClientID;
+	ClientId iClientID;
 	std::wstring wscCharname;
 };
 
@@ -433,31 +435,31 @@ IMPORT void Plugin_Communication(PLUGIN_MESSAGE msgtype, void* msg);
 #define LOG_EXCEPTION { AddLog("ERROR Exception in %s", __FUNCTION__); AddExceptionInfoLog(); }
 
 // HkFuncTools
-IMPORT uint HkGetClientIdFromAccount(CAccount *acc);
-IMPORT uint HkGetClientIdFromPD(struct PlayerData *pPD);
-IMPORT CAccount* HkGetAccountByCharname(const std::wstring &wscCharname);
-IMPORT uint HkGetClientIdFromCharname(const std::wstring &wscCharname);
-IMPORT std::wstring HkGetAccountID(CAccount *acc);
-IMPORT bool HkIsEncoded(const std::string &scFilename);
-IMPORT bool HkIsInCharSelectMenu(const std::wstring &wscCharname);
-IMPORT bool HkIsInCharSelectMenu(uint iClientID);
-IMPORT bool HkIsValidClientID(uint iClientID);
-IMPORT HK_ERROR HkResolveId(const std::wstring &wscCharname, uint &iClientID);
-IMPORT HK_ERROR HkResolveShortCut(const std::wstring &wscShortcut, uint &iClientID);
+IMPORT uint HkGetClientIdFromAccount(CAccount* acc);
+IMPORT uint HkGetClientIdFromPD(struct PlayerData* pPD);
+IMPORT CAccount* HkGetAccountByCharname(const std::wstring& wscCharname);
+IMPORT uint HkGetClientIdFromCharname(const std::wstring& wscCharname);
+IMPORT std::wstring HkGetAccountID(CAccount* acc);
+IMPORT bool HkIsEncoded(const std::string& scFilename);
+IMPORT bool HkIsInCharSelectMenu(const std::wstring& wscCharname);
+IMPORT bool HkIsInCharSelectMenu(ClientId iClientID);
+IMPORT bool HkIsValidClientID(ClientId iClientID);
+IMPORT HK_ERROR HkResolveId(const std::wstring& wscCharname, uint& iClientID);
+IMPORT HK_ERROR HkResolveShortCut(const std::wstring& wscShortcut, uint& iClientID);
 IMPORT uint HkGetClientIDByShip(uint iShip);
-IMPORT HK_ERROR HkGetAccountDirName(CAccount *acc, std::wstring &wscDir);
-IMPORT HK_ERROR HkGetAccountDirName(const std::wstring &wscCharname, std::wstring &wscDir);
-IMPORT HK_ERROR HkGetCharFileName(const std::wstring &wscCharname, std::wstring &wscFilename);
+IMPORT HK_ERROR HkGetAccountDirName(CAccount* acc, std::wstring& wscDir);
+IMPORT HK_ERROR HkGetAccountDirName(const std::wstring& wscCharname, std::wstring& wscDir);
+IMPORT HK_ERROR HkGetCharFileName(const std::wstring& wscCharname, std::wstring& wscFilename);
 IMPORT std::wstring HkGetBaseNickByID(uint iBaseID);
-IMPORT std::wstring HkGetPlayerSystem(uint iClientID);
+IMPORT std::wstring HkGetPlayerSystem(ClientId iClientID);
 IMPORT std::wstring HkGetSystemNickByID(uint iSystemID);
-IMPORT void HkLockAccountAccess(CAccount *acc, bool bKick);
-IMPORT void HkUnlockAccountAccess(CAccount *acc);
-IMPORT void HkGetItemsForSale(uint iBaseID, std::list<uint> &lstItems);
-IMPORT IObjInspectImpl* HkGetInspect(uint iClientID);
-IMPORT ENGINE_STATE HkGetEngineState(uint iClientID);
-IMPORT EQ_TYPE HkGetEqType(Archetype::Equipment *eq);
-IMPORT HK_ERROR HkGetClientID(bool& bIdString, uint& iClientID, const std::wstring &wscCharname);
+IMPORT void HkLockAccountAccess(CAccount* acc, bool bKick);
+IMPORT void HkUnlockAccountAccess(CAccount* acc);
+IMPORT void HkGetItemsForSale(uint iBaseID, std::list<uint>& lstItems);
+IMPORT IObjInspectImpl* HkGetInspect(ClientId iClientID);
+IMPORT ENGINE_STATE HkGetEngineState(ClientId iClientID);
+IMPORT EQ_TYPE HkGetEqType(Archetype::Equipment* eq);
+IMPORT HK_ERROR HkGetClientID(bool& bIdString, uint& iClientID, const std::wstring& wscCharname);
 IMPORT float HkDistance3D(Vector v1, Vector v2);
 IMPORT float HkDistance3DByShip(uint iShip1, uint iShip2);
 IMPORT Quaternion HkMatrixToQuaternion(Matrix m);
@@ -465,186 +467,187 @@ template<typename Str>
 IMPORT Str VectorToSectorCoord(uint iSystemID, Vector vPos);
 IMPORT float degrees(float rad);
 IMPORT Vector MatrixToEuler(const Matrix& mat);
-IMPORT void Rotate180(Matrix &rot);
-IMPORT void TranslateY(Vector &pos, Matrix &rot, float y);
-IMPORT void TranslateX(Vector &pos, Matrix &rot, float x);
-IMPORT void TranslateZ(Vector &pos, Matrix &rot, float z);
+IMPORT void Rotate180(Matrix& rot);
+IMPORT void TranslateY(Vector& pos, Matrix& rot, float y);
+IMPORT void TranslateX(Vector& pos, Matrix& rot, float x);
+IMPORT void TranslateZ(Vector& pos, Matrix& rot, float z);
 
 #define HK_GET_CLIENTID(a, b) \
 	bool bIdString = false; uint a = uint(-1); \
     if(auto err = HkGetClientID(bIdString, a, b); err != HKE_OK) return err;
 
 // HkFuncMsg
-IMPORT HK_ERROR HkMsg(int iClientID, const std::wstring &wscMessage);
-IMPORT HK_ERROR HkMsg(const std::wstring &wscCharname, const std::wstring &wscMessage);
-IMPORT HK_ERROR HkMsgS(const std::wstring &wscSystemname, const std::wstring &wscMessage);
-IMPORT HK_ERROR HkMsgU(const std::wstring &wscMessage);
-IMPORT HK_ERROR HkFMsgEncodeXML(const std::wstring &wscXML, char *szBuf, uint iSize, uint &iRet);
-IMPORT HK_ERROR HkFMsgSendChat(uint iClientID, char *szBuf, uint iSize);
-IMPORT HK_ERROR HkFMsg(uint iClientID, const std::wstring &wscXML);
-IMPORT HK_ERROR HkFMsg(const std::wstring &wscCharname, const std::wstring &wscXML);
-IMPORT HK_ERROR HkFMsgS(const std::wstring &wscSystemname, const std::wstring &wscXML);
-IMPORT HK_ERROR HkFMsgU(const std::wstring &wscXML);
+IMPORT HK_ERROR HkMsg(int iClientID, const std::wstring& wscMessage);
+IMPORT HK_ERROR HkMsg(const std::wstring& wscCharname, const std::wstring& wscMessage);
+IMPORT HK_ERROR HkMsgS(const std::wstring& wscSystemname, const std::wstring& wscMessage);
+IMPORT HK_ERROR HkMsgU(const std::wstring& wscMessage);
+IMPORT HK_ERROR HkFMsgEncodeXML(const std::wstring& wscXML, char* szBuf, uint iSize, uint& iRet);
+IMPORT HK_ERROR HkFMsgSendChat(ClientId iClientID, char* szBuf, uint iSize);
+IMPORT HK_ERROR HkFMsg(ClientId iClientID, const std::wstring& wscXML);
+IMPORT HK_ERROR HkFMsg(const std::wstring& wscCharname, const std::wstring& wscXML);
+IMPORT HK_ERROR HkFMsgS(const std::wstring& wscSystemname, const std::wstring& wscXML);
+IMPORT HK_ERROR HkFMsgU(const std::wstring& wscXML);
 IMPORT std::wstring HkGetWStringFromIDS(uint iIDS);
 IMPORT void HkLoadStringDLLs();
 IMPORT void HkUnloadStringDLLs();
-IMPORT void FormatSendChat(uint iToClientID, const std::wstring &wscSender, const std::wstring &wscText, const std::wstring &wscTextColor);
-IMPORT void SendGroupChat(uint iFromClientID, const std::wstring &wscText);
-IMPORT void SendLocalSystemChat(uint iFromClientID, const std::wstring &wscText);
-IMPORT void SendPrivateChat(uint iFromClientID, uint iToClientID, const std::wstring &wscText);
-IMPORT void SendSystemChat(uint iFromClientID, const std::wstring &wscText);
+IMPORT void FormatSendChat(uint iToClientID, const std::wstring& wscSender, const std::wstring& wscText, const std::wstring& wscTextColor);
+IMPORT void SendGroupChat(uint iFromClientID, const std::wstring& wscText);
+IMPORT void SendLocalSystemChat(uint iFromClientID, const std::wstring& wscText);
+IMPORT void SendPrivateChat(uint iFromClientID, uint iToClientID, const std::wstring& wscText);
+IMPORT void SendSystemChat(uint iFromClientID, const std::wstring& wscText);
 
 // HkFuncPlayers
-IMPORT HK_ERROR HkGetCash(const std::wstring &wscCharname, int &iCash);
-IMPORT HK_ERROR HkAddCash(const std::wstring &wscCharname, int iAmount);
-IMPORT HK_ERROR HkKick(CAccount *acc);
-IMPORT HK_ERROR HkKick(const std::wstring &wscCharname);
-IMPORT HK_ERROR HkKickReason(const std::wstring &wscCharname, const std::wstring &wscReason);
-IMPORT HK_ERROR HkBan(const std::wstring &wscCharname, bool bBan);
-IMPORT HK_ERROR HkBeam(const std::wstring &wscCharname, const std::wstring &wscBasename);
-IMPORT HK_ERROR HkSaveChar(const std::wstring &wscCharname);
-IMPORT HK_ERROR HkEnumCargo(const std::wstring &wscCharname, std::list<CARGO_INFO> &lstCargo, int &iRemainingHoldSize);
-IMPORT HK_ERROR HkRemoveCargo(const std::wstring &wscCharname, uint iID, int iCount);
-IMPORT HK_ERROR HkAddCargo(const std::wstring &wscCharname, uint iGoodID, int iCount, bool bMission);
-IMPORT HK_ERROR HkAddCargo(const std::wstring &wscCharname, const std::wstring &wscGood, int iCount, bool bMission);
-IMPORT HK_ERROR HkRename(const std::wstring &wscCharname, const std::wstring &wscNewCharname, bool bOnlyDelete);
-IMPORT HK_ERROR HkMsgAndKick(uint iClientID, const std::wstring &wscReason, uint iIntervall);
-IMPORT HK_ERROR HkKill(const std::wstring &wscCharname);
-IMPORT HK_ERROR HkGetReservedSlot(const std::wstring &wscCharname, bool &bResult);
-IMPORT HK_ERROR HkSetReservedSlot(const std::wstring &wscCharname, bool bReservedSlot);
-IMPORT void HkPlayerAutoBuy(uint iClientID, uint iBaseID);
-IMPORT HK_ERROR HkResetRep(const std::wstring &wscCharname);
-IMPORT HK_ERROR HkGetGroupMembers(const std::wstring &wscCharname, std::list<GROUP_MEMBER> &lstMembers);
-IMPORT HK_ERROR HkSetRep(const std::wstring &wscCharname, const std::wstring &wscRepGroup, float fValue);
-IMPORT HK_ERROR HkGetRep(const std::wstring &wscCharname, const std::wstring &wscRepGroup, float &fValue);
-IMPORT HK_ERROR HkReadCharFile(const std::wstring &wscCharname, std::list<std::wstring> &lstOutput);
-IMPORT HK_ERROR HkWriteCharFile(const std::wstring &wscCharname, std::wstring wscData);
-IMPORT HK_ERROR HkPlayerRecalculateCRC(uint iClientID);
-IMPORT std::string HkGetPlayerSystemS(uint iClientID);
-IMPORT bool IsInRange(uint iClientID, float fDistance);
-IMPORT std::wstring GetLocation(unsigned int iClientID);
-IMPORT HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint);
-IMPORT HK_ERROR HkAntiCheat(uint iClientID);
-IMPORT void HkDelayedKick(uint iClientID, uint secs);
-IMPORT HK_ERROR HkDeleteCharacter(CAccount *acc, std::wstring &wscCharname);
-IMPORT HK_ERROR HkNewCharacter(CAccount *acc, std::wstring &wscCharname);
-IMPORT std::wstring HkGetAccountIDByClientID(uint iClientID);
-IMPORT HK_ERROR HkGetOnlineTime(const std::wstring &wscCharname, int &iSecs);
-IMPORT HK_ERROR HkGetRank(const std::wstring &wscCharname, int &iRank);
-IMPORT HK_ERROR HKGetShipValue(const std::wstring &wscCharname, float &fValue);
-IMPORT void HkRelocateClient(uint iClientID, Vector vDestination, Matrix mOrientation);
-IMPORT void HkSaveChar(uint iClientID);
+IMPORT HK_ERROR HkGetCash(const std::wstring& wscCharname, int& iCash);
+IMPORT HK_ERROR HkAddCash(const std::wstring& wscCharname, int iAmount);
+IMPORT HK_ERROR HkKick(CAccount* acc);
+IMPORT HK_ERROR HkKick(const std::wstring& wscCharname);
+IMPORT HK_ERROR HkKickReason(const std::wstring& wscCharname, const std::wstring& wscReason);
+IMPORT HK_ERROR HkBan(const std::wstring& wscCharname, bool bBan);
+IMPORT HK_ERROR HkBeam(const std::wstring& wscCharname, const std::wstring& wscBasename);
+IMPORT HK_ERROR HkSaveChar(const std::wstring& wscCharname);
+IMPORT HK_ERROR HkEnumCargo(const std::wstring& wscCharname, std::list<CARGO_INFO>& lstCargo, int& iRemainingHoldSize);
+IMPORT HK_ERROR HkRemoveCargo(const std::wstring& wscCharname, uint iID, int iCount);
+IMPORT HK_ERROR HkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount, bool bMission);
+IMPORT HK_ERROR HkAddCargo(const std::wstring& wscCharname, const std::wstring& wscGood, int iCount, bool bMission);
+IMPORT HK_ERROR HkRename(const std::wstring& wscCharname, const std::wstring& wscNewCharname, bool bOnlyDelete);
+IMPORT HK_ERROR HkMsgAndKick(ClientId iClientID, const std::wstring& wscReason, uint iIntervall);
+IMPORT HK_ERROR HkKill(const std::wstring& wscCharname);
+IMPORT HK_ERROR HkGetReservedSlot(const std::wstring& wscCharname, bool& bResult);
+IMPORT HK_ERROR HkSetReservedSlot(const std::wstring& wscCharname, bool bReservedSlot);
+IMPORT void HkPlayerAutoBuy(ClientId iClientID, uint iBaseID);
+IMPORT HK_ERROR HkResetRep(const std::wstring& wscCharname);
+IMPORT HK_ERROR HkGetGroupMembers(const std::wstring& wscCharname, std::list<GROUP_MEMBER>& lstMembers);
+IMPORT HK_ERROR HkSetRep(const std::wstring& wscCharname, const std::wstring& wscRepGroup, float fValue);
+IMPORT HK_ERROR HkGetRep(const std::wstring& wscCharname, const std::wstring& wscRepGroup, float& fValue);
+IMPORT HK_ERROR HkReadCharFile(const std::wstring& wscCharname, std::list<std::wstring>& lstOutput);
+IMPORT HK_ERROR HkWriteCharFile(const std::wstring& wscCharname, std::wstring wscData);
+IMPORT HK_ERROR HkPlayerRecalculateCRC(ClientId iClientID);
+IMPORT std::string HkGetPlayerSystemS(ClientId iClientID);
+IMPORT bool IsInRange(ClientId iClientID, float fDistance);
+IMPORT std::wstring GetLocation(ClientId iClientID);
+IMPORT HK_ERROR HkAddEquip(const std::wstring& wscCharname, uint iGoodID, const std::string& scHardpoint);
+IMPORT HK_ERROR HkAntiCheat(ClientId iClientID);
+IMPORT void HkDelayedKick(ClientId iClientID, uint secs);
+IMPORT HK_ERROR HkDeleteCharacter(CAccount* acc, std::wstring& wscCharname);
+IMPORT HK_ERROR HkNewCharacter(CAccount* acc, std::wstring& wscCharname);
+IMPORT std::wstring HkGetAccountIDByClientID(ClientId iClientID);
+IMPORT HK_ERROR HkGetOnlineTime(const std::wstring& wscCharname, int& iSecs);
+IMPORT HK_ERROR HkGetRank(const std::wstring& wscCharname, int& iRank);
+IMPORT HK_ERROR HKGetShipValue(const std::wstring& wscCharname, float& fValue);
+IMPORT void HkRelocateClient(ClientId iClientID, Vector vDestination, Matrix mOrientation);
+IMPORT void HkSaveChar(ClientId iClientID);
 
 // HkFuncLog
 #define AddBothLog(s, ...) { AddLog(s, __VA_ARGS__); AddDebugLog(s, __VA_ARGS__);  }
-IMPORT void AddDebugLog(const char *szString, ...);
-IMPORT void AddLog(const char *szString, ...);
-IMPORT void HkHandleCheater(uint iClientID, bool bBan, std::wstring wscReason, ...);
-IMPORT bool HkAddCheaterLog(const std::wstring &wscCharname, const std::wstring &wscReason);
-IMPORT bool HkAddCheaterLog(const uint &iClientID, const std::wstring &wscReason);
-IMPORT bool HkAddKickLog(uint iClientID, std::wstring wscReason, ...);
-IMPORT bool HkAddConnectLog(uint iClientID, std::wstring wscReason, ...);
-IMPORT void HkAddAdminCmdLog(const char *szString, ...);
-IMPORT void HkAddUserCmdLog(const char *szString, ...);
-IMPORT void HkAddPerfTimerLog(const char *szString, ...);
+IMPORT void AddDebugLog(const std::string& szString, ...);
+IMPORT void AddLog(const std::string& szString, ...);
+IMPORT void HkHandleCheater(ClientId iClientID, bool bBan, std::wstring wscReason, ...);
+IMPORT bool HkAddCheaterLog(const std::wstring& wscCharname, const std::wstring& wscReason);
+IMPORT bool HkAddCheaterLog(const uint& iClientID, const std::wstring& wscReason);
+IMPORT bool HkAddKickLog(ClientId iClientID, std::wstring wscReason, ...);
+IMPORT bool HkAddConnectLog(ClientId iClientID, std::wstring wscReason, ...);
+IMPORT void HkAddAdminCmdLog(std::string scString, ...);
+IMPORT void HkAddUserCmdLog(std::string scString, ...);
+IMPORT void HkAddPerfTimerLog(std::string scString, ...);
+IMPORT void HkAddUserChatLog(std::string scString, ...);
 
 // HkFuncOther
-IMPORT void HkGetPlayerIP(uint iClientID, std::wstring &wscIP);
-IMPORT HK_ERROR HkGetPlayerInfo(const std::wstring &wscCharname, HKPLAYERINFO &pi, bool bAlsoCharmenu);
+IMPORT void HkGetPlayerIP(ClientId iClientID, std::wstring& wscIP);
+IMPORT HK_ERROR HkGetPlayerInfo(const std::wstring& wscCharname, HKPLAYERINFO& pi, bool bAlsoCharmenu);
 IMPORT std::list<HKPLAYERINFO> HkGetPlayers();
-IMPORT HK_ERROR HkGetConnectionStats(uint iClientID, DPN_CONNECTION_INFO &ci);
-IMPORT HK_ERROR HkSetAdmin(const std::wstring &wscCharname, const std::wstring &wscRights);
-IMPORT HK_ERROR HkGetAdmin(const std::wstring &wscCharname, std::wstring &wscRights);
-IMPORT HK_ERROR HkDelAdmin(const std::wstring &wscCharname);
+IMPORT HK_ERROR HkGetConnectionStats(ClientId iClientID, DPN_CONNECTION_INFO& ci);
+IMPORT HK_ERROR HkSetAdmin(const std::wstring& wscCharname, const std::wstring& wscRights);
+IMPORT HK_ERROR HkGetAdmin(const std::wstring& wscCharname, std::wstring& wscRights);
+IMPORT HK_ERROR HkDelAdmin(const std::wstring& wscCharname);
 IMPORT HK_ERROR HkChangeNPCSpawn(bool bDisable);
-IMPORT HK_ERROR HkGetBaseStatus(const std::wstring &wscBasename, float &fHealth, float &fMaxHealth);
+IMPORT HK_ERROR HkGetBaseStatus(const std::wstring& wscBasename, float& fHealth, float& fMaxHealth);
 IMPORT bool HkLightFuse(IObjRW* ship, uint iFuseID, float fDelay, float fLifetime, float fSkip);
 IMPORT bool HkUnLightFuse(IObjRW* ship, uint iFuseID);
-IMPORT CEqObj* HkGetEqObjFromObjRW(struct IObjRW *objRW);
-IMPORT uint HkGetClientIDFromArg(const std::wstring &wscArg);
+IMPORT CEqObj* HkGetEqObjFromObjRW(struct IObjRW* objRW);
+IMPORT uint HkGetClientIDFromArg(const std::wstring& wscArg);
 
 // HkFLIni
-IMPORT HK_ERROR HkFLIniGet(const std::wstring &wscCharname, const std::wstring &wscKey, std::wstring &wscRet);
-IMPORT HK_ERROR HkFLIniWrite(const std::wstring &wscCharname, const std::wstring &wscKey, const std::wstring &wscValue);
+IMPORT HK_ERROR HkFLIniGet(const std::wstring& wscCharname, const std::wstring& wscKey, std::wstring& wscRet);
+IMPORT HK_ERROR HkFLIniWrite(const std::wstring& wscCharname, const std::wstring& wscKey, const std::wstring& wscValue);
 
 IMPORT std::wstring HkErrGetText(HK_ERROR hkErr);
 
-IMPORT void UserCmd_SetDieMsg(uint iClientID, const std::wstring &wscParam);
-IMPORT void UserCmd_SetChatFont(uint iClientID, const std::wstring &wscParam);
+IMPORT void UserCmd_SetDieMsg(ClientId iClientID, const std::wstring& wscParam);
+IMPORT void UserCmd_SetChatFont(ClientId iClientID, const std::wstring& wscParam);
 
 IMPORT void ProcessEvent(std::wstring wscText, ...);
 
-IMPORT void PrintUserCmdText(uint iClientID, std::wstring wscText, ...);
-IMPORT void PrintLocalUserCmdText(uint iClientID, const std::wstring &wscMsg, float fDistance);
+IMPORT void PrintUserCmdText(ClientId iClientID, std::wstring wscText, ...);
+IMPORT void PrintLocalUserCmdText(ClientId iClientID, const std::wstring& wscMsg, float fDistance);
 
 // tools
-IMPORT std::wstring stows(const std::string &scText);
-IMPORT std::string wstos(const std::wstring &wscText);
-IMPORT std::string IniGetS(const std::string &scFile, const std::string &scApp, const std::string &scKey, const std::string &scDefault);
-IMPORT int IniGetI(const std::string &scFile, const std::string &scApp, const std::string &scKey, int iDefault);
-IMPORT bool IniGetB(const std::string &scFile, const std::string &scApp, const std::string &scKey, bool bDefault);
-IMPORT void IniWrite(const std::string &scFile, const std::string &scApp, const std::string &scKey, const std::string &scValue);
-IMPORT void WriteProcMem(void *pAddress, void *pMem, int iSize);
-IMPORT void ReadProcMem(void *pAddress, void *pMem, int iSize);
-IMPORT int ToInt(const std::wstring &wscStr);
+IMPORT std::wstring stows(const std::string& scText);
+IMPORT std::string wstos(const std::wstring& wscText);
+IMPORT std::string IniGetS(const std::string& scFile, const std::string& scApp, const std::string& scKey, const std::string& scDefault);
+IMPORT int IniGetI(const std::string& scFile, const std::string& scApp, const std::string& scKey, int iDefault);
+IMPORT bool IniGetB(const std::string& scFile, const std::string& scApp, const std::string& scKey, bool bDefault);
+IMPORT void IniWrite(const std::string& scFile, const std::string& scApp, const std::string& scKey, const std::string& scValue);
+IMPORT void WriteProcMem(void* pAddress, void* pMem, int iSize);
+IMPORT void ReadProcMem(void* pAddress, void* pMem, int iSize);
+IMPORT int ToInt(const std::wstring& wscStr);
 IMPORT void ConPrint(std::wstring wscText, ...);
-IMPORT std::wstring XMLText(const std::wstring &wscText);
-IMPORT std::wstring GetParam(const std::wstring &wscLine, wchar_t wcSplitChar, uint iPos);
+IMPORT std::wstring XMLText(const std::wstring& wscText);
+IMPORT std::wstring GetParam(const std::wstring& wscLine, wchar_t wcSplitChar, uint iPos);
 IMPORT std::string GetParam(std::string scLine, char cSplitChar, uint iPos);
-IMPORT std::wstring ReplaceStr(const std::wstring &wscSource, const std::wstring &wscSearchFor, const std::wstring &wscReplaceWith);
-IMPORT void IniDelSection(const std::string &scFile, const std::string &scApp);
-IMPORT void IniWriteW(const std::string &scFile, const std::string &scApp, const std::string &scKey, const std::wstring &wscValue);
-IMPORT std::wstring IniGetWS(const std::string &scFile, const std::string &scApp, const std::string &scKey, const std::wstring &wscDefault);
+IMPORT std::wstring ReplaceStr(const std::wstring& wscSource, const std::wstring& wscSearchFor, const std::wstring& wscReplaceWith);
+IMPORT void IniDelSection(const std::string& scFile, const std::string& scApp);
+IMPORT void IniWriteW(const std::string& scFile, const std::string& scApp, const std::string& scKey, const std::wstring& wscValue);
+IMPORT std::wstring IniGetWS(const std::string& scFile, const std::string& scApp, const std::string& scKey, const std::wstring& wscDefault);
 IMPORT std::wstring ToMoneyStr(int iCash);
-IMPORT float IniGetF(const std::string &scFile, const std::string &scApp, const std::string &scKey, float fDefault);
-IMPORT void IniGetSection(const std::string &scFile, const std::string &scApp, std::list<INISECTIONVALUE> &lstValues);
-IMPORT float ToFloat(const std::wstring &wscStr);
+IMPORT float IniGetF(const std::string& scFile, const std::string& scApp, const std::string& scKey, float fDefault);
+IMPORT void IniGetSection(const std::string& scFile, const std::string& scApp, std::list<INISECTIONVALUE>& lstValues);
+IMPORT float ToFloat(const std::wstring& wscStr);
 IMPORT mstime timeInMS();
-IMPORT void SwapBytes(void *ptr, uint iLen);
-IMPORT FARPROC PatchCallAddr(char *hMod, DWORD dwInstallAddress, char *dwHookFunction);
+IMPORT void SwapBytes(void* ptr, uint iLen);
+IMPORT FARPROC PatchCallAddr(char* hMod, DWORD dwInstallAddress, char* dwHookFunction);
 IMPORT std::wstring ToLower(std::wstring wscStr);
 IMPORT std::string ToLower(std::string wscStr);
-IMPORT std::wstring GetParamToEnd(const std::wstring &wscLine, wchar_t wcSplitChar, uint iPos);
-IMPORT void ini_write_wstring(FILE *file, const std::string &parmname, const std::wstring &in);
-IMPORT void ini_get_wstring(INI_Reader &ini, std::wstring &wscValue);
+IMPORT std::wstring GetParamToEnd(const std::wstring& wscLine, wchar_t wcSplitChar, uint iPos);
+IMPORT void ini_write_wstring(FILE* file, const std::string& parmname, const std::wstring& in);
+IMPORT void ini_get_wstring(INI_Reader& ini, std::wstring& wscValue);
 template<typename Str>
 IMPORT Str Trim(const Str& scIn);
 IMPORT std::wstring GetTimeString(bool bLocalTime);
-IMPORT std::string GetUserFilePath(const std::wstring &wscCharname, const std::string &scExtension);
+IMPORT std::string GetUserFilePath(const std::wstring& wscCharname, const std::string& scExtension);
 IMPORT mstime GetTimeInMS();
 
 // flcodec
-IMPORT bool flc_decode(const char *ifile, const char *ofile);
-IMPORT bool flc_encode(const char *ifile, const char *ofile);
+IMPORT bool flc_decode(const char* ifile, const char* ofile);
+IMPORT bool flc_encode(const char* ifile, const char* ofile);
 
 // admin commands
 
 // enums
 enum CCMDS_RIGHTS
 {
-	RIGHT_NOTHING		= 0,
-	RIGHT_SUPERADMIN	= 0xFFFFFFFF,
-	RIGHT_MSG			= (1 << 0),
-	RIGHT_KICKBAN		= (1 << 1),
-	RIGHT_EVENTMODE		= (1 << 2),
-	RIGHT_CASH			= (1 << 3),
-	RIGHT_BEAMKILL		= (1 << 4),
-	RIGHT_REPUTATION	= (1 << 5),
-	RIGHT_CARGO			= (1 << 6),
-	RIGHT_CHARACTERS	= (1 << 7),
-	RIGHT_SETTINGS		= (1 << 8),
-	RIGHT_PLUGINS		= (1 << 9),
-	RIGHT_OTHER			= (1 << 10),
-	RIGHT_SPECIAL1		= (1 << 11),
-	RIGHT_SPECIAL2		= (1 << 12),
-	RIGHT_SPECIAL3		= (1 << 13),
+	RIGHT_NOTHING = 0,
+	RIGHT_SUPERADMIN = 0xFFFFFFFF,
+	RIGHT_MSG = (1 << 0),
+	RIGHT_KICKBAN = (1 << 1),
+	RIGHT_EVENTMODE = (1 << 2),
+	RIGHT_CASH = (1 << 3),
+	RIGHT_BEAMKILL = (1 << 4),
+	RIGHT_REPUTATION = (1 << 5),
+	RIGHT_CARGO = (1 << 6),
+	RIGHT_CHARACTERS = (1 << 7),
+	RIGHT_SETTINGS = (1 << 8),
+	RIGHT_PLUGINS = (1 << 9),
+	RIGHT_OTHER = (1 << 10),
+	RIGHT_SPECIAL1 = (1 << 11),
+	RIGHT_SPECIAL2 = (1 << 12),
+	RIGHT_SPECIAL3 = (1 << 13),
 };
 
 class CTimer
 {
 public:
 	IMPORT CTimer(std::string sFunction, uint iWarning);
-    IMPORT void start();
+	IMPORT void start();
 	IMPORT uint stop();
 
 private:
@@ -668,84 +671,84 @@ public:
 
 	IMPORT void PrintError();
 
-// commands
-	void CmdGetCash(const std::wstring &wscCharname);
-	void CmdSetCash(const std::wstring &wscCharname, int iAmount);
-	void CmdSetCashSec(const std::wstring &wscCharname, int iAmountCheck, int iAmount);
-	void CmdAddCash(const std::wstring &wscCharname, int iAmount);
-	void CmdAddCashSec(const std::wstring &wscCharname, int iAmountCheck, int iAmount);
+	// commands
+	void CmdGetCash(const std::wstring& wscCharname);
+	void CmdSetCash(const std::wstring& wscCharname, int iAmount);
+	void CmdSetCashSec(const std::wstring& wscCharname, int iAmountCheck, int iAmount);
+	void CmdAddCash(const std::wstring& wscCharname, int iAmount);
+	void CmdAddCashSec(const std::wstring& wscCharname, int iAmountCheck, int iAmount);
 
-	void CmdKick(const std::wstring &wscCharname, const std::wstring &wscReason);
-	void CmdBan(const std::wstring &wscCharname);
-	void CmdUnban(const std::wstring &wscCharname);
-	void CmdKickBan(const std::wstring &wscCharname, const std::wstring &wscReason);
+	void CmdKick(const std::wstring& wscCharname, const std::wstring& wscReason);
+	void CmdBan(const std::wstring& wscCharname);
+	void CmdUnban(const std::wstring& wscCharname);
+	void CmdKickBan(const std::wstring& wscCharname, const std::wstring& wscReason);
 
-	void CmdBeam(const std::wstring &wscCharname, const std::wstring &wscBasename);
-	void CmdKill(const std::wstring &wscCharname);
-	void CmdResetRep(const std::wstring &wscCharname);
-	void CmdSetRep(const std::wstring &wscCharname, const std::wstring &wscRepGroup, float fValue);
-	void CmdGetRep(const std::wstring &wscCharname, const std::wstring &wscRepGroup);
+	void CmdBeam(const std::wstring& wscCharname, const std::wstring& wscBasename);
+	void CmdKill(const std::wstring& wscCharname);
+	void CmdResetRep(const std::wstring& wscCharname);
+	void CmdSetRep(const std::wstring& wscCharname, const std::wstring& wscRepGroup, float fValue);
+	void CmdGetRep(const std::wstring& wscCharname, const std::wstring& wscRepGroup);
 
-	void CmdMsg(const std::wstring &wscCharname, const std::wstring &wscText);
-	void CmdMsgS(const std::wstring &wscSystemname, const std::wstring &wscText);
-	void CmdMsgU(const std::wstring &wscText);
-	void CmdFMsg(const std::wstring &wscCharname, const std::wstring &wscXML);
-	void CmdFMsgS(const std::wstring &wscSystemname, const std::wstring &wscXML);
-	void CmdFMsgU(const std::wstring &wscXML);
+	void CmdMsg(const std::wstring& wscCharname, const std::wstring& wscText);
+	void CmdMsgS(const std::wstring& wscSystemname, const std::wstring& wscText);
+	void CmdMsgU(const std::wstring& wscText);
+	void CmdFMsg(const std::wstring& wscCharname, const std::wstring& wscXML);
+	void CmdFMsgS(const std::wstring& wscSystemname, const std::wstring& wscXML);
+	void CmdFMsgU(const std::wstring& wscXML);
 
-	void CmdEnumCargo(const std::wstring &wscCharname);
-	void CmdRemoveCargo(const std::wstring &wscCharname, uint iID, uint iCount);
-	void CmdAddCargo(const std::wstring &wscCharname, const std::wstring &wscGood, uint iCount, uint iMission);
+	void CmdEnumCargo(const std::wstring& wscCharname);
+	void CmdRemoveCargo(const std::wstring& wscCharname, uint iID, uint iCount);
+	void CmdAddCargo(const std::wstring& wscCharname, const std::wstring& wscGood, uint iCount, uint iMission);
 
-	void CmdRename(const std::wstring &wscCharname, const std::wstring &wscNewCharname);
-	void CmdDeleteChar(const std::wstring &wscCharname);
+	void CmdRename(const std::wstring& wscCharname, const std::wstring& wscNewCharname);
+	void CmdDeleteChar(const std::wstring& wscCharname);
 
-	void CmdReadCharFile(const std::wstring &wscCharname);
-	void CmdWriteCharFile(const std::wstring &wscCharname, const std::wstring &wscData);
+	void CmdReadCharFile(const std::wstring& wscCharname);
+	void CmdWriteCharFile(const std::wstring& wscCharname, const std::wstring& wscData);
 
-	void CmdGetBaseStatus(const std::wstring &wscBasename);
-	void CmdGetClientId(const std::wstring &wscCharname);
+	void CmdGetBaseStatus(const std::wstring& wscBasename);
+	void CmdGetClientId(const std::wstring& wscCharname);
 	void PrintPlayerInfo(HKPLAYERINFO pi);
-	void CmdGetPlayerInfo(const std::wstring &wscCharname);
+	void CmdGetPlayerInfo(const std::wstring& wscCharname);
 	void CmdGetPlayers();
 	void XPrintPlayerInfo(HKPLAYERINFO pi);
-	void CmdXGetPlayerInfo(const std::wstring &wscCharname);
+	void CmdXGetPlayerInfo(const std::wstring& wscCharname);
 	void CmdXGetPlayers();
 	void CmdGetPlayerIDs();
 	void CmdHelp();
-	void CmdGetAccountDirName(const std::wstring &wscCharname);
-	void CmdGetCharFileName(const std::wstring &wscCharname);
-	void CmdIsOnServer(const std::wstring &wscCharname);
-	void CmdIsLoggedIn(const std::wstring &wscCharname);
+	void CmdGetAccountDirName(const std::wstring& wscCharname);
+	void CmdGetCharFileName(const std::wstring& wscCharname);
+	void CmdIsOnServer(const std::wstring& wscCharname);
+	void CmdIsLoggedIn(const std::wstring& wscCharname);
 	void CmdMoneyFixList();
 	void CmdServerInfo();
-	void CmdGetGroupMembers(const std::wstring &wscCharname);
+	void CmdGetGroupMembers(const std::wstring& wscCharname);
 
-	void CmdSaveChar(const std::wstring &wscCharname);
+	void CmdSaveChar(const std::wstring& wscCharname);
 
-	void CmdGetReservedSlot(const std::wstring &wscCharname);
-	void CmdSetReservedSlot(const std::wstring &wscCharname, int iReservedSlot);
-	void CmdSetAdmin(const std::wstring &wscCharname, std::wstring wscRights);
-	void CmdGetAdmin(const std::wstring &wscCharname);
-	void CmdDelAdmin(const std::wstring &wscCharname);
+	void CmdGetReservedSlot(const std::wstring& wscCharname);
+	void CmdSetReservedSlot(const std::wstring& wscCharname, int iReservedSlot);
+	void CmdSetAdmin(const std::wstring& wscCharname, std::wstring wscRights);
+	void CmdGetAdmin(const std::wstring& wscCharname);
+	void CmdDelAdmin(const std::wstring& wscCharname);
 	void CmdRehash();
-	void CmdUnload(const std::wstring &wscParam);
+	void CmdUnload(const std::wstring& wscParam);
 
 	void CmdLoadPlugins();
 	void CmdListPlugins();
-	void CmdUnloadPlugin(const std::wstring &wscPlugin);
-	void CmdPausePlugin(const std::wstring &wscPlugin);
-	void CmdUnpausePlugin(const std::wstring &wscPlugin);
+	void CmdUnloadPlugin(const std::wstring& wscPlugin);
+	void CmdPausePlugin(const std::wstring& wscPlugin);
+	void CmdUnpausePlugin(const std::wstring& wscPlugin);
 
 	void CmdTest(int iArg, int iArg2, int iArg3);
-//
+	//
 	IMPORT std::wstring ArgCharname(uint iArg);
 	IMPORT int ArgInt(uint iArg);
 	IMPORT uint ArgUInt(uint iArg);
 	IMPORT float ArgFloat(uint iArg);
 	IMPORT std::wstring ArgStr(uint iArg);
 	IMPORT std::wstring ArgStrToEnd(uint iArg);
-	void ExecuteCommandString(const std::wstring &wscCmd);
+	void ExecuteCommandString(const std::wstring& wscCmd);
 
 	void SetRightsByString(std::string scRightStr);
 	IMPORT void Print(std::wstring wscText, ...);
@@ -757,16 +760,16 @@ public:
 
 
 // namespaces
-namespace HkIServerImpl 
+namespace HkIServerImpl
 {
 	IMPORT extern bool g_bInSubmitChat;
 	IMPORT extern uint g_iTextLen;
 }
 namespace PluginManager {
 	IMPORT void LoadPlugins(bool, CCmds*);
-	IMPORT void LoadPlugin(const std::string &sFileName, CCmds*);
-	IMPORT HK_ERROR PausePlugin(const std::string &sShortName, bool bPause);
-	IMPORT HK_ERROR UnloadPlugin(const std::string &sShortName);
+	IMPORT void LoadPlugin(const std::string& sFileName, CCmds*);
+	IMPORT HK_ERROR PausePlugin(const std::string& sShortName, bool bPause);
+	IMPORT HK_ERROR UnloadPlugin(const std::string& sShortName);
 	IMPORT void UnloadPlugins();
 }
 
@@ -794,8 +797,8 @@ extern IMPORT HMODULE hModRemoteClient;
 extern IMPORT HMODULE hModDPNet;
 extern IMPORT HMODULE hModDaLib;
 extern IMPORT HMODULE hModContent;
-extern IMPORT FILE *fLog;
-extern IMPORT FILE *fLogDebug;
+extern IMPORT FILE* fLog;
+extern IMPORT FILE* fLogDebug;
 extern IMPORT FARPROC fpOldUpdate;
 extern IMPORT std::string sDebugLog;
 
@@ -856,8 +859,8 @@ extern IMPORT bool	set_bPerfTimer;
 
 extern IMPORT std::list<BASE_INFO> lstBases;
 
-extern IMPORT CDPClientProxy **g_cClientProxyArray;
-extern IMPORT void *pClient;
+extern IMPORT CDPClientProxy** g_cClientProxyArray;
+extern IMPORT void* pClient;
 
 extern IMPORT _RCSendChatMsg RCSendChatMsg;
 extern IMPORT _CRCAntiCheat CRCAntiCheat;
@@ -866,32 +869,32 @@ extern IMPORT _CreateChar CreateChar;
 extern IMPORT std::string scAcctPath;
 
 #define MAX_CLIENT_ID 249
-extern IMPORT CLIENT_INFO ClientInfo[MAX_CLIENT_ID+1];
-extern IMPORT CDPServer *cdpSrv;
+extern IMPORT CLIENT_INFO ClientInfo[MAX_CLIENT_ID + 1];
+extern IMPORT CDPServer* cdpSrv;
 extern IMPORT uint g_iServerLoad;
 extern IMPORT uint g_iPlayerCount;
 extern IMPORT bool g_bNPCDisabled;
-extern IMPORT char *g_FLServerDataPtr;
+extern IMPORT char* g_FLServerDataPtr;
 extern IMPORT bool g_gNonGunHitsBase;
 extern IMPORT float g_LastHitPts;
 
 // help
 
 typedef bool (*_HelpEntryDisplayed)(uint);
-extern IMPORT void HkAddHelpEntry(const std::wstring &c, const std::wstring &t, const std::wstring &shelp, const std::wstring &lhelp, _HelpEntryDisplayed check);
-extern IMPORT void HkRemoveHelpEntry(const std::wstring &c, const std::wstring &t);
-extern IMPORT bool get_bTrue(uint iClientID);
+extern IMPORT void HkAddHelpEntry(const std::wstring& c, const std::wstring& t, const std::wstring& shelp, const std::wstring& lhelp, _HelpEntryDisplayed check);
+extern IMPORT void HkRemoveHelpEntry(const std::wstring& c, const std::wstring& t);
+extern IMPORT bool get_bTrue(ClientId iClientID);
 
 //blowfish
 
 typedef struct {
-  unsigned long P[16 + 2];
-  unsigned long S[4][256];
+	unsigned long P[16 + 2];
+	unsigned long S[4][256];
 } BLOWFISH_CTX;
 
-IMPORT void Blowfish_Init(BLOWFISH_CTX *ctx, unsigned char *key, int keyLen);
-IMPORT char Blowfish_Encrypt(BLOWFISH_CTX *ctx, void *ptr, unsigned long dataLen);
-IMPORT char Blowfish_Decrypt(BLOWFISH_CTX *ctx, void *ptr, unsigned long dataLen);
+IMPORT void Blowfish_Init(BLOWFISH_CTX* ctx, unsigned char* key, int keyLen);
+IMPORT char Blowfish_Encrypt(BLOWFISH_CTX* ctx, void* ptr, unsigned long dataLen);
+IMPORT char Blowfish_Decrypt(BLOWFISH_CTX* ctx, void* ptr, unsigned long dataLen);
 
 struct SYSTEMINFO
 {
@@ -1003,13 +1006,13 @@ extern IMPORT std::multimap<uint, JUMPPOINT> jumpPoints;
 namespace ZoneUtilities
 {
 	IMPORT void ReadUniverse(zone_map_t* set_mmapZones);
-    IMPORT void ReadLootableZone(zone_map_t &set_mmapZones, const std::string &systemNick, const std::string &defaultZoneNick, const std::string &file);
-    IMPORT void ReadSystemLootableZones(zone_map_t &set_mmapZones, const std::string &systemNick, const std::string &file);
-    IMPORT void ReadSystemZones(zone_map_t &set_mmapZones, const std::string &systemNick, const std::string &file);
-	IMPORT bool InZone(uint systemID, const Vector &pos, ZONE &rlz);
-	IMPORT bool InDeathZone(uint systemID, const Vector &pos, ZONE &rlz);
-	IMPORT SYSTEMINFO *GetSystemInfo(uint systemID);
-    IMPORT void PrintZones();
+	IMPORT void ReadLootableZone(zone_map_t& set_mmapZones, const std::string& systemNick, const std::string& defaultZoneNick, const std::string& file);
+	IMPORT void ReadSystemLootableZones(zone_map_t& set_mmapZones, const std::string& systemNick, const std::string& file);
+	IMPORT void ReadSystemZones(zone_map_t& set_mmapZones, const std::string& systemNick, const std::string& file);
+	IMPORT bool InZone(uint systemID, const Vector& pos, ZONE& rlz);
+	IMPORT bool InDeathZone(uint systemID, const Vector& pos, ZONE& rlz);
+	IMPORT SYSTEMINFO* GetSystemInfo(uint systemID);
+	IMPORT void PrintZones();
 }
 
 #endif

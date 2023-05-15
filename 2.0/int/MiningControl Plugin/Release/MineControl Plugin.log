@@ -1,8 +1,9 @@
 ﻿  Main.cpp
-  MineControl Plugin.vcxproj -> C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\bin\Release\plugins\MiningControl Plugin\minecontrol.dll
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\MiningControl Plugin\minecontrol.dll
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MiningControl Plugin\minecontrol.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MiningControl Plugin\minecontrol.exp" werden erstellt.
+  MineControl Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\MiningControl Plugin\minecontrol.dll
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MiningControl Plugin\minecontrol.dll
   1 Datei(en) kopiert
-  C:\Users\Mara\source\repos\Freelancer-Sirius-Revival\FLSR-Hook\2.0\project\..\bin\Release\plugins\MiningControl Plugin\minecontrol.pdb
+  C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MiningControl Plugin\minecontrol.pdb
   1 Datei(en) kopiert
   Datei *.ini nicht gefunden
   0 Datei(en) kopiert

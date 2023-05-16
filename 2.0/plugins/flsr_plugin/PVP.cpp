@@ -91,28 +91,67 @@ namespace PVP {
         }
 		return std::list<PVP::Member>();
     }
-    
-    void HandleKill(uint iClientKillerID) {
-        std::wstring killerCharName = (const wchar_t*)Players.GetActiveCharacterName(iClientKillerID);
-        
 
-        ConPrint (L"Killer: %s\n", killerCharName.c_str());
-        std::list<Member> PVPMembers = GetPVPMember (iClientKillerID);
-        for (auto& member : PVPMembers) {
-            if (member.wscCharname == killerCharName) {
-				ConPrint (L"Found killer\n");
-                ConPrint(L"Member: %s\n", member.wscCharname.c_str());
+   void HandleKill(uint iClientKillerID) {
+       std::wstring killerCharName = (const wchar_t*)Players.GetActiveCharacterName(iClientKillerID);
 
-				member.iKills++;
-                ConPrint (L"Kills: %u\n", member.iKills);
+       // Durchsuche die ServerFightData-Liste nach dem Fight, der den Killer enthält
+       for (auto& fight : ServerFightData) {
+           for (auto& member : fight.lMembers) {
+               if (member.bIsInDuel && member.wscCharname == killerCharName) {
+                   // Erstelle eine aktualisierte Member-Instanz
+                   Member updatedMember;
+                   updatedMember.wscCharname = member.wscCharname;
+                   updatedMember.iKills = member.iKills;
+                   updatedMember.bIsInDuel = member.bIsInDuel;
 
-				break;
-			}
-		}
+                   // Führe die gewünschten Änderungen an der Member-Instanz durch
+                   updatedMember.iKills++;
+                   ConPrint(L"Kills: %u\n", updatedMember.iKills);
 
-        ConPrint(L"TESTDEATH-HandleKill\n");
+                   // Suche manuell nach dem entsprechenden Element und aktualisiere es
+                   for (auto it = fight.lMembers.begin(); it != fight.lMembers.end(); ++it) {
+                       if (it->wscCharname == member.wscCharname) {
+                           *it = updatedMember; // Aktualisiere das Element in der Liste
+                           break;
+                       }
+                   }
 
-    }
+                   // Optional: Hier kannst du weitere Aktionen ausführen, die du für notwendig hältst
+                   // ...
+
+                   break; // Breche die Schleife ab, da der Killer gefunden wurde
+               }
+           }
+       }
+
+       ConPrint(L"TESTDEATH-HandleKill\n");
+   }
+
+
+
+
+   uint GetKills(uint iClientID)
+   {
+	   std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+       //Debug Print Charname
+       ConPrint(L"CharnameKillerWanted: %s\n", wscCharnameClient.c_str());
+       for (const auto& fight : ServerFightData) {
+           for (const auto& member : fight.lMembers) {
+               //Debug Print Charname
+               ConPrint(L"Charname: %s\n", member.wscCharname.c_str());
+               //Debug Print kills
+               ConPrint(L"Kills: %u\n", member.iKills);
+               if (member.bIsInDuel && member.wscCharname == wscCharnameClient) {
+                   ConPrint(L"CharnameKiller: %s\n", member.wscCharname.c_str());
+                   ConPrint(L"KillsKiller: %u\n", member.iKills);
+
+				   return member.iKills;
+			   }
+		   }
+	   }
+	   return 0;
+   }
     
     void AcceptFight(Fights& fight, uint iClientID)
     {
@@ -436,7 +475,7 @@ namespace PVP {
             if (!Tools::isValidPlayer(iClientKillerID, false))
                 return;
 
-            ConPrint(L"TESTDEATH1.1\n");
+           ConPrint(L"TESTDEATH1.1\n");
 
 
 
@@ -453,7 +492,11 @@ namespace PVP {
             //HandleKill
             //Debug
             HandleKill(iClientKillerID);
-            ConPrint(L"TESTDEATH2\n");
+            ConPrint(L"Kill handeld\n");
+
+            //Show kills of Client
+            uint iKills = GetKills(iClientKillerID);
+            ConPrint (L"NewKills: " + std::to_wstring(iKills) + L"\n");
 
         }
 

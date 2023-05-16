@@ -4,7 +4,6 @@ c:\flsr-hook\2.0\int\flsr plugin\release\sql.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\popup.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\playerhunt.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\pathselection.obj
-c:\flsr-hook\2.0\int\flsr plugin\release\pvp.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\modules.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\main.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\insurance.obj
@@ -21,13 +20,13 @@ c:\flsr-hook\2.0\int\flsr plugin\release\chat.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\anticheat.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\tools.obj
 c:\flsr-hook\2.0\int\flsr plugin\release\timers.obj
+c:\flsr-hook\2.0\int\flsr plugin\release\pvp.obj
 c:\flsr-hook\2.0\bin\release\plugins\flsr plugin\sqlite3.dll
 c:\flsr-hook\2.0\bin\release\plugins\flsr plugin\flsr.lib
 c:\flsr-hook\2.0\bin\release\plugins\flsr plugin\flsr.exp
 c:\flsr-hook\2.0\bin\release\plugins\flsr plugin\flsr.dll
 c:\flsr-hook\2.0\bin\release\plugins\flsr plugin\flsr.ilk
 c:\flsr-hook\2.0\bin\release\plugins\flsr plugin\flsr.pdb
-c:\flsr-hook\2.0\int\flsr plugin\release\vc142.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\flsr plugin\flsr.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\flsr plugin\flsr.ilk
 c:\flsr-hook\2.0\project\..\int\flsr plugin\release\flsr plugin.vcxproj.filelistabsolute.txt

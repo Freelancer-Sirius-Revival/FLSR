@@ -965,6 +965,8 @@ namespace PlayerHunt {
 
 namespace PVP {
 
+
+
     enum PVPType {
         PVPTYPE_NONE,
         PVPTYPE_DUEL,
@@ -1004,6 +1006,7 @@ namespace PVP {
     extern std::list<Fights> ServerFightData;
 
     uint IsInFight(uint iClientID);
+    uint GetKills(uint iClientID);
     PVPType GetPVPType(uint iClientID);
     std::list<Member> GetPVPMember(uint iClientID);
     void HandleKill(uint iClientKillerID);

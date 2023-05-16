@@ -7,3 +7,6 @@
 2.0/project/.vs/FLHook/v17/Browse.VC.db-wal
 2.0/project/.vs/FLHook/v17/Solution.VC.db-shm
 2.0/project/.vs/FLHook/v17/Solution.VC.db-wal
+*.ilk
+*.obj
+*.vsidx

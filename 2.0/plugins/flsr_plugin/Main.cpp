@@ -38,6 +38,9 @@ void LoadSettings() {
         SQL::InitializeDB();
 
         ConPrint(L"Module loaded: SQL\n");
+
+        //PVP::UpdateDuelRanking(L"test", true);
+
     }
 	
     // CARRIER-Module ###########################################################################

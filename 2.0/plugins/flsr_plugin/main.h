@@ -972,21 +972,21 @@ namespace PVP {
         PVPTYPE_DUEL,
         PVPTYPE_FFA,
         PVPTYPE_RANKED
-        
+
     };
 
     enum DisconnectReason {
-		CHARSWITCH,
+        CHARSWITCH,
         DISCONNECTED
     };
-    
+
     struct Member {
         std::wstring wscCharname;
         uint iKills;
         bool bIsInDuel = false;
 
     };
-    
+
     static uint nextFightID = 1;
 
     struct Fights {
@@ -1002,7 +1002,7 @@ namespace PVP {
             ++nextFightID;
         }
     };
-    
+
     extern std::list<Fights> ServerFightData;
 
     uint IsInFight(uint iClientID);
@@ -1015,6 +1015,7 @@ namespace PVP {
     void AcceptFight(PVP::Fights& fight, uint iClientID);
     void CheckDisConnect(uint iClientID, DisconnectReason reason);
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
+    void UpdateDuelRanking(const std::wstring& wscCharname, bool bKills);
 }
 
 #endif

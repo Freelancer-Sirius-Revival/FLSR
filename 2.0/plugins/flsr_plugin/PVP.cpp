@@ -107,12 +107,14 @@ namespace PVP {
 
                    // Führe die gewünschten Änderungen an der Member-Instanz durch
                    updatedMember.iKills++;
-                   ConPrint(L"Kills: %u\n", updatedMember.iKills);
+                   //ConPrint(L"Kills: %u\n", updatedMember.iKills);
 
                    // Suche manuell nach dem entsprechenden Element und aktualisiere es
                    for (auto it = fight.lMembers.begin(); it != fight.lMembers.end(); ++it) {
                        if (it->wscCharname == member.wscCharname) {
                            *it = updatedMember; // Aktualisiere das Element in der Liste
+
+                           UpdateDuelRanking(member.wscCharname, true); // Aktualisiere die Rangliste
                            break;
                        }
                    }
@@ -135,16 +137,16 @@ namespace PVP {
    {
 	   std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
        //Debug Print Charname
-       ConPrint(L"CharnameKillerWanted: %s\n", wscCharnameClient.c_str());
+       //ConPrint(L"CharnameKillerWanted: %s\n", wscCharnameClient.c_str());
        for (const auto& fight : ServerFightData) {
            for (const auto& member : fight.lMembers) {
                //Debug Print Charname
-               ConPrint(L"Charname: %s\n", member.wscCharname.c_str());
+               //ConPrint(L"Charname: %s\n", member.wscCharname.c_str());
                //Debug Print kills
-               ConPrint(L"Kills: %u\n", member.iKills);
+               //ConPrint(L"Kills: %u\n", member.iKills);
                if (member.bIsInDuel && member.wscCharname == wscCharnameClient) {
-                   ConPrint(L"CharnameKiller: %s\n", member.wscCharname.c_str());
-                   ConPrint(L"KillsKiller: %u\n", member.iKills);
+                   //ConPrint(L"CharnameKiller: %s\n", member.wscCharname.c_str());
+                   //ConPrint(L"KillsKiller: %u\n", member.iKills);
 
 				   return member.iKills;
 			   }
@@ -408,7 +410,7 @@ namespace PVP {
                         wscWinnerMsg += L" through character switch of the last opponent!";
                     }
                     for (auto& member : fight.lMembers) {
-                        ConPrint(L"Member: " + member.wscCharname + L"\n");
+                        //ConPrint(L"Member: " + member.wscCharname + L"\n");
                         uint MemberClientID = HkGetClientIdFromCharname(member.wscCharname);
                         if (MemberClientID != -1) {
                             PrintUserCmdText(MemberClientID, wscWinnerMsg.c_str());
@@ -464,42 +466,83 @@ namespace PVP {
         }
 
         //Debug
-        ConPrint(L"TESTDEATH\n");
+        //ConPrint(L"TESTDEATH\n");
 
         //Check for DeathType - PVP Kill
         if (DeathType == Tools::PVP)
         {
-            ConPrint(L"TESTDEATH1\n");
+            //ConPrint(L"TESTDEATH1\n");
 
             // The iClientKillerID must be a valid player
             if (!Tools::isValidPlayer(iClientKillerID, false))
                 return;
 
-           ConPrint(L"TESTDEATH1.1\n");
+           //ConPrint(L"TESTDEATH1.1\n");
 
 
 
             if (!IsInSameFight(iFightIDClient, iClientKillerID))
             {
                 //No Death in a Fight
-                ConPrint(L"NO DEATH in a FIGHT\n");
+                //ConPrint(L"NO DEATH in a FIGHT\n");
                 return;
             }
 
-
-            ConPrint(L"TESTDEATH1.2\n");
-
-            //HandleKill
             //Debug
+            //ConPrint(L"TESTDEATH1.2\n");
             HandleKill(iClientKillerID);
-            ConPrint(L"Kill handeld\n");
+            
+            //Update Killed Ranking
+            UpdateDuelRanking((const wchar_t*)Players.GetActiveCharacterName(iClientID), false);
 
             //Show kills of Client
             uint iKills = GetKills(iClientKillerID);
-            ConPrint (L"NewKills: " + std::to_wstring(iKills) + L"\n");
 
         }
 
     }
+
+    void UpdateDuelRanking(const std::wstring& wscCharname, bool bKills)
+    {
+        ConPrint(L"UpdateDuelRanking\n");
+        try
+        {
+            // Open a database file
+            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+
+            // Check if the entry already exists in the table
+            SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charname = '" + wstos(wscCharname) + "'");
+            ConPrint(L"Query prepared\n");
+            // Print Query
+            ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
+            bool entryExists = queryExists.executeStep();
+
+            if (entryExists)
+            {
+                ConPrint(L"Entry exists\n");
+                // If the entry exists, update the Kills and Deaths values
+                std::string columnName = (bKills ? "Kills" : "Deaths");
+                SQLite::Statement queryUpdate(db, "UPDATE DuelRanking SET " + columnName + " = " + columnName + " + 1 WHERE Charname = '" + wstos(wscCharname) + "'");
+                ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
+                queryUpdate.exec();
+            }
+            else
+            {
+                ConPrint(L"Entry doesn't exist\n");
+                // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
+                SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ")");                ConPrint(L"Query prepared\n");
+                ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
+                queryInsert.exec();
+            }
+        }
+        catch (std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+        }
+    }
+
+
+
 
 }

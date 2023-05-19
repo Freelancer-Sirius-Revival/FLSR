@@ -114,7 +114,7 @@ namespace PVP {
                        if (it->wscCharname == member.wscCharname) {
                            *it = updatedMember; // Aktualisiere das Element in der Liste
 
-                           UpdateDuelRanking(member.wscCharname, true); // Aktualisiere die Rangliste
+                           UpdateDuelRanking(HkGetClientIdFromCharname(member.wscCharname), true); // Aktualisiere die Rangliste
                            break;
                        }
                    }
@@ -493,7 +493,7 @@ namespace PVP {
             HandleKill(iClientKillerID);
             
             //Update Killed Ranking
-            UpdateDuelRanking((const wchar_t*)Players.GetActiveCharacterName(iClientID), false);
+            UpdateDuelRanking(iClientID, false);
 
             //Show kills of Client
             uint iKills = GetKills(iClientKillerID);
@@ -502,8 +502,13 @@ namespace PVP {
 
     }
 
-    void UpdateDuelRanking(const std::wstring& wscCharname, bool bKills)
+    void UpdateDuelRanking(uint iClientID, bool bKills)
     {
+
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+
         ConPrint(L"UpdateDuelRanking\n");
         try
         {
@@ -511,7 +516,7 @@ namespace PVP {
             SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
 
             // Check if the entry already exists in the table
-            SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charname = '" + wstos(wscCharname) + "'");
+            SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charfile = '" + wstos(wscCharFilename) + "'");
             ConPrint(L"Query prepared\n");
             // Print Query
             ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
@@ -522,7 +527,7 @@ namespace PVP {
                 ConPrint(L"Entry exists\n");
                 // If the entry exists, update the Kills and Deaths values
                 std::string columnName = (bKills ? "Kills" : "Deaths");
-                SQLite::Statement queryUpdate(db, "UPDATE DuelRanking SET " + columnName + " = " + columnName + " + 1 WHERE Charname = '" + wstos(wscCharname) + "'");
+                SQLite::Statement queryUpdate(db, "UPDATE DuelRanking SET " + columnName + " = " + columnName + " + 1 WHERE Charfile = '" + wstos(wscCharFilename) + "'");
                 ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
                 queryUpdate.exec();
             }
@@ -530,7 +535,7 @@ namespace PVP {
             {
                 ConPrint(L"Entry doesn't exist\n");
                 // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
-                SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ")");                ConPrint(L"Query prepared\n");
+                SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths, Charfile) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ",'" + wstos(wscCharFilename) + "')");                ConPrint(L"Query prepared\n");
                 ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
                 queryInsert.exec();
             }

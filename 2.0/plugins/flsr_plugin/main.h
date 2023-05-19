@@ -1015,7 +1015,7 @@ namespace PVP {
     void AcceptFight(PVP::Fights& fight, uint iClientID);
     void CheckDisConnect(uint iClientID, DisconnectReason reason);
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
-    void UpdateDuelRanking(const std::wstring& wscCharname, bool bKills);
+    void UpdateDuelRanking(uint iClientID, bool bKills);
 }
 
 #endif

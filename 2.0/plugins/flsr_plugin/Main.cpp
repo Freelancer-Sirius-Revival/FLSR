@@ -166,6 +166,8 @@ void LoadSettings() {
         else
         {
             ConPrint(L"Depot Module not loaded! Necessary Module not loaded: SQL\n");
+            Modules::SetModuleState("DepotModule", false);
+
         }
     }
 
@@ -201,8 +203,19 @@ void LoadSettings() {
     if (Modules::GetModuleState("PVP"))
     {
         //Load PVP
-        //PlayerHunt::LoadPlayerHuntSettings();
-        ConPrint(L"Module loaded: PVP \n");
+        if (Modules::GetModuleState("SQLModule"))
+        {
+            ConPrint(L"Module loading: PVP ...\n");
+
+            PVP::LoadPVP();
+
+            ConPrint(L"Module loaded: PVP \n");
+        }
+        else
+        {
+            ConPrint(L"PVP Module not loaded! Necessary Module not loaded: SQL\n");
+            Modules::SetModuleState ("PVP", false);
+        }
     }
 }
 

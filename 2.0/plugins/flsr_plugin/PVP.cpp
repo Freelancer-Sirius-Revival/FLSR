@@ -15,6 +15,17 @@ namespace PVP {
 
     */
     //Tools
+
+
+    void LoadPVP()
+    {
+        // Calculate Ranking
+        ConPrint(L"Task: Calculate DuelRanking...");
+        CalcRanking("DuelRanking");
+        ConPrint(L" done\n");
+
+    }
+
     uint IsInFight(uint iClientID) 
     {
         // Get the current character name
@@ -538,6 +549,43 @@ namespace PVP {
                 SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths, Charfile) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ",'" + wstos(wscCharFilename) + "')");                ConPrint(L"Query prepared\n");
                 ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
                 queryInsert.exec();
+            }
+        }
+        catch (std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+        }
+    }
+
+    void CalcRanking(const std::string& tableName)
+    {
+        try
+        {
+            // Open a database file
+            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+
+            // Check if the ranking table already exists and drop it if it does
+            std::string calculatedTableName = tableName + "Calculated";
+            if (db.tableExists(calculatedTableName))
+                db.exec("DROP TABLE " + calculatedTableName);
+
+            // Execute a query to calculate the ranking
+            SQLite::Statement query(db, "SELECT Charname, (Kills * Kills) / Deaths AS Rating FROM " + tableName + " ORDER BY Rating DESC LIMIT 100");
+
+            // Create a new table for the calculated ranking
+            db.exec("CREATE TABLE " + calculatedTableName + " (Charname TEXT, Rating REAL)");
+
+            // Insert the top 100 entries into the calculated ranking table
+            while (query.executeStep())
+            {
+                std::string charname = query.getColumn(0).getString();
+                double rating = query.getColumn(1).getDouble();
+
+                SQLite::Statement insertQuery(db, "INSERT INTO " + calculatedTableName + " (Charname, Rating) VALUES (?, ?)");
+                insertQuery.bind(1, charname);
+                insertQuery.bind(2, rating);
+                insertQuery.exec();
             }
         }
         catch (std::exception& e)

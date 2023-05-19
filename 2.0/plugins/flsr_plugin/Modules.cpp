@@ -35,21 +35,30 @@ namespace Modules {
 		return false;
 	}
 
-	void SwitchModuleState(std::string scModuleName) {
-		for (std::list<Module>::iterator i = lModules.begin(); i != lModules.end(); i++) {
-			if (i->scModuleName == scModuleName) {
-				bool bLastState = i->bModulestate;
-				lModules.erase(i);
-				Module NewModule;
-				if (bLastState)
-					NewModule.bModulestate = false;
-				else
-					NewModule.bModulestate = true;
-				NewModule.scModuleName = scModuleName;
-				lModules.push_back(NewModule);
-				return;				
+	bool SetModuleState(const std::string& scModuleName, bool bModuleState)
+	{
+		for (std::list<Modules::Module>::iterator it = Modules::lModules.begin(); it != Modules::lModules.end(); ++it)
+		{
+			if (it->scModuleName == scModuleName)
+			{
+				it->bModulestate = bModuleState;
+				return true;
 			}
 		}
+		return false;
+	}
+
+	void SwitchModuleState(std::string scModuleName) {
+        // Iterate through the list of modules
+        for (std::list<Module>::iterator i = lModules.begin(); i != lModules.end(); i++)
+        {
+            // Find the module with the specified name
+            if (i->scModuleName == scModuleName)
+            {
+                // Set the new module state based on the current state
+                i->bModulestate = !i->bModulestate; // Toggle the module state (true -> false, false -> true)
+            }
+        }
 	}
 
 

@@ -64,6 +64,7 @@ namespace Modules {
 
     void LoadModules();
     bool GetModuleState(std::string scModuleName);
+    bool SetModuleState(const std::string& scModuleName, bool bModuleState);
     void SwitchModuleState(std::string scModuleName);
 	
     extern std::list<Module> lModules;
@@ -1005,6 +1006,7 @@ namespace PVP {
 
     extern std::list<Fights> ServerFightData;
 
+    void LoadPVP();
     uint IsInFight(uint iClientID);
     uint GetKills(uint iClientID);
     PVPType GetPVPType(uint iClientID);
@@ -1016,6 +1018,8 @@ namespace PVP {
     void CheckDisConnect(uint iClientID, DisconnectReason reason);
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
     void UpdateDuelRanking(uint iClientID, bool bKills);
+    void CalcRanking(const std::string& tableName);
+
 }
 
 #endif

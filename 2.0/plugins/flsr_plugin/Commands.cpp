@@ -62,11 +62,19 @@ namespace Commands {
     }
         */
 
-    void UserCmd_testduel(uint iClientID, const std::wstring& wscParam) {
+    void UserCmd_duel(uint iClientID, const std::wstring& wscParam) {
 
         if (Modules::GetModuleState("PVP"))
         {
-            PVP::CmdDuel(iClientID, wscParam);
+            PVP::CmdFight(iClientID, wscParam, PVP::PVPTYPE_DUEL);
+        }
+    }
+
+    void UserCmd_ffa(uint iClientID, const std::wstring& wscParam) {
+
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CmdFight(iClientID, wscParam, PVP::PVPTYPE_FFA);
         }
     }
 
@@ -1081,7 +1089,8 @@ namespace Commands {
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
-        {L"/testduel", UserCmd_testduel},
+        {L"/testduel", UserCmd_duel},
+        {L"/testffa", UserCmd_ffa},
         {L"/accept", UserCmd_accept},
 
 

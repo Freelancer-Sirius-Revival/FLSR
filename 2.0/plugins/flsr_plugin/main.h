@@ -993,7 +993,6 @@ namespace PVP {
     struct Fights {
         uint iFightID;
         std::list<Member> lMembers;
-        uint iGambleValue;
         PVPType ePVPType;
         uint iFights;
         uint iFightsRemaining;
@@ -1007,18 +1006,22 @@ namespace PVP {
     extern std::list<Fights> ServerFightData;
 
     void LoadPVP();
+    std::wstring GetWStringFromPVPTYPE(PVPType pvpType);
     uint IsInFight(uint iClientID);
     uint GetKills(uint iClientID);
     PVPType GetPVPType(uint iClientID);
+    PVPType GetActiveFightPVPType(uint iFightID);
     std::list<Member> GetPVPMember(uint iClientID);
-    void HandleKill(uint iClientKillerID);
+    void HandleKill(uint iClientKillerID, PVPType ePVPType);
     void CmdAcceptPVP(uint iClientID, const std::wstring& wscParam);
-    void CmdDuel(uint iClientID, const std::wstring& wscParam);
+    void CmdFight(uint iClientID, const std::wstring& wscParam, PVP::PVPType ePVPType);
     void AcceptFight(PVP::Fights& fight, uint iClientID);
     void CheckDisConnect(uint iClientID, DisconnectReason reason);
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
     void UpdateDuelRanking(uint iClientID, bool bKills);
+    void UpdateFFARanking(uint iClientID, bool bKills);
     void CalcRanking(const std::string& tableName);
+    void CheckLastRound();
 
 }
 

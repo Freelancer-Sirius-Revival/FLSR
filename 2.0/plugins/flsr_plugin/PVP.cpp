@@ -193,7 +193,7 @@ namespace PVP {
            }
        }
 
-       ConPrint(L"TESTDEATH-HandleKill\n");
+       //ConPrint(L"TESTDEATH-HandleKill\n");
    }
 
    void CheckLastRound()
@@ -219,8 +219,8 @@ namespace PVP {
                {
                    uint kills = GetKills(HkGetClientIdFromCharname(member.wscCharname)); // Get the kills for the member
                    //Print Kills + Charname
-                   ConPrint(L"Kills: %u ", kills);
-                   ConPrint(L"Charname: %s\n", member.wscCharname.c_str());                  
+                   //ConPrint(L"Kills: %u ", kills);
+                   //ConPrint(L"Charname: %s\n", member.wscCharname.c_str());                  
                    if (kills > highestKills)
                    {
                        highestKills = kills;
@@ -639,7 +639,7 @@ namespace PVP {
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
-        ConPrint(L"UpdateDuelRanking\n");
+        //ConPrint(L"UpdateDuelRanking\n");
         try
         {
             // Open a database file
@@ -647,27 +647,27 @@ namespace PVP {
 
             // Check if the entry already exists in the table
             SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-            ConPrint(L"Query prepared\n");
+            //ConPrint(L"Query prepared\n");
             // Print Query
-            ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
+            //ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
             bool entryExists = queryExists.executeStep();
 
             if (entryExists)
             {
-                ConPrint(L"Entry exists\n");
+                //ConPrint(L"Entry exists\n");
                 // If the entry exists, update the Kills and Deaths values
                 std::string columnName = (bKills ? "Kills" : "Deaths");
                 SQLite::Statement queryUpdate(db, "UPDATE DuelRanking SET " + columnName + " = " + columnName + " + 1, Charname = '" + wstos(wscCharname) + "' WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-                ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
+                //ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
                 queryUpdate.exec();
             }
             else
             {
-                ConPrint(L"Entry doesn't exist\n");
+                //ConPrint(L"Entry doesn't exist\n");
                 // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
                 SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths, Charfile) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ",'" + wstos(wscCharFilename) + "')");                
-                ConPrint(L"Query prepared\n");
-                ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
+                //ConPrint(L"Query prepared\n");
+                //ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
                 queryInsert.exec();
             }
 
@@ -686,7 +686,7 @@ namespace PVP {
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
-        ConPrint(L"UpdateFFARanking\n");
+        //ConPrint(L"UpdateFFARanking\n");
         try
         {
             // Open a database file
@@ -694,27 +694,27 @@ namespace PVP {
 
             // Check if the entry already exists in the table
             SQLite::Statement queryExists(db, "SELECT * FROM FFARanking WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-            ConPrint(L"Query prepared\n");
+            //ConPrint(L"Query prepared\n");
             // Print Query
-            ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
+            //ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
             bool entryExists = queryExists.executeStep();
 
             if (entryExists)
             {
-                ConPrint(L"Entry exists\n");
+                //ConPrint(L"Entry exists\n");
                 // If the entry exists, update the Kills and Deaths values
                 std::string columnName = (bKills ? "Kills" : "Deaths");
                 SQLite::Statement queryUpdate(db, "UPDATE FFARanking SET " + columnName + " = " + columnName + " + 1, Charname = '" + wstos(wscCharname) + "' WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-                ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
+                //ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
                 queryUpdate.exec();
             }
             else
             {
-                ConPrint(L"Entry doesn't exist\n");
+               //ConPrint(L"Entry doesn't exist\n");
                 // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
                 SQLite::Statement queryInsert(db, "INSERT INTO FFARanking (Charname, Kills, Deaths, Charfile) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ",'" + wstos(wscCharFilename) + "')");
-                ConPrint(L"Query prepared\n");
-                ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
+                //ConPrint(L"Query prepared\n");
+                //ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
                 queryInsert.exec();
             }
 
@@ -729,7 +729,7 @@ namespace PVP {
     void CalcRanking(const std::string& tableName)
     {
      
-        ConPrint(L"Task: Calculate " + stows(tableName) + L"...\n");
+        //ConPrint(L"Task: Calculate " + stows(tableName) + L"...\n");
 
         try
         {
@@ -768,7 +768,7 @@ namespace PVP {
 
     void WriteFightInfoToCFG(uint iFightID, const std::string& scCharFilename)
     {
-        ConPrint (L"WriteFightInfoToCFG\n");
+        //ConPrint (L"WriteFightInfoToCFG\n");
 
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
@@ -801,7 +801,7 @@ namespace PVP {
 
     void RemoveCharFromFightInfo(const std::string& scCharFilename)
     {
-        ConPrint(L"RemoveFightInfoToCFG " + stows(scCharFilename) + L"\n");
+        //ConPrint(L"RemoveFightInfoToCFG " + stows(scCharFilename) + L"\n");
 
 
         char szCurDir[MAX_PATH];

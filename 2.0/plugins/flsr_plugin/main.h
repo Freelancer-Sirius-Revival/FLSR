@@ -41,6 +41,7 @@ extern PLUGIN_RETURNCODE returncode;
 #define MISSION_STORE "\\flhook_plugins\\missions\\"
 #define Equip_WHITELIST_FILE "\\flhook_plugins\\FLSR-EquipWhiteList.cfg"
 #define AC_REPORT_TPL "\\flhook_plugins\\flsr-cheater\\ReportTemplate.html"
+#define PVP_FIGHTINFO "\\flhook_plugins\\FightInfo.cfg"
 #define DATADIR "..\\DATA"
 
 //-Static
@@ -268,6 +269,8 @@ namespace Tools {
     void ParsePathsFromFile(std::vector<Edge>& edges);
     std::vector<std::string> GetShortestPath(std::string start, std::string end);
     int CountShortestPath(std::string start, std::string end);
+
+    void FLSRIniDelete(const std::string& scFile, const std::string& scApp, const std::string& scKey);
  
 }
 
@@ -982,9 +985,11 @@ namespace PVP {
     };
 
     struct Member {
+        uint iClientID;
         std::wstring wscCharname;
+        std::wstring wscCharFilename;
         uint iKills;
-        bool bIsInDuel = false;
+        bool bIsInFight = false;
 
     };
 
@@ -1007,9 +1012,10 @@ namespace PVP {
 
     void LoadPVP();
     std::wstring GetWStringFromPVPTYPE(PVPType pvpType);
-    uint IsInFight(uint iClientID);
+    uint IsInFight(uint iClientID, bool bSkipFightCheck);
     uint GetKills(uint iClientID);
     PVPType GetPVPType(uint iClientID);
+    uint GetFightIDByCharname(const std::wstring& wscCharname);
     PVPType GetActiveFightPVPType(uint iFightID);
     std::list<Member> GetPVPMember(uint iClientID);
     void HandleKill(uint iClientKillerID, PVPType ePVPType);
@@ -1022,6 +1028,14 @@ namespace PVP {
     void UpdateFFARanking(uint iClientID, bool bKills);
     void CalcRanking(const std::string& tableName);
     void CheckLastRound();
+    void WriteFightInfoToCFG(uint iFightID, const std::string& scCharFilename);
+    bool IsCharInFightInfo(const std::string& scCharFilename);
+    void ClearFightInfo();
+    void RemoveCharFromFightInfo(const std::string& scCharFilename);
+    void CmdClearPVP(uint iClientID, const std::wstring& wscParam);
+    void AddPlayerToFFAFight(uint iFightID, const std::wstring& wscCharname, const std::wstring& wscCharFilename);
+    void InvitePlayerToFFAFight(uint iClientID, uint iTargetClientID);
+    void RemovePlayerFromFight(uint iFightID, const std::wstring& wscCharname);
 
 }
 

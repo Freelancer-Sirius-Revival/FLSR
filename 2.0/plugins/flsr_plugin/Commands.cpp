@@ -62,7 +62,9 @@ namespace Commands {
     }
         */
 
-    void UserCmd_duel(uint iClientID, const std::wstring& wscParam) {
+    ///// PVP
+
+    void UserCmd_pvpduel(uint iClientID, const std::wstring& wscParam) {
 
         if (Modules::GetModuleState("PVP"))
         {
@@ -70,7 +72,7 @@ namespace Commands {
         }
     }
 
-    void UserCmd_ffa(uint iClientID, const std::wstring& wscParam) {
+    void UserCmd_pvpffa(uint iClientID, const std::wstring& wscParam) {
 
         if (Modules::GetModuleState("PVP"))
         {
@@ -78,7 +80,7 @@ namespace Commands {
         }
     }
 
-    void UserCmd_accept(uint iClientID, const std::wstring& wscParam) {
+    void UserCmd_pvpaccept(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("PVP"))
         {
             PVP::CmdAcceptPVP(iClientID, wscParam);
@@ -86,9 +88,48 @@ namespace Commands {
 
     }
     
+    void UserCmd_pvpclear(uint iClientID, const std::wstring& wscParam) {
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CmdClearPVP(iClientID, wscParam);
+        }
 
+    }
 
+    void UserCmd_pvpinvite(uint iClientID, const std::wstring& wscParam) {
+        if (Modules::GetModuleState("PVP"))
+        {
+            // Überprüfe ob Spieler im Space ist
+            uint iShip;
+            pub::Player::GetShip(iClientID, iShip);
+            if (!iShip)
+            {
+                PrintUserCmdText(iClientID, L"Please undock!");
+                return;
+            }
 
+            // Überprüfe auf Target
+            uint iTargetShip;
+            pub::SpaceObj::GetTarget(iShip, iTargetShip);
+            if (!iTargetShip)
+            {
+                PrintUserCmdText(iClientID, L"Please select a target!");
+                return;
+            }
+
+            // Überprüfe ob Target ein Spieler ist
+            uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
+            if (!iTargetClientID)
+            {
+                PrintUserCmdText(iClientID, L"Please select a player!");
+                return;
+            }
+
+            PVP::InvitePlayerToFFAFight(iClientID, iTargetClientID);
+
+        }
+
+    }
 	
 
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
@@ -1089,9 +1130,11 @@ namespace Commands {
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
-        {L"/testduel", UserCmd_duel},
-        {L"/testffa", UserCmd_ffa},
-        {L"/accept", UserCmd_accept},
+        {L"/pvpduel", UserCmd_pvpduel},
+        {L"/pvpffa", UserCmd_pvpffa},
+        {L"/pvpaccept", UserCmd_pvpaccept},
+        {L"/pvpclear", UserCmd_pvpclear},
+        {L"/pvpinvite", UserCmd_pvpinvite},
 
 
         //Not Used Commands

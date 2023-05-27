@@ -20,6 +20,8 @@ namespace PVP {
         // Calculate Ranking
         CalcRanking("DuelRanking");
         CalcRanking("FFARanking");
+        //Clear FightInfo
+        ClearFightInfo();
 
     }
 
@@ -39,24 +41,25 @@ namespace PVP {
     }
 
 
-    uint IsInFight(uint iClientID) 
+    uint IsInFight(uint iClientID, bool bSkipFightCheck = false)
     {
         // Get the current character name
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
-        uint ireturn = 0;
-
         for (const auto& fight : ServerFightData) {
             for (const auto& member : fight.lMembers) {
-                if (member.bIsInDuel && member.wscCharname == wscCharname) {
-                    ireturn = fight.iFightID;
-                }
+                if (!bSkipFightCheck && !member.bIsInFight)
+                    continue;
 
-                //ConPrint (L"Member: %s\n", member.wscCharname.c_str());
+                if (member.wscCharname == wscCharname) {
+                    return fight.iFightID;
+                }
             }
         }
-        return ireturn;
+
+        return 0;
     }
+
 
     PVPType GetActiveFightPVPType(uint iFightID)
     {
@@ -80,10 +83,10 @@ namespace PVP {
             bool found1 = false;
             bool found2 = false;
             for (const auto& member : fight.lMembers) {
-                if (!found1 && member.bIsInDuel && member.wscCharname == wscCharname1) {
+                if (!found1 && member.bIsInFight && member.wscCharname == wscCharname1) {
                     found1 = true;
                 }
-                if (!found2 && member.bIsInDuel && member.wscCharname == wscCharname2) {
+                if (!found2 && member.bIsInFight && member.wscCharname == wscCharname2) {
                     found2 = true;
                 }
                 // Optional: Wenn beide IDs bereits gefunden wurden, kann die Schleife vorzeitig beendet werden, um die Leistung zu verbessern.
@@ -98,6 +101,21 @@ namespace PVP {
         return false;
     }
 
+    uint GetFightIDByCharname(const std::wstring& wscCharname)
+    {
+        for (const auto& fight : ServerFightData)
+        {
+            for (const auto& member : fight.lMembers)
+            {
+                if (member.wscCharname == wscCharname)
+                {
+                    return fight.iFightID;
+                }
+            }
+        }
+        return 0; // Falls keine entsprechende FightID gefunden wurde
+    }
+
 
     
     PVPType GetPVPType(uint iClientID)
@@ -107,7 +125,7 @@ namespace PVP {
 
         for (const auto& fight : ServerFightData) {
             for (const auto& member : fight.lMembers) {
-                if (member.bIsInDuel && member.wscCharname == wscCharname) {
+                if (member.bIsInFight && member.wscCharname == wscCharname) {
                     return fight.ePVPType;
                 }
             }
@@ -122,7 +140,7 @@ namespace PVP {
 
         for (const auto& fight : ServerFightData) {
             for (const auto& member : fight.lMembers) {
-                if (member.bIsInDuel && member.wscCharname == wscCharname) {
+                if (member.bIsInFight && member.wscCharname == wscCharname) {
                     return fight.lMembers;
                 }
             }
@@ -136,12 +154,13 @@ namespace PVP {
        // Durchsuche die ServerFightData-Liste nach dem Fight, der den Killer enthält
        for (auto& fight : ServerFightData) {
            for (auto& member : fight.lMembers) {
-               if (member.bIsInDuel && member.wscCharname == killerCharName) {
+               if (member.bIsInFight && member.wscCharname == killerCharName) {
                    // Erstelle eine aktualisierte Member-Instanz
                    Member updatedMember;
                    updatedMember.wscCharname = member.wscCharname;
+                   updatedMember.wscCharFilename = member.wscCharFilename;
                    updatedMember.iKills = member.iKills;
-                   updatedMember.bIsInDuel = member.bIsInDuel;
+                   updatedMember.bIsInFight = member.bIsInFight;
 
                    // Führe die gewünschten Änderungen an der Member-Instanz durch
                    updatedMember.iKills++;
@@ -219,6 +238,7 @@ namespace PVP {
                        message = L"The fight has ended. Thank you for participating, " + member.wscCharname + L"! The winner is " + winner + L" with the most kills.";
 
                    PrintUserCmdText(HkGetClientIdFromCharname(member.wscCharname), message);
+                   RemoveCharFromFightInfo(wstos(member.wscCharFilename));
                }
 
                // Remove the fight from ServerFightData
@@ -242,7 +262,7 @@ namespace PVP {
                //ConPrint(L"Charname: %s\n", member.wscCharname.c_str());
                //Debug Print kills
                //ConPrint(L"Kills: %u\n", member.iKills);
-               if (member.bIsInDuel && member.wscCharname == wscCharnameClient) {
+               if (member.bIsInFight && member.wscCharname == wscCharnameClient) {
                    //ConPrint(L"CharnameKiller: %s\n", member.wscCharname.c_str());
                    //ConPrint(L"KillsKiller: %u\n", member.iKills);
 
@@ -257,10 +277,15 @@ namespace PVP {
     {
         // Check if player is already in the fight
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+
         bool bFound = false;
         for (auto& member : fight.lMembers) {
             if (member.wscCharname == wscCharname) {
-                member.bIsInDuel = true;
+                member.iClientID = iClientID;
+                member.bIsInFight = true;
+                member.wscCharFilename = wscCharFilename;
                 bFound = true;
                 break;
             }
@@ -269,8 +294,10 @@ namespace PVP {
         // If player not found, add to the fight
         if (!bFound) {
             Member member;
+            member.iClientID = iClientID;
             member.wscCharname = wscCharname;
-            member.bIsInDuel = true;
+            member.wscCharFilename = wscCharFilename;
+            member.bIsInFight = true;
             fight.lMembers.push_back(member);
         }
 
@@ -281,6 +308,10 @@ namespace PVP {
                 break;
             }
         }
+
+        // Update FightInfo
+        WriteFightInfoToCFG(fight.iFightID, wstos(wscCharFilename));
+
 
         // Notify all members that the fight has started, except the joining player
         std::wstring wscMsg = L" has joined the fight!";
@@ -311,10 +342,17 @@ namespace PVP {
         // Get the current character name
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
+        // Get the current charfilename
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+
         //Init variables
-        bool bBet = false;
         uint iFights = 5;
-        int cash = 0;
+        if (ePVPType == PVPTYPE_FFA)
+        {
+            iFights = 20; // Default 20 fights for FFA
+        }
+        
 
         // Überprüfe ob Spieler im Space ist
         uint iShip;
@@ -325,11 +363,18 @@ namespace PVP {
             return;
         }
 
-        //Hat der Spieler einen aktiven Fight?
+        //Hat der Spieler einen Fight?
         uint iFightID = IsInFight(iClientID);
         if (iFightID != 0)
         {
             PrintUserCmdText(iClientID, L"You are already in a fight!");
+            return;
+        }
+
+        iFightID = IsInFight(iClientID, true);
+        if (iFightID != 0)
+        {
+            PrintUserCmdText(iClientID, L"You have been invited to a fight. Use /pvpclear to decline the invitation.");
             return;
         }
 
@@ -350,53 +395,23 @@ namespace PVP {
             return;
         }
 
+        // Get Target Charname
         std::wstring wscTargetCharname = (const wchar_t*)Players.GetActiveCharacterName(iTargetClientID);
+        // Get Target Charfilename
+        std::wstring wscTargetCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iTargetClientID), wscTargetCharFilename);
 
         // Überprüfe ob Target bereits in einem Fight ist
         uint iFightIDTarget = IsInFight(iTargetClientID);
         if (iFightIDTarget != 0)
         {
             PVPType activeFightPVPType = GetActiveFightPVPType(iFightIDTarget);
-            if (activeFightPVPType == PVPTYPE_DUEL || activeFightPVPType == PVPTYPE_RANKED)
+            if (activeFightPVPType == PVPTYPE_DUEL || activeFightPVPType == PVPTYPE_RANKED || ePVPType == PVPTYPE_DUEL || ePVPType == PVPTYPE_FFA)
             {
                 PrintUserCmdText(iClientID, L"Target is already in a " + GetWStringFromPVPTYPE(activeFightPVPType) + L" fight!");
                 return;
             }
-            else if (activeFightPVPType == PVPTYPE_FFA)
-            {
-                // Füge den Spieler zum vorhandenen FFA-Fight hinzu
-                for (auto& fight : ServerFightData)
-                {
-                    if (fight.iFightID == iFightIDTarget)
-                    {
-                        Member newMember;
-                        newMember.wscCharname = wscCharname;
-                        newMember.iKills = 0;
-                        newMember.bIsInDuel = true;
 
-                        fight.lMembers.push_back(newMember);
-
-                        // Benachrichtige alle Mitglieder des FFA-Fights
-                        std::wstring message = wscCharname + L" has joined the " + GetWStringFromPVPTYPE(activeFightPVPType) + L" fight!";
-                        for (const auto& member : fight.lMembers)
-                        {
-                            if (member.wscCharname != wscCharname)
-                            {
-                                // Benachrichtigung an andere Mitglieder
-                                PrintUserCmdText(HkGetClientIdFromCharname(member.wscCharname), message);
-                            }
-                            else
-                            {
-                                // Personalisierte Benachrichtigung an den hinzugefügten Spieler
-                                PrintUserCmdText(iClientID, L"You have joined the " + GetWStringFromPVPTYPE(activeFightPVPType) + L" fight!");
-                            }
-                        }
-
-                        return;
-                    }
-                }
-
-            }
         }
 
         
@@ -412,8 +427,8 @@ namespace PVP {
         PVP::Fights newFight;
         
         //Füge die Mitglieder hinzu
-        newFight.lMembers.push_back({ wscCharname, 0, true }); //Herausforderer
-        newFight.lMembers.push_back({ wscTargetCharname, 0, false }); //Herausgeforderter
+        newFight.lMembers.push_back({iClientID, wscCharname, wscCharFilename, 0, true }); //Herausforderer
+        newFight.lMembers.push_back({iTargetClientID, wscTargetCharname, wscTargetCharFilename, 0, false }); //Herausgeforderter
 
         // Setze den PVP-Typ
         newFight.ePVPType = ePVPType;
@@ -425,12 +440,15 @@ namespace PVP {
         // Füge den neuen Kampf zur Liste hinzu
         ServerFightData.push_back(newFight);
 
+        // Füge den Herausforderer in die FightInfo hinzu
+        WriteFightInfoToCFG(GetFightIDByCharname(wscCharname), wstos(wscCharFilename));
+
         // Gib beiden Spielern ein Feedback
         std::wstring wscMessageTarget;
         std::wstring wscMessageClient;
 
         wscMessageTarget = L"You have been challenged to a " + GetWStringFromPVPTYPE(ePVPType) + L" by " + wscCharname + L"!";
-        wscMessageClient = L"You have challenged " + wscTargetCharname + L" to a  " + GetWStringFromPVPTYPE(ePVPType) + L"!";
+        wscMessageClient = L"You have challenged " + wscTargetCharname + L" to a " + GetWStringFromPVPTYPE(ePVPType) + L"!";
  
         PrintUserCmdText(iTargetClientID, wscMessageTarget);
         PrintUserCmdText(iClientID, wscMessageClient);
@@ -454,7 +472,7 @@ namespace PVP {
 
         for (const auto& member : f.lMembers) {
             if (member.wscCharname == activeCharacterName) {
-                if (!member.bIsInDuel)
+                if (!member.bIsInFight)
                 {
                     return true;
                 }
@@ -475,68 +493,67 @@ namespace PVP {
 
     void CheckDisConnect(uint iClientID, DisconnectReason reason)
     {
-        std::wstring wscCharname = L"";
-
         if (!Tools::isValidPlayer(iClientID, false))
             return;
-        
+
         //Check if there are fights
         if (ServerFightData.size() == 0)
-			return;
-
-        // Get the character name of the player if Player is not in CharSelect
-        if (!HkIsInCharSelectMenu(iClientID))
-        {
-            wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-        }
+            return;
 
         // Check if player was in a fight
         for (auto& fight : ServerFightData) {
-            auto iter = std::find_if(fight.lMembers.begin(), fight.lMembers.end(), [&](const Member& m) {
-                return m.wscCharname == wscCharname;
-                });
+            bool playerFound = false;
+            for (auto it = fight.lMembers.begin(); it != fight.lMembers.end(); ++it) {
+                if (it->iClientID == iClientID) {
+                    // Player is in the fight
+                    playerFound = true;
+                    //Remove player from FightInfo
+                    RemoveCharFromFightInfo(wstos(it->wscCharFilename));
+                    // Remove player from the fight
+                    fight.lMembers.erase(it);
 
-            // Player is in the fight
-            if (iter != fight.lMembers.end()) {
-                // Remove player from the fight
-                fight.lMembers.erase(iter);
 
-                // If only one player is left, end the fight and declare the remaining player as the winner
-                if (fight.lMembers.size() == 1) {
-                    Member& winner = fight.lMembers.front();
-                    std::wstring wscWinnerMsg = winner.wscCharname + L" has won the fight";
-					if (reason == DisconnectReason::DISCONNECTED) {
-                        wscWinnerMsg += L" through disconnect of the last opponent!";
+
+                    // If only one player is left, end the fight and declare the remaining player as the winner
+                    if (fight.lMembers.size() == 1) {
+                        std::wstring wscWinnerMsg = fight.lMembers.front().wscCharname + L" has won the fight";
+                        if (reason == DisconnectReason::DISCONNECTED) {
+                            wscWinnerMsg += L" through disconnect of the last opponent!";
+                        }
+                        else if (reason == DisconnectReason::CHARSWITCH) {
+                            wscWinnerMsg += L" through character switch of the last opponent!";
+                        }
+                       
+                         PrintUserCmdText(fight.lMembers.front().iClientID, wscWinnerMsg.c_str());
+
+                         RemoveCharFromFightInfo(wstos(fight.lMembers.front().wscCharFilename));//OMG iam so stupid
+                         RemovePlayerFromFight(fight.iFightID, fight.lMembers.front().wscCharname);
+
+                        
+
+                        // Call the FightEnd function to clean up the fight
+                        //FightEnd(fight.iFightID);
                     }
-                    else if (reason == DisconnectReason::CHARSWITCH) {
-                        wscWinnerMsg += L" through character switch of the last opponent!";
-                    }
-                    for (auto& member : fight.lMembers) {
-                        //ConPrint(L"Member: " + member.wscCharname + L"\n");
-                        uint MemberClientID = HkGetClientIdFromCharname(member.wscCharname);
-                        if (MemberClientID != -1) {
-                            PrintUserCmdText(MemberClientID, wscWinnerMsg.c_str());
+
+                    // Update the fight in the ServerFightData
+                    for (auto& f : ServerFightData) {
+                        if (f.iFightID == fight.iFightID) {
+                            f = fight;
+                            break;
                         }
                     }
+                    
 
-                    // Call the FightEnd function to clean up the fight
-                    //FightEnd(fight.iFightID);
+
+                    break;
                 }
-                else {
-                    // Update the fight in the ServerFightData
-                    auto iter2 = std::find_if(ServerFightData.begin(), ServerFightData.end(), [&](const Fights& f) {
-                        return f.iFightID == fight.iFightID;
-                        });
-
-                    if (iter2 != ServerFightData.end()) {
-                        *iter2 = fight;
-                    }
-                }
-
-                break;
             }
+
+            if (playerFound)
+                break;
         }
     }
+
 
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType)
     {
@@ -749,6 +766,182 @@ namespace PVP {
         }
     }
 
+    void WriteFightInfoToCFG(uint iFightID, const std::string& scCharFilename)
+    {
+        ConPrint (L"WriteFightInfoToCFG\n");
+
+        char szCurDir[MAX_PATH];
+        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
+        std::string scFightInfo = std::string(szCurDir) + PVP_FIGHTINFO;
+
+        // Schreibe den Charakterdateinamen und die zugehörige Fight-ID in die CFG-Datei
+        IniWrite(scFightInfo, "FightInfo", scCharFilename, std::to_string(iFightID));
+    }
+
+    bool IsCharInFightInfo(const std::string& scCharFilename)
+    {
+        char szCurDir[MAX_PATH];
+        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
+        std::string scFightInfo = std::string(szCurDir) + PVP_FIGHTINFO;
+
+        // Überprüfe, ob der Charakterdateiname als Eintrag in der FightInfo-Sektion existiert
+        return IniGetS(scFightInfo, "FightInfo", scCharFilename, "") != "";
+    }
+
+    void ClearFightInfo()
+    {
+        char szCurDir[MAX_PATH];
+        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
+        std::string scFightInfo = std::string(szCurDir) + PVP_FIGHTINFO;
+
+        // Lösche den Inhalt der FightInfo.cfg-Datei
+        std::ofstream ofs(scFightInfo, std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+    }
+
+    void RemoveCharFromFightInfo(const std::string& scCharFilename)
+    {
+        ConPrint(L"RemoveFightInfoToCFG " + stows(scCharFilename) + L"\n");
+
+
+        char szCurDir[MAX_PATH];
+        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
+        std::string scFightInfo = std::string(szCurDir) + PVP_FIGHTINFO;
+
+        // Lösche den Eintrag des Charakters aus der FightInfo.cfg-Datei
+        Tools::FLSRIniDelete(scFightInfo, "FightInfo", scCharFilename);
+    }
+
+    void CmdClearPVP(uint iClientID, const std::wstring& wscParam)
+    {
+        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+
+        bool isLastPlayer = false;
+
+        for (auto it = ServerFightData.begin(); it != ServerFightData.end(); ++it)
+        {
+            auto& fight = *it;
+
+            for (auto fightIt = fight.lMembers.begin(); fightIt != fight.lMembers.end(); ++fightIt)
+            {
+                if (fightIt->wscCharname == wscCharname)
+                {
+                    fight.lMembers.erase(fightIt);
+                    RemoveCharFromFightInfo(wstos(wscCharFilename));
+
+                    // Rückmeldung an den Spieler
+                    PrintUserCmdText(iClientID, L"You have been removed from the PvP fight.");
+
+                    // Überprüfen, ob noch mehr als ein Spieler im Fight verbleibt
+                    if (fight.lMembers.size() <= 1)
+                    {
+                        // Der letzte verbleibende Spieler hat den Fight gewonnen
+                        if (!fight.lMembers.empty())
+                        {
+                            std::wstring wscWinnerCharname = fight.lMembers.front().wscCharname;
+                            PrintUserCmdText(iClientID, L"The fight has ended. The winner is: " + wscWinnerCharname);
+                            PrintUserCmdText(HkGetClientIdFromCharname(wscWinnerCharname), L"The fight has ended. The winner is: " + wscWinnerCharname);
+                            RemoveCharFromFightInfo(wstos(fight.lMembers.front().wscCharFilename));
+                        }
+
+                        // Markiere den Fight zum Löschen
+                        isLastPlayer = true;
+                    }
+
+                    // Benachrichtigung an andere Spieler im Fight
+                    for (auto& member : fight.lMembers)
+                    {
+                        if (member.wscCharname != wscCharname)
+                        {
+                            PrintUserCmdText(HkGetClientIdFromCharname(member.wscCharname), L"Player " + wscCharname + L" has left the PvP fight.");
+                        }
+                    }
+
+                    break; // Der Spieler wurde gefunden und entfernt, beende die Schleife
+                }
+            }
+
+            // Wenn der Fight aufgelöst werden soll, entferne ihn aus der Liste
+            if (isLastPlayer)
+            {
+                ServerFightData.erase(it);
+                break;
+            }
+        }
+
+        // Wenn der Spieler nicht in einem PvP-Fight war
+        if (!isLastPlayer)
+        {
+            PrintUserCmdText(iClientID, L"You are not currently participating in any PvP fight.");
+        }
+    }
+
+    void AddPlayerToFFAFight(uint iFightID, const std::wstring& wscCharname, const std::wstring& wscCharFilename)
+    {
+        // Suche nach dem entsprechenden FFA-Fight anhand der Fight-ID
+        for (auto& fight : ServerFightData)
+        {
+            if (fight.iFightID == iFightID)
+            {
+                Member newMember;
+                newMember.wscCharname = wscCharname;
+                newMember.wscCharFilename = wscCharFilename;
+                newMember.iKills = 0;
+                newMember.bIsInFight = false;
+
+                fight.lMembers.push_back(newMember);
+
+                return;
+            }
+        }
+    }
+
+    void InvitePlayerToFFAFight(uint iClientID, uint iTargetClientID)
+    {
+        // Überprüfe, ob der Zielspieler bereits in einem Fight ist
+        uint iFightIDTarget = IsInFight(iTargetClientID);
+        if (iFightIDTarget != 0)
+        {
+            PrintUserCmdText(iClientID, L"The target player is already in a fight. You cannot invite them.");
+            return;
+        }
+
+        // Überprüfe, ob der einladende Spieler in einem Fight ist
+        uint iFightID = IsInFight(iClientID);
+        if (iFightID == 0)
+        {
+            PrintUserCmdText(iClientID, L"You are not currently in a fight.");
+            return;
+        }
+
+        std::wstring wscCharFilenameTarget;
+        HkGetCharFileName(ARG_CLIENTID(iTargetClientID), wscCharFilenameTarget);
+
+        // Lade den Zielspieler zum eigenen FFA-Fight ein
+        AddPlayerToFFAFight(iFightID, (const wchar_t*)Players.GetActiveCharacterName(iTargetClientID), wscCharFilenameTarget);
+
+        // Sende eine Einladungsnachricht an den Zielspieler
+        PrintUserCmdText(iTargetClientID, L"You have been invited to join a FFA fight. Type /pvpaccept to accept the invitation.");
+
+        // Sende eine Bestätigungsnachricht an den einladenden Spieler
+        PrintUserCmdText(iClientID, L"You have invited the target player to join the FFA fight.");
+    }
+
+    void RemovePlayerFromFight(uint iFightID, const std::wstring& wscCharname) {
+        for (auto& fight : ServerFightData) {
+            if (fight.iFightID == iFightID) {
+                for (auto iter = fight.lMembers.begin(); iter != fight.lMembers.end(); ++iter) {
+                    if (iter->wscCharname == wscCharname) {
+                        fight.lMembers.erase(iter);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
 
 
 

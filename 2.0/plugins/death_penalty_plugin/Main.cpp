@@ -395,6 +395,17 @@ void LoadSettings() {
         return fValue;
     }
 
+    //PVP
+    bool IsCharInFightInfoDP(const std::string& scCharFilename)
+    {
+        char szCurDir[MAX_PATH];
+        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
+        std::string scFightInfo = std::string(szCurDir) + "\\flhook_plugins\\FightInfo.cfg";
+
+        // Überprüfe, ob der Charakterdateiname als Eintrag in der FightInfo-Sektion existiert
+        return IniGetS(scFightInfo, "FightInfo", scCharFilename, "") != "";
+    }
+
 
 
 //Nekura END
@@ -492,10 +503,24 @@ void LoadUserCharSettings(uint iClientID) {
     MapClients[iClientID] = c;
 }
 
+
+
 // Function that will apply the death penalty on a player death
 void PenalizeDeath(uint iClientID, uint iKillerID) {
     if (!set_fDeathPenalty)
         return;
+
+    //Nekura
+    //Check for FightInfo
+    std::wstring wscCharFilename;
+    HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+
+    std::wstring wscKillerCharFilename;
+    HkGetCharFileName(ARG_CLIENTID(iKillerID), wscKillerCharFilename);
+    if (IsCharInFightInfoDP(wstos(wscCharFilename)) && IsCharInFightInfoDP(wstos(wscKillerCharFilename)))
+    {
+		return;
+	}
 
     // Valid iClientID and the ShipArch or System isnt in the excluded list?
     if (iClientID != -1 && !bExcludedSystem(iClientID)) {

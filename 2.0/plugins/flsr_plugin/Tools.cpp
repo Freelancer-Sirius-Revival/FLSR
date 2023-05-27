@@ -1113,10 +1113,10 @@ namespace Tools {
                 //PVP
                 if (Modules::GetModuleState("PVP"))
                 {
+                    ConPrint (std::to_wstring(iClientID) + L" is in CharSelectMenu\n");
                     PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
                 }
 
-                //ConPrint (std::to_wstring(iClientID) + L" is in CharSelectMenu\n");
             }
 
 
@@ -1125,5 +1125,9 @@ namespace Tools {
 
     }
 
+    void FLSRIniDelete(const std::string& scFile, const std::string& scApp,const std::string& scKey) {
+        WritePrivateProfileString(scApp.c_str(), scKey.c_str(), NULL,
+            scFile.c_str());
+    }
 
 }

@@ -351,7 +351,7 @@ namespace PlayerHunt {
 		//Check for DeathType - PVE Kill
 		if (DeathType == Tools::PVE)
 		{
-			ConPrint(L"PVEKILL\n");
+			//ConPrint(L"PVEKILL\n");
 			//Check if Hunt is active
 			if (ServerHuntData.eState == HUNT_STATE_HUNTING && Tools::isValidPlayer(iClientID, true))
 			{

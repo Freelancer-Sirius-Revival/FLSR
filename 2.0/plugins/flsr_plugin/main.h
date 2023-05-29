@@ -797,8 +797,13 @@ namespace SQL {
     
 
 
-   extern std::string scDbName;
+    extern std::string scDbName;
     void InitializeDB();
+    void CheckAndCreateDuelRankingTable();
+    void CheckAndCreateFFARankingTable();
+    void CheckAndCreatePVPRankingTable();
+    void CheckAndCreatePVERankingTable();
+
 }
 
 namespace Depot {
@@ -1036,6 +1041,8 @@ namespace PVP {
     void AddPlayerToFFAFight(uint iFightID, const std::wstring& wscCharname, const std::wstring& wscCharFilename);
     void InvitePlayerToFFAFight(uint iClientID, uint iTargetClientID);
     void RemovePlayerFromFight(uint iFightID, const std::wstring& wscCharname);
+    void UpdatePVERanking(uint iClientID, bool bKills);
+    void UpdatePVPRanking(uint iClientID, bool bKills);
 
 }
 

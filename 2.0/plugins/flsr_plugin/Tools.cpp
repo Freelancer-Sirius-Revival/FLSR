@@ -1098,9 +1098,12 @@ namespace Tools {
         while (pPD = Players.traverse_active(pPD)) {
             uint iClientID = HkGetClientIdFromPD(pPD);
 
+            if (iClientID == -1)
+				continue;
 
             if (!isValidPlayer(iClientID, false))
                 continue;
+
 
             if (HkIsInCharSelectMenu(iClientID))
             {
@@ -1110,12 +1113,7 @@ namespace Tools {
                     PlayerHunt::CheckDisConnect(iClientID);
                 }
 
-                //PVP
-                if (Modules::GetModuleState("PVP"))
-                {
-                    ConPrint (std::to_wstring(iClientID) + L" is in CharSelectMenu\n");
-                    PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
-                }
+
 
             }
 

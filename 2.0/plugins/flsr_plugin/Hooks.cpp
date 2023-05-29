@@ -24,12 +24,19 @@ namespace Hooks {
 
         //NewPlayerMessage
         Tools::HkNewPlayerMessage(iClientID, cId);
-		
+
         //CloakModule
         if (Modules::GetModuleState("CloakModule"))
         {
             Commands::UserCmd_UNCLOAK(iClientID, L"");
             ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
+        }
+
+        //PVP
+        if (Modules::GetModuleState("PVP"))
+        {
+            //ConPrint(L"CHARSWITCH");
+            PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
         }
     }
 
@@ -122,6 +129,9 @@ namespace Hooks {
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller) {
         returncode = DEFAULT_RETURNCODE;
 
+        if (!Tools::isValidPlayer(iClientIDVictim, true))
+            return;
+
         //ConPrint(wscMsg + L"\n");
 
         std::wstring victim, killer;
@@ -132,6 +142,8 @@ namespace Hooks {
                     size_t victimEnd = wscMsg.find(L" was killed by an NPC");
                     victim = wscMsg.substr(victimStart, victimEnd - victimStart);
                     DeathType = Tools::PVE;
+
+                    iClientIDKiller = 0;
 
         }
         else if (wscMsg.find(L"was killed by an admin") != std::wstring::npos) {
@@ -200,7 +212,23 @@ namespace Hooks {
         //PVP
         if (Modules::GetModuleState("PVP"))
         {
+
             PVP::CheckDied(iClientIDVictim, iClientIDKiller, DeathType);
+
+            //PVE Ranking
+            if (DeathType == Tools::PVE)
+            {
+                PVP::UpdatePVERanking(iClientIDVictim, false);
+            }
+            //PVP Ranking
+            else if (DeathType == Tools::PVP)
+            {
+                PVP::UpdatePVPRanking(iClientIDVictim, false);
+                PVP::UpdatePVPRanking(iClientIDKiller, true);
+
+            }
+
+
         }
 
         
@@ -210,19 +238,54 @@ namespace Hooks {
 
     
     //ShipDestroyed
-    void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
+    void __stdcall ShipDestroyed(DamageList* _dmg, DWORD* ecx, uint iKill) {
         returncode = DEFAULT_RETURNCODE;
 
+        if (iKill != 1)
+            return;
 
-      
-   
-            CShip* cship = (CShip*)ecx[4];
-            uint iClientID = cship->GetOwnerPlayer();
+        DamageList dmg;
+        try {
+            dmg = *_dmg;
+        }
+        catch (...) {
+            return;
+        }
+
+
+        CShip* cship = (CShip*)ecx[4];
+        uint iClientID = cship->GetOwnerPlayer();
+
+        if (Modules::GetModuleState("PVP"))
+        {
+
+            if (cship->is_player())
+            {
+                //Player is killed
+                //std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+                //ConPrint(wscCharnameClient + L" was killed\n");
+            }
+            else
+            {
+                //NPC is killed
+                uint iKillerID = dmg.get_inflictor_owner_player();
+                if (HkIsValidClientID(iKillerID))
+                {
+                    //NPC is killed by Player
+                    //std::wstring wscCharnameKiller = (const wchar_t*)Players.GetActiveCharacterName(iKillerID);
+                    //ConPrint(wscCharnameKiller + L" has Killed a NPC\n");
+                    PVP::UpdatePVERanking(iKillerID, true);
+                }
+            }
+        }
 
             if (iClientID) { // a player was killed
+              
 
-                // Insurance-PlayerDied
                 if (iClientID != 0) {
+
+                    // Insurance-PlayerDied
+
 				    if (Modules::GetModuleState("InsuranceModule"))
 				    {
 					    Insurance::PlayerDiedEvent(true, iClientID);
@@ -243,6 +306,7 @@ namespace Hooks {
                     ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
                 }
             }
+
         
         
     }

@@ -20,6 +20,9 @@ namespace PVP {
         // Calculate Ranking
         CalcRanking("DuelRanking");
         CalcRanking("FFARanking");
+        CalcRanking("PVPRanking");
+        CalcRanking("PVERanking");
+
         //Clear FightInfo
         ClearFightInfo();
 
@@ -172,7 +175,10 @@ namespace PVP {
                            *it = updatedMember; // Aktualisiere das Element in der Liste
 
                            // Verringere die Anzahl der übrigen Fights um eins und aktualisiere ServerFightData
-                           fight.iFightsRemaining--;
+                           // Nicht für FFA
+                           if (ePVPType != PVPTYPE_FFA)
+                            fight.iFightsRemaining--;
+
                            //ConPrint(L"iFightsRemaining: %u\n", fight.iFightsRemaining);
                            if (ePVPType == PVPTYPE_DUEL)
                            {
@@ -209,6 +215,7 @@ namespace PVP {
                    std::wstring message = L"This is the last round of the fight. Good luck, " + member.wscCharname + L"!";
                    PrintUserCmdText(HkGetClientIdFromCharname(member.wscCharname), message);
                }
+               return;
            }
            else if (it->iFightsRemaining == 0)
            {
@@ -238,13 +245,14 @@ namespace PVP {
                        message = L"The fight has ended. Thank you for participating, " + member.wscCharname + L"! The winner is " + winner + L" with the most kills.";
 
                    PrintUserCmdText(HkGetClientIdFromCharname(member.wscCharname), message);
+                   
                    RemoveCharFromFightInfo(wstos(member.wscCharFilename));
                }
 
                // Remove the fight from ServerFightData
                it = ServerFightData.erase(it);
                if (it == ServerFightData.end())
-                   break; // Exit the loop if all fights have been processed
+                   return; // Exit the loop if all fights have been processed
            }
        }
    }
@@ -347,12 +355,7 @@ namespace PVP {
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
 
         //Init variables
-        uint iFights = 5;
-        if (ePVPType == PVPTYPE_FFA)
-        {
-            iFights = 20; // Default 20 fights for FFA
-        }
-        
+        uint iFights = 5;        
 
         // Überprüfe ob Spieler im Space ist
         uint iShip;
@@ -496,6 +499,10 @@ namespace PVP {
         if (!Tools::isValidPlayer(iClientID, false))
             return;
 
+        if (!HkIsValidClientID(iClientID)) {
+            return;
+        }
+
         //Check if there are fights
         if (ServerFightData.size() == 0)
             return;
@@ -629,48 +636,43 @@ namespace PVP {
             }
 
         }
-
     }
 
-    void UpdateDuelRanking(uint iClientID, bool bKills)
+    void UpdatePVPRanking(uint iClientID, bool bKills)
     {
-
         std::wstring wscCharFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
-        //ConPrint(L"UpdateDuelRanking\n");
         try
         {
-            // Open a database file
+            // Open a database file with UTF-8 encoding
             SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
 
             // Check if the entry already exists in the table
-            SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-            //ConPrint(L"Query prepared\n");
-            // Print Query
-            //ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
+            SQLite::Statement queryExists(db, "SELECT * FROM PVPRanking WHERE Charfile = ?");
+            queryExists.bind(1, wstos(wscCharFilename));
             bool entryExists = queryExists.executeStep();
 
             if (entryExists)
             {
-                //ConPrint(L"Entry exists\n");
                 // If the entry exists, update the Kills and Deaths values
                 std::string columnName = (bKills ? "Kills" : "Deaths");
-                SQLite::Statement queryUpdate(db, "UPDATE DuelRanking SET " + columnName + " = " + columnName + " + 1, Charname = '" + wstos(wscCharname) + "' WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-                //ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
+                SQLite::Statement queryUpdate(db, "UPDATE PVPRanking SET " + columnName + " = " + columnName + " + 1, Charname = ? WHERE Charfile = ?");
+                queryUpdate.bind(1, wstos(wscCharname));
+                queryUpdate.bind(2, wstos(wscCharFilename));
                 queryUpdate.exec();
             }
             else
             {
-                //ConPrint(L"Entry doesn't exist\n");
                 // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
-                SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths, Charfile) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ",'" + wstos(wscCharFilename) + "')");                
-                //ConPrint(L"Query prepared\n");
-                //ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
+                SQLite::Statement queryInsert(db, "INSERT INTO PVPRanking (Charname, Kills, Deaths, Charfile) VALUES (?, ?, ?, ?)");
+                queryInsert.bind(1, wstos(wscCharname));
+                queryInsert.bind(2, bKills ? 1 : 0);
+                queryInsert.bind(3, bKills ? 0 : 1);
+                queryInsert.bind(4, wstos(wscCharFilename));
                 queryInsert.exec();
             }
-
         }
         catch (std::exception& e)
         {
@@ -679,45 +681,128 @@ namespace PVP {
         }
     }
 
-    void UpdateFFARanking(uint iClientID, bool bKills)
+    void UpdatePVERanking(uint iClientID, bool bKills)
     {
-
         std::wstring wscCharFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
-        //ConPrint(L"UpdateFFARanking\n");
         try
         {
-            // Open a database file
+            // Open a database file with UTF-8 encoding
             SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
 
             // Check if the entry already exists in the table
-            SQLite::Statement queryExists(db, "SELECT * FROM FFARanking WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-            //ConPrint(L"Query prepared\n");
-            // Print Query
-            //ConPrint(L"Query: " + stows(queryExists.getQuery().c_str()) + L"\n");
+            SQLite::Statement queryExists(db, "SELECT * FROM PVERanking WHERE Charfile = ?");
+            queryExists.bind(1, wstos(wscCharFilename));
             bool entryExists = queryExists.executeStep();
 
             if (entryExists)
             {
-                //ConPrint(L"Entry exists\n");
                 // If the entry exists, update the Kills and Deaths values
                 std::string columnName = (bKills ? "Kills" : "Deaths");
-                SQLite::Statement queryUpdate(db, "UPDATE FFARanking SET " + columnName + " = " + columnName + " + 1, Charname = '" + wstos(wscCharname) + "' WHERE Charfile = '" + wstos(wscCharFilename) + "'");
-                //ConPrint(L"Query: " + stows(queryUpdate.getQuery().c_str()) + L"\n");
+                SQLite::Statement queryUpdate(db, "UPDATE PVERanking SET " + columnName + " = " + columnName + " + 1, Charname = ? WHERE Charfile = ?");
+                queryUpdate.bind(1, wstos(wscCharname));
+                queryUpdate.bind(2, wstos(wscCharFilename));
                 queryUpdate.exec();
             }
             else
             {
-               //ConPrint(L"Entry doesn't exist\n");
                 // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
-                SQLite::Statement queryInsert(db, "INSERT INTO FFARanking (Charname, Kills, Deaths, Charfile) VALUES ('" + wstos(wscCharname) + "', " + (bKills ? "1, 0" : "0, 1") + ",'" + wstos(wscCharFilename) + "')");
-                //ConPrint(L"Query prepared\n");
-                //ConPrint(L"Query: " + stows(queryInsert.getQuery().c_str()) + L"\n");
+                SQLite::Statement queryInsert(db, "INSERT INTO PVERanking (Charname, Kills, Deaths, Charfile) VALUES (?, ?, ?, ?)");
+                queryInsert.bind(1, wstos(wscCharname));
+                queryInsert.bind(2, bKills ? 1 : 0);
+                queryInsert.bind(3, bKills ? 0 : 1);
+                queryInsert.bind(4, wstos(wscCharFilename));
                 queryInsert.exec();
             }
+        }
+        catch (std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+        }
+    }
 
+    void UpdateDuelRanking(uint iClientID, bool bKills)
+    {
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+
+        try
+        {
+            // Open a database file with UTF-8 encoding
+            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+
+            // Check if the entry already exists in the table
+            SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charfile = ?");
+            queryExists.bind(1, wstos(wscCharFilename));
+            bool entryExists = queryExists.executeStep();
+
+            if (entryExists)
+            {
+                // If the entry exists, update the Kills and Deaths values
+                std::string columnName = (bKills ? "Kills" : "Deaths");
+                SQLite::Statement queryUpdate(db, "UPDATE DuelRanking SET " + columnName + " = " + columnName + " + 1, Charname = ? WHERE Charfile = ?");
+                queryUpdate.bind(1, wstos(wscCharname));
+                queryUpdate.bind(2, wstos(wscCharFilename));
+                queryUpdate.exec();
+            }
+            else
+            {
+                // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
+                SQLite::Statement queryInsert(db, "INSERT INTO DuelRanking (Charname, Kills, Deaths, Charfile) VALUES (?, ?, ?, ?)");
+                queryInsert.bind(1, wstos(wscCharname));
+                queryInsert.bind(2, bKills ? 1 : 0);
+                queryInsert.bind(3, bKills ? 0 : 1);
+                queryInsert.bind(4, wstos(wscCharFilename));
+                queryInsert.exec();
+            }
+        }
+        catch (std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+        }
+    }
+
+
+    void UpdateFFARanking(uint iClientID, bool bKills)
+    {
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+
+        try
+        {
+            // Open a database file with UTF-8 encoding
+            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+
+            // Check if the entry already exists in the table
+            SQLite::Statement queryExists(db, "SELECT * FROM FFARanking WHERE Charfile = ?");
+            queryExists.bind(1, wstos(wscCharFilename));
+            bool entryExists = queryExists.executeStep();
+
+            if (entryExists)
+            {
+                // If the entry exists, update the Kills and Deaths values
+                std::string columnName = (bKills ? "Kills" : "Deaths");
+                SQLite::Statement queryUpdate(db, "UPDATE FFARanking SET " + columnName + " = " + columnName + " + 1, Charname = ? WHERE Charfile = ?");
+                queryUpdate.bind(1, wstos(wscCharname));
+                queryUpdate.bind(2, wstos(wscCharFilename));
+                queryUpdate.exec();
+            }
+            else
+            {
+                // If the entry doesn't exist, insert a new row with the default value of 1 for Kills and Deaths
+                SQLite::Statement queryInsert(db, "INSERT INTO FFARanking (Charname, Kills, Deaths, Charfile) VALUES (?, ?, ?, ?)");
+                queryInsert.bind(1, wstos(wscCharname));
+                queryInsert.bind(2, bKills ? 1 : 0);
+                queryInsert.bind(3, bKills ? 0 : 1);
+                queryInsert.bind(4, wstos(wscCharFilename));
+                queryInsert.exec();
+            }
         }
         catch (std::exception& e)
         {
@@ -729,7 +814,7 @@ namespace PVP {
     void CalcRanking(const std::string& tableName)
     {
      
-        //ConPrint(L"Task: Calculate " + stows(tableName) + L"...\n");
+        ConPrint(L"Task: Calculate " + stows(tableName) + L"...\n");
 
         try
         {

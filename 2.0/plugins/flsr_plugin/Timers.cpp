@@ -93,7 +93,7 @@ namespace Timers {
        {TimerUpdate1000ms, 1000, 0},
        {Docking::DockRequest3000ms, 3000, 0},
        {PathSelection::ModUnlawfulChar500ms, 500, 0},
-       {Tools::CharSelectMenu, 500, 0},
+       {Tools::CharSelectMenu, 2000, 0},
 
     };
 

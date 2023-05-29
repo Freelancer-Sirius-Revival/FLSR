@@ -1,6 +1,6 @@
 ﻿  PVP.cpp
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\PVP.cpp(224,30): warning C4018: ">": Konflikt zwischen "signed" und "unsigned"
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\PVP.cpp(340,18): warning C4101: "err": Unreferenzierte lokale Variable
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\PVP.cpp(231,30): warning C4018: ">": Konflikt zwischen "signed" und "unsigned"
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\PVP.cpp(348,18): warning C4101: "err": Unreferenzierte lokale Variable
   FLSR Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\FLSR Plugin\FLSR.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.dll
   1 Datei(en) kopiert

@@ -32,12 +32,6 @@ namespace Hooks {
             ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
         }
 
-        //PVP
-        if (Modules::GetModuleState("PVP"))
-        {
-            //ConPrint(L"CHARSWITCH");
-            PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
-        }
     }
 
     // LaunchComplete
@@ -716,6 +710,7 @@ namespace Hooks {
         //PVP
         if (Modules::GetModuleState("PVP"))
         {
+            //ConPrint (L"Disconnect: %u\n", iClientID);
             PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::DISCONNECTED);
         }
     }

@@ -626,6 +626,7 @@ namespace PVP {
             }
             else if (ePVPType == PVPTYPE_FFA)
             {
+                ConPrint(L"FFA DEATH\n");
                 HandleKill(iClientKillerID, ePVPType);
 
                 //CheckLastRound
@@ -770,6 +771,8 @@ namespace PVP {
 
     void UpdateFFARanking(uint iClientID, bool bKills)
     {
+        ConPrint(L"FFARanking Updae\n");
+
         std::wstring wscCharFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
         std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
@@ -813,7 +816,6 @@ namespace PVP {
 
     void CalcRanking(const std::string& tableName)
     {
-     
         ConPrint(L"Task: Calculate " + stows(tableName) + L"...\n");
 
         try
@@ -827,20 +829,26 @@ namespace PVP {
                 db.exec("DROP TABLE " + calculatedTableName);
 
             // Execute a query to calculate the ranking
-            SQLite::Statement query(db, "SELECT Charname, (Kills * Kills) / Deaths AS Rating FROM " + tableName + " ORDER BY Rating DESC LIMIT 100");
+            SQLite::Statement query(db, "SELECT Charname, Kills, Deaths, Charfile, (Kills * Kills) / Deaths AS Rating FROM " + tableName + " ORDER BY Rating DESC LIMIT 100");
 
             // Create a new table for the calculated ranking
-            db.exec("CREATE TABLE " + calculatedTableName + " (Charname TEXT, Rating REAL)");
+            db.exec("CREATE TABLE " + calculatedTableName + " (Charname TEXT, Kills INTEGER, Deaths INTEGER, Charfile TEXT, Rating INTEGER)");
 
             // Insert the top 100 entries into the calculated ranking table
             while (query.executeStep())
             {
                 std::string charname = query.getColumn(0).getString();
-                double rating = query.getColumn(1).getDouble();
+                int kills = query.getColumn(1).getInt();
+                int deaths = query.getColumn(2).getInt();
+                std::string charfile = query.getColumn(3).getString();
+                int rating = static_cast<int>(query.getColumn(4).getDouble()); // Umwandlung in int
 
-                SQLite::Statement insertQuery(db, "INSERT INTO " + calculatedTableName + " (Charname, Rating) VALUES (?, ?)");
+                SQLite::Statement insertQuery(db, "INSERT INTO " + calculatedTableName + " (Charname, Kills, Deaths, Charfile, Rating) VALUES (?, ?, ?, ?, ?)");
                 insertQuery.bind(1, charname);
-                insertQuery.bind(2, rating);
+                insertQuery.bind(2, kills);
+                insertQuery.bind(3, deaths);
+                insertQuery.bind(4, charfile);
+                insertQuery.bind(5, rating);
                 insertQuery.exec();
             }
         }
@@ -850,6 +858,8 @@ namespace PVP {
             ConPrint(L"SQLERROR: " + stows(error) + L"\n");
         }
     }
+
+
 
     void WriteFightInfoToCFG(uint iFightID, const std::string& scCharFilename)
     {
@@ -1028,6 +1038,114 @@ namespace PVP {
         }
     }
 
+    void CmdStats(uint iClientID, const std::wstring& wscParam)
+    {
+
+        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
+        std::string scCharname = wstos(wscCharname);
+
+        // Wandele den Parameter in Kleinbuchstaben um
+        std::wstring wscLowerParam = ToLower(wscParam);
+
+        // Prüfe den Parameter und wähle die entsprechende Tabelle aus
+        std::string scNormalTable;
+        std::string scCalculatedTable;
+
+        if (wscLowerParam == L"pvp")
+        {
+            CalcRanking("PVPRanking");
+            scNormalTable = "PVPRanking";
+            scCalculatedTable = "PVPRankingCalculated";
+        }
+        else if (wscLowerParam == L"pve")
+        {
+            CalcRanking("PVERanking");
+            scNormalTable = "PVERanking";
+            scCalculatedTable = "PVERankingCalculated";
+        }
+        else if (wscLowerParam == L"duel")
+        {
+            CalcRanking("DuelRanking");
+            scNormalTable = "DuelRanking";
+            scCalculatedTable = "DuelRankingCalculated";
+        }
+        else if (wscLowerParam == L"ffa")
+        {
+            CalcRanking("FFARanking");
+            scNormalTable = "FFARanking";
+            scCalculatedTable = "FFARankingCalculated";
+        }
+        else
+        {
+            PrintUserCmdText(iClientID, L"Invalid parameter. Valid options: pvp, pve, duel, ffa");
+            PrintUserCmdText(iClientID, L"Usage: /stats <type>");
+            return;
+        }
+
+        try
+        {
+            // Öffne die Datenbankverbindung
+            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READONLY);
+
+            // Abfrage für die Top 5 Einträge
+            std::string scTop5Query = "SELECT Charname, Kills, Deaths, Rating, ROUND(CAST(Kills AS REAL) / NULLIF(Deaths, 0), 2) AS KD, ROW_NUMBER() OVER(ORDER BY Rating DESC) AS Rank FROM " + scCalculatedTable + " ORDER BY Rank ASC LIMIT 5";
+
+            // Abfrage für den Spieler selbst
+            std::string scPlayerQuery = "SELECT r.Charname, r.Kills, r.Deaths, c.Rating, ROUND(CAST(r.Kills AS REAL) / NULLIF(r.Deaths, 0), 2) AS KD, (SELECT COUNT(*) FROM " + scCalculatedTable + " WHERE Rating > c.Rating) + 1 AS Rank FROM " + scNormalTable + " r LEFT JOIN " + scCalculatedTable + " c ON r.Charname = c.Charname WHERE r.Charname = '" + scCharname + "'";
+
+            // Abfrage für die Top 5 Einträge
+            SQLite::Statement queryTop5(db, scTop5Query);
+            PrintUserCmdText(iClientID, L"TOP 5 " + Tools::ToUpper(wscParam) + L"-STATS");
+            while (queryTop5.executeStep())
+            {
+                std::string charname = queryTop5.getColumn(0).getText();
+                int kills = queryTop5.getColumn(1).getInt();
+                int deaths = queryTop5.getColumn(2).getInt();
+                int rating = queryTop5.getColumn(3).getInt();
+                double kd = queryTop5.getColumn(4).getDouble();
+                int rank = queryTop5.getColumn(5).getInt();
+
+                std::wstring wsckd = std::to_wstring(kd);
+                if (wsckd.length() >= 4) {
+                    wsckd = wsckd.substr(0, wsckd.length() - 4);
+                }
+
+                std::wstring wscEntry = L"[" + std::to_wstring(rank) + L"] " + stows(charname) + L" - Kills: " + std::to_wstring(kills) + L", Deaths: " + std::to_wstring(deaths) + L", Rating: " + std::to_wstring(rating) + L", K/D: " + (wsckd);
+                PrintUserCmdText(iClientID, wscEntry);
+            }
+
+            // Abfrage für den Spieler selbst
+            SQLite::Statement queryPlayer(db, scPlayerQuery);
+            PrintUserCmdText(iClientID, L"\nYOUR STATS");
+            if (queryPlayer.executeStep())
+            {
+                std::string charname = queryPlayer.getColumn(0).getText();
+                int kills = queryPlayer.getColumn(1).getInt();
+                int deaths = queryPlayer.getColumn(2).getInt();
+                int rating = queryPlayer.getColumn(3).getInt();
+                double kd = queryPlayer.getColumn(4).getDouble();
+                int rank = queryPlayer.getColumn(5).getInt();
+
+                std::wstring wsckd = std::to_wstring(kd);
+                if (wsckd.length() >= 4) {
+                    wsckd = wsckd.substr(0, wsckd.length() - 4);
+                }
+
+                std::wstring wscEntry = L"[" + std::to_wstring(rank) + L"] " + stows(charname) + L" - Kills: " + std::to_wstring(kills) + L", Deaths: " + std::to_wstring(deaths) + L", Rating: " + std::to_wstring(rating) + L", K/D: " + (wsckd);
+                PrintUserCmdText(iClientID, wscEntry);
+            }
+            else
+            {
+                PrintUserCmdText(iClientID, L"No stats found for your character.");
+            }
+        }
+        catch (std::exception& e)
+        {
+            std::string error = e.what();
+            ConPrint(L"SQLERROR: " + stows(error) + L"\n");
+            PrintUserCmdText(iClientID, L"Error retrieving statistics. Please try again later.");
+        }
+    }
 
 
 }

@@ -96,6 +96,14 @@ namespace Commands {
 
     }
 
+    void UserCmd_stats(uint iClientID, const std::wstring& wscParam) {
+        if (Modules::GetModuleState("PVP"))
+        {
+            PVP::CmdStats(iClientID, wscParam);
+        }
+
+    }
+
     void UserCmd_pvpinvite(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("PVP"))
         {
@@ -1135,6 +1143,7 @@ namespace Commands {
         {L"/pvpaccept", UserCmd_pvpaccept},
         {L"/pvpclear", UserCmd_pvpclear},
         {L"/pvpinvite", UserCmd_pvpinvite},
+        {L"/stats", UserCmd_stats},
 
 
         //Not Used Commands

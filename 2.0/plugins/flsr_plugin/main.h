@@ -271,6 +271,7 @@ namespace Tools {
     int CountShortestPath(std::string start, std::string end);
 
     void FLSRIniDelete(const std::string& scFile, const std::string& scApp, const std::string& scKey);
+    std::wstring ToUpper(const std::wstring& str);
  
 }
 
@@ -1043,6 +1044,7 @@ namespace PVP {
     void RemovePlayerFromFight(uint iFightID, const std::wstring& wscCharname);
     void UpdatePVERanking(uint iClientID, bool bKills);
     void UpdatePVPRanking(uint iClientID, bool bKills);
+    void CmdStats(uint iClientID, const std::wstring& wscParam);
 
 }
 

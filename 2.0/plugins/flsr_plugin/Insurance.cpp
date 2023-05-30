@@ -35,23 +35,11 @@ namespace Insurance {
         std::list<CARGO_INFO> lstAdditional;
         float fValue;
         int iPrice;
-        for (auto& cargo : lstCargo) {
-            Archetype::Equipment* eq = Archetype::GetEquipment(cargo.iArchID);
-            auto aType = eq->get_class_type();
+        for (auto const& cargo : lstCargo) {
+            Archetype::Equipment const* eq = Archetype::GetEquipment(cargo.iArchID);
+            auto aType = eq->get_class_type();           
 
-            //conprint icount archtype archid bmounted
-            
-
-
-
-            if (cargo.bMounted &&
-                (aType == Archetype::SHIELD_GENERATOR ||
-                    aType == Archetype::THRUSTER ||
-                    aType == Archetype::LAUNCHER ||
-                    aType == Archetype::GUN ||
-                    aType == Archetype::MINE_DROPPER ||
-                    aType == Archetype::COUNTER_MEASURE_DROPPER ||
-                    aType == Archetype::CLOAKING_DEVICE)) {
+            if (cargo.bMounted && isInsurableClass(aType)) {
 
                 const GoodInfo* gi = GoodList_get()->find_by_id(cargo.iArchID);
                 if (gi) {
@@ -63,38 +51,22 @@ namespace Insurance {
                         fValue += fItemValue;
 
                         // Save
-                        if (iPrice <= 0) {
-                            iCountEquip++;
-                            lstMounted.push_back(cargo);
+                        iCountEquip++;
+                        lstMounted.push_back(cargo);
 
-                            // AddToPriceList
-                            PriceList NewEntry;
-                            NewEntry.bFreeInsurance = bFreeInsurance;
-                            NewEntry.bItemisFree = true;
-                            NewEntry.CARGO_INFO = cargo;
-                            NewEntry.GoodInfo = *gi;
-                            lPriceList.push_back(NewEntry);
-                        }
-                        else {
-                            iCountEquip++;
-                            lstMounted.push_back(cargo);
+                        // AddToPriceList
+                        PriceList NewEntry;
+                        NewEntry.bFreeInsurance = bFreeInsurance;
+                        NewEntry.bItemisFree = (iPrice <= 0);
+                        NewEntry.CARGO_INFO = cargo;
+                        NewEntry.GoodInfo = *gi;
+                        NewEntry.aClassType = aType;
+                        lPriceList.push_back(NewEntry);
 
-                            // AddToPriceList
-                            PriceList NewEntry;
-                            NewEntry.bFreeInsurance = bFreeInsurance;
-                            NewEntry.bItemisFree = false;
-                            NewEntry.CARGO_INFO = cargo;
-                            NewEntry.GoodInfo = *gi;
-                            lPriceList.push_back(NewEntry);
-                        }
                     }
                 }
             }
-            else if (aType == Archetype::REPAIR_KIT ||
-                    aType == Archetype::SHIELD_BATTERY ||
-                    aType == Archetype::MUNITION ||
-                    aType == Archetype::MINE ||
-                    aType == Archetype::COUNTER_MEASURE) {
+            else if (isAmmoClass(aType)) {
 
                 //ConPrint(L"found additional item\n");
                 //ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
@@ -109,30 +81,17 @@ namespace Insurance {
                         fValue += fItemValue;
 
                         // Save
-                        if (iPrice <= 0) {
-                            iCountEquip++;
-                            lstAdditional.push_back(cargo);
+                        iCountEquip++;
+                        lstMounted.push_back(cargo);
 
-                            // AddToPriceList
-                            PriceList NewEntry;
-                            NewEntry.bFreeInsurance = bFreeInsurance;
-                            NewEntry.bItemisFree = true;
-                            NewEntry.CARGO_INFO = cargo;
-                            NewEntry.GoodInfo = *gi;
-                            lPriceList.push_back(NewEntry);
-                        }
-                        else {
-                            iCountEquip++;
-                            lstAdditional.push_back(cargo);
-
-                            // AddToPriceList
-                            PriceList NewEntry;
-                            NewEntry.bFreeInsurance = bFreeInsurance;
-                            NewEntry.bItemisFree = false;
-                            NewEntry.CARGO_INFO = cargo;
-                            NewEntry.GoodInfo = *gi;
-                            lPriceList.push_back(NewEntry);
-                        }
+                        // AddToPriceList
+                        PriceList NewEntry;
+                        NewEntry.bFreeInsurance = bFreeInsurance;
+                        NewEntry.bItemisFree = (iPrice <= 0);
+                        NewEntry.CARGO_INFO = cargo;
+                        NewEntry.GoodInfo = *gi;
+                        NewEntry.aClassType = aType;
+                        lPriceList.push_back(NewEntry);
                     }
                 }
             }
@@ -166,11 +125,12 @@ namespace Insurance {
 
             if (!MountedEquipPriceList->bItemisFree && !MountedEquipPriceList->bFreeInsurance)
             {
-                fprice += gi.fPrice;
-                fCalculatedPrice = fCalculatedPrice + ((gi.fPrice / 100.0f) * Insurance::set_fCostPercent);
+                fprice += gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount;
+                fCalculatedPrice = fCalculatedPrice + (((gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount) / 100.0f) * Insurance::set_fCostPercent);
 
-               // ConPrint(L"New Calculated Price: " + std::to_wstring(fCalculatedPrice) + L"\n");
+                // ConPrint(L"New Calculated Price: " + std::to_wstring(fCalculatedPrice) + L"\n");
             }
+
            
 
             MountedEquipPriceList++;
@@ -226,6 +186,8 @@ namespace Insurance {
                 //GetData
                 GoodInfo gi = MountedEquipPriceList->GoodInfo;
                 CARGO_INFO ci = MountedEquipPriceList->CARGO_INFO;
+                std::string classType = std::to_string(static_cast<int>(MountedEquipPriceList->aClassType));
+
 
                 IniWrite(scInsuranceStore + scFilename + ".cfg", "Equip-" + std::to_string(Equip), "bMission", std::to_string(ci.bMission));
                 IniWrite(scInsuranceStore + scFilename + ".cfg", "Equip-" + std::to_string(Equip), "bMounted", std::to_string(ci.bMounted));
@@ -236,6 +198,8 @@ namespace Insurance {
                 IniWrite(scInsuranceStore + scFilename + ".cfg", "Equip-" + std::to_string(Equip), "iID", std::to_string(ci.iID));
                 IniWrite(scInsuranceStore + scFilename + ".cfg", "Equip-" + std::to_string(Equip), "fPrice", std::to_string(((gi.fPrice / 100.0f)* Insurance::set_fCostPercent)));
                 IniWrite(scInsuranceStore + scFilename + ".cfg", "Equip-" + std::to_string(Equip), "bItemisFree", std::to_string(MountedEquipPriceList->bItemisFree));
+                IniWrite(scInsuranceStore + scFilename + ".cfg", "Equip-" + std::to_string(Equip), "ClassType", classType);
+
 
 
                 Equip++;
@@ -438,7 +402,26 @@ namespace Insurance {
                 // ConPrint InsuranceEquip Size
                 ConPrint(L"InsuranceEquip Size: %u\n", iterInsuranceEquip->CARGO_INFO.iCount);
 
-   
+                if (auto aType = eq->get_class_type();
+                    aType == Archetype::REPAIR_KIT ||
+                    aType == Archetype::SHIELD_BATTERY ||
+                    aType == Archetype::MUNITION ||
+                    aType == Archetype::MINE ||
+                    aType == Archetype::COUNTER_MEASURE)
+                {
+                    ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+
+                    Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, iterInsuranceEquip->CARGO_INFO.iCount, false);
+                    bAdded = true;
+
+                }
+                else {
+                    std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
+                    HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
+                    ConPrint(L"Created WEAPON %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                    bAdded = true;
+
+                }
 
 
 
@@ -806,4 +789,26 @@ namespace Insurance {
             }    
         }
     }
+
+    bool isAmmoClass(Archetype::AClassType aType)
+    {
+        return aType == Archetype::REPAIR_KIT ||
+            aType == Archetype::SHIELD_BATTERY ||
+            aType == Archetype::MUNITION ||
+            aType == Archetype::MINE ||
+            aType == Archetype::COUNTER_MEASURE;
+    }
+
+    bool isInsurableClass(Archetype::AClassType aType)
+    {
+        return aType == Archetype::SHIELD_GENERATOR ||
+            aType == Archetype::THRUSTER ||
+            aType == Archetype::LAUNCHER ||
+            aType == Archetype::GUN ||
+            aType == Archetype::MINE_DROPPER ||
+            aType == Archetype::COUNTER_MEASURE_DROPPER ||
+            aType == Archetype::CLOAKING_DEVICE;
+    }
+
+
 }

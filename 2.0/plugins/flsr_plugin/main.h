@@ -496,6 +496,8 @@ namespace Insurance {
     std::wstring CalcInsurance(uint iClientID, bool bPlayerCMD, bool bFreeInsurance);
     bool insurace_exists(const std::string &name);
     void ReNewInsurance(uint iClientID);
+    bool isAmmoClass(Archetype::AClassType aType);
+    bool isInsurableClass(Archetype::AClassType aType);
 
     extern struct PlayerDied {
 
@@ -536,6 +538,8 @@ namespace Insurance {
 		GoodInfo GoodInfo;
         bool bFreeInsurance;
         bool bItemisFree;
+        Archetype::AClassType aClassType;
+
     };
 
     extern struct RestoreEquip {

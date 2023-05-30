@@ -272,6 +272,8 @@ namespace Tools {
 
     void FLSRIniDelete(const std::string& scFile, const std::string& scApp, const std::string& scKey);
     std::wstring ToUpper(const std::wstring& str);
+    HK_ERROR FLSRHkAddEquip(const std::wstring& wscCharname, uint iGoodID,const std::string& scHardpoint, bool bMounted);
+    HK_ERROR FLSRHkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount, bool bMission);
  
 }
 

@@ -810,5 +810,47 @@ namespace Insurance {
             aType == Archetype::CLOAKING_DEVICE;
     }
 
+    std::string GetInsuranceTypeString(InsuranceType type) {
+        switch (type) {
+        case InsuranceType::None: return "none";
+        case InsuranceType::Mines: return "mines";
+        case InsuranceType::Projectiles: return "projectiles";
+        case InsuranceType::Countermeasures: return "cms";
+        case InsuranceType::ShieldBatteries: return "shieldbats";
+        case InsuranceType::Nanobots: return "nanobots";
+        case InsuranceType::Equipment: return "equipment";
+        case InsuranceType::All: return "all";
+        default: return "";
+        }
+    }
+
+    void SetInsuranceTypeString(uint iClientID, InsuranceType type, const std::string& value) {
+        CAccount* acc = Players.FindAccountFromClientID(iClientID);
+        std::wstring wscAccDir;
+        HkGetAccountDirName(acc, wscAccDir);
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+
+        std::wstring wscFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
+        std::string scFilename = wstos(wscFilename);
+
+        std::string typeString = GetInsuranceTypeString(type);
+        if (!typeString.empty()) {
+            IniWrite(scUserFile, scFilename, "INSURANCE-" + typeString, value);
+        }
+    }
+
+    InsuranceType GetInsuranceTypeFromString(const std::string& value) {
+        if (value == "none") return InsuranceType::None;
+        if (value == "mines") return InsuranceType::Mines;
+        if (value == "projectiles") return InsuranceType::Projectiles;
+        if (value == "cms") return InsuranceType::Countermeasures;
+        if (value == "shieldbats") return InsuranceType::ShieldBatteries;
+        if (value == "nanobots") return InsuranceType::Nanobots;
+        if (value == "equipment") return InsuranceType::Equipment;
+        if (value == "all") return InsuranceType::All;
+        return InsuranceType::None; // Default value
+    }
+
 
 }

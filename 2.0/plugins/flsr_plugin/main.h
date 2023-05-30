@@ -483,21 +483,18 @@ namespace ClientController {
 
 namespace Insurance {
 
-    extern float set_fCostPercent;
     
-    extern bool Insurance_Module;
-    void CreateNewInsurance(uint iClientID, bool bFreeItem);
-    void UseInsurance(uint iClientID);
-    void PlayerDiedEvent(bool bDied, uint iClientID);
-    bool CheckPlayerDied(uint iClientID);
-    bool FindHardpointCargolist(std::list<CARGO_INFO> &cargolist, CacheString &hardpoint);   
-    void BookInsurance(uint iClientID, bool bFreeItem);
-    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID);
-    std::wstring CalcInsurance(uint iClientID, bool bPlayerCMD, bool bFreeInsurance);
-    bool insurace_exists(const std::string &name);
-    void ReNewInsurance(uint iClientID);
-    bool isAmmoClass(Archetype::AClassType aType);
-    bool isInsurableClass(Archetype::AClassType aType);
+
+    enum class InsuranceType {
+        None,
+        Mines,
+        Projectiles,
+        Countermeasures,
+        ShieldBatteries,
+        Nanobots,
+        Equipment,
+        All
+    };
 
     extern struct PlayerDied {
 
@@ -552,6 +549,24 @@ namespace Insurance {
     extern std::map<std::wstring, std::list<PriceList>> mPriceList;
     extern std::list<PlayerDied> lPlayerDied;
     extern std::list<BookInsuranceEvent> lBookInsuranceEvent;
+    extern float set_fCostPercent;
+
+    extern bool Insurance_Module;
+    void CreateNewInsurance(uint iClientID, bool bFreeItem);
+    void UseInsurance(uint iClientID);
+    void PlayerDiedEvent(bool bDied, uint iClientID);
+    bool CheckPlayerDied(uint iClientID);
+    bool FindHardpointCargolist(std::list<CARGO_INFO>& cargolist, CacheString& hardpoint);
+    void BookInsurance(uint iClientID, bool bFreeItem);
+    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID);
+    std::wstring CalcInsurance(uint iClientID, bool bPlayerCMD, bool bFreeInsurance);
+    bool insurace_exists(const std::string& name);
+    void ReNewInsurance(uint iClientID);
+    bool isAmmoClass(Archetype::AClassType aType);
+    bool isInsurableClass(Archetype::AClassType aType);
+    std::string GetInsuranceTypeString(InsuranceType type);
+    void SetInsuranceTypeString(uint iClientID, InsuranceType type, const std::string& value);
+    InsuranceType GetInsuranceTypeFromString(const std::string& value);
 }
 
 namespace AntiCheat {

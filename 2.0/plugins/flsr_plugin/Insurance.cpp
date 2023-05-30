@@ -208,6 +208,8 @@ namespace Insurance {
 
             //HkSaveChar(iClientID);
 
+            //Test
+            iCountEquip--;
 
             // New Insurance
             IniWrite(scInsuranceStore + scFilename + ".cfg", "INSURANCE", "Charname", scFilename);
@@ -278,6 +280,8 @@ namespace Insurance {
         int Store_iCountEquip = IniGetI(scInsuranceStore + scFilename + ".cfg", "INSURANCE", "EquipCount", 0);
         bool bFreeInsurance = IniGetB(scInsuranceStore + scFilename + ".cfg", "INSURANCE", "FreeInsurance", false);
 
+
+
         //Read Insurance from Store
         int Equiploop = 0;
         while (Equiploop <= Store_iCountEquip) {
@@ -323,8 +327,8 @@ namespace Insurance {
         // Initialize the lists to store mounted and additional equipment
         std::list<CARGO_INFO> lstMounted;
 
-        for (auto& cargo : lstCargo) {
-            Archetype::Equipment* eq = Archetype::GetEquipment(cargo.iArchID);
+        for (auto const& cargo : lstCargo) {
+            Archetype::Equipment const* eq = Archetype::GetEquipment(cargo.iArchID);
             auto aType = eq->get_class_type();
 
             if (cargo.bMounted &&
@@ -338,167 +342,118 @@ namespace Insurance {
 
                 lstMounted.push_back(cargo);
             }
-            else if (!cargo.bMounted &&
-                (aType == Archetype::REPAIR_KIT ||
+            else if (aType == Archetype::REPAIR_KIT ||
                     aType == Archetype::SHIELD_BATTERY ||
                     aType == Archetype::MUNITION ||
                     aType == Archetype::MINE ||
-                    aType == Archetype::COUNTER_MEASURE)) {
+                    aType == Archetype::COUNTER_MEASURE) 
+            {
 
 
                 lstMounted.push_back(cargo);
             }
 
         }
+        
 
+        ConPrint(L"Insured Equip: \n");
+        //Print lInsuredEquip to Console in a Loop
+        for (auto const& equip : lInsuredEquip) {
+            ConPrint(L"Equip: " + stows(equip.CARGO_INFO.hardpoint.value) + L" " + std::to_wstring(equip.CARGO_INFO.iArchID) + L" " + std::to_wstring(equip.CARGO_INFO.iCount) + L" " + std::to_wstring(equip.CARGO_INFO.iID) + L" " + std::to_wstring(equip.CARGO_INFO.fStatus) + L" " + std::to_wstring(equip.bItemisFree) + L" " + std::to_wstring(equip.fPrice) + L"\n");
+        }
+
+        ConPrint(L"Mounted Equip: \n");
+        //Print lstMounted to Console in a Loop
+        for (auto const& equip : lstMounted) {
+			ConPrint(L"Equip: " + stows(equip.hardpoint.value) + L" " + std::to_wstring(equip.iArchID) + L" " + std::to_wstring(equip.iCount) + L" " + std::to_wstring(equip.iID) + L" " + std::to_wstring(equip.fStatus) + L" " + std::to_wstring(equip.bMounted) + L" " + std::to_wstring(equip.bMission) + L"\n");
+		}
         
         //Merge Insurance with actual Equip
         float fPrice = 0.0f;
-        uint iEquipAdded = 0;
+        //uint iEquipAdded = 0;
         bool bAdded = false;
-        std::list<RestoreEquip>::iterator InsuranceEquip = lInsuredEquip.begin();
-        while (InsuranceEquip != lInsuredEquip.end())
+        auto iterInsuranceEquip = lInsuredEquip.begin();
+        while (iterInsuranceEquip != lInsuredEquip.end())
         {
             bool bFound = false;
 
-            std::list<CARGO_INFO>::iterator mountedEquip = lstMounted.begin();
-            while (mountedEquip != lstMounted.end())
+            Archetype::Equipment const* eq = Archetype::GetEquipment(iterInsuranceEquip->CARGO_INFO.iArchID);
+
+
+            auto itermountedEquip = lstMounted.begin();
+            while (itermountedEquip != lstMounted.end())
             {
-                if (mountedEquip->iArchID == InsuranceEquip->CARGO_INFO.iArchID)
+                if (itermountedEquip->iArchID == iterInsuranceEquip->CARGO_INFO.iArchID)
                 {
                     bFound = true;
 
-                    if (mountedEquip->iCount < InsuranceEquip->CARGO_INFO.iCount)
+                    if (itermountedEquip->iCount < iterInsuranceEquip->CARGO_INFO.iCount)
                     {
-                        uint itemsToAdd = InsuranceEquip->CARGO_INFO.iCount - mountedEquip->iCount;
+                        uint itemsToAdd = iterInsuranceEquip->CARGO_INFO.iCount - itermountedEquip->iCount;
  
-                        Archetype::Equipment* eq = Archetype::GetEquipment(InsuranceEquip->CARGO_INFO.iArchID);
-                        auto aType = eq->get_class_type();
 
-                        if (aType == Archetype::REPAIR_KIT ||
+                        if (auto aType = eq->get_class_type(); 
+                            aType == Archetype::REPAIR_KIT ||
                             aType == Archetype::SHIELD_BATTERY ||
                             aType == Archetype::MUNITION ||
                             aType == Archetype::MINE ||
                             aType == Archetype::COUNTER_MEASURE)
                         {
 
-                            Tools::FLSRHkAddCargo(wscCharname, InsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
+                            Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
+                            ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            bAdded = true;
 
-                            char* szClassPtr;
-                            memcpy(&szClassPtr, &Players, 4);
-                            szClassPtr += 0x418 * (iClientID - 1);
-                            ulong lCRC;
-                            __asm
-                            {
-                                pushad
-                                mov ecx, [szClassPtr]
-                                call[CRCAntiCheat_FLSR]
-                                mov[lCRC], eax
-                                popad
-                            }
-                            memcpy(szClassPtr + 0x320, &lCRC, 4);
                         }
                         else {
-                            std::string phardpoint = InsuranceEquip->CARGO_INFO.hardpoint.value;
-                            HkAddEquip(ARG_CLIENTID(iClientID), InsuranceEquip->CARGO_INFO.iArchID, phardpoint);
-
-                            char* szClassPtr;
-                            memcpy(&szClassPtr, &Players, 4);
-                            szClassPtr += 0x418 * (iClientID - 1);
-                            ulong lCRC;
-                            __asm
-                            {
-                                pushad
-                                mov ecx, [szClassPtr]
-                                call[CRCAntiCheat_FLSR]
-                                mov[lCRC], eax
-                                popad
-                            }
-                            memcpy(szClassPtr + 0x320, &lCRC, 4);
+                            std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
+                            HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
+                            ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            bAdded = true;
 
                         }
 
 
-                        
+                       
 
-                        bAdded = true;
-
-                        if (!InsuranceEquip->bItemisFree && !bFreeInsurance)
+                        if (!iterInsuranceEquip->bItemisFree && !bFreeInsurance && bAdded)
                         {
-                            float newfItemPrice = InsuranceEquip->fPrice * itemsToAdd;
+                            float newfItemPrice = iterInsuranceEquip->fPrice * itemsToAdd;
                             fPrice += newfItemPrice;
                         }
                     }
-                    break; // Wenn das Equipment gefunden wurde und der iCount überprüft wurde, brechen wir die Schleife ab
                 }
 
-                ++mountedEquip;
+                if (bFound)
+                    break;
+
+                itermountedEquip++;
             }
 
             if (!bFound)
             {
                 // Das Equipment wurde nicht in lstMounted gefunden, fügen Sie es hinzu
-                
-                Archetype::Equipment* eq = Archetype::GetEquipment(InsuranceEquip->CARGO_INFO.iArchID);
-                auto aType = eq->get_class_type();
+                ConPrint(L"not found\n");
 
-                if (aType == Archetype::REPAIR_KIT ||
-                    aType == Archetype::SHIELD_BATTERY ||
-                    aType == Archetype::MUNITION ||
-                    aType == Archetype::MINE ||
-                    aType == Archetype::COUNTER_MEASURE)
+                // ConPrint InsuranceEquip Size
+                ConPrint(L"InsuranceEquip Size: %u\n", iterInsuranceEquip->CARGO_INFO.iCount);
+
+   
+
+
+
+                if (!iterInsuranceEquip->bItemisFree && !bFreeInsurance && bAdded)
                 {
-
-                    Tools::FLSRHkAddCargo(wscCharname, InsuranceEquip->CARGO_INFO.iArchID, InsuranceEquip->CARGO_INFO.iCount, false);
-
-                    char* szClassPtr;
-                    memcpy(&szClassPtr, &Players, 4);
-                    szClassPtr += 0x418 * (iClientID - 1);
-                    ulong lCRC;
-                    __asm
-                    {
-                        pushad
-                        mov ecx, [szClassPtr]
-                        call[CRCAntiCheat_FLSR]
-                        mov[lCRC], eax
-                        popad
-                    }
-                    memcpy(szClassPtr + 0x320, &lCRC, 4);
-                }
-                else {
-                    std::string phardpoint = InsuranceEquip->CARGO_INFO.hardpoint.value;
-                    HkAddEquip(ARG_CLIENTID(iClientID), InsuranceEquip->CARGO_INFO.iArchID, phardpoint);
-
-                    char* szClassPtr;
-                    memcpy(&szClassPtr, &Players, 4);
-                    szClassPtr += 0x418 * (iClientID - 1);
-                    ulong lCRC;
-                    __asm
-                    {
-                        pushad
-                        mov ecx, [szClassPtr]
-                        call[CRCAntiCheat_FLSR]
-                        mov[lCRC], eax
-                        popad
-                    }
-                    memcpy(szClassPtr + 0x320, &lCRC, 4);
-
-                }
-                
-
-                bAdded = true;
-
-                if (!InsuranceEquip->bItemisFree && !bFreeInsurance)
-                {
-                    float newfItemPrice = InsuranceEquip->fPrice * InsuranceEquip->CARGO_INFO.iCount;
+                    float newfItemPrice = iterInsuranceEquip->fPrice * iterInsuranceEquip->CARGO_INFO.iCount;
                     fPrice += newfItemPrice;
                 }
+
             }
 
-            ++InsuranceEquip;
+
+
+            iterInsuranceEquip++;
         }
-
-
 
         // Add Cash
         if (!bFreeInsurance)
@@ -510,6 +465,25 @@ namespace Insurance {
             }
 
             //PrintUserCmdText(iClientID, L"Insurance Deposit: " + std::to_wstring(Store_iWorth) + L". Cashback: " + std::to_wstring(CashBack));
+        }
+
+        //Update CRC
+        if (bAdded)
+        {
+
+            char* szClassPtr;
+            memcpy(&szClassPtr, &Players, 4);
+            szClassPtr += 0x418 * (iClientID - 1);
+            ulong lCRC;
+            __asm
+            {
+                pushad
+                mov ecx, [szClassPtr]
+                call[CRCAntiCheat_FLSR]
+                mov[lCRC], eax
+                popad
+            }
+            memcpy(szClassPtr + 0x320, &lCRC, 4);
         }
 
         //PlayerFeedback
@@ -526,29 +500,6 @@ namespace Insurance {
         //DeleteInsurance
         std::string sInsurancepath = scInsuranceStore + scFilename + ".cfg";
         remove(sInsurancepath.c_str());
-
-        //Bypass AntiCheat
-        struct PlayerData* pPD = 0;
-        while (pPD = Players.traverse_active(pPD)) {
-            uint piClientID = HkGetClientIdFromPD(pPD);
-            if (piClientID == iClientID) {
-
-                char* szClassPtr;
-                memcpy(&szClassPtr, &Players, 4);
-                szClassPtr += 0x418 * (iClientID - 1);
-                ulong lCRC;
-                __asm
-                {
-                    pushad
-                    mov ecx, [szClassPtr]
-                    call[CRCAntiCheat_FLSR]
-                    mov[lCRC], eax
-                    popad
-                }
-                memcpy(szClassPtr + 0x320, &lCRC, 4);
-                break;
-            }
-        }
     }
 
     void PlayerDiedEvent(bool bDied, uint iClientID) {

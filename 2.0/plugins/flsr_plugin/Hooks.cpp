@@ -145,6 +145,8 @@ namespace Hooks {
             size_t victimEnd = wscMsg.find(L" was killed by an admin");
             victim = wscMsg.substr(victimStart, victimEnd - victimStart);
             DeathType = Tools::ADMIN;
+            iClientIDKiller = 0;
+
         }
         else if (wscMsg.find(L" was killed by ") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
@@ -168,18 +170,21 @@ namespace Hooks {
             size_t typeEnd = wscMsg.find_last_of(L")");
             DeathType = Tools::KILLEDHIMSELF;
 
+            iClientIDKiller = 0;
         }
         else if (wscMsg.find(L"committed suicide") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
             size_t victimEnd = wscMsg.find(L" committed suicide");
             victim = wscMsg.substr(victimStart, victimEnd - victimStart);
             DeathType = Tools::SUICIDE;
+            iClientIDKiller = 0;
         }
         else if (wscMsg.find(L" has died") != std::wstring::npos) {
             size_t victimStart = wscMsg.find(L"Death: ") + 7;
             size_t victimEnd = wscMsg.find(L" has died");
             victim = wscMsg.substr(victimStart, victimEnd - victimStart);
             DeathType = Tools::HASDIED;
+            iClientIDKiller = 0;
         }
 
 

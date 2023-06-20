@@ -259,15 +259,8 @@ namespace Commands {
 
         }
     }
-	
-    void UserCMD_INSURANCE_CALC(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("InsuranceModule"))
-        {
-            Insurance::CalcInsurance(iClientID, true, false);
-        }
-	}
 
-    void UserCMD_INSURANCE_AUTOSAVE(uint iClientID, const std::wstring &wscParam) {
+    /*void UserCMD_INSURANCE_AUTOSAVE(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("InsuranceModule"))
         {
             uint ship;
@@ -316,6 +309,331 @@ namespace Commands {
             }
         }
     }
+    */
+
+    void UserCMD_INSURANCE_AUTOSAVE(uint iClientID, const std::wstring& wscParam) {
+
+        using namespace Insurance;
+
+        // Check Modul
+        if (!Modules::GetModuleState("InsuranceModule")) {
+            return;
+        }
+
+        // Charname
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+        std::string scCharname = wstos(wscCharname);
+
+        // Check InsuranceType - Konfig
+        CAccount* acc = Players.FindAccountFromClientID(iClientID);
+        std::wstring wscAccDir;
+        HkGetAccountDirName(acc, wscAccDir);
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+
+        // Charfilename
+        std::wstring wscCharFilename;
+        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
+        std::string scCharFilename = wstos(wscCharFilename);
+
+        // Lese die INI-Werte
+        bool bMines = (IniGetS(scUserFile, "INSURANCE-" + scCharFilename, "Mines", "OFF") == "ON");
+        bool bProjectiles = (IniGetS(scUserFile, "INSURANCE-" + scCharFilename, "Projectiles", "OFF") == "ON");
+        bool bCountermeasures = (IniGetS(scUserFile, "INSURANCE-" + scCharFilename, "Countermeasures", "OFF") == "ON");
+        bool bShieldBatteries = (IniGetS(scUserFile, "INSURANCE-" + scCharFilename, "ShieldBatteries", "OFF") == "ON");
+        bool bNanobots = (IniGetS(scUserFile, "INSURANCE-" + scCharFilename, "Nanobots", "OFF") == "ON");
+        bool bEquipment = (IniGetS(scUserFile, "INSURANCE-" + scCharFilename, "Equipment", "OFF") == "ON");
+
+        // Berechne die insuranceMask
+        InsuranceType insuranceMask = InsuranceType::None;
+
+        if (bMines)
+            insuranceMask |= InsuranceType::Mines;
+        if (bProjectiles)
+            insuranceMask |= InsuranceType::Projectiles;
+        if (bCountermeasures)
+            insuranceMask |= InsuranceType::Countermeasures;
+        if (bShieldBatteries)
+            insuranceMask |= InsuranceType::ShieldBatteries;
+        if (bNanobots)
+            insuranceMask |= InsuranceType::Nanobots;
+        if (bEquipment)
+            insuranceMask |= InsuranceType::Equipment;
+      
+        // Prüfen, ob alle sechs Typen festgelegt sind
+        if (bool allTypesSet = (bMines && bProjectiles && bCountermeasures && bShieldBatteries && bNanobots && bEquipment))
+            insuranceMask |= InsuranceType::All;
+
+        std::list<Insurance::InsuranceType> insuranceTypes = Insurance::GetInsuranceTypesFromMask(insuranceMask);
+
+        // Check InsuranceTypes
+        bool isAllInsured = false;
+        bool isNoneInsured = false;
+        for (const auto& type : insuranceTypes) {
+            std::string typeString = Insurance::GetInsuranceTypeString(type);
+            //ConPrint(stows(typeString + "\n"));
+
+            if (type == Insurance::InsuranceType::All) {
+                isAllInsured = true;
+                break;
+            }
+
+
+            if (type == Insurance::InsuranceType::None && insuranceTypes.size() == 1) {
+                isNoneInsured = true;
+                break;
+            }
+        }
+
+        //ConPrint(std::to_wstring(insuranceTypes.size()) + L"\n");
+
+        // Insurance TypeString
+        std::string scInsuranceType;
+
+        if (isAllInsured) {
+            // PrintUserCmdText(iClientID, L"ALL Types are Insured");
+            scInsuranceType = "All";
+        }
+        else if (isNoneInsured) {
+            // PrintUserCmdText(iClientID, L"None");
+            scInsuranceType = "None";
+        }
+        else {
+            bool firstType = true;  // Variable zur Verfolgung des ersten Versicherungstyps
+
+            for (const auto& type : insuranceTypes) {
+                if (type == Insurance::InsuranceType::None)
+                    continue;
+
+                std::string typeString = Insurance::GetInsuranceTypeString(type);
+
+                if (!firstType) {
+                    scInsuranceType += ", ";  // Komma nur hinzufügen, wenn bereits ein Eintrag vorhanden ist
+                }
+                else {
+                    firstType = false;  // Setze firstType auf false, nachdem der erste Versicherungstyp hinzugefügt wurde
+                }
+
+                scInsuranceType += typeString;
+                // PrintUserCmdText(iClientID, L"Insurance Type: " + stows(typeString));
+            }
+        }
+
+        //Insurance Store
+        char szCurDir[MAX_PATH];
+        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
+        std::string scInsuranceStore = std::string(szCurDir) + INSURANCE_STORE;
+
+        //Get Insurance State
+        bool bisInsured = Insurance::insurace_exists(scInsuranceStore + scCharFilename + ".cfg");
+
+        //Get Insurance Data
+        std::list<Insurance::RestoreEquip> lInsuredEquip;
+        int Store_iWorth;
+        int Store_iCountEquip;
+        bool bFreeInsurance;
+
+        if (bisInsured)
+        {
+            //Get Insurance Data
+            Store_iWorth = IniGetI(scInsuranceStore + scCharFilename + ".cfg", "INSURANCE", "Worth", 0);
+            Store_iCountEquip = IniGetI(scInsuranceStore + scCharFilename + ".cfg", "INSURANCE", "EquipCount", 0);
+            bFreeInsurance = IniGetB(scInsuranceStore + scCharFilename + ".cfg", "INSURANCE", "FreeInsurance", false);
+
+            //Read Insurance from Store
+            int Equiploop = 0;
+            while (Equiploop <= Store_iCountEquip) {
+
+                //Read Equip
+                bool bMission = IniGetB(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "bMission", false);
+                bool bMounted = IniGetB(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "bMounted", true);
+                float fStatus = IniGetF(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "fStatus", 1);
+                std::string hardpoint = IniGetS(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "hardpoint", "");
+                uint iArchID = IniGetI(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "iArchID", 0);
+                uint iCount = IniGetI(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "iCount", 0);
+                uint iID = IniGetI(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "iID", 0);
+
+                //Prepare Data
+                CacheString newhardpoint;
+                const char* cshardpoint = hardpoint.c_str();
+                newhardpoint.value = StringAlloc(cshardpoint, false);
+
+                //Create Equip
+                CARGO_INFO NewCargo_Info;
+                NewCargo_Info.bMission = bMission;
+                NewCargo_Info.bMounted = bMounted;
+                NewCargo_Info.fStatus = fStatus;
+                NewCargo_Info.hardpoint = newhardpoint;
+                NewCargo_Info.iArchID = iArchID;
+                NewCargo_Info.iCount = iCount;
+                NewCargo_Info.iID = iID;
+
+                Insurance::RestoreEquip NewEquip;
+                NewEquip.CARGO_INFO = NewCargo_Info;
+                NewEquip.bItemisFree = IniGetB(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "bItemisFree", true);
+                NewEquip.fPrice = IniGetF(scInsuranceStore + scCharFilename + ".cfg", "Equip-" + std::to_string(Equiploop), "fPrice", 0);
+                lInsuredEquip.push_back(NewEquip);
+
+                Equiploop++;
+            }
+		}
+
+        // Checke Parameter
+        const std::string& scMsg = wstos(GetParamToEnd(wscParam, ' ', 0));
+        if (scMsg == "") {
+            // Kein Parameter angegeben, zeige aktuellen Versicherungstyp an
+            PrintUserCmdText(iClientID, L"Current insurance type: " + stows(scInsuranceType));
+
+            // Zusammenfassung des aktuellen Versicherungsstatus
+            std::wstring wscInsuranceStatus = L"Your insurance is currently ";
+            wscInsuranceStatus += (bisInsured) ? L"ACTIVE" : L"INACTIVE";
+            PrintUserCmdText(iClientID, wscInsuranceStatus);
+
+            if (bisInsured && scInsuranceType != "None")
+			{
+                // Anzahl und Wert der versicherten Ausrüstung
+                PrintUserCmdText(iClientID,L"Total insured worth: " + std::to_wstring(Store_iWorth) + L" Credits");
+            }
+            // Berechnung falls Gedockt
+            //Check if player is docked
+            uint iShip = 0;
+            pub::Player::GetShip(iClientID, iShip);
+            if (!iShip)
+            {
+                PrintUserCmdText(iClientID, L"The projected value of the new insurance is: " + std::to_wstring(CalcInsurance(iClientID)) + L" Credits");
+            }
+
+            
+            return;
+        }
+        else {
+
+            //Check if player is docked
+            uint iShip = 0;
+            pub::Player::GetShip(iClientID, iShip);
+            if (iShip)
+            {
+                PrintUserCmdText(iClientID, L"ERR: You can only apply for an insurance when docked.");
+                return;
+            }
+
+            // Aufteilen der Eingabezeichenkette nach Leerzeichen
+            std::istringstream iss(scMsg);
+            std::vector<std::string> tokens{ std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{} };
+
+            for (const auto& token : tokens) {
+                Insurance::InsuranceType insuranceType = Insurance::GetInsuranceTypeFromString(token);
+
+                //INI-Datei aktualisieren
+                switch (insuranceType) {
+                case Insurance::InsuranceType::All:
+                    bMines = bProjectiles = bCountermeasures = bShieldBatteries = bNanobots = bEquipment = true;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Mines", "ON");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Projectiles", "ON");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Countermeasures", "ON");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "ShieldBatteries", "ON");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Nanobots", "ON");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Equipment", "ON");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, L"Settings changed: All types activated");
+                    break;
+                case Insurance::InsuranceType::Mines:
+                    bMines = !bMines;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Mines", bMines ? "ON" : "OFF");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, (bMines ? L"Settings changed: Mines activated" : L"Settings changed: Mines deactivated"));
+                    break;
+                case Insurance::InsuranceType::Projectiles:
+                    bProjectiles = !bProjectiles;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Projectiles", bProjectiles ? "ON" : "OFF");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, (bProjectiles ? L"Settings changed: Projectiles activated" : L"Settings changed: Projectiles deactivated"));
+                    break;
+                case Insurance::InsuranceType::Countermeasures:
+                    bCountermeasures = !bCountermeasures;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Countermeasures", bCountermeasures ? "ON" : "OFF");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, (bCountermeasures ? L"Settings changed: Countermeasures activated" : L"Settings changed: Countermeasures deactivated"));
+                    break;
+                case Insurance::InsuranceType::ShieldBatteries:
+                    bShieldBatteries = !bShieldBatteries;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "ShieldBatteries", bShieldBatteries ? "ON" : "OFF");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, (bShieldBatteries ? L"Settings changed: ShieldBatteries activated" : L"Settings changed: ShieldBatteries deactivated"));
+                    break;
+                case Insurance::InsuranceType::Nanobots:
+                    bNanobots = !bNanobots;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Nanobots", bNanobots ? "ON" : "OFF");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, (bNanobots ? L"Settings changed: Nanobots activated" : L"Settings changed: Nanobots deactivated"));
+                    break;
+                case Insurance::InsuranceType::Equipment:
+                    bEquipment = !bEquipment;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Equipment", bEquipment ? "ON" : "OFF");
+                    // Enable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "ON");
+
+                    //New Payed Insurance
+                    Insurance::BookInsurance(iClientID, false);
+
+                    PrintUserCmdText(iClientID, (bEquipment ? L"Settings changed: Equipment activated" : L"Settings changed: Equipment deactivated"));
+                    break;
+                case Insurance::InsuranceType::None:
+                    bMines = bProjectiles = bCountermeasures = bShieldBatteries = bNanobots = bEquipment = false;
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Mines", "OFF");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Projectiles", "OFF");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Countermeasures", "OFF");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "ShieldBatteries", "OFF");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Nanobots", "OFF");
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "Equipment", "OFF");
+                    // Disable Auto Insurance
+                    IniWrite(scUserFile, "INSURANCE-" + scCharFilename, "AutoInsurance", "OFF");
+
+                    //New Free Insurance
+                    Insurance::BookInsurance(iClientID, true);
+
+                    PrintUserCmdText(iClientID, L"Settings changed: All types deactivated");
+                    break;
+                case Insurance::InsuranceType::Invalid:
+                    PrintUserCmdText(iClientID, L"Settings changed: Unknown type!");
+                    return;
+                default:
+                    break;
+                }                    
+            }
+        }
+
+    }
+
 
     void UserCmd_UV(uint iClientID, const std::wstring &wscParam) {
         std::wstring Chat = wscParam;
@@ -450,7 +768,8 @@ namespace Commands {
             std::list<Docking::CarrierList>::iterator iterCarrier1 = Docking::lCarrierList.begin();
             while (iterCarrier1 != Docking::lCarrierList.end()) {
 
-				//ConPrint(L"CarrierID: %u \n", iterCarrier1->iCarrierID);
+				//
+                (L"CarrierID: %u \n", iterCarrier1->iCarrierID);
                 
                 // Spieler ist selbst ein Carrier
                 if (iterCarrier1->iCarrierID == iClientID) {
@@ -1132,7 +1451,6 @@ namespace Commands {
         {L"/sendcash$", UserCMD_SendCash$},
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", UserCMD_INSURANCE_AUTOSAVE},
-        {L"/insurancecost", UserCMD_INSURANCE_CALC},
         {L"/cloak", UserCmd_CLOAK},
 		{L"/uncloak", UserCmd_UNCLOAK},
         {L"/help", UserCmd_HELP},

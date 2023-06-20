@@ -30,7 +30,8 @@ namespace Tools {
             if (aType == Archetype::SHIELD_GENERATOR ||
                 aType == Archetype::THRUSTER || aType == Archetype::LAUNCHER ||
                 aType == Archetype::GUN || aType == Archetype::MINE_DROPPER ||
-                aType == Archetype::COUNTER_MEASURE_DROPPER || aType == Archetype::CLOAKING_DEVICE) {
+                aType == Archetype::COUNTER_MEASURE_DROPPER ||
+                aType == Archetype::CLOAKING_DEVICE) {
 
                 for (std::vector<std::string>::iterator it = DamagedHardPoints.begin(); it != DamagedHardPoints.end(); ++it) {
                     if (startsWith(*it, cargo.hardpoint.value)) {
@@ -1146,5 +1147,157 @@ namespace Tools {
         std::transform(result.begin(), result.end(), result.begin(), ::toupper);
         return result;
     }
+
+    HK_ERROR FLSRHkAddEquip(const std::wstring& wscCharname, uint iGoodID,
+        const std::string& scHardpoint, bool bMounted) {
+        typedef bool(__stdcall* _AddCargoDocked)(
+            uint iGoodID, CacheString*& hardpoint, int iNumItems, float fHealth,
+            int bMounted, int bMission, uint iOne);
+        static _AddCargoDocked AddCargoDocked = 0;
+        if (!AddCargoDocked)
+            AddCargoDocked = (_AddCargoDocked)((char*)hModServer + 0x6EFC0);
+
+        HK_GET_CLIENTID(iClientID, wscCharname);
+        if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+            return HKE_PLAYER_NOT_LOGGED_IN;
+
+        uint iBase = 0;
+        pub::Player::GetBase(iClientID, iBase);
+        uint iLocation = 0;
+        pub::Player::GetLocation(iClientID, iLocation);
+
+        if (iLocation)
+            Server.LocationExit(iLocation, iClientID);
+        if (iBase)
+            Server.BaseExit(iBase, iClientID);
+        if (!HkIsValidClientID(iClientID))
+            return HKE_PLAYER_NOT_LOGGED_IN;
+
+        PlayerData* pd = &Players[iClientID];
+        const char* p = scHardpoint.c_str();
+        CacheString hardpoint;
+        hardpoint.value = StringAlloc(p, false);
+
+        int iOne = 1;
+        int iMounted = bMounted;
+        float fHealth = 1;
+        CacheString* pHP = &hardpoint;
+        __asm {
+            push iOne
+            push iMounted
+            push iOne
+            push fHealth
+            push iOne
+            push pHP
+            push iGoodID
+            mov ecx, pd
+            call AddCargoDocked
+        }
+
+        if (iBase) Server.BaseEnter(iBase, iClientID);
+        if (iLocation)
+            Server.LocationEnter(iLocation, iClientID);
+
+        return HKE_OK;
+    }
+
+    HK_ERROR FLSRHkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount,
+        bool bMission) {
+        HK_GET_CLIENTID(iClientID, wscCharname);
+
+        if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+            return HKE_PLAYER_NOT_LOGGED_IN;
+
+        /*	// anti-cheat related
+                char *szClassPtr;
+                memcpy(&szClassPtr, &Players, 4);
+                szClassPtr += 0x418 * (iClientID - 1);
+                EquipDescList *edlList = (EquipDescList*)szClassPtr + 0x328;
+                bool bCargoFound = true;
+                if(!edlList->find_matching_cargo(iGoodID, 0, 1))
+                        bCargoFound = false;*/
+
+                        // add
+        const GoodInfo* gi;
+        if (!(gi = GoodList::find_by_id(iGoodID)))
+            return HKE_INVALID_GOOD;
+
+        bool bMultiCount;
+        memcpy(&bMultiCount, (char*)gi + 0x70, 1);
+
+        uint iBase = 0;
+        pub::Player::GetBase(iClientID, iBase);
+        uint iLocation = 0;
+        pub::Player::GetLocation(iClientID, iLocation);
+
+        // trick cheat detection
+        if (iBase) {
+            if (iLocation)
+                Server.LocationExit(iLocation, iClientID);
+            Server.BaseExit(iBase, iClientID);
+            if (!HkIsValidClientID(iClientID)) // got cheat kicked
+                return HKE_PLAYER_NOT_LOGGED_IN;
+        }
+
+        if (bMultiCount) { // it's a good that can have multiple units(commodities,
+            // missile ammo, etc)
+            int iRet;
+
+            // we need to do this, else server or client may crash
+            std::list<CARGO_INFO> lstCargo;
+            HkEnumCargo(wscCharname, lstCargo, iRet);
+            for (auto& cargo : lstCargo) {
+                if ((cargo.iArchID == iGoodID) && (cargo.bMission != bMission)) {
+                    HkRemoveCargo(wscCharname, cargo.iID, cargo.iCount);
+                    iCount += cargo.iCount;
+                }
+            }
+
+            pub::Player::AddCargo(iClientID, iGoodID, iCount, 1, bMission);
+        }
+        else {
+            for (int i = 0; (i < iCount); i++)
+                pub::Player::AddCargo(iClientID, iGoodID, 1, 1, bMission);
+        }
+
+        if (iBase) { // player docked on base
+            ///////////////////////////////////////////////////
+            // fix, else we get anti-cheat msg when undocking
+            // this DOES NOT disable anti-cheat-detection, we're
+            // just making some adjustments so that we dont get kicked
+
+            Server.BaseEnter(iBase, iClientID);
+            if (iLocation)
+                Server.LocationEnter(iLocation, iClientID);
+
+            /*		// fix "Ship or Equipment not sold on base" kick
+                            if(!bCargoFound)
+                            {
+                                    // get last equipid
+                                    char *szLastEquipID = szClassPtr + 0x3C8;
+                                    ushort sEquipID;
+                                    memcpy(&sEquipID, szLastEquipID, 2);
+
+                                    // add to check-list which is being compared to
+               the users equip-list when saving char EquipDesc ed; memset(&ed, 0,
+               sizeof(ed)); ed.id = sEquipID; ed.count = iCount; ed.archid =
+               iGoodID; edlList->add_equipment_item(ed, true);
+                            }
+
+                            // fix "Ship Related" kick, update crc
+                            ulong lCRC;
+                            __asm
+                            {
+                                    mov ecx, [szClassPtr]
+                                    call [CRCAntiCheat]
+                                    mov [lCRC], eax
+                            }
+                            memcpy(szClassPtr + 0x320, &lCRC, 4);*/
+        }
+
+        return HKE_OK;
+    }
+
+
 
 }

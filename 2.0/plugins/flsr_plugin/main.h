@@ -272,6 +272,8 @@ namespace Tools {
 
     void FLSRIniDelete(const std::string& scFile, const std::string& scApp, const std::string& scKey);
     std::wstring ToUpper(const std::wstring& str);
+    HK_ERROR FLSRHkAddEquip(const std::wstring& wscCharname, uint iGoodID,const std::string& scHardpoint, bool bMounted);
+    HK_ERROR FLSRHkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount, bool bMission);
  
 }
 
@@ -481,19 +483,41 @@ namespace ClientController {
 
 namespace Insurance {
 
-    extern float set_fCostPercent;
     
-    extern bool Insurance_Module;
-    void CreateNewInsurance(uint iClientID, bool bFreeItem);
-    void UseInsurance(uint iClientID);
-    void PlayerDiedEvent(bool bDied, uint iClientID);
-    bool CheckPlayerDied(uint iClientID);
-    bool FindHardpointCargolist(std::list<CARGO_INFO> &cargolist, CacheString &hardpoint);   
-    void BookInsurance(uint iClientID, bool bFreeItem);
-    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID);
-    std::wstring CalcInsurance(uint iClientID, bool bPlayerCMD, bool bFreeInsurance);
-    bool insurace_exists(const std::string &name);
-    void ReNewInsurance(uint iClientID);
+
+    enum class InsuranceType : unsigned long {
+        None = 0x0,
+        Mines = 0x1,
+        Projectiles = 0x2,
+        Countermeasures = 0x4,
+        ShieldBatteries = 0x8,
+        Nanobots = 0x10,
+        Equipment = 0x20,
+        All = 0x40,
+        Invalid = 0x80,
+    };
+
+    template<typename T>
+    constexpr inline T operator~ (T a) { return static_cast<T>(~static_cast<typename std::underlying_type<T>::type>(a)); }
+
+    template<typename T>
+    constexpr inline T operator| (T a, T b) { return static_cast<T>(static_cast<typename std::underlying_type<T>::type>(a) | static_cast<typename std::underlying_type<T>::type>(b)); }
+
+    template<typename T>
+    constexpr inline T operator& (T a, T b) { return static_cast<T>(static_cast<typename std::underlying_type<T>::type>(a) & static_cast<typename std::underlying_type<T>::type>(b)); }
+
+    template<typename T>
+    constexpr inline T operator^ (T a, T b) { return static_cast<T>(static_cast<typename std::underlying_type<T>::type>(a) ^ static_cast<typename std::underlying_type<T>::type>(b)); }
+
+    template<typename T>
+    constexpr inline T& operator|= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) |= static_cast<typename std::underlying_type<T>::type>(b)); }
+
+    template<typename T>
+    constexpr inline T& operator&= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) &= static_cast<typename std::underlying_type<T>::type>(b)); }
+
+    template<typename T>
+    constexpr inline T& operator^= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) ^= static_cast<typename std::underlying_type<T>::type>(b)); }
+
 
     extern struct PlayerDied {
 
@@ -534,6 +558,9 @@ namespace Insurance {
 		GoodInfo GoodInfo;
         bool bFreeInsurance;
         bool bItemisFree;
+        Archetype::AClassType aClassType;
+        bool bIsAmmo;
+
     };
 
     extern struct RestoreEquip {
@@ -546,6 +573,25 @@ namespace Insurance {
     extern std::map<std::wstring, std::list<PriceList>> mPriceList;
     extern std::list<PlayerDied> lPlayerDied;
     extern std::list<BookInsuranceEvent> lBookInsuranceEvent;
+    extern float set_fCostPercent;
+
+    extern bool Insurance_Module;
+    void CreateNewInsurance(uint iClientID, bool bFreeItem);
+    void UseInsurance(uint iClientID);
+    void PlayerDiedEvent(bool bDied, uint iClientID);
+    bool CheckPlayerDied(uint iClientID);
+    bool FindHardpointCargolist(std::list<CARGO_INFO>& cargolist, CacheString& hardpoint);
+    void BookInsurance(uint iClientID, bool bFreeItem);
+    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID);
+    int CalcInsurance(int iClientID);
+    bool insurace_exists(const std::string& name);
+    void ReNewInsurance(uint iClientID);
+    bool isAmmoClass(Archetype::AClassType aType, uint iClientID);
+    bool isInsurableClass(Archetype::AClassType aType, uint iClientID);
+    std::string GetInsuranceTypeString(InsuranceType type);
+    void SetInsuranceTypeString(uint iClientID, InsuranceType type, const std::string& value);
+    InsuranceType GetInsuranceTypeFromString(const std::string& value);
+    std::list<InsuranceType> GetInsuranceTypesFromMask(InsuranceType insuranceMask);
 }
 
 namespace AntiCheat {

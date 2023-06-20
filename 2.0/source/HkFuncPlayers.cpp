@@ -1502,6 +1502,7 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
     } else {
         Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true,
                           iClientID);
+
     }
 
     // Add to check-list which is being compared to the users equip-list when

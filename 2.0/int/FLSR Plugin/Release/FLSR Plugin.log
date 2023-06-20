@@ -1,27 +1,4 @@
-﻿  Hooks.cpp
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xmemory(2071,24): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(192,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_1>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
-          with
-          [
-              _FwdIt=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
-              _Elem=wchar_t,
-              _Pr=Hooks::SendDeathMsg::<lambda_1>
-          ]
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xutility(5993,19): warning C4244: "Argument": Konvertierung von "wchar_t" in "unsigned char", möglicher Datenverlust
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include\xmemory(2062): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_InIt std::find_if<wchar_t*,_Fn>(_InIt,const _InIt,_Pr)" der Funktions-Vorlage.
-          with
-          [
-              _InIt=wchar_t *,
-              _Fn=Hooks::SendDeathMsg::<lambda_1>,
-              _Pr=Hooks::SendDeathMsg::<lambda_1>
-          ]
-C:\FLSR-Hook\2.0\plugins\flsr_plugin\Hooks.cpp(192,114): message : Siehe Verweis auf die gerade kompilierte Instanziierung "_FwdIt std::remove_if<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,Hooks::SendDeathMsg::<lambda_1>>(_FwdIt,const _FwdIt,_Pr)" der Funktions-Vorlage.
-          with
-          [
-              _FwdIt=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
-              _Elem=wchar_t,
-              _Pr=Hooks::SendDeathMsg::<lambda_1>
-          ]
+﻿  Commands.cpp
   FLSR Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\FLSR Plugin\FLSR.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.dll
   1 Datei(en) kopiert

@@ -1,8 +1,6 @@
 #include "Main.h"
 
 namespace Commands {
-    
-
     //Test Commands
     /*
     void UserCmd_TESTDEPOT(uint iClientID, const std::wstring& wscParam) {
@@ -62,7 +60,151 @@ namespace Commands {
     }
         */
 
+    // Discord
+    void UserCMD_BANK(uint iClientID, const std::wstring& wscParam) {
+        if (Modules::GetModuleState("DiscordBot"))
+        {
+			std::wstring wscCharFileName;
+			HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+			std::string scCharfile = wstos(wscCharFileName);
+			std::string scDiscordID = Discord::GetDiscordIDForChar(scCharfile);
+            if (scDiscordID == "") // No Link Request
+            {
+				PrintUserCmdText(iClientID, L"Char not linked!");
+				return;
+			}
+            else
+            {
+
+                //Show Balance without Parameter
+                if (wscParam == L"")
+                {
+                    //Get Current Balance
+                    std::string scCredits = Discord::GetCreditsForDiscordAccount(scDiscordID);
+                    PrintUserCmdText(iClientID, L"Current Balance: " + stows(scCredits));
+                    PrintUserCmdText(iClientID, L"Use /bank <amount> to deposit credits");
+                }
+                else
+                {
+                    std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+
+
+                    // Parameter übergeben - Betrag auf Discord-Account überweisen
+
+                    // Ist der Char alt genug (Abuse-Prevention - 1h)?
+                    int secs = 0;
+                    HkGetOnlineTime(wscCharname, secs);
+                    if (secs < 3600) {
+                        PrintUserCmdText(iClientID, L"ERR insufficient time online");
+                        return;
+                    }
+
+                    // Betrag aus dem Parameter extrahieren und in einen int umwandeln
+                    int amount = std::stoi(wstos(wscParam));
+
+                    // Betrag validieren (muss positiv sein)
+                    if (amount <= 0)
+                    {
+                        PrintUserCmdText(iClientID, L"Invalid amount specified.");
+                        return;
+                    }
+
+                    // Ist genügend Geld auf dem Charakter?
+                    int iCash;
+                    HkGetCash(wscCharname, iCash);
+                    if (iCash < amount)
+                    {
+                        //Nicht genügeng Geld
+                        PrintUserCmdText(iClientID, L"You don't have enough credits.");
+                        return;
+                    }
+
+                    
+                    // The last error.
+                    HK_ERROR err;
+
+                    if ((err = HkAddCash(wscCharname, -amount)) != HKE_OK) {
+
+                        PrintUserCmdText(iClientID, L"Error while updateing ingame balance");
+                        return;
+                    }
+
+                    // Betrag auf den Discord-Account überweisen
+                    if (!Discord::UpdateCreditsForDiscordAccount(scDiscordID, std::to_string(amount), true))
+                    {
+						PrintUserCmdText(iClientID, L"Error while updating discord balance");
+						return;
+					}
+
+                    // Erfolgmeldung anzeigen
+                    PrintUserCmdText(iClientID, L"Successfully deposited " + wscParam + L" credits to your account.");
+                }
+
+
+
+
+			}
+		}   
+
+
+    }
+
+    void UserCMD_LINK(uint iClientID, const std::wstring& wscParam) {
+
+        if (Modules::GetModuleState("DiscordBot"))
+        {
+
+            std::wstring wscCharFileName;
+            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+            std::string scCharfile = wstos(wscCharFileName);
+            std::string sha1PW = Tools::sha1(wstos(wscParam));
+ 
+
+            //Get 2FA
+            std::string scValid = Discord::GetValidationForChar(scCharfile);
+            if (scValid == "") // No Link Request
+            {
+                PrintUserCmdText(iClientID, L"No link request!");
+                return;
+            }
+            else if (scValid == "TRUE") // Already Linked
+            {
+				PrintUserCmdText(iClientID, L"Char already linked!");
+				return;
+			}
+
+
+            if (scValid == sha1PW)
+            {
+                Discord::UpdateValidationForChar(scCharfile);
+                PrintUserCmdText(iClientID, L"Char Linked!");
+                std::string sscCharname = wstos((wchar_t*)Players.GetActiveCharacterName(iClientID));
+
+                std::string scDiscordID = Discord::GetDiscordIDForChar(scCharfile);
+                std::string scMsg = "Char " + sscCharname + " linked!";
+                dpp::message dm(scMsg);
+                Discord::DMMessage NewMessage;
+                NewMessage.DiscordUserID = scDiscordID;
+                NewMessage.DiscordMessage = dm;
+
+                {
+                    // Mutex sperren
+                    std::lock_guard<std::mutex> lock(m_Mutex);
+                    Discord::lDMMessages.push_back(NewMessage);
+
+                    Discord::CharManager_UpdateCharname(scCharfile, sscCharname);
+                } // Mutex wird hier automatisch freigegeben
+            }
+            else
+            {
+				PrintUserCmdText(iClientID, L"Wrong Pass!");
+			}
+
+        }
+    }
+
     ///// PVP
+
 
     void UserCmd_pvpduel(uint iClientID, const std::wstring& wscParam) {
 
@@ -639,7 +781,22 @@ namespace Commands {
         std::wstring Chat = wscParam;
         std::wstring Charname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         Chat::HkSendUChat(Charname, Chat);
-        ShellExecute(NULL, "open", DISCORD_WEBHOOK_UVCHAT_FILE, wstos(Charname + L": " + Chat).c_str(), NULL, NULL);
+
+        //Discord
+        Discord::ChatMessage ChatMsg;
+        ChatMsg.wscCharname = Charname;
+        ChatMsg.wscChatMessage = Chat;
+
+
+        {
+            // Mutex sperren
+            std::lock_guard<std::mutex> lock(m_Mutex);
+
+            // Chat-Nachricht zur Liste hinzufügen
+            Discord::lChatMessages.push_back(ChatMsg);
+        } // Mutex wird hier automatisch freigegeben
+
+
     }
 
     void UserCmd_MODREQUEST(uint iClientID, const std::wstring &wscParam) {
@@ -1462,6 +1619,9 @@ namespace Commands {
         {L"/pvpclear", UserCmd_pvpclear},
         {L"/pvpinvite", UserCmd_pvpinvite},
         {L"/stats", UserCmd_stats},
+        {L"/link", UserCMD_LINK},
+        {L"/bank", UserCMD_BANK},
+
 
 
         //Not Used Commands

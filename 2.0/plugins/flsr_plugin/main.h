@@ -4,6 +4,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
+//DISCORD Includes
+#include <dpp/dpp.h>
+
 //FLHOOK Includes
 #include <FLHook.h>
 #include <plugin.h>
@@ -19,6 +22,8 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
 #include <unordered_map>
+#include <openssl/sha.h>
+
 
 //Plugin Stuff
 extern PLUGIN_RETURNCODE returncode;
@@ -52,9 +57,13 @@ extern PLUGIN_RETURNCODE returncode;
 #define CHEATREPORT_STORE "C:\\Caddy\\files\\cheater\\"
 #define DISCORD_CHAT_FILE "C:\\DiscordBot\\Chat.ini"
 
+// Mutex-Objekt deklarieren
+extern std::mutex m_Mutex;
+
 //AntiCheat
 typedef void(__stdcall *_CRCAntiCheat)();
 extern _CRCAntiCheat CRCAntiCheat_FLSR;
+
 
 //Namespaces
 namespace Modules {
@@ -274,6 +283,8 @@ namespace Tools {
     std::wstring ToUpper(const std::wstring& str);
     HK_ERROR FLSRHkAddEquip(const std::wstring& wscCharname, uint iGoodID,const std::string& scHardpoint, bool bMounted);
     HK_ERROR FLSRHkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount, bool bMission);
+    float GetAveragePingOfAllPlayers();
+    std::string sha1(const std::string& input);
  
 }
 
@@ -1093,5 +1104,87 @@ namespace PVP {
     void CmdStats(uint iClientID, const std::wstring& wscParam);
 
 }
+
+namespace Discord {
+    struct ChatMessage {
+        std::wstring wscCharname;
+        std::wstring wscChatMessage;
+
+    };
+
+    struct DMMessage {
+        std::string DiscordUserID;
+        dpp::message DiscordMessage;
+
+    };
+
+    struct LastSelectClick {
+        dpp::user User;
+        dpp::select_click_t event;
+
+        LastSelectClick(const dpp::user& user, const dpp::select_click_t& clickEvent)
+            : User(user), event(clickEvent)
+        {
+        }
+    };
+
+    //extern
+    extern std::list<ChatMessage> lChatMessages;
+    extern std::list<DMMessage> lDMMessages;
+    extern std::list <LastSelectClick> lLastSelectClick;
+    extern int iOnlinePlayers;
+
+    //Konfig
+    extern std::string scDiscordBotToken;
+	extern std::string scDiscordServerID;
+    extern std::string scUVChatChannelID;
+    extern std::string scNewsChannelID;
+    extern std::string scNewsFilePath;
+
+
+    extern int iRenameCost;
+
+    bool LoadSettings();
+    void StartUp();
+    void CommandUptime(const dpp::slashcommand_t& event);
+    std::string wstring_to_utf8(const std::wstring& wstr);
+    std::wstring Utf8ToWString(const std::string& utf8Str);
+    std::string GeneratePassword();
+
+    //Pages
+    void CharManagerPageMenu(dpp::cluster& DiscordBot, const dpp::button_click_t& event);
+
+    //Embeds
+    template<typename T>
+    void BankEmbed(const T& event);
+
+    //Modals
+    template<typename T>
+    void LinkModal(const T& event);
+    template<typename T>
+    void CharRenameModal(const T& event);
+    template<typename T>
+    void BankTransferModal(const T& event, const std::string modal_id);
+
+
+    //Helper
+    std::string GetFormComponentValue(const dpp::form_submit_t& event, const std::string& customId);
+
+    //Charmanager Stuff
+    std::string CharManager_Insert(const std::string& charfile, const std::string& discordID, const std::string& password);
+    void CharManager_DeleteInvalidEntries();
+    std::string GetValidationForChar(const std::string& charfile);
+    void UpdateValidationForChar(const std::string& charfile);
+    std::string GetDiscordIDForChar(const std::string& charfile);
+    bool IsCharacterLinkedWithDiscordID(const std::string& discordID, const std::string& charfile);
+    bool CharManager_Rename(const std::string& oldcharfile, const std::string& newcharfile);
+    bool CharManager_UpdateCharname(const std::string& charfile, const std::string& charname);
+    std::string GetCreditsForDiscordAccount(const std::string& discordAccount);
+    bool UpdateCreditsForDiscordAccount(const std::string& discordAccount, const std::string& credits, bool bAdd);
+    bool DoesDiscordAccountHaveValidChars(const std::string& discordAccount);
+    std::string GetUserIDByDiscordName(const std::string& discordName);
+    std::string GetNicknameByDiscordName(const std::string& discordName);
+
+} // namespace DiscordBot
 
 #endif

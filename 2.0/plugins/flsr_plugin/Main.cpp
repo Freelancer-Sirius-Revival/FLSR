@@ -1,8 +1,12 @@
 ﻿// includes
 #include "Main.h"
 
+// Mutex-Objekt definieren
+std::mutex m_Mutex;
+
 PLUGIN_RETURNCODE returncode;
 _CRCAntiCheat CRCAntiCheat_FLSR;
+
 
 /// Lade Konfig
 void LoadSettings() {
@@ -217,9 +221,49 @@ void LoadSettings() {
             Modules::SetModuleState ("PVP", false);
         }
     }
+
+    //DiscordBot - MUST BE LAST MODULE TO LOAD     #############################################################################
+    if (Modules::GetModuleState("DiscordBot"))
+    {
+        //Load DiscordBot
+        if (Discord::LoadSettings())
+        {
+           // DiscordBot::StartUp();
+           
+            try {
+                HANDLE hDiscordBotThread;
+          
+                DWORD id;
+                DWORD dwParam;
+                hDiscordBotThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Discord::StartUp, &dwParam, 0, &id);
+                
+                //CleanUp CharManager
+                Discord::CharManager_DeleteInvalidEntries();
+
+
+                ConPrint(L"Module loaded: DiscordBot\n");
+
+            }
+            catch (const char* e) {
+				ConPrint(L"Module failed to load: DiscordBot\n");
+				Modules::SetModuleState("DiscordBot", false);
+			}
+
+
+        }
+        else
+        {
+            ConPrint(L"Module failed to load: DiscordBot\n");
+            Modules::SetModuleState("DiscordBot", false);
+        }
+
+    }
+
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
+
+
 
     return true;
 

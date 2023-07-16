@@ -1298,6 +1298,50 @@ namespace Tools {
         return HKE_OK;
     }
 
+    float GetAveragePingOfAllPlayers()
+    {
+        float totalPing = 0.0f;
+        int playerCount = 0;
 
+        struct PlayerData* pPD = 0;
+        while (pPD = Players.traverse_active(pPD))
+        {
+            uint iClientID = HkGetClientIdFromPD(pPD);
+            if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
+                continue;
+
+            std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+
+            HKPLAYERINFO pi;
+            HkGetPlayerInfo(wscCharname, pi, false);
+
+            uint ping = static_cast<uint>(pi.ci.dwRoundTripLatencyMS);
+            totalPing += ping;
+            playerCount++;
+        }
+
+        if (playerCount > 0)
+        {
+            float averagePing = totalPing / static_cast<float>(playerCount);
+            return averagePing;
+        }
+        else
+        {
+            // Return a default value or handle the case when there are no players
+            return 0.0f;
+        }
+    }
+
+    std::string sha1(const std::string& input) {
+        unsigned char hash[SHA_DIGEST_LENGTH];
+        SHA1(reinterpret_cast<const unsigned char*>(input.c_str()), input.length(), hash);
+
+        std::stringstream ss;
+        for (int i = 0; i < SHA_DIGEST_LENGTH; ++i) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+        }
+
+        return ss.str();
+    }
 
 }

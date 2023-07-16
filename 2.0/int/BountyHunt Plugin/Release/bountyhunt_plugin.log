@@ -1,4 +1,61 @@
-﻿  bountyhunt_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\BountyHunt Plugin\bountyhunt.dll
+﻿  Installing vcpkg dependencies to C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\
+  "C:\vcpkg\vcpkg\vcpkg.exe" install  --x-wait-for-lock --triplet "x86-windows" --vcpkg-root "C:\vcpkg\vcpkg\\" "--x-manifest-root=C:\FLSR-Hook\2.0\\" "--x-install-root=C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\\" 
+  Compilerhash f├╝r Triplet x64-windows wird erkannt...
+  Compilerhash f├╝r Triplet x86-windows wird erkannt...
+  Die folgenden Pakete werden erstellt und installiert:
+      dpp[core]:x86-windows -> 10.0.21
+    * libsodium[core]:x86-windows -> 1.0.18#8
+    * openssl[core]:x86-windows -> 3.0.7#1
+    * opus[core]:x86-windows -> 1.3.1#9
+    * vcpkg-cmake-get-vars[core]:x64-windows -> 2022-09-04
+    * zlib[core]:x86-windows -> 1.2.13
+  Zus├ñtzliche Pakete (*) werden ge├ñndert, um diesen Vorgang abzuschlie├ƒen.
+  6 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 3.172 s wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
+  Installing 1/6 zlib:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von zlib:x86-windows: 51.31 ms
+  Installing 2/6 opus:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von opus:x86-windows: 86.96 ms
+  Installing 3/6 vcpkg-cmake-get-vars:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von vcpkg-cmake-get-vars:x64-windows: 62.34 ms
+  Installing 4/6 openssl:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von openssl:x86-windows: 295.7 ms
+  Installing 5/6 libsodium:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von libsodium:x86-windows: 84.56 ms
+  Installing 6/6 dpp:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von dpp:x86-windows: 344.2 ms
+  Gesamtinstallationszeit: 4.098 s
+  The package nlohmann-json provides CMake targets:
+  
+      find_package(nlohmann_json CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json)
+  
+  The package nlohmann-json can be configured to not provide implicit conversions via a custom triplet file:
+  
+      set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+  
+  For more information, see the docs here:
+      
+      https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
+  
+  dpp provides CMake targets:
+      find_package(dpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE dpp::dpp)
+  
+  ÔÇ×spdlogÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+  
+  ÔÇ×sqlitecppÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(SQLiteCpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE SQLiteCpp)
+  
+  Main.cpp
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\BountyHunt Plugin\bountyhunt.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\BountyHunt Plugin\bountyhunt.exp" werden erstellt.
+  bountyhunt_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\BountyHunt Plugin\bountyhunt.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\BountyHunt Plugin\bountyhunt.dll
   1 Datei(en) kopiert
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\BountyHunt Plugin\bountyhunt.pdb

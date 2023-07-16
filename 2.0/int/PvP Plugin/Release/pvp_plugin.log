@@ -1,4 +1,43 @@
-﻿  pvp_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\PvP Plugin\pvp.dll
+﻿  Installing vcpkg dependencies to C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\
+  "C:\vcpkg\vcpkg\vcpkg.exe" install  --x-wait-for-lock --triplet "x86-windows" --vcpkg-root "C:\vcpkg\vcpkg\\" "--x-manifest-root=C:\FLSR-Hook\2.0\\" "--x-install-root=C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\\" 
+  Es wird auf die Sperre des Dateisystems f├╝r ÔÇ×C:\vcpkg\vcpkg\.vcpkg-rootÔÇ£ gewartet...
+  Compilerhash f├╝r Triplet x64-windows wird erkannt...
+  Compilerhash f├╝r Triplet x86-windows wird erkannt...
+  Alle angeforderten Pakete sind derzeit installiert.
+  0 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 212.3 us wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
+  Gesamtinstallationszeit: 270.3 us
+  The package nlohmann-json provides CMake targets:
+  
+      find_package(nlohmann_json CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json)
+  
+  The package nlohmann-json can be configured to not provide implicit conversions via a custom triplet file:
+  
+      set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+  
+  For more information, see the docs here:
+      
+      https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
+  
+  dpp provides CMake targets:
+      find_package(dpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE dpp::dpp)
+  
+  ÔÇ×spdlogÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+  
+  ÔÇ×sqlitecppÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(SQLiteCpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE SQLiteCpp)
+  
+  Main.cpp
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.exp" werden erstellt.
+  pvp_plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\PvP Plugin\pvp.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.dll
   1 Datei(en) kopiert
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\PvP Plugin\pvp.pdb

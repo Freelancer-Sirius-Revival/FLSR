@@ -1,4 +1,9 @@
-﻿  MobileDocking Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\MobileDocking Plugin\mobiledock.dll
+﻿  ClientCommands.cpp
+  Main.cpp
+  SaveFiles.cpp
+  Code wird generiert...
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MobileDocking Plugin\mobiledock.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MobileDocking Plugin\mobiledock.exp" werden erstellt.
+  MobileDocking Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\MobileDocking Plugin\mobiledock.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MobileDocking Plugin\mobiledock.dll
   1 Datei(en) kopiert
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\MobileDocking Plugin\mobiledock.pdb

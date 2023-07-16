@@ -76,3 +76,65 @@ Description: Use the (unofficial) sqlite3 port of vcpkg
 Type: Port
 Status: install ok installed
 
+Package: zlib
+Version: 1.2.13
+Depends: vcpkg-cmake:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 9970fb49b31bf1ae30da13099dcfcd81ff7f6c8d5366b905fc30a6a400f147a3
+Description: A compression library
+Type: Port
+Status: install ok installed
+
+Package: opus
+Version: 1.3.1
+Port-Version: 9
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: ccf6b122abf7c249e597336b6686f524c99cb2d0cd9ad2406ba61ab3f583b8b9
+Description: Totally open, royalty-free, highly versatile audio codec
+Type: Port
+Status: install ok installed
+
+Package: vcpkg-cmake-get-vars
+Version: 2022-09-04
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 541dd3757ec0f879fc1730ff67901bd1b3911d46d77f78ed8ae5eb3a2255b47a
+Type: Port
+Status: install ok installed
+
+Package: openssl
+Version: 3.0.7
+Port-Version: 1
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows, vcpkg-cmake-get-vars:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: be6854cb2f600316a0eabd7fa3ee4abe2b7167e4f5a61f08b250fb0599910931
+Description: OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
+Type: Port
+Status: install ok installed
+
+Package: libsodium
+Version: 1.0.18
+Port-Version: 8
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 31144c6e3bd2844df4b367642b36bf053a567ad17e1b3b8392ddf34880c9d683
+Description: A modern and easy-to-use crypto library
+Type: Port
+Status: install ok installed
+
+Package: dpp
+Version: 10.0.21
+Depends: libsodium, nlohmann-json, openssl, opus, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows, zlib
+Architecture: x86-windows
+Multi-Arch: same
+Abi: d97d979e3b1d1f1a4c8b5cfe5dbd0a4933cccf5627cd2ab170cb10fa9dc76fd6
+Description: D++ Extremely Lightweight C++ Discord Library.
+Type: Port
+Status: install ok installed
+

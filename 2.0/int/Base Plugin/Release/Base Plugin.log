@@ -1,4 +1,17 @@
-﻿  Base Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Base Plugin\base.dll
+﻿  BuildModule.cpp
+  ClientCommands.cpp
+  CoreModule.cpp
+  DefenseModule.cpp
+  FactoryModule.cpp
+  Main.cpp
+  PlayerBase.cpp
+  PlayerCommands.cpp
+  SaveFiles.cpp
+  ShieldModule.cpp
+  StorageModule.cpp
+  Code wird generiert...
+     Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.exp" werden erstellt.
+  Base Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Base Plugin\base.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.dll
   1 Datei(en) kopiert
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Base Plugin\base.pdb

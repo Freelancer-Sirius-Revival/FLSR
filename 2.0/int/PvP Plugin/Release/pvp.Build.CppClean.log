@@ -1,10 +1,10 @@
 c:\flsr-hook\2.0\int\pvp plugin\release\vc143.pdb
 c:\flsr-hook\2.0\int\pvp plugin\release\main.obj
-c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.ilk
-c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.dll
-c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.pdb
 c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.lib
 c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.exp
+c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.dll
+c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.ilk
+c:\flsr-hook\2.0\bin\release\plugins\pvp plugin\pvp.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\pvp plugin\pvp.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\pvp plugin\pvp.ilk
 c:\flsr-hook\2.0\project\..\int\pvp plugin\release\pvp_plugin.vcxproj.filelistabsolute.txt
@@ -15,3 +15,4 @@ c:\flsr-hook\2.0\int\pvp plugin\release\pvp plugin.tlog\link.command.1.tlog
 c:\flsr-hook\2.0\int\pvp plugin\release\pvp plugin.tlog\link.read.1.tlog
 c:\flsr-hook\2.0\int\pvp plugin\release\pvp plugin.tlog\link.write.1.tlog
 c:\flsr-hook\2.0\int\pvp plugin\release\pvp plugin.tlog\link.write.2u.tlog
+c:\flsr-hook\2.0\int\pvp plugin\release\pvp plugin.tlog\vcpkginstallmanifestx86-windows.read.1u.tlog

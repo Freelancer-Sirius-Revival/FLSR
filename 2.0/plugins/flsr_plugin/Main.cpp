@@ -222,14 +222,28 @@ void LoadSettings() {
         }
     }
 
-    //DiscordBot - MUST BE LAST MODULE TO LOAD     #############################################################################
+    //SpawnProtection  #############################################################################
+    if (Modules::GetModuleState("SpawnProtection"))
+    {
+        //Load DiscordBot
+        if (SpawnProtection::LoadSettings())
+        {
+            ConPrint(L"Module loaded: SpawnProtection - ProtectionTime: " + std::to_wstring(SpawnProtection::g_spawnProtectionDuration) + L" Sec\n");
+        }
+        else {
+            //Missing Config
+            Modules::SetModuleState("SpawnProtection", false);
+            ConPrint(L"Module failed to load: SpawnProtection\n");
+        }
+
+    }
+
+    //DiscordBot     #############################################################################
     if (Modules::GetModuleState("DiscordBot"))
     {
         //Load DiscordBot
         if (Discord::LoadSettings())
-        {
-           // DiscordBot::StartUp();
-           
+        {           
             try {
                 HANDLE hDiscordBotThread;
           
@@ -255,6 +269,38 @@ void LoadSettings() {
         {
             ConPrint(L"Module failed to load: DiscordBot\n");
             Modules::SetModuleState("DiscordBot", false);
+        }
+
+    }
+
+    //API
+    if (Modules::GetModuleState("API"))
+    {
+        //Load DiscordBot
+        if (API::LoadSettings())
+        {
+
+            try {
+                HANDLE hAPIThread;
+
+                DWORD id;
+                DWORD dwParam;
+                hAPIThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)API::StartUp, &dwParam, 0, &id);
+
+
+                ConPrint(L"Module loaded: API\n");
+
+            }
+            catch (const char* e) {
+                ConPrint(L"Module failed to load: API\n");
+                Modules::SetModuleState("API", false);
+            }
+
+        }
+        else {
+            //Missing Config
+            Modules::SetModuleState("API", false);
+            ConPrint(L"Module failed to load: API\n");
         }
 
     }

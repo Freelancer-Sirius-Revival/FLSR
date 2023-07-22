@@ -1,0 +1,12 @@
+x86-windows/
+x86-windows/include/
+x86-windows/include/boost/
+x86-windows/include/boost/exception/
+x86-windows/include/boost/exception/exception.hpp
+x86-windows/include/boost/throw_exception.hpp
+x86-windows/share/
+x86-windows/share/boost-throw-exception/
+x86-windows/share/boost-throw-exception/copyright
+x86-windows/share/boost-throw-exception/usage
+x86-windows/share/boost-throw-exception/vcpkg.spdx.json
+x86-windows/share/boost-throw-exception/vcpkg_abi_info.txt

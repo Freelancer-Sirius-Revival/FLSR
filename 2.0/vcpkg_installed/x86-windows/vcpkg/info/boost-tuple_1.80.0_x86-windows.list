@@ -1,0 +1,15 @@
+x86-windows/
+x86-windows/include/
+x86-windows/include/boost/
+x86-windows/include/boost/tuple/
+x86-windows/include/boost/tuple/detail/
+x86-windows/include/boost/tuple/detail/tuple_basic.hpp
+x86-windows/include/boost/tuple/tuple.hpp
+x86-windows/include/boost/tuple/tuple_comparison.hpp
+x86-windows/include/boost/tuple/tuple_io.hpp
+x86-windows/share/
+x86-windows/share/boost-tuple/
+x86-windows/share/boost-tuple/copyright
+x86-windows/share/boost-tuple/usage
+x86-windows/share/boost-tuple/vcpkg.spdx.json
+x86-windows/share/boost-tuple/vcpkg_abi_info.txt

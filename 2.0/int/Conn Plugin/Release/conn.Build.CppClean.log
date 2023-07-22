@@ -1,10 +1,10 @@
 c:\flsr-hook\2.0\int\conn plugin\release\vc143.pdb
 c:\flsr-hook\2.0\int\conn plugin\release\main.obj
-c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.ilk
-c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.dll
-c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.pdb
 c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.lib
 c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.exp
+c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.dll
+c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.ilk
+c:\flsr-hook\2.0\bin\release\plugins\conn plugin\conn.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\conn plugin\conn.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\conn plugin\conn.ilk
 c:\flsr-hook\2.0\project\..\int\conn plugin\release\conn plugin.vcxproj.filelistabsolute.txt

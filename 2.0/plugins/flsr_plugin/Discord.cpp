@@ -2,23 +2,30 @@
 #include <codecvt>
 #include <regex>
 #include <random>
+#include <unordered_set>
+#include "curl/curl.h"
 
 namespace Discord {
 
 	std::string scDiscordBotToken;
 	std::string scDiscordServerID;
 	std::string scUVChatChannelID;
+	std::string scModRequestChannelID;
+	std::string scModGroupID;
 	std::string scNewsChannelID;
-	std::string scNewsFilePath;
+	std::string scEventChannelID;
 
 	int iRenameCost;
 
 
 	std::list<ChatMessage> lChatMessages;
+	std::list<ChatMessage> lModMessages;
 	std::list<DMMessage> lDMMessages;
+	std::list<MessageListEntry> lNewsList;
+	std::list<MessageListEntry> lEventList;
 	std::list <LastSelectClick> lLastSelectClick;
+	std::map<std::string, DiscordUser> userDataMap;
 	int iOnlinePlayers;
-
 
 	bool LoadSettings()
 	{
@@ -45,16 +52,27 @@ namespace Discord {
 			return false;
 		}
 
+		scModRequestChannelID = IniGetS(scPluginCfgFile, "Discord", "ModRequestChannelID", "");
+		if (scModRequestChannelID.empty()) {
+			ConPrint(L"ERROR: No Discord ModRequestChannelID found in config file!\n");
+			return false;
+		}
+
+		scModGroupID = IniGetS(scPluginCfgFile, "Discord", "ModGroupID", "");
+		if (scModGroupID.empty()) {
+			ConPrint(L"ERROR: No Discord ModGroupID found in config file!\n");
+			return false;
+		}
+
 		scNewsChannelID = IniGetS(scPluginCfgFile, "Discord", "NewsChannelID", "");
 		if (scNewsChannelID.empty()) {
 			ConPrint(L"ERROR: No Discord NewsChannelID found in config file!\n");
 			return false;
 		}
 
-
-		scNewsFilePath = IniGetS(scPluginCfgFile, "Discord", "NewsFilePath", "");
-		if (scNewsFilePath.empty()) {
-			ConPrint(L"ERROR: No Discord NewsFilePath found in config file!\n");
+		scEventChannelID = IniGetS(scPluginCfgFile, "Discord", "EventChannelID", "");
+		if (scEventChannelID.empty()) {
+			ConPrint(L"ERROR: No Discord EventChannelID found in config file!\n");
 			return false;
 		}
 
@@ -97,6 +115,23 @@ namespace Discord {
 					}
 				}
 
+				// Überprüfen, ob es neue Mod-Nachrichten gibt
+				if (!lModMessages.empty()) {
+					// Neue Chat-Nachrichten vorhanden
+
+					// Schleife über die Chat-Nachrichten
+					for (auto it = Discord::lModMessages.begin(); it != Discord::lModMessages.end(); ) {
+						// Zugriff auf einzelne Chat-Nachricht
+						ChatMessage& chatMsg = *it;
+						std::string scCharname = wstring_to_utf8(chatMsg.wscCharname);
+						std::string scChatMsg = wstring_to_utf8(chatMsg.wscChatMessage);
+						DiscordBot.message_create(dpp::message(scModRequestChannelID, "<@&"+ scModGroupID + "> " + scCharname + ": " + scChatMsg));
+
+						// Nachdem die Aktionen durchgeführt wurden, Chat-Nachricht aus der Liste löschen
+						it = Discord::lModMessages.erase(it);
+					}
+				}
+
 				// Überprüfen, ob es neue DM-Nachrichten gibt
 				if (!lDMMessages.empty()) {
 					// Neue Nachrichten vorhanden
@@ -112,7 +147,14 @@ namespace Discord {
 						it = Discord::lDMMessages.erase(it);
 					}
 				}
+
+
 			} // Mutex wird hier automatisch freigegeben
+
+
+
+
+
 
 		}, 1);
 
@@ -139,6 +181,24 @@ namespace Discord {
 			} // Mutex wird hier automatisch freigegeben
 
 		}, 10);
+
+		//1h Timer for News/Events
+		dpp::timer NewsTimer = DiscordBot.start_timer([&](dpp::timer timer_handle) {
+
+			//Update Events & News
+			{
+				ConPrint(L"Fetching News/Events ");
+				// Mutex sperren
+				std::lock_guard<std::mutex> lock(m_Mutex);
+
+				Update_NewsList(DiscordBot);
+				Update_EventList(DiscordBot);
+
+				ConPrint(L"- done\n");
+
+			} // Mutex wird hier automatisch freigegeben
+
+		}, 3600);
 
 		//On Ready
 		DiscordBot.on_ready([&DiscordBot](const dpp::ready_t& event) {
@@ -229,6 +289,23 @@ namespace Discord {
 				bank_cmd.set_dm_permission(true);
 				DiscordBot.global_command_create(bank_cmd);
 			}	
+
+
+			//Update Events & News
+			{
+				ConPrint(L"Fetching News/Events ");
+				// Mutex sperren
+				std::lock_guard<std::mutex> lock(m_Mutex);
+
+				Update_NewsList(DiscordBot);
+				Update_EventList(DiscordBot);
+
+				// Starte den UpdateUserData-Thread
+				std::thread UpdateUserData(ThreadUpdateUsers);
+				UpdateUserData.join();
+				ConPrint(L"- done\n");
+
+			} // Mutex wird hier automatisch freigegeben
 
 			ConPrint(L"Discord Bot is Online!\n");
 		});
@@ -398,51 +475,6 @@ namespace Discord {
 				
 				//Show Bank Embed
 				BankEmbed(event);
-
-			}
-
-		});
-
-		//On Message Create
-		DiscordBot.on_message_create([&](const dpp::message_create_t& event) {
-
-			//NewsChat
-			if (std::to_string(event.msg.channel_id) == scNewsChannelID) {
-				std::string sMessage = event.msg.content;
-				std::string sNewsID = std::to_string(event.msg.id);
-				int iAttachments = event.msg.attachments.size();
-
-				//Get Username
-				dpp::user DiscordUser = event.msg.author;
-				std::string scServerNickname = GetNicknameByDiscordName(DiscordUser.username);
-				std::string scUsername = scServerNickname.empty() ? DiscordUser.username : scServerNickname;
-
-				// Regex to remove emojis
-				std::regex emojiRegex(R"(<:[^:]+:\d+>)");
-				sMessage = std::regex_replace(sMessage, emojiRegex, "");
-
-				std::string sData = "@START" + scUsername + "<br>" + sMessage + "<br>";
-
-				if (iAttachments > 0)
-				{
-					std::string sFileName;
-					std::string sURL;
-					std::string sType;
-					for (int i = 0; i < iAttachments; i++) {
-						sFileName = event.msg.attachments[i].filename;
-						sURL = event.msg.attachments[i].url;
-						sType = event.msg.attachments[i].content_type;
-
-						sData = sData + "@ATTACHMENT-START" + sFileName + "-" + sURL + "-" + sType + "@ATTACHMENT-END";
-					}
-				}
-
-				sData = sData + "@END<br><br>\n";
-
-				std::ofstream chatfile;
-
-				chatfile.open(scNewsFilePath, std::ios_base::app); // append instead of overwrite
-				chatfile << sData;
 
 			}
 
@@ -1631,6 +1663,196 @@ namespace Discord {
 
 	}
 
+
+	void Update_NewsList(dpp::cluster &DiscordBot)
+	{
+
+
+		DiscordBot.messages_get(scNewsChannelID, 0, 0, 0, 5, [&DiscordBot](const dpp::confirmation_callback_t& callback) {
+			if (!callback.is_error()) {
+
+				lNewsList.clear();
+
+				auto messages = get<dpp::message_map>(callback.value);
+
+				std::vector<dpp::message> reversedMessages;
+
+				// Fülle die Liste mit Nachrichten in umgekehrter Reihenfolge
+				for (const auto& pair : messages) {
+					reversedMessages.insert(reversedMessages.begin(), pair.second);
+				}
+
+				// Sortiere die Nachrichten nach dem Erstellungsdatum
+				std::sort(reversedMessages.begin(), reversedMessages.end(), [](const dpp::message& msg1, const dpp::message& msg2) {
+					return msg1.get_creation_time() < msg2.get_creation_time();
+					});
+
+				for (const auto& msg : reversedMessages) {
+					MessageListEntry MessageEntry;
+					
+
+					std::string scServerNickname = GetNicknameByDiscordName(msg.author.username);
+					std::string scUsername = scServerNickname.empty() ? msg.author.username : scServerNickname;
+
+					MessageEntry.Nickname = scUsername;
+					MessageEntry.Message = msg;
+
+					// Füge die Nachricht der Liste hinzu
+					lNewsList.push_back(MessageEntry);
+				}
+			}
+		});
+
+	}
+
+	void Update_EventList(dpp::cluster &DiscordBot)
+	{
+
+
+		DiscordBot.messages_get(scEventChannelID, 0, 0, 0, 5, [&DiscordBot](const dpp::confirmation_callback_t& callback) {
+			if (!callback.is_error()) {
+
+				lEventList.clear();
+
+				auto messages = get<dpp::message_map>(callback.value);
+
+				std::vector<dpp::message> reversedMessages;
+
+				// Fülle die Liste mit Nachrichten in umgekehrter Reihenfolge
+				for (const auto& pair : messages) {
+					reversedMessages.insert(reversedMessages.begin(), pair.second);
+				}
+
+				// Sortiere die Nachrichten nach dem Erstellungsdatum
+				std::sort(reversedMessages.begin(), reversedMessages.end(), [](const dpp::message& msg1, const dpp::message& msg2) {
+					return msg1.get_creation_time() < msg2.get_creation_time();
+					});
+
+				for (const auto& msg : reversedMessages) {
+					MessageListEntry MessageEntry;
+
+
+					std::string scServerNickname = GetNicknameByDiscordName(msg.author.username);
+					std::string scUsername = scServerNickname.empty() ? msg.author.username : scServerNickname;
+
+					MessageEntry.Nickname = scUsername;
+					MessageEntry.Message = msg;
+
+					lEventList.push_back(MessageEntry);
+				}
+			}
+		});
+
+	}
+
+
+
+	//TEST
+	std::string makeAPICall(const std::string& url, const std::string& authorizationHeader) {
+		CURL* curl = curl_easy_init();
+		std::string response;
+
+		if (curl) {
+			curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void* buffer, size_t size, size_t nmemb, std::string* out) -> size_t {
+				out->append(static_cast<char*>(buffer), size * nmemb);
+				return size * nmemb;
+				});
+			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, curl_slist_append(nullptr, authorizationHeader.c_str()));
+			CURLcode res = curl_easy_perform(curl);
+			curl_easy_cleanup(curl);
+
+			if (res != CURLE_OK) {
+				std::cerr << "Failed to make API call: " << curl_easy_strerror(res) << std::endl;
+			}
+		}
+		return response;
+	}
+
+	// Function to get user from the guild
+	std::string getUserFromGuildAPI(const std::string& guildId, const std::string& userId, const std::string& token) {
+		std::string url = "https://discord.com/api/v10/guilds/" + guildId + "/members/" + userId;
+		std::string authorizationHeader = "Authorization: Bot " + token;
+		std::string response = makeAPICall(url, authorizationHeader);
+
+		// Parse the JSON response and extract the user information
+		json userDataJson = json::parse(response);
+		std::string nickname;
+
+		if (userDataJson.contains("nick")) {
+			nickname = userDataJson["nick"].get<std::string>();
+		}
+		
+		return nickname;
+	}
+
+	// Function to get user information
+	std::pair<std::string, std::string> getUserInfoAPI(const std::string& userId, const std::string& token) {
+		std::string url = "https://discord.com/api/v10/users/" + userId;
+		std::string authorizationHeader = "Authorization: Bot " + token;
+		std::string response = makeAPICall(url, authorizationHeader);
+
+		// Parse the JSON response and extract the user information
+		json userDataJson = json::parse(response);
+		std::string username = userDataJson["username"].get<std::string>();
+		std::string global_name = userDataJson["global_name"].get<std::string>();
+
+		return std::make_pair(username, global_name);
+	}
+
+	DiscordUser GetDiscordUserData(const std::string& userID)
+	{
+		// Get user information
+		std::pair<std::string, std::string> userInfo = getUserInfoAPI(userID, scDiscordBotToken);
+		std::string scDiscordUsername = userInfo.first;
+		std::string scDiscordDisplayName = userInfo.second;
+		std::string scServerUsername = getUserFromGuildAPI(scDiscordServerID, userID, scDiscordBotToken);
+		std::string scDiscordID = userID;
+
+
+		DiscordUser NewUser;
+		NewUser.scDiscordUsername = scDiscordUsername;
+		NewUser.scDiscordDisplayName = scDiscordDisplayName;
+		NewUser.scServerUsername = scServerUsername;
+		NewUser.scDiscordID = scDiscordID;
+
+		return NewUser;
+
+
+	}
+
+	void updateUserMap(const std::string& userId, const DiscordUser& User) {
+		std::lock_guard<std::mutex> lock(m_Mutex);
+		userDataMap[userId] = User;
+	}
+
+	void ThreadUpdateUsers() {
+		
+		std::unordered_set<std::string> userIds;
+
+		{
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			userDataMap.clear();
+
+			// Durchlaufe die lNewsList und füge die User-IDs dem Set hinzu
+			for (const auto& messageEntry : lNewsList) {
+				userIds.insert(std::to_string(messageEntry.Message.author.id));
+			}
+
+			// Durchlaufe die lEventList und füge die User-IDs dem Set hinzu
+			for (const auto& messageEntry : lEventList) {
+				userIds.insert(std::to_string(messageEntry.Message.author.id));
+			}
+		}
+
+		// Rufe für jede eindeutige User-ID die Benutzerdaten ab und aktualisiere die Map
+		for (const auto& userId : userIds) {
+			DiscordUser user = GetDiscordUserData(userId);
+			ConPrint(stows("USER: " + user.scDiscordUsername) + L"\n");
+			updateUserMap(user.scDiscordID, user);
+		}
+	}
 
 
 } // namespace DiscordBot

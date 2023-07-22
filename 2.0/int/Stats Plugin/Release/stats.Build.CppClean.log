@@ -1,11 +1,11 @@
 c:\flsr-hook\2.0\int\stats plugin\release\vc143.pdb
 c:\flsr-hook\2.0\int\stats plugin\release\main.obj
 c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.cfg
-c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.ilk
-c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.dll
-c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.pdb
 c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.lib
 c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.exp
+c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.dll
+c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.ilk
+c:\flsr-hook\2.0\bin\release\plugins\stats plugin\stats.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\stats plugin\stats.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\stats plugin\stats.ilk
 c:\flsr-hook\2.0\project\..\int\stats plugin\release\stats_plugin.vcxproj.filelistabsolute.txt
@@ -19,3 +19,4 @@ c:\flsr-hook\2.0\int\stats plugin\release\stats plugin.tlog\link.command.1.tlog
 c:\flsr-hook\2.0\int\stats plugin\release\stats plugin.tlog\link.read.1.tlog
 c:\flsr-hook\2.0\int\stats plugin\release\stats plugin.tlog\link.write.1.tlog
 c:\flsr-hook\2.0\int\stats plugin\release\stats plugin.tlog\link.write.2u.tlog
+c:\flsr-hook\2.0\int\stats plugin\release\stats plugin.tlog\vcpkginstallmanifestx86-windows.read.1u.tlog

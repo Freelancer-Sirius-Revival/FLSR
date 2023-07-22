@@ -10,11 +10,11 @@ c:\flsr-hook\2.0\int\base plugin\release\defensemodule.obj
 c:\flsr-hook\2.0\int\base plugin\release\coremodule.obj
 c:\flsr-hook\2.0\int\base plugin\release\clientcommands.obj
 c:\flsr-hook\2.0\int\base plugin\release\buildmodule.obj
-c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.ilk
-c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.dll
-c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.pdb
 c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.lib
 c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.exp
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.dll
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.ilk
+c:\flsr-hook\2.0\bin\release\plugins\base plugin\base.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\base plugin\base.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\base plugin\base.ilk
 c:\flsr-hook\2.0\project\..\int\base plugin\release\base plugin.vcxproj.filelistabsolute.txt

@@ -1,29 +1,23 @@
 ﻿  Installing vcpkg dependencies to C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\
   "C:\vcpkg\vcpkg\vcpkg.exe" install  --x-wait-for-lock --triplet "x86-windows" --vcpkg-root "C:\vcpkg\vcpkg\\" "--x-manifest-root=C:\FLSR-Hook\2.0\\" "--x-install-root=C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\\" 
+  Es wird auf die Sperre des Dateisystems f├╝r ÔÇ×C:\vcpkg\vcpkg\.vcpkg-rootÔÇ£ gewartet...
   Compilerhash f├╝r Triplet x64-windows wird erkannt...
   Compilerhash f├╝r Triplet x86-windows wird erkannt...
-  Die folgenden Pakete werden erstellt und installiert:
-      dpp[core]:x86-windows -> 10.0.21
-    * libsodium[core]:x86-windows -> 1.0.18#8
-    * openssl[core]:x86-windows -> 3.0.7#1
-    * opus[core]:x86-windows -> 1.3.1#9
-    * vcpkg-cmake-get-vars[core]:x64-windows -> 2022-09-04
-    * zlib[core]:x86-windows -> 1.2.13
-  Zus├ñtzliche Pakete (*) werden ge├ñndert, um diesen Vorgang abzuschlie├ƒen.
-  6 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 3.172 s wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
-  Installing 1/6 zlib:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von zlib:x86-windows: 51.31 ms
-  Installing 2/6 opus:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von opus:x86-windows: 86.96 ms
-  Installing 3/6 vcpkg-cmake-get-vars:x64-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von vcpkg-cmake-get-vars:x64-windows: 62.34 ms
-  Installing 4/6 openssl:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von openssl:x86-windows: 295.7 ms
-  Installing 5/6 libsodium:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von libsodium:x86-windows: 84.56 ms
-  Installing 6/6 dpp:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von dpp:x86-windows: 344.2 ms
-  Gesamtinstallationszeit: 4.098 s
+  Alle angeforderten Pakete sind derzeit installiert.
+  0 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 274.6 us wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
+  Gesamtinstallationszeit: 400.4 us
+  ÔÇ×crowÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(Crow CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE Crow::Crow)
+  
+  ÔÇ×curlÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(CURL CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE CURL::libcurl)
+  
   The package nlohmann-json provides CMake targets:
   
       find_package(nlohmann_json CONFIG REQUIRED)

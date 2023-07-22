@@ -86,6 +86,12 @@
     <ClCompile Include="Discord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SpawnProtection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="API.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -108,5 +114,7 @@
     <None Include="ReportTemplate.html">
       <Filter>Source Files\AC REPORT</Filter>
     </None>
+    <None Include="curl\Makefile.am" />
+    <None Include="curl\Makefile.in" />
   </ItemGroup>
 </Project>

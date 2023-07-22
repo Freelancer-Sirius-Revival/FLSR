@@ -1,10 +1,10 @@
 c:\flsr-hook\2.0\int\plugintemplate\release\vc143.pdb
 c:\flsr-hook\2.0\int\plugintemplate\release\main.obj
-c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.ilk
-c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.dll
-c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.pdb
 c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.lib
 c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.exp
+c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.dll
+c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.ilk
+c:\flsr-hook\2.0\bin\release\plugins\plugintemplate\$safeprojectname$.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\plugintemplate\$safeprojectname$.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\plugintemplate\$safeprojectname$.ilk
 c:\flsr-hook\2.0\project\..\int\plugintemplate\release\plugintemplate.vcxproj.filelistabsolute.txt

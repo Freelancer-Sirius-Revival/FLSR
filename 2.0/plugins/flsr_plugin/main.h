@@ -14,7 +14,7 @@
 //Includes
 #include <list>
 #include <string>
-#include <windows.h>
+#include <Windows.h>
 #include <fstream>
 #include <filesystem>
 #include <sstream>
@@ -23,7 +23,7 @@
 #include <SQLiteCpp/VariadicBind.h>
 #include <unordered_map>
 #include <openssl/sha.h>
-
+#include <crow.h>
 
 //Plugin Stuff
 extern PLUGIN_RETURNCODE returncode;
@@ -53,9 +53,7 @@ extern PLUGIN_RETURNCODE returncode;
 #define DISCORD_WEBHOOK_UVCHAT_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\webhook.exe"
 #define DISCORD_WEBHOOK_MODREQUEST_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\modrequest.exe"
 #define DISCORD_WEBHOOK_CHEATREPORT_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\cheatreport.exe"
-#define PLAYERONLINE_FILE "C:\\Caddy\\files\\Server.ini"
 #define CHEATREPORT_STORE "C:\\Caddy\\files\\cheater\\"
-#define DISCORD_CHAT_FILE "C:\\DiscordBot\\Chat.ini"
 
 // Mutex-Objekt deklarieren
 extern std::mutex m_Mutex;
@@ -285,6 +283,7 @@ namespace Tools {
     HK_ERROR FLSRHkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount, bool bMission);
     float GetAveragePingOfAllPlayers();
     std::string sha1(const std::string& input);
+    std::string typeToString(Archetype::AClassType aType);
  
 }
 
@@ -1128,18 +1127,39 @@ namespace Discord {
         }
     };
 
+    struct MessageListEntry {
+        std::string Nickname;
+        dpp::message Message;
+
+    };
+
+
+    struct DiscordUser {
+        std::string scServerUsername;
+        std::string scDiscordUsername;
+        std::string scDiscordDisplayName;
+        std::string scDiscordID;
+    };
+
+
     //extern
     extern std::list<ChatMessage> lChatMessages;
+    extern std::list<ChatMessage> lModMessages;
     extern std::list<DMMessage> lDMMessages;
     extern std::list <LastSelectClick> lLastSelectClick;
+    extern std::list<MessageListEntry> lNewsList;
+    extern std::list<MessageListEntry> lEventList;
+    extern std::map<std::string, DiscordUser> userDataMap;
     extern int iOnlinePlayers;
 
     //Konfig
     extern std::string scDiscordBotToken;
 	extern std::string scDiscordServerID;
     extern std::string scUVChatChannelID;
+    extern std::string scModRequestChannelID;
+    extern std::string scModGroupID;
     extern std::string scNewsChannelID;
-    extern std::string scNewsFilePath;
+    extern std::string scEventChannelID;
 
 
     extern int iRenameCost;
@@ -1184,7 +1204,40 @@ namespace Discord {
     bool DoesDiscordAccountHaveValidChars(const std::string& discordAccount);
     std::string GetUserIDByDiscordName(const std::string& discordName);
     std::string GetNicknameByDiscordName(const std::string& discordName);
+    void Update_NewsList(dpp::cluster &DiscordBot);
+    void Update_EventList(dpp::cluster &DiscordBot);
+
+    std::string makeAPICall(const std::string& url, const std::string& authorizationHeader);
+    std::string getUserFromGuildAPI(const std::string& guildId, const std::string& userId, const std::string& token);
+    std::pair<std::string, std::string> getUserInfoAPI(const std::string& userId, const std::string& token);
+    void updateUserMap(const std::string& userId, const DiscordUser& User);
+    DiscordUser GetDiscordUserData(const std::string& userID);
+    void ThreadUpdateUsers();
 
 } // namespace DiscordBot
+
+
+namespace SpawnProtection {
+
+    extern std::map<uint, mstime> g_lastSpawnTimes;
+    extern uint g_spawnProtectionDuration;
+    bool LoadSettings();
+    void SetLastSpawnTime(uint iClientID, mstime spawnTimestamp);
+    mstime GetLastSpawnTime(uint iClientID);
+    void UpdateLastSpawnTime(uint iClientID);;
+    bool IsSpawnProtectionActive(uint iClientID);
+
+
+
+} // namespace SpawnProtection
+
+namespace API {
+
+    extern ushort;
+
+    bool LoadSettings();
+    void StartUp();
+
+} // namespace API
 
 #endif

@@ -102,6 +102,13 @@ namespace Hooks {
     void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1, float damage, enum DamageEntry::SubObjFate fate) {
         returncode = DEFAULT_RETURNCODE;
 
+        if (SpawnProtection::IsSpawnProtectionActive(iDmgTo))
+        {
+            ConPrint(L"DMG WHILE PROTECTED\n");
+            returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+            return;
+		}
+
         //NPCs always do damage
         if (!dmg->is_inflictor_a_player())
         {
@@ -626,6 +633,9 @@ namespace Hooks {
             Commands::UserCMD_ENABLECARRIER(iClientID, L"");
             //ConPrint(L"Spawn\n");
         }
+
+        //SpawnProtection Test
+        SpawnProtection::UpdateLastSpawnTime(iClientID);
 
         //Update BaseState
         ClientController::Send_ControlMsg(false, iClientID, L"_InSpaceState");

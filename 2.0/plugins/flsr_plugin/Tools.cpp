@@ -1344,4 +1344,48 @@ namespace Tools {
         return ss.str();
     }
 
+    // Helper function to convert AClassType enum to string
+    std::string typeToString(Archetype::AClassType aType) {
+        switch (aType) {
+        case Archetype::ROOT: return "ROOT";
+        case Archetype::EQ_OBJ: return "EQ_OBJ";
+        case Archetype::SOLAR: return "SOLAR";
+        case Archetype::SHIP: return "SHIP";
+        case Archetype::ASTEROID: return "ASTEROID";
+        case Archetype::DYNAMIC_ASTEROID: return "DYNAMIC_ASTEROID";
+        case Archetype::EQUIPMENT: return "EQUIPMENT";
+        case Archetype::ATTACHED_EQUIPMENT: return "ATTACHED_EQUIPMENT";
+        case Archetype::LOOT_CRATE: return "LOOT_CRATE";
+        case Archetype::CARGO_POD: return "CARGO_POD";
+        case Archetype::COMMODITY: return "COMMODITY";
+        case Archetype::POWER: return "POWER";
+        case Archetype::ENGINE: return "ENGINE";
+        case Archetype::SHIELD: return "SHIELD";
+        case Archetype::SHIELD_GENERATOR: return "SHIELD_GENERATOR";
+        case Archetype::THRUSTER: return "THRUSTER";
+        case Archetype::LAUNCHER: return "LAUNCHER";
+        case Archetype::GUN: return "GUN";
+        case Archetype::MINE_DROPPER: return "MINE_DROPPER";
+        case Archetype::COUNTER_MEASURE_DROPPER: return "COUNTER_MEASURE_DROPPER";
+        case Archetype::SCANNER: return "SCANNER";
+        case Archetype::LIGHT: return "LIGHT";
+        case Archetype::TRACTOR: return "TRACTOR";
+        case Archetype::ATTACHED_FX_EQUIP: return "ATTACHED_FX_EQUIP";
+        case Archetype::INTERNAL_FX_EQUIP: return "INTERNAL_FX_EQUIP";
+        case Archetype::REPAIR_DROID: return "REPAIR_DROID";
+        case Archetype::REPAIR_KIT: return "REPAIR_KIT";
+        case Archetype::SHIELD_BATTERY: return "SHIELD_BATTERY";
+        case Archetype::CLOAKING_DEVICE: return "CLOAKING_DEVICE";
+        case Archetype::TRADE_LANE_EQUIP: return "TRADE_LANE_EQUIP";
+        case Archetype::PROJECTILE: return "PROJECTILE";
+        case Archetype::MUNITION: return "MUNITION";
+        case Archetype::MINE: return "MINE";
+        case Archetype::COUNTER_MEASURE: return "COUNTER_MEASURE";
+        case Archetype::ARMOR: return "ARMOR";
+        default: return "UNKNOWN";
+        }
+    }
+
+
+
 }

@@ -1,0 +1,13 @@
+x86-windows/
+x86-windows/include/
+x86-windows/include/boost/
+x86-windows/include/boost/assert.hpp
+x86-windows/include/boost/assert/
+x86-windows/include/boost/assert/source_location.hpp
+x86-windows/include/boost/current_function.hpp
+x86-windows/share/
+x86-windows/share/boost-assert/
+x86-windows/share/boost-assert/copyright
+x86-windows/share/boost-assert/usage
+x86-windows/share/boost-assert/vcpkg.spdx.json
+x86-windows/share/boost-assert/vcpkg_abi_info.txt

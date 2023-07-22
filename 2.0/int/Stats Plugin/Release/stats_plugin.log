@@ -4,8 +4,20 @@
   Compilerhash f├╝r Triplet x64-windows wird erkannt...
   Compilerhash f├╝r Triplet x86-windows wird erkannt...
   Alle angeforderten Pakete sind derzeit installiert.
-  0 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 178.4 us wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
-  Gesamtinstallationszeit: 237.7 us
+  0 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 198.5 us wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
+  Gesamtinstallationszeit: 248 us
+  ÔÇ×crowÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(Crow CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE Crow::Crow)
+  
+  ÔÇ×curlÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(CURL CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE CURL::libcurl)
+  
   The package nlohmann-json provides CMake targets:
   
       find_package(nlohmann_json CONFIG REQUIRED)

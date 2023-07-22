@@ -67,6 +67,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AntiCheat.cpp" />
+    <ClCompile Include="API.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
     <ClCompile Include="Commands.cpp" />
@@ -86,6 +87,7 @@
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="PVP.cpp" />
     <ClCompile Include="SendCash.cpp" />
+    <ClCompile Include="SpawnProtection.cpp" />
     <ClCompile Include="SQL.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
@@ -99,6 +101,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="curl\Makefile.am" />
+    <None Include="curl\Makefile.in" />
     <None Include="report.html" />
     <None Include="ReportTemplate.html" />
     <None Include="surdump.zip" />

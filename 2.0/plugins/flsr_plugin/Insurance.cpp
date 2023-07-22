@@ -32,7 +32,6 @@ namespace Insurance {
 
         // Add mounted Equip to list
         std::list<CARGO_INFO> lstMounted;
-        std::list<CARGO_INFO> lstAdditional;
         float fValue;
         int iPrice;
         for (auto const& cargo : lstCargo) {
@@ -643,7 +642,6 @@ namespace Insurance {
 
         // Add mounted Equip to list
         std::list<CARGO_INFO> lstMounted;
-        std::list<CARGO_INFO> lstAdditional;
         float fValue;
         int iPrice;
         for (auto const& cargo : lstCargo) {

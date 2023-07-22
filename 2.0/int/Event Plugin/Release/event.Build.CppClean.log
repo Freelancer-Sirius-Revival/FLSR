@@ -1,10 +1,10 @@
 c:\flsr-hook\2.0\int\event plugin\release\vc143.pdb
 c:\flsr-hook\2.0\int\event plugin\release\main.obj
-c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.ilk
-c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.dll
-c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.pdb
 c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.lib
 c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.exp
+c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.dll
+c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.ilk
+c:\flsr-hook\2.0\bin\release\plugins\event plugin\event.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\event plugin\event.pdb
 c:\flsr-hook\2.0\project\..\bin\release\plugins\event plugin\event.ilk
 c:\flsr-hook\2.0\project\..\int\event plugin\release\event plugin.vcxproj.filelistabsolute.txt

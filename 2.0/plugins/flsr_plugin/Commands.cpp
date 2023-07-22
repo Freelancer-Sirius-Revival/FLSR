@@ -801,10 +801,21 @@ namespace Commands {
 
     void UserCmd_MODREQUEST(uint iClientID, const std::wstring &wscParam) {
         std::wstring Chat = wscParam;
-        std::wstring Charname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
-        // HkSendUChat(Charname, Chat);
-        ShellExecute( NULL, "open", DISCORD_WEBHOOK_MODREQUEST_FILE, wstos(Charname + L": " + Chat).c_str(), NULL, NULL);
-        PrintUserCmdText(iClientID, L"Request send!");
+        std::wstring Charname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+        PrintUserCmdText (iClientID, L"Your request has been sent to the moderators.");
+        //Discord
+        Discord::ChatMessage ChatMsg;
+        ChatMsg.wscCharname = Charname;
+        ChatMsg.wscChatMessage = Chat;
+
+
+        {
+            // Mutex sperren
+            std::lock_guard<std::mutex> lock(m_Mutex);
+
+            // Chat-Nachricht zur Liste hinzufügen
+            Discord::lModMessages.push_back(ChatMsg);
+        } // Mutex wird hier automatisch freigegeben
     }
 
     void UserCMD_ENABLECARRIER(uint iClientID, const std::wstring &wscParam) {

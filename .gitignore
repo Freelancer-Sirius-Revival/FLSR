@@ -11,3 +11,4 @@
 *.pdb
 2.0/dist/*
 2.0/int/*
+2.0/vcpkg_installed/*

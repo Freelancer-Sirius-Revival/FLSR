@@ -1,4 +1,252 @@
-﻿  Main.cpp
+﻿  Installing vcpkg dependencies to C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\
+  "C:\vcpkg\vcpkg\vcpkg.exe" install  --x-wait-for-lock --triplet "x86-windows" --vcpkg-root "C:\vcpkg\vcpkg\\" "--x-manifest-root=C:\FLSR-Hook\2.0\\" "--x-install-root=C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\\" 
+  Compilerhash f├╝r Triplet x64-windows wird erkannt...
+  Compilerhash f├╝r Triplet x86-windows wird erkannt...
+  Die folgenden Pakete werden erstellt und installiert:
+    * boost-algorithm:x86-windows -> 1.82.0#2
+    * boost-align:x86-windows -> 1.82.0#2
+    * boost-array:x86-windows -> 1.82.0#2
+    * boost-asio:x86-windows -> 1.82.0#3
+    * boost-assert:x86-windows -> 1.82.0#2
+    * boost-bind:x86-windows -> 1.82.0#2
+    * boost-build:x64-windows -> 1.82.0#2
+    * boost-chrono:x86-windows -> 1.82.0#2
+    * boost-concept-check:x86-windows -> 1.82.0#2
+    * boost-config:x86-windows -> 1.82.0#2
+    * boost-container:x86-windows -> 1.82.0#2
+    * boost-container-hash:x86-windows -> 1.82.0#2
+    * boost-context:x86-windows -> 1.82.0#2
+    * boost-conversion:x86-windows -> 1.82.0#2
+    * boost-core:x86-windows -> 1.82.0#2
+    * boost-coroutine:x86-windows -> 1.82.0#2
+    * boost-date-time:x86-windows -> 1.82.0#2
+    * boost-describe:x86-windows -> 1.82.0#2
+    * boost-detail:x86-windows -> 1.82.0#2
+    * boost-exception:x86-windows -> 1.82.0#2
+    * boost-function:x86-windows -> 1.82.0#2
+    * boost-function-types:x86-windows -> 1.82.0#2
+    * boost-functional:x86-windows -> 1.82.0#2
+    * boost-fusion:x86-windows -> 1.82.0#2
+    * boost-integer:x86-windows -> 1.82.0#2
+    * boost-intrusive:x86-windows -> 1.82.0#2
+    * boost-io:x86-windows -> 1.82.0#2
+    * boost-iterator:x86-windows -> 1.82.0#2
+    * boost-lexical-cast:x86-windows -> 1.82.0#2
+    * boost-modular-build-helper:x64-windows -> 1.82.0#4
+    * boost-move:x86-windows -> 1.82.0#2
+    * boost-mp11:x86-windows -> 1.82.0#2
+    * boost-mpl:x86-windows -> 1.82.0#2
+    * boost-numeric-conversion:x86-windows -> 1.82.0#2
+    * boost-optional:x86-windows -> 1.82.0#2
+    * boost-pool:x86-windows -> 1.82.0#2
+    * boost-predef:x86-windows -> 1.82.0#2
+    * boost-preprocessor:x86-windows -> 1.82.0#2
+    * boost-range:x86-windows -> 1.82.0#2
+    * boost-ratio:x86-windows -> 1.82.0#2
+    * boost-rational:x86-windows -> 1.82.0#2
+    * boost-regex:x86-windows -> 1.82.0#2
+    * boost-smart-ptr:x86-windows -> 1.82.0#2
+    * boost-static-assert:x86-windows -> 1.82.0#2
+    * boost-system:x86-windows -> 1.82.0#2
+    * boost-throw-exception:x86-windows -> 1.82.0#2
+    * boost-tokenizer:x86-windows -> 1.82.0#2
+    * boost-tuple:x86-windows -> 1.82.0#2
+    * boost-type-traits:x86-windows -> 1.82.0#2
+    * boost-typeof:x86-windows -> 1.82.0#2
+    * boost-uninstall:x64-windows -> 1.82.0#2
+    * boost-uninstall:x86-windows -> 1.82.0#2
+    * boost-unordered:x86-windows -> 1.82.0#2
+    * boost-utility:x86-windows -> 1.82.0#2
+    * boost-variant2:x86-windows -> 1.82.0#2
+    * boost-vcpkg-helpers:x86-windows -> 1.82.0#2
+    * boost-winapi:x86-windows -> 1.82.0#2
+      crow:x86-windows -> 1.0-5
+    * fmt:x86-windows -> 10.0.0
+      nlohmann-json:x86-windows -> 3.11.2
+      openssl:x86-windows -> 3.1.1#1
+      spdlog:x86-windows -> 1.12.0
+    * sqlite3[core,json1]:x86-windows -> 3.42.0#1
+      sqlitecpp[core,sqlite]:x86-windows -> 3.3.0
+    * vcpkg-cmake:x64-windows -> 2023-05-04
+    * vcpkg-cmake-config:x64-windows -> 2022-02-06#1
+    * vcpkg-cmake-get-vars:x64-windows -> 2023-03-02
+  Zus├ñtzliche Pakete (*) werden ge├ñndert, um diesen Vorgang abzuschlie├ƒen.
+  67 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 39 s wiederhergestellt. Verwenden Sie ÔÇ×--debug", um weitere Details anzuzeigen.
+  Installing 1/67 vcpkg-cmake-config:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von vcpkg-cmake-config:x64-windows: 12.6 ms
+  Installing 2/67 vcpkg-cmake:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von vcpkg-cmake:x64-windows: 34.5 ms
+  Installing 3/67 boost-uninstall:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-uninstall:x86-windows: 30.5 ms
+  Installing 4/67 boost-vcpkg-helpers:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-vcpkg-helpers:x86-windows: 34.4 ms
+  Installing 5/67 boost-config:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-config:x86-windows: 178 ms
+  Installing 6/67 boost-static-assert:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-static-assert:x86-windows: 39.3 ms
+  Installing 7/67 boost-type-traits:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-type-traits:x86-windows: 141 ms
+  Installing 8/67 boost-assert:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-assert:x86-windows: 29.6 ms
+  Installing 9/67 boost-throw-exception:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-throw-exception:x86-windows: 31.6 ms
+  Installing 10/67 boost-preprocessor:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-preprocessor:x86-windows: 248 ms
+  Installing 11/67 boost-io:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-io:x86-windows: 37.9 ms
+  Installing 12/67 boost-core:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-core:x86-windows: 61.1 ms
+  Installing 13/67 boost-utility:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-utility:x86-windows: 43.8 ms
+  Installing 14/67 boost-predef:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-predef:x86-windows: 110 ms
+  Installing 15/67 boost-move:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-move:x86-windows: 57.9 ms
+  Installing 16/67 boost-detail:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-detail:x86-windows: 40.8 ms
+  Installing 17/67 boost-optional:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-optional:x86-windows: 36.3 ms
+  Installing 18/67 boost-tuple:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-tuple:x86-windows: 29.2 ms
+  Installing 19/67 boost-smart-ptr:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-smart-ptr:x86-windows: 85.5 ms
+  Installing 20/67 boost-mpl:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-mpl:x86-windows: 516 ms
+  Installing 21/67 vcpkg-cmake-get-vars:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von vcpkg-cmake-get-vars:x64-windows: 30.7 ms
+  Installing 22/67 boost-uninstall:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-uninstall:x64-windows: 26.6 ms
+  Installing 23/67 boost-modular-build-helper:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-modular-build-helper:x64-windows: 30.5 ms
+  Installing 24/67 boost-integer:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-integer:x86-windows: 40.4 ms
+  Installing 25/67 boost-mp11:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-mp11:x86-windows: 47.7 ms
+  Installing 26/67 boost-describe:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-describe:x86-windows: 43.6 ms
+  Installing 27/67 boost-container-hash:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-container-hash:x86-windows: 43.5 ms
+  Installing 28/67 boost-concept-check:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-concept-check:x86-windows: 41.9 ms
+  Installing 29/67 boost-build:x64-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-build:x64-windows: 498 ms
+  Installing 30/67 boost-regex:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-regex:x86-windows: 90.3 ms
+  Installing 31/67 boost-typeof:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-typeof:x86-windows: 64.7 ms
+  Installing 32/67 boost-function-types:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-function-types:x86-windows: 111 ms
+  Installing 33/67 boost-bind:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-bind:x86-windows: 64.6 ms
+  Installing 34/67 boost-function:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-function:x86-windows: 60.1 ms
+  Installing 35/67 boost-functional:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-functional:x86-windows: 58.6 ms
+  Installing 36/67 boost-fusion:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-fusion:x86-windows: 594 ms
+  Installing 37/67 boost-conversion:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-conversion:x86-windows: 44.6 ms
+  Installing 38/67 boost-iterator:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-iterator:x86-windows: 114 ms
+  Installing 39/67 boost-array:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-array:x86-windows: 53.5 ms
+  Installing 40/67 boost-range:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-range:x86-windows: 140 ms
+  Installing 41/67 boost-numeric-conversion:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-numeric-conversion:x86-windows: 61.8 ms
+  Installing 42/67 boost-intrusive:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-intrusive:x86-windows: 103 ms
+  Installing 43/67 boost-container:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-container:x86-windows: 108 ms
+  Installing 44/67 boost-lexical-cast:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-lexical-cast:x86-windows: 61.4 ms
+  Installing 45/67 boost-winapi:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-winapi:x86-windows: 116 ms
+  Installing 46/67 boost-tokenizer:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-tokenizer:x86-windows: 39.4 ms
+  Installing 47/67 boost-unordered:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-unordered:x86-windows: 55.3 ms
+  Installing 48/67 boost-exception:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-exception:x86-windows: 53.5 ms
+  Installing 49/67 boost-algorithm:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-algorithm:x86-windows: 101 ms
+  Installing 50/67 boost-date-time:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-date-time:x86-windows: 98.7 ms
+  Installing 51/67 boost-variant2:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-variant2:x86-windows: 49.3 ms
+  Installing 52/67 boost-system:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-system:x86-windows: 72.7 ms
+  Installing 53/67 boost-pool:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-pool:x86-windows: 53.1 ms
+  Installing 54/67 boost-context:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-context:x86-windows: 73.7 ms
+  Installing 55/67 boost-coroutine:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-coroutine:x86-windows: 62.1 ms
+  Installing 56/67 boost-rational:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-rational:x86-windows: 37.4 ms
+  Installing 57/67 boost-ratio:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-ratio:x86-windows: 60.8 ms
+  Installing 58/67 boost-chrono:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-chrono:x86-windows: 75.9 ms
+  Installing 59/67 boost-align:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-align:x86-windows: 72.6 ms
+  Installing 60/67 boost-asio:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von boost-asio:x86-windows: 342 ms
+  Installing 61/67 crow:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von crow:x86-windows: 65.5 ms
+  Installing 62/67 nlohmann-json:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von nlohmann-json:x86-windows: 71.6 ms
+  Installing 63/67 openssl:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von openssl:x86-windows: 112 ms
+  Installing 64/67 fmt:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von fmt:x86-windows: 56.3 ms
+  Installing 65/67 spdlog:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von spdlog:x86-windows: 88.9 ms
+  Installing 66/67 sqlite3:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von sqlite3:x86-windows: 63 ms
+  Installing 67/67 sqlitecpp:x86-windows...
+  Verstrichene Zeit f├╝r die Bearbeitung von sqlitecpp:x86-windows: 67 ms
+  Gesamtinstallationszeit: 6.2 s
+  ÔÇ×crowÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(Crow CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE Crow::Crow)
+  
+  The package nlohmann-json provides CMake targets:
+  
+      find_package(nlohmann_json CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json)
+  
+  The package nlohmann-json can be configured to not provide implicit conversions via a custom triplet file:
+  
+      set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+  
+  For more information, see the docs here:
+      
+      https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
+  
+  The package openssl is compatible with built-in CMake targets:
+  
+      find_package(OpenSSL REQUIRED)
+      target_link_libraries(main PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+  
+  The package spdlog provides CMake targets:
+  
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog)
+  
+      # Or use the header-only version
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog_header_only)
+  
+  ÔÇ×sqlitecppÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(SQLiteCpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE SQLiteCpp)
+  
+  Main.cpp
      Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\_HookExtension Plugin\ahookext.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\_HookExtension Plugin\ahookext.exp" werden erstellt.
   HookExt Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\_HookExtension Plugin\ahookext.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\_HookExtension Plugin\ahookext.dll

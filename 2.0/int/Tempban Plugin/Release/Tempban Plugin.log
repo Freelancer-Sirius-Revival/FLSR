@@ -1,4 +1,50 @@
-﻿  Main.cpp
+﻿  Installing vcpkg dependencies to C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\
+  "C:\vcpkg\vcpkg\vcpkg.exe" install  --x-wait-for-lock --triplet "x86-windows" --vcpkg-root "C:\vcpkg\vcpkg\\" "--x-manifest-root=C:\FLSR-Hook\2.0\\" "--x-install-root=C:\FLSR-Hook\2.0\vcpkg_installed\x86-windows\\" 
+  Es wird auf die Sperre des Dateisystems f├╝r ÔÇ×C:\vcpkg\vcpkg\.vcpkg-rootÔÇ£ gewartet...
+  Compilerhash f├╝r Triplet x64-windows wird erkannt...
+  Compilerhash f├╝r Triplet x86-windows wird erkannt...
+  Alle angeforderten Pakete sind derzeit installiert.
+  Gesamtinstallationszeit: 800 ns
+  ÔÇ×crowÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(Crow CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE Crow::Crow)
+  
+  The package nlohmann-json provides CMake targets:
+  
+      find_package(nlohmann_json CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json)
+  
+  The package nlohmann-json can be configured to not provide implicit conversions via a custom triplet file:
+  
+      set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+  
+  For more information, see the docs here:
+      
+      https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
+  
+  The package openssl is compatible with built-in CMake targets:
+  
+      find_package(OpenSSL REQUIRED)
+      target_link_libraries(main PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+  
+  The package spdlog provides CMake targets:
+  
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog)
+  
+      # Or use the header-only version
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog_header_only)
+  
+  ÔÇ×sqlitecppÔÇ£ stellt CMake-Ziele bereit:
+  
+      # this is heuristically generated, and may be not correct
+      find_package(SQLiteCpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE SQLiteCpp)
+  
+  Main.cpp
      Bibliothek "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Tempban Plugin\tempban.lib" und Objekt "C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Tempban Plugin\tempban.exp" werden erstellt.
   Tempban Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\Tempban Plugin\tempban.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\Tempban Plugin\tempban.dll

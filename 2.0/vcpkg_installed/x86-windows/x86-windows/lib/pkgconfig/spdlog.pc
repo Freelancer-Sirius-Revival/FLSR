@@ -1,5 +1,4 @@
 prefix=${pcfiledir}/../..
-
 exec_prefix=${prefix}
 includedir=${prefix}/include
 libdir=${exec_prefix}/lib
@@ -7,8 +6,9 @@ libdir=${exec_prefix}/lib
 Name: libspdlog
 Description: Fast C++ logging library.
 URL: https://github.com/gabime/spdlog
-Version: 1.11.0
-CFlags: -I"${includedir}" -DSPDLOG_SHARED_LIB -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL
-Libs: -L"${libdir}" -lspdlog -pthread
+Version: 1.12.0
+CFlags: "-I${includedir}" -DSPDLOG_SHARED_LIB -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL
+Libs: "-L${libdir}" -lspdlog -pthread
 Requires: fmt
+
 

@@ -4,8 +4,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
+//Disable Warnings
+#pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
+
 //DISCORD Includes
 #include <dpp/dpp.h>
+
+//SQL Includes
+#include <SQLiteCpp/SQLiteCpp.h>
 
 //FLHOOK Includes
 #include <FLHook.h>
@@ -19,8 +25,6 @@
 #include <filesystem>
 #include <sstream>
 #include <numeric>
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <SQLiteCpp/VariadicBind.h>
 #include <unordered_map>
 #include <openssl/sha.h>
 #include <crow.h>
@@ -62,6 +66,29 @@ extern std::mutex m_Mutex;
 typedef void(__stdcall *_CRCAntiCheat)();
 extern _CRCAntiCheat CRCAntiCheat_FLSR;
 
+//SQL Defines
+#define SQLITE_OPEN_READONLY         0x00000001  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_DELETEONCLOSE    0x00000008  /* VFS only */
+#define SQLITE_OPEN_EXCLUSIVE        0x00000010  /* VFS only */
+#define SQLITE_OPEN_AUTOPROXY        0x00000020  /* VFS only */
+#define SQLITE_OPEN_URI              0x00000040  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_MEMORY           0x00000080  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_MAIN_DB          0x00000100  /* VFS only */
+#define SQLITE_OPEN_TEMP_DB          0x00000200  /* VFS only */
+#define SQLITE_OPEN_TRANSIENT_DB     0x00000400  /* VFS only */
+#define SQLITE_OPEN_MAIN_JOURNAL     0x00000800  /* VFS only */
+#define SQLITE_OPEN_TEMP_JOURNAL     0x00001000  /* VFS only */
+#define SQLITE_OPEN_SUBJOURNAL       0x00002000  /* VFS only */
+#define SQLITE_OPEN_SUPER_JOURNAL    0x00004000  /* VFS only */
+#define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_SHAREDCACHE      0x00020000  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_PRIVATECACHE     0x00040000  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_WAL              0x00080000  /* VFS only */
+#define SQLITE_OPEN_NOFOLLOW         0x01000000  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_EXRESCODE        0x02000000  /* Extended result codes */
 
 //Namespaces
 namespace Modules {
@@ -853,7 +880,6 @@ namespace EquipWhiteList {
 namespace SQL {
     
 
-
     extern std::string scDbName;
     void InitializeDB();
     void CheckAndCreateDuelRankingTable();
@@ -1203,16 +1229,10 @@ namespace Discord {
     bool UpdateCreditsForDiscordAccount(const std::string& discordAccount, const std::string& credits, bool bAdd);
     bool DoesDiscordAccountHaveValidChars(const std::string& discordAccount);
     std::string GetUserIDByDiscordName(const std::string& discordName);
-    std::string GetNicknameByDiscordName(const std::string& discordName);
     void Update_NewsList(dpp::cluster &DiscordBot);
     void Update_EventList(dpp::cluster &DiscordBot);
 
-    std::string makeAPICall(const std::string& url, const std::string& authorizationHeader);
-    std::string getUserFromGuildAPI(const std::string& guildId, const std::string& userId, const std::string& token);
-    std::pair<std::string, std::string> getUserInfoAPI(const std::string& userId, const std::string& token);
-    void updateUserMap(const std::string& userId, const DiscordUser& User);
-    DiscordUser GetDiscordUserData(const std::string& userID);
-    void ThreadUpdateUsers();
+    std::string GetDiscordUsername(const dpp::user& dppUser);
 
 } // namespace DiscordBot
 

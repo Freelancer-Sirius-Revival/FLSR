@@ -26,7 +26,7 @@
 #include <dpp/utility.h>
 #include <dpp/voicestate.h>
 #include <dpp/message.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/permissions.h>
 #include <dpp/json_interface.h>
 #include <unordered_map>
@@ -75,6 +75,7 @@ enum channel_flags : uint16_t {
 	c_pinned_thread =	0b0000000010000000,
 	/// Whether a tag is required to be specified when creating a thread in a forum channel. Tags are specified in the thread::applied_tags field.
 	c_require_tag =		0b0000000100000000,
+	/* Note that the 9th and 10th bit are used for the forum layout type */
 };
 
 /**
@@ -95,6 +96,15 @@ enum default_forum_sort_order_t : uint8_t {
 	so_latest_activity = 0,
 	/// Sort forum posts by creation time (from most recent to oldest)
 	so_creation_date = 1,
+};
+
+/**
+ * @brief Types of forum layout views that indicates how the threads in a forum channel will be displayed for users by default
+ */
+enum forum_layout_type : uint8_t {
+	fl_not_set = 0, //!< No default has been set for the forum channel
+	fl_list_view = 1, //!< Display posts as a list
+	fl_gallery_view = 2, //!< Display posts as a collection of tiles
 };
 
 /**
@@ -239,7 +249,9 @@ struct DPP_EXPORT forum_tag : public managed {
 	forum_tag& set_name(const std::string& name);
 };
 
-/** @brief A group of thread member objects*/
+/**
+ * @brief A group of thread member objects. the key is the user_id of the dpp::thread_member
+ */
 typedef std::unordered_map<snowflake, thread_member> thread_member_map;
 
 /**
@@ -306,7 +318,7 @@ public:
 	/** Sorting position, lower number means higher up the list */
 	uint16_t position;
 
-	/** the bitrate (in bits) of the voice channel */
+	/** the bitrate (in kilobits) of the voice channel */
 	uint16_t bitrate;
 
 	/** amount of seconds a user has to wait before sending another message (0-21600); bots, as well as users with the permission manage_messages or manage_channel, are unaffected*/
@@ -335,6 +347,13 @@ public:
 
 	/** Destructor */
 	virtual ~channel();
+
+	/**
+	* @brief Create a mentionable channel.
+	* @param id The ID of the channel.
+	* @return std::string The formatted mention of the channel.
+	*/
+	static std::string get_mention(const snowflake& id);
 
 	/** Read class values from json object
 	 * @param j A json object to read from
@@ -378,6 +397,22 @@ public:
 	 * @return Reference to self, so these method calls may be chained
 	 */
 	channel& set_type(channel_type type);
+
+	/**
+	 * @brief Set the default forum layout type for the forum channel
+	 *
+	 * @param layout_type The layout type
+	 * @return Reference to self, so these method calls may be chained
+	 */
+	channel& set_default_forum_layout(forum_layout_type layout_type);
+
+	/**
+	 * @brief Set the default forum sort order for the forum channel
+	 *
+	 * @param sort_order The sort order
+	 * @return Reference to self, so these method calls may be chained
+	 */
+	channel& set_default_sort_order(default_forum_sort_order_t sort_order);
 
 	/**
 	 * @brief Set flags for this channel object
@@ -438,7 +473,7 @@ public:
 	/**
 	 * @brief Set bitrate of this channel object
 	 *
-	 * @param bitrate Bitrate to set
+	 * @param bitrate Bitrate to set (in kilobits)
 	 * @return Reference to self, so these method calls may be chained 
 	 */
 	channel& set_bitrate(const uint16_t bitrate);
@@ -469,16 +504,39 @@ public:
 	channel& set_rate_limit_per_user(const uint16_t rate_limit_per_user);
 
 	/**
-	 * @brief Add a permission_overwrite to this channel object
-	 * 
-	 * @param id ID of the role or the member you want to add overwrite for
-	 * @param type type of overwrite
-	 * @param allowed_permissions bitmask of allowed permissions (refer to enum dpp::permissions) for this user/role in this channel
-	 * @param denied_permissions bitmask of denied permissions (refer to enum dpp::permissions) for this user/role in this channel
+	 * @brief Add permission overwrites for a user or role.
+	 * If the channel already has permission overwrites for the passed target, the existing ones will be adjusted by the passed permissions
 	 *
-	 * @return Reference to self, so these method calls may be chained 
+	 * @param target ID of the role or the member you want to adjust overwrites for
+	 * @param type type of overwrite
+	 * @param allowed_permissions bitmask of dpp::permissions you want to allow for this user/role in this channel. Note: You can use the dpp::permission class
+	 * @param denied_permissions bitmask of dpp::permissions you want to deny for this user/role in this channel. Note: You can use the dpp::permission class
+	 *
+	 * @return Reference to self, so these method calls may be chained
 	 */
-	channel& add_permission_overwrite(const snowflake id, const overwrite_type type, const uint64_t allowed_permissions, const uint64_t denied_permissions);
+	channel& add_permission_overwrite(const snowflake target, const overwrite_type type, const uint64_t allowed_permissions, const uint64_t denied_permissions);
+	/**
+	 * @brief Set permission overwrites for a user or role on this channel object. Old permission overwrites for the target will be overwritten
+	 *
+	 * @param target ID of the role or the member you want to set overwrites for
+	 * @param type type of overwrite
+	 * @param allowed_permissions bitmask of allowed dpp::permissions for this user/role in this channel. Note: You can use the dpp::permission class
+	 * @param denied_permissions bitmask of denied dpp::permissions for this user/role in this channel. Note: You can use the dpp::permission class
+	 *
+	 * @return Reference to self, so these method calls may be chained
+	 *
+	 * @note If both `allowed_permissions` and `denied_permissions` parameters are 0, the permission overwrite for the target will be removed
+	 */
+	channel& set_permission_overwrite(const snowflake target, const overwrite_type type, const uint64_t allowed_permissions, const uint64_t denied_permissions);
+	/**
+	 * @brief Remove channel specific permission overwrites of a user or role
+	 *
+	 * @param target ID of the role or the member you want to remove permission overwrites of
+	 * @param type type of overwrite
+	 *
+	 * @return Reference to self, so these method calls may be chained
+	 */
+	channel& remove_permission_overwrite(const snowflake target, const overwrite_type type);
 
 	/**
 	 * @brief Get the channel type
@@ -486,6 +544,13 @@ public:
 	 * @return channel_type Channel type
 	 */
 	channel_type get_type() const;
+
+	/**
+	 * @brief Get the default forum layout type used to display posts in forum channels
+	 *
+	 * @return forum_layout_types Forum layout type
+	 */
+	forum_layout_type get_default_forum_layout() const;
 
 	/**
 	 * @brief Get the mention ping for the channel
@@ -542,10 +607,12 @@ public:
 	/**
 	 * @brief Get the channel's icon url (if its a group DM), otherwise returns an empty string
 	 *
-	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096. if not specified, the default sized icon is returned.
-	 * @return std::string icon url or empty string
+	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized icon is returned.
+	 * @param format The format to use for the avatar. It can be one of `i_webp`, `i_jpg` or `i_png`.
+	 * @return std::string icon url or an empty string, if required attributes are missing or an invalid format was passed
 	 */
-	std::string get_icon_url(uint16_t size = 0) const;
+	std::string get_icon_url(uint16_t size = 0, const image_type format = i_png) const;
 
 	/**
 	 * @brief Returns true if the channel is NSFW gated
@@ -690,7 +757,7 @@ public:
 	 */
 	uint8_t message_count;
 
-	/** Approximate count of members in a thread (threads) */
+	/** Approximate count of members in a thread (stops counting at 50) */
 	uint8_t member_count;
 
 	/**
@@ -766,6 +833,26 @@ typedef std::unordered_map<snowflake, channel> channel_map;
  * @brief A group of threads
  */
 typedef std::unordered_map<snowflake, thread> thread_map;
+
+/**
+ * @brief A thread alongside the bot's optional thread_member object tied to it
+ */
+struct active_thread_info {
+	/**
+	 * @brief The thread object
+	 */
+	thread active_thread;
+
+	/**
+	 * @brief The bot as a thread member, only present if the bot is in the thread
+	 */
+	std::optional<thread_member> bot_member;
+};
+
+/**
+ * @brief A map of threads alongside optionally the thread_member tied to the bot if it is in the thread. The map's key is the thread id. Returned from the cluster::threads_get_active method
+ */
+using active_threads = std::map<snowflake, active_thread_info>;
 
 };
 

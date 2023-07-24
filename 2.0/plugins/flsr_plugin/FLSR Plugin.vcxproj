@@ -48,12 +48,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>FLSR</TargetName>
+    <IncludePath>$(SolutionDir)..\FLHookSDK\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\FLHookSDK\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgInstalledDir>..\..\..\..\vcpkg\vcpkg</VcpkgInstalledDir>
+    <VcpkgInstalledDir>C:\vcpkg\vcpkg</VcpkgInstalledDir>
+    <VcpkgAdditionalInstallOptions>
+    </VcpkgAdditionalInstallOptions>
+    <VcpkgUseStatic>false</VcpkgUseStatic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

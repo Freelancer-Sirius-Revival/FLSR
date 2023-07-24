@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/openssl-x86-windows-3.0.7#1-c6411709-953a-4a9b-a652-08139b19b765",
-  "name": "openssl:x86-windows@3.0.7#1 be6854cb2f600316a0eabd7fa3ee4abe2b7167e4f5a61f08b250fb0599910931",
+  "documentNamespace": "https://spdx.org/spdxdocs/openssl-x86-windows-3.1.1#1-aa9fd6d7-622b-4209-8ed7-a46784f08a4a",
+  "name": "openssl:x86-windows@3.1.1#1 98d54a20ef965bd5fa69082422898e68a7c92f5ad4e1f7ef5e85e9fcc42dc2a8",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-5fdee72bc1fceca198fb1ab7589837206a8b81ba"
+      "Tool: vcpkg-814b7ec837b59f1c8778f72351c1dd7605983cd2"
     ],
-    "created": "2023-06-20T22:50:58Z"
+    "created": "2023-07-24T12:48:41Z"
   },
   "relationships": [
     {
@@ -78,6 +78,41 @@
       "relatedSpdxElement": "SPDXRef-file-11"
     },
     {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-12"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-13"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-14"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-15"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-16"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-17"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-18"
+    },
+    {
       "spdxElementId": "SPDXRef-binary",
       "relationshipType": "GENERATED_FROM",
       "relatedSpdxElement": "SPDXRef-port"
@@ -128,11 +163,6 @@
       "relatedSpdxElement": "SPDXRef-port"
     },
     {
-      "spdxElementId": "SPDXRef-file-8",
-      "relationshipType": "DEPENDENCY_MANIFEST_OF",
-      "relatedSpdxElement": "SPDXRef-port"
-    },
-    {
       "spdxElementId": "SPDXRef-file-9",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
@@ -146,14 +176,54 @@
       "spdxElementId": "SPDXRef-file-11",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-12",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-13",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-14",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-15",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-15",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-16",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-17",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-18",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
     }
   ],
   "packages": [
     {
       "name": "openssl",
       "SPDXID": "SPDXRef-port",
-      "versionInfo": "3.0.7#1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "3.1.1#1",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/openssl",
       "homepage": "https://www.openssl.org",
       "licenseConcluded": "Apache-2.0",
       "licenseDeclared": "NOASSERTION",
@@ -164,7 +234,7 @@
     {
       "name": "openssl:x86-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "be6854cb2f600316a0eabd7fa3ee4abe2b7167e4f5a61f08b250fb0599910931",
+      "versionInfo": "98d54a20ef965bd5fa69082422898e68a7c92f5ad4e1f7ef5e85e9fcc42dc2a8",
       "downloadLocation": "NONE",
       "licenseConcluded": "Apache-2.0",
       "licenseDeclared": "NOASSERTION",
@@ -181,15 +251,39 @@
       "checksums": [
         {
           "algorithm": "SHA512",
-          "checksumValue": "27dd3ef0c1827a74ec880d20232acb818c7d05e004ad7389c355e200a01e899f1b1ba5c34dcce44ecf7c8767c5e1bfbb2c795e3fa5461346087e7e3b95c8a51f"
+          "checksumValue": "7073fd82ce17a63d77babb6a184c14c7341e4b1f8f5a6caeaa1a6d9c78d6a12bb6d9cbad5d39d16412be6d1c12eac60364644664a8e26e3940476973ba07fd19"
         }
       ]
     }
   ],
   "files": [
     {
-      "fileName": "./install-pc-files.cmake",
+      "fileName": "./disable-apps.patch",
       "SPDXID": "SPDXRef-file-0",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "6e023fd20a245cb83476c93df00c6a2deee4ae585b0cf7c82e192c8f582ef790"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./disable-install-docs.patch",
+      "SPDXID": "SPDXRef-file-1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d012655095d6b90f882e5e661836ac24510c24ffe4d4189cf90030a657d7d925"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./install-pc-files.cmake",
+      "SPDXID": "SPDXRef-file-2",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -201,7 +295,7 @@
     },
     {
       "fileName": "./openssl.pc.in",
-      "SPDXID": "SPDXRef-file-1",
+      "SPDXID": "SPDXRef-file-3",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -213,23 +307,83 @@
     },
     {
       "fileName": "./portfile.cmake",
-      "SPDXID": "SPDXRef-file-2",
+      "SPDXID": "SPDXRef-file-4",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "8deacd7c4443f20950c1461dfcab307e4b61a2a29771af3d779e6b50b257362a"
+          "checksumValue": "840cd21d69d08c18ac353c17608e994eedd4719b39bcf5e002a9e1fbee6a3a7c"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": "./unix/CMakeLists.txt",
-      "SPDXID": "SPDXRef-file-3",
+      "fileName": "./script-prefix.patch",
+      "SPDXID": "SPDXRef-file-5",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "3e7d6734cb881fc00115fa3b4b68377033f69da147c8fd1a6e30ff5c9f442c3d"
+          "checksumValue": "a18b53acdea8180aa24c4abbe85c4269e4d092c6eba4f946d5feafa7ca2a163d"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./unix/android-cc.patch",
+      "SPDXID": "SPDXRef-file-6",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a3cde12ca3c7c7894e73d300e0ccf728de28b87afde13776e7d7267979c3ead2"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./unix/configure",
+      "SPDXID": "SPDXRef-file-7",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "96ef16490c8a7c240a0c96de7e641c93843d0b78400b4de7dc2c7d2e500f3480"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./unix/move-openssldir.patch",
+      "SPDXID": "SPDXRef-file-8",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "63609e967d45ad4e8a370d4d6d8bcd382d4bdff7f5ed8c10f5960568dc80b596"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./unix/no-empty-dirs.patch",
+      "SPDXID": "SPDXRef-file-9",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4234f4369a37580cbc3a6257bb97e1665e32d9aad8f3c8764ca8e05d2a97af41"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./unix/no-static-libs-for-shared.patch",
+      "SPDXID": "SPDXRef-file-10",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "491c196f6c7f7155226c116ec1db8199c4a699f3efd1bef9ce944cb0a69d6f9d"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -237,11 +391,11 @@
     },
     {
       "fileName": "./unix/portfile.cmake",
-      "SPDXID": "SPDXRef-file-4",
+      "SPDXID": "SPDXRef-file-11",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "7ad19be7e298f3dc6fcc4ee3ffda38bd021e4206c8e818b67645895ddf673a69"
+          "checksumValue": "f8c3317d56479bb28fa6e500ccd9d6db284cb9a918294a25a12e0995eb31a84c"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -249,7 +403,7 @@
     },
     {
       "fileName": "./unix/remove-deps.cmake",
-      "SPDXID": "SPDXRef-file-5",
+      "SPDXID": "SPDXRef-file-12",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -261,7 +415,7 @@
     },
     {
       "fileName": "./usage",
-      "SPDXID": "SPDXRef-file-6",
+      "SPDXID": "SPDXRef-file-13",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -273,7 +427,7 @@
     },
     {
       "fileName": "./vcpkg-cmake-wrapper.cmake.in",
-      "SPDXID": "SPDXRef-file-7",
+      "SPDXID": "SPDXRef-file-14",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -285,11 +439,11 @@
     },
     {
       "fileName": "./vcpkg.json",
-      "SPDXID": "SPDXRef-file-8",
+      "SPDXID": "SPDXRef-file-15",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "60e22c9410264d75528b9e29e0d2833ceba7af2f9cb279404e50135ac47d76ed"
+          "checksumValue": "b0ef88e68f05f5a6dd780b08bb357e1c6d3aacb7a4b5156dcadbc6a285154356"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -297,7 +451,7 @@
     },
     {
       "fileName": "./windows/install-layout.patch",
-      "SPDXID": "SPDXRef-file-9",
+      "SPDXID": "SPDXRef-file-16",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -309,7 +463,7 @@
     },
     {
       "fileName": "./windows/install-pdbs.patch",
-      "SPDXID": "SPDXRef-file-10",
+      "SPDXID": "SPDXRef-file-17",
       "checksums": [
         {
           "algorithm": "SHA256",
@@ -321,11 +475,11 @@
     },
     {
       "fileName": "./windows/portfile.cmake",
-      "SPDXID": "SPDXRef-file-11",
+      "SPDXID": "SPDXRef-file-18",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "ed738f1e138eff2d97acfc2ee2696754394ef2cce0af14520ce172c2374d2964"
+          "checksumValue": "0cb709b866473c99da16b513b31e10f6177bd19d3d032753bd1dbbe6b66c69bc"
         }
       ],
       "licenseConcluded": "NOASSERTION",

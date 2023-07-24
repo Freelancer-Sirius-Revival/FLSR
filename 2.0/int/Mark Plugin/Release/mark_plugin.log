@@ -3,198 +3,13 @@
   Es wird auf die Sperre des Dateisystems f├╝r ÔÇ×C:\vcpkg\vcpkg\.vcpkg-rootÔÇ£ gewartet...
   Compilerhash f├╝r Triplet x64-windows wird erkannt...
   Compilerhash f├╝r Triplet x86-windows wird erkannt...
-  Die folgenden Pakete werden erstellt und installiert:
-    * boost-algorithm[core]:x86-windows -> 1.80.0#1
-    * boost-align[core]:x86-windows -> 1.80.0#1
-    * boost-array[core]:x86-windows -> 1.80.0#1
-    * boost-asio[core]:x86-windows -> 1.80.0#2
-    * boost-assert[core]:x86-windows -> 1.80.0#1
-    * boost-bind[core]:x86-windows -> 1.80.0#1
-    * boost-build[core]:x64-windows -> 1.80.0#2
-    * boost-chrono[core]:x86-windows -> 1.80.0#1
-    * boost-concept-check[core]:x86-windows -> 1.80.0#1
-    * boost-config[core]:x86-windows -> 1.80.0#1
-    * boost-container[core]:x86-windows -> 1.80.0#1
-    * boost-container-hash[core]:x86-windows -> 1.80.0#1
-    * boost-context[core]:x86-windows -> 1.80.0#1
-    * boost-conversion[core]:x86-windows -> 1.80.0#1
-    * boost-core[core]:x86-windows -> 1.80.0#1
-    * boost-coroutine[core]:x86-windows -> 1.80.0#2
-    * boost-date-time[core]:x86-windows -> 1.80.0#1
-    * boost-detail[core]:x86-windows -> 1.80.0#1
-    * boost-exception[core]:x86-windows -> 1.80.0#1
-    * boost-function[core]:x86-windows -> 1.80.0#1
-    * boost-function-types[core]:x86-windows -> 1.80.0#1
-    * boost-functional[core]:x86-windows -> 1.80.0#1
-    * boost-fusion[core]:x86-windows -> 1.80.0#1
-    * boost-integer[core]:x86-windows -> 1.80.0#1
-    * boost-intrusive[core]:x86-windows -> 1.80.0#1
-    * boost-io[core]:x86-windows -> 1.80.0#1
-    * boost-iterator[core]:x86-windows -> 1.80.0#1
-    * boost-lexical-cast[core]:x86-windows -> 1.80.0#1
-    * boost-modular-build-helper[core]:x64-windows -> 1.80.0#4
-    * boost-move[core]:x86-windows -> 1.80.0#1
-    * boost-mp11[core]:x86-windows -> 1.80.0#1
-    * boost-mpl[core]:x86-windows -> 1.80.0#1
-    * boost-numeric-conversion[core]:x86-windows -> 1.80.0#1
-    * boost-optional[core]:x86-windows -> 1.80.0#1
-    * boost-pool[core]:x86-windows -> 1.80.0#1
-    * boost-predef[core]:x86-windows -> 1.80.0#1
-    * boost-preprocessor[core]:x86-windows -> 1.80.0#1
-    * boost-range[core]:x86-windows -> 1.80.0#1
-    * boost-ratio[core]:x86-windows -> 1.80.0#1
-    * boost-rational[core]:x86-windows -> 1.80.0#1
-    * boost-regex[core]:x86-windows -> 1.80.0#1
-    * boost-smart-ptr[core]:x86-windows -> 1.80.0#1
-    * boost-static-assert[core]:x86-windows -> 1.80.0#1
-    * boost-system[core]:x86-windows -> 1.80.0#1
-    * boost-throw-exception[core]:x86-windows -> 1.80.0#1
-    * boost-tokenizer[core]:x86-windows -> 1.80.0#1
-    * boost-tuple[core]:x86-windows -> 1.80.0#1
-    * boost-type-index[core]:x86-windows -> 1.80.0#1
-    * boost-type-traits[core]:x86-windows -> 1.80.0#1
-    * boost-typeof[core]:x86-windows -> 1.80.0#1
-    * boost-uninstall[core]:x64-windows -> 1.80.0#1
-    * boost-uninstall[core]:x86-windows -> 1.80.0#1
-    * boost-unordered[core]:x86-windows -> 1.80.0#1
-    * boost-utility[core]:x86-windows -> 1.80.0#1
-    * boost-variant2[core]:x86-windows -> 1.80.0#1
-    * boost-vcpkg-helpers[core]:x86-windows -> 1.80.0#1
-    * boost-winapi[core]:x86-windows -> 1.80.0#1
-      crow[core]:x86-windows -> 1.0-5
-      curl[core,non-http,schannel,ssl,sspi]:x86-windows -> 7.86.0#1
-  Zus├ñtzliche Pakete (*) werden ge├ñndert, um diesen Vorgang abzuschlie├ƒen.
-  59 Paket(e) wurde(n) von C:\Users\Christian.Czichy\AppData\Local\vcpkg\archives in 27.38 s wiederhergestellt. Verwenden Sie "--debug", um weitere Details anzuzeigen.
-  Installing 1/59 boost-uninstall:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-uninstall:x86-windows: 142.8 ms
-  Installing 2/59 boost-vcpkg-helpers:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-vcpkg-helpers:x86-windows: 24.79 ms
-  Installing 3/59 boost-config:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-config:x86-windows: 290.7 ms
-  Installing 4/59 boost-static-assert:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-static-assert:x86-windows: 27.08 ms
-  Installing 5/59 boost-type-traits:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-type-traits:x86-windows: 228.3 ms
-  Installing 6/59 boost-assert:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-assert:x86-windows: 32.13 ms
-  Installing 7/59 boost-throw-exception:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-throw-exception:x86-windows: 27.5 ms
-  Installing 8/59 boost-preprocessor:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-preprocessor:x86-windows: 499.5 ms
-  Installing 9/59 boost-io:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-io:x86-windows: 36.99 ms
-  Installing 10/59 boost-core:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-core:x86-windows: 87.77 ms
-  Installing 11/59 boost-utility:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-utility:x86-windows: 54.22 ms
-  Installing 12/59 boost-predef:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-predef:x86-windows: 183.6 ms
-  Installing 13/59 boost-winapi:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-winapi:x86-windows: 151.9 ms
-  Installing 14/59 boost-move:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-move:x86-windows: 80.27 ms
-  Installing 15/59 boost-detail:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-detail:x86-windows: 51.77 ms
-  Installing 16/59 boost-optional:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-optional:x86-windows: 47.4 ms
-  Installing 17/59 boost-tuple:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-tuple:x86-windows: 34.65 ms
-  Installing 18/59 boost-smart-ptr:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-smart-ptr:x86-windows: 151.5 ms
-  Installing 19/59 boost-mpl:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-mpl:x86-windows: 1.038 s
-  Installing 20/59 boost-uninstall:x64-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-uninstall:x64-windows: 25.84 ms
-  Installing 21/59 boost-modular-build-helper:x64-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-modular-build-helper:x64-windows: 28.73 ms
-  Installing 22/59 boost-integer:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-integer:x86-windows: 46.3 ms
-  Installing 23/59 boost-container-hash:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-container-hash:x86-windows: 42.72 ms
-  Installing 24/59 boost-concept-check:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-concept-check:x86-windows: 48.31 ms
-  Installing 25/59 boost-build:x64-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-build:x64-windows: 1.159 s
-  Installing 26/59 boost-regex:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-regex:x86-windows: 159.3 ms
-  Installing 27/59 boost-typeof:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-typeof:x86-windows: 113 ms
-  Installing 28/59 boost-function-types:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-function-types:x86-windows: 127.4 ms
-  Installing 29/59 boost-fusion:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-fusion:x86-windows: 1.249 s
-  Installing 30/59 boost-conversion:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-conversion:x86-windows: 39.74 ms
-  Installing 31/59 boost-iterator:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-iterator:x86-windows: 67.32 ms
-  Installing 32/59 boost-array:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-array:x86-windows: 34.86 ms
-  Installing 33/59 boost-range:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-range:x86-windows: 190.3 ms
-  Installing 34/59 boost-numeric-conversion:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-numeric-conversion:x86-windows: 69.71 ms
-  Installing 35/59 boost-intrusive:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-intrusive:x86-windows: 156.5 ms
-  Installing 36/59 boost-container:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-container:x86-windows: 186.2 ms
-  Installing 37/59 boost-lexical-cast:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-lexical-cast:x86-windows: 69.57 ms
-  Installing 38/59 boost-type-index:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-type-index:x86-windows: 68.59 ms
-  Installing 39/59 boost-bind:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-bind:x86-windows: 101.1 ms
-  Installing 40/59 boost-function:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-function:x86-windows: 88.75 ms
-  Installing 41/59 boost-functional:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-functional:x86-windows: 72.47 ms
-  Installing 42/59 boost-tokenizer:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-tokenizer:x86-windows: 62.16 ms
-  Installing 43/59 boost-mp11:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-mp11:x86-windows: 107.5 ms
-  Installing 44/59 boost-unordered:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-unordered:x86-windows: 113.9 ms
-  Installing 45/59 boost-exception:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-exception:x86-windows: 110 ms
-  Installing 46/59 boost-algorithm:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-algorithm:x86-windows: 221.2 ms
-  Installing 47/59 boost-date-time:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-date-time:x86-windows: 271.5 ms
-  Installing 48/59 boost-variant2:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-variant2:x86-windows: 68.45 ms
-  Installing 49/59 boost-system:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-system:x86-windows: 134 ms
-  Installing 50/59 boost-pool:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-pool:x86-windows: 96.78 ms
-  Installing 51/59 boost-context:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-context:x86-windows: 121.9 ms
-  Installing 52/59 boost-coroutine:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-coroutine:x86-windows: 202 ms
-  Installing 53/59 boost-rational:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-rational:x86-windows: 86.63 ms
-  Installing 54/59 boost-ratio:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-ratio:x86-windows: 197.7 ms
-  Installing 55/59 boost-chrono:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-chrono:x86-windows: 257.3 ms
-  Installing 56/59 boost-align:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-align:x86-windows: 219.8 ms
-  Installing 57/59 boost-asio:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von boost-asio:x86-windows: 1.442 s
-  Installing 58/59 crow:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von crow:x86-windows: 133.4 ms
-  Installing 59/59 curl:x86-windows...
-  Verstrichene Zeit f├╝r die Bearbeitung von curl:x86-windows: 139.2 ms
-  Gesamtinstallationszeit: 38.7 s
+  Alle angeforderten Pakete sind derzeit installiert.
+  Gesamtinstallationszeit: 300 ns
   ÔÇ×crowÔÇ£ stellt CMake-Ziele bereit:
   
       # this is heuristically generated, and may be not correct
       find_package(Crow CONFIG REQUIRED)
       target_link_libraries(main PRIVATE Crow::Crow)
-  
-  ÔÇ×curlÔÇ£ stellt CMake-Ziele bereit:
-  
-      # this is heuristically generated, and may be not correct
-      find_package(CURL CONFIG REQUIRED)
-      target_link_libraries(main PRIVATE CURL::libcurl)
   
   The package nlohmann-json provides CMake targets:
   
@@ -209,15 +24,19 @@
       
       https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
   
-  dpp provides CMake targets:
-      find_package(dpp CONFIG REQUIRED)
-      target_link_libraries(main PRIVATE dpp::dpp)
+  The package openssl is compatible with built-in CMake targets:
   
-  ÔÇ×spdlogÔÇ£ stellt CMake-Ziele bereit:
+      find_package(OpenSSL REQUIRED)
+      target_link_libraries(main PRIVATE OpenSSL::SSL OpenSSL::Crypto)
   
-      # this is heuristically generated, and may be not correct
+  The package spdlog provides CMake targets:
+  
       find_package(spdlog CONFIG REQUIRED)
-      target_link_libraries(main PRIVATE spdlog::spdlog spdlog::spdlog_header_only)
+      target_link_libraries(main PRIVATE spdlog::spdlog)
+  
+      # Or use the header-only version
+      find_package(spdlog CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE spdlog::spdlog_header_only)
   
   ÔÇ×sqlitecppÔÇ£ stellt CMake-Ziele bereit:
   

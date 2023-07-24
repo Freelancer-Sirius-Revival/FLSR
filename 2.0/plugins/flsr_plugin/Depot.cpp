@@ -9,7 +9,7 @@ namespace Depot {
         try
         {
             // Open a database file
-            SQLite::Database db(SQL::scDbName);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
             // Compile a SQL query, containing one parameter (index 1)
             SQLite::Statement query(db, R"(SELECT * FROM "PlayerDepot";)");
@@ -58,7 +58,7 @@ namespace Depot {
         try
         {
             // Open a database file
-            SQLite::Database db(SQL::scDbName);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
             // Compile a SQL query, containing one parameter (index 1)
             SQLite::Statement query(db, R"(SELECT * FROM "PlayerDepot" WHERE  "AccountName" = ')" + scAccountName + R"(' AND "BaseID" = ')" + std::to_string(iBase) + R"(';)");
@@ -92,7 +92,7 @@ namespace Depot {
         try
         {
             // Open a database file
-            SQLite::Database db(SQL::scDbName);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
             // Compile a SQL query, containing one parameter (index 1)
             SQLite::Statement query(db, R"(SELECT * FROM "DepotStore" WHERE  "PlayerDepot" = ')" + std::to_string(iDepotID) + R"(';)");
@@ -317,7 +317,7 @@ namespace Depot {
         try
         {
             // Öffne die Datenbankdatei
-            SQLite::Database db(SQL::scDbName);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
             // Führe eine SQL-Abfrage aus, um das Depot des Spielers auf der Basis zu finden
             SQLite::Statement query(db, R"(SELECT * FROM "PlayerDepot" WHERE  "AccountName" = ')" + scAccountName + R"(' AND "BaseID" = ')" + std::to_string(iBase) + R"(';)");
@@ -345,7 +345,7 @@ namespace Depot {
         try
         {
             // Öffne die Datenbankdatei
-            SQLite::Database db(SQL::scDbName);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
             // Führe eine SQL-Abfrage aus, um das Equip in das Depot einzufügen
             SQLite::Statement query(db, R"(INSERT INTO "PlayerDepotEquip" ("DepotID", "GoodID") VALUES (')" + std::to_string(iDepotID) + R"(', ')" + std::to_string(goodID) + R"(');)");

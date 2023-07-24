@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/dpp-x86-windows-10.0.21-942de2c6-f559-4583-a34b-e5452a319172",
-  "name": "dpp:x86-windows@10.0.21 d97d979e3b1d1f1a4c8b5cfe5dbd0a4933cccf5627cd2ab170cb10fa9dc76fd6",
+  "documentNamespace": "https://spdx.org/spdxdocs/dpp-x86-windows-10.0.24-4d6cd4ca-d79a-4e6e-8617-63eaad030f11",
+  "name": "dpp:x86-windows@10.0.24 NONE",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-5fdee72bc1fceca198fb1ab7589837206a8b81ba"
+      "Tool: vcpkg-814b7ec837b59f1c8778f72351c1dd7605983cd2"
     ],
-    "created": "2023-06-20T23:29:20Z"
+    "created": "2023-07-24T14:43:43Z"
   },
   "relationships": [
     {
@@ -18,53 +18,8 @@
       "relatedSpdxElement": "SPDXRef-binary"
     },
     {
-      "spdxElementId": "SPDXRef-port",
-      "relationshipType": "CONTAINS",
-      "relatedSpdxElement": "SPDXRef-file-0"
-    },
-    {
-      "spdxElementId": "SPDXRef-port",
-      "relationshipType": "CONTAINS",
-      "relatedSpdxElement": "SPDXRef-file-1"
-    },
-    {
-      "spdxElementId": "SPDXRef-port",
-      "relationshipType": "CONTAINS",
-      "relatedSpdxElement": "SPDXRef-file-2"
-    },
-    {
-      "spdxElementId": "SPDXRef-port",
-      "relationshipType": "CONTAINS",
-      "relatedSpdxElement": "SPDXRef-file-3"
-    },
-    {
       "spdxElementId": "SPDXRef-binary",
       "relationshipType": "GENERATED_FROM",
-      "relatedSpdxElement": "SPDXRef-port"
-    },
-    {
-      "spdxElementId": "SPDXRef-file-0",
-      "relationshipType": "CONTAINED_BY",
-      "relatedSpdxElement": "SPDXRef-port"
-    },
-    {
-      "spdxElementId": "SPDXRef-file-1",
-      "relationshipType": "CONTAINED_BY",
-      "relatedSpdxElement": "SPDXRef-port"
-    },
-    {
-      "spdxElementId": "SPDXRef-file-2",
-      "relationshipType": "CONTAINED_BY",
-      "relatedSpdxElement": "SPDXRef-port"
-    },
-    {
-      "spdxElementId": "SPDXRef-file-3",
-      "relationshipType": "CONTAINED_BY",
-      "relatedSpdxElement": "SPDXRef-port"
-    },
-    {
-      "spdxElementId": "SPDXRef-file-3",
-      "relationshipType": "DEPENDENCY_MANIFEST_OF",
       "relatedSpdxElement": "SPDXRef-port"
     }
   ],
@@ -72,8 +27,8 @@
     {
       "name": "dpp",
       "SPDXID": "SPDXRef-port",
-      "versionInfo": "10.0.21",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "10.0.24",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/dpp",
       "homepage": "https://dpp.dev/",
       "licenseConcluded": "Apache-2.0",
       "licenseDeclared": "NOASSERTION",
@@ -84,76 +39,13 @@
     {
       "name": "dpp:x86-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "d97d979e3b1d1f1a4c8b5cfe5dbd0a4933cccf5627cd2ab170cb10fa9dc76fd6",
+      "versionInfo": "NONE",
       "downloadLocation": "NONE",
       "licenseConcluded": "Apache-2.0",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "comment": "This is a binary package built by vcpkg."
-    },
-    {
-      "SPDXID": "SPDXRef-resource-1",
-      "name": "brainboxdotcc/DPP",
-      "downloadLocation": "git+https://github.com/brainboxdotcc/DPP@cee27e000166b7aa5fce63f6c8ef25ded2f8bf27",
-      "licenseConcluded": "NOASSERTION",
-      "licenseDeclared": "NOASSERTION",
-      "copyrightText": "NOASSERTION",
-      "checksums": [
-        {
-          "algorithm": "SHA512",
-          "checksumValue": "38716a2fcbfab43df34fc213c1901f077d4a5e1b9013027826b1d1c40ea5aa736a7f43c2a75773bd3c3b1ce5d3255526956becc469df93588b7ea4005f9f6d23"
-        }
-      ]
     }
   ],
-  "files": [
-    {
-      "fileName": "./make-pkgconfig-required.patch",
-      "SPDXID": "SPDXRef-file-0",
-      "checksums": [
-        {
-          "algorithm": "SHA256",
-          "checksumValue": "63e7ac98a2dc84506848cd285a2a102fd90a1923160bf1ec32281c4957ecaf71"
-        }
-      ],
-      "licenseConcluded": "NOASSERTION",
-      "copyrightText": "NOASSERTION"
-    },
-    {
-      "fileName": "./portfile.cmake",
-      "SPDXID": "SPDXRef-file-1",
-      "checksums": [
-        {
-          "algorithm": "SHA256",
-          "checksumValue": "454cb3ab059593995bce797af0aa6e77af0d3865bf1191c67a31fd3abf615027"
-        }
-      ],
-      "licenseConcluded": "NOASSERTION",
-      "copyrightText": "NOASSERTION"
-    },
-    {
-      "fileName": "./usage",
-      "SPDXID": "SPDXRef-file-2",
-      "checksums": [
-        {
-          "algorithm": "SHA256",
-          "checksumValue": "f8ed10c7f7b55b1ce63650990d88907e35d7a402ec744ae387b134c14e282199"
-        }
-      ],
-      "licenseConcluded": "NOASSERTION",
-      "copyrightText": "NOASSERTION"
-    },
-    {
-      "fileName": "./vcpkg.json",
-      "SPDXID": "SPDXRef-file-3",
-      "checksums": [
-        {
-          "algorithm": "SHA256",
-          "checksumValue": "0ab618801fdc9cf6d233aea309fc11af2b4107b4a689fc2493d7745ce1e19544"
-        }
-      ],
-      "licenseConcluded": "NOASSERTION",
-      "copyrightText": "NOASSERTION"
-    }
-  ]
+  "files": []
 }

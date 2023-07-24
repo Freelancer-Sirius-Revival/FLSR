@@ -1,5 +1,7 @@
 include(CMakeFindDependencyMacro)
-find_dependency(unofficial-sqlite3 REQUIRED)
+if(NOT OFF)
+    find_dependency(unofficial-sqlite3 REQUIRED)
+endif()
 if()
     set(THREADS_PREFER_PTHREAD_FLAG )
     find_dependency(Threads REQUIRED)

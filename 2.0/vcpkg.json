@@ -6,8 +6,7 @@
     "nlohmann-json",
 	"sqlitecpp",
 	"spdlog",
-	"dpp",
 	"crow",
-	"curl"
+	"dpp"
   ]
 }

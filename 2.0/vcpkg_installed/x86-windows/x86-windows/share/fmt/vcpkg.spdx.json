@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/fmt-x86-windows-9.1.0-adfbfc41-c105-4aeb-a7e3-0121547158a2",
-  "name": "fmt:x86-windows@9.1.0 da4aad88447a442932811c03273b29de5e38f13943c23a9c6469b7533a839220",
+  "documentNamespace": "https://spdx.org/spdxdocs/fmt-x86-windows-10.0.0-2257c54e-249a-4414-9f59-845f551f8543",
+  "name": "fmt:x86-windows@10.0.0 e2609ee2e8f0862d0d10082ce090ad2a2590aede97c5fc77cc8f35cc592d515f",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-5fdee72bc1fceca198fb1ab7589837206a8b81ba"
+      "Tool: vcpkg-814b7ec837b59f1c8778f72351c1dd7605983cd2"
     ],
-    "created": "2023-04-12T09:06:38Z"
+    "created": "2023-07-24T12:20:55Z"
   },
   "relationships": [
     {
@@ -82,10 +82,10 @@
     {
       "name": "fmt",
       "SPDXID": "SPDXRef-port",
-      "versionInfo": "9.1.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "10.0.0",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/fmt",
       "homepage": "https://github.com/fmtlib/fmt",
-      "licenseConcluded": "NOASSERTION",
+      "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "description": "Formatting library for C++. It can be used as a safe alternative to printf or as a fast alternative to IOStreams.",
@@ -94,9 +94,9 @@
     {
       "name": "fmt:x86-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "da4aad88447a442932811c03273b29de5e38f13943c23a9c6469b7533a839220",
+      "versionInfo": "e2609ee2e8f0862d0d10082ce090ad2a2590aede97c5fc77cc8f35cc592d515f",
       "downloadLocation": "NONE",
-      "licenseConcluded": "NOASSERTION",
+      "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "comment": "This is a binary package built by vcpkg."
@@ -104,14 +104,14 @@
     {
       "SPDXID": "SPDXRef-resource-1",
       "name": "fmtlib/fmt",
-      "downloadLocation": "git+https://github.com/fmtlib/fmt@9.1.0",
+      "downloadLocation": "git+https://github.com/fmtlib/fmt@${VERSION}",
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "checksums": [
         {
           "algorithm": "SHA512",
-          "checksumValue": "a18442042722dd48e20714ec034a12fcc0576c9af7be5188586970e2edf47529825bdc99af366b1d5891630c8dbf6f63bfa9f012e77ab3d3ed80d1a118e3b2be"
+          "checksumValue": "6188508d74ca1ed75bf6441b152c07ca83971d3104b37f33784a7b55dfcc614d6243e77e0a14220018586fdb86207cc033eece834e7acd5e0907ed4c97403f3b"
         }
       ]
     }
@@ -147,7 +147,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "8b383837254930b3ef57bf741e3f1b97aa7746231c88125d38f126dcb1752ae6"
+          "checksumValue": "f6930d932f16c29b38462ea8b1524431b10066e7620063701938a28cb4260e7a"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -171,7 +171,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "dd101f76043162b358c1f0c3cc344d706d07544cc8fed8b08e10aad22a6473cd"
+          "checksumValue": "e1150e43095aa49160893382b1c038fd0e027737198e710d73d595299b3ab3c6"
         }
       ],
       "licenseConcluded": "NOASSERTION",

@@ -3,7 +3,6 @@
 #include <regex>
 #include <random>
 #include <unordered_set>
-#include "curl/curl.h"
 
 namespace Discord {
 
@@ -300,9 +299,6 @@ namespace Discord {
 				Update_NewsList(DiscordBot);
 				Update_EventList(DiscordBot);
 
-				// Starte den UpdateUserData-Thread
-				std::thread UpdateUserData(ThreadUpdateUsers);
-				UpdateUserData.join();
 				ConPrint(L"- done\n");
 
 			} // Mutex wird hier automatisch freigegeben
@@ -821,12 +817,6 @@ namespace Discord {
 							
 							std::string scCredits = GetCreditsForDiscordAccount(userID);
 
-							//Get Username
-							dpp::user DiscordUser = event.command.usr;
-							dpp::guild_member ServerUser = event.command.member;
-							std::string scServerNickname = GetNicknameByDiscordName(event.command.usr.username);
-							std::string scUsername = ((scServerNickname).empty() ? DiscordUser.username : scServerNickname);
-
 							//Time
 							time_t _tm = time(NULL);
 							struct tm* curtime = localtime(&_tm);
@@ -837,7 +827,7 @@ namespace Discord {
 								set_title(":bank: Incoming Transfer").
 								set_description("New Balance: " + scCredits + " Credits").
 								set_color(0x00FFFF).
-								add_field("Sender: " + scUsername, "").
+								add_field("Sender: " + GetDiscordUsername(event.command.usr), "").
 								add_field("Amount: " + scAmount, "").
 								add_field("Date: " + scTime, "")
 							);
@@ -1249,7 +1239,7 @@ namespace Discord {
 		try
 		{
 			// Open a database file with UTF-8 encoding
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Prüfe, ob bereits ein Eintrag mit dem Charakterdateinamen existiert
 			SQLite::Statement checkQuery(db, R"(SELECT COUNT(*) FROM "CharManager" WHERE Charfile = ?;)");
@@ -1288,7 +1278,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Vorbereitung des DELETE-Statements
 			SQLite::Statement query(db, R"(DELETE FROM "CharManager" WHERE "Validation" != 'TRUE';)");
@@ -1308,7 +1298,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
 			// Vorbereitung eines SELECT-Statements mit einem Parameter
 			SQLite::Statement query(db, R"(SELECT "Validation" FROM "CharManager" WHERE Charfile = ?;)");
@@ -1341,7 +1331,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Vorbereitung eines UPDATE-Statements mit einem Parameter
 			SQLite::Statement query(db, R"(UPDATE "CharManager" SET "Validation" = 'TRUE' WHERE Charfile = ?;)");
@@ -1364,7 +1354,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
 			// Vorbereitung eines SELECT-Statements mit einem Parameter
 			SQLite::Statement query(db, R"(SELECT DiscordAccount FROM CharManager WHERE Charfile = ?;)");
@@ -1394,7 +1384,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Erstelle die SQL-Abfrage
 			std::string sql = "SELECT * FROM CharManager WHERE DiscordAccount = ? AND Charfile = ? AND Validation = ?"; //WTF
@@ -1426,7 +1416,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Erstelle die SQL-Abfrage zum Aktualisieren des Charakternamens
 			std::string sql = "UPDATE CharManager SET Charfile = ? WHERE Charfile = ?";
@@ -1455,7 +1445,7 @@ namespace Discord {
 
 		try {
 			// Verbindung zur Datenbank herstellen
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// SQL-Update-Statement vorbereiten
 			SQLite::Statement query(db, "UPDATE CharManager SET Charname = ? WHERE Charfile = ?");
@@ -1485,7 +1475,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Erstelle die SQL-Abfrage
 			std::string sql = "SELECT Credits FROM Bank WHERE DiscordAccount = ?";
@@ -1514,7 +1504,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
 			// Überprüfen, ob der Discord-Account in der Datenbank existiert
 			std::string sqlCheckAccount = "SELECT COUNT(*) FROM Bank WHERE DiscordAccount = ?";
@@ -1586,7 +1576,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName);
+			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
 
 			// Erstelle die SQL-Abfrage
 			std::string sql = "SELECT COUNT(*) FROM CharManager WHERE DiscordAccount = ? AND Validation = 'TRUE'";
@@ -1621,8 +1611,9 @@ namespace Discord {
 			dpp::guild_member& guildMember = member.second;
 			std::string DiscordUsername = guildMember.get_user()->username;
 			std::string ServerUsername = guildMember.nickname;
+			std::string GlobalUsername = guildMember.get_user()->global_name;
 
-			if (DiscordUsername == discordName || ServerUsername == discordName)
+			if (DiscordUsername == discordName || ServerUsername == discordName || GlobalUsername == discordName)
 			{
 				user_id = guildMember.user_id;
 
@@ -1635,34 +1626,6 @@ namespace Discord {
 		return std::to_string(user_id);
 
 	}
-
-	std::string GetNicknameByDiscordName(const std::string& discordName)
-	{
-
-		std::string scNickname;
-
-		dpp::guild* server = dpp::find_guild(scDiscordServerID);
-		for (auto& member : server->members)
-		{
-			// Zugriff auf das Member-Objekt
-			dpp::guild_member& guildMember = member.second;
-			std::string DiscordUsername = guildMember.get_user()->username;
-			std::string ServerUsername = guildMember.nickname;
-
-			if (DiscordUsername == discordName || ServerUsername == discordName)
-			{
-				scNickname = guildMember.nickname;
-
-				break;
-			}
-			//ConPrint(L"DiscordUsername: " + stows(DiscordUsername) + L"\n");
-
-		}
-
-		return scNickname;
-
-	}
-
 
 	void Update_NewsList(dpp::cluster &DiscordBot)
 	{
@@ -1690,11 +1653,7 @@ namespace Discord {
 				for (const auto& msg : reversedMessages) {
 					MessageListEntry MessageEntry;
 					
-
-					std::string scServerNickname = GetNicknameByDiscordName(msg.author.username);
-					std::string scUsername = scServerNickname.empty() ? msg.author.username : scServerNickname;
-
-					MessageEntry.Nickname = scUsername;
+					MessageEntry.Nickname = GetDiscordUsername(msg.author);
 					MessageEntry.Message = msg;
 
 					// Füge die Nachricht der Liste hinzu
@@ -1732,10 +1691,7 @@ namespace Discord {
 					MessageListEntry MessageEntry;
 
 
-					std::string scServerNickname = GetNicknameByDiscordName(msg.author.username);
-					std::string scUsername = scServerNickname.empty() ? msg.author.username : scServerNickname;
-
-					MessageEntry.Nickname = scUsername;
+					MessageEntry.Nickname = GetDiscordUsername(msg.author);
 					MessageEntry.Message = msg;
 
 					lEventList.push_back(MessageEntry);
@@ -1745,114 +1701,44 @@ namespace Discord {
 
 	}
 
-
-
-	//TEST
-	std::string makeAPICall(const std::string& url, const std::string& authorizationHeader) {
-		CURL* curl = curl_easy_init();
-		std::string response;
-
-		if (curl) {
-			curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void* buffer, size_t size, size_t nmemb, std::string* out) -> size_t {
-				out->append(static_cast<char*>(buffer), size * nmemb);
-				return size * nmemb;
-				});
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, curl_slist_append(nullptr, authorizationHeader.c_str()));
-			CURLcode res = curl_easy_perform(curl);
-			curl_easy_cleanup(curl);
-
-			if (res != CURLE_OK) {
-				std::cerr << "Failed to make API call: " << curl_easy_strerror(res) << std::endl;
-			}
-		}
-		return response;
-	}
-
-	// Function to get user from the guild
-	std::string getUserFromGuildAPI(const std::string& guildId, const std::string& userId, const std::string& token) {
-		std::string url = "https://discord.com/api/v10/guilds/" + guildId + "/members/" + userId;
-		std::string authorizationHeader = "Authorization: Bot " + token;
-		std::string response = makeAPICall(url, authorizationHeader);
-
-		// Parse the JSON response and extract the user information
-		json userDataJson = json::parse(response);
-		std::string nickname;
-
-		if (userDataJson.contains("nick")) {
-			nickname = userDataJson["nick"].get<std::string>();
-		}
-		
-		return nickname;
-	}
-
-	// Function to get user information
-	std::pair<std::string, std::string> getUserInfoAPI(const std::string& userId, const std::string& token) {
-		std::string url = "https://discord.com/api/v10/users/" + userId;
-		std::string authorizationHeader = "Authorization: Bot " + token;
-		std::string response = makeAPICall(url, authorizationHeader);
-
-		// Parse the JSON response and extract the user information
-		json userDataJson = json::parse(response);
-		std::string username = userDataJson["username"].get<std::string>();
-		std::string global_name = userDataJson["global_name"].get<std::string>();
-
-		return std::make_pair(username, global_name);
-	}
-
-	DiscordUser GetDiscordUserData(const std::string& userID)
+	std::string GetDiscordUsername(const dpp::user& dppUser)
 	{
-		// Get user information
-		std::pair<std::string, std::string> userInfo = getUserInfoAPI(userID, scDiscordBotToken);
-		std::string scDiscordUsername = userInfo.first;
-		std::string scDiscordDisplayName = userInfo.second;
-		std::string scServerUsername = getUserFromGuildAPI(scDiscordServerID, userID, scDiscordBotToken);
-		std::string scDiscordID = userID;
 
+		std::string scServerUsername;
 
-		DiscordUser NewUser;
-		NewUser.scDiscordUsername = scDiscordUsername;
-		NewUser.scDiscordDisplayName = scDiscordDisplayName;
-		NewUser.scServerUsername = scServerUsername;
-		NewUser.scDiscordID = scDiscordID;
-
-		return NewUser;
-
-
-	}
-
-	void updateUserMap(const std::string& userId, const DiscordUser& User) {
-		std::lock_guard<std::mutex> lock(m_Mutex);
-		userDataMap[userId] = User;
-	}
-
-	void ThreadUpdateUsers() {
-		
-		std::unordered_set<std::string> userIds;
-
+		dpp::guild* server = dpp::find_guild(scDiscordServerID);
+		for (auto& member : server->members)
 		{
-			std::lock_guard<std::mutex> lock(m_Mutex);
-			userDataMap.clear();
+			// Zugriff auf das Member-Objekt
+			dpp::guild_member& guildMember = member.second;
 
-			// Durchlaufe die lNewsList und füge die User-IDs dem Set hinzu
-			for (const auto& messageEntry : lNewsList) {
-				userIds.insert(std::to_string(messageEntry.Message.author.id));
+			if (guildMember.get_user()->id == dppUser.id) {
+				scServerUsername = guildMember.nickname;
+				break;
 			}
 
-			// Durchlaufe die lEventList und füge die User-IDs dem Set hinzu
-			for (const auto& messageEntry : lEventList) {
-				userIds.insert(std::to_string(messageEntry.Message.author.id));
-			}
 		}
 
-		// Rufe für jede eindeutige User-ID die Benutzerdaten ab und aktualisiere die Map
-		for (const auto& userId : userIds) {
-			DiscordUser user = GetDiscordUserData(userId);
-			ConPrint(stows("USER: " + user.scDiscordUsername) + L"\n");
-			updateUserMap(user.scDiscordID, user);
+
+		if (!scServerUsername.empty()) {
+			ConPrint (stows(scServerUsername) + L"\n");
+			return scServerUsername;
 		}
+		else if (!dppUser.global_name.empty()) {
+			ConPrint(stows(dppUser.global_name) + L"\n");
+
+			return dppUser.global_name;
+		}
+		else {
+			ConPrint(stows(dppUser.username) + L"\n");
+
+			return dppUser.username;
+		}
+
+
 	}
+		
+		
 
 
 } // namespace DiscordBot

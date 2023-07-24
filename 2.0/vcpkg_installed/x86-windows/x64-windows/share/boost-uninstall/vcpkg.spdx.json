@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/boost-uninstall-x64-windows-1.80.0#1-9cf84026-1736-4869-83c2-40a539321caa",
-  "name": "boost-uninstall:x64-windows@1.80.0#1 bb9590c4c6210336b266cc26b3a37639c2824514ae5b9bfcf8a69e67cac17c06",
+  "documentNamespace": "https://spdx.org/spdxdocs/boost-uninstall-x64-windows-1.82.0#2-ee9d5ef2-50b1-4e01-b6b8-13bedc7980fc",
+  "name": "boost-uninstall:x64-windows@1.82.0#2 b2d5ad25b34bbd2e9e2efdc31d09705ec0db71fd3b7642ee36b757876bdfbd7f",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-5fdee72bc1fceca198fb1ab7589837206a8b81ba"
+      "Tool: vcpkg-814b7ec837b59f1c8778f72351c1dd7605983cd2"
     ],
-    "created": "2023-07-17T15:40:38Z"
+    "created": "2023-07-24T12:15:53Z"
   },
   "relationships": [
     {
@@ -62,8 +62,8 @@
     {
       "name": "boost-uninstall",
       "SPDXID": "SPDXRef-port",
-      "versionInfo": "1.80.0#1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "1.82.0#2",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/boost-uninstall",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
@@ -73,7 +73,7 @@
     {
       "name": "boost-uninstall:x64-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "bb9590c4c6210336b266cc26b3a37639c2824514ae5b9bfcf8a69e67cac17c06",
+      "versionInfo": "b2d5ad25b34bbd2e9e2efdc31d09705ec0db71fd3b7642ee36b757876bdfbd7f",
       "downloadLocation": "NONE",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -112,7 +112,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "bc0a0679fb22e069e496bda4f44eecc07befc4d658a8f42a1860435f1ba9766b"
+          "checksumValue": "742566148d71633b185be596a8b711c0d658482d4a5e0a3996acf5cbc0995f17"
         }
       ],
       "licenseConcluded": "NOASSERTION",

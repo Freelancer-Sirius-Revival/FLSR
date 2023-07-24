@@ -3,764 +3,590 @@ Version: 2022-02-06
 Port-Version: 1
 Architecture: x64-windows
 Multi-Arch: same
-Abi: f3ef9e805c26f6635e6743b0b0046843b0e4b230e65a07caed529dc8f12e14b5
-Type: Port
+Abi: 55ff33c70e234a6f4680c2f668847672748eec759629bef543255e298b6fb997
 Status: install ok installed
 
 Package: vcpkg-cmake
-Version: 2022-10-30
+Version: 2023-05-04
 Architecture: x64-windows
 Multi-Arch: same
-Abi: 265919c7912e0a2954dd363c6c6ce424b3a14d434e5b15b5791ed373f8dc3477
-Type: Port
-Status: install ok installed
-
-Package: nlohmann-json
-Version: 3.11.2
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: c9db514c78c846d10fbe404fda222f4a7296e4a6650e7eb37de0bfcea0d15d3d
-Description: JSON for Modern C++
-Type: Port
-Status: install ok installed
-
-Package: fmt
-Version: 9.1.0
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: da4aad88447a442932811c03273b29de5e38f13943c23a9c6469b7533a839220
-Description: Formatting library for C++. It can be used as a safe alternative to printf or as a fast alternative to IOStreams.
-Type: Port
-Status: install ok installed
-
-Package: spdlog
-Version: 1.11.0
-Depends: fmt, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: fbe8f09303e078995e0463604a3b67d2db11a5c6d49d54317bf5553372d2a9e5
-Description: Very fast, header only, C++ logging library
-Type: Port
-Status: install ok installed
-
-Package: sqlite3
-Version: 3.40.0
-Port-Version: 1
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: b8c038e45c48d59c8b1a18379ed260f0ea904df129720973363ce7fe6487b926
-Description: SQLite is a software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine.
-Type: Port
-Status: install ok installed
-
-Package: sqlitecpp
-Version: 3.2.0
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 303fa818ed1e7d1ff920b9b4649fa8669e20fc3c94d4bf4c72455bb24e1d9ee0
-Description: SQLiteC++ (SQLiteCpp) is a smart and easy to use C++ SQLite3 wrapper.
-Type: Port
-Default-Features: sqlite
-Status: install ok installed
-
-Package: sqlitecpp
-Feature: sqlite
-Depends: sqlite3
-Architecture: x86-windows
-Multi-Arch: same
-Description: Use the (unofficial) sqlite3 port of vcpkg
-Type: Port
-Status: install ok installed
-
-Package: zlib
-Version: 1.2.13
-Depends: vcpkg-cmake:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 9970fb49b31bf1ae30da13099dcfcd81ff7f6c8d5366b905fc30a6a400f147a3
-Description: A compression library
-Type: Port
-Status: install ok installed
-
-Package: opus
-Version: 1.3.1
-Port-Version: 9
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: ccf6b122abf7c249e597336b6686f524c99cb2d0cd9ad2406ba61ab3f583b8b9
-Description: Totally open, royalty-free, highly versatile audio codec
-Type: Port
-Status: install ok installed
-
-Package: vcpkg-cmake-get-vars
-Version: 2022-09-04
-Depends: vcpkg-cmake
-Architecture: x64-windows
-Multi-Arch: same
-Abi: 541dd3757ec0f879fc1730ff67901bd1b3911d46d77f78ed8ae5eb3a2255b47a
-Type: Port
-Status: install ok installed
-
-Package: openssl
-Version: 3.0.7
-Port-Version: 1
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows, vcpkg-cmake-get-vars:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: be6854cb2f600316a0eabd7fa3ee4abe2b7167e4f5a61f08b250fb0599910931
-Description: OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
-Type: Port
-Status: install ok installed
-
-Package: libsodium
-Version: 1.0.18
-Port-Version: 8
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 31144c6e3bd2844df4b367642b36bf053a567ad17e1b3b8392ddf34880c9d683
-Description: A modern and easy-to-use crypto library
-Type: Port
-Status: install ok installed
-
-Package: dpp
-Version: 10.0.21
-Depends: libsodium, nlohmann-json, openssl, opus, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows, zlib
-Architecture: x86-windows
-Multi-Arch: same
-Abi: d97d979e3b1d1f1a4c8b5cfe5dbd0a4933cccf5627cd2ab170cb10fa9dc76fd6
-Description: D++ Extremely Lightweight C++ Discord Library.
-Type: Port
+Abi: 8e4c7f30a47ac01c42dda6f3b7dddffabaf2e637cd3c5de651e83df2ee31c583
 Status: install ok installed
 
 Package: boost-uninstall
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Architecture: x86-windows
 Multi-Arch: same
-Abi: b0d082cccdb120edf221a505bdb984461a6f00e35356d762dfd42d6207520218
+Abi: 9186db7b3acdf2533fcbc873c98090e47d2defb68bb1807a6af96d2c76235685
 Description: Internal vcpkg port used to uninstall Boost
-Type: Port
 Status: install ok installed
 
 Package: boost-vcpkg-helpers
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-uninstall
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 52bb27d5789ff8bac202e3b5fceb831472561ec5ffd36f0b22c5e63e22f8085b
+Abi: e1ee65da4462e1d6408705c04a7c0cfd10d8b143662e3a1c5b59cb9e527906dd
 Description: Internal vcpkg port used to modularize Boost
-Type: Port
 Status: install ok installed
 
 Package: boost-config
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 39af130d5d4f0e3f82a60f1262ced7c9b3a5a55493c02a73efe63c9708c231e2
+Abi: 1847c949e95f935900b4f6cca6c43c620c310b0cb007f65818d2defeb321d067
 Description: Boost config module
-Type: Port
 Status: install ok installed
 
 Package: boost-static-assert
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: aa7501490d585c9d8344727d51f70c3021def6ac9800c237199b9ac5e7c5d865
+Abi: 0a4cf2d2200d86199a7623be6b058300135c465da7b5f56e201ef5bd62110ad7
 Description: Boost static_assert module
-Type: Port
 Status: install ok installed
 
 Package: boost-type-traits
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-static-assert, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 5d169d9475e66ebef9256e86bd1f76594d56d89e6d6d2406bad08c8279e3b6a2
+Abi: b21ae2792e35bf674a2b2884431c9142d4acedc460857a80e92a534deb111884
 Description: Boost type_traits module
-Type: Port
 Status: install ok installed
 
 Package: boost-assert
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: c1d5384c4868c0674f7689ef16c12b8d10a9fae3ecadef71c25b8b558eb79355
+Abi: a0bc40f272caf41a0f78831fd1cbb8d8ace522a9fca5e2f13fa4903036088d1f
 Description: Boost assert module
-Type: Port
 Status: install ok installed
 
 Package: boost-throw-exception
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 2e5a2f3dbf754af553c6f1c00273e6a1fbbb34f058f2682205084ab15f258328
+Abi: 0a98069535825bf2c4e2774fcede86e82dad9f292eb8c17ae9706caefad999a6
 Description: Boost throw_exception module
-Type: Port
 Status: install ok installed
 
 Package: boost-preprocessor
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 9f2324e523c08bf070ef8f400df0e5f2b9dbad10d7e725c24043f0fa81e0b545
+Abi: 04c11cbdab8e8051e7b397b1549dd2ca023ddd138081fb785a13cc804f3b5f83
 Description: Boost preprocessor module
-Type: Port
 Status: install ok installed
 
 Package: boost-io
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 1a9622d0a6db73ef8934aba6e40b99cd0003089008d0840760d0988ca95d6ef9
+Abi: e0aaa7fac3f58466beba2d50e3184941724575cf79af59b574126b2c6deed5af
 Description: Boost io module
-Type: Port
 Status: install ok installed
 
 Package: boost-core
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-static-assert, boost-throw-exception, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: b1cd969d06664ff71f19680f44a28bcb7751c698a81e40b71baf48bcea0f5bc9
+Abi: 59eeb97255c26471b60f5708346ab9a0e28b56b42e1ef4c10cdee0f61fa898a7
 Description: Boost core module
-Type: Port
 Status: install ok installed
 
 Package: boost-utility
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-io, boost-preprocessor, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: caa6420c76056f55e2cdefce02bf4a1ecad25d12027b2d5c2ab056b320c8c90a
+Abi: 78d3f3b7a97ecf1201cf1b9a4c7270275c27e97c93758f4ede6ed122c88c3d79
 Description: Boost utility module
-Type: Port
 Status: install ok installed
 
 Package: boost-predef
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 78c543f571c6d96f0a2e817d7c5ed1858ae693b631ea5655d4ee457013a670cb
+Abi: d860ef7ffd9e6861b940259c2a5ed21c3270a33d0711442e3892f7940a9eb071
 Description: Boost predef module
-Type: Port
-Status: install ok installed
-
-Package: boost-winapi
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-config, boost-predef, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 0c92e146924e6916931c2651cc986bf80f34c8e38d4ef7c9357b19990d079b9d
-Description: Boost winapi module
-Type: Port
 Status: install ok installed
 
 Package: boost-move
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-config, boost-core, boost-static-assert, boost-vcpkg-helpers, boost-winapi
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-config, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 6ed70e3e0cc1f0254a50a5cfaf4fbff1471df520a5aa2112e2618f665fd8ac63
+Abi: c2f25f1c2d74c93d96c76ad64d3ecb5eb159d4b6c77498ea6d39f21bc0a738d1
 Description: Boost move module
-Type: Port
 Status: install ok installed
 
 Package: boost-detail
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-preprocessor, boost-static-assert, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: f54686a09f699cf9248b7de9f9c770979c23176267d9e5e4aac773e7fb0ae77c
+Abi: f29f71fad9ca6fc681276621485bf6c244783086d62c8af4c6a89e0c4266426c
 Description: Boost detail module
-Type: Port
 Status: install ok installed
 
 Package: boost-optional
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-detail, boost-move, boost-predef, boost-static-assert, boost-throw-exception, boost-type-traits, boost-utility, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 8a35262d2c776a034a3e5576213c27f4f46c39934e17763381cce3d257459b9e
+Abi: 629254431be2cec410787a2df3fd9cc8d44949298feafa54aa2cde159a22b4d2
 Description: Boost optional module
-Type: Port
 Status: install ok installed
 
 Package: boost-tuple
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-static-assert, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: b6c3151af68c55c03d7a029eabbefb46452e08faa5c5e5cd880649bc5cc39131
+Abi: b5b2119f23713bb3b136bd16e7702d5ff4179d1f0c164bfc7a5aa7fe304177a4
 Description: Boost tuple module
-Type: Port
 Status: install ok installed
 
 Package: boost-smart-ptr
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-move, boost-static-assert, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 7a103f39752c9d0f566fc9b1fd9a7b0efdf83787fed23a3e333b5f3351c729c2
+Abi: eb5d5a4512e6c5b5e665b83a6ede4e857f025eead146bb390e95b2b50be9ce3b
 Description: Boost smart_ptr module
-Type: Port
 Status: install ok installed
 
 Package: boost-mpl
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-predef, boost-preprocessor, boost-static-assert, boost-type-traits, boost-utility, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: d898ed97d5847feb2e0f0196251b7039fa71007391ca346634625ddc508f7353
+Abi: 95a7f9b020e5c531558865938f0659372e8e80aabdcafd68ad3d1ac33245434a
 Description: Boost mpl module
-Type: Port
+Status: install ok installed
+
+Package: vcpkg-cmake-get-vars
+Version: 2023-03-02
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 4ae708b0b8778a571fdb56888af913e0004fac9c2c495ba4066eb3822c8e3662
 Status: install ok installed
 
 Package: boost-uninstall
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Architecture: x64-windows
 Multi-Arch: same
-Abi: bb9590c4c6210336b266cc26b3a37639c2824514ae5b9bfcf8a69e67cac17c06
+Abi: b2d5ad25b34bbd2e9e2efdc31d09705ec0db71fd3b7642ee36b757876bdfbd7f
 Description: Internal vcpkg port used to uninstall Boost
-Type: Port
 Status: install ok installed
 
 Package: boost-modular-build-helper
-Version: 1.80.0
+Version: 1.82.0
 Port-Version: 4
 Depends: boost-uninstall, vcpkg-cmake, vcpkg-cmake-get-vars
 Architecture: x64-windows
 Multi-Arch: same
-Abi: bd064123c1c190c849dc5b0d218dac9fd3b3494b579854f30eea68ee71be7ec5
+Abi: 8eb85a650a9c34f44c5be27262c3dcfea7881e9aecead9937000e1d8e039fbc4
 Description: Internal vcpkg port used to build Boost libraries
-Type: Port
 Status: install ok installed
 
 Package: boost-integer
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-static-assert, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: dd115289f82c515d09cd1ea9015e08e5a94984a420bfcb786fb52ce610fa58c0
+Abi: 718902689805cafc6bd64d9fef775fefe140510171610c5b0adb191ca897c16d
 Description: Boost integer module
-Type: Port
+Status: install ok installed
+
+Package: boost-mp11
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 5fd3ac78bc03977ed31eb0d02383af5fdc04832ada992783e60a57b9d5e666cd
+Description: Boost mp11 module
+Status: install ok installed
+
+Package: boost-describe
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-mp11, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 8334821e5a82db8ef59ac2dac3a9addc3d9a9ce6970a2ab13b3f5568e69b30da
+Description: Boost describe module
 Status: install ok installed
 
 Package: boost-container-hash
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-config, boost-core, boost-detail, boost-integer, boost-static-assert, boost-type-traits, boost-vcpkg-helpers
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-config, boost-describe, boost-mp11, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: c789ff2a808113f406fcbc1f4d5461a9c9802d05c8d9a3120ab7cd0249fac668
+Abi: 14342a059111d255095139b3e60cdc60bc1fd6f35a816e46d179a332c7ef3dff
 Description: Boost container_hash module
-Type: Port
 Status: install ok installed
 
 Package: boost-concept-check
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-preprocessor, boost-static-assert, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 111d70da0c8e48ceb0a7582baacfb7772e950412d8ccdf64e7c7fef463832d52
+Abi: c339b9789eaff97d7e687fcb098c976205d37e906fafb75a8ecda9552aa4e08c
 Description: Boost concept_check module
-Type: Port
 Status: install ok installed
 
 Package: boost-build
-Version: 1.80.0
+Version: 1.82.0
 Port-Version: 2
 Depends: boost-uninstall
 Architecture: x64-windows
 Multi-Arch: same
-Abi: 8ba2e0ec2c3ae8ee1792f37d364701841b2416214f2f9897ad9c03e970974eaa
+Abi: c63465d9a715dccd07fa084813b59dfcbe85f04c1bdb74d840ac9292b2f9fcab
 Description: Boost.Build
-Type: Port
 Status: install ok installed
 
 Package: boost-regex
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-build:x64-windows, boost-concept-check, boost-config, boost-container-hash, boost-core, boost-integer, boost-modular-build-helper:x64-windows, boost-mpl, boost-predef, boost-smart-ptr, boost-static-assert, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: fd5c1edaa693aa1845f3123fca57cd4d219e3fb04cffacd06df8af4b646e4156
+Abi: 32bb03a0fa2f9605acfbc7705b97e57b3b3eb55367134ec2c028cff2ac14037c
 Description: Boost regex module
-Type: Port
 Status: install ok installed
 
 Package: boost-typeof
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-preprocessor, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: aaf07d7f3ee78118a8db1ca9e36620ce4ca975eb4ab15c2d07ce8129bbcea72d
+Abi: a6b6f737a087573b881ec8c733fbb311f0ba02e207c459839129a2722fce4e48
 Description: Boost typeof module
-Type: Port
 Status: install ok installed
 
 Package: boost-function-types
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-detail, boost-mpl, boost-preprocessor, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 6bcd89ee5b6d1686959ff8536852eaa016f36807dd001c7365d9f84e862dff3c
+Abi: 29243914440fd1443f0857fad2425f37f758ad17544835aac1c3817fbce1f771
 Description: Boost function_types module
-Type: Port
-Status: install ok installed
-
-Package: boost-fusion
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-config, boost-container-hash, boost-core, boost-function-types, boost-mpl, boost-preprocessor, boost-static-assert, boost-tuple, boost-type-traits, boost-typeof, boost-utility, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 2fb97c126aceb6aca44d32e5993ed4829c47c68e72c2f7ca59edf5aeaffd0cc2
-Description: Boost fusion module
-Type: Port
-Status: install ok installed
-
-Package: boost-conversion
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-config, boost-core, boost-smart-ptr, boost-throw-exception, boost-type-traits, boost-typeof, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: fcd22e04be5ac3035bbb566fd66abd4b855a6ea13831bbcb77862e00622f3cf8
-Description: Boost conversion module
-Type: Port
-Status: install ok installed
-
-Package: boost-iterator
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-concept-check, boost-config, boost-conversion, boost-core, boost-detail, boost-function-types, boost-fusion, boost-mpl, boost-optional, boost-smart-ptr, boost-static-assert, boost-type-traits, boost-utility, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: a00c9bc1e43f45875b3449c8a656be0baabcc3a63d345cac80f36b547a2f9572
-Description: Boost iterator module
-Type: Port
-Status: install ok installed
-
-Package: boost-array
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-config, boost-core, boost-static-assert, boost-throw-exception, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: e1d8b46c788904279e3cb3ba2bf638b5aefa08e6810932f254e703619a172487
-Description: Boost array module
-Type: Port
-Status: install ok installed
-
-Package: boost-range
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-array, boost-assert, boost-concept-check, boost-config, boost-container-hash, boost-conversion, boost-core, boost-detail, boost-iterator, boost-mpl, boost-optional, boost-preprocessor, boost-regex, boost-static-assert, boost-tuple, boost-type-traits, boost-utility, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 89a4a2a78b9d045e1d873344ed16b7a0d16e1610fd11345a036a18d539bfe5fb
-Description: Boost range module
-Type: Port
-Status: install ok installed
-
-Package: boost-numeric-conversion
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-config, boost-conversion, boost-core, boost-mpl, boost-preprocessor, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: d2f9d972a15a87770cb0f913102f2a8d4303b6d485dc67331be926a357ca5140
-Description: Boost numeric_conversion module
-Type: Port
-Status: install ok installed
-
-Package: boost-intrusive
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-config, boost-container-hash, boost-core, boost-move, boost-static-assert, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: a97347f19078b7edc812daae09a8ce7bec9e4f129da3472469bde2195cd7e3f6
-Description: Boost intrusive module
-Type: Port
-Status: install ok installed
-
-Package: boost-container
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-build:x64-windows, boost-config, boost-core, boost-intrusive, boost-modular-build-helper:x64-windows, boost-move, boost-static-assert, boost-type-traits, boost-vcpkg-helpers, boost-winapi, vcpkg-cmake:x64-windows
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 12c9b2faaf92b4296799a18417c802f5e7f6cbf4103e33b1d6aa54abd3f65bde
-Description: Boost container module
-Type: Port
-Status: install ok installed
-
-Package: boost-lexical-cast
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-array, boost-assert, boost-config, boost-container, boost-core, boost-integer, boost-numeric-conversion, boost-range, boost-static-assert, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 99e0058ab854837dfbfccc9eeca1e7c6643202f483efe99c89de8a8b898279de
-Description: Boost lexical_cast module
-Type: Port
-Status: install ok installed
-
-Package: boost-type-index
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-config, boost-container-hash, boost-core, boost-preprocessor, boost-static-assert, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: e402b1ee4403de25bae663f31c0d0dee80bb8f2b82e3adfcc78d7d318285f953
-Description: Boost type_index module
-Type: Port
 Status: install ok installed
 
 Package: boost-bind
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: e144ec53fb76d1d6b31d6fe73ca2960c2c030e131a34413abafdc544ad12ffb3
+Abi: 314dc4efe0aaf2cb7d80dc911d86f332aa80a57e8f56d84d891d850762a624ff
 Description: Boost bind module
-Type: Port
 Status: install ok installed
 
 Package: boost-function
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-bind, boost-config, boost-core, boost-integer, boost-preprocessor, boost-throw-exception, boost-type-index, boost-type-traits, boost-typeof, boost-vcpkg-helpers
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-bind, boost-config, boost-core, boost-preprocessor, boost-throw-exception, boost-type-traits, boost-typeof, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: a38776116bcb578d94d4904babcc8c8d233a4d19b43b85f7a220c9b829812a74
+Abi: fca2f8541d4149cd7a2f2785f553b7718f084a6ac4ff9784a57124699d8f4149
 Description: Boost function module
-Type: Port
 Status: install ok installed
 
 Package: boost-functional
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-function, boost-function-types, boost-mpl, boost-preprocessor, boost-type-traits, boost-typeof, boost-utility, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: fa39ba08aa24922ba58b7ded0dd1125f3e3c5aaeb736d0b7cf566ece9a24f1ab
+Abi: c64b39779fb4a6242530b55e4f6eb4dedddc0698bbd9a0d9d242cf5b364bd176
 Description: Boost functional module
-Type: Port
+Status: install ok installed
+
+Package: boost-fusion
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-config, boost-container-hash, boost-core, boost-function-types, boost-functional, boost-mpl, boost-preprocessor, boost-static-assert, boost-tuple, boost-type-traits, boost-typeof, boost-utility, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: f1127ca7131e4137ad7839f3798576018fa63f07af83d9632aea9da0c100a8cf
+Description: Boost fusion module
+Status: install ok installed
+
+Package: boost-conversion
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-config, boost-core, boost-smart-ptr, boost-throw-exception, boost-type-traits, boost-typeof, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 0e185700b31734ab9f8601a30488d9058434ce7330425661f6d28a6eec937c38
+Description: Boost conversion module
+Status: install ok installed
+
+Package: boost-iterator
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-concept-check, boost-config, boost-conversion, boost-core, boost-detail, boost-function-types, boost-fusion, boost-mpl, boost-optional, boost-smart-ptr, boost-static-assert, boost-type-traits, boost-utility, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 7dd3c1360a54c934f4da8aae5ba1d00682d8e4366bde98ae901d1f8f693e65b5
+Description: Boost iterator module
+Status: install ok installed
+
+Package: boost-array
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-config, boost-core, boost-static-assert, boost-throw-exception, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 4b9d20970ea7cd34f9e4c78d013b10e1f3125695e2264bc0b1ffbe70f65194fc
+Description: Boost array module
+Status: install ok installed
+
+Package: boost-range
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-array, boost-assert, boost-concept-check, boost-config, boost-container-hash, boost-conversion, boost-core, boost-detail, boost-iterator, boost-mpl, boost-optional, boost-preprocessor, boost-regex, boost-static-assert, boost-tuple, boost-type-traits, boost-utility, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: b08d39c36f6690e065165da0e23f94eac522cdad5e2221d63185896da6e65b50
+Description: Boost range module
+Status: install ok installed
+
+Package: boost-numeric-conversion
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-config, boost-conversion, boost-core, boost-mpl, boost-preprocessor, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: ad3ef4ccf6a5267568df650b03fe4fbd2825d13343b972c55fe88ed4f40108d0
+Description: Boost numeric_conversion module
+Status: install ok installed
+
+Package: boost-intrusive
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-config, boost-container-hash, boost-move, boost-static-assert, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 191ae4306bbff3900a641295396988091a5c82bf1dadb9ff91e65f4216955b80
+Description: Boost intrusive module
+Status: install ok installed
+
+Package: boost-container
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-build:x64-windows, boost-config, boost-intrusive, boost-modular-build-helper:x64-windows, boost-move, boost-static-assert, boost-vcpkg-helpers, vcpkg-cmake:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 93904e11189cdbd1da6cb818fa26be3d8f21fecc08f17b7dfdcdf3f30808e60f
+Description: Boost container module
+Status: install ok installed
+
+Package: boost-lexical-cast
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-array, boost-assert, boost-config, boost-container, boost-core, boost-integer, boost-numeric-conversion, boost-range, boost-static-assert, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: cbb2e0ecaf1f7ddf805d967833a7c731318874368bba0e625d83b8d6fe1baf68
+Description: Boost lexical_cast module
+Status: install ok installed
+
+Package: boost-winapi
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-config, boost-predef, boost-vcpkg-helpers
+Architecture: x86-windows
+Multi-Arch: same
+Abi: f09b0faafacb7484fea8118ead3bade4270a43a1ddd0e0064213298725b32016
+Description: Boost winapi module
 Status: install ok installed
 
 Package: boost-tokenizer
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-iterator, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 39450687bf3bf2cd314cecb699e1bde6da01efad9955f5a836afa35978e97b18
+Abi: d0bc98a87839a06733e0f78495629ce249c88d5d08c0204af120071859484a2a
 Description: Boost tokenizer module
-Type: Port
-Status: install ok installed
-
-Package: boost-mp11
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-vcpkg-helpers
-Architecture: x86-windows
-Multi-Arch: same
-Abi: 5aec90b23f4c24be4fe43a11cc5d7bb172496191437a8e64c5467faf666fb580
-Description: Boost mp11 module
-Type: Port
 Status: install ok installed
 
 Package: boost-unordered
-Version: 1.80.0
-Port-Version: 1
-Depends: boost-assert, boost-config, boost-container-hash, boost-core, boost-move, boost-mp11, boost-predef, boost-preprocessor, boost-throw-exception, boost-tuple, boost-type-traits, boost-vcpkg-helpers
+Version: 1.82.0
+Port-Version: 2
+Depends: boost-assert, boost-config, boost-container-hash, boost-core, boost-move, boost-mp11, boost-predef, boost-preprocessor, boost-static-assert, boost-throw-exception, boost-tuple, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 84b9f57739dc4b5e41ff70303e925ff89b64cad04b220e811d9d926cbf8256fe
+Abi: 4eb65ce707b5f584eb7e82f43af7352e00d00c458225c7732ded096093a7f794
 Description: Boost unordered module
-Type: Port
 Status: install ok installed
 
 Package: boost-exception
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-build:x64-windows, boost-config, boost-core, boost-modular-build-helper:x64-windows, boost-smart-ptr, boost-throw-exception, boost-tuple, boost-type-traits, boost-vcpkg-helpers, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 02c869ff26b2ee53833c559646a35c7d2e934a6e9bac58472a009dedc5e9e91a
+Abi: caf59a6a0992c721b1d7d688bfb4dd69a24587bc67427d05cd7533eac563f9d4
 Description: Boost exception module
-Type: Port
 Status: install ok installed
 
 Package: boost-algorithm
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-array, boost-assert, boost-bind, boost-concept-check, boost-config, boost-core, boost-exception, boost-function, boost-iterator, boost-mpl, boost-range, boost-regex, boost-static-assert, boost-throw-exception, boost-tuple, boost-type-traits, boost-unordered, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 57f197565f604d19f920fa6c8591107d37ab9d26889865eb92ec9d10f7f354e6
+Abi: 63270f9bc2c1716e3983cde16e705cd55a1fa73e6e7bf32bf2e970f08a90c175
 Description: Boost algorithm module
-Type: Port
 Status: install ok installed
 
 Package: boost-date-time
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-algorithm, boost-assert, boost-build:x64-windows, boost-config, boost-core, boost-io, boost-lexical-cast, boost-modular-build-helper:x64-windows, boost-numeric-conversion, boost-range, boost-smart-ptr, boost-static-assert, boost-throw-exception, boost-tokenizer, boost-type-traits, boost-utility, boost-vcpkg-helpers, boost-winapi, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 1c86818a640853651ddd0f6f4280d16e7959948c0feee766fceca1ff89ec491e
+Abi: 5f5a50997f54617cb25ddb5b336553c308c9cc8e5659547aa07c36dc6666678d
 Description: Boost date_time module
-Type: Port
 Status: install ok installed
 
 Package: boost-variant2
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-mp11, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 8dec3e8332a50add2ef9cce343885569b25b3b36e7d78a929d44a6553f1f4cbb
+Abi: 66cbe4c89101a64cda351e3baeb1ee43378b1a357647b59ed0923697b8c74701
 Description: Boost variant2 module
-Type: Port
 Status: install ok installed
 
 Package: boost-system
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-build:x64-windows, boost-config, boost-modular-build-helper:x64-windows, boost-throw-exception, boost-variant2, boost-vcpkg-helpers, boost-winapi, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 69d4169e4b6e705770d903add3f86b659fb857f65a5619c87a2e8a86ba9786ed
+Abi: 973c8056469808da0a955da2a45c9f230a928fbe46cd90aef2f2dd02853b2d4d
 Description: Boost system module
-Type: Port
 Status: install ok installed
 
 Package: boost-pool
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-integer, boost-throw-exception, boost-type-traits, boost-vcpkg-helpers, boost-winapi
 Architecture: x86-windows
 Multi-Arch: same
-Abi: c4b7e1fe944994fe7f06ce1925dfa8b83c1e657f684da2011446fb5c702abe03
+Abi: a529a89716eb6741ec464ba1f52466c35095bd9ae7e7514e54a66409179d4a42
 Description: Boost pool module
-Type: Port
 Status: install ok installed
 
 Package: boost-context
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-build:x64-windows, boost-config, boost-core, boost-modular-build-helper:x64-windows, boost-mp11, boost-pool, boost-predef, boost-smart-ptr, boost-vcpkg-helpers, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 3c5b5e3e220d5f7bbc47c03e8b8035bd004c78536fe3be60a72422d496710c16
+Abi: 2811eb44a95101fe32f71e34a4f9977bb7d09a3b4d8dc507a132ea33b2e44c84
 Description: Boost context module
-Type: Port
 Status: install ok installed
 
 Package: boost-coroutine
-Version: 1.80.0
+Version: 1.82.0
 Port-Version: 2
 Depends: boost-assert, boost-build:x64-windows, boost-config, boost-context, boost-core, boost-exception, boost-modular-build-helper:x64-windows, boost-move, boost-system, boost-throw-exception, boost-type-traits, boost-utility, boost-vcpkg-helpers, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 938e0f5cc36f014c819ca859e2383d8b0d5769677dac92658adde2addccb79ea
+Abi: 9861d51ccd0daa7e9ec72291c79f813e16ff36a0a438f60261d6fc3068758c0e
 Description: Boost coroutine module
-Type: Port
 Status: install ok installed
 
 Package: boost-rational
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-integer, boost-static-assert, boost-throw-exception, boost-type-traits, boost-utility, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 59ffa6bdd4f81e15888eb4e0f62676c0cbe0f8b51f464cd02686d4ee1736ea67
+Abi: 60d0d43de5b2fc6d432d8aa8d58bef90df1bacc1c44df78ab5e663578f1c7f74
 Description: Boost rational module
-Type: Port
 Status: install ok installed
 
 Package: boost-ratio
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-config, boost-core, boost-integer, boost-mpl, boost-rational, boost-static-assert, boost-type-traits, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: aa3fcd341e880e5d08958fe1d3865c803e8a1efa67a14fba7e144108063cef08
+Abi: 6fc66d4aca8c5ee6e308f75f6ff8e4e52a83e4e6e1c838d67a1b272795d199e9
 Description: Boost ratio module
-Type: Port
 Status: install ok installed
 
 Package: boost-chrono
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-build:x64-windows, boost-config, boost-core, boost-integer, boost-modular-build-helper:x64-windows, boost-move, boost-mpl, boost-predef, boost-ratio, boost-static-assert, boost-system, boost-throw-exception, boost-type-traits, boost-typeof, boost-utility, boost-vcpkg-helpers, boost-winapi, vcpkg-cmake:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: bb150bae440088ddf1be6684643e9c7815a599ac46c93438b66d6a6b731d2f63
+Abi: 9d88615a0b45cb305b516799e897782e1837d55f9e63ed9192b2b2d81acb5ead
 Description: Boost chrono module
-Type: Port
 Status: install ok installed
 
 Package: boost-align
-Version: 1.80.0
-Port-Version: 1
+Version: 1.82.0
+Port-Version: 2
 Depends: boost-assert, boost-config, boost-core, boost-static-assert, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 626da815462ff5c96508786406dca8b7ec042bcc9d9658467b6700285a85ff7f
+Abi: 219d93180bb7688fae42cfe8f99b03409cbe3fd4e394aa4a07d81c99c190a261
 Description: Boost align module
-Type: Port
 Status: install ok installed
 
 Package: boost-asio
-Version: 1.80.0
-Port-Version: 2
+Version: 1.82.0
+Port-Version: 3
 Depends: boost-align, boost-array, boost-assert, boost-bind, boost-chrono, boost-config, boost-context, boost-core, boost-coroutine, boost-date-time, boost-exception, boost-function, boost-regex, boost-smart-ptr, boost-system, boost-throw-exception, boost-type-traits, boost-utility, boost-vcpkg-helpers
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 16c33a85d7a3937515bd9919466b521a969fa24e4eab8fd50a4be4e8770a8111
+Abi: dbe16f653c47ac7053ff9e310f5f3b933188cf7f76ce97cbd30860aa3dea2814
 Description: Boost asio module
-Type: Port
 Status: install ok installed
 
 Package: crow
@@ -768,54 +594,79 @@ Version: 1.0-5
 Depends: boost-algorithm, boost-array, boost-asio, boost-date-time, boost-functional, boost-lexical-cast, boost-optional, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: fb4842cc9c4406e0cdad031c033a6617c416844682737c958877ab8abdae94e3
+Abi: dc5f5651df15217091d064a7490a9f48164b8a0c117a46f4879e59696e9d8114
 Description: Very fast and easy to use C++ micro web framework
-Type: Port
 Status: install ok installed
 
-Package: curl
-Version: 7.86.0
+Package: nlohmann-json
+Version: 3.11.2
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 526957d0e93741fd331f69cf649523877aeb0a714a9bcc146fd369dce51ee453
+Description: JSON for Modern C++
+Status: install ok installed
+
+Package: openssl
+Version: 3.1.1
 Port-Version: 1
-Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows, zlib
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows, vcpkg-cmake-get-vars:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Abi: 2e9cd92760da1ddd9c0911027dcf5ab0135744c267ebad71919042f29c60bccb
-Description: A library for transferring data with URLs
-Type: Port
-Default-Features: non-http, ssl
+Abi: 98d54a20ef965bd5fa69082422898e68a7c92f5ad4e1f7ef5e85e9fcc42dc2a8
+Description: OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
 Status: install ok installed
 
-Package: curl
-Feature: non-http
+Package: fmt
+Version: 10.0.0
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Description: Enables protocols beyond HTTP/HTTPS/HTTP2
-Type: Port
+Abi: e2609ee2e8f0862d0d10082ce090ad2a2590aede97c5fc77cc8f35cc592d515f
+Description: Formatting library for C++. It can be used as a safe alternative to printf or as a fast alternative to IOStreams.
 Status: install ok installed
 
-Package: curl
-Feature: schannel
-Depends: curl
+Package: spdlog
+Version: 1.12.0
+Depends: fmt, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Description: SSL support (Secure Channel)
-Type: Port
+Abi: 32ddc91602ed1a2b91780ec3f5263e1d3fe4acb559ae27b11cb6136e6c7d875a
+Description: Very fast, header only, C++ logging library
 Status: install ok installed
 
-Package: curl
-Feature: ssl
-Depends: curl
+Package: sqlite3
+Version: 3.42.0
+Port-Version: 1
+Depends: vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
 Architecture: x86-windows
 Multi-Arch: same
-Description: Default SSL backend
-Type: Port
+Abi: 759f21dbcec26525e41076c6ae92ddd3d4407426ff391dd9a8f876db2e743ed8
+Description: SQLite is a software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine.
+Default-Features: json1
 Status: install ok installed
 
-Package: curl
-Feature: sspi
+Package: sqlite3
+Feature: json1
 Architecture: x86-windows
 Multi-Arch: same
-Description: SSPI support
-Type: Port
+Description: Enable JSON functionality for sqlite3
+Status: install ok installed
+
+Package: sqlitecpp
+Version: 3.3.0
+Depends: sqlite3, vcpkg-cmake:x64-windows, vcpkg-cmake-config:x64-windows
+Architecture: x86-windows
+Multi-Arch: same
+Abi: 8952e8b8b8b6ed376b3ffb8ac7ce0b81df3aa12472f22fc6ae6b206bd458fad9
+Description: SQLiteC++ (SQLiteCpp) is a smart and easy to use C++ SQLite3 wrapper.
+Default-Features: sqlite
+Status: install ok installed
+
+Package: sqlitecpp
+Feature: sqlite
+Architecture: x86-windows
+Multi-Arch: same
+Description: Deprecated; no effects
 Status: install ok installed
 

@@ -111,6 +111,9 @@ int glob( const char * c, const char * s )
  * globchars() - build a bitlist to check for character group match.
  */
 
+#if defined(_MSC_VER) && _MSC_VER == 1935 && defined(_M_ARM64)
+__declspec(noinline)
+#endif
 static void globchars( const char * s,  const char * e, char * b )
 {
     int neg = 0;

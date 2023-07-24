@@ -648,7 +648,7 @@ namespace PVP {
         try
         {
             // Open a database file with UTF-8 encoding
-            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
             // Check if the entry already exists in the table
             SQLite::Statement queryExists(db, "SELECT * FROM PVPRanking WHERE Charfile = ?");
@@ -691,7 +691,7 @@ namespace PVP {
         try
         {
             // Open a database file with UTF-8 encoding
-            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
             // Check if the entry already exists in the table
             SQLite::Statement queryExists(db, "SELECT * FROM PVERanking WHERE Charfile = ?");
@@ -734,7 +734,7 @@ namespace PVP {
         try
         {
             // Open a database file with UTF-8 encoding
-            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
             // Check if the entry already exists in the table
             SQLite::Statement queryExists(db, "SELECT * FROM DuelRanking WHERE Charfile = ?");
@@ -780,7 +780,7 @@ namespace PVP {
         try
         {
             // Open a database file with UTF-8 encoding
-            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
             // Check if the entry already exists in the table
             SQLite::Statement queryExists(db, "SELECT * FROM FFARanking WHERE Charfile = ?");
@@ -821,7 +821,7 @@ namespace PVP {
         try
         {
             // Open a database file
-            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
             // Check if the ranking table already exists and drop it if it does
             std::string calculatedTableName = tableName + "Calculated";
@@ -1085,7 +1085,7 @@ namespace PVP {
         try
         {
             // Öffne die Datenbankverbindung
-            SQLite::Database db(SQL::scDbName, SQLite::OPEN_READONLY);
+            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
 
             // Abfrage für die Top 5 Einträge
             std::string scTop5Query = "SELECT Charname, Kills, Deaths, Rating, ROUND(CAST(Kills AS REAL) / NULLIF(Deaths, 0), 2) AS KD, ROW_NUMBER() OVER(ORDER BY Rating DESC) AS Rank FROM " + scCalculatedTable + " ORDER BY Rank ASC LIMIT 5";

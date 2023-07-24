@@ -58,7 +58,6 @@ endif()
 add_library(unofficial::sqlite3::sqlite3 SHARED IMPORTED)
 
 set_target_properties(unofficial::sqlite3::sqlite3 PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "SQLITE_API=__declspec(dllimport);SQLITE_OS_WIN=1;SQLITE_ENABLE_COLUMN_METADATA=1"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
 )
 

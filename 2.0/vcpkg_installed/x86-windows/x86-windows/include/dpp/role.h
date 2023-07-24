@@ -19,9 +19,10 @@
  *
  ************************************************************************************/
 #pragma once
+#include <variant>
 #include <dpp/export.h>
 #include <dpp/managed.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/permissions.h>
 #include <dpp/guild.h>
 #include <dpp/json_interface.h>
@@ -30,10 +31,13 @@ namespace dpp {
 
 /** Various flags related to dpp::role */
 enum role_flags : uint8_t {
-	r_hoist =		0b00000001, //!< Hoisted role
+	r_hoist =		0b00000001, //!< Hoisted role (if the role is pinned in the user listing)
 	r_managed =		0b00000010, //!< Managed role (introduced by a bot or application)
-	r_mentionable =		0b00000100, //!< Mentionable with a ping
-	r_premium_subscriber =	0b00001000, //!< This is set for the role given to nitro 
+	r_mentionable =		0b00000100, //!< Whether this role is mentionable with a ping
+	r_premium_subscriber =	0b00001000, //!< Whether this is the guild's booster role
+	r_available_for_purchase = 0b00010000, //!< Whether the role is available for purchase
+	r_guild_connections = 0b00100000, //!< Whether the role is a guild's linked role
+	r_in_prompt			= 0b01000000, //!< Whether the role can be selected by members in an onboarding prompt
 };
 
 /**
@@ -71,6 +75,8 @@ public:
 	snowflake integration_id;
 	/** Bot id if any (e.g. role is a bot's role created when it was invited) */
 	snowflake bot_id;
+	/** The id of the role's subscription sku and listing */
+	snowflake subscription_listing_id;
 	/** The unicode emoji used for the role's icon, can be an empty string */
 	std::string unicode_emoji;
 	/** The role icon hash, can be an empty string */
@@ -87,6 +93,13 @@ public:
 	 * @brief Destroy the role object
 	 */
 	virtual ~role();
+
+	/**
+	* @brief Create a mentionable role.
+	* @param id The ID of the role.
+	* @return std::string The formatted mention of the role.
+	*/
+	static std::string get_mention(const snowflake& id);
 
 	/**
 	 * @brief Set the name of the role
@@ -181,18 +194,20 @@ public:
 	std::string get_mention() const;
 
 	/**
-	 * @brief Returns the role's icon if they have one, otherwise returns an empty string
+	 * @brief Returns the role's icon url if they have one, otherwise returns an empty string
 	 *
-	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096. If not specified, the default sized icon is returned.
-	 * @return std::string icon url or empty string
+	 * @param size The size of the icon in pixels. It can be any power of two between 16 and 4096,
+	 * otherwise the default sized icon is returned.
+	 * @param format The format to use for the avatar. It can be one of `i_webp`, `i_jpg` or `i_png`.
+	 * @return std::string icon url or an empty string, if required attributes are missing or an invalid format was passed
 	 */
-	std::string get_icon_url(uint16_t size = 0) const;
+	std::string get_icon_url(uint16_t size = 0, const image_type format = i_png) const;
 
 	/**
 	 * @brief Load an image into the object as base64
 	 * 
 	 * @param image_blob Image binary data
-	 * @param type Type of image
+	 * @param type Type of image. It can be one of `i_gif`, `i_jpg` or `i_png`.
 	 * @return emoji& Reference to self
 	 */
 	role& load_image(const std::string &image_blob, const image_type type);
@@ -258,6 +273,26 @@ public:
 	 * @return bool True if the role is managed (introduced for a bot or other application by Discord)
 	 */
 	bool is_managed() const;
+	/**
+	 * @brief True if the role is the guild's Booster role
+	 * @return bool whether the role is the premium subscriber, AKA "boost", role for the guild
+	 */
+	bool is_premium_subscriber() const;
+	/**
+	 * @brief True if the role is available for purchase
+	 * @return bool whether this role is available for purchase
+	 */
+	bool is_available_for_purchase() const;
+	/**
+	 * @brief True if the role is a linked role
+	 * @return bool True if the role is a linked role
+	 */
+	bool is_linked() const;
+	/**
+	 * @brief True if the role can be selected by members in an onboarding prompt
+	 * @return bool True if the role can be selected by members in an onboarding prompt
+	 */
+	bool is_selectable_in_prompt() const;
 	/**
 	 * @brief True if has create instant invite permission
 	 * @note Having the administrator permission causes this method to always return true
@@ -540,6 +575,34 @@ public:
 	 * @return bool True if user has the moderate users permission or is administrator.
 	 */
 	bool has_moderate_members() const;
+	/**
+	 * @brief True if has the view creator monetization analytics permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the view creator monetization analytics permission or is administrator.
+	 */
+	bool has_view_creator_monetization_analytics() const;
+	/**
+	 * @brief True if has the use soundboard permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the use soundboard permission or is administrator.
+	 */
+	bool has_use_soundboard() const;
+	/**
+	 * @brief True if has the use external sounds permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the use external sounds permission or is administrator.
+	 */
+	bool has_use_external_sounds() const;
+	/**
+	 * @brief True if has the send voice messages permission.
+	 * @note Having the administrator permission causes this method to always return true
+	 * Channel specific overrides may apply to permissions.
+	 * @return bool True if user has the send voice messages permission or is administrator.
+	 */
+	bool has_send_voice_messages() const;
 
 	/**
 	 * @brief Get guild members who have this role
@@ -549,8 +612,92 @@ public:
 	members_container get_members() const;
 };
 
+/**
+ * @brief Application Role Connection Metadata Type
+ *
+ * @note Each metadata type offers a comparison operation that allows guilds to configure role requirements based on metadata values stored by the bot. Bots specify a `metadata value` for each user and guilds specify the required `guild's configured value` within the guild role settings.
+ */
+enum application_role_connection_metadata_type : uint8_t {
+	rc_integer_less_than_or_equal = 1, //!< The metadata value (integer) is less than or equal to the guild's configured value (integer)
+	rc_integer_greater_than_or_equal = 2, //!< The metadata value (integer) is greater than or equal to the guild's configured value (integer)
+	rc_integer_equal = 3, //!< The metadata value (integer) is equal to the guild's configured value (integer)
+	rc_integer_not_equal = 4, //!< The metadata value (integer) is not equal to the guild's configured value (integer)
+	rc_datetime_less_than_or_equal = 5, //!< The metadata value (ISO8601 string) is less than or equal to the guild's configured value (integer; days before current date)
+	rc_datetime_greater_than_or_equal = 6, //!< The metadata value (ISO8601 string) is greater than or equal to the guild's configured value (integer; days before current date)
+	rc_boolean_equal = 7, //!< The metadata value (integer) is equal to the guild's configured value (integer; 1)
+	rc_boolean_not_equal = 8, //!< The metadata value (integer) is not equal to the guild's configured value (integer; 1)
+};
+
+/**
+ * @brief Application Role Connection Metadata. Represents a role connection metadata for an dpp::application
+ */
+class DPP_EXPORT application_role_connection_metadata : public json_interface<application_role_connection_metadata> {
+public:
+	application_role_connection_metadata_type type; //!< Type of metadata value
+	std::string key; //!< Dictionary key for the metadata field (must be `a-z`, `0-9`, or `_` characters; 1-50 characters)
+	std::string name; //!< Name of the metadata field (1-100 characters)
+	std::map<std::string, std::string> name_localizations; //!< Translations of the name
+	std::string description; //!< Description of the metadata field (1-200 characters)
+	std::map<std::string, std::string> description_localizations; //!< Translations of the description
+
+	/**
+	 * Constructor
+	 */
+	application_role_connection_metadata();
+
+	virtual ~application_role_connection_metadata() = default;
+
+	/** Fill this record from json.
+	 * @param j The json to fill this record from
+	 * @return Reference to self
+	 */
+	application_role_connection_metadata& fill_from_json(nlohmann::json* j);
+
+	/**
+	 * @brief Convert to JSON string
+	 *
+	 * @param with_id include ID in output
+	 * @return std::string JSON output
+	 */
+	virtual std::string build_json(bool with_id = false) const;
+};
+
+/**
+ * @brief The application role connection that an application has attached to a user.
+ */
+class DPP_EXPORT application_role_connection : public json_interface<application_role_connection> {
+public:
+	std::string platform_name; //!< Optional: The vanity name of the platform a bot has connected (max 50 characters)
+	std::string platform_username; //!< Optional: The username on the platform a bot has connected (max 100 characters)
+	std::variant<std::monostate, application_role_connection_metadata> metadata; //!< Optional: Object mapping application role connection metadata keys to their stringified value (max 100 characters) for the user on the platform a bot has connected
+
+	/**
+	 * Constructor
+	 */
+	application_role_connection();
+
+	virtual ~application_role_connection() = default;
+
+	/** Fill this record from json.
+	 * @param j The json to fill this record from
+	 * @return Reference to self
+	 */
+	application_role_connection& fill_from_json(nlohmann::json* j);
+
+	/**
+	 * @brief Convert to JSON string
+	 *
+	 * @param with_id include ID in output
+	 * @return std::string JSON output
+	 */
+	virtual std::string build_json(bool with_id = false) const;
+};
+
 /** A group of roles */
 typedef std::unordered_map<snowflake, role> role_map;
+
+/** A group of application_role_connection_metadata objects */
+typedef std::vector<application_role_connection_metadata> application_role_connection_metadata_list;
 
 };
 

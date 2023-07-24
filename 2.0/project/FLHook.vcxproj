@@ -65,6 +65,9 @@
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgTriplet>
     </VcpkgTriplet>
+    <VcpkgInstalledDir>C:\vcpkg\vcpkg</VcpkgInstalledDir>
+    <VcpkgAdditionalInstallOptions>
+    </VcpkgAdditionalInstallOptions>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>

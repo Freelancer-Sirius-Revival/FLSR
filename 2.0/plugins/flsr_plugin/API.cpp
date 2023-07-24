@@ -81,7 +81,7 @@ namespace API {
 
                 for (const auto& message : Discord::lNewsList) {
                     json newsData;
-                    newsData["author"] = message.Nickname;
+                    newsData["author"] = Discord::GetDiscordUsername(message.Message.author);
                     newsData["content"] = message.Message.content;
 
                     newsList.push_back(newsData);
@@ -108,7 +108,7 @@ namespace API {
 
                 for (const auto& message : Discord::lEventList) {
                     json eventdata;
-                    eventdata["author"] = message.Nickname;
+                    eventdata["author"] = Discord::GetDiscordUsername(message.Message.author);
                     eventdata["content"] = message.Message.content;
 
                     eventList.push_back(eventdata);

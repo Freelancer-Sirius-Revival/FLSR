@@ -27,7 +27,7 @@
 #include <dpp/guild.h>
 #include <optional>
 #include <variant>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/json_interface.h>
 
 namespace dpp {
@@ -85,15 +85,15 @@ enum component_style : uint8_t {
  */
 struct DPP_EXPORT select_option : public json_interface<select_option> {
 	/**
-	 * @brief Label for option
+	 * @brief User-facing name of the option
 	 */
 	std::string label;
 	/**
-	 * @brief Value for option
+	 * @brief Dev-defined value of the option
 	 */
 	std::string value;
 	/**
-	 * @brief Description of option
+	 * @brief Additional description of the option
 	 */
 	std::string description;
 	/**
@@ -256,12 +256,12 @@ public:
 	 */
 	std::string placeholder;
 
-	/** Minimum number of items that must be chosen for a select menu.
+	/** Minimum number of items that must be chosen for a select menu (0-25).
 	 * Default is -1 to not set this
 	 */
 	int32_t min_values;
 
-	/** Maximum number of items that can be chosen for a select menu.
+	/** Maximum number of items that can be chosen for a select menu (0-25).
 	 * Default is -1 to not set this
 	 */
 	int32_t max_values;
@@ -441,33 +441,33 @@ public:
 	component& set_placeholder(const std::string &placeholder);
 
 	/**
-	 * @brief Set the min value
+	 * @brief Set the minimum number of items that must be chosen for a select menu
 	 * 
-	 * @param min_values min value to set
+	 * @param min_values min value to set (0-25)
 	 * @return component& Reference to self
 	 */
 	component& set_min_values(uint32_t min_values);
 
 	/**
-	 * @brief Set the max value
+	 * @brief Set the maximum number of items that can be chosen for a select menu
 	 * 
-	 * @param max_values max value to set (0 - 25)
+	 * @param max_values max value to set (0-25)
 	 * @return component& Reference to self
 	 */
 	component& set_max_values(uint32_t max_values);
 
 	/**
-	 * @brief Set the min length of text input
+	 * @brief Set the minimum input length for a text input
 	 * 
-	 * @param min_l min value to set (0 - 25)
+	 * @param min_l min length to set (0-4000)
 	 * @return component& Reference to self
 	 */
 	component& set_min_length(uint32_t min_l);
 
 	/**
-	 * @brief Set the max length of text input
+	 * @brief Set the maximum input length for a text input
 	 * 
-	 * @param max_l max value to set
+	 * @param max_l max length to set (1-4000)
 	 * @return component& Reference to self
 	 */
 	component& set_max_length(uint32_t max_l);
@@ -523,7 +523,7 @@ public:
 struct DPP_EXPORT embed_footer {
 	/** Footer text */
 	std::string text;
-	/** Footer icon url */
+	/** Footer icon url (only supports http(s) and attachments) */
 	std::string icon_url;
 	/** Proxied icon url */
 	std::string proxy_url;
@@ -577,9 +577,9 @@ struct DPP_EXPORT embed_provider {
 struct DPP_EXPORT embed_author {
 	/** Author name */
 	std::string name;
-	/** Author url */
+	/** Author url (only supports http(s)) */
 	std::string url;
-	/** Author icon url */
+	/** Author icon url (only supports http(s) and attachments) */
 	std::string icon_url;
 	/** Proxied icon url */
 	std::string proxy_icon_url;
@@ -589,9 +589,9 @@ struct DPP_EXPORT embed_author {
  * @brief A dpp::embed may contain zero or more fields
  */
 struct DPP_EXPORT embed_field {
-	/** Name of field */
+	/** Name of field (max length 256) */
 	std::string name;
-	/** Value of field (max length 1000) */
+	/** Value of field (max length 1024) */
 	std::string value;
 	/** True if the field is to be displayed inline */
 	bool is_inline;
@@ -659,7 +659,7 @@ struct DPP_EXPORT embed {
 
 	 /** Set the footer of the embed. Returns the embed itself so these method calls may be "chained"
 	  * @param text string to set as footer text. It will be truncated to the maximum length of 2048 UTF-8 characters.
-	  * @param icon_url an url to set as footer icon url
+	  * @param icon_url an url to set as footer icon url (only supports http(s) and attachments)
 	  * @return A reference to self
 	  */
 	embed& set_footer(const std::string& text, const std::string& icon_url);
@@ -669,6 +669,12 @@ struct DPP_EXPORT embed {
 	 * @return A reference to self
 	 */
 	embed& set_color(uint32_t col);
+
+	/** Set embed colour. Returns the embed itself so these method calls may be "chained"
+	 * @param col The colour of the embed
+	 * @return A reference to self
+	 */
+	embed& set_colour(uint32_t col);
 
 	/** Set embed timestamp. Returns the embed itself so these method calls may be "chained"
 	 * @param tstamp The timestamp to show in the footer, should be in UTC
@@ -698,8 +704,8 @@ struct DPP_EXPORT embed {
 
 	/** Set embed author. Returns the embed itself so these method calls may be "chained"
 	 * @param name The name of the author. It will be truncated to the maximum length of 256 UTF-8 characters.
-	 * @param url The url of the author
-	 * @param icon_url The icon URL of the author
+	 * @param url The url of the author (only supports http(s))
+	 * @param icon_url The icon URL of the author (only supports http(s) and attachments)
 	 * @return A reference to self
 	 */
 	embed& set_author(const std::string& name, const std::string& url, const std::string& icon_url);
@@ -712,7 +718,7 @@ struct DPP_EXPORT embed {
 	embed& set_provider(const std::string& name, const std::string& url);
 
 	/** Set embed image. Returns the embed itself so these method calls may be "chained"
-	 * @param url The embed image URL
+	 * @param url The embed image URL (only supports http(s) and attachments)
 	 * @return A reference to self
 	 */
 	embed& set_image(const std::string& url);
@@ -724,7 +730,7 @@ struct DPP_EXPORT embed {
 	embed& set_video(const std::string& url);
 
 	/** Set embed thumbnail. Returns the embed itself so these method calls may be "chained"
-	 * @param url The embed thumbnail url
+	 * @param url The embed thumbnail url (only supports http(s) and attachments)
 	 * @return A reference to self
 	 */
 	embed& set_thumbnail(const std::string& url);
@@ -761,6 +767,14 @@ struct DPP_EXPORT reaction {
 };
 
 /**
+ * @brief Bitmask flags for a dpp::attachment
+ */
+enum attachment_flags : uint8_t {
+	/// this attachment has been edited using the remix feature on mobile
+	a_is_remix = 1 << 2,
+};
+
+/**
  * @brief Represents an attachment in a dpp::message
  */
 struct DPP_EXPORT attachment {
@@ -784,6 +798,12 @@ struct DPP_EXPORT attachment {
 	std::string content_type;
 	/** Whether this attachment is ephemeral, if applicable */
 	bool ephemeral;
+	/** The duration of the audio file (currently for voice messages) */
+	double duration_secs;
+	/** base64 encoded bytearray representing a sampled waveform (currently for voice messages) */
+	std::string waveform;
+	/** Flags. Made of bits in dpp::attachment_flags */
+	uint8_t		flags;
 	/** Owning message */
 	struct message* owner;
 
@@ -814,6 +834,13 @@ struct DPP_EXPORT attachment {
 	 * itself has an owning cluster, this method will throw a dpp::logic_exception when called.
 	 */
 	void download(http_completion_event callback) const;
+	
+	/**
+	 * @brief Returns true if remixed
+	 * 
+	 * @return true if remixed
+	 */
+	bool is_remix() const;
 };
 
 /**
@@ -832,7 +859,8 @@ enum sticker_type : uint8_t {
 enum sticker_format : uint8_t {
 	sf_png = 1,
 	sf_apng = 2,
-	sf_lottie = 3
+	sf_lottie = 3,
+	sf_gif = 4,
 };
 
 /**
@@ -894,12 +922,11 @@ struct DPP_EXPORT sticker : public managed, public json_interface<sticker> {
 	virtual std::string build_json(bool with_id = true) const;
 
 	/**
-	 * @brief Get the sticker url
+	 * @brief Get the sticker url.
 	 *
-	 * @param accept_lottie Whether to allow that [lottie](https://airbnb.io/lottie/#/) (json format) can be returned or not
-	 * @return std::string The sticker url or an empty string when its a lottie and accept_lottie is false
+	 * @return std::string The sticker url or an empty string, if the id is empty
 	 */
-	std::string get_url(bool accept_lottie = true) const;
+	std::string get_url() const;
 
 	/**
 	 * @brief Set the filename
@@ -979,6 +1006,10 @@ enum message_flags : uint16_t {
 	m_loading = 1 << 7,
 	/// this message failed to mention some roles and add their members to the thread
 	m_thread_mention_failed = 1 << 8,
+	/// this message will not trigger push and desktop notifications
+	m_suppress_notifications = 1 << 12,
+	/// this message is a voice message
+	m_is_voice_message = 1 << 13,
 };
 
 /**
@@ -1069,6 +1100,20 @@ enum message_type {
 	mt_context_menu_command 			= 23,
 	/// Auto moderation action
 	mt_auto_moderation_action			= 24,
+	/// Role subscription purchase
+	mt_role_subscription_purchase		= 25,
+	/// Interaction premium upsell
+	mt_interaction_premium_upsell		= 26,
+	/// Stage start
+	mt_stage_start						= 27,
+	/// Stage end
+	mt_stage_end						= 28,
+	/// Stage speaker
+	mt_stage_speaker					= 29,
+	/// Stage topic
+	mt_stage_topic						= 31,
+	/// Guild application premium subscription
+	mt_application_premium_subscription	= 32,
 };
 
 /**
@@ -1150,7 +1195,7 @@ struct DPP_EXPORT message : public managed {
 	std::vector<channel> mention_channels;
 	/** any attached files */
 	std::vector<attachment> attachments;
-	/** zero or more dpp::embed objects */
+	/** Up to 10 dpp::embed objects */
 	std::vector<embed> embeds;
 	/** Optional: reactions to the message */
 	std::vector<reaction> reactions;
@@ -1166,6 +1211,9 @@ struct DPP_EXPORT message : public managed {
 
 	/** File content to upload (raw binary) */
 	std::vector<std::string>	filecontent;
+
+	/** Mime type of files to upload */
+	std::vector<std::string>	filemimetype;
 
 	/**
 	 * @brief Reference to another message, e.g. a reply
@@ -1389,6 +1437,20 @@ struct DPP_EXPORT message : public managed {
 	bool is_thread_mention_failed() const;
 
 	/**
+	 * @brief True if the message will not trigger push and desktop notifications
+	 *
+	 * @return True if notifications suppressed
+	 */
+	bool suppress_notifications() const;
+
+	/**
+	 * @brief True if the message is a voice message
+	 *
+	 * @return True if voice message
+	 */
+	bool is_voice_message() const;
+
+	/**
 	 * @brief Add a component (button) to message
 	 * 
 	 * @param c component to add
@@ -1443,9 +1505,10 @@ struct DPP_EXPORT message : public managed {
 	 *
 	 * @param filename filename
 	 * @param filecontent raw file content contained in std::string
+	 * @param filemimetype optional mime type of the file
 	 * @return message& reference to self
 	 */
-	message& add_file(const std::string &filename, const std::string &filecontent);
+	message& add_file(const std::string &filename, const std::string &filecontent, const std::string &filemimetype = "");
 
 	/**
 	 * @brief Set the message content
@@ -1477,6 +1540,13 @@ struct DPP_EXPORT message : public managed {
 	 * @return true if message is a DM
 	 */
 	bool is_dm() const;
+
+	/**
+	 * @brief Returns true if message has remixed attachment
+	 * 
+	 * @return true if message has remixed attachment
+	 */
+	bool has_remix_attachment() const;
 };
 
 /** A group of messages */

@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/sqlitecpp-x86-windows-3.2.0-261b069c-1ab8-4eae-a7b5-be50751828a6",
-  "name": "sqlitecpp:x86-windows@3.2.0 303fa818ed1e7d1ff920b9b4649fa8669e20fc3c94d4bf4c72455bb24e1d9ee0",
+  "documentNamespace": "https://spdx.org/spdxdocs/sqlitecpp-x86-windows-3.3.0-7577deed-be0c-4e95-b917-658db0746fce",
+  "name": "sqlitecpp:x86-windows@3.3.0 8952e8b8b8b6ed376b3ffb8ac7ce0b81df3aa12472f22fc6ae6b206bd458fad9",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-5fdee72bc1fceca198fb1ab7589837206a8b81ba"
+      "Tool: vcpkg-814b7ec837b59f1c8778f72351c1dd7605983cd2"
     ],
-    "created": "2023-04-12T09:08:01Z"
+    "created": "2023-07-24T12:22:36Z"
   },
   "relationships": [
     {
@@ -72,8 +72,8 @@
     {
       "name": "sqlitecpp",
       "SPDXID": "SPDXRef-port",
-      "versionInfo": "3.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "3.3.0",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/sqlitecpp",
       "homepage": "https://github.com/SRombauts/SQLiteCpp",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -84,7 +84,7 @@
     {
       "name": "sqlitecpp:x86-windows",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "303fa818ed1e7d1ff920b9b4649fa8669e20fc3c94d4bf4c72455bb24e1d9ee0",
+      "versionInfo": "8952e8b8b8b6ed376b3ffb8ac7ce0b81df3aa12472f22fc6ae6b206bd458fad9",
       "downloadLocation": "NONE",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -94,26 +94,26 @@
     {
       "SPDXID": "SPDXRef-resource-1",
       "name": "SRombauts/SQLiteCpp",
-      "downloadLocation": "git+https://github.com/SRombauts/SQLiteCpp@3.2.0",
+      "downloadLocation": "git+https://github.com/SRombauts/SQLiteCpp@${VERSION}",
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "checksums": [
         {
           "algorithm": "SHA512",
-          "checksumValue": "af57c3e82a8804174c52105ecc14ea7a2d4e293ef13b2fc371f2455890ea54683ed76adf4649e561686a6b4c3368676f5edcc54d9f22c4850be3ba32832d3272"
+          "checksumValue": "9702b17c55b1b3bc46a72d5c204b560249e9c1f02647c864fd4ca54011e4b0238638800ee870baa5106512a9568338d3faa9c9f9799d42fbd558d10376e3b73a"
         }
       ]
     }
   ],
   "files": [
     {
-      "fileName": "./0001-unofficial-sqlite3-and-sqlcipher.patch",
+      "fileName": "./add_runtime_destination.patch",
       "SPDXID": "SPDXRef-file-0",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "98c5ef08d5973bbbc4b9cea31e91c0e8c370f4c0f30cc3e07eaafc31d6839c93"
+          "checksumValue": "e35e3c8e6c8026107c4de32cb0f07e9d5f6f14139068682e994b2cbed2a7e485"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -125,7 +125,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "6e03e07ab396a0801dd2697ca6c0c6e2fd08d37e0806630a30dc553fd17a91b4"
+          "checksumValue": "bdde908b7c0180d71745a863ac58acfe2630a893d59cc11f9806bb7a991466a9"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -137,7 +137,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "e39c63446294bf8007b342bcafd7cafe3cf199e8bba14e620d060c393275c699"
+          "checksumValue": "38b6571b519c36cf87bd46ee34decfc1a8462cd74ffd52c43f17b3c515813ff6"
         }
       ],
       "licenseConcluded": "NOASSERTION",
@@ -149,7 +149,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "440c1256fad9ed5ec48523822d4e1ef2dbe0b7060ae190ceb0d20208dd60d018"
+          "checksumValue": "7092bc77d546bfdebb06bf72c510f1fea89d7b1ece2c647427833a17bb78e8b8"
         }
       ],
       "licenseConcluded": "NOASSERTION",

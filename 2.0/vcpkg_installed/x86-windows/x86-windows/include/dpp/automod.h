@@ -24,7 +24,7 @@
 #include <dpp/snowflake.h>
 #include <dpp/managed.h>
 #include <dpp/utility.h>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/json_interface.h>
 
 namespace dpp {
@@ -52,7 +52,8 @@ enum automod_preset_type : uint8_t {
  */
 enum automod_action_type : uint8_t {
 	/**
-	 * @brief Block the message
+	 * @brief Blocks the message and prevents it from being posted.
+	 * A custom explanation can be specified and shown to members whenever their message is blocked
 	 */
 	amod_action_block_message = 1,
 	/**
@@ -60,7 +61,8 @@ enum automod_action_type : uint8_t {
 	 */
 	amod_action_send_alert = 2,
 	/**
-	 * @brief time out the user
+	 * @brief timeout the user
+	 * @note Can only be set up for rules with trigger types of dpp::amod_type_keyword and dpp::amod_type_mention_spam
 	 */
 	amod_action_timeout = 3,
 };
@@ -80,7 +82,7 @@ enum automod_event_type : uint8_t {
  */
 enum automod_trigger_type : uint8_t {
 	/**
-	 * @brief Check if content contains words from a user defined list of keywords
+	 * @brief Check if content contains words from a user defined list of keywords (max 6 of this type per guild)
 	 */
 	amod_type_keyword = 1,
 	/**
@@ -89,27 +91,28 @@ enum automod_trigger_type : uint8_t {
 	 */
 	amod_type_harmful_link = 2,
 	/**
-	 * @brief Check if content represents generic spam
+	 * @brief Check if content represents generic spam (max 1 of this type per guild)
 	 */
 	amod_type_spam = 3,
 	/**
-	 * @brief Check if content contains words from discord pre-defined wordsets
+	 * @brief Check if content contains words from discord pre-defined wordsets (max 1 of this type per guild)
 	 */
 	amod_type_keyword_preset = 4,
 	/**
-	 * @brief Check if content contains more mentions than allowed
+	 * @brief Check if content contains more mentions than allowed (max 1 of this type per guild)
 	 */
 	amod_type_mention_spam = 5,
 };
 
 /**
- * @brief Metadata associated with an automod action
+ * @brief Metadata associated with an automod action. Different fields are relevant based on the value of dpp::automod_rule::trigger_type.
  */
 struct DPP_EXPORT automod_metadata : public json_interface<automod_metadata> {
 	/**
-	 * @brief @brief Substrings which will be searched for in content.
+	 * @brief @brief Substrings which will be searched for in content (Maximum of 1000).
 	 *
-	 * Each keyword can be a phrase which contains multiple words. All keywords are case insensitive.
+	 * Each keyword can be a phrase which contains multiple words.
+	 * All keywords are case insensitive and can be up to 60 characters.
 	 *
 	 * Wildcard symbols (`*`) can be used to customize how each keyword will be matched.
 	 *
@@ -147,15 +150,57 @@ struct DPP_EXPORT automod_metadata : public json_interface<automod_metadata> {
 	std::vector<std::string> keywords;
 
 	/**
+	 * @brief Regular expression patterns which will be matched against content (Maximum of 10).
+	 *
+	 * Only Rust flavored regex is currently supported, which can be tested in online editors such as [Rustexp](https://rustexp.lpil.uk/).
+	 * Each regex pattern can be up to 260 characters.
+	 */
+	std::vector<std::string> regex_patterns;
+
+	/**
 	 * @brief Preset keyword list types to moderate
 	 * @see automod_preset_type
 	 */
 	std::vector<automod_preset_type> presets;
 
 	/**
-	 * @brief Substrings which will be exempt from triggering the automod_metadata::presets trigger type.
+	 * @brief Substrings which should not trigger the rule (Maximum of 100 for the trigger type dpp::amod_type_keyword, Maximum of 1000 for the trigger type dpp::amod_type_keyword_preset).
 	 *
-	 * Each keyword can be a phrase which contains multiple words. All keywords are case insensitive.
+	 * Each keyword can be a phrase which contains multiple words.
+	 * All keywords are case insensitive and can be up to 60 characters.
+	 *
+	 * Wildcard symbols (`*`) can be used to customize how each keyword will be matched.
+	 *
+	 * **Examples for the `*` wildcard symbol:**
+	 *
+	 * Prefix - word must start with the keyword
+	 *
+	 * | keyword  | matches                             |
+     * |----------|-------------------------------------|
+     * | cat*     | <u><b>cat</b></u>ch, <u><b>Cat</b></u>apult, <u><b>CAt</b></u>tLE |
+     * | the mat* | <u><b>the mat</b></u>rix                      |
+     *
+     * Suffix - word must end with the keyword
+     *
+     * | keyword  | matches                  |
+     * |----------|--------------------------|
+     * | *cat     | wild<u><b>cat</b></u>, copy<u><b>Cat</b></u> |
+     * | *the mat | brea<u><b>the mat</b></u>          |
+     *
+     * Anywhere - keyword can appear anywhere in the content
+     *
+     * | keyword   | matches                     |
+     * |-----------|-----------------------------|
+     * | \*cat*     | lo<u><b>cat</b></u>ion, edu<u><b>Cat</b></u>ion |
+     * | \*the mat* | brea<u><b>the mat</b></u>ter          |
+     *
+     * Whole Word - keyword is a full word or phrase and must be surrounded by whitespace at the beginning and end
+     *
+     * | keyword | matches     |
+     * |---------|-------------|
+     * | cat     | <u><b>Cat</b></u>     |
+     * | the mat | <u><b>the mat</b></u> |
+     *
 	 */
 	std::vector<std::string> allow_list;
 
@@ -163,6 +208,11 @@ struct DPP_EXPORT automod_metadata : public json_interface<automod_metadata> {
 	 * @brief Total number of unique role and user mentions allowed per message (Maximum of 50)
 	 */
 	uint8_t mention_total_limit;
+
+	/**
+	 * @brief Whether to automatically detect mention raids
+	 */
+	bool mention_raid_protection_enabled;
 
 	/**
 	 * @brief Construct a new automod metadata object
@@ -201,15 +251,19 @@ struct DPP_EXPORT automod_action : public json_interface<automod_action> {
 	automod_action_type type;
 
 	/**
-	 * @brief Channel ID, for type dpp::amod_action_send_alert
+	 * @brief Channel ID to which user content should be logged, for type dpp::amod_action_send_alert
 	 */
 	snowflake channel_id;
 
 	/**
-	 * @brief Timeout duration in seconds (Maximum of 2419200), for dpp::amod_action_timeout
-	 * 
+	 * @brief Additional explanation that will be shown to members whenever their message is blocked. For type dpp::amod_action_block_message
 	 */
-	int32_t duration_seconds;
+	std::string custom_message;
+
+	/**
+	 * @brief Timeout duration in seconds (Maximum of 2419200), for dpp::amod_action_timeout
+	 */
+	uint32_t duration_seconds;
 
 	/**
 	 * @brief Construct a new automod action object

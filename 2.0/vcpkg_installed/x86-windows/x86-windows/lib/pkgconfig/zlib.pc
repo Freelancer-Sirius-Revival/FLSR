@@ -1,5 +1,4 @@
 prefix=${pcfiledir}/../..
-
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 sharedlibdir=${prefix}/lib
@@ -10,5 +9,6 @@ Description: zlib compression library
 Version: 1.2.13
 
 Requires:
-Libs: -L"${libdir}" -L"${sharedlibdir}" -lzlib
-Cflags: -I"${includedir}"
+Libs: "-L${libdir}" "-L${sharedlibdir}" -lzlib
+Cflags: "-I${includedir}"
+

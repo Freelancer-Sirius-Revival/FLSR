@@ -38,12 +38,14 @@ namespace API {
 
             {
                 std::lock_guard<std::mutex> lock(m_Mutex);
-
+                HkLoadStringDLLs();
                 struct PlayerData* pPD = 0;
 
                 while (pPD = Players.traverse_active(pPD)) {
                     int iRank = pPD->iRank;
                     uint iShipArch = pPD->iShipArchetype;
+                    Archetype::Ship* ship = Archetype::GetShip(iShipArch);
+                    std::wstring wscShipName = HkGetWStringFromIDS(ship->iIdsName).c_str();
                     uint iClientID = HkGetClientIdFromPD(pPD);
 
                     std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
@@ -53,10 +55,22 @@ namespace API {
                     HkGetPlayerInfo(wscCharname, pi, false);
                     auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
 
+                    // get affiliation
+                    int iRep;
+                    pub::Player::GetRep(iClientID, iRep);
+                    uint iAff;
+                    pub::Reputation::GetAffiliation(iRep, iAff);
+                    uint iIDS = Reputation::get_name(iAff);
+                    std::wstring wscFaction = HkGetWStringFromIDS(iIDS);
+
+
+
+
                     json playerData;
                     playerData["charname"] = scCharname;
-                    playerData["shipArch"] = std::to_string(iShipArch);
+                    playerData["ship"] = wstos(wscShipName);
                     playerData["ping"] = std::to_string(ping);
+                    playerData["faction"] = wstos(wscFaction);
 
                     playerList.push_back(playerData);
                 }

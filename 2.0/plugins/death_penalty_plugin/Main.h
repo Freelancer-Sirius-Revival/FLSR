@@ -38,7 +38,7 @@
 
 //Nekura
 
-    #define CMP_DUMP_FOLDER "\\flhook_plugins\\flsr-cmpdumps\\"
+    #define Globals::CMP_DUMP_FOLDER "\\flhook_plugins\\flsr-cmpdumps\\"
 
     struct CMPDump_Entry {
         bool bisCollGroup;

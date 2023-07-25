@@ -453,7 +453,7 @@ namespace AntiCheat {
             CAccount *acc = Players.FindAccountFromClientID(iClientID);
             std::wstring wscAccDir;
             HkGetAccountDirName(acc, wscAccDir);
-            std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+            std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
             std::string scACFile = CHEATREPORT_STORE;
             std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
             std::string Charname = wstos(wscCharname);
@@ -462,7 +462,7 @@ namespace AntiCheat {
             HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
             std::string scFilename = wstos(wscFilename);
             scACFile = scACFile + scFilename + "_" + sTime + ".html";
-            std::ifstream RTPL(std::string(szCurDir) + AC_REPORT_TPL);
+            std::ifstream RTPL(std::string(szCurDir) + Globals::AC_REPORT_TPL);
 
             std::string AllCharnames;
             //Get Charnames on ID
@@ -480,7 +480,7 @@ namespace AntiCheat {
 
             //TPL
             std::ostringstream fileContentsStream;
-            fileContentsStream << std::ifstream(std::string(szCurDir) + AC_REPORT_TPL).rdbuf();
+            fileContentsStream << std::ifstream(std::string(szCurDir) + Globals::AC_REPORT_TPL).rdbuf();
             std::string RTPL_STR = fileContentsStream.str();
 
 
@@ -529,7 +529,7 @@ namespace AntiCheat {
 
     // AC Tools
     namespace DataGrab {
-        void CharnameToFLHOOKUSER_FILE(uint iClientID) {
+        void CharnameToFLHOOKUSER_FILE (uint iClientID) {
             std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
             std::string scCharname = wstos(wscCharname);
             std::string scBase64Charname = "-> " + Tools::base64_encode((const unsigned char *)scCharname.c_str(), scCharname.length());
@@ -538,7 +538,7 @@ namespace AntiCheat {
             CAccount *acc = Players.FindAccountFromClientID(iClientID);
             std::wstring wscAccDir;
             HkGetAccountDirName(acc, wscAccDir);
-            std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+            std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 
 
             //SaveCharnames        

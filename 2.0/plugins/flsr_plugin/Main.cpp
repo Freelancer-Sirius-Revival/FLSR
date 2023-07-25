@@ -14,7 +14,7 @@ void LoadSettings() {
     // Konfigpfad
     char szCurDir[MAX_PATH];
     GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-    std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
+    std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
     //Load HashMap
     if (Tools::ReadIniNicknames())
@@ -53,7 +53,7 @@ void LoadSettings() {
         //Read Settings
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scCarrier = std::string(szCurDir) + CARRIER_CONFIG_FILE;
+        std::string scCarrier = std::string(szCurDir) + Globals::CARRIER_CONFIG_FILE;
         
         //Lade CarrierIDs
         Docking::lCarrierConfig.clear();
@@ -182,7 +182,7 @@ void LoadSettings() {
         Tools::get_cmpExceptions();
         
         //Update CMPFiles
-        Tools::get_cmpfiles(DATADIR + std::string("\\SHIPS"));
+        Tools::get_cmpfiles(Globals::DATADIR + std::string("\\SHIPS"));
 		ConPrint(L"Module loaded: CMPUpdate with " + std::to_wstring(Tools::lCMPUpdateExceptions.size()) + L" Exceptions\n");
     }
     

@@ -8,7 +8,7 @@ namespace CustomMissions {
 
 		char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string sMissionStoreFolder = std::string(szCurDir) + MISSION_STORE;
+        std::string sMissionStoreFolder = std::string(szCurDir) + Globals::MISSION_STORE;
 
         // Load all missions from the mission store
 		lCustomMission.clear();

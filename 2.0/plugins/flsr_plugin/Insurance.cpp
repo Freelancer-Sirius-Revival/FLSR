@@ -68,8 +68,8 @@ namespace Insurance {
             }
             else if (isAmmoClass(aType, iClientID)) {
 
-                //ConPrint(L"found Ammo item\n");
-                //ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
+                ConPrint(L"found Ammo item\n");
+                ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
 
                 const GoodInfo* gi = GoodList_get()->find_by_id(cargo.iArchID);
                 if (gi) {
@@ -151,7 +151,7 @@ namespace Insurance {
         if (iCalculatedPrice <= iCash) {
             char szCurDir[MAX_PATH];
             GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-            std::string scInsuranceStore = std::string(szCurDir) + INSURANCE_STORE;
+            std::string scInsuranceStore = std::string(szCurDir) + Globals::INSURANCE_STORE;
             std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
             std::string Charname = wstos(wscCharname);
             std::wstring wscFilename;
@@ -239,7 +239,7 @@ namespace Insurance {
 
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scInsuranceStore = std::string(szCurDir) + INSURANCE_STORE;
+        std::string scInsuranceStore = std::string(szCurDir) + Globals::INSURANCE_STORE;
         std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
@@ -381,14 +381,14 @@ namespace Insurance {
                         {
 
                             Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
-                            //ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                             bAdded = true;
 
                         }
                         else {
                             std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
                             HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
-                           //ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                             bAdded = true;
 
                         }
@@ -425,7 +425,7 @@ namespace Insurance {
                     aType == Archetype::MINE ||
                     aType == Archetype::COUNTER_MEASURE)
                 {
-                    //ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                    ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
 
                     Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, iterInsuranceEquip->CARGO_INFO.iCount, false);
                     bAdded = true;
@@ -763,7 +763,7 @@ namespace Insurance {
         CAccount *acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
-        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
@@ -796,7 +796,7 @@ namespace Insurance {
         CAccount* acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
-        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 
         std::wstring wscCharFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
@@ -881,7 +881,7 @@ namespace Insurance {
         CAccount* acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
-        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 
         std::wstring wscCharFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFilename);
@@ -961,7 +961,7 @@ namespace Insurance {
         CAccount* acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
-        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 
         std::wstring wscFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);

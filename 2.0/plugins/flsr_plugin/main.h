@@ -36,26 +36,7 @@ extern PLUGIN_RETURNCODE returncode;
 #define ADDR_CLIENT_NEWPLAYER 0x8010
 #define ADDR_CRCANTICHEAT 0x6FAF0
 
-//FilePaths
-#define PLUGIN_CONFIG_FILE "\\flhook_plugins\\flsr.cfg"
-#define DOCK_CONFIG_FILE "\\flhook_plugins\\flsr-dock.cfg"
-#define PATHSELECTION_CONFIG_FILE "\\flhook_plugins\\flsr-pathselection.cfg"
-#define CARRIER_CONFIG_FILE "\\flhook_plugins\\FLSR-Carrier.cfg"
-#define CLOAK_CONFIG_FILE "\\flhook_plugins\\FLSR-Cloak.cfg"
-#define FLHOOKUSER_FILE "\\flhookuser.ini"
-#define SENDCASHLOG_FILE "-givecashlog.txt"
-#define INSURANCE_STORE "\\flhook_plugins\\flsr-insurance\\"
-#define LIBRELANCER_SDK "\\flhook_plugins\\librelancer-sdk\\"
-#define CMP_DUMP_FOLDER "\\flhook_plugins\\flsr-cmpdumps\\"
-#define MISSION_STORE "\\flhook_plugins\\missions\\"
-#define Equip_WHITELIST_FILE "\\flhook_plugins\\FLSR-EquipWhiteList.cfg"
-#define AC_REPORT_TPL "\\flhook_plugins\\flsr-cheater\\ReportTemplate.html"
-#define PVP_FIGHTINFO "\\flhook_plugins\\FightInfo.cfg"
-#define DATADIR "..\\DATA"
-
 //-Static
-#define DISCORD_WEBHOOK_UVCHAT_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\webhook.exe"
-#define DISCORD_WEBHOOK_MODREQUEST_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\modrequest.exe"
 #define DISCORD_WEBHOOK_CHEATREPORT_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\cheatreport.exe"
 #define CHEATREPORT_STORE "C:\\Caddy\\files\\cheater\\"
 
@@ -66,31 +47,56 @@ extern std::mutex m_Mutex;
 typedef void(__stdcall *_CRCAntiCheat)();
 extern _CRCAntiCheat CRCAntiCheat_FLSR;
 
-//SQL Defines
-#define SQLITE_OPEN_READONLY         0x00000001  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_DELETEONCLOSE    0x00000008  /* VFS only */
-#define SQLITE_OPEN_EXCLUSIVE        0x00000010  /* VFS only */
-#define SQLITE_OPEN_AUTOPROXY        0x00000020  /* VFS only */
-#define SQLITE_OPEN_URI              0x00000040  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_MEMORY           0x00000080  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_MAIN_DB          0x00000100  /* VFS only */
-#define SQLITE_OPEN_TEMP_DB          0x00000200  /* VFS only */
-#define SQLITE_OPEN_TRANSIENT_DB     0x00000400  /* VFS only */
-#define SQLITE_OPEN_MAIN_JOURNAL     0x00000800  /* VFS only */
-#define SQLITE_OPEN_TEMP_JOURNAL     0x00001000  /* VFS only */
-#define SQLITE_OPEN_SUBJOURNAL       0x00002000  /* VFS only */
-#define SQLITE_OPEN_SUPER_JOURNAL    0x00004000  /* VFS only */
-#define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_SHAREDCACHE      0x00020000  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_PRIVATECACHE     0x00040000  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_WAL              0x00080000  /* VFS only */
-#define SQLITE_OPEN_NOFOLLOW         0x01000000  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_EXRESCODE        0x02000000  /* Extended result codes */
-
 //Namespaces
+
+namespace Globals {
+
+    //FilePaths
+    const std::string PLUGIN_CONFIG_FILE = "\\flhook_plugins\\flsr.cfg";
+    const std::string DOCK_CONFIG_FILE = "\\flhook_plugins\\flsr-dock.cfg";
+    const std::string PATHSELECTION_CONFIG_FILE = "\\flhook_plugins\\flsr-pathselection.cfg";
+    const std::string CARRIER_CONFIG_FILE = "\\flhook_plugins\\FLSR-Carrier.cfg";
+    const std::string CLOAK_CONFIG_FILE = "\\flhook_plugins\\FLSR-Cloak.cfg";
+    const std::string FLHOOKUSER_FILE = "\\flhookuser.ini";
+    const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
+    const std::string INSURANCE_STORE = "\\flhook_plugins\\flsr-insurance\\";
+    const std::string LIBRELANCER_SDK = "\\flhook_plugins\\librelancer-sdk\\";
+    const std::string CMP_DUMP_FOLDER = "\\flhook_plugins\\flsr-cmpdumps\\";
+    const std::string MISSION_STORE = "\\flhook_plugins\\missions\\";
+    const std::string Equip_WHITELIST_FILE = "\\flhook_plugins\\FLSR-EquipWhiteList.cfg";
+    const std::string AC_REPORT_TPL = "\\flhook_plugins\\flsr-cheater\\ReportTemplate.html";
+    const std::string PVP_FIGHTINFO = "\\flhook_plugins\\FightInfo.cfg";
+    const std::string DATADIR = "..\\DATA";
+
+    //SQL 
+    enum SQLOpenFlags {
+        OPEN_READONLY = 0x00000001,
+        OPEN_READWRITE = 0x00000002,
+        OPEN_CREATE = 0x00000004,
+        OPEN_DELETEONCLOSE = 0x00000008,
+        OPEN_EXCLUSIVE = 0x00000010,
+        OPEN_AUTOPROXY = 0x00000020,
+        OPEN_URI = 0x00000040,
+        OPEN_MEMORY = 0x00000080,
+        OPEN_MAIN_DB = 0x00000100,
+        OPEN_TEMP_DB = 0x00000200,
+        OPEN_TRANSIENT_DB = 0x00000400,
+        OPEN_MAIN_JOURNAL = 0x00000800,
+        OPEN_TEMP_JOURNAL = 0x00001000,
+        OPEN_SUBJOURNAL = 0x00002000,
+        OPEN_SUPER_JOURNAL = 0x00004000,
+        OPEN_NOMUTEX = 0x00008000,
+        OPEN_FULLMUTEX = 0x00010000,
+        OPEN_SHAREDCACHE = 0x00020000,
+        OPEN_PRIVATECACHE = 0x00040000,
+        OPEN_WAL = 0x00080000,
+        OPEN_NOFOLLOW = 0x01000000,
+        OPEN_EXRESCODE = 0x02000000
+    };
+
+
+}
+
 namespace Modules {
     struct Module {
         std::string scModuleName;
@@ -1259,5 +1265,38 @@ namespace API {
     void StartUp();
 
 } // namespace API
+
+namespace SrvCtrlObj {
+
+    struct SrvObj {
+        //Name
+        std::string scSrvObjNickname;
+
+        //Type
+        std::string scType;
+
+        //Coords
+        float x;
+        float y;
+        float z;
+
+        //Orientation
+        Matrix m;
+
+        //System
+        std::string scSystem;
+
+        //ShipArch
+        std::string scShipArch;
+
+        //Loadout
+        std::string scLoadOut;
+
+        //AI
+        pub::AI::SetPersonalityParams p;
+    };
+
+
+}// namespace SrvCtrlObj
 
 #endif

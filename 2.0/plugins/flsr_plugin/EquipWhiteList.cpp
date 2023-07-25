@@ -9,7 +9,7 @@ namespace EquipWhiteList {
 		//Read Settings
 		char szCurDir[MAX_PATH];
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scEquipWhiteList = std::string(szCurDir) + Equip_WHITELIST_FILE;
+		std::string scEquipWhiteList = std::string(szCurDir) + Globals::Equip_WHITELIST_FILE;
 
 		//Clear old data
 		lEquipWhiteList.clear();

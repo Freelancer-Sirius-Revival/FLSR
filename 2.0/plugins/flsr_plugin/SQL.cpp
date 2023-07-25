@@ -11,7 +11,7 @@ namespace SQL {
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
 		scDbName = std::string(szCurDir) + "\\flhook_plugins\\flsr.db3";
 
-		SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+		SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
         CheckAndCreateDuelRankingTable();
         CheckAndCreateFFARankingTable();
@@ -25,7 +25,7 @@ namespace SQL {
     {
         try
         {
-            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
             // Überprüfen, ob die Tabelle "DuelRanking" existiert
             SQLite::Statement queryCheckTable(db, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='DuelRanking'");
@@ -49,7 +49,7 @@ namespace SQL {
     {
         try
         {
-            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
             // Überprüfen, ob die Tabelle "DuelRanking" existiert
             SQLite::Statement queryCheckTable(db, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='FFARanking'");
@@ -73,7 +73,7 @@ namespace SQL {
     {
         try
         {
-            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
             // Überprüfen, ob die Tabelle "DuelRanking" existiert
             SQLite::Statement queryCheckTable(db, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='PVPRanking'");
@@ -97,7 +97,7 @@ namespace SQL {
     {
         try
         {
-            SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+            SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
             // Überprüfen, ob die Tabelle "DuelRanking" existiert
             SQLite::Statement queryCheckTable(db, "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='PVERanking'");

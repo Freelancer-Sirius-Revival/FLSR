@@ -38,7 +38,7 @@ const char *EquipmentUtilities::FindNickname(uint hash) {
 
 /** Read freelancer data to determine mod settings. */
 void EquipmentUtilities::ReadIniNicknames() {
-    std::string dataDirPath = "..\\data";
+    std::string Globals::DATADIRPath = "..\\data";
 
     INI_Reader ini;
     if (ini.open("freelancer.ini", false)) {
@@ -46,7 +46,7 @@ void EquipmentUtilities::ReadIniNicknames() {
             if (ini.is_header("Freelancer")) {
                 while (ini.read_value()) {
                     if (ini.is_value("data path")) {
-                        dataDirPath = ini.get_value_string();
+                        Globals::DATADIRPath = ini.get_value_string();
                         break;
                     }
                 }
@@ -61,13 +61,13 @@ void EquipmentUtilities::ReadIniNicknames() {
             if (ini.is_header("Data")) {
                 while (ini.read_value()) {
                     if (ini.is_value("equipment")) {
-                        ReadIniNicknameFile(dataDirPath + std::string("\\") + ini.get_value_string());
+                        ReadIniNicknameFile(Globals::DATADIRPath + std::string("\\") + ini.get_value_string());
                     } else if (ini.is_value("ships")) {
-                        ReadIniNicknameFile(dataDirPath + std::string("\\") + ini.get_value_string());
+                        ReadIniNicknameFile(Globals::DATADIRPath + std::string("\\") + ini.get_value_string());
                     } else if (ini.is_value("goods")) {
-                        ReadIniNicknameFile(dataDirPath + std::string("\\") + ini.get_value_string());
+                        ReadIniNicknameFile(Globals::DATADIRPath + std::string("\\") + ini.get_value_string());
                     } else if (ini.is_value("loadouts")) {
-                        ReadIniNicknameFile(dataDirPath + std::string("\\") + ini.get_value_string());
+                        ReadIniNicknameFile(Globals::DATADIRPath + std::string("\\") + ini.get_value_string());
                     }
                 }
             }

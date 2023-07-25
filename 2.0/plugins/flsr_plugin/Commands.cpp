@@ -412,7 +412,7 @@ namespace Commands {
             CAccount* acc = Players.FindAccountFromClientID(iClientID);
             std::wstring wscAccDir;
             HkGetAccountDirName(acc, wscAccDir);
-            std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+            std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
             std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
             std::string Charname = wstos(wscCharname);
             std::wstring wscFilename;
@@ -441,7 +441,7 @@ namespace Commands {
                 //DeleteInsurance
                 char szCurDir[MAX_PATH];
                 GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-                std::string scInsuranceStore = std::string(szCurDir) + INSURANCE_STORE;
+                std::string scInsuranceStore = std::string(szCurDir) + Globals::INSURANCE_STORE;
                 std::string sInsurancepath = scInsuranceStore + scFilename + ".cfg";
                 remove(sInsurancepath.c_str());
                 
@@ -470,7 +470,7 @@ namespace Commands {
         CAccount* acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
-        std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+        std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 
         // Charfilename
         std::wstring wscCharFilename;
@@ -563,7 +563,7 @@ namespace Commands {
         //Insurance Store
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scInsuranceStore = std::string(szCurDir) + INSURANCE_STORE;
+        std::string scInsuranceStore = std::string(szCurDir) + Globals::INSURANCE_STORE;
 
         //Get Insurance State
         bool bisInsured = Insurance::insurace_exists(scInsuranceStore + scCharFilename + ".cfg");

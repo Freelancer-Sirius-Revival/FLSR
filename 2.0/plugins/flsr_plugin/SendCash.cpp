@@ -3,7 +3,7 @@
 namespace SendCash {
 
     void LogTransfer(std::wstring wscToCharname, std::wstring msg) {
-        std::string logFile = GetUserFilePath(wscToCharname, SENDCASHLOG_FILE);
+        std::string logFile = GetUserFilePath(wscToCharname, Globals::SENDCASHLOG_FILE);
         if (logFile.empty())
             return;
         FILE *f;

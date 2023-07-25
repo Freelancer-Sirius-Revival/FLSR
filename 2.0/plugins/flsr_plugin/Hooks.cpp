@@ -104,7 +104,7 @@ namespace Hooks {
 
         if (SpawnProtection::IsSpawnProtectionActive(iDmgTo))
         {
-            ConPrint(L"DMG WHILE PROTECTED\n");
+            //ConPrint(L"DMG WHILE PROTECTED\n");
             returncode = SKIPPLUGINS_NOFUNCTIONCALL;
             return;
 		}

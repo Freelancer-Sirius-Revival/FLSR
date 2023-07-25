@@ -11,7 +11,7 @@ namespace SpawnProtection {
         // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
         g_spawnProtectionDuration = IniGetI(scPluginCfgFile, "SpawnProtection", "ProtectionDuration", 0);
         if (g_spawnProtectionDuration == 0) {

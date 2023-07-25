@@ -11,7 +11,7 @@ namespace Modules {
         // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
         //Load Module-Settings
         ConPrint(L"\n----------LOADING FLSR-Modules----------\n");

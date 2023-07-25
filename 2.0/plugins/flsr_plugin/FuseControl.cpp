@@ -79,7 +79,7 @@ namespace FuseControl {
 
     bool ReadIniFuseConfig() {
 
-        std::string dataDirPath = DATADIR;
+        std::string dataDirPath = Globals::DATADIR;
         bool bReturn = false;
 
         //Ship, Solar ini

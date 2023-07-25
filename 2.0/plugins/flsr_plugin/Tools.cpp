@@ -72,7 +72,7 @@ namespace Tools {
                 char szCurDir[MAX_PATH];
                 GetCurrentDirectory(sizeof(szCurDir), szCurDir);
 
-                std::string cmpDump = std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string();
+                std::string cmpDump = std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string();
 
                 cmpDump = cmpDump + ".cmp_dump";
 
@@ -338,7 +338,7 @@ namespace Tools {
         //Configpath
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
         //Clear List
         lCMPUpdateExceptions.clear();
@@ -362,16 +362,16 @@ namespace Tools {
 
 
         //Check if Librelancer-SDK is installed
-        if (!std::filesystem::exists(std::string(szCurDir) + std::string(LIBRELANCER_SDK) + "lleditscript.exe"))
+        if (!std::filesystem::exists(std::string(szCurDir) + std::string(Globals::LIBRELANCER_SDK) + "lleditscript.exe"))
         {
-            ConPrint(L"Error: Librelancer-SDK is not properly installed please reinstall it to path: \n" + stows(std::string(szCurDir) + std::string(LIBRELANCER_SDK)) + L"\n");
+            ConPrint(L"Error: Librelancer-SDK is not properly installed please reinstall it to path: \n" + stows(std::string(szCurDir) + std::string(Globals::LIBRELANCER_SDK)) + L"\n");
             return;
         }
    
         //Check if Dumpfolder Exists
-        if (!std::filesystem::exists(std::string(szCurDir) + CMP_DUMP_FOLDER))
+        if (!std::filesystem::exists(std::string(szCurDir) + Globals::CMP_DUMP_FOLDER))
         {
-            std::filesystem::create_directory(std::string(szCurDir) + CMP_DUMP_FOLDER);
+            std::filesystem::create_directory(std::string(szCurDir) + Globals::CMP_DUMP_FOLDER);
         }
 
         //Copy into Dump Folder if not exist or file changed
@@ -401,13 +401,13 @@ namespace Tools {
 
                     //Hash Files
                     std::string pathFileA = p.path().string();
-                    std::string pathFileB = std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string();
+                    std::string pathFileB = std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string();
 
                     if (!std::filesystem::exists(pathFileB))
                     {
                         ConPrint(L"New CMP found: " + stows(f.filename().string()) + L" - ");
-                        std::filesystem::copy_file(p.path(), std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string(), std::filesystem::copy_options::update_existing);
-                        std::string parameters = "/C \"\"" + std::string(szCurDir) + std::string(LIBRELANCER_SDK) + "lleditscript.exe\"" + " \"" + std::string(szCurDir) + std::string(LIBRELANCER_SDK) + "dumpcmp.cs-script\" \"" + std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string() + "\" > \"" + std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string() + ".cmp_dump\"";
+                        std::filesystem::copy_file(p.path(), std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string(), std::filesystem::copy_options::update_existing);
+                        std::string parameters = "/C \"\"" + std::string(szCurDir) + std::string(Globals::LIBRELANCER_SDK) + "lleditscript.exe\"" + " \"" + std::string(szCurDir) + std::string(Globals::LIBRELANCER_SDK) + "dumpcmp.cs-script\" \"" + std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string() + "\" > \"" + std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string() + ".cmp_dump\"";
                         ConPrint(L"Dumping - ");
                         system(("cmd " + parameters).c_str());
                         ConPrint(L"done\n");
@@ -453,8 +453,8 @@ namespace Tools {
                         //ConPrint(L"FileChangedA: " + stows(pathFileA + "\n"));
                         //ConPrint(L"FileChangedB: " + stows(pathFileB + "\n"));
 
-                        std::filesystem::copy_file(p.path(), std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string(), std::filesystem::copy_options::update_existing);
-                        std::string parameters = "/C \"\"" + std::string(szCurDir) + std::string(LIBRELANCER_SDK) + "lleditscript.exe\"" + " \"" + std::string(szCurDir) + std::string(LIBRELANCER_SDK) + "dumpcmp.cs-script\" \"" + std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string() + "\" > \"" + std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string() + ".cmp_dump\"";
+                        std::filesystem::copy_file(p.path(), std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string(), std::filesystem::copy_options::update_existing);
+                        std::string parameters = "/C \"\"" + std::string(szCurDir) + std::string(Globals::LIBRELANCER_SDK) + "lleditscript.exe\"" + " \"" + std::string(szCurDir) + std::string(Globals::LIBRELANCER_SDK) + "dumpcmp.cs-script\" \"" + std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string() + "\" > \"" + std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string() + ".cmp_dump\"";
                         ConPrint(L"Dumping - ");
                         system(("cmd " + parameters).c_str());
                         ConPrint(L"done\n");
@@ -704,7 +704,7 @@ namespace Tools {
     /** Read freelancer data to determine mod settings. */
     bool ReadIniNicknames() {
 
-        std::string dataDirPath = DATADIR;
+        std::string dataDirPath = Globals::DATADIR;
         bool bReturn = false;
 
         INI_Reader ini;
@@ -992,7 +992,7 @@ namespace Tools {
     }
 
     void ParsePathsFromFile(std::vector<Edge>& edges) {
-        std::string filename = std::string(DATADIR) + "\\UNIVERSE\\systems_shortest_path.ini";
+        std::string filename = std::string(Globals::DATADIR) + "\\UNIVERSE\\systems_shortest_path.ini";
         std::ifstream file(filename);
         if (!file.is_open()) {
             ConPrint(L"ParsePathsFromFile-Error: Could not open file " + stows(filename));

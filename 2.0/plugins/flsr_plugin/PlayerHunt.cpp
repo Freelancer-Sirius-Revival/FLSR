@@ -23,7 +23,7 @@ namespace PlayerHunt {
 		// Konfigpfad
 		char szCurDir[MAX_PATH];
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
+		std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
 		set_fRewardMultiplicator = IniGetF(scPluginCfgFile, "PlayerHunt", "RewardMultiplicator", 0.5f);
 		set_iMinTargetSystemDistance = IniGetI(scPluginCfgFile, "PlayerHunt", "MinTargetSystemDistance", 4);
@@ -594,9 +594,19 @@ namespace PlayerHunt {
 
 				//Discord Chat
 				std::wstring wscMessage = wscCharname + L" has started a player hunt! The target system is " + wscSystemname + L"!";
-				ShellExecute(NULL, "open", DISCORD_WEBHOOK_UVCHAT_FILE, wstos(L"FLSR: " + wscMessage).c_str(), NULL, NULL);
 
-				
+				{//Mutex
+					std::lock_guard<std::mutex> lock(m_Mutex);
+
+					//Discord
+					Discord::ChatMessage ChatMsg;
+					ChatMsg.wscCharname = L"FL:SR";
+					ChatMsg.wscChatMessage = wscMessage;
+
+					Discord::lChatMessages.push_back(ChatMsg);
+
+
+				}				
 				return;
 			}
 			case HUNT_STATE_LOST:

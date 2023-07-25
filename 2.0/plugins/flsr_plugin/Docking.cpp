@@ -78,7 +78,7 @@ namespace Docking {
         // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + DOCK_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
@@ -128,7 +128,7 @@ namespace Docking {
         // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + DOCK_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
@@ -264,7 +264,7 @@ namespace Docking {
     {
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + DOCK_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
         std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
@@ -484,7 +484,7 @@ namespace Docking {
     {
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + DOCK_CONFIG_FILE;
+        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
         std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());

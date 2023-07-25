@@ -18,7 +18,7 @@ namespace PopUp {
             CAccount *acc = Players.FindAccountFromClientID(iClientID);
             std::wstring wscAccDir;
             HkGetAccountDirName(acc, wscAccDir);
-            std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+            std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
             std::string sWelcomePopupSend = IniGetS(scUserFile, "Settings", "WelcomePopup", "no");
             if (sWelcomePopupSend == "no") {
 

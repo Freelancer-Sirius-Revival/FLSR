@@ -13,7 +13,7 @@ namespace Cloak {
 		// Konfigpfad
 		char szCurDir[MAX_PATH];
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scPluginCfgFile = std::string(szCurDir) + CLOAK_CONFIG_FILE;
+		std::string scPluginCfgFile = std::string(szCurDir) + Globals::CLOAK_CONFIG_FILE;
 
 		//Clear old data
 		lCloakDeviceList.clear();

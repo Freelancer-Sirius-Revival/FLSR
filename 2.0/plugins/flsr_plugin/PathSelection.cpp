@@ -17,7 +17,7 @@ namespace PathSelection {
 		//Configpath
 		char szCurDir[MAX_PATH];
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scPluginCfgFile = std::string(szCurDir) + PATHSELECTION_CONFIG_FILE;
+		std::string scPluginCfgFile = std::string(szCurDir) + Globals::PATHSELECTION_CONFIG_FILE;
 
 		//Read General 
 		PathSelection::scSystem = IniGetS(scPluginCfgFile, "General", "system", "start");
@@ -94,7 +94,7 @@ namespace PathSelection {
 		CAccount* acc = Players.FindAccountFromClientID(iClientID);
 		std::wstring wscAccDir;
 		HkGetAccountDirName(acc, wscAccDir);
-		std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+		std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 
 		//Get Charname
 		std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
@@ -148,7 +148,7 @@ namespace PathSelection {
 		//Get "iCharnameID"
 		int iCharnameID = CreateID(scCharname.c_str());
 		
-		std::string scUserFile = scAcctPath + wstos(wscAccDir) + FLHOOKUSER_FILE;
+		std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
 		
 		//Set Unlawful
 		IniWrite(scUserFile, "FLSR-Unlawful", std::to_string(iCharnameID), scState);

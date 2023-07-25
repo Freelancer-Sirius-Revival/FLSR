@@ -31,7 +31,7 @@ namespace Discord {
 		// Konfigpfad
 		char szCurDir[MAX_PATH];
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scPluginCfgFile = std::string(szCurDir) + PLUGIN_CONFIG_FILE;
+		std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
 		scDiscordBotToken = IniGetS(scPluginCfgFile, "Discord", "BotToken", "");
 		if (scDiscordBotToken.empty()) {
@@ -317,7 +317,7 @@ namespace Discord {
 				std::string pingString = std::to_string(roundedPing);
 				pingString = pingString.substr(0, pingString.find('.'));
 
-				std::string reply = "Average Ping of all players: " + pingString;
+				std::string reply = "Average Ping of all players: " + pingString + " ms";
 				event.reply(reply);
 			}
 
@@ -629,51 +629,47 @@ namespace Discord {
 
 				HK_ERROR renameResult;
 
-				if (iRenameCost != 0)
+				//Check if new Charname has enough Money
+				int iCash;
+				HkGetCash(wscCharname, iCash);
+				if (iCash < iRenameCost)
 				{
-					//Check if new Charname has enough Money
-					int iCash;
-					HkGetCash(wscCharname, iCash);
-					if (iCash < iRenameCost)
-					{
-						int requiredCash = iRenameCost - iCash;
-						std::string errorMessage = "Sorry, you don't have enough money to rename your character.\n\n"
-							"You need an additional " + std::to_string(requiredCash) + " credits.\n"
-							"The total cost to rename your character is " + wstos(ToMoneyStr(iRenameCost)) + " credits.\n\n"
-							"Character to be renamed: " + scCharnameOld;
+					int requiredCash = iRenameCost - iCash;
+					std::string errorMessage = "Sorry, you don't have enough money to rename your character.\n\n"
+						"You need an additional " + std::to_string(requiredCash) + " credits.\n"
+						"The total cost to rename your character is " + wstos(ToMoneyStr(iRenameCost)) + " credits.\n\n"
+						"Character to be renamed: " + scCharnameOld;
+					DiscordBot.direct_message_create(event.command.usr.id, errorMessage);
+					event.reply();
+					return;
+				}
+
+				{
+					// Mutex sperren
+					std::lock_guard<std::mutex> lock(m_Mutex);
+
+					//Calc new Cash
+
+					// The last error.
+					HK_ERROR err;
+
+					if ((err = HkAddCash(wscCharname, -iRenameCost)) != HKE_OK) {
+						std::string errorMessage = "Sorry, an error occurred while renaming your character.\n\n"
+							"Please try again later.\n\n";
+
 						DiscordBot.direct_message_create(event.command.usr.id, errorMessage);
 						event.reply();
+
 						return;
 					}
 
-					{
-						// Mutex sperren
-						std::lock_guard<std::mutex> lock(m_Mutex);
 
-						//Calc new Cash
+					//FLHook Rename
+					renameResult = HkRename(wscCharname, wscNewCharname, false);
 
-						// The last error.
-						HK_ERROR err;
-
-						if ((err = HkAddCash(wscCharname, -iRenameCost)) != HKE_OK) {
-							std::string errorMessage = "Sorry, an error occurred while renaming your character.\n\n"
-								"Please try again later.\n\n";
-
-							DiscordBot.direct_message_create(event.command.usr.id, errorMessage);
-							event.reply();
-
-							return;
-						}
+				} // Mutex wird hier automatisch freigegeben
 
 
-						//FLHook Rename
-						renameResult = HkRename(wscCharname, wscNewCharname, false);
-
-					} // Mutex wird hier automatisch freigegeben
-
-				}else{
-						renameResult = HKE_OK;
-				}
 
 				if (renameResult == HKE_OK)
 				{
@@ -997,6 +993,7 @@ namespace Discord {
 		
 		DiscordBot.direct_message_create(event.command.usr.id, pageContent);
 	}
+
 	//Embeds
 	template<typename T>
 	void BankEmbed(const T& event)
@@ -1239,7 +1236,7 @@ namespace Discord {
 		try
 		{
 			// Open a database file with UTF-8 encoding
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Prüfe, ob bereits ein Eintrag mit dem Charakterdateinamen existiert
 			SQLite::Statement checkQuery(db, R"(SELECT COUNT(*) FROM "CharManager" WHERE Charfile = ?;)");
@@ -1278,7 +1275,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Vorbereitung des DELETE-Statements
 			SQLite::Statement query(db, R"(DELETE FROM "CharManager" WHERE "Validation" != 'TRUE';)");
@@ -1298,7 +1295,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READONLY);
 
 			// Vorbereitung eines SELECT-Statements mit einem Parameter
 			SQLite::Statement query(db, R"(SELECT "Validation" FROM "CharManager" WHERE Charfile = ?;)");
@@ -1331,7 +1328,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Vorbereitung eines UPDATE-Statements mit einem Parameter
 			SQLite::Statement query(db, R"(UPDATE "CharManager" SET "Validation" = 'TRUE' WHERE Charfile = ?;)");
@@ -1354,7 +1351,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankdatei
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READONLY);
 
 			// Vorbereitung eines SELECT-Statements mit einem Parameter
 			SQLite::Statement query(db, R"(SELECT DiscordAccount FROM CharManager WHERE Charfile = ?;)");
@@ -1384,7 +1381,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Erstelle die SQL-Abfrage
 			std::string sql = "SELECT * FROM CharManager WHERE DiscordAccount = ? AND Charfile = ? AND Validation = ?"; //WTF
@@ -1416,7 +1413,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Erstelle die SQL-Abfrage zum Aktualisieren des Charakternamens
 			std::string sql = "UPDATE CharManager SET Charfile = ? WHERE Charfile = ?";
@@ -1445,7 +1442,7 @@ namespace Discord {
 
 		try {
 			// Verbindung zur Datenbank herstellen
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// SQL-Update-Statement vorbereiten
 			SQLite::Statement query(db, "UPDATE CharManager SET Charname = ? WHERE Charfile = ?");
@@ -1475,7 +1472,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Erstelle die SQL-Abfrage
 			std::string sql = "SELECT Credits FROM Bank WHERE DiscordAccount = ?";
@@ -1504,7 +1501,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READWRITE);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READWRITE);
 
 			// Überprüfen, ob der Discord-Account in der Datenbank existiert
 			std::string sqlCheckAccount = "SELECT COUNT(*) FROM Bank WHERE DiscordAccount = ?";
@@ -1576,7 +1573,7 @@ namespace Discord {
 		try
 		{
 			// Öffne die Datenbankverbindung
-			SQLite::Database db(SQL::scDbName, SQLITE_OPEN_READONLY);
+			SQLite::Database db(SQL::scDbName, Globals::SQLOpenFlags::OPEN_READONLY);
 
 			// Erstelle die SQL-Abfrage
 			std::string sql = "SELECT COUNT(*) FROM CharManager WHERE DiscordAccount = ? AND Validation = 'TRUE'";
@@ -1721,16 +1718,16 @@ namespace Discord {
 
 
 		if (!scServerUsername.empty()) {
-			ConPrint (stows(scServerUsername) + L"\n");
+			//ConPrint (stows(scServerUsername) + L"\n");
 			return scServerUsername;
 		}
 		else if (!dppUser.global_name.empty()) {
-			ConPrint(stows(dppUser.global_name) + L"\n");
+			//ConPrint(stows(dppUser.global_name) + L"\n");
 
 			return dppUser.global_name;
 		}
 		else {
-			ConPrint(stows(dppUser.username) + L"\n");
+			//ConPrint(stows(dppUser.username) + L"\n");
 
 			return dppUser.username;
 		}

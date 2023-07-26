@@ -1,0 +1,457 @@
+duration  =  10000
+
+entities  = 
+{
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, 1 }
+			},
+			pos  =  { 0, 0, 0 }
+		},
+		front  =  2,
+		usr_flg  =  0,
+		entity_name  =  "Ambi_Layer_Basic_cv_01_bar_Ew04_01",
+		type  =  9,
+		srt_grp  =  0,
+		lt_grp  =  0,
+		up  =  1,
+		ambient  =  { 0, 0, 0 }
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.007291, 0, 0.999973 },
+				{ -0.142821, 0.989748, 0.001041 },
+				{ -0.989722, -0.142825, 0.007216 }
+			},
+			pos  =  { 0.957667, 0, -0.356404 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG00_Inf_Ext_Glow",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  0,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 4e-006 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 0.215686, 0.25098, 0.282353 },
+			type  =  3,
+			ambient  =  { 0, 0, 0 },
+			cutoff  =  99.999985,
+			direction  =  { 0, 0, 1 },
+			color  =  { 174, 232, 249 },
+			range  =  2000
+		}
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.799085, 0, -0.601217 },
+				{ 0, 1, 0 },
+				{ 0.601217, 0, 0.799085 }
+			},
+			pos  =  { 2.630128, 0, 0.865694 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG20_Geo_Inf",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  20,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 4e-006 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 1, 1, 1 },
+			type  =  3,
+			ambient  =  { 1, 1, 1 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.636787, 0, -0.77104 },
+				{ 0, 1, 0 },
+				{ 0.77104, 0, 0.636787 }
+			},
+			pos  =  { 2.635458, 0, 1.632055 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG21_TDistant_Amb",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  21,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 0 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 0, 0, 0 },
+			type  =  3,
+			ambient  =  { 1, 1, 1 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.636787, 0, -0.77104 },
+				{ 0, 1, 0 },
+				{ 0.77104, 0, 0.636787 }
+			},
+			pos  =  { 2.667863, 0, -0.525955 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG10_Terrain_Inf",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  10,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 4e-006 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 1, 1, 1 },
+			type  =  3,
+			ambient  =  { 1, 1, 1 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		type  =  7,
+		usr_flg  =  0,
+		entity_name  =  "Ambi_Key_TerrainField_Mkr",
+		srt_grp  =  0,
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, 1 }
+			},
+			pos  =  { 0, 0, 0 }
+		},
+		lt_grp  =  0,
+		template_name  =  ""
+	},
+	{
+		type  =  7,
+		usr_flg  =  0,
+		entity_name  =  "Ambi_Key_DistantRoids_Mkr",
+		srt_grp  =  0,
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.024448, 0, 0.999701 },
+				{ 0, 1, 0 },
+				{ -0.999701, 0, 0.024448 }
+			},
+			pos  =  { 0, 0, 0 }
+		},
+		lt_grp  =  0,
+		template_name  =  ""
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.000107, 0.015646, -0.999878 },
+				{ 0.999977, -0.006817, 0 },
+				{ -0.006816, -0.999854, -0.015646 }
+			},
+			pos  =  { 1.865657, 0, 0.044509 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG09_Set_Amb",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  9,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 0 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 0, 0, 0 },
+			type  =  3,
+			ambient  =  { 0.913726, 0.913726, 0.913726 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ -0.012351, 0, -0.999924 },
+				{ 0, 1, 0 },
+				{ 0.999924, 0, -0.012351 }
+			},
+			pos  =  { 2.675188, 0, 0.158034 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG11_Puffs_Amb",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  11,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 0 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 0, 0, 0 },
+			type  =  3,
+			ambient  =  { 1, 1, 1 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		type  =  7,
+		usr_flg  =  0,
+		entity_name  =  "Ambi_Key_TerrainDyna_Mkr",
+		srt_grp  =  0,
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, 1 }
+			},
+			pos  =  { 0, 0, 0 }
+		},
+		lt_grp  =  0,
+		template_name  =  ""
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.636787, 0, -0.77104 },
+				{ 0, 1, 0 },
+				{ 0.77104, 0, 0.636787 }
+			},
+			pos  =  { 2.667863, 0, -0.525955 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG03_Ships_Inf",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  3,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 0 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 1, 1, 1 },
+			type  =  3,
+			ambient  =  { 1, 1, 1 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  100000
+		}
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 0.636787, 0, -0.77104 },
+				{ 0, 1, 0 },
+				{ 0.77104, 0, 0.636787 }
+			},
+			pos  =  { 2.635458, 0, 1.632055 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG23_Sky_Amb",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  23,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 4e-006 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 0, 0, 0 },
+			type  =  3,
+			ambient  =  { 1, 1, 1 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		type  =  7,
+		usr_flg  =  0,
+		entity_name  =  "Ambi_Key_NebulaClouds_Mkr",
+		srt_grp  =  0,
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, 1 }
+			},
+			pos  =  { 0, 0, 0 }
+		},
+		lt_grp  =  0,
+		template_name  =  ""
+	},
+	{
+		template_name  =  "",
+		spatialprops  = 
+		{
+			orient  = 
+			{
+				{ 1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, 1 }
+			},
+			pos  =  { -2.691281, 6.149895, -0.031646 }
+		},
+		usr_flg  =  0,
+		entity_name  =  "ambi_LtG00_Point_Overhead",
+		type  =  5,
+		srt_grp  =  0,
+		lt_grp  =  0,
+		lightprops  = 
+		{
+			atten  =  { 1, 0, 0 },
+			specular  =  { 0, 0, 0 },
+			on  =  1,
+			theta  =  90,
+			diffuse  =  { 0.87451, 0.823529, 0.623529 },
+			type  =  1,
+			ambient  =  { 0.34902, 0.321569, 0.27451 },
+			cutoff  =  98.999977,
+			direction  =  { 0, 0, 1 },
+			color  =  { 255, 255, 255 },
+			range  =  2000
+		}
+	},
+	{
+		srt_grp = -100,
+		lt_grp = 23,
+		flags = 4,
+		type = 1,
+		template_name = "starsphere_Ew04",
+		userprops =
+		{
+			category = "Prop",
+			NoFog = "Y"
+		},
+		spatialprops =
+		{
+			orient =
+			{
+				{ -1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, -1 }
+			},
+			pos = { 0, 0, 0 }
+		},
+		usr_flg = 1,
+		entity_name = "ambi_starsphere_Ew04_1"
+	},
+	{
+		srt_grp = -101,
+		lt_grp = 23,
+		flags = 4,
+		type = 1,
+		template_name = "starsphere_Ew04_stars",
+		userprops =
+		{
+			category = "Prop",
+			NoFog = "Y"
+		},
+		spatialprops =
+		{
+			orient =
+			{
+				{ -1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, -1 }
+			},
+			pos = { 0, 0, 0 }
+		},
+		usr_flg = 1,
+		entity_name = "ambi_starsphere_Ew04_stars_2"
+	},
+}
+
+events  = 
+{
+	{
+		0,
+		16,
+		{
+			"Ambi_Layer_Basic_cv_01_bar_Ew04_01"
+		},
+		{
+			duration  =  0,
+			fogprops  = 
+			{
+				fogend  =  0,
+				fogstart  =  0,
+				fogmode  =  0,
+				fogcolor  =  { 0, 0, 0 },
+				fogon  =  0,
+				fogdensity  =  0
+			}
+		}
+	}
+}

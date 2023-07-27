@@ -550,7 +550,10 @@ namespace Hooks {
 
 		}
 
-
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            SpawnProtection::UpdateLastSpawnTime(iClientID);
+        }
         
 
     }
@@ -634,8 +637,11 @@ namespace Hooks {
             //ConPrint(L"Spawn\n");
         }
 
-        //SpawnProtection Test
-        SpawnProtection::UpdateLastSpawnTime(iClientID);
+        //SpawnProtection
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            SpawnProtection::UpdateLastSpawnTime(iClientID);
+        }
 
         //Update BaseState
         ClientController::Send_ControlMsg(false, iClientID, L"_InSpaceState");

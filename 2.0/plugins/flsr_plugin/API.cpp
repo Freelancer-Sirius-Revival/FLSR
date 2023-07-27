@@ -27,7 +27,7 @@ namespace API {
 		});
 
         //Online players
-        CROW_ROUTE(app, "/api/players")([]() {
+        CROW_ROUTE(app, "/players")([]() {
 
             crow::response response;
             response.add_header("Content-Type", "application/json");
@@ -40,6 +40,8 @@ namespace API {
                 std::lock_guard<std::mutex> lock(m_Mutex);
                 HkLoadStringDLLs();
                 struct PlayerData* pPD = 0;
+
+                std::list<Tools::RepCB> lFactions = Tools::HkGetFactions();
 
                 while (pPD = Players.traverse_active(pPD)) {
                     int iRank = pPD->iRank;
@@ -56,21 +58,40 @@ namespace API {
                     auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
 
                     // get affiliation
-                    int iRep;
-                    pub::Player::GetRep(iClientID, iRep);
-                    uint iAff;
-                    pub::Reputation::GetAffiliation(iRep, iAff);
-                    uint iIDS = Reputation::get_name(iAff);
-                    std::wstring wscFaction = HkGetWStringFromIDS(iIDS);
+                    std::list<Tools::RepCB> lMaxReputationFactions;
+                    int iPlayerRep;
+                    pub::Player::GetRep(iClientID, iPlayerRep);
+                    for (const auto& faction : lFactions) {
 
+        
+                        float fValue;
+                        pub::Reputation::GetGroupFeelingsTowards(iPlayerRep, faction.iGroup, fValue);
 
+                        // Wenn fValue den Wert 1.0 hat, fügen wir die Fraktion zu lMaxReputationFactions hinzu
+                        if (fValue == 1.0f) {
+                            lMaxReputationFactions.push_back(faction);
+                        }
 
+                    }
 
                     json playerData;
                     playerData["charname"] = scCharname;
                     playerData["ship"] = wstos(wscShipName);
                     playerData["ping"] = std::to_string(ping);
-                    playerData["faction"] = wstos(wscFaction);
+                 
+
+                    if (!lMaxReputationFactions.empty()) {
+                        const Tools::RepCB& firstFaction = lMaxReputationFactions.front();
+                        uint iIDS = Reputation::get_short_name(firstFaction.iGroup);
+                        std::wstring wscFaction = HkGetWStringFromIDS(iIDS);
+
+                        playerData["faction"] = wstos(wscFaction);
+                    }
+                    else {
+                        playerData["faction"] = "";
+                    }
+
+
 
                     playerList.push_back(playerData);
                 }
@@ -83,7 +104,7 @@ namespace API {
         });
 
         //News
-        CROW_ROUTE(app, "/api/news")([]() {
+        CROW_ROUTE(app, "/news")([]() {
 
             crow::response response;
             response.add_header("Content-Type", "application/json");
@@ -97,6 +118,8 @@ namespace API {
                     json newsData;
                     newsData["author"] = Discord::GetDiscordUsername(message.Message.author);
                     newsData["content"] = message.Message.content;
+                    newsData["date"] = message.Message.get_creation_time();
+
 
                     newsList.push_back(newsData);
                 }
@@ -110,7 +133,7 @@ namespace API {
         });
 
         //Events
-        CROW_ROUTE(app, "/api/event")([]() {
+        CROW_ROUTE(app, "/event")([]() {
              
             crow::response response;
             response.add_header("Content-Type", "application/json");
@@ -124,6 +147,7 @@ namespace API {
                     json eventdata;
                     eventdata["author"] = Discord::GetDiscordUsername(message.Message.author);
                     eventdata["content"] = message.Message.content;
+                    eventdata["date"] = message.Message.get_creation_time();
 
                     eventList.push_back(eventdata);
                 }
@@ -137,7 +161,7 @@ namespace API {
         });
 
         //Playerdata
-        CROW_ROUTE(app, "/api/playerdata/<string>")([](const crow::request& req, std::string charname) {
+        CROW_ROUTE(app, "/playerdata/<string>")([](const crow::request& req, std::string charname) {
             {
                 std::lock_guard<std::mutex> lock(m_Mutex);
 

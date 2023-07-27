@@ -4,7 +4,7 @@
   Compilerhash f├╝r Triplet x64-windows wird erkannt...
   Compilerhash f├╝r Triplet x86-windows wird erkannt...
   Alle angeforderten Pakete sind derzeit installiert.
-  Gesamtinstallationszeit: 700 ns
+  Gesamtinstallationszeit: 300 ns
   ÔÇ×crowÔÇ£ stellt CMake-Ziele bereit:
   
       # this is heuristically generated, and may be not correct
@@ -24,10 +24,9 @@
       
       https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
   
-  The package openssl is compatible with built-in CMake targets:
-  
-      find_package(OpenSSL REQUIRED)
-      target_link_libraries(main PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+  dpp provides CMake targets:
+      find_package(dpp CONFIG REQUIRED)
+      target_link_libraries(main PRIVATE dpp::dpp)
   
   The package spdlog provides CMake targets:
   

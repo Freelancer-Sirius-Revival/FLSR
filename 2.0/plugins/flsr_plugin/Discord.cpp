@@ -358,94 +358,7 @@ namespace Discord {
 
 			// Serverstatus
 			if (event.command.get_command_name() == "serverstatus") {
-				if (iOnlinePlayers > 0)
-				{
-					std::vector<std::string> charnames;
-					std::vector<std::string> ships;
-					std::vector<std::string> pings;
-
-					{
-						// Mutex sperren
-						std::lock_guard<std::mutex> lock(m_Mutex);
-
-						struct PlayerData* pPD = 0;
-
-						while (pPD = Players.traverse_active(pPD))
-						{
-							int iRank = pPD->iRank;
-							uint iShipArch = pPD->iShipArchetype;
-							uint iClientID = HkGetClientIdFromPD(pPD);
-							//Charname
-							std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-							std::string scCharname = wstos(wscCharname);
-							//Ping
-							HKPLAYERINFO pi;
-							HkGetPlayerInfo(wscCharname, pi, false);
-							auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
-
-
-							charnames.push_back(scCharname);
-							ships.push_back(std::to_string(iShipArch));
-							pings.push_back(std::to_string(ping));
-
-
-						}
-
-					} // Mutex wird hier automatisch freigegeben
-
-					// Erstellen der Discord-Nachricht
-					dpp::message msg("");
-					dpp::embed embed = dpp::embed().
-						set_title("Serverstatus").
-						set_description("Online Players: " + std::to_string(iOnlinePlayers)).
-						set_color(0x00FFFF);
-
-					// Charakternamen zu einer Zeile zusammenfügen
-					std::string charnamesLine;
-					for (size_t i = 0; i < charnames.size(); ++i)
-					{
-						if (i > 0)
-							charnamesLine += "\n";
-						charnamesLine += charnames[i];
-					}
-
-					// Schiffe zu einer Zeile zusammenfügen
-					HkLoadStringDLLs();
-					std::string shipsLine;
-					for (size_t i = 0; i < ships.size(); ++i)
-					{
-						if (i > 0)
-							shipsLine += "\n";
-
-						Archetype::Ship* ship = Archetype::GetShip(std::stoul(ships[i]));
-						std::wstring wscShipName = HkGetWStringFromIDS(ship->iIdsName).c_str();
-
-						shipsLine += wstos(wscShipName);
-					}
-
-					// Pings zu einer Zeile zusammenfügen
-					std::string pingsLine;
-					for (size_t i = 0; i < pings.size(); ++i)
-					{
-						if (i > 0)
-							pingsLine += "\n";
-						pingsLine += pings[i] + " ms";
-					}
-
-					embed.add_field("Charname", charnamesLine, true)
-						.add_field("Ship", shipsLine, true)
-						.add_field("Ping", pingsLine, true);
-
-
-					msg.add_embed(embed);
-
-					// Senden der Nachricht
-					event.reply(msg);
-				}
-				else
-				{
-					event.reply("Currently there are no players online.");
-				}
+				GetServerstatus(event);
 			}
 
 
@@ -491,6 +404,9 @@ namespace Discord {
 				//Show Bank Embed
 				BankEmbed(event);
 
+			}
+			if (event.command.get_command_name() == "Serverstatus") {
+				GetServerstatus(event);
 			}
 
 		});
@@ -589,6 +505,16 @@ namespace Discord {
 				//Get Charname
 				scCharnameOld = GetFormComponentValue(event, "rename_modal_charname_old");
 				scCharnameNew = GetFormComponentValue(event, "rename_modal_charname_new");
+
+				if (containsWhitespace(scCharnameOld) || containsWhitespace(scCharnameNew))
+				{
+					dpp::message dm;
+					dm.content = "The new character name must not contain any spaces!";
+					DiscordBot.direct_message_create(event.command.usr.id, dm);
+					event.reply();
+					return;
+				}
+
 				
 				if (scCharnameOld == "" || scCharnameNew == "")
 					return;
@@ -596,7 +522,7 @@ namespace Discord {
 				//WString
 				std::wstring wscCharname = Utf8ToWString(scCharnameOld);
 				std::wstring wscNewCharname = Utf8ToWString(scCharnameNew);
-				DiscordBot.direct_message_create(event.command.usr.id, "Old: " + scCharnameOld + " New: " + scCharnameNew);
+				//DiscordBot.direct_message_create(event.command.usr.id, "Old: " + scCharnameOld + " New: " + scCharnameNew);
 
 				//Get DiscordUser
 				dpp::guild_member ServerUser = event.command.member;
@@ -680,7 +606,7 @@ namespace Discord {
 					if (databaseUpdateResult && databaseUpdateResult2)
 					{
 						
-						std::string successMessage = "Character renamed successfully.";
+						std::string successMessage = "Character renamed successfully!";
 						DiscordBot.direct_message_create(event.command.usr.id, successMessage);
 					}
 					else
@@ -933,7 +859,7 @@ namespace Discord {
 		// Get the selected value
 		std::string selectedValue = event.custom_id;
 
-		ConPrint(L"CharManagerPageMenu: " + stows(selectedValue) + L"\n");
+		//ConPrint(L"CharManagerPageMenu: " + stows(selectedValue) + L"\n");
 
 		dpp::message pageContent(event.command.channel_id, "Please select an option!");
 
@@ -998,6 +924,11 @@ namespace Discord {
 	template<typename T>
 	void BankEmbed(const T& event)
 	{
+		//New Direct Message
+		DMMessage NewMessage1;
+		NewMessage1.DiscordUserID = std::to_string(event.command.usr.id);
+		NewMessage1.DiscordMessage = dpp::message("Use /bank <amount> ingame to transfer Credits to your Account!");
+		lDMMessages.push_back(NewMessage1);
 
 		//Get User Credits
 		std::string scCredits = GetCreditsForDiscordAccount(std::to_string(event.command.usr.id));
@@ -1047,8 +978,8 @@ namespace Discord {
 			set_id("link_modal_p1_charname").
 			set_type(dpp::cot_text).
 			set_placeholder("Charname").
-			set_min_length(5).
-			set_max_length(50).
+			set_min_length(1).
+			set_max_length(23).
 			set_text_style(dpp::text_short)
 		);
 
@@ -1065,8 +996,8 @@ namespace Discord {
 			set_id("rename_modal_charname_old").
 			set_type(dpp::cot_text).
 			set_placeholder("Charname").
-			set_min_length(5).
-			set_max_length(50).
+			set_min_length(1).
+			set_max_length(23).
 			set_text_style(dpp::text_short)
 		);
 
@@ -1078,12 +1009,107 @@ namespace Discord {
 			set_id("rename_modal_charname_new").
 			set_type(dpp::cot_text).
 			set_placeholder("Charname").
-			set_min_length(5).
-			set_max_length(50).
+			set_min_length(1).
+			set_max_length(23).
 			set_text_style(dpp::text_short)
 		);
 
 		event.dialog(rename_modal_p1);
+
+	}
+
+	template<typename T>
+	void GetServerstatus(const T& event)
+	{
+		if (iOnlinePlayers > 0)
+		{
+			std::vector<std::string> charnames;
+			std::vector<std::string> ships;
+			std::vector<std::string> pings;
+
+			{
+				// Mutex sperren
+				std::lock_guard<std::mutex> lock(m_Mutex);
+
+				struct PlayerData* pPD = 0;
+
+				while (pPD = Players.traverse_active(pPD))
+				{
+					int iRank = pPD->iRank;
+					uint iShipArch = pPD->iShipArchetype;
+					uint iClientID = HkGetClientIdFromPD(pPD);
+					//Charname
+					std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+					std::string scCharname = wstring_to_utf8(wscCharname);
+					//Ping
+					HKPLAYERINFO pi;
+					HkGetPlayerInfo(wscCharname, pi, false);
+					auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
+
+
+					charnames.push_back(scCharname);
+					ships.push_back(std::to_string(iShipArch));
+					pings.push_back(std::to_string(ping));
+
+
+				}
+
+			} // Mutex wird hier automatisch freigegeben
+
+			// Erstellen der Discord-Nachricht
+			dpp::message msg("");
+			dpp::embed embed = dpp::embed().
+				set_title("Serverstatus").
+				set_description("Online Players: " + std::to_string(iOnlinePlayers)).
+				set_color(0x00FFFF);
+
+			// Charakternamen zu einer Zeile zusammenfügen
+			std::string charnamesLine;
+			for (size_t i = 0; i < charnames.size(); ++i)
+			{
+				if (i > 0)
+					charnamesLine += "\n";
+				charnamesLine += charnames[i];
+			}
+
+			// Schiffe zu einer Zeile zusammenfügen
+			HkLoadStringDLLs();
+			std::string shipsLine;
+			for (size_t i = 0; i < ships.size(); ++i)
+			{
+				if (i > 0)
+					shipsLine += "\n";
+
+				Archetype::Ship* ship = Archetype::GetShip(std::stoul(ships[i]));
+				std::wstring wscShipName = HkGetWStringFromIDS(ship->iIdsName).c_str();
+
+				shipsLine += wstos(wscShipName);
+			}
+
+			// Pings zu einer Zeile zusammenfügen
+			std::string pingsLine;
+			for (size_t i = 0; i < pings.size(); ++i)
+			{
+				if (i > 0)
+					pingsLine += "\n";
+				pingsLine += pings[i] + " ms";
+			}
+
+			embed.add_field("Charname", charnamesLine, true)
+				.add_field("Ship", shipsLine, true)
+				.add_field("Ping", pingsLine, true);
+
+
+			msg.add_embed(embed);
+
+			// Senden der Nachricht
+			event.reply(msg);
+		}
+		else
+		{
+			event.reply("Currently there are no players online.");
+		}
+
 
 	}
 
@@ -1110,8 +1136,8 @@ namespace Discord {
 			set_id(modal_id+"rec").
 			set_type(dpp::cot_text).
 			set_placeholder("Recipient").
-			set_min_length(5).
-			set_max_length(50).
+			set_min_length(1).
+			set_max_length(23).
 			set_required(true).
 			set_text_style(dpp::text_short)
 		);
@@ -1395,7 +1421,7 @@ namespace Discord {
 			if (query.executeStep())
 			{
 				// Lesen der Discord-ID aus der Ergebniszeile
-				ConPrint(stows(query.getColumn(0).getString()) + L"\n");
+				//ConPrint(stows(query.getColumn(0).getString()) + L"\n");
 				return true;
 			}
 		}
@@ -1736,6 +1762,13 @@ namespace Discord {
 	}
 		
 		
-
+	bool containsWhitespace(const std::string& str) {
+		return std::any_of(str.begin(), str.end(), [](char c) {
+			return std::isspace(static_cast<unsigned char>(c)) != 0 ||
+				(c == '\u00A0' || c == '\u1680' || c == '\u180E' ||
+					(c >= '\u2000' && c <= '\u200B') || c == '\u202F' ||
+					c == '\u205F' || c == '\u3000' || c == '\uFEFF');
+			});
+	}
 
 } // namespace DiscordBot

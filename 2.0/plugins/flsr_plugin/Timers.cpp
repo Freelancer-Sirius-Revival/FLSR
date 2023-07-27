@@ -11,6 +11,7 @@ namespace Timers {
        {Docking::DockRequest3000ms, 3000, 0},
        {PathSelection::ModUnlawfulChar500ms, 500, 0},
        {Tools::CharSelectMenu, 2000, 0},
+      // {SrvCtrlObj::Timer1000ms, 1000, 0}
 
     };
 

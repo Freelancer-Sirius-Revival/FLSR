@@ -172,7 +172,7 @@ void LoadSettings() {
                 char szCurDir[MAX_PATH];
                 GetCurrentDirectory(sizeof(szCurDir), szCurDir);
 
-                std::string cmpDump = std::string(szCurDir) + Globals::CMP_DUMP_FOLDER + f.filename().string();
+                std::string cmpDump = std::string(szCurDir) + CMP_DUMP_FOLDER + f.filename().string();
                 cmpDump = cmpDump + ".cmp_dump";
 
                 if (!std::filesystem::exists(cmpDump)) {

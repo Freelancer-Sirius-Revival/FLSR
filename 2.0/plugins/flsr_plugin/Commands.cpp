@@ -624,6 +624,7 @@ namespace Commands {
         if (scMsg == "") {
             // Kein Parameter angegeben, zeige aktuellen Versicherungstyp an
             PrintUserCmdText(iClientID, L"Current insurance type: " + stows(scInsuranceType));
+            PrintUserCmdText(iClientID, L"Possible types: All, Equipment, Nanobots, ShieldBatteries, Countermeasures, Projectiles, Mines, None");
 
             // Zusammenfassung des aktuellen Versicherungsstatus
             std::wstring wscInsuranceStatus = L"Your insurance is currently ";

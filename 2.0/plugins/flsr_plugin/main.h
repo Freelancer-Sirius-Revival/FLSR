@@ -1217,6 +1217,8 @@ namespace Discord {
     void CharRenameModal(const T& event);
     template<typename T>
     void BankTransferModal(const T& event, const std::string modal_id);
+    template<typename T>
+    void GetServerstatus(const T& event);
 
 
     //Helper
@@ -1239,6 +1241,7 @@ namespace Discord {
     void Update_EventList(dpp::cluster &DiscordBot);
 
     std::string GetDiscordUsername(const dpp::user& dppUser);
+    bool containsWhitespace(const std::string& str);
 
 } // namespace DiscordBot
 
@@ -1266,6 +1269,7 @@ namespace API {
 
 } // namespace API
 
+//namespace SrvCtrlObj {
 namespace SrvCtrlObj {
 
     struct SrvObj {
@@ -1295,6 +1299,8 @@ namespace SrvCtrlObj {
         //AI
         pub::AI::SetPersonalityParams p;
     };
+
+   // extern std::list<SrvObj> lstSrvObjs;
 
 
 }// namespace SrvCtrlObj

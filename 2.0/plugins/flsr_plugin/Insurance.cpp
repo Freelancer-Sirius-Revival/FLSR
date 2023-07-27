@@ -68,8 +68,8 @@ namespace Insurance {
             }
             else if (isAmmoClass(aType, iClientID)) {
 
-                ConPrint(L"found Ammo item\n");
-                ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
+                //ConPrint(L"found Ammo item\n");
+                //ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
 
                 const GoodInfo* gi = GoodList_get()->find_by_id(cargo.iArchID);
                 if (gi) {
@@ -381,14 +381,14 @@ namespace Insurance {
                         {
 
                             Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
-                            ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            //ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                             bAdded = true;
 
                         }
                         else {
                             std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
                             HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
-                            ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            //ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                             bAdded = true;
 
                         }
@@ -425,7 +425,7 @@ namespace Insurance {
                     aType == Archetype::MINE ||
                     aType == Archetype::COUNTER_MEASURE)
                 {
-                    ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                    //ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
 
                     Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, iterInsuranceEquip->CARGO_INFO.iCount, false);
                     bAdded = true;

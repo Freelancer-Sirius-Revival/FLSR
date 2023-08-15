@@ -1,23 +1,23 @@
-#include "main.h"
+ï»¿#include "main.h"
 
 //Usefull: Archetype::Equipment *item = Archetype::GetEquipment(MountedEquip->iArchID);
 
 
 namespace Insurance {
 
-	bool Insurance_Module = true;
+    bool Insurance_Module = true;
     std::list<PlayerDied> lPlayerDied;
     std::list<BookInsuranceEvent> lBookInsuranceEvent;
     std::map<std::wstring, std::list<PriceList>> mPriceList;
     float set_fCostPercent;
 
-	void CreateNewInsurance(uint iClientID, bool bFreeInsurance) {
+    void CreateNewInsurance(uint iClientID, bool bFreeInsurance) {
         HK_ERROR err;
         int iCountEquip = 0;
 
         //Create New Insurance
         //ConPrint(L"NewInsurance\n");
-        
+
         //Player CharfileName
         std::wstring wscCharFileName;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
@@ -32,11 +32,12 @@ namespace Insurance {
 
         // Add mounted Equip to list
         std::list<CARGO_INFO> lstMounted;
+        std::list<CARGO_INFO> lstAdditional;
         float fValue;
         int iPrice;
         for (auto const& cargo : lstCargo) {
             Archetype::Equipment const* eq = Archetype::GetEquipment(cargo.iArchID);
-            auto aType = eq->get_class_type();           
+            auto aType = eq->get_class_type();
 
             if (cargo.bMounted && isInsurableClass(aType, iClientID)) {
 
@@ -68,31 +69,154 @@ namespace Insurance {
             }
             else if (isAmmoClass(aType, iClientID)) {
 
-                //ConPrint(L"found Ammo item\n");
-                //ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
+                //  ConPrint(L"found Ammo item\n");
+                  //ConPrint(L"bMounted: %d, iCount: %u, ArchType: %u, ArchID: %u\n", cargo.bMounted, cargo.iCount, aType, cargo.iArchID);
+
+                Archetype::Ship* ship_ID = Archetype::GetShip(Players[iClientID].iShipArchetype);
+                uint NanobotsID;
+                pub::GetGoodID(NanobotsID, "ge_s_repair_01");
+                uint MaxNanobots = ship_ID->iMaxNanobots;
+                uint ShieldBatsID;
+                pub::GetGoodID(ShieldBatsID, "ge_s_battery_01");
+                uint MaxShieldBats = ship_ID->iMaxShieldBats;
+                uint MaxHoldSize = ship_ID->fHoldSize;
 
                 const GoodInfo* gi = GoodList_get()->find_by_id(cargo.iArchID);
                 if (gi) {
                     gi = GoodList::find_by_id(gi->iArchID);
                     if (gi) {
-                        float fItemValue = gi->fPrice;
-                        iPrice = (int)fItemValue;
 
-                        fValue += fItemValue;
+                        if (gi->iArchID == NanobotsID)
+                        {
+                            if (cargo.iCount > MaxNanobots)
+                            {
 
-                        // Save
-                        iCountEquip++;
-                        lstMounted.push_back(cargo);
+                                float fItemValue = gi->fPrice;
+                                iPrice = (int)fItemValue;
+                                fValue += fItemValue;
+                                // Save
+                                iCountEquip++;
+                                lstMounted.push_back(cargo);
 
-                        // AddToPriceList
-                        PriceList NewEntry;
-                        NewEntry.bFreeInsurance = bFreeInsurance;
-                        NewEntry.bItemisFree = (iPrice <= 0);
-                        NewEntry.CARGO_INFO = cargo;
-                        NewEntry.GoodInfo = *gi;
-                        NewEntry.aClassType = aType;
-                        NewEntry.bIsAmmo = true;
-                        lPriceList.push_back(NewEntry);
+                                CARGO_INFO insured_NB = cargo;
+                                insured_NB.iCount = MaxNanobots;
+
+                                // AddToPriceList
+                                PriceList NewEntry;
+                                NewEntry.bFreeInsurance = bFreeInsurance;
+                                NewEntry.bItemisFree = (iPrice <= 0);
+                                NewEntry.CARGO_INFO = insured_NB;
+                                NewEntry.GoodInfo = *gi;
+                                NewEntry.aClassType = aType;
+                                NewEntry.bIsAmmo = true;
+                                lPriceList.push_back(NewEntry);
+
+                            }
+
+
+                            else
+                            {
+                                float fItemValue = gi->fPrice;
+                                iPrice = (int)fItemValue;
+                                fValue += fItemValue;
+                                // Save
+                                iCountEquip++;
+                                lstMounted.push_back(cargo);
+
+                                // AddToPriceList
+                                PriceList NewEntry;
+                                NewEntry.bFreeInsurance = bFreeInsurance;
+                                NewEntry.bItemisFree = (iPrice <= 0);
+                                NewEntry.CARGO_INFO = cargo;
+                                NewEntry.GoodInfo = *gi;
+                                NewEntry.aClassType = aType;
+                                NewEntry.bIsAmmo = true;
+                                lPriceList.push_back(NewEntry);
+
+                            }
+
+                        }
+
+
+
+
+                        else if (gi->iArchID == ShieldBatsID)
+                        {
+                            if (cargo.iCount > MaxShieldBats)
+                            {
+
+                                float fItemValue = gi->fPrice;
+                                iPrice = (int)fItemValue;
+                                fValue += fItemValue;
+                                // Save
+                                iCountEquip++;
+                                lstMounted.push_back(cargo);
+
+                                CARGO_INFO insured_NB = cargo;
+                                insured_NB.iCount = MaxShieldBats;
+
+                                // AddToPriceList
+                                PriceList NewEntry;
+                                NewEntry.bFreeInsurance = bFreeInsurance;
+                                NewEntry.bItemisFree = (iPrice <= 0);
+                                NewEntry.CARGO_INFO = insured_NB;
+                                NewEntry.GoodInfo = *gi;
+                                NewEntry.aClassType = aType;
+                                NewEntry.bIsAmmo = true;
+                                lPriceList.push_back(NewEntry);
+
+                            }
+
+
+                            else
+                            {
+                                float fItemValue = gi->fPrice;
+                                iPrice = (int)fItemValue;
+                                fValue += fItemValue;
+                                // Save
+                                iCountEquip++;
+                                lstMounted.push_back(cargo);
+
+                                // AddToPriceList
+                                PriceList NewEntry;
+                                NewEntry.bFreeInsurance = bFreeInsurance;
+                                NewEntry.bItemisFree = (iPrice <= 0);
+                                NewEntry.CARGO_INFO = cargo;
+                                NewEntry.GoodInfo = *gi;
+                                NewEntry.aClassType = aType;
+                                NewEntry.bIsAmmo = true;
+                                lPriceList.push_back(NewEntry);
+
+                            }
+
+                        }
+
+
+
+                        else
+                        {
+
+                            float fItemValue = gi->fPrice;
+                            iPrice = (int)fItemValue;
+
+                            fValue += fItemValue;
+
+                            // Save
+                            iCountEquip++;
+                            lstMounted.push_back(cargo);
+
+                            // AddToPriceList
+                            PriceList NewEntry;
+                            NewEntry.bFreeInsurance = bFreeInsurance;
+                            NewEntry.bItemisFree = (iPrice <= 0);
+                            NewEntry.CARGO_INFO = cargo;
+                            NewEntry.GoodInfo = *gi;
+                            NewEntry.aClassType = aType;
+                            NewEntry.bIsAmmo = true;
+                            lPriceList.push_back(NewEntry);
+
+
+                        }
                     }
                 }
             }
@@ -100,11 +224,11 @@ namespace Insurance {
 
 
         //Save Pricelist to Map
-		mPriceList[wscCharFileName] = lPriceList;
+        mPriceList[wscCharFileName] = lPriceList;
 
         //Get PriceList
         std::list<PriceList> lPlayerPriceList = mPriceList[wscCharFileName];
-		
+
         //Set Price
         float fprice = 0.0f;
         float fCalculatedPrice = 0.0f;
@@ -115,49 +239,54 @@ namespace Insurance {
         //ConPrint(L"Percent: " + std::to_wstring(Insurance::set_fCostPercent) + L"\n");
         while (MountedEquipPriceList != lPlayerPriceList.end()) {
 
-           //GetData
+            //GetData
             GoodInfo gi = MountedEquipPriceList->GoodInfo;
-			CARGO_INFO ci = MountedEquipPriceList->CARGO_INFO;
+            CARGO_INFO ci = MountedEquipPriceList->CARGO_INFO;
 
             //Print Data to Console
 
-            //ConPrint(L"Insurance is Free: " + std::to_wstring(MountedEquipPriceList->bFreeInsurance) + L", MountedEquipID: " + std::to_wstring(gi.iArchID) + L", Mounted on Hardpoint: " + stows(ci.hardpoint.value) + L", Price: " + std::to_wstring(gi.fPrice) + L", Equip is Free: " + std::to_wstring(MountedEquipPriceList->bItemisFree) + L"\n");
+          //  ConPrint(L"Insurance is Free: " + std::to_wstring(MountedEquipPriceList->bFreeInsurance) + L", MountedEquipID: " + std::to_wstring(gi.iArchID) + L", Mounted on Hardpoint: " + stows(ci.hardpoint.value) + L", Price: " + std::to_wstring(gi.fPrice) + L", Equip is Free: " + std::to_wstring(MountedEquipPriceList->bItemisFree) + L"\n");
 
 
-            if (!MountedEquipPriceList->bItemisFree && !MountedEquipPriceList->bFreeInsurance && !MountedEquipPriceList->bIsAmmo)
+            if (!MountedEquipPriceList->bItemisFree  /* && !MountedEquipPriceList->bFreeInsurance*/ && !MountedEquipPriceList->bIsAmmo)
             {
                 fprice += gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount;
                 fCalculatedPrice = fCalculatedPrice + (((gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount) / 100.0f) * Insurance::set_fCostPercent);
+                ConPrint(L"fCalculatedPrice calc: " + std::to_wstring(fCalculatedPrice) + L"\n");
+
             }
-            else if (!MountedEquipPriceList->bItemisFree && !MountedEquipPriceList->bFreeInsurance && MountedEquipPriceList->bIsAmmo)
+            else if (!MountedEquipPriceList->bItemisFree  /* && !MountedEquipPriceList->bFreeInsurance */ && MountedEquipPriceList->bIsAmmo)
             {
                 fprice += gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount;
                 fCalculatedPrice = fCalculatedPrice + (gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount);
             }
 
-           
 
-            MountedEquipPriceList++;
+
+            ++MountedEquipPriceList;
         }
-  
-		//Cast fCalculatedPrice to int
+
+
+        ConPrint(L"fCalculatedPrice final: " + std::to_wstring(fCalculatedPrice) + L"\n");
+
+        //Cast fCalculatedPrice to int
         int iCalculatedPrice = static_cast<int>(fCalculatedPrice);
 
         //Get Player Cash
         int iCash;
         HkGetCash(ARG_CLIENTID(iClientID), iCash);
-        
-		//Check if Player has enough Cash
+
+        //Check if Player has enough Cash
         if (iCalculatedPrice <= iCash) {
             char szCurDir[MAX_PATH];
             GetCurrentDirectory(sizeof(szCurDir), szCurDir);
             std::string scInsuranceStore = std::string(szCurDir) + Globals::INSURANCE_STORE;
-            std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+            std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
             std::string Charname = wstos(wscCharname);
             std::wstring wscFilename;
             HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
             std::string scFilename = wstos(wscFilename);
-            
+
             // Remove Cash
             if ((err = HkAddCash(wscCharname, 0 - iCalculatedPrice)) != HKE_OK) {
                 PrintUserCmdText(iClientID, L"ERR Remove cash failed err=" + HkErrGetText(err));
@@ -180,7 +309,7 @@ namespace Insurance {
             IniWrite(scInsuranceStore + scFilename + ".cfg", "INSURANCE", "Worth", std::to_string(iCalculatedPrice));
             IniWrite(scInsuranceStore + scFilename + ".cfg", "INSURANCE", "EquipCount", std::to_string(iCountEquip));
             if (bFreeInsurance)
-                IniWrite(scInsuranceStore + scFilename + ".cfg","INSURANCE", "FreeInsurance", "true");
+                IniWrite(scInsuranceStore + scFilename + ".cfg", "INSURANCE", "FreeInsurance", "true");
 
             //Write Equip to Store
             std::list<PriceList>::iterator MountedEquipPriceList = lPlayerPriceList.begin();
@@ -221,16 +350,17 @@ namespace Insurance {
                 MountedEquipPriceList++;
             }
 
-            if (!bFreeInsurance)
-                PrintUserCmdText(iClientID, L"Your ship is insured. Upon landing the unspent insurance deposit will be transferred back.");
-        } else {
-            if (!bFreeInsurance)
-                PrintUserCmdText(iClientID, L"Insurance failed. You need to have at least " + ToMoneyStr(iCalculatedPrice) + L" Credits for this.");
+            if (iCalculatedPrice > 0)
+                PrintUserCmdText(iClientID, L"Your ship is insured with total worth of $" + ToMoneyStr(iCalculatedPrice) + L" .Upon landing the unspent insurance deposit will be transferred back.");
+        }
+        else {
+            // if (!bFreeInsurance)
+            PrintUserCmdText(iClientID, L"Insurance failed. You need to have at least " + ToMoneyStr(iCalculatedPrice) + L" Credits for this.");
         }
 
 
         return;
-	}
+    }
 
     void UseInsurance(uint iClientID) {
         HK_ERROR err;
@@ -303,6 +433,8 @@ namespace Insurance {
         std::list<CARGO_INFO> lstCargo;
         HkEnumCargo(ARG_CLIENTID(iClientID), lstCargo, iRemHoldSize);
 
+
+        ConPrint(L"Hold Size: " + std::to_wstring(iRemHoldSize) + L"\n");
         // Initialize the lists to store mounted and additional equipment
         std::list<CARGO_INFO> lstMounted;
 
@@ -322,10 +454,10 @@ namespace Insurance {
                 lstMounted.push_back(cargo);
             }
             else if (aType == Archetype::REPAIR_KIT ||
-                    aType == Archetype::SHIELD_BATTERY ||
-                    aType == Archetype::MUNITION ||
-                    aType == Archetype::MINE ||
-                    aType == Archetype::COUNTER_MEASURE) 
+                aType == Archetype::SHIELD_BATTERY ||
+                aType == Archetype::MUNITION ||
+                aType == Archetype::MINE ||
+                aType == Archetype::COUNTER_MEASURE)
             {
 
 
@@ -333,7 +465,7 @@ namespace Insurance {
             }
 
         }
-        
+
         /*
         ConPrint(L"Insured Equip: \n");
         //Print lInsuredEquip to Console in a Loop
@@ -344,10 +476,10 @@ namespace Insurance {
         ConPrint(L"Mounted Equip: \n");
         //Print lstMounted to Console in a Loop
         for (auto const& equip : lstMounted) {
-			ConPrint(L"Equip: " + stows(equip.hardpoint.value) + L" " + std::to_wstring(equip.iArchID) + L" " + std::to_wstring(equip.iCount) + L" " + std::to_wstring(equip.iID) + L" " + std::to_wstring(equip.fStatus) + L" " + std::to_wstring(equip.bMounted) + L" " + std::to_wstring(equip.bMission) + L"\n");
-		}
+            ConPrint(L"Equip: " + stows(equip.hardpoint.value) + L" " + std::to_wstring(equip.iArchID) + L" " + std::to_wstring(equip.iCount) + L" " + std::to_wstring(equip.iID) + L" " + std::to_wstring(equip.fStatus) + L" " + std::to_wstring(equip.bMounted) + L" " + std::to_wstring(equip.bMission) + L"\n");
+        }
         */
-        
+
         //Merge Insurance with actual Equip
         float fPrice = 0.0f;
         //uint iEquipAdded = 0;
@@ -370,9 +502,9 @@ namespace Insurance {
                     if (itermountedEquip->iCount < iterInsuranceEquip->CARGO_INFO.iCount)
                     {
                         uint itemsToAdd = iterInsuranceEquip->CARGO_INFO.iCount - itermountedEquip->iCount;
- 
 
-                        if (auto aType = eq->get_class_type(); 
+
+                        if (auto aType = eq->get_class_type();
                             aType == Archetype::REPAIR_KIT ||
                             aType == Archetype::SHIELD_BATTERY ||
                             aType == Archetype::MUNITION ||
@@ -381,7 +513,7 @@ namespace Insurance {
                         {
 
                             Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
-                            //ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                            ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                             bAdded = true;
 
                         }
@@ -394,9 +526,9 @@ namespace Insurance {
                         }
 
 
-                       
 
-                        if (!iterInsuranceEquip->bItemisFree && !bFreeInsurance && bAdded)
+
+                        if (!iterInsuranceEquip->bItemisFree && bAdded)
                         {
                             float newfItemPrice = iterInsuranceEquip->fPrice * itemsToAdd;
                             fPrice += newfItemPrice;
@@ -412,7 +544,7 @@ namespace Insurance {
 
             if (!bFound)
             {
-                // Das Equipment wurde nicht in lstMounted gefunden, fügen Sie es hinzu
+                // Das Equipment wurde nicht in lstMounted gefunden, fï¿½gen Sie es hinzu
                 //ConPrint(L"not found\n");
 
                 // ConPrint InsuranceEquip Size
@@ -441,7 +573,7 @@ namespace Insurance {
 
 
 
-                if (!iterInsuranceEquip->bItemisFree && !bFreeInsurance && bAdded)
+                if (!iterInsuranceEquip->bItemisFree && bAdded)
                 {
                     float newfItemPrice = iterInsuranceEquip->fPrice * iterInsuranceEquip->CARGO_INFO.iCount;
                     fPrice += newfItemPrice;
@@ -455,18 +587,17 @@ namespace Insurance {
         }
 
         // Add Cash
-        if (!bFreeInsurance)
-        {
-            int CashBack = Store_iWorth - static_cast<int>(fPrice);
 
-            if ((err = HkAddCash(wscCharname, 0 + CashBack)) != HKE_OK) {
-                PrintUserCmdText(iClientID, L"ERR Add cash failed err=" + HkErrGetText(err));
-            }
+        int CashBack = Store_iWorth - static_cast<int>(fPrice);
 
-            //PrintUserCmdText(iClientID, L"Insurance Deposit: " + std::to_wstring(Store_iWorth) + L". Cashback: " + std::to_wstring(CashBack));
+        if ((err = HkAddCash(wscCharname, 0 + CashBack)) != HKE_OK) {
+            PrintUserCmdText(iClientID, L"ERR Add cash failed err=" + HkErrGetText(err));
         }
 
-        //Update CRC
+        //PrintUserCmdText(iClientID, L"Insurance Deposit: " + std::to_wstring(Store_iWorth) + L". Cashback: " + std::to_wstring(CashBack));
+
+
+    //Update CRC
         if (bAdded)
         {
 
@@ -486,29 +617,26 @@ namespace Insurance {
         }
 
         //PlayerFeedback
-        if (!bFreeInsurance) {
-            if (bAdded) {
-                PrintUserCmdText(iClientID, L"Your lost Equipment was replaced by your insurance. The unspent insurance deposit was transferred back.");
-            }
-            else
-            {
-                PrintUserCmdText(iClientID, L"The unspent insurance deposit was transferred back.");
-            }
+
+        if (bAdded) {
+            PrintUserCmdText(iClientID, L"Your lost Equipment was replaced by your insurance. The unspent insurance deposit was transferred back.");
         }
+        else
+        {
+            PrintUserCmdText(iClientID, L"The unspent insurance deposit was transferred back.");
+        }
+
 
         //DeleteInsurance
         std::string sInsurancepath = scInsuranceStore + scFilename + ".cfg";
         remove(sInsurancepath.c_str());
-
-        
-
     }
 
     void PlayerDiedEvent(bool bDied, uint iClientID) {
         // New PlayerDied Event
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         bool Playerfound = false;
-        
+
         //Edit List
         std::list<PlayerDied>::iterator PlayerDiedList = lPlayerDied.begin();
         while (PlayerDiedList != lPlayerDied.end()) {
@@ -530,7 +658,7 @@ namespace Insurance {
         }
 
         //Add to List
-        if (Playerfound == false) 
+        if (Playerfound == false)
         {
             Insurance::PlayerDied NewDeath;
             NewDeath.wscCharname = wscCharname;
@@ -546,7 +674,7 @@ namespace Insurance {
 
     bool CheckPlayerDied(uint iClientID) {
         // New PlayerDied Event
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         bool bReturn = false;
         std::list<PlayerDied>::iterator PlayerDiedList = lPlayerDied.begin();
         while (PlayerDiedList != lPlayerDied.end()) {
@@ -562,11 +690,11 @@ namespace Insurance {
     }
 
     //Find Hardpoint in Cargolist
-    bool FindHardpointCargolist( std::list<CARGO_INFO> &cargolist, CacheString &hardpoint) {
+    bool FindHardpointCargolist(std::list<CARGO_INFO>& cargolist, CacheString& hardpoint) {
         std::string shardpoint = hardpoint.value;
 
 
-        for (const auto &p : cargolist) {
+        for (const auto& p : cargolist) {
             std::string phardpoint = p.hardpoint.value;
             if (phardpoint == shardpoint) {
                 return true;
@@ -577,7 +705,7 @@ namespace Insurance {
 
     //Book Insurance
     void BookInsurance(uint iClientID, bool bFreeItem) {
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         bool Playerfound = false;
 
         // Edit List
@@ -611,7 +739,7 @@ namespace Insurance {
 
     //CheckInsuranceBooked
     std::pair<bool, bool> CheckInsuranceBooked(uint iClientID) {
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         bool bReturn = false;
         bool bFreeItem = true;
         std::list<BookInsuranceEvent>::iterator PlayerBooked = lBookInsuranceEvent.begin();
@@ -645,8 +773,9 @@ namespace Insurance {
 
         // Add mounted Equip to list
         std::list<CARGO_INFO> lstMounted;
-        float fValue;
-        int iPrice;
+        std::list<CARGO_INFO> lstAdditional;
+        float fValue = 0;
+        int iPrice = 0;
         for (auto const& cargo : lstCargo) {
             Archetype::Equipment const* eq = Archetype::GetEquipment(cargo.iArchID);
             auto aType = eq->get_class_type();
@@ -726,12 +855,12 @@ namespace Insurance {
             //ConPrint(L"Insurance is Free: " + std::to_wstring(MountedEquipPriceList->bFreeInsurance) + L", MountedEquipID: " + std::to_wstring(gi.iArchID) + L", Mounted on Hardpoint: " + stows(ci.hardpoint.value) + L", Price: " + std::to_wstring(gi.fPrice) + L", Equip is Free: " + std::to_wstring(MountedEquipPriceList->bItemisFree) + L"\n");
 
 
-            if (!MountedEquipPriceList->bItemisFree && !MountedEquipPriceList->bFreeInsurance && !MountedEquipPriceList->bIsAmmo)
+            if (!MountedEquipPriceList->bItemisFree /* && !MountedEquipPriceList->bFreeInsurance */ && !MountedEquipPriceList->bIsAmmo)
             {
                 fprice += gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount;
                 fCalculatedPrice = fCalculatedPrice + (((gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount) / 100.0f) * Insurance::set_fCostPercent);
             }
-            else if (!MountedEquipPriceList->bItemisFree && !MountedEquipPriceList->bFreeInsurance && MountedEquipPriceList->bIsAmmo)
+            else if (!MountedEquipPriceList->bItemisFree /* && !MountedEquipPriceList->bFreeInsurance*/ && MountedEquipPriceList->bIsAmmo)
             {
                 fprice += gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount;
                 fCalculatedPrice = fCalculatedPrice + (gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount);
@@ -752,7 +881,7 @@ namespace Insurance {
 
 
     //Check File Exists
-    bool insurace_exists(const std::string &name) 
+    bool insurace_exists(const std::string& name)
     {
         struct stat buffer;
         return (stat(name.c_str(), &buffer) == 0);
@@ -763,11 +892,11 @@ namespace Insurance {
         pub::Player::GetShip(iClientID, ship);
 
         // Check On/Off
-        CAccount *acc = Players.FindAccountFromClientID(iClientID);
+        CAccount* acc = Players.FindAccountFromClientID(iClientID);
         std::wstring wscAccDir;
         HkGetAccountDirName(acc, wscAccDir);
         std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         std::string Charname = wstos(wscCharname);
         std::wstring wscFilename;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
@@ -778,18 +907,20 @@ namespace Insurance {
 
         if (sAutoInsurance == "ON") {
             if (!ship) {
-                if (Insurance::Insurance_Module) {                
+                if (Insurance::Insurance_Module) {
                     Insurance::BookInsurance(iClientID, false);
                 }
-            } else {
+            }
+            else {
                 PrintUserCmdText(iClientID, L"ERR: You can only renew an insurance when docked.");
             }
-        } else {
+        }
+        else {
             if (!ship) {
                 if (Insurance::Insurance_Module) {
                     Insurance::BookInsurance(iClientID, true);
                 }
-            }    
+            }
         }
     }
 
@@ -828,8 +959,8 @@ namespace Insurance {
             insuranceMask |= InsuranceType::Nanobots;
         if (bEquipment)
             insuranceMask |= InsuranceType::Equipment;
-        
-        // Prüfen, ob alle sechs Typen festgelegt sind
+
+        // Prï¿½fen, ob alle sechs Typen festgelegt sind
         if (bool allTypesSet = (bMines && bProjectiles && bCountermeasures && bShieldBatteries && bNanobots && bEquipment))
         {
             if (aType == Archetype::MINE || aType == Archetype::MUNITION ||
@@ -914,7 +1045,7 @@ namespace Insurance {
         if (bEquipment)
             insuranceMask |= InsuranceType::Equipment;
 
-        // Prüfen, ob alle sechs Typen festgelegt sind
+        // Prï¿½fen, ob alle sechs Typen festgelegt sind
         if (bool allTypesSet = (bMines && bProjectiles && bCountermeasures && bShieldBatteries && bNanobots && bEquipment))
             insuranceMask |= InsuranceType::All;
 
@@ -989,7 +1120,7 @@ namespace Insurance {
         }
         else if (lowerValue == "projectiles" || lowerValue == "pj" || lowerValue == "p" ||
             lowerValue == "rocket" || lowerValue == "rockets" || lowerValue == "torpedo" ||
-            lowerValue == "torp" || lowerValue == "torps" || lowerValue == "missiles" || 
+            lowerValue == "torp" || lowerValue == "torps" || lowerValue == "missiles" ||
             lowerValue == "missile") {
             return Projectiles;
         }
@@ -1076,7 +1207,5 @@ namespace Insurance {
         }
 
     }
-
-
 
 }

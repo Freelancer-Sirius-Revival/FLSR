@@ -1,5 +1,8 @@
-﻿  ClientController.cpp
+﻿  Insurance.cpp
 C:\vcpkg\vcpkg\x86-windows\include\crow\routing.h(1212): warning C4267: "Argument": Konvertierung von "size_t" nach "uint16_t", Datenverlust möglich
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(82,34): warning C4244: "Initialisierung": Konvertierung von "float" in "uint", möglicher Datenverlust
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(91,46): warning C4018: ">": Konflikt zwischen "signed" und "unsigned"
+C:\FLSR-Hook\2.0\plugins\flsr_plugin\Insurance.cpp(145,46): warning C4018: ">": Konflikt zwischen "signed" und "unsigned"
   FLSR Plugin.vcxproj -> C:\FLSR-Hook\2.0\bin\Release\plugins\FLSR Plugin\FLSR.dll
   C:\FLSR-Hook\2.0\project\..\bin\Release\plugins\FLSR Plugin\FLSR.dll
   1 Datei(en) kopiert

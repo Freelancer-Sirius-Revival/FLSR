@@ -184,13 +184,18 @@ namespace ClientController {
             //UI
             if (Tools::startsWith(scData, "undockPressed"))
             {
+
                 ConPrint(L"UndockPressed\n");
 
-                Insurance::CalcRemHold(iClientID);
+                if (!Insurance::CalcRemHold(iClientID))
+                {
+                    PrintUserCmdText(iClientID, L"Your ship is overloaded, you cannot undock!");
+                }
 
             }
             if (Tools::startsWith(scData, "LaunchPad_open"))
             {
+
                 ConPrint(L"LaunchPad\n");
                 Insurance::CalcRemHold(iClientID);
 

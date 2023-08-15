@@ -635,7 +635,7 @@ namespace Insurance {
     void SetInsuranceTypeString(uint iClientID, InsuranceType type, const std::string& value);
     InsuranceType GetInsuranceTypeFromString(const std::string& value);
     std::list<InsuranceType> GetInsuranceTypesFromMask(InsuranceType insuranceMask);
-    void CalcRemHold(uint iClientID);
+    bool CalcRemHold(uint iClientID);
 }
 
 namespace AntiCheat {

@@ -1170,7 +1170,7 @@ namespace Insurance {
         return insuranceTypes;
     }
 
-    void CalcRemHold(uint iClientID)
+    bool CalcRemHold(uint iClientID)
     {
         //Player cargo
         int iRemHoldSize;
@@ -1196,13 +1196,14 @@ namespace Insurance {
 
         if (CargofVolume <= fSize) {
             ClientController::Send_ControlMsg(false, iClientID, L"allowundock 1\n");
-            ConPrint(L"allowundock 1 \n");
+            //ConPrint(L"allowundock 1 \n");
+            return true;
 
         }
         else {
             ClientController::Send_ControlMsg(false, iClientID, L"allowundock 0\n");
-            ConPrint(L"allowundock 0 \n");
-            PrintUserCmdText(iClientID, L"Your ship is overloaded, you cannot undock!");
+            //ConPrint(L"allowundock 0 \n");
+            return false;
 
         }
 

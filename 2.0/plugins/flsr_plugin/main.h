@@ -516,7 +516,7 @@ namespace Hooks {
     void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
     void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
-
+    void __stdcall ReqRemoveItem(unsigned short iID, int count, unsigned int client);
     }
 
 namespace ClientController {
@@ -635,6 +635,7 @@ namespace Insurance {
     void SetInsuranceTypeString(uint iClientID, InsuranceType type, const std::string& value);
     InsuranceType GetInsuranceTypeFromString(const std::string& value);
     std::list<InsuranceType> GetInsuranceTypesFromMask(InsuranceType insuranceMask);
+    void CalcRemHold(uint iClientID);
 }
 
 namespace AntiCheat {

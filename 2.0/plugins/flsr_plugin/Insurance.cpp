@@ -499,6 +499,9 @@ namespace Insurance {
         //DeleteInsurance
         std::string sInsurancepath = scInsuranceStore + scFilename + ".cfg";
         remove(sInsurancepath.c_str());
+
+        
+
     }
 
     void PlayerDiedEvent(bool bDied, uint iClientID) {
@@ -1034,6 +1037,44 @@ namespace Insurance {
             insuranceTypes.push_back(Insurance::InsuranceType::All);
 
         return insuranceTypes;
+    }
+
+    void CalcRemHold(uint iClientID)
+    {
+        //Player cargo
+        int iRemHoldSize;
+        std::list<CARGO_INFO> lstCargo;
+        HkEnumCargo(ARG_CLIENTID(iClientID), lstCargo, iRemHoldSize);
+
+        float CargofVolume = 0.0f;
+
+        for (auto const& cargo : lstCargo) {
+            Archetype::Equipment const* eq = Archetype::GetEquipment(cargo.iArchID);
+
+            float itemVolume = eq->fVolume * static_cast<float>(cargo.iCount);
+
+            CargofVolume += itemVolume;
+        }
+
+        uint iShipArchIDPlayer;
+        pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
+
+        Archetype::Ship const* ship = Archetype::GetShip(iShipArchIDPlayer);
+        float fSize = ship->fHoldSize;
+
+
+        if (CargofVolume <= fSize) {
+            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 1\n");
+            ConPrint(L"allowundock 1 \n");
+
+        }
+        else {
+            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 0\n");
+            ConPrint(L"allowundock 0 \n");
+            PrintUserCmdText(iClientID, L"Your ship is overloaded, you cannot undock!");
+
+        }
+
     }
 
 

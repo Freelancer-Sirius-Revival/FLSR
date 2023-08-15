@@ -374,6 +374,9 @@ namespace Hooks {
         
         //Update BaseState
         ClientController::Send_ControlMsg(false, iClientID, L"_OnBaseState");
+
+        //Check CargoRem
+        Insurance::CalcRemHold(iClientID);
     }
 
 	//SPObjUpdate
@@ -662,6 +665,8 @@ namespace Hooks {
                 returncode = SKIPPLUGINS_NOFUNCTIONCALL;
             }
         }
+
+        Insurance::CalcRemHold(iClientID);
     }
 
     void __stdcall ReqShipArch_AFTER(unsigned int iArchID, unsigned int iClientID) {
@@ -749,4 +754,11 @@ namespace Hooks {
     }
 
 
+    void __stdcall ReqRemoveItem(unsigned short iID, int count, unsigned int client) {
+        returncode = DEFAULT_RETURNCODE;
+
+
+        Insurance::CalcRemHold(client);
+
+    }
 }

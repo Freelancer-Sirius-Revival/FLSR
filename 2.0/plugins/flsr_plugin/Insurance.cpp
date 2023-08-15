@@ -523,6 +523,22 @@ namespace Insurance {
                                 std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
                                 HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
                                 //ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+
+                                //AC
+                                char* szClassPtr;
+                                memcpy(&szClassPtr, &Players, 4);
+                                szClassPtr += 0x418 * (iClientID - 1);
+                                ulong lCRC;
+                                __asm
+                                {
+                                    pushad
+                                    mov ecx, [szClassPtr]
+                                    call[CRCAntiCheat_FLSR]
+                                    mov[lCRC], eax
+                                    popad
+                                }
+                                memcpy(szClassPtr + 0x320, &lCRC, 4);
+
                                 bAdded = true;
 
                             }
@@ -575,6 +591,22 @@ namespace Insurance {
                         //ConPrint(L"Created WEAPON %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                         bAdded = true;
 
+                        //AC
+                        char* szClassPtr;
+                        memcpy(&szClassPtr, &Players, 4);
+                        szClassPtr += 0x418 * (iClientID - 1);
+                        ulong lCRC;
+                        __asm
+                        {
+                            pushad
+                            mov ecx, [szClassPtr]
+                            call[CRCAntiCheat_FLSR]
+                            mov[lCRC], eax
+                            popad
+                        }
+                        memcpy(szClassPtr + 0x320, &lCRC, 4);
+
+
                     }
 				}   
 
@@ -602,25 +634,6 @@ namespace Insurance {
 
         //PrintUserCmdText(iClientID, L"Insurance Deposit: " + std::to_wstring(Store_iWorth) + L". Cashback: " + std::to_wstring(CashBack));
 
-
-    //Update CRC
-        if (bAdded)
-        {
-
-            char* szClassPtr;
-            memcpy(&szClassPtr, &Players, 4);
-            szClassPtr += 0x418 * (iClientID - 1);
-            ulong lCRC;
-            __asm
-            {
-                pushad
-                mov ecx, [szClassPtr]
-                call[CRCAntiCheat_FLSR]
-                mov[lCRC], eax
-                popad
-            }
-            memcpy(szClassPtr + 0x320, &lCRC, 4);
-        }
 
         //PlayerFeedback
 

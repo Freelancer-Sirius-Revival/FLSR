@@ -1270,6 +1270,7 @@ namespace Tools {
             if (iLocation)
                 Server.LocationEnter(iLocation, iClientID);
 
+
             /*		// fix "Ship or Equipment not sold on base" kick
                             if(!bCargoFound)
                             {
@@ -1293,7 +1294,22 @@ namespace Tools {
                                     mov [lCRC], eax
                             }
                             memcpy(szClassPtr + 0x320, &lCRC, 4);*/
+
         }
+
+        char* szClassPtr;
+        memcpy(&szClassPtr, &Players, 4);
+        szClassPtr += 0x418 * (iClientID - 1);
+        ulong lCRC;
+        __asm
+        {
+            pushad
+            mov ecx, [szClassPtr]
+            call[CRCAntiCheat_FLSR]
+            mov[lCRC], eax
+            popad
+        }
+        memcpy(szClassPtr + 0x320, &lCRC, 4);
 
         return HKE_OK;
     }

@@ -184,10 +184,11 @@ namespace ClientController {
             //UI
             if (Tools::startsWith(scData, "undockPressed"))
             {
-
                 ConPrint(L"UndockPressed\n");
-
-                if (!Insurance::CalcRemHold(iClientID))
+                std::pair CargoRemHold = Insurance::CalcRemHold(iClientID);
+                ConPrint(L"RemHold: " + std::to_wstring(CargoRemHold.first) + L"\n");
+                ConPrint(L"RemHold: " + std::to_wstring(CargoRemHold.second) + L"\n");
+                if (CargoRemHold.first > CargoRemHold.second)
                 {
                     PrintUserCmdText(iClientID, L"Your ship is overloaded, you cannot undock!");
                 }

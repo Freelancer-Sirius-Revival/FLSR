@@ -503,28 +503,30 @@ namespace Insurance {
                     {
                         uint itemsToAdd = iterInsuranceEquip->CARGO_INFO.iCount - itermountedEquip->iCount;
 
-
-                        if (auto aType = eq->get_class_type();
-                            aType == Archetype::REPAIR_KIT ||
-                            aType == Archetype::SHIELD_BATTERY ||
-                            aType == Archetype::MUNITION ||
-                            aType == Archetype::MINE ||
-                            aType == Archetype::COUNTER_MEASURE)
+                        std::pair CargoRemHold = Insurance::CalcRemHold(iClientID);
+                        if (isAddPossible((eq->fVolume * itemsToAdd), CargoRemHold.first, CargoRemHold.second))
                         {
+                            if (auto aType = eq->get_class_type();
+                                aType == Archetype::REPAIR_KIT ||
+                                aType == Archetype::SHIELD_BATTERY ||
+                                aType == Archetype::MUNITION ||
+                                aType == Archetype::MINE ||
+                                aType == Archetype::COUNTER_MEASURE)
+                            {
 
-                            Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
-                            ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
-                            bAdded = true;
+                                Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
+                                ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                                bAdded = true;
 
-                        }
-                        else {
-                            std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
-                            HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
-                            //ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
-                            bAdded = true;
+                            }
+                            else {
+                                std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
+                                HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
+                                //ConPrint(L"Added WEAPON %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                                bAdded = true;
 
-                        }
-
+                            }
+						}   
 
 
 
@@ -549,28 +551,32 @@ namespace Insurance {
 
                 // ConPrint InsuranceEquip Size
                 //ConPrint(L"InsuranceEquip Size: %u\n", iterInsuranceEquip->CARGO_INFO.iCount);
-
-                if (auto aType = eq->get_class_type();
-                    aType == Archetype::REPAIR_KIT ||
-                    aType == Archetype::SHIELD_BATTERY ||
-                    aType == Archetype::MUNITION ||
-                    aType == Archetype::MINE ||
-                    aType == Archetype::COUNTER_MEASURE)
+                std::pair CargoRemHold = Insurance::CalcRemHold(iClientID);
+                if (isAddPossible((eq->fVolume * iterInsuranceEquip->CARGO_INFO.iCount), CargoRemHold.first, CargoRemHold.second))
                 {
-                    //ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
 
-                    Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, iterInsuranceEquip->CARGO_INFO.iCount, false);
-                    bAdded = true;
 
-                }
-                else {
-                    std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
-                    HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
-                    //ConPrint(L"Created WEAPON %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
-                    bAdded = true;
+                    if (auto aType = eq->get_class_type();
+                        aType == Archetype::REPAIR_KIT ||
+                        aType == Archetype::SHIELD_BATTERY ||
+                        aType == Archetype::MUNITION ||
+                        aType == Archetype::MINE ||
+                        aType == Archetype::COUNTER_MEASURE)
+                    {
+                        //ConPrint(L"Created AMMO %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
 
-                }
+                        Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, iterInsuranceEquip->CARGO_INFO.iCount, false);
+                        bAdded = true;
 
+                    }
+                    else {
+                        std::string phardpoint = iterInsuranceEquip->CARGO_INFO.hardpoint.value;
+                        HkAddEquip(ARG_CLIENTID(iClientID), iterInsuranceEquip->CARGO_INFO.iArchID, phardpoint);
+                        //ConPrint(L"Created WEAPON %u, %u to %s\n", iterInsuranceEquip->CARGO_INFO.iCount, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                        bAdded = true;
+
+                    }
+				}   
 
 
                 if (!iterInsuranceEquip->bItemisFree && bAdded)
@@ -1170,7 +1176,7 @@ namespace Insurance {
         return insuranceTypes;
     }
 
-    bool CalcRemHold(uint iClientID)
+    std::pair<float,float> CalcRemHold(uint iClientID)
     {
         //Player cargo
         int iRemHoldSize;
@@ -1195,17 +1201,32 @@ namespace Insurance {
 
 
         if (CargofVolume <= fSize) {
-            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 1\n");
+            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 1");
             //ConPrint(L"allowundock 1 \n");
-            return true;
+            
 
         }
         else {
-            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 0\n");
+            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 0");
             //ConPrint(L"allowundock 0 \n");
-            return false;
 
         }
+
+        return std::make_pair(CargofVolume, fSize);
+
+    }
+
+    bool isAddPossible(float fVolumetoAdd, float fHold, float fMaxHold)
+    {
+        //Calc NewHold
+        if ((fVolumetoAdd + fHold) <= fMaxHold)
+        {
+			return true;
+		}
+        else
+        {
+			return false;
+		}
 
     }
 

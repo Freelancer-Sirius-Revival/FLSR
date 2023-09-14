@@ -252,7 +252,7 @@ namespace Insurance {
             {
                 fprice += gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount;
                 fCalculatedPrice = fCalculatedPrice + (((gi.fPrice * MountedEquipPriceList->CARGO_INFO.iCount) / 100.0f) * Insurance::set_fCostPercent);
-                ConPrint(L"fCalculatedPrice calc: " + std::to_wstring(fCalculatedPrice) + L"\n");
+                //ConPrint(L"fCalculatedPrice calc: " + std::to_wstring(fCalculatedPrice) + L"\n");
 
             }
             else if (!MountedEquipPriceList->bItemisFree  /* && !MountedEquipPriceList->bFreeInsurance */ && MountedEquipPriceList->bIsAmmo)
@@ -267,7 +267,7 @@ namespace Insurance {
         }
 
 
-        ConPrint(L"fCalculatedPrice final: " + std::to_wstring(fCalculatedPrice) + L"\n");
+        //ConPrint(L"fCalculatedPrice final: " + std::to_wstring(fCalculatedPrice) + L"\n");
 
         //Cast fCalculatedPrice to int
         int iCalculatedPrice = static_cast<int>(fCalculatedPrice);
@@ -434,7 +434,7 @@ namespace Insurance {
         HkEnumCargo(ARG_CLIENTID(iClientID), lstCargo, iRemHoldSize);
 
 
-        ConPrint(L"Hold Size: " + std::to_wstring(iRemHoldSize) + L"\n");
+        //ConPrint(L"Hold Size: " + std::to_wstring(iRemHoldSize) + L"\n");
         // Initialize the lists to store mounted and additional equipment
         std::list<CARGO_INFO> lstMounted;
 
@@ -515,7 +515,7 @@ namespace Insurance {
                             {
 
                                 Tools::FLSRHkAddCargo(wscCharname, iterInsuranceEquip->CARGO_INFO.iArchID, itemsToAdd, false);
-                                ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
+                                //ConPrint(L"Added AMMO %u, %u to %s\n", itemsToAdd, iterInsuranceEquip->CARGO_INFO.iArchID, wscCharname.c_str());
                                 bAdded = true;
 
                             }

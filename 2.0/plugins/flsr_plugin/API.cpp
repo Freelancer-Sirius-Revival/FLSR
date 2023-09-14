@@ -238,6 +238,27 @@ namespace API {
             }
         });
 
+        // Discord Data
+        CROW_ROUTE(app, "/discord/<string>")
+            ([](std::string discordID) {
+
+            crow::response response;
+            response.add_header("Content-Type", "application/json");
+
+            json userData;
+
+            {
+                std::lock_guard<std::mutex> lock(m_Mutex);
+                userData["hasUserValidChars"] = Discord::DoesDiscordAccountHaveValidChars(discordID);                
+            }
+
+          
+
+            response.write(userData.dump());
+            return response;
+
+            });
+
 
 
 

@@ -1214,13 +1214,13 @@ namespace Insurance {
 
 
         if (CargofVolume <= fSize) {
-            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 1");
+            //ClientController::Send_ControlMsg(false, iClientID, L"allowundock 1");
             //ConPrint(L"allowundock 1 \n");
             
 
         }
         else {
-            ClientController::Send_ControlMsg(false, iClientID, L"allowundock 0");
+            //ClientController::Send_ControlMsg(false, iClientID, L"allowundock 0");
             //ConPrint(L"allowundock 0 \n");
 
         }

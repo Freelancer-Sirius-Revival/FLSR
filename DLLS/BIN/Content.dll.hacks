@@ -1,0 +1,24 @@
+File: Content.dll
+
+06C470: INTEGER32 | max range at which NPCs will scan your cargo | FL: 500 | FLSR: 1500
+0A9D8E: BYTE | rank level limit  | FL: 40 | FLSR: 100
+0AAD7A: make MP job difficulty exactly between min and max difficulty in mbases.ini 
+        FL: 99 B9 03 00 00 00 F7 F9 85 D2 74 33 D9 05 30 B2 FB 06 DD 5C 24 04 FF D6 99 DD 44 24 04 B9 03 00 00 00 F7 F9 8D 54 12 
+        FLSR: 89 44 E4 04 D9 44 E4 20 D8 64 E4 1C EB 04 66 B8 FB 06 DB 44 E4 04 D8 0D D0 97 39 06 DE C9 D8 44 E4 1C 5E 83 C4 10 C3
+0CC985: BYTE | jump gates test reputation | FL: 40 | FLSR: 00
+0D3D6E: FLOAT32 | maximum distance that NPCs will persist in MP | FL: 2500 | FLSR: 5000
+0F17D9: FLOAT32 | distance at which NPC wave ships in randommissions are created | FL: 2625 | FLSR: 3000
+117A68: FLOAT32 | distance over which NPC spawning will ignore density cap in MP | FL: 7500 | FLSR: 5000
+118130: FLOAT32 | time given to drop cargo | FL: 20 | FLSR: 5
+11B930: FLOAT64 | adjustment for maximum reputation | FL: 0.1 | FLSR: 0
+11BC68: FLOAT64 | NPC max spawn distance in SP and MP | FL: 2500 | FLSR: 5000
+11BC80: FLOAT64 | initial NPC max spawn distance in SP and MP | FL: 1775 | FLSR: 2000
+11BCF4: FLOAT32 | hostile docking reputation | FL: -0.6 | FLSR: -0.4
+11C2B0: FLOAT32 | distance at which mission target solars in randommissions are created | FL: 7500 | FLSR: 15000
+11C2C4: FLOAT32 | distance at which NPC mission target ships in randommissions are created | FL: 2500 | FLSR: 3500
+11C2C8: FLOAT32 | core retreat distance from randommission waypoint, modified by below offset | FL: 3500 | FLSR: 4250
+11CBCC: FLOAT32 | distance from 1st mission waypoint that second waypoint (and ships at it) in randommissions are created | FL: 6000 | FLSR: 7500
+11CBE8: String | name of NPC Class to spawn in random missions | FL: class_fighter | FLSR: class_mission
+11CC7C: Weighted vector used to determine how many ships should occur in random missions. Starts at 0 ships up to 8 ships. (MP) | FL: 0f, 0f, 2f, 3f, 9f, 6f, 4f, 2f, 1f | FLSR: 0f, 0f, 1f, 2f, 4f, 6f, 5f, 3f, 2f
+12E354: FLOAT32 | reputation needed for lawful factions to show rumors | FL: 0.2 | FLSR: 0
+12E358: FLOAT32 | reputation needed for unlawful factions to show rumors | FL: 0.4 | FLSR: 0.2

@@ -1,0 +1,31 @@
+File: server.dll
+
+00960C: Fix explosion damage not causing full damage (or no damage) on large ships and bases. | FL: 0C | FLSR: 00
+00AFC0: Energy weapons don't damage power. | FL: D9 44 24 | FLSR: C2 08 00
+0112A3: need level to buy ships/equipment in MP | FL: 1D | FLSR: 00 (outdated version of this hack)
+02C057: update objects once (fixes bug that causes solar guns reduce refire delay when multiple players are around) | FL: 74 0A 41 83 C2 04 3B C8 7C F4 EB | FLSR: 75 0B C7 84 8C 9C 00 00 00 00 00
+        0B C7 84 8C 9C 00 00 00 00 00 00  [ 00 00 41 83 C2 04 39 C1 7C E9 EB ]
+06F46F: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06F475: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06F4A6: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06F4AD: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06F51E: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06F525: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06FB9B: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06FBA3: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06FBAE: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06FC00: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06FC08: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+06FC1C: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+07543C: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+075443: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+0754E0: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+0754E7: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+076426: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+07642D: INTEGER32 | aximum credits that a player can have in MP | FL: 999999999 | FLSR: 2147483647
+085535: FLOAT64 | respawn time for any solar object to regain full health once destroyed in MP | FL: 60 | FLSR: 600
+086AEC: FLOAT32 | square of NPC disappear distance in MP  | FL: 6250000 | FLSR: 25000000
+086AF0: FLOAT32 | square of player disappear distance in MP | FL: 25000000 | FLSR: 400000000
+086AF4: FLOAT32 | square of grouped player disappear distance in MP | FL: 100000000 | FLSR: 400000000
+08AE78: FLOAT32 | resale % for ships (server-side, must match variable above or 1.1 server dll will kick client for cheating) | FL: 0.8 | FLSR: 0.5
+08AE7C: FLOAT32 | resale % for equipment (server-side, must match variable above or 1.1 server dll will kick client for cheating) | FL: 0.3 | FLSR: 0.5

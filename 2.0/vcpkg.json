@@ -4,9 +4,10 @@
   "version": "2.1.0",
   "dependencies": [
     "nlohmann-json",
-	"sqlitecpp",
-	"spdlog",
-	"crow",
-	"dpp"
-  ]
+    "sqlitecpp",
+    "spdlog",
+    "crow",
+    "dpp"
+  ],
+  "builtin-baseline": "06c79a9afa6f99f02f44d20df9e0848b2a56bf1b"
 }

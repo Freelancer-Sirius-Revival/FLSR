@@ -55,7 +55,8 @@
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgInstalledDir>C:\vcpkg\vcpkg</VcpkgInstalledDir>
+    <VcpkgInstalledDir>
+    </VcpkgInstalledDir>
     <VcpkgAdditionalInstallOptions>
     </VcpkgAdditionalInstallOptions>
     <VcpkgUseStatic>false</VcpkgUseStatic>

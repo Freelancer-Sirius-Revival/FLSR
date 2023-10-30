@@ -1035,22 +1035,23 @@ namespace Discord {
 
 				while (pPD = Players.traverse_active(pPD))
 				{
-					int iRank = pPD->iRank;
-					uint iShipArch = pPD->iShipArchetype;
-					uint iClientID = HkGetClientIdFromPD(pPD);
-					//Charname
-					std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-					std::string scCharname = wstring_to_utf8(wscCharname);
-					//Ping
-					HKPLAYERINFO pi;
-					HkGetPlayerInfo(wscCharname, pi, false);
-					auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
+					if (!HkIsInCharSelectMenu(pPD->iOnlineID)) {
+						int iRank = pPD->iRank;
+						uint iShipArch = pPD->iShipArchetype;
+						uint iClientID = HkGetClientIdFromPD(pPD);
+						//Charname
+						std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+						std::string scCharname = wstring_to_utf8(wscCharname);
+						//Ping
+						HKPLAYERINFO pi;
+						HkGetPlayerInfo(wscCharname, pi, false);
+						auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
 
 
-					charnames.push_back(scCharname);
-					ships.push_back(std::to_string(iShipArch));
-					pings.push_back(std::to_string(ping));
-
+						charnames.push_back(scCharname);
+						ships.push_back(std::to_string(iShipArch));
+						pings.push_back(std::to_string(ping));
+					}
 
 				}
 

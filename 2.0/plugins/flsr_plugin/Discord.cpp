@@ -784,6 +784,18 @@ namespace Discord {
 							// The last error.
 							HK_ERROR err;
 
+							int currentCash = 0;
+							if (HkGetCash(stows(scTarget), currentCash) != HKE_OK)
+								return;
+
+							long long newCash = static_cast<long long>(currentCash) + iAmount;
+
+							if (newCash < 0 || newCash > std::numeric_limits<long>::max())
+							{
+								event.reply("Credits transfer failed! Max cash on character account cannot exceed $ 2,147,483,647.");
+								return;
+							}
+
 							if ((err = HkAddCash(stows(scTarget), iAmount)) != HKE_OK) {
 
 								if (err == HKE_CHAR_DOES_NOT_EXIST)
@@ -1552,27 +1564,27 @@ namespace Discord {
 				{
 					// Discord-Account existiert bereits, Betrag aktualisieren
 					// Aktuellen Betrag abrufen und in int umwandeln
-					int intCredits = std::stoi(GetCreditsForDiscordAccount(discordAccount));
-
-					// Betrag addieren oder subtrahieren
-					if (bAdd)
+					long long intCredits = std::stoi(GetCreditsForDiscordAccount(discordAccount));
+					try
 					{
-						intCredits += std::stoi(credits);
-					}
-					else
-					{
-						int creditsToSubtract = std::stoi(credits);
-						if (creditsToSubtract <= intCredits)
+						int creditsChange = std::stoi(credits);
+						// Betrag addieren oder subtrahieren
+						if (bAdd)
 						{
-							intCredits -= creditsToSubtract;
+							intCredits += creditsChange;
+						}
+						else
+						{
+							intCredits -= creditsChange;
 						}
 					}
-
-					// Balance darf nicht negativ sein
-					if (intCredits < 0)
+					catch (const std::exception&) // Checks for invalid argument or out of range
 					{
-						intCredits = 0;
+						return false;
 					}
+
+					if (intCredits < 0 || intCredits > std::numeric_limits<long>::max())
+						return false;
 
 					// Aktualisierten Betrag in der Datenbank speichern
 					std::string sqlUpdateCredits = "UPDATE Bank SET Credits = ? WHERE DiscordAccount = ?";

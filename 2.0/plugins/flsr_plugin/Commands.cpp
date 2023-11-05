@@ -89,7 +89,7 @@ namespace Commands {
                     std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
 
 
-                    // Parameter übergeben - Betrag auf Discord-Account überweisen
+                    // Parameter ï¿½bergeben - Betrag auf Discord-Account ï¿½berweisen
 
                     // Ist der Char alt genug (Abuse-Prevention - 1h)?
                     int secs = 0;
@@ -99,8 +99,18 @@ namespace Commands {
                         return;
                     }
 
+                    int amount = -1;
+
                     // Betrag aus dem Parameter extrahieren und in einen int umwandeln
-                    int amount = std::stoi(wstos(wscParam));
+                    try
+                    {
+                        amount = std::stoi(wstos(wscParam));
+                    }
+                    catch (const std::exception&)
+                    {
+                        PrintUserCmdText(iClientID, L"Invalid amount specified.");
+                        return;
+                    }
 
                     // Betrag validieren (muss positiv sein)
                     if (amount <= 0)
@@ -109,12 +119,12 @@ namespace Commands {
                         return;
                     }
 
-                    // Ist genügend Geld auf dem Charakter?
+                    // Ist genï¿½gend Geld auf dem Charakter?
                     int iCash;
                     HkGetCash(wscCharname, iCash);
                     if (iCash < amount)
                     {
-                        //Nicht genügeng Geld
+                        //Nicht genï¿½geng Geld
                         PrintUserCmdText(iClientID, L"You don't have enough credits.");
                         return;
                     }
@@ -129,7 +139,7 @@ namespace Commands {
                         return;
                     }
 
-                    // Betrag auf den Discord-Account überweisen
+                    // Betrag auf den Discord-Account ï¿½berweisen
                     if (!Discord::UpdateCreditsForDiscordAccount(scDiscordID, std::to_string(amount), true))
                     {
 						PrintUserCmdText(iClientID, L"Error while updating discord balance");
@@ -249,7 +259,7 @@ namespace Commands {
     void UserCmd_pvpinvite(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("PVP"))
         {
-            // Überprüfe ob Spieler im Space ist
+            // ï¿½berprï¿½fe ob Spieler im Space ist
             uint iShip;
             pub::Player::GetShip(iClientID, iShip);
             if (!iShip)
@@ -258,7 +268,7 @@ namespace Commands {
                 return;
             }
 
-            // Überprüfe auf Target
+            // ï¿½berprï¿½fe auf Target
             uint iTargetShip;
             pub::SpaceObj::GetTarget(iShip, iTargetShip);
             if (!iTargetShip)
@@ -267,7 +277,7 @@ namespace Commands {
                 return;
             }
 
-            // Überprüfe ob Target ein Spieler ist
+            // ï¿½berprï¿½fe ob Target ein Spieler ist
             uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
             if (!iTargetClientID)
             {
@@ -417,7 +427,7 @@ namespace Commands {
             // Mutex sperren
             std::lock_guard<std::mutex> lock(m_Mutex);
 
-            // Chat-Nachricht zur Liste hinzufügen
+            // Chat-Nachricht zur Liste hinzufï¿½gen
             Discord::lChatMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
 
@@ -438,7 +448,7 @@ namespace Commands {
             // Mutex sperren
             std::lock_guard<std::mutex> lock(m_Mutex);
 
-            // Chat-Nachricht zur Liste hinzufügen
+            // Chat-Nachricht zur Liste hinzufï¿½gen
             Discord::lModMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
     }
@@ -467,7 +477,7 @@ namespace Commands {
 			
             }
             
-            //Überprüfe ob Spieler ein Carrier sein kann (Schiff)
+            //ï¿½berprï¿½fe ob Spieler ein Carrier sein kann (Schiff)
             // Get ShipArchID
             uint iShipArchIDPlayer;
             pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
@@ -493,7 +503,7 @@ namespace Commands {
 
 
             
-            // Überprüfe ob der Spieler bereits ein Carrier ist
+            // ï¿½berprï¿½fe ob der Spieler bereits ein Carrier ist
             bool isCarrier = false;
             std::list<Docking::CarrierList>::iterator iterCarrier =
                 Docking::lCarrierList.begin();
@@ -504,7 +514,7 @@ namespace Commands {
                     break;
                 }
 
-                // Hochzählen
+                // Hochzï¿½hlen
                 iterCarrier++;
             }
 
@@ -533,7 +543,7 @@ namespace Commands {
     void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam) {
         if (Modules::GetModuleState("CarrierModule")) {
 
-            // Überprüfe ob Spieler im Space ist
+            // ï¿½berprï¿½fe ob Spieler im Space ist
             uint iShip;
             pub::Player::GetShip(iClientID, iShip);
             if (!iShip) {
@@ -541,7 +551,7 @@ namespace Commands {
                 return;
             }
 
-            // Überprüfe auf Target
+            // ï¿½berprï¿½fe auf Target
             uint iTargetShip;
             pub::SpaceObj::GetTarget(iShip, iTargetShip);
             if (!iTargetShip) {
@@ -549,14 +559,14 @@ namespace Commands {
                 return;
             }
 
-            // Überprüfe ob Target ein Spieler ist
+            // ï¿½berprï¿½fe ob Target ein Spieler ist
             uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
             if (!iTargetClientID) {
                 PrintUserCmdText(iClientID, L"Please select a player!");
                 return;
             }
             
-            //Überprüfe ob Spieler ein Carrier ist
+            //ï¿½berprï¿½fe ob Spieler ein Carrier ist
 			bool bisCarrier = false;
             std::list<Docking::CarrierList>::iterator iterCarrier1 = Docking::lCarrierList.begin();
             while (iterCarrier1 != Docking::lCarrierList.end()) {
@@ -572,7 +582,7 @@ namespace Commands {
                 iterCarrier1++;
             }
 
-            // Überprüfe ob der Spieler ein Carrier ist
+            // ï¿½berprï¿½fe ob der Spieler ein Carrier ist
             std::list<Docking::CarrierList>::iterator iterCarrier = Docking::lCarrierList.begin();
             while (iterCarrier != Docking::lCarrierList.end()) {
 
@@ -635,7 +645,7 @@ namespace Commands {
                     }
                 }
 
-                // Hochzählen
+                // Hochzï¿½hlen
                 iterCarrier++;
             }
         }
@@ -646,7 +656,7 @@ namespace Commands {
 
             std::wstring Charname = wscParam;
             uint requestedClientId = HkGetClientIdFromCharname(Charname);
-            // Nur wenn die ClientID gültig ist den Spieler Docken
+            // Nur wenn die ClientID gï¿½ltig ist den Spieler Docken
             if (HkIsValidClientID(requestedClientId)) {
 
                 // Suche dockrequest
@@ -659,7 +669,7 @@ namespace Commands {
 
                             //PrintUserCmdText(iClientID, stows(iterDockRequest->sInterior));
 
-                            //Überprüfe die Distanz
+                            //ï¿½berprï¿½fe die Distanz
                             uint CarrierShip;
                             pub::Player::GetShip(iClientID, CarrierShip);
                             uint RequestedShip;
@@ -706,7 +716,7 @@ namespace Commands {
                             }
                         }
                     }
-                    // Hochzählen
+                    // Hochzï¿½hlen
                     iterDockRequest++;
                 }
 

@@ -94,7 +94,7 @@ namespace Commands {
                     // Ist der Char alt genug (Abuse-Prevention - 1h)?
                     int secs = 0;
                     HkGetOnlineTime(wscCharname, secs);
-                    if (secs < 3600) {
+                    if (secs < 600) {
                         PrintUserCmdText(iClientID, L"ERR insufficient time online");
                         return;
                     }

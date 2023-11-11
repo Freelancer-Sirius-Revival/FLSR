@@ -2,18 +2,12 @@
 
 namespace Timers {
 
-
     TIMER Timers[] = {
-       {Cloak::CloakInstallTimer2000ms, 2000, 0},
-	   {Cloak::WarmUpCloakTimer1000ms, 1000, 0},
-       {Cloak::DoCloakingTimer250ms, 250, 0},
-       {Cloak::UpdateShipEnergyTimer, 1500, 0},
+        { Cloak::SynchronizeCloakedClients, 200, 0 },
        {Docking::DockRequest3000ms, 3000, 0},
        {PathSelection::ModUnlawfulChar500ms, 500, 0},
         { GroupReputation::CleanDestroyedShipRegistry, 1000 },
        {Tools::CharSelectMenu, 2000, 0},
-      // {SrvCtrlObj::Timer1000ms, 1000, 0}
-
     };
 
     int __stdcall Update() {
@@ -22,13 +16,8 @@ namespace Timers {
         // call timers
         for (uint i = 0; (i < sizeof(Timers) / sizeof(TIMER)); i++) {
             if ((timeInMS() - Timers[i].tmLastCall) >= Timers[i].tmIntervallMS) {
-              
-  
                     Timers[i].tmLastCall = timeInMS();
                     Timers[i].proc();
- 
-                
-   
             }
         }
 
@@ -36,6 +25,4 @@ namespace Timers {
                   // return code to "DEFAULT_RETURNCODE", so FLHook will just ignore
                   // it
     }
-
-
 }

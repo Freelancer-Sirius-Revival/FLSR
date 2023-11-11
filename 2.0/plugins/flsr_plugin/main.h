@@ -514,7 +514,6 @@ namespace Hooks {
 	void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
     void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state);
     void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
-    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }
 
@@ -712,78 +711,53 @@ namespace CustomMissions {
 
 }
 
-namespace Cloak {
-
-
-    void InstallCloak(uint iClientID);
-	void CloakInstallTimer2000ms();
-    void WarmUpCloakTimer1000ms();
-    void DoCloakingTimer250ms();
-	void UncloakGroup(uint iClientID);
+namespace Cloak
+{
+    void ClearClientData(uint clientId);
+    void InstallCloak(uint clientId);
     void LoadCloakSettings();
-    bool Check_Dock_Call(uint iShip, uint iDockTarget, uint iCancel, enum DOCK_HOST_RESPONSE response);
-    bool Check_GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
-    bool Check_Cloak(uint iClientID);
-    void StartCloakPlayer(uint iClientID);
-    void DoCloak(uint iClientID);
-    void UncloakPlayer(uint iClientID);
-    void UpdateShipEnergyTimer();
-    bool Check_RequestEventFormaDocking(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
-    void CloakSync(uint iClientID);
-    void KillShield(uint iClientID);
+    void InitializeWithGameData();
+    bool CheckDockCall(uint ship, uint dockTargetId, uint dockPortIndex, enum DOCK_HOST_RESPONSE response);
+    bool IsFullyUncloaked(uint clientId);
+    void AttemptInitialUncloak(uint clientId);
+    void QueueUncloak(uint clientId);
+    void SynchronizeCloakedClients();
+    void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
+    void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);
+    void UserCmd_CLOAK_TIME(uint clientId, const std::wstring& wscParam);
 
-    struct CloakDeviceInfo {
-		
-        std::string scCloakDeviceNickname;
-        uint iCloakDeviceArchID;
-        float fCloakCapacity;
-		float fPowerUsageToRecharge;
-		float fCloakPowerUsageWhileCloaked;
-        float fMinRequiredCapacityToCloak;
-        bool bUseShipPowerToRecharge;
-        bool bShieldDownOnCloaking;
-        bool bShieldDownWhileCloaking;
-		bool bCanUseCloakModule;
-        int iCloakWarmUpDuration;
-        int iCloakEffectDuration;
-        int iUncloakEffectDuration;
-		
+    struct CloakDeviceInfo
+    {
+        uint archetypeId;
+        float capacity;
+		float powerUsage;
+		float powerRecharge;
+        float minRequiredCapacityToCloak;
+        bool shieldDown;
+        int cloakEffectDuration;
+        int uncloakEffectDuration;
     };
 
-    struct PlayerCloakInfo {
-        bool bInitialCloak = false;
-        bool bCanCloak = false;
-        bool bIsCloaking = false;
-        bool bWantsCloak = false;
-        bool bCloaked = false;
-        int iCloakSlot = 0;
-        uint iCloakDeviceArchID;
-        mstime tmCloakTime = timeInMS();
-		mstime tmUnCloakTime = timeInMS();
-        bool bIsinGroup = false;
-		uint iGroupID = 0;
-        float fCloakCap = 0.0f;
-		float fEnergy = 0.0f;
-        CloakDeviceInfo PlayerCloakData;
-		bool bShowUI = false;
-        bool bAllowUncloak = true;
-        bool bAllowCloak = false;
-        bool bPlayerShield = false;
+    enum CloakState
+    {
+        Uncloaked,
+        Cloaking,
+        Cloaked,
+        Uncloaking
     };
-	
-    struct WarmUpCloak {
-        bool bRdy = false;
-        mstime msStart = 0;
+
+    struct ClientCloakingDevice
+    {
+        int cargoId = 0;
+        CloakState cloakState = CloakState::Cloaked;
+        bool initialUncloakRequired = true;
+        mstime cloakTimeStamp = 0;
+		mstime uncloakTimeStamp = 0;
+        mstime lastTimingInfoTimeStamp = 0;
+        float capacity = 0.0f;
+        bool insideNoCloakZone = false;
+        CloakDeviceInfo cloakData;
     };
-    
-    // extern IMPORT PlayerCloakInfo PlayerCloakData[MAX_CLIENT_ID + 1];
-    // extern IMPORT WarmUpCloak PlayerWarmUpCloak[MAX_CLIENT_ID + 1];
-
-	extern std::list<CloakDeviceInfo> lCloakDeviceList;
-	extern std::map<std::wstring, PlayerCloakInfo> mPlayerCloakData;
-    extern std::map<std::wstring, WarmUpCloak> mPlayerWarmUpCloak;
-
-
 }
 
 namespace Crafting

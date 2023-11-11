@@ -74,7 +74,7 @@ namespace ClientController {
                 }
             }
             //Cloak
-            if (Modules::GetModuleState("CloakModule"))
+            /*if (Modules::GetModuleState("CloakModule"))
             {
                 if (Tools::startsWith(scData, "Power: "))
                 {
@@ -106,7 +106,7 @@ namespace ClientController {
                     Cloak::InstallCloak(iClientID);
 
                 }
-            }
+            }*/
             //Carrier Module
             if (Modules::GetModuleState("CarrierModule"))
             {

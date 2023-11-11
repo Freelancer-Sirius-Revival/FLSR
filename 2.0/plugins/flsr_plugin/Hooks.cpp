@@ -25,13 +25,10 @@ namespace Hooks {
         //NewPlayerMessage
         Tools::HkNewPlayerMessage(iClientID, cId);
 
-        //CloakModule
         if (Modules::GetModuleState("CloakModule"))
         {
-            Commands::UserCmd_UNCLOAK(iClientID, L"");
-            ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
+            Cloak::ClearClientData(iClientID);
         }
-
     }
 
     // LaunchComplete
@@ -70,13 +67,7 @@ namespace Hooks {
             Docking::ClearCarrier(iClientID);
             Docking::HandleUndocking(iClientID);
         }
-		
-        if (Modules::GetModuleState("CloakModule"))
-        {
-            Cloak::InstallCloak(iClientID);
-            Commands::UserCmd_UNCLOAK(iClientID, L"");
-        }
-        
+
         //Test
         //int iWorth = (int)Tools::CalcDisabledHardpointWorth(iClientID);
         //PrintUserCmdText(iClientID, std::to_wstring(iWorth));
@@ -290,16 +281,7 @@ namespace Hooks {
                     pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
                     EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
                 }
-
-                if (Modules::GetModuleState("CloakModule"))
-                {
-                    Commands::UserCmd_UNCLOAK(iClientID, L"");
-                    ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-                }
             }
-
-        
-        
     }
 
     //BaseEnter_AFTER
@@ -336,8 +318,7 @@ namespace Hooks {
 		//Cloak
         if (Modules::GetModuleState("CloakModule"))
         {
-            Commands::UserCmd_UNCLOAK(iClientID, L"");
-            ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
+            Cloak::ClearClientData(iClientID);
         }
 
         //PathSelection
@@ -358,6 +339,11 @@ namespace Hooks {
         {
             AntiCheat::TimingAC::CheckTimeStamp(ui, iClientID);
             AntiCheat::SpeedAC::CheckSpeedCheat(ui, iClientID);
+        }
+
+        if (Modules::GetModuleState("CloakModule"))
+        {
+            Cloak::AttemptInitialUncloak(iClientID);
         }
     }
 
@@ -384,7 +370,7 @@ namespace Hooks {
             //CloakModule
             if (Modules::GetModuleState("CloakModule"))
             {
-                if (!Cloak::Check_Dock_Call(iShip, iDockTarget, iCancel, response))
+                if (!Cloak::CheckDockCall(iShip, iDockTarget, iCancel, response))
                 {
 					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
                 }
@@ -403,21 +389,7 @@ namespace Hooks {
 
         return 0;
     }
-    
-    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID)
-    {
-        returncode = DEFAULT_RETURNCODE;
-        
-        //CloakModule
-        if (Modules::GetModuleState("CloakModule"))
-        {
-            if (!Cloak::Check_RequestEventFormaDocking( iIsFormationRequest, iShip, iDockTarget, p4, p5, iClientID))
-            {
-                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            }
-        }
-    }
-	
+
     // Called when a gun hits something
     void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci, unsigned int iClientID) {
         returncode = DEFAULT_RETURNCODE;
@@ -452,6 +424,11 @@ namespace Hooks {
         {
 			PlayerHunt::CheckSystemReached(iClientID, iSystemID);
         }
+
+        if (Modules::GetModuleState("CloakModule"))
+        {
+            Cloak::QueueUncloak(iClientID);
+        }
     }
 	
     void __stdcall SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID) {
@@ -474,7 +451,7 @@ namespace Hooks {
                  
 				
              
-                // Überprüfe auf DockRequest
+                // ï¿½berprï¿½fe auf DockRequest
                 std::list<Docking::UndockRelocate>::iterator iterRelocate = Docking::lUndockRelocate.begin();
                 while (iterRelocate != Docking::lUndockRelocate.end()) {
 
@@ -543,17 +520,12 @@ namespace Hooks {
 
         }
 
-        //Cloak
+        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE ClearClientInfo");
+
         if (Modules::GetModuleState("CloakModule"))
         {
-    
-          Cloak::InstallCloak(iClientID);
-          Commands::UserCmd_UNCLOAK(iClientID, L"");
-          ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-
+            Cloak::ClearClientData(iClientID);
         }
-
-        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE ClearClientInfo");
     }
 
     void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn) {
@@ -563,15 +535,6 @@ namespace Hooks {
         if (Modules::GetModuleState("ACModule"))
         {
             AntiCheat::PowerAC::FireWeapon(iClientID, wpn);
-        }
-
-        //CloakModule
-        if (Modules::GetModuleState("CloakModule"))
-        {
-            if (Cloak::Check_Cloak(iClientID))
-            {
-                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            }
         }
     }
 
@@ -589,11 +552,7 @@ namespace Hooks {
 		//Cloak
         if (Modules::GetModuleState("CloakModule"))
         {
-           //Install CLoak on Spawn
            Cloak::InstallCloak(iClientID);
-           Commands::UserCmd_UNCLOAK(iClientID, L"");
-           ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-			
         }
 
         //EquipWhiteList
@@ -653,13 +612,6 @@ namespace Hooks {
         {
             EquipWhiteList::SendList(iArchID, iClientID, false);
         }
-
-        //CloakModule
-        if (Modules::GetModuleState("CloakModule"))
-        {
-            Commands::UserCmd_UNCLOAK(iClientID, L"");
-            ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-        }
     }
 
     void __stdcall ReqEquipment(class EquipDescList const& edl, unsigned int iClientID) {
@@ -675,33 +627,25 @@ namespace Hooks {
 		
     }
 
-    void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl) {
+    void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl)
+    {
         returncode = DEFAULT_RETURNCODE;
 		
         //CloakModule
         if (Modules::GetModuleState("CloakModule"))
         {
-            if (!Cloak::Check_GoTradelane(iClientID,gtl))
-            {
-                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            }
+            Cloak::QueueUncloak(iClientID);
         }
-
     }
 	
-    void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state) {
+    void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state)
+    {
         returncode = DEFAULT_RETURNCODE;
 		
 		//CloakModule
         if (Modules::GetModuleState("CloakModule"))
         {
-            try {
-                //Install CLoak on Spawn
-                Cloak::InstallCloak(iClientID);
-                Commands::UserCmd_UNCLOAK(iClientID, L"");
-                ClientController::Send_ControlMsg(false, iClientID, L"_DisableCloakEnergy");
-            }
-            catch (...) {}
+            Cloak::ClearClientData(iClientID);
         }
         
         //PlayerHunt

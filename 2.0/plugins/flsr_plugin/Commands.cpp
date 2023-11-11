@@ -89,7 +89,7 @@ namespace Commands {
                     std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
 
 
-                    // Parameter ï¿½bergeben - Betrag auf Discord-Account ï¿½berweisen
+                    // Parameter übergeben - Betrag auf Discord-Account überweisen
 
                     // Ist der Char alt genug (Abuse-Prevention - 1h)?
                     int secs = 0;
@@ -119,12 +119,12 @@ namespace Commands {
                         return;
                     }
 
-                    // Ist genï¿½gend Geld auf dem Charakter?
+                    // Ist genügend Geld auf dem Charakter?
                     int iCash;
                     HkGetCash(wscCharname, iCash);
                     if (iCash < amount)
                     {
-                        //Nicht genï¿½geng Geld
+                        //Nicht genügeng Geld
                         PrintUserCmdText(iClientID, L"You don't have enough credits.");
                         return;
                     }
@@ -139,7 +139,7 @@ namespace Commands {
                         return;
                     }
 
-                    // Betrag auf den Discord-Account ï¿½berweisen
+                    // Betrag auf den Discord-Account überweisen
                     if (!Discord::UpdateCreditsForDiscordAccount(scDiscordID, std::to_string(amount), true))
                     {
 						PrintUserCmdText(iClientID, L"Error while updating discord balance");
@@ -259,7 +259,7 @@ namespace Commands {
     void UserCmd_pvpinvite(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("PVP"))
         {
-            // ï¿½berprï¿½fe ob Spieler im Space ist
+            // Überprüfe ob Spieler im Space ist
             uint iShip;
             pub::Player::GetShip(iClientID, iShip);
             if (!iShip)
@@ -268,7 +268,7 @@ namespace Commands {
                 return;
             }
 
-            // ï¿½berprï¿½fe auf Target
+            // Überprüfe auf Target
             uint iTargetShip;
             pub::SpaceObj::GetTarget(iShip, iTargetShip);
             if (!iTargetShip)
@@ -277,7 +277,7 @@ namespace Commands {
                 return;
             }
 
-            // ï¿½berprï¿½fe ob Target ein Spieler ist
+            // Überprüfe ob Target ein Spieler ist
             uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
             if (!iTargetClientID)
             {
@@ -369,48 +369,6 @@ namespace Commands {
             PrintUserCmdText(iClientID, L"Error: could not find faction");
         }
     }
-    
-    void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("CloakModule"))
-        {
-            
-            std::wstring wscCharFileName;
-            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-
-            uint iShip = 0;
-            pub::Player::GetShip(iClientID, iShip);
-            if (!iShip)
-            {
-                PrintUserCmdText(iClientID, L"Error: You are docked.");
-                return;
-            }
-			
-            if (ClientInfo[iClientID].bTradelane)
-            {
-				//PrintUserCmdText(iClientID, L"Error: You are in a tradelane.");
-				return;
-            }
-
-            if (Cloak::mPlayerCloakData[wscCharFileName].bCanCloak)
-            {
-                //PrintUserCmdText(iClientID, L"CLOAK TOGGLED SERVRSIDE");
-                Cloak::StartCloakPlayer(iClientID);
-
-            }
-
-
-        }
-    }
-
-    void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("CloakModule"))
-        {
-            Cloak::UncloakPlayer(iClientID);
-
-
-
-        }
-    }
 
     void UserCmd_UV(uint iClientID, const std::wstring &wscParam) {
         std::wstring Chat = wscParam;
@@ -427,7 +385,7 @@ namespace Commands {
             // Mutex sperren
             std::lock_guard<std::mutex> lock(m_Mutex);
 
-            // Chat-Nachricht zur Liste hinzufï¿½gen
+            // Chat-Nachricht zur Liste hinzufügen
             Discord::lChatMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
 
@@ -448,7 +406,7 @@ namespace Commands {
             // Mutex sperren
             std::lock_guard<std::mutex> lock(m_Mutex);
 
-            // Chat-Nachricht zur Liste hinzufï¿½gen
+            // Chat-Nachricht zur Liste hinzufügen
             Discord::lModMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
     }
@@ -477,7 +435,7 @@ namespace Commands {
 			
             }
             
-            //ï¿½berprï¿½fe ob Spieler ein Carrier sein kann (Schiff)
+            //Überprüfe ob Spieler ein Carrier sein kann (Schiff)
             // Get ShipArchID
             uint iShipArchIDPlayer;
             pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
@@ -503,7 +461,7 @@ namespace Commands {
 
 
             
-            // ï¿½berprï¿½fe ob der Spieler bereits ein Carrier ist
+            // Überprüfe ob der Spieler bereits ein Carrier ist
             bool isCarrier = false;
             std::list<Docking::CarrierList>::iterator iterCarrier =
                 Docking::lCarrierList.begin();
@@ -514,7 +472,7 @@ namespace Commands {
                     break;
                 }
 
-                // Hochzï¿½hlen
+                // Hochzählen
                 iterCarrier++;
             }
 
@@ -543,7 +501,7 @@ namespace Commands {
     void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam) {
         if (Modules::GetModuleState("CarrierModule")) {
 
-            // ï¿½berprï¿½fe ob Spieler im Space ist
+            // Überprüfe ob Spieler im Space ist
             uint iShip;
             pub::Player::GetShip(iClientID, iShip);
             if (!iShip) {
@@ -551,7 +509,7 @@ namespace Commands {
                 return;
             }
 
-            // ï¿½berprï¿½fe auf Target
+            // Überprüfe auf Target
             uint iTargetShip;
             pub::SpaceObj::GetTarget(iShip, iTargetShip);
             if (!iTargetShip) {
@@ -559,14 +517,14 @@ namespace Commands {
                 return;
             }
 
-            // ï¿½berprï¿½fe ob Target ein Spieler ist
+            // Überprüfe ob Target ein Spieler ist
             uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
             if (!iTargetClientID) {
                 PrintUserCmdText(iClientID, L"Please select a player!");
                 return;
             }
             
-            //ï¿½berprï¿½fe ob Spieler ein Carrier ist
+            //Überprüfe ob Spieler ein Carrier ist
 			bool bisCarrier = false;
             std::list<Docking::CarrierList>::iterator iterCarrier1 = Docking::lCarrierList.begin();
             while (iterCarrier1 != Docking::lCarrierList.end()) {
@@ -582,7 +540,7 @@ namespace Commands {
                 iterCarrier1++;
             }
 
-            // ï¿½berprï¿½fe ob der Spieler ein Carrier ist
+            // Überprüfe ob der Spieler ein Carrier ist
             std::list<Docking::CarrierList>::iterator iterCarrier = Docking::lCarrierList.begin();
             while (iterCarrier != Docking::lCarrierList.end()) {
 
@@ -645,7 +603,7 @@ namespace Commands {
                     }
                 }
 
-                // Hochzï¿½hlen
+                // Hochzählen
                 iterCarrier++;
             }
         }
@@ -656,7 +614,7 @@ namespace Commands {
 
             std::wstring Charname = wscParam;
             uint requestedClientId = HkGetClientIdFromCharname(Charname);
-            // Nur wenn die ClientID gï¿½ltig ist den Spieler Docken
+            // Nur wenn die ClientID gültig ist den Spieler Docken
             if (HkIsValidClientID(requestedClientId)) {
 
                 // Suche dockrequest
@@ -669,7 +627,7 @@ namespace Commands {
 
                             //PrintUserCmdText(iClientID, stows(iterDockRequest->sInterior));
 
-                            //ï¿½berprï¿½fe die Distanz
+                            //Überprüfe die Distanz
                             uint CarrierShip;
                             pub::Player::GetShip(iClientID, CarrierShip);
                             uint RequestedShip;
@@ -716,7 +674,7 @@ namespace Commands {
                             }
                         }
                     }
-                    // Hochzï¿½hlen
+                    // Hochzählen
                     iterDockRequest++;
                 }
 
@@ -1254,8 +1212,12 @@ namespace Commands {
         {L"/sendcash$", UserCMD_SendCash$},
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", Insurance::UserCMD_INSURANCE},
-        {L"/cloak", UserCmd_CLOAK},
-		{L"/uncloak", UserCmd_UNCLOAK},
+        {L"/cloak", Cloak::UserCmd_CLOAK},
+        {L"/c", Cloak::UserCmd_CLOAK},
+		{L"/uncloak", Cloak::UserCmd_UNCLOAK},
+        {L"/uc", Cloak::UserCmd_UNCLOAK},
+        {L"/cloaktime", Cloak::UserCmd_CLOAK_TIME},
+        {L"/ct", Cloak::UserCmd_CLOAK_TIME},
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},

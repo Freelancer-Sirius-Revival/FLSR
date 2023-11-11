@@ -22,10 +22,19 @@ namespace Cloak
 	std::map<uint, std::vector<uint>> jumpHolesPerSystem;
 
 	std::set<uint> clientIdsRequestingUncloak;
+	std::map<std::wstring, float> lastPersistedCharacterCloakCapacity;
 
-	void ClearClientData(uint clientId)
+	void ClearClientData(uint clientId, bool storeCloakCapacity)
 	{
+		if (storeCloakCapacity)
+		{
+			std::wstring characterFileNameWS;
+			if (clientCloakingDevice.contains(clientId) && HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK)
+				lastPersistedCharacterCloakCapacity.insert({ characterFileNameWS, clientCloakingDevice[clientId].capacity });
+		}
+
 		clientCloakingDevice.erase(clientId);
+		clientIdsRequestingUncloak.erase(clientId);
 	}
 
 	void CollectAllJumpSolarsPerSystem()
@@ -213,7 +222,6 @@ namespace Cloak
 			return;
 
 		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-
 		std::list<CARGO_INFO> cargoList;
 		int remainingCargoHoldSize;
 		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
@@ -229,7 +237,15 @@ namespace Cloak
 					{
 						clientCloakingDevice[clientId].cloakData = cloakDevice;
 						clientCloakingDevice[clientId].cargoId = cargo.iID;
-						clientCloakingDevice[clientId].capacity = clientCloakingDevice[clientId].cloakData.capacity;
+						if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK && lastPersistedCharacterCloakCapacity.contains(characterFileNameWS))
+						{
+							clientCloakingDevice[clientId].capacity = lastPersistedCharacterCloakCapacity[characterFileNameWS];
+							lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
+						}
+						else
+						{
+							clientCloakingDevice[clientId].capacity = clientCloakingDevice[clientId].cloakData.capacity;
+						}
 						return;
 					}
 				}

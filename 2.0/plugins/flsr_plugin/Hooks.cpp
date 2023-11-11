@@ -27,7 +27,7 @@ namespace Hooks {
 
         if (Modules::GetModuleState("CloakModule"))
         {
-            Cloak::ClearClientData(iClientID);
+            Cloak::ClearClientData(iClientID, true);
         }
     }
 
@@ -318,7 +318,7 @@ namespace Hooks {
 		//Cloak
         if (Modules::GetModuleState("CloakModule"))
         {
-            Cloak::ClearClientData(iClientID);
+            Cloak::ClearClientData(iClientID, false);
         }
 
         //PathSelection
@@ -645,7 +645,7 @@ namespace Hooks {
 		//CloakModule
         if (Modules::GetModuleState("CloakModule"))
         {
-            Cloak::ClearClientData(iClientID);
+            Cloak::ClearClientData(iClientID, true);
         }
         
         //PlayerHunt

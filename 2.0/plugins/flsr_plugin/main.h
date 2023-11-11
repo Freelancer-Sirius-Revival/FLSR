@@ -713,7 +713,7 @@ namespace CustomMissions {
 
 namespace Cloak
 {
-    void ClearClientData(uint clientId);
+    void ClearClientData(uint clientId, bool storeCloakCapacity);
     void InstallCloak(uint clientId);
     void LoadCloakSettings();
     void InitializeWithGameData();

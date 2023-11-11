@@ -139,7 +139,13 @@ namespace Cloak
 		CloakReturnState result = CloakReturnState::None;
 
 		const auto cloakState = clientCloakingDevice[clientId].cloakState;
-		if (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking)
+		uint cloakingDeviceCargoId;
+		CloakDeviceInfo cloakDeviceInfo;
+		if (!FindCloakingDevice(clientId, cloakingDeviceCargoId, cloakDeviceInfo))
+		{
+			result = CloakReturnState::NotReady;
+		}
+		else if (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking)
 		{
 			result = CloakReturnState::Successful;
 		}
@@ -182,6 +188,11 @@ namespace Cloak
 
 		if (timeInMS() - clientCloakingDevice[clientId].cloakTimeStamp > clientCloakingDevice[clientId].cloakData.cloakEffectDuration)
 		{
+			uint cloakingDeviceCargoId;
+			CloakDeviceInfo cloakDeviceInfo;
+			if (!FindCloakingDevice(clientId, cloakingDeviceCargoId, cloakDeviceInfo))
+				return false;
+
 			clientIdsRequestingUncloak.erase(clientId);
 			clientCloakingDevice[clientId].uncloakTimeStamp = timeInMS();
 			clientCloakingDevice[clientId].cloakState = CloakState::Uncloaking;
@@ -216,17 +227,17 @@ namespace Cloak
 		pub::SpaceObj::DrainShields(Players[clientId].iShipID);
 	}
 
-	void InstallCloak(uint clientId)
+	bool FindCloakingDevice(uint clientId, uint& cargoId, CloakDeviceInfo& cloakDeviceInfo)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
-			return;
+			return false;
 
 		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
 		std::list<CARGO_INFO> cargoList;
 		int remainingCargoHoldSize;
 		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
-			return;
-		
+			return false;
+
 		for (const auto& cargo : cargoList)
 		{
 			if (cargo.bMounted)
@@ -235,20 +246,44 @@ namespace Cloak
 				{
 					if (cargo.iArchID == cloakDevice.archetypeId)
 					{
-						clientCloakingDevice[clientId].cloakData = cloakDevice;
-						clientCloakingDevice[clientId].cargoId = cargo.iID;
-						if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK && lastPersistedCharacterCloakCapacity.contains(characterFileNameWS))
-						{
-							clientCloakingDevice[clientId].capacity = lastPersistedCharacterCloakCapacity[characterFileNameWS];
-							lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
-						}
-						else
-						{
-							clientCloakingDevice[clientId].capacity = clientCloakingDevice[clientId].cloakData.capacity;
-						}
-						return;
+						cargoId = cargo.iID;
+						cloakDeviceInfo = cloakDevice;
+						return true;
 					}
 				}
+			}
+		}
+		return false;
+	}
+
+	void InstallCloak(uint clientId)
+	{
+		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			return;
+
+		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
+
+		std::list<CARGO_INFO> cargoList;
+		int remainingCargoHoldSize;
+		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
+			return;
+		
+		uint cloakingDeviceCargoId;
+		CloakDeviceInfo cloakDeviceInfo;
+		if (FindCloakingDevice(clientId, cloakingDeviceCargoId, cloakDeviceInfo))
+		{
+			clientCloakingDevice[clientId].cloakData = cloakDeviceInfo;
+			clientCloakingDevice[clientId].cargoId = cloakingDeviceCargoId;
+
+			std::wstring characterFileNameWS;
+			if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK && lastPersistedCharacterCloakCapacity.contains(characterFileNameWS))
+			{
+				clientCloakingDevice[clientId].capacity = lastPersistedCharacterCloakCapacity[characterFileNameWS];
+				lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
+			}
+			else
+			{
+				clientCloakingDevice[clientId].capacity = clientCloakingDevice[clientId].cloakData.capacity;
 			}
 		}
 	}
@@ -393,6 +428,14 @@ namespace Cloak
 			const uint clientId = HkGetClientIdFromPD(playerData);
 			if (!IsValidCloakableClient(clientId) || clientCloakingDevice[clientId].initialUncloakRequired)
 				continue;
+
+			uint cloakingDeviceCargoId;
+			CloakDeviceInfo cloakDeviceInfo;
+			if (!FindCloakingDevice(clientId, cloakingDeviceCargoId, cloakDeviceInfo))
+			{
+				ClearClientData(clientId, false);
+				continue;
+			}
 
 			// Synchronize cloak state to all players
 			const auto cloakState = clientCloakingDevice[clientId].cloakState;

@@ -130,7 +130,6 @@ namespace Commands {
     void AdminCmd_Stalk(CCmds *cmds, std::wstring Charname = L"");
     void CmdHelp_Callback(CCmds *classptr);
     bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd);
-    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam);
     void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam);
     void UserCMD_DOCKACCEPT(uint iClientID, const std::wstring &wscParam);
     void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam);
@@ -140,8 +139,6 @@ namespace Commands {
     void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam);
     void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam);
     void UserCmd_UV(uint iClientID, const std::wstring &wscParam);
-    void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
     void UserCmd_Tag(uint iClientID, const std::wstring& wscParam);
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam);
@@ -713,51 +710,21 @@ namespace CustomMissions {
 
 namespace Cloak
 {
-    void ClearClientData(uint clientId, bool storeCloakCapacity);
-    void InstallCloak(uint clientId);
     void LoadCloakSettings();
     void InitializeWithGameData();
-    bool CheckDockCall(uint ship, uint dockTargetId, uint dockPortIndex, enum DOCK_HOST_RESPONSE response);
-    bool IsFullyUncloaked(uint clientId);
-    void AttemptInitialUncloak(uint clientId);
-    void QueueUncloak(uint clientId);
     void SynchronizeCloakedClients();
-    void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
-    void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);
     void UserCmd_CLOAK_TIME(uint clientId, const std::wstring& wscParam);
-
-    struct CloakDeviceInfo
-    {
-        uint archetypeId;
-        float capacity;
-		float powerUsage;
-		float powerRecharge;
-        float minRequiredCapacityToCloak;
-        bool shieldDown;
-        int cloakEffectDuration;
-        int uncloakEffectDuration;
-    };
-
-    enum CloakState
-    {
-        Uncloaked,
-        Cloaking,
-        Cloaked,
-        Uncloaking
-    };
-
-    struct ClientCloakingDevice
-    {
-        int cargoId = 0;
-        CloakState cloakState = CloakState::Cloaked;
-        bool initialUncloakRequired = true;
-        mstime cloakTimeStamp = 0;
-		mstime uncloakTimeStamp = 0;
-        mstime lastTimingInfoTimeStamp = 0;
-        float capacity = 0.0f;
-        bool insideNoCloakZone = false;
-        CloakDeviceInfo cloakData;
-    };
+    void __stdcall ActivateEquip(unsigned int clientId, struct XActivateEquip const& activateEquip);
+    void __stdcall FireWeapon(unsigned int clientId, struct XFireWeaponInfo const& fireWeaponInfo);
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+    void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
+    void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane);
+    int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
+    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
+    void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
+    void __stdcall CharacterSelect(struct CHARACTER_ID const& characterId, unsigned int clientId);
+    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
+    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
 }
 
 namespace Crafting

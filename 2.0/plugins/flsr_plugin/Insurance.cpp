@@ -104,8 +104,7 @@ namespace Insurance
                 archetypeType == Archetype::LAUNCHER ||
                 archetypeType == Archetype::GUN ||
                 archetypeType == Archetype::MINE_DROPPER ||
-                archetypeType == Archetype::COUNTER_MEASURE_DROPPER ||
-                archetypeType == Archetype::CLOAKING_DEVICE;
+                archetypeType == Archetype::COUNTER_MEASURE_DROPPER;
     }
 
     bool IsArchetypeTypeConsumable(Archetype::AClassType archetypeType)

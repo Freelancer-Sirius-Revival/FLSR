@@ -523,14 +523,9 @@ namespace Cloak
 		return true;
 	}
 
-	void UncloakInNoCloakZones(uint clientId, uint clientSystemId, uint clientShipId)
+	void CheckPlayerInNoCloakZones(uint clientId, uint clientSystemId, uint clientShipId)
 	{
-		const auto cloakState = clientCloakingDevice[clientId].cloakState;
-		if (cloakState == CloakState::Uncloaked || cloakState == CloakState::Uncloaking)
-			return;
-		
 		bool insideNoCloakZone = false;
-
 		if (jumpGatesPerSystem.contains(clientSystemId))
 		{
 			for (const uint& jumpGateId : jumpGatesPerSystem[clientSystemId])
@@ -555,7 +550,8 @@ namespace Cloak
 		}
 
 		clientCloakingDevice[clientId].insideNoCloakZone = insideNoCloakZone;
-		if (insideNoCloakZone)
+		const auto cloakState = clientCloakingDevice[clientId].cloakState;
+		if (insideNoCloakZone && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
 			QueueUncloak(clientId);
 	}
 
@@ -653,7 +649,7 @@ namespace Cloak
 			SendClientActivatorActivationState(clientId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
 
 			// Uncloak player in no-cloak-zones
-			UncloakInNoCloakZones(clientId, playerData->iSystemID, playerData->iShipID);
+			CheckPlayerInNoCloakZones(clientId, playerData->iSystemID, playerData->iShipID);
 
 			// The rest in the update loop should be ignored for not initially uncloaked ships.
 			if (clientCloakingDevice[clientId].initialUncloakRequired)

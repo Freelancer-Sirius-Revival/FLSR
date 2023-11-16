@@ -7,16 +7,20 @@ namespace Cloak
 	float jumpHoleDecloakRadius = 1000.0f;
 	std::string defaultCloakHardpoint = "HpCloak01";
 
-	struct CloakingDeviceDefinition
+	struct CloakStatsDefinition
 	{
-		uint activatorArchetypeId;
-		uint cloakArchetypeId;
-		float capacity;
-		float powerUsage;
-		float powerRecharge;
-		float minRequiredCapacityToCloak;
-		int cloakEffectDuration;
-		int uncloakEffectDuration;
+		uint activatorArchetypeId = -1;
+		float capacity = 0.0f;
+		float powerUsage = 0.0f;
+		float powerRecharge = 0.0f;
+	};
+
+	struct ShipEffectDefinition
+	{
+		uint shipArchetypeId = -1;
+		uint cloakingDeviceArchetypeId = -1;
+		uint fuseId = -1;
+		int effectDuration = 0;
 	};
 
 	enum CloakState
@@ -27,20 +31,22 @@ namespace Cloak
 		Uncloaking
 	};
 
-	struct ClientCloakingDevice
+	struct ClientCloakStats
 	{
-		int activatorCargoId = 0;
+		uint activatorCargoId = -1;
 		std::string activatorHardpoint = "";
-		int cloakCargoId = 0;
+		uint cloakCargoId = -1;
 		CloakState cloakState = CloakState::Cloaked;
 		bool initialUncloakRequired = true;
 		mstime cloakTimeStamp = 0;
 		mstime uncloakTimeStamp = 0;
 		mstime lastTimingInfoTimeStamp = 0;
 		float capacity = 0.0f;
+		float minRequiredCapacityToCloak = 0.0f;
 		bool insideNoCloakZone = false;
 		bool dockingManeuverActive = false;
-		CloakingDeviceDefinition cloakingDeviceDefinition;
+		CloakStatsDefinition* statsDefinition = 0;
+		ShipEffectDefinition* effectsDefinition = 0;
 	};
 
 	enum CloakReturnState
@@ -52,8 +58,9 @@ namespace Cloak
 		NotReady
 	};
 
-	std::map<uint, ClientCloakingDevice> clientCloakingDevice;
-	std::vector<CloakingDeviceDefinition> cloakingDeviceDefinitions;
+	std::vector<CloakStatsDefinition> cloakDefinitions;
+	std::vector<ShipEffectDefinition> shipEffects;
+	std::map<uint, ClientCloakStats> clientCloakStats;
 
 	std::map<uint, std::vector<uint>> jumpGatesPerSystem;
 	std::map<uint, std::vector<uint>> jumpHolesPerSystem;
@@ -63,7 +70,7 @@ namespace Cloak
 
 	bool IsValidCloakableClient(uint clientId)
 	{
-		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakingDevice.contains(clientId))
+		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakStats.contains(clientId))
 		{
 			uint ship = 0;
 			pub::Player::GetShip(clientId, ship);
@@ -74,7 +81,7 @@ namespace Cloak
 
 	bool IsFullyUncloaked(uint clientId)
 	{
-		return IsValidCloakableClient(clientId) && clientCloakingDevice[clientId].cloakState == CloakState::Uncloaked;
+		return IsValidCloakableClient(clientId) && clientCloakStats[clientId].cloakState == CloakState::Uncloaked;
 	}
 
 	void CollectAllJumpSolarsPerSystem()
@@ -97,14 +104,14 @@ namespace Cloak
 
 	void ClearClientData(uint clientId, bool storeCloakCapacity)
 	{
-		if (storeCloakCapacity && clientCloakingDevice.contains(clientId))
+		if (storeCloakCapacity && clientCloakStats.contains(clientId))
 		{
 			std::wstring characterFileNameWS;
 			if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK)
-				lastPersistedCharacterCloakCapacity.insert({ characterFileNameWS, clientCloakingDevice[clientId].capacity });
+				lastPersistedCharacterCloakCapacity.insert({ characterFileNameWS, clientCloakStats[clientId].capacity });
 		}
 
-		clientCloakingDevice.erase(clientId);
+		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
 
@@ -114,35 +121,64 @@ namespace Cloak
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
 		const std::string configFilePath = std::string(currentDirectory) + Globals::CLOAK_CONFIG_FILE;
 
-		cloakingDeviceDefinitions.clear();
-
-		const std::string generalSection = "General";
-		defaultCloakHardpoint = IniGetS(configFilePath, generalSection, "CloakHardpoint", "HpCloak01");
-		cloakTimeInfoInterval = IniGetI(configFilePath, generalSection, "CloakTimeInfoInterval", 5000);
-		jumpGateDecloakRadius = IniGetF(configFilePath, generalSection, "JumpGateDecloakRadius", 2000.0f);
-		jumpHoleDecloakRadius = IniGetF(configFilePath, generalSection, "JumpHoleDecloakRadius", 1000.0f);
-
-		for (int i = 0;; i++)
+		shipEffects.clear();
+		cloakDefinitions.clear();
+		INI_Reader ini;
+		if (ini.open(configFilePath.c_str(), false))
 		{
-			const std::string section = "CloakDevice" + std::to_string(i);
-			const std::string activatorNickname = IniGetS(configFilePath, section, "ActivatorNickname", "");
-			const std::string cloakNickname = IniGetS(configFilePath, section, "CloakNickname", "");
-			if (activatorNickname == "" || cloakNickname == "")
-				break;
-			CloakingDeviceDefinition definition;
-			definition.activatorArchetypeId = CreateID(activatorNickname.c_str());
-			definition.cloakArchetypeId = CreateID(cloakNickname.c_str());
-			definition.capacity = IniGetF(configFilePath, section, "Capacity", 0.0f);
-			definition.powerUsage = IniGetF(configFilePath, section, "PowerUsageWhileCloaked", 0.0f) / 1000.0f;
-			definition.powerRecharge = IniGetF(configFilePath, section, "PowerRecharge", 0.0f) / 1000.0f;
-			definition.minRequiredCapacityToCloak = 0.0f;
-			definition.cloakEffectDuration = 0.0f;
-			definition.uncloakEffectDuration = 0.0f;
+			while (ini.read_header())
+			{
+				if (ini.is_header("General"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("cloak_hardpoint"))
+							defaultCloakHardpoint = ini.get_value_string(0);
+						else if (ini.is_value("cloak_time_info_interval"))
+							cloakTimeInfoInterval = ini.get_value_int(0);
+						else if (ini.is_value("jump_gate_decloak_radius"))
+							jumpGateDecloakRadius = ini.get_value_float(0);
+						else if (ini.is_value("jump_hole_decloak_radius"))
+							jumpHoleDecloakRadius = ini.get_value_float(0);
+					}
+				}
 
-			cloakingDeviceDefinitions.push_back(definition);
+				if (ini.is_header("ShipEffects"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("ship_cloak_fuse"))
+						{
+							ShipEffectDefinition definition;
+							definition.shipArchetypeId = CreateID(ini.get_value_string(0));
+							definition.cloakingDeviceArchetypeId = CreateID(ini.get_value_string(1));
+							definition.fuseId = CreateID(ini.get_value_string(2));
+							if (definition.shipArchetypeId && definition.cloakingDeviceArchetypeId && definition.fuseId)
+								shipEffects.push_back(definition);
+						}
+					}
+				}
+
+				if (ini.is_header("Cloak"))
+				{
+					CloakStatsDefinition definition;
+					while (ini.read_value())
+					{
+						if (ini.is_value("activator_nickname"))
+							definition.activatorArchetypeId = CreateID(ini.get_value_string(0));
+						else if (ini.is_value("capacity"))
+							definition.capacity = ini.get_value_float(0);
+						else if (ini.is_value("power_usage_while_cloaked"))
+							definition.powerUsage = ini.get_value_float(0) / 1000.0f;
+						else if (ini.is_value("power_recharge"))
+							definition.powerRecharge = ini.get_value_float(0) / 1000.0f;
+					}
+					if (definition.activatorArchetypeId)
+						cloakDefinitions.push_back(definition);
+				}
+			}
+			ini.close();
 		}
-
-		CollectAllJumpSolarsPerSystem();
 	}
 
 	bool initialized = false;
@@ -154,23 +190,39 @@ namespace Cloak
 			return;
 
 		initialized = true;
-		for (auto& definition : cloakingDeviceDefinitions)
+		for (auto& shipEffect : shipEffects)
 		{
-			const Archetype::Equipment* equipment = Archetype::GetEquipment(definition.cloakArchetypeId);
+			const Archetype::Equipment* equipment = Archetype::GetEquipment(shipEffect.cloakingDeviceArchetypeId);
 			if (equipment == 0)
 				continue;
 			const Archetype::CloakingDevice* archetype = (Archetype::CloakingDevice*)equipment;
-			definition.minRequiredCapacityToCloak = definition.powerUsage * 1000 * archetype->fCloakinTime;
-			definition.cloakEffectDuration = archetype->fCloakinTime * 1000;
-			definition.uncloakEffectDuration = archetype->fCloakoutTime * 1000;
+			shipEffect.effectDuration = std::min(archetype->fCloakinTime, archetype->fCloakoutTime) * 1000;
 		}
 
 		CollectAllJumpSolarsPerSystem();
 	}
 
-	bool EnsureCloakBeingEquipped(uint clientId)
+	bool EquipCloakingDevice(uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			return false;
+
+		uint shipArchetypeId;
+		pub::Player::GetShipID(clientId, shipArchetypeId);
+		if (!shipArchetypeId)
+			return false;
+
+		uint cloakingDeviceArchetypeId = -1;
+		for (const auto& shipEffect : shipEffects)
+		{
+			if (shipEffect.shipArchetypeId == shipArchetypeId)
+			{
+				cloakingDeviceArchetypeId = shipEffect.cloakingDeviceArchetypeId;
+				break;
+			}
+		}
+
+		if (!cloakingDeviceArchetypeId)
 			return false;
 
 		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
@@ -179,14 +231,13 @@ namespace Cloak
 		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
 			return false;
 
-		for (const auto& cloakingDeviceDefinition : cloakingDeviceDefinitions)
+		for (const auto& cloakDefinition : cloakDefinitions)
 		{
 			for (const auto& cargo : cargoList)
 			{
-				if (cargo.bMounted && cargo.iArchID == cloakingDeviceDefinition.activatorArchetypeId)
+				if (cargo.bMounted && cargo.iArchID == cloakDefinition.activatorArchetypeId)
 				{
-					const Archetype::Ship* ship = Archetype::GetShip(Players[clientId].iShipArchetype);
-					if (HkAddEquip(ARG_CLIENTID(clientId), cloakingDeviceDefinition.cloakArchetypeId, defaultCloakHardpoint) == HKE_OK)
+					if (HkAddEquip(ARG_CLIENTID(clientId), cloakingDeviceArchetypeId, defaultCloakHardpoint) == HKE_OK)
 					{
 						// Anti Cheat
 						char* szClassPtr;
@@ -212,7 +263,7 @@ namespace Cloak
 		return false;
 	}
 
-	void RemoveCloakingEquipment(uint clientId)
+	void RemoveCloakingDevices(uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
@@ -234,44 +285,6 @@ namespace Cloak
 		}
 	}
 
-	bool FindCloakingEquipments(uint clientId, uint& activatorCargoId, std::string& activatorHardpoint, uint& cloakCargoId, CloakingDeviceDefinition& cloakingDeviceDefinition)
-	{
-		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
-			return false;
-
-		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-		std::list<CARGO_INFO> cargoList;
-		int remainingCargoHoldSize;
-		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
-			return false;
-
-		for (auto& definition : cloakingDeviceDefinitions)
-		{
-			activatorCargoId = -1;
-			cloakCargoId = -1;
-			for (const auto& cargo : cargoList)
-			{
-				if (cargo.bMounted)
-				{
-					if (cargo.iArchID == definition.activatorArchetypeId)
-					{
-						activatorCargoId = cargo.iID;
-						activatorHardpoint = std::string(cargo.hardpoint.value);
-					}
-					if (cargo.iArchID == definition.cloakArchetypeId)
-						cloakCargoId = cargo.iID;
-					if (activatorCargoId != -1 && cloakCargoId != -1)
-					{
-						cloakingDeviceDefinition = definition;
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
 	bool HasMountedEquipmentByCargoId(uint clientId, uint cargoId)
 	{
 		if (!HkIsValidClientID(clientId))
@@ -291,12 +304,95 @@ namespace Cloak
 		return false;
 	}
 
+	void InstallCloak(uint clientId)
+	{
+		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			return;
+
+		ClientCloakStats clientStats;
+
+		uint shipArchetypeId;
+		pub::Player::GetShipID(clientId, shipArchetypeId);
+		for (int index = 0; index < shipEffects.size(); index++)
+		{
+			if (shipEffects[index].shipArchetypeId == shipArchetypeId)
+			{
+				clientStats.effectsDefinition = &shipEffects[index];
+				break;
+			}
+		}
+		if (!clientStats.effectsDefinition)
+			return;
+
+		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
+		std::list<CARGO_INFO> cargoList;
+		int remainingCargoHoldSize;
+		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
+			return;
+
+		for (int index = 0; index < cloakDefinitions.size(); index++)
+		{
+			for (const auto& cargo : cargoList)
+			{
+				if (cargo.bMounted)
+				{
+					if (cargo.iArchID == cloakDefinitions[index].activatorArchetypeId)
+					{
+						clientStats.activatorCargoId = cargo.iID;
+						clientStats.activatorHardpoint = std::string(cargo.hardpoint.value);
+					}
+					if (cargo.iArchID == clientStats.effectsDefinition->cloakingDeviceArchetypeId)
+						clientStats.cloakCargoId = cargo.iID;
+				}
+
+				if (clientStats.activatorCargoId != -1 && clientStats.cloakCargoId != -1)
+				{
+					clientStats.statsDefinition = &cloakDefinitions[index];
+					break;
+				}
+			}
+			if (clientStats.statsDefinition)
+				break;
+		}
+		if (!clientStats.statsDefinition)
+			return;
+
+		clientStats.minRequiredCapacityToCloak = clientStats.statsDefinition->powerUsage * clientStats.effectsDefinition->effectDuration;
+
+		std::wstring characterFileNameWS;
+		if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK && lastPersistedCharacterCloakCapacity.contains(characterFileNameWS))
+		{
+			lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
+			clientStats.capacity = lastPersistedCharacterCloakCapacity[characterFileNameWS];
+		}
+		else
+		{
+			clientStats.capacity = clientStats.statsDefinition->capacity;
+		}
+
+		clientCloakStats.insert({ clientId, clientStats });
+	}
+
+	void StartFuse(uint clientId, uint fuseId)
+	{
+		const IObjInspectImpl* obj = HkGetInspect(clientId);
+		if (obj)
+			HkLightFuse((IObjRW*)obj, fuseId, 0.0f, 0.0f, 0.0f);
+	}
+
+	void StopFuse(uint clientId, uint fuseId)
+	{
+		const IObjInspectImpl* obj = HkGetInspect(clientId);
+		if (obj)
+			HkUnLightFuse((IObjRW*)obj, fuseId);
+	}
+
 	void SendServerCloakingDeviceActivationState(uint clientId, bool active)
 	{
 		XActivateEquip activateEquipment;
 		activateEquipment.bActivate = active;
 		activateEquipment.iSpaceID = ClientInfo[clientId].iShip;
-		activateEquipment.sID = clientCloakingDevice[clientId].cloakCargoId;
+		activateEquipment.sID = clientCloakStats[clientId].cloakCargoId;
 		Server.ActivateEquip(clientId, activateEquipment);
 	}
 
@@ -305,7 +401,7 @@ namespace Cloak
 		XActivateEquip activateEquipment;
 		activateEquipment.bActivate = active;
 		activateEquipment.iSpaceID = ClientInfo[clientId].iShip;
-		activateEquipment.sID = clientCloakingDevice[clientId].cloakCargoId;
+		activateEquipment.sID = clientCloakStats[clientId].cloakCargoId;
 		HookClient->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
 	}
 
@@ -314,7 +410,7 @@ namespace Cloak
 		XActivateEquip activateEquipment;
 		activateEquipment.bActivate = active;
 		activateEquipment.iSpaceID = ClientInfo[clientId].iShip;
-		activateEquipment.sID = clientCloakingDevice[clientId].activatorCargoId;
+		activateEquipment.sID = clientCloakStats[clientId].activatorCargoId;
 		Server.ActivateEquip(clientId, activateEquipment);
 	}
 
@@ -323,7 +419,7 @@ namespace Cloak
 		XActivateEquip activateEquipment;
 		activateEquipment.bActivate = active;
 		activateEquipment.iSpaceID = ClientInfo[clientId].iShip;
-		activateEquipment.sID = clientCloakingDevice[clientId].activatorCargoId;
+		activateEquipment.sID = clientCloakStats[clientId].activatorCargoId;
 		HookClient->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
 	}
 
@@ -341,16 +437,16 @@ namespace Cloak
 				while ((delimiterPos = currentWeaponGroups.find('\n')) != std::string::npos)
 				{
 					std::string line = currentWeaponGroups.substr(0, delimiterPos);
-					if (!line.empty() && line.find(clientCloakingDevice[clientId].activatorHardpoint) == std::string::npos)
+					if (!line.empty() && line.find(clientCloakStats[clientId].activatorHardpoint) == std::string::npos)
 						lines.push_back(currentWeaponGroups.substr(0, delimiterPos));
 					currentWeaponGroups.erase(0, delimiterPos + 1);
 				}
 
-				const auto cloakState = clientCloakingDevice[clientId].cloakState;
+				const auto cloakState = clientCloakStats[clientId].cloakState;
 				if (cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked)
 				{
 					for (int groupIndex = 0; groupIndex < 6; groupIndex++)
-						lines.push_back("wg = " + std::to_string(groupIndex) + ", " + clientCloakingDevice[clientId].activatorHardpoint);
+						lines.push_back("wg = " + std::to_string(groupIndex) + ", " + clientCloakStats[clientId].activatorHardpoint);
 				}
 
 				std::string newWeaponGroups;
@@ -368,8 +464,8 @@ namespace Cloak
 	{
 		CloakReturnState result = CloakReturnState::None;
 
-		const auto cloakState = clientCloakingDevice[clientId].cloakState;
-		if (!HasMountedEquipmentByCargoId(clientId, clientCloakingDevice[clientId].activatorCargoId))
+		const auto cloakState = clientCloakStats[clientId].cloakState;
+		if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 		{
 			result = CloakReturnState::NotReady;
 		}
@@ -377,17 +473,17 @@ namespace Cloak
 		{
 			result = CloakReturnState::Successful;
 		}
-		else if (clientCloakingDevice[clientId].insideNoCloakZone || clientCloakingDevice[clientId].dockingManeuverActive || ClientInfo[clientId].bTradelane)
+		else if (clientCloakStats[clientId].insideNoCloakZone || clientCloakStats[clientId].dockingManeuverActive || ClientInfo[clientId].bTradelane)
 		{
 			result = CloakReturnState::Blocked;
 			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
 		}
-		else if (clientCloakingDevice[clientId].capacity < clientCloakingDevice[clientId].cloakingDeviceDefinition.minRequiredCapacityToCloak)
+		else if (clientCloakStats[clientId].capacity < clientCloakStats[clientId].minRequiredCapacityToCloak)
 		{
 			result = CloakReturnState::NoEnergy;
 			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
 		}
-		else if (timeInMS() - clientCloakingDevice[clientId].uncloakTimeStamp < clientCloakingDevice[clientId].cloakingDeviceDefinition.uncloakEffectDuration)
+		else if (timeInMS() - clientCloakStats[clientId].uncloakTimeStamp < clientCloakStats[clientId].effectsDefinition->effectDuration)
 		{
 			result = CloakReturnState::NotReady;
 			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
@@ -395,13 +491,14 @@ namespace Cloak
 
 		if (result == CloakReturnState::None)
 		{
-			clientCloakingDevice[clientId].cloakTimeStamp = timeInMS();
-			clientCloakingDevice[clientId].cloakState = CloakState::Cloaking;
 			SendServerCloakingDeviceActivationState(clientId, true);
 			SendClientCloakingDeviceActivationState(clientId, true);
 			SendServerActivatorActivationState(clientId, true);
 			SendClientActivatorActivationState(clientId, true);
 			SynchronizeWeaponGroupsWithCloakState(clientId);
+			StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
+			clientCloakStats[clientId].cloakTimeStamp = timeInMS();
+			clientCloakStats[clientId].cloakState = CloakState::Cloaking;
 			result = CloakReturnState::Successful;
 		}
 
@@ -413,28 +510,32 @@ namespace Cloak
 
 	bool TryUncloak(uint clientId)
 	{
-		const auto cloakState = clientCloakingDevice[clientId].cloakState;
+		const auto cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Uncloaked || cloakState == CloakState::Uncloaking)
 		{
 			clientIdsRequestingUncloak.erase(clientId);
 			return true;
 		}
 
-		if (timeInMS() - clientCloakingDevice[clientId].cloakTimeStamp > clientCloakingDevice[clientId].cloakingDeviceDefinition.cloakEffectDuration)
+		if (timeInMS() - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration)
 		{
-			if (!HasMountedEquipmentByCargoId(clientId, clientCloakingDevice[clientId].activatorCargoId))
+			if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 				return false;
 
 			clientIdsRequestingUncloak.erase(clientId);
-			clientCloakingDevice[clientId].uncloakTimeStamp = timeInMS();
-			clientCloakingDevice[clientId].cloakState = CloakState::Uncloaking;
-			clientCloakingDevice[clientId].initialUncloakRequired = false;
 			SendServerCloakingDeviceActivationState(clientId, false);
 			SendClientCloakingDeviceActivationState(clientId, false);
 			SendServerActivatorActivationState(clientId, false);
 			SendClientActivatorActivationState(clientId, false);
 			SynchronizeWeaponGroupsWithCloakState(clientId);
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("deactivated"));
+			if (!clientCloakStats[clientId].initialUncloakRequired)
+			{
+				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
+				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("deactivated"));
+			}
+			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
+			clientCloakStats[clientId].cloakState = CloakState::Uncloaking;
+			clientCloakStats[clientId].initialUncloakRequired = false;
 			return true;
 		}
 		return false;
@@ -442,7 +543,7 @@ namespace Cloak
 
 	void QueueUncloak(uint clientId)
 	{
-		if (!IsValidCloakableClient(clientId) || clientCloakingDevice[clientId].initialUncloakRequired)
+		if (!IsValidCloakableClient(clientId) || clientCloakStats[clientId].initialUncloakRequired)
 			return;
 
 		if (!TryUncloak(clientId))
@@ -451,7 +552,7 @@ namespace Cloak
 
 	void AttemptInitialUncloak(uint clientId)
 	{
-		if (IsValidCloakableClient(clientId) && clientCloakingDevice[clientId].initialUncloakRequired)
+		if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].initialUncloakRequired)
 		{
 			TryUncloak(clientId);
 		}
@@ -462,42 +563,13 @@ namespace Cloak
 		pub::SpaceObj::DrainShields(Players[clientId].iShipID);
 	}
 
-	void InstallCloak(uint clientId)
-	{
-		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
-			return;
-
-		uint activatorCargoId;
-		std::string activatorHardpoint;
-		uint cloakCargoId;
-		CloakingDeviceDefinition definition;
-		if (FindCloakingEquipments(clientId, activatorCargoId, activatorHardpoint, cloakCargoId, definition))
-		{
-			clientCloakingDevice[clientId].cloakingDeviceDefinition = definition;
-			clientCloakingDevice[clientId].activatorCargoId = activatorCargoId;
-			clientCloakingDevice[clientId].activatorHardpoint = activatorHardpoint;
-			clientCloakingDevice[clientId].cloakCargoId = cloakCargoId;
-
-			std::wstring characterFileNameWS;
-			if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK && lastPersistedCharacterCloakCapacity.contains(characterFileNameWS))
-			{
-				lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
-				clientCloakingDevice[clientId].capacity = lastPersistedCharacterCloakCapacity[characterFileNameWS];
-			}
-			else
-			{
-				clientCloakingDevice[clientId].capacity = clientCloakingDevice[clientId].cloakingDeviceDefinition.capacity;
-			}
-		}
-	}
-
 	bool CheckDockCall(uint ship, uint dockTargetId, uint dockPortIndex, enum DOCK_HOST_RESPONSE response)
 	{
 		const uint clientId = HkGetClientIDByShip(ship);
 		if (!IsValidCloakableClient(clientId))
 			return true;
 
-		clientCloakingDevice[clientId].dockingManeuverActive = false;
+		clientCloakStats[clientId].dockingManeuverActive = false;
 
 		// dockPortIndex == -1 -> aborting the dock
 		if (!dockTargetId || dockPortIndex == -1 || response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
@@ -519,7 +591,7 @@ namespace Cloak
 			return false;
 		}
 
-		clientCloakingDevice[clientId].dockingManeuverActive = true;
+		clientCloakStats[clientId].dockingManeuverActive = true;
 		return true;
 	}
 
@@ -549,65 +621,69 @@ namespace Cloak
 			}
 		}
 
-		clientCloakingDevice[clientId].insideNoCloakZone = insideNoCloakZone;
-		const auto cloakState = clientCloakingDevice[clientId].cloakState;
+		clientCloakStats[clientId].insideNoCloakZone = insideNoCloakZone;
+		const auto cloakState = clientCloakStats[clientId].cloakState;
 		if (insideNoCloakZone && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
 			QueueUncloak(clientId);
 	}
 
 	void UpdateStateByEffectTimings(uint clientId, mstime currentTime)
 	{
-		const auto& cloakState = clientCloakingDevice[clientId].cloakState;
+		auto& cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Cloaking)
 		{
-			clientCloakingDevice[clientId].cloakState = currentTime - clientCloakingDevice[clientId].cloakTimeStamp > clientCloakingDevice[clientId].cloakingDeviceDefinition.cloakEffectDuration ? CloakState::Cloaked : CloakState::Cloaking;
+			cloakState = currentTime - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration ? CloakState::Cloaked : CloakState::Cloaking;
 		}
 		else if (cloakState == CloakState::Uncloaking)
 		{
-			clientCloakingDevice[clientId].cloakState = currentTime - clientCloakingDevice[clientId].uncloakTimeStamp > clientCloakingDevice[clientId].cloakingDeviceDefinition.uncloakEffectDuration ? CloakState::Uncloaked : CloakState::Uncloaking;
+			cloakState = currentTime - clientCloakStats[clientId].uncloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration ? CloakState::Uncloaked : CloakState::Uncloaking;
+		}
+		if (cloakState == CloakState::Cloaked || cloakState == CloakState::Uncloaked)
+		{
+			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
 		}
 	}
 
 	void UpdateCapacity(uint clientId, mstime currentTime, mstime previousTime)
 	{
-		if (clientCloakingDevice[clientId].cloakingDeviceDefinition.capacity == 0)
+		if (clientCloakStats[clientId].statsDefinition->capacity == 0)
 			return;
 
-		const auto cloakState = clientCloakingDevice[clientId].cloakState;
+		const auto cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked)
 		{
-			clientCloakingDevice[clientId].capacity -= clientCloakingDevice[clientId].cloakingDeviceDefinition.powerUsage * (currentTime - previousTime);
-			if (clientCloakingDevice[clientId].capacity <= 0.0f)
+			clientCloakStats[clientId].capacity -= clientCloakStats[clientId].statsDefinition->powerUsage * (currentTime - previousTime);
+			if (clientCloakStats[clientId].capacity <= 0.0f)
 			{
-				clientCloakingDevice[clientId].capacity = 0.0f;
+				clientCloakStats[clientId].capacity = 0.0f;
 				QueueUncloak(clientId);
 			}
 		}
 		else if (cloakState == CloakState::Uncloaked)
 		{
-			clientCloakingDevice[clientId].capacity += clientCloakingDevice[clientId].cloakingDeviceDefinition.powerRecharge * (currentTime - previousTime);
-			clientCloakingDevice[clientId].capacity = std::min(clientCloakingDevice[clientId].capacity, clientCloakingDevice[clientId].cloakingDeviceDefinition.capacity);
+			clientCloakStats[clientId].capacity += clientCloakStats[clientId].statsDefinition->powerRecharge * (currentTime - previousTime);
+			clientCloakStats[clientId].capacity = std::min(clientCloakStats[clientId].capacity, clientCloakStats[clientId].statsDefinition->capacity);
 		}
 	}
 
 	void PrintRemainingCloakTime(uint clientId)
 	{
-		const int seconds = clientCloakingDevice[clientId].cloakingDeviceDefinition.powerUsage > 0 ? clientCloakingDevice[clientId].capacity  / (clientCloakingDevice[clientId].cloakingDeviceDefinition.powerUsage * 1000) : 0;
+		const int seconds = clientCloakStats[clientId].statsDefinition->powerUsage > 0 ? clientCloakStats[clientId].capacity  / (clientCloakStats[clientId].statsDefinition->powerUsage * 1000) : 0;
 		PrintUserCmdText(clientId, L"Cloak time remaining: " + std::to_wstring(seconds) + L"s");
-		clientCloakingDevice[clientId].lastTimingInfoTimeStamp = timeInMS();
+		clientCloakStats[clientId].lastTimingInfoTimeStamp = timeInMS();
 	}
 
 	void PrintTimeUntilRecharged(uint clientId)
 	{
-		const int timeDifference = std::min(clientCloakingDevice[clientId].cloakingDeviceDefinition.uncloakEffectDuration * 1000 + static_cast<int>(clientCloakingDevice[clientId].uncloakTimeStamp - timeInMS()), 0);
-		const int seconds = clientCloakingDevice[clientId].cloakingDeviceDefinition.powerRecharge > 0 ? (clientCloakingDevice[clientId].cloakingDeviceDefinition.capacity - clientCloakingDevice[clientId].capacity) / (clientCloakingDevice[clientId].cloakingDeviceDefinition.powerRecharge * 1000) + timeDifference : 0;
+		const int timeDifference = std::min(clientCloakStats[clientId].effectsDefinition->effectDuration * 1000 + static_cast<int>(clientCloakStats[clientId].uncloakTimeStamp - timeInMS()), 0);
+		const int seconds = clientCloakStats[clientId].statsDefinition->powerRecharge > 0 ? (clientCloakStats[clientId].statsDefinition->capacity - clientCloakStats[clientId].capacity) / (clientCloakStats[clientId].statsDefinition->powerRecharge * 1000) + timeDifference : 0;
 		PrintUserCmdText(clientId, L"Cloak until recharged completely: " + std::to_wstring(seconds) + L"s");
-		clientCloakingDevice[clientId].lastTimingInfoTimeStamp = timeInMS();
+		clientCloakStats[clientId].lastTimingInfoTimeStamp = timeInMS();
 	}
 
 	void PrintCloakPowerInformation(uint clientId)
 	{
-		const auto cloakState = clientCloakingDevice[clientId].cloakState;
+		const auto cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked)
 			PrintRemainingCloakTime(clientId);
 		else
@@ -634,14 +710,14 @@ namespace Cloak
 			if (!IsValidCloakableClient(clientId))
 				continue;
 
-			if (!HasMountedEquipmentByCargoId(clientId, clientCloakingDevice[clientId].activatorCargoId))
+			if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 			{
 				ClearClientData(clientId, false);
 				continue;
 			}
 
 			// Synchronize cloak state to all players
-			const auto cloakState = clientCloakingDevice[clientId].cloakState;
+			const auto cloakState = clientCloakStats[clientId].cloakState;
 			SendServerCloakingDeviceActivationState(clientId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
 
 			// Synchronize activator state to all players
@@ -652,7 +728,7 @@ namespace Cloak
 			CheckPlayerInNoCloakZones(clientId, playerData->iSystemID, playerData->iShipID);
 
 			// The rest in the update loop should be ignored for not initially uncloaked ships.
-			if (clientCloakingDevice[clientId].initialUncloakRequired)
+			if (clientCloakStats[clientId].initialUncloakRequired)
 				continue;
 
 			// Cloak state update when effect time has passed
@@ -668,7 +744,7 @@ namespace Cloak
 			if (!IsFullyUncloaked(clientId))
 				DropShield(clientId);
 
-			if (clientCloakingDevice[clientId].capacity < clientCloakingDevice[clientId].cloakingDeviceDefinition.capacity && (now - clientCloakingDevice[clientId].lastTimingInfoTimeStamp) >= cloakTimeInfoInterval)
+			if (clientCloakStats[clientId].capacity < clientCloakStats[clientId].statsDefinition->capacity && (now - clientCloakStats[clientId].lastTimingInfoTimeStamp) >= cloakTimeInfoInterval)
 				PrintCloakPowerInformation(clientId);
 		}
 		lastSynchronizeTimeStamp = now;
@@ -719,7 +795,7 @@ namespace Cloak
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId) && clientCloakingDevice[clientId].activatorCargoId == activateEquip.sID)
+		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId) && clientCloakStats[clientId].activatorCargoId == activateEquip.sID)
 		{
 			ToggleClientCloakActivator(clientId, activateEquip.bActivate);
 		}
@@ -729,9 +805,9 @@ namespace Cloak
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId) && clientCloakingDevice[clientId].activatorCargoId == *fireWeaponInfo.sHpIdsBegin)
+		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId) && clientCloakStats[clientId].activatorCargoId == *fireWeaponInfo.sHpIdsBegin)
 		{
-			const auto cloakState = clientCloakingDevice[clientId].cloakState;
+			const auto cloakState = clientCloakStats[clientId].cloakState;
 			const bool activate = !(cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
 			if (ToggleClientCloakActivator(clientId, activate))
 			{
@@ -756,7 +832,7 @@ namespace Cloak
 
 			QueueUncloak(clientId);
 			if (IsValidCloakableClient(clientId))
-				clientCloakingDevice[clientId].dockingManeuverActive = false;
+				clientCloakStats[clientId].dockingManeuverActive = false;
 		}
 	}
 
@@ -799,7 +875,7 @@ namespace Cloak
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			ClearClientData(clientId, false);
-			RemoveCloakingEquipment(clientId);
+			RemoveCloakingDevices(clientId);
 		}
 	}
 
@@ -809,7 +885,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			EnsureCloakBeingEquipped(clientId);
+			EquipCloakingDevice(clientId);
 		}
 	}
 

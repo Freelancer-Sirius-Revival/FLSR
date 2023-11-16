@@ -9,6 +9,10 @@
  * 
  * Config template:
  * 
+ * [General]
+ * jump_gate_decloak_radius = 
+ * jump_hole_decloak_radius = 
+ * 
  * [Ship]
  * ship_nickname = 
  * cloaking_device_nickname = 
@@ -156,11 +160,11 @@ namespace Cloak
 		{
 			uint type;
 			pub::SpaceObj::GetType(obj->iID, type);
-			if (type == OBJ_JUMP_GATE && obj->GetParentNickname().IsEmpty())
+			if (type == OBJ_JUMP_GATE && jumpGateDecloakRadius > 0.0f && obj->GetParentNickname().IsEmpty())
 			{
 				jumpGatesPerSystem[obj->iSystem].push_back(obj->iID);
 			}
-			else if (type == OBJ_JUMP_HOLE && obj->GetParentNickname().IsEmpty())
+			else if (type == OBJ_JUMP_HOLE && jumpHoleDecloakRadius > 0.0f && obj->GetParentNickname().IsEmpty())
 			{
 				jumpHolesPerSystem[obj->iSystem].push_back(obj->iID);
 			}

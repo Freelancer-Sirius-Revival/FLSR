@@ -5,7 +5,6 @@ namespace Cloak
 	int cloakTimeInfoInterval = 5000;
 	float jumpGateDecloakRadius = 2000.0f;
 	float jumpHoleDecloakRadius = 1000.0f;
-	std::string defaultCloakHardpoint = "HpCloak01";
 
 	struct CloakStatsDefinition
 	{
@@ -20,6 +19,7 @@ namespace Cloak
 		uint shipArchetypeId = -1;
 		uint cloakingDeviceArchetypeId = -1;
 		uint fuseId = -1;
+		std::string hardpoint = "";
 		int effectDuration = 0;
 	};
 
@@ -132,9 +132,7 @@ namespace Cloak
 				{
 					while (ini.read_value())
 					{
-						if (ini.is_value("cloak_hardpoint"))
-							defaultCloakHardpoint = ini.get_value_string(0);
-						else if (ini.is_value("cloak_time_info_interval"))
+						if (ini.is_value("cloak_time_info_interval"))
 							cloakTimeInfoInterval = ini.get_value_int(0);
 						else if (ini.is_value("jump_gate_decloak_radius"))
 							jumpGateDecloakRadius = ini.get_value_float(0);
@@ -143,20 +141,22 @@ namespace Cloak
 					}
 				}
 
-				if (ini.is_header("ShipEffects"))
+				if (ini.is_header("Ship"))
 				{
+					ShipEffectDefinition definition;
 					while (ini.read_value())
 					{
-						if (ini.is_value("ship_cloak_fuse"))
-						{
-							ShipEffectDefinition definition;
+						if (ini.is_value("ship_nickname"))
 							definition.shipArchetypeId = CreateID(ini.get_value_string(0));
-							definition.cloakingDeviceArchetypeId = CreateID(ini.get_value_string(1));
-							definition.fuseId = CreateID(ini.get_value_string(2));
-							if (definition.shipArchetypeId && definition.cloakingDeviceArchetypeId && definition.fuseId)
-								shipEffects.push_back(definition);
-						}
+						else if (ini.is_value("cloaking_device_nickname"))
+							definition.cloakingDeviceArchetypeId = CreateID(ini.get_value_string(0));
+						else if (ini.is_value("fuse_name"))
+							definition.fuseId = CreateID(ini.get_value_string(0));
+						else if (ini.is_value("hardpoint"))
+							definition.hardpoint = ini.get_value_string(0);
 					}
+					if (definition.shipArchetypeId && definition.cloakingDeviceArchetypeId && definition.fuseId && !definition.hardpoint.empty())
+						shipEffects.push_back(definition);
 				}
 
 				if (ini.is_header("Cloak"))
@@ -213,16 +213,18 @@ namespace Cloak
 			return false;
 
 		uint cloakingDeviceArchetypeId = -1;
+		std::string hardpoint = "";
 		for (const auto& shipEffect : shipEffects)
 		{
 			if (shipEffect.shipArchetypeId == shipArchetypeId)
 			{
 				cloakingDeviceArchetypeId = shipEffect.cloakingDeviceArchetypeId;
+				hardpoint = shipEffect.hardpoint;
 				break;
 			}
 		}
 
-		if (!cloakingDeviceArchetypeId)
+		if (!cloakingDeviceArchetypeId || hardpoint.empty())
 			return false;
 
 		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
@@ -237,7 +239,7 @@ namespace Cloak
 			{
 				if (cargo.bMounted && cargo.iArchID == cloakDefinition.activatorArchetypeId)
 				{
-					if (HkAddEquip(ARG_CLIENTID(clientId), cloakingDeviceArchetypeId, defaultCloakHardpoint) == HKE_OK)
+					if (HkAddEquip(ARG_CLIENTID(clientId), cloakingDeviceArchetypeId, hardpoint) == HKE_OK)
 					{
 						// Anti Cheat
 						char* szClassPtr;

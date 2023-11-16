@@ -124,6 +124,7 @@ namespace Cloak
 		Successful,
 		DockSequence,
 		Blocked,
+		Destroyed,
 		NotReady,
 		NotInitialized
 	};
@@ -141,9 +142,9 @@ namespace Cloak
 	{
 		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakStats.contains(clientId))
 		{
-			uint ship = 0;
-			pub::Player::GetShip(clientId, ship);
-			return ship;
+			uint shipId = 0;
+			pub::Player::GetShip(clientId, shipId);
+			return shipId;
 		}
 		return false;
 	}
@@ -155,18 +156,18 @@ namespace Cloak
 
 	void CollectAllJumpSolarsPerSystem()
 	{
-		CSolar* obj = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
-		while (obj = static_cast<CSolar*>(obj->FindNext()))
+		CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
+		while (solar = static_cast<CSolar*>(solar->FindNext()))
 		{
 			uint type;
-			pub::SpaceObj::GetType(obj->iID, type);
-			if (type == OBJ_JUMP_GATE && jumpGateDecloakRadius > 0.0f && obj->GetParentNickname().IsEmpty())
+			pub::SpaceObj::GetType(solar->iID, type);
+			if (type == OBJ_JUMP_GATE && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
-				jumpGatesPerSystem[obj->iSystem].push_back(obj->iID);
+				jumpGatesPerSystem[solar->iSystem].push_back(solar->iID);
 			}
-			else if (type == OBJ_JUMP_HOLE && jumpHoleDecloakRadius > 0.0f && obj->GetParentNickname().IsEmpty())
+			else if (type == OBJ_JUMP_HOLE && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
-				jumpHolesPerSystem[obj->iSystem].push_back(obj->iID);
+				jumpHolesPerSystem[solar->iSystem].push_back(solar->iID);
 			}
 		}
 	}
@@ -458,7 +459,8 @@ namespace Cloak
 					}
 				}
 
-				if (clientStats.activatorCargoId && clientStats.cloakCargoId && clientStats.powerId)
+				// Do not check for Activator. Ships that have it shot-off but didn't dock yet will otherwise never uncloak again after login.
+				if (clientStats.cloakCargoId && clientStats.powerId)
 				{
 					clientStats.statsDefinition = &cloakDefinitions[index];
 					break;
@@ -547,9 +549,9 @@ namespace Cloak
 		{
 			result = CloakReturnState::NotInitialized;
 		}
-		else if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
+		else if (!clientCloakStats[clientId].activatorCargoId)
 		{
-			result = CloakReturnState::NotReady;
+			result = CloakReturnState::Destroyed;
 		}
 		else if (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking)
 		{
@@ -575,10 +577,10 @@ namespace Cloak
 		{
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, true);
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, true);
-			SynchronizeWeaponGroupsWithCloakState(clientId);
 			StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
 			clientCloakStats[clientId].cloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Cloaking;
+			SynchronizeWeaponGroupsWithCloakState(clientId);
 			result = CloakReturnState::Successful;
 		}
 
@@ -599,14 +601,11 @@ namespace Cloak
 
 		if (timeInMS() - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration)
 		{
-			if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
-				return false;
-
 			clientIdsRequestingUncloak.erase(clientId);
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, false);
-			SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, false);
+			if (clientCloakStats[clientId].activatorCargoId)
+				SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, false);
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].powerId, false);
-			SynchronizeWeaponGroupsWithCloakState(clientId);
 			if (clientCloakStats[clientId].initialUncloakCompleted)
 			{
 				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
@@ -614,6 +613,7 @@ namespace Cloak
 			}
 			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Uncloaking;
+			SynchronizeWeaponGroupsWithCloakState(clientId);
 			return true;
 		}
 		return false;
@@ -737,10 +737,10 @@ namespace Cloak
 			if (!IsValidCloakableClient(clientId))
 				continue;
 
-			if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
+			if (!clientCloakStats[clientId].activatorCargoId || !HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 			{
-				ClearClientData(clientId);
-				continue;
+				clientCloakStats[clientId].activatorCargoId = 0;
+				QueueUncloak(clientId);
 			}
 
 			const auto& cloakState = clientCloakStats[clientId].cloakState;
@@ -816,9 +816,7 @@ namespace Cloak
 			const auto cloakState = clientCloakStats[clientId].cloakState;
 			const bool activate = !(cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
 			if (ToggleClientCloakActivator(clientId, activate))
-			{
 				SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, activate);
-			}
 
 			// Prevent creating a projectile in space by the Activator.
 			returncode = NOFUNCTIONCALL;

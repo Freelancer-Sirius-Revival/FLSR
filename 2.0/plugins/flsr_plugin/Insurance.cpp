@@ -577,9 +577,9 @@ namespace Insurance
         {
             PrintUserCmdText(clientId, L"Currently insured: " + stows(GetCurrentlyInsuredTypesJoinedString(clientId)));
 
-            uint ship;
-            pub::Player::GetShip(clientId, ship);
-            if (ship)
+            uint shipId;
+            pub::Player::GetShip(clientId, shipId);
+            if (shipId)
             {
                 if (!currentInsuranceTypes.empty())
                 {
@@ -603,9 +603,9 @@ namespace Insurance
         // When there are arguments, toggle insurance features accordingly.
         else
         {
-            uint ship;
-            pub::Player::GetShip(clientId, ship);
-            if (ship)
+            uint shipId;
+            pub::Player::GetShip(clientId, shipId);
+            if (shipId)
             {
                 PrintUserCmdText(clientId, L"You can only apply for an insurance when docked.");
                 return;

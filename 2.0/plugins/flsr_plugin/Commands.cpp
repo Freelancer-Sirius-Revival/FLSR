@@ -1212,8 +1212,6 @@ namespace Commands {
         {L"/sendcash$", UserCMD_SendCash$},
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", Insurance::UserCMD_INSURANCE},
-        {L"/cloaktime", Cloak::UserCmd_CLOAK_TIME},
-        {L"/ct", Cloak::UserCmd_CLOAK_TIME},
         {L"/help", UserCmd_HELP},
         {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},

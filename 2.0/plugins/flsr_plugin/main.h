@@ -713,7 +713,7 @@ namespace Cloak
     void LoadCloakSettings();
     void InitializeWithGameData();
     void SynchronizeCloakedClients();
-    void UserCmd_CLOAK_TIME(uint clientId, const std::wstring& wscParam);
+    extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, struct XActivateEquip const& activateEquip);
     void __stdcall FireWeapon(unsigned int clientId, struct XFireWeaponInfo const& fireWeaponInfo);
     void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);

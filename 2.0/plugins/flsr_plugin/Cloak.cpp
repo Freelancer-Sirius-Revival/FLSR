@@ -55,7 +55,8 @@ namespace Cloak
 		Successful,
 		Blocked,
 		NoEnergy,
-		NotReady
+		NotReady,
+		NotInitialized
 	};
 
 	std::vector<CloakStatsDefinition> cloakDefinitions;
@@ -102,14 +103,11 @@ namespace Cloak
 		}
 	}
 
-	void ClearClientData(uint clientId, bool storeCloakCapacity)
+	void ClearClientData(uint clientId)
 	{
-		if (storeCloakCapacity && clientCloakStats.contains(clientId))
-		{
-			std::wstring characterFileNameWS;
-			if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK)
-				lastPersistedCharacterCloakCapacity.insert({ characterFileNameWS, clientCloakStats[clientId].capacity });
-		}
+		std::wstring characterFileNameWS;
+		if (clientCloakStats.contains(clientId) && HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK)
+			lastPersistedCharacterCloakCapacity.insert({ characterFileNameWS, clientCloakStats[clientId].capacity });
 
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
@@ -364,8 +362,8 @@ namespace Cloak
 		std::wstring characterFileNameWS;
 		if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK && lastPersistedCharacterCloakCapacity.contains(characterFileNameWS))
 		{
-			lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
 			clientStats.capacity = lastPersistedCharacterCloakCapacity[characterFileNameWS];
+			lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
 		}
 		else
 		{
@@ -467,7 +465,11 @@ namespace Cloak
 		CloakReturnState result = CloakReturnState::None;
 
 		const auto cloakState = clientCloakStats[clientId].cloakState;
-		if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
+		if (clientCloakStats[clientId].initialUncloakRequired)
+		{
+			result = CloakReturnState::NotInitialized;
+		}
+		else if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 		{
 			result = CloakReturnState::NotReady;
 		}
@@ -714,7 +716,7 @@ namespace Cloak
 
 			if (!HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 			{
-				ClearClientData(clientId, false);
+				ClearClientData(clientId);
 				continue;
 			}
 
@@ -768,21 +770,25 @@ namespace Cloak
 		{
 			switch (TryCloak(clientId))
 			{
-			case CloakReturnState::Blocked:
-				PrintUserCmdText(clientId, L"Cloak blocked!");
-				break;
+				case CloakReturnState::Blocked:
+					PrintUserCmdText(clientId, L"Cloak blocked!");
+					break;
 
-			case CloakReturnState::NoEnergy:
-				PrintUserCmdText(clientId, L"Not enough cloaking energy!");
-				break;
+				case CloakReturnState::NoEnergy:
+					PrintUserCmdText(clientId, L"Not enough cloaking energy!");
+					break;
 
-			case CloakReturnState::NotReady:
-				PrintUserCmdText(clientId, L"Cloak not ready!");
-				break;
+				case CloakReturnState::NotReady:
+					PrintUserCmdText(clientId, L"Cloak not ready!");
+					break;
 
-			default:
-				successful = true;
-				PrintRemainingCloakTime(clientId);
+				case CloakReturnState::NotInitialized:
+					// Do not print anything in this case.
+					break;
+
+				default:
+					successful = true;
+					PrintRemainingCloakTime(clientId);
 			}
 		}
 		else
@@ -876,7 +882,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			ClearClientData(clientId, false);
+			ClearClientData(clientId);
 			RemoveCloakingDevices(clientId);
 		}
 	}
@@ -887,6 +893,9 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
+			std::wstring characterFileNameWS;
+			if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) == HKE_OK)
+				lastPersistedCharacterCloakCapacity.erase(characterFileNameWS);
 			EquipCloakingDevice(clientId);
 		}
 	}
@@ -897,7 +906,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			ClearClientData(clientId, true);
+			ClearClientData(clientId);
 		}
 	}
 
@@ -917,7 +926,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			ClearClientData(clientId, true);
+			ClearClientData(clientId);
 		}
 	}
 }

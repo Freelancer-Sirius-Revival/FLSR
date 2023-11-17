@@ -16,8 +16,9 @@
  * [Ship]
  * ship_nickname = 
  * cloaking_device_nickname = 
- * fuse_name = 
- * hardpoint = 
+ * cloaking_device_hardpoint = 
+ * cloak_fuse_name = 
+ * uncloak_fuse_name = 
  * 
  * [Cloak]
  * activator_nickname = 
@@ -37,7 +38,9 @@
  *   and to enable the transition from visible to invisible. The cloak-times should both be the same and match the desired effect's length!
  *   The actual cloak-effects should be set empty/removed - a fuse will do the job.
  * 
- * * `fuse_name` is a fuse which is being created as effect for the cloak. This is done to avoid the game bug of the uncloak effect being always detached from the ship.
+ * * `cloak_fuse_name` is a fuse which is being created as effect when cloaking. This is done to avoid the game bug of the uncloak effect being always detached from the ship.
+ * 
+ * * `uncloak_fuse_name` is a fuse which is being created as effect when uncloaking. This is done to avoid the game bug of the uncloak effect being always detached from the ship.
  * 
  * * `hardpoint` is the name of the hardpont where the Cloaking Device will be mounted to. Ideally this should be inside the ship and parented to the main hull.
  *   The Cloaking Device should never be shot off (explosion_resistance = 0) to avoid being unable to uncloak when losing a wing.
@@ -86,9 +89,11 @@ namespace Cloak
 	{
 		uint shipArchetypeId = 0;
 		uint cloakingDeviceArchetypeId = 0;
-		uint fuseId = 0;
-		std::string hardpoint = "";
-		int effectDuration = 0;
+		uint cloakFuseId = 0;
+		uint uncloakFuseId = 0;
+		int cloakDuration = 0;
+		int uncloakDuration = 0;
+		std::string cloakingDeviceHardpoint = "";
 	};
 
 	enum CloakState
@@ -211,12 +216,14 @@ namespace Cloak
 							definition.shipArchetypeId = CreateID(ini.get_value_string(0));
 						else if (ini.is_value("cloaking_device_nickname"))
 							definition.cloakingDeviceArchetypeId = CreateID(ini.get_value_string(0));
-						else if (ini.is_value("fuse_name"))
-							definition.fuseId = CreateID(ini.get_value_string(0));
-						else if (ini.is_value("hardpoint"))
-							definition.hardpoint = ini.get_value_string(0);
+						else if (ini.is_value("cloaking_device_hardpoint"))
+							definition.cloakingDeviceHardpoint = ini.get_value_string(0);
+						else if (ini.is_value("cloak_fuse_name"))
+							definition.cloakFuseId = CreateID(ini.get_value_string(0));
+						else if (ini.is_value("uncloak_fuse_name"))
+							definition.uncloakFuseId = CreateID(ini.get_value_string(0));
 					}
-					if (definition.shipArchetypeId && definition.cloakingDeviceArchetypeId && definition.fuseId && !definition.hardpoint.empty())
+					if (definition.shipArchetypeId && definition.cloakingDeviceArchetypeId && definition.cloakFuseId && definition.uncloakFuseId && !definition.cloakingDeviceHardpoint.empty())
 						shipEffects.push_back(definition);
 				}
 
@@ -253,7 +260,8 @@ namespace Cloak
 			if (!equipment)
 				continue;
 			const Archetype::CloakingDevice* archetype = (Archetype::CloakingDevice*)equipment;
-			shipEffect.effectDuration = std::min(archetype->fCloakinTime, archetype->fCloakoutTime) * 1000;
+			shipEffect.cloakDuration = archetype->fCloakinTime * 1000;
+			shipEffect.uncloakDuration = archetype->fCloakoutTime * 1000;
 		}
 
 		for (auto& cloak : cloakDefinitions)
@@ -308,7 +316,7 @@ namespace Cloak
 			if (shipEffect.shipArchetypeId == shipArchetypeId)
 			{
 				cloakingDeviceArchetypeId = shipEffect.cloakingDeviceArchetypeId;
-				hardpoint = shipEffect.hardpoint;
+				hardpoint = shipEffect.cloakingDeviceHardpoint;
 				break;
 			}
 		}
@@ -567,7 +575,7 @@ namespace Cloak
 			result = CloakReturnState::Blocked;
 			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
 		}
-		else if (timeInMS() - clientCloakStats[clientId].uncloakTimeStamp < clientCloakStats[clientId].effectsDefinition->effectDuration)
+		else if (timeInMS() - clientCloakStats[clientId].uncloakTimeStamp < clientCloakStats[clientId].effectsDefinition->uncloakDuration)
 		{
 			result = CloakReturnState::NotReady;
 			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
@@ -577,7 +585,7 @@ namespace Cloak
 		{
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, true);
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, true);
-			StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
+			StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->cloakFuseId);
 			clientCloakStats[clientId].cloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Cloaking;
 			SynchronizeWeaponGroupsWithCloakState(clientId);
@@ -599,7 +607,7 @@ namespace Cloak
 			return true;
 		}
 
-		if (timeInMS() - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration)
+		if (timeInMS() - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->cloakDuration)
 		{
 			clientIdsRequestingUncloak.erase(clientId);
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, false);
@@ -608,7 +616,7 @@ namespace Cloak
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].powerId, false);
 			if (clientCloakStats[clientId].initialUncloakCompleted)
 			{
-				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
+				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
 				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("deactivated"));
 			}
 			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
@@ -703,17 +711,18 @@ namespace Cloak
 		auto& cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Cloaking)
 		{
-			cloakState = currentTime - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration ? CloakState::Cloaked : CloakState::Cloaking;
+			cloakState = currentTime - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->cloakDuration ? CloakState::Cloaked : CloakState::Cloaking;
 		}
 		else if (cloakState == CloakState::Uncloaking)
 		{
-			cloakState = currentTime - clientCloakStats[clientId].uncloakTimeStamp > clientCloakStats[clientId].effectsDefinition->effectDuration ? CloakState::Uncloaked : CloakState::Uncloaking;
+			cloakState = currentTime - clientCloakStats[clientId].uncloakTimeStamp > clientCloakStats[clientId].effectsDefinition->uncloakDuration ? CloakState::Uncloaked : CloakState::Uncloaking;
 			if (!clientCloakStats[clientId].initialUncloakCompleted && cloakState == CloakState::Uncloaked)
 				clientCloakStats[clientId].initialUncloakCompleted = true;
 		}
 		if (cloakState == CloakState::Cloaked || cloakState == CloakState::Uncloaked)
 		{
-			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->fuseId);
+			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->cloakFuseId);
+			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
 		}
 	}
 

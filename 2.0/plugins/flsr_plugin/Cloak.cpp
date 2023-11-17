@@ -10,8 +10,9 @@
  * Config template:
  * 
  * [General]
- * jump_gate_decloak_radius = 
- * jump_hole_decloak_radius = 
+ * cloak_transition_prolongation = 1
+ * jump_gate_decloak_radius = 2000
+ * jump_hole_decloak_radius = 1000
  * 
  * [Ship]
  * ship_nickname = 
@@ -75,6 +76,8 @@ namespace Cloak
 	const std::string BAY_HARDPOINT = "BAY";
 	const uint TIMER_INTERVAL = 200;
 
+	// When toggling cloak extremely fast, small lags can cause confusion of state at the client. Cloak/uncloak durations can be prolonged to reduce this effect.
+	uint cloakTransitionProlongation = 1000;
 	float jumpGateDecloakRadius = 2000.0f;
 	float jumpHoleDecloakRadius = 1000.0f;
 
@@ -204,6 +207,8 @@ namespace Cloak
 							jumpGateDecloakRadius = ini.get_value_float(0);
 						else if (ini.is_value("jump_hole_decloak_radius"))
 							jumpHoleDecloakRadius = ini.get_value_float(0);
+						else if (ini.is_value("cloak_transition_prolongation"))
+							cloakTransitionProlongation = ini.get_value_float(0) * 1000;
 					}
 				}
 
@@ -260,8 +265,8 @@ namespace Cloak
 			if (!equipment)
 				continue;
 			const Archetype::CloakingDevice* archetype = (Archetype::CloakingDevice*)equipment;
-			shipEffect.cloakDuration = archetype->fCloakinTime * 1000;
-			shipEffect.uncloakDuration = archetype->fCloakoutTime * 1000;
+			shipEffect.cloakDuration = archetype->fCloakinTime * 1000 + cloakTransitionProlongation;
+			shipEffect.uncloakDuration = archetype->fCloakoutTime * 1000 + cloakTransitionProlongation;
 		}
 
 		for (auto& cloak : cloakDefinitions)

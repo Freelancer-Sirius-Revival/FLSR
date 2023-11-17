@@ -936,4 +936,20 @@ namespace Cloak
 			ClearClientData(clientId);
 		}
 	}
+
+	void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam)
+	{
+		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
+		{
+			ToggleClientCloakActivator(clientId, true);
+		}
+	}
+
+	void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam)
+	{
+		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
+		{
+			ToggleClientCloakActivator(clientId, false);
+		}
+	}
 }

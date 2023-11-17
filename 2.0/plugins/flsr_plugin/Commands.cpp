@@ -1223,6 +1223,10 @@ namespace Commands {
         {L"/stats", UserCmd_stats},
         {L"/link", UserCMD_LINK},
         {L"/bank", UserCMD_BANK},
+        {L"/cloak", Cloak::UserCmd_CLOAK},
+        {L"/c", Cloak::UserCmd_CLOAK},
+        {L"/uncloak", Cloak::UserCmd_UNCLOAK},
+        {L"/uc", Cloak::UserCmd_UNCLOAK}
 
 
 

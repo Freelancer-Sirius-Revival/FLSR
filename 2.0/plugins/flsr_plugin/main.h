@@ -725,6 +725,8 @@ namespace Cloak
     void __stdcall CharacterSelect(struct CHARACTER_ID const& characterId, unsigned int clientId);
     void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
+    void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam);
+    void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
 }
 
 namespace Crafting

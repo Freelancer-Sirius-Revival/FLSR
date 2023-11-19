@@ -859,6 +859,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
+			ClearClientData(clientId);
 			InstallCloak(clientId);
 		}
 	}
@@ -904,16 +905,6 @@ namespace Cloak
 		{
 			if (!EquipCloakingDeviceAndPower(clientId))
 				RemoveCloakingDevicesAndPower(clientId);
-		}
-	}
-
-	void __stdcall CharacterSelect(struct CHARACTER_ID const& characterId, unsigned int clientId)
-	{
-		returncode = DEFAULT_RETURNCODE;
-
-		if (Modules::GetModuleState("CloakModule"))
-		{
-			ClearClientData(clientId);
 		}
 	}
 

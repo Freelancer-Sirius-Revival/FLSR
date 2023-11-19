@@ -952,4 +952,35 @@ namespace Cloak
 			ToggleClientCloakActivator(clientId, false);
 		}
 	}
+
+	/**
+	 * This fixes a Vanilla Server Bug.
+	 * The Server is not receiving an information about Engine Kill being disabled when Cruise is activated by the Client.
+	 * So while Engine Kill is active, and Cruise gets activated, the Server thinks the Engine is off and does not draw any Cruise Power.
+	 * This makes Server-Side power state of the Client's ship become asynchronous with the Client's own power state.
+	 * To fix this, the Server enables the Engine again once Cruise goes online. The Client does this anyway.
+	 */
+	void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		uint shipId;
+		pub::Player::GetShip(clientId, shipId);
+		if (activateCruise.bActivate && shipId)
+		{
+			for (const auto& equip : Players[clientId].equipDescList.equip)
+			{
+				const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
+				if (equipment && equipment->get_class_type() == Archetype::ENGINE)
+				{
+					XActivateEquip activateEquipment;
+					activateEquipment.bActivate = activateCruise.bActivate;
+					activateEquipment.iSpaceID = shipId;
+					activateEquipment.sID = equip.sID;
+					Server.ActivateEquip(clientId, activateEquipment);
+					return;
+				}
+			}
+		}
+	}
 }

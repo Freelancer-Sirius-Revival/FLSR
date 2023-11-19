@@ -114,7 +114,8 @@ namespace Cloak
 		uint activatorCargoId = 0;
 		std::string activatorHardpoint = "";
 		uint cloakCargoId = 0;
-		uint powerId = 0;
+		uint cloakPowerCargoId = 0;
+		std::vector<uint> otherPowerCargoIds;
 		bool shieldPresent = false;
 		CloakState cloakState = CloakState::Cloaked;
 		bool initialUncloakCompleted = false;
@@ -457,7 +458,7 @@ namespace Cloak
 					}
 					else if (cargo.iArchID == cloakDefinitions[index].powerArchetypeId)
 					{
-						clientStats.powerId = cargo.iID;
+						clientStats.cloakPowerCargoId = cargo.iID;
 					}
 					else if (cargo.iArchID == clientStats.effectsDefinition->cloakingDeviceArchetypeId)
 					{
@@ -466,7 +467,7 @@ namespace Cloak
 				}
 
 				// Do not check for Activator. Ships that have it shot-off but didn't dock yet will otherwise never uncloak again after login.
-				if (clientStats.cloakCargoId && clientStats.powerId)
+				if (clientStats.cloakCargoId && clientStats.cloakPowerCargoId)
 				{
 					clientStats.statsDefinition = &cloakDefinitions[index];
 					break;
@@ -477,6 +478,20 @@ namespace Cloak
 		}
 		if (!clientStats.statsDefinition)
 			return;
+
+		// Find all other power plants
+		for (const auto& cargo : cargoList)
+		{
+			if (cargo.bMounted &&
+				cargo.iArchID != clientStats.statsDefinition->activatorArchetypeId &&
+				cargo.iArchID != clientStats.statsDefinition->powerArchetypeId &&
+				cargo.iArchID != clientStats.effectsDefinition->cloakingDeviceArchetypeId)
+			{
+				const Archetype::Equipment* equipment = Archetype::GetEquipment(cargo.iArchID);
+				if (equipment && equipment->get_class_type() == Archetype::AClassType::POWER)
+					clientStats.otherPowerCargoIds.push_back(cargo.iID);
+			}
+		}
 
 		uint shipId;
 		pub::Player::GetShip(clientId, shipId);
@@ -495,7 +510,7 @@ namespace Cloak
 		clientCloakStats.insert({ clientId, clientStats });
 
 		// Deactivate the power initially. This must be done here as there's additional information used in the called function.
-		SendEquipmentActivationState(clientId, clientStats.powerId, false);
+		SendEquipmentActivationState(clientId, clientStats.cloakPowerCargoId, false);
 	}
 
 	void SynchronizeWeaponGroupsWithCloakState(uint clientId)
@@ -543,7 +558,11 @@ namespace Cloak
 
 	void SynchronizePowerStateWithCloakState(uint clientId)
 	{
-		SendEquipmentActivationState(clientId, clientCloakStats[clientId].powerId, clientCloakStats[clientId].cloakState == CloakState::Cloaked);
+		const auto cloakState = clientCloakStats[clientId].cloakState;
+		const bool activated = cloakState == CloakState::Cloaked || cloakState == CloakState::Uncloaking;
+		SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakPowerCargoId, activated);
+		for (const uint cargoId : clientCloakStats[clientId].otherPowerCargoIds)
+			SendEquipmentActivationState(clientId, cargoId, !activated);
 	}
 
 	CloakReturnState TryCloak(uint clientId)
@@ -611,7 +630,7 @@ namespace Cloak
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, false);
 			if (clientCloakStats[clientId].activatorCargoId)
 				SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, false);
-			SendEquipmentActivationState(clientId, clientCloakStats[clientId].powerId, false);
+			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakPowerCargoId, false);
 			if (clientCloakStats[clientId].initialUncloakCompleted)
 			{
 				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
@@ -961,7 +980,7 @@ namespace Cloak
 						continue;
 
 					const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
-					if (equipment && equipment->get_class_type() == Archetype::ENGINE)
+					if (equipment && equipment->get_class_type() == Archetype::AClassType::ENGINE)
 					{
 						XActivateEquip activateEquipment;
 						activateEquipment.bActivate = activateCruise.bActivate;

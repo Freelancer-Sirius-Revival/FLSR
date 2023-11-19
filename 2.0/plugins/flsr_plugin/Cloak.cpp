@@ -77,9 +77,9 @@ namespace Cloak
 	const uint TIMER_INTERVAL = 200;
 
 	// When toggling cloak extremely fast, small lags can cause confusion of state at the client. Cloak/uncloak durations can be prolonged to reduce this effect.
-	uint cloakTransitionProlongation = 1000;
-	float jumpGateDecloakRadius = 2000.0f;
-	float jumpHoleDecloakRadius = 1000.0f;
+	static uint cloakTransitionProlongation = 1000;
+	static float jumpGateDecloakRadius = 2000.0f;
+	static float jumpHoleDecloakRadius = 1000.0f;
 
 	struct CloakStatsDefinition
 	{
@@ -137,14 +137,14 @@ namespace Cloak
 		NotInitialized
 	};
 
-	std::vector<CloakStatsDefinition> cloakDefinitions;
-	std::vector<ShipEffectDefinition> shipEffects;
-	std::map<uint, ClientCloakStats> clientCloakStats;
+	static std::vector<CloakStatsDefinition> cloakDefinitions;
+	static std::vector<ShipEffectDefinition> shipEffects;
+	static std::map<uint, ClientCloakStats> clientCloakStats;
 
-	std::map<uint, std::vector<uint>> jumpGatesPerSystem;
-	std::map<uint, std::vector<uint>> jumpHolesPerSystem;
+	static std::map<uint, std::vector<uint>> jumpGatesPerSystem;
+	static std::map<uint, std::vector<uint>> jumpHolesPerSystem;
 
-	std::set<uint> clientIdsRequestingUncloak;
+	static std::set<uint> clientIdsRequestingUncloak;
 
 	bool IsValidCloakableClient(uint clientId)
 	{
@@ -281,6 +281,18 @@ namespace Cloak
 		CollectAllJumpSolarsPerSystem();
 	}
 
+	std::list<CARGO_INFO> GetClientCargoList(uint clientId)
+	{
+		std::list<CARGO_INFO> cargoList;
+		if (!HkIsValidClientID(clientId))
+			return cargoList;
+
+		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
+		int remainingCargoHoldSize;
+		HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize);
+		return cargoList;
+	}
+
 	bool EquipEquipment(uint clientId, uint archetypeId, std::string hardpoint)
 	{
 		if (HkAddEquip(ARG_CLIENTID(clientId), archetypeId, hardpoint) == HKE_OK)
@@ -329,12 +341,7 @@ namespace Cloak
 		if (!cloakingDeviceArchetypeId || hardpoint.empty())
 			return false;
 
-		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-		std::list<CARGO_INFO> cargoList;
-		int remainingCargoHoldSize;
-		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
-			return false;
-
+		std::list<CARGO_INFO> cargoList = GetClientCargoList(clientId);
 		for (const auto& cloakDefinition : cloakDefinitions)
 		{
 			for (const auto& cargo : cargoList)
@@ -356,11 +363,7 @@ namespace Cloak
 			return;
 
 		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-		std::list<CARGO_INFO> cargoList;
-		int remainingCargoHoldSize;
-		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
-			return;
-
+		std::list<CARGO_INFO> cargoList = GetClientCargoList(clientId);
 		for (const auto& cargo : cargoList)
 		{
 			const Archetype::Equipment* equipment = Archetype::GetEquipment(cargo.iArchID);
@@ -391,12 +394,7 @@ namespace Cloak
 		if (!HkIsValidClientID(clientId))
 			return false;
 
-		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-		std::list<CARGO_INFO> cargoList;
-		int remainingCargoHoldSize;
-		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
-			return false;
-
+		std::list<CARGO_INFO> cargoList = GetClientCargoList(clientId);
 		for (const auto& cargo : cargoList)
 		{
 			if (cargo.bMounted && cargo.iID == cargoId)
@@ -445,12 +443,7 @@ namespace Cloak
 		if (!clientStats.effectsDefinition)
 			return;
 
-		std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-		std::list<CARGO_INFO> cargoList;
-		int remainingCargoHoldSize;
-		if (HkEnumCargo(characterNameWS, cargoList, remainingCargoHoldSize) != HKE_OK)
-			return;
-
+		std::list<CARGO_INFO> cargoList = GetClientCargoList(clientId);
 		for (int index = 0; index < cloakDefinitions.size(); index++)
 		{
 			for (const auto& cargo : cargoList)
@@ -778,6 +771,7 @@ namespace Cloak
 			SynchronizeShieldStateWithCloakState(clientId);
 			SynchronizePowerStateWithCloakState(clientId);
 
+			// Uncloak when power becomes too little.
 			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= clientCloakStats[clientId].statsDefinition->powerUsage)
 				QueueUncloak(clientId);
 

@@ -76,6 +76,9 @@ namespace Cloak
 	const std::string BAY_HARDPOINT = "BAY";
 	const uint TIMER_INTERVAL = 200;
 
+	// When a player joins when another player is in cloak-transition, timings get confused.
+	// To counter this, a Cloaking Device with zero-time is used to completely cloak/uncloak at the end of the transitions to make sur the state is always where it should be.
+	static uint instantCloakingDeviceArchetypeId = 0;
 	// When toggling cloak extremely fast, small lags can cause confusion of state at the client. Cloak/uncloak durations can be prolonged to reduce this effect.
 	static uint cloakTransitionProlongation = 1000;
 	static float jumpGateDecloakRadius = 2000.0f;
@@ -114,6 +117,7 @@ namespace Cloak
 		uint activatorCargoId = 0;
 		std::string activatorHardpoint = "";
 		uint cloakCargoId = 0;
+		uint instantCloakCargoId = 0;
 		uint cloakPowerCargoId = 0;
 		std::vector<uint> otherPowerCargoIds;
 		bool shieldPresent = false;
@@ -210,6 +214,8 @@ namespace Cloak
 							jumpHoleDecloakRadius = ini.get_value_float(0);
 						else if (ini.is_value("cloak_transition_prolongation"))
 							cloakTransitionProlongation = ini.get_value_float(0) * 1000;
+						else if (ini.is_value("instant_cloaking_device_nickname"))
+							instantCloakingDeviceArchetypeId = CreateID(ini.get_value_string(0));
 					}
 				}
 
@@ -350,6 +356,7 @@ namespace Cloak
 				if (cargo.bMounted && cargo.iArchID == cloakDefinition.activatorArchetypeId)
 				{
 					return EquipEquipment(clientId, cloakingDeviceArchetypeId, hardpoint) &&
+						   EquipEquipment(clientId, instantCloakingDeviceArchetypeId, hardpoint) &&
 						   EquipEquipment(clientId, cloakDefinition.powerArchetypeId, BAY_HARDPOINT);
 				}
 			}
@@ -464,10 +471,14 @@ namespace Cloak
 					{
 						clientStats.cloakCargoId = cargo.iID;
 					}
+					else if (cargo.iArchID == instantCloakingDeviceArchetypeId)
+					{
+						clientStats.instantCloakCargoId = cargo.iID;
+					}
 				}
 
 				// Do not check for Activator. Ships that have it shot-off but didn't dock yet will otherwise never uncloak again after login.
-				if (clientStats.cloakCargoId && clientStats.cloakPowerCargoId)
+				if (clientStats.cloakCargoId && clientStats.instantCloakCargoId && clientStats.cloakPowerCargoId)
 				{
 					clientStats.statsDefinition = &cloakDefinitions[index];
 					break;
@@ -773,6 +784,9 @@ namespace Cloak
 
 			// Synchronize cloak state to all players
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
+			// Synchronize fallback instant cloak to all players
+			SendEquipmentActivationState(clientId, clientCloakStats[clientId].instantCloakCargoId, cloakState == CloakState::Cloaked || cloakState == CloakState::Uncloaking);
+
 			// Synchronize activator state to all players
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
 

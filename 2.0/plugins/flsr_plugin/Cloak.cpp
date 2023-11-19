@@ -949,21 +949,27 @@ namespace Cloak
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		uint shipId;
-		pub::Player::GetShip(clientId, shipId);
-		if (activateCruise.bActivate && shipId)
+		if (activateCruise.bActivate)
 		{
-			for (const auto& equip : Players[clientId].equipDescList.equip)
+			uint shipId;
+			pub::Player::GetShip(clientId, shipId);
+			if (shipId)
 			{
-				const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
-				if (equipment && equipment->get_class_type() == Archetype::ENGINE)
+				for (const auto& equip : Players[clientId].equipDescList.equip)
 				{
-					XActivateEquip activateEquipment;
-					activateEquipment.bActivate = activateCruise.bActivate;
-					activateEquipment.iSpaceID = shipId;
-					activateEquipment.sID = equip.sID;
-					Server.ActivateEquip(clientId, activateEquipment);
-					return;
+					if (!equip.is_internal() && equip.get_count() != 1)
+						continue;
+
+					const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
+					if (equipment && equipment->get_class_type() == Archetype::ENGINE)
+					{
+						XActivateEquip activateEquipment;
+						activateEquipment.bActivate = activateCruise.bActivate;
+						activateEquipment.iSpaceID = shipId;
+						activateEquipment.sID = equip.sID;
+						Server.ActivateEquip(clientId, activateEquipment);
+						return;
+					}
 				}
 			}
 		}

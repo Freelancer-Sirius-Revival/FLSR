@@ -151,6 +151,9 @@ namespace Cloak
 
 	static std::set<uint> clientIdsRequestingUncloak;
 
+	static std::map<uint, std::vector<uint>> clientCloakScanners;
+	static std::map<uint, std::vector<uint>> clientCloakDisruptors;
+
 	bool IsValidCloakableClient(uint clientId)
 	{
 		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakStats.contains(clientId))
@@ -569,11 +572,9 @@ namespace Cloak
 
 	void SynchronizePowerStateWithCloakState(uint clientId)
 	{
-		const auto cloakState = clientCloakStats[clientId].cloakState;
-		const bool activated = cloakState == CloakState::Cloaked || cloakState == CloakState::Uncloaking;
-		SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakPowerCargoId, activated);
+		SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakPowerCargoId, clientCloakStats[clientId].cloakState == CloakState::Cloaked);
 		for (const uint cargoId : clientCloakStats[clientId].otherPowerCargoIds)
-			SendEquipmentActivationState(clientId, cargoId, !activated);
+			SendEquipmentActivationState(clientId, cargoId, IsFullyUncloaked(clientId));
 	}
 
 	CloakReturnState TryCloak(uint clientId)
@@ -813,6 +814,17 @@ namespace Cloak
 				QueueUncloak(clientId);
 		}
 		lastSynchronizeTimeStamp = now;
+	}
+
+	std::vector<uint> FindMountedEquipments(std::list<CARGO_INFO>& cargoList, uint archetypeId)
+	{
+		std::vector<uint> result;
+		for (const auto& cargo : cargoList)
+		{
+			if (cargo.bMounted && cargo.iArchID == archetypeId)
+				result.push_back(cargo.iID);
+		}
+		return result;
 	}
 
 	bool ToggleClientCloakActivator(uint clientId, bool active)

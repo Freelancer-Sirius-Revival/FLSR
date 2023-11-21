@@ -74,7 +74,10 @@ namespace Cloak
 {
 	const uint SHIELD_SLOT_ID = 65521;
 	const std::string BAY_HARDPOINT = "BAY";
-	const uint TIMER_INTERVAL = 200;
+	// The main update loop's interval.
+	const uint TIMER_INTERVAL = 100;
+	// This time is used as additional time ahead to stop energy usage. This is to prevent negative energy to occur due to lags and unprecise timings.
+	const uint CLOAK_ENERGY_USAGE_AHEAD_TIME = 500;
 
 	// When a player joins when another player is in cloak-transition, timings get confused.
 	// To counter this, a Cloaking Device with zero-time is used to completely cloak/uncloak at the end of the transitions to make sur the state is always where it should be.
@@ -88,7 +91,7 @@ namespace Cloak
 	{
 		uint activatorArchetypeId = 0;
 		uint powerArchetypeId = 0;
-		float powerUsage = 0.0f;
+		float minRequiredPower = 0.0f;
 	};
 
 	struct ShipEffectDefinition
@@ -285,7 +288,7 @@ namespace Cloak
 			if (!equipment)
 				continue;
 			const Archetype::Power* archetype = (Archetype::Power*)equipment;
-			cloak.powerUsage = archetype->fChargeRate / -1000 * TIMER_INTERVAL;
+			cloak.minRequiredPower = archetype->fChargeRate / -1000 * CLOAK_ENERGY_USAGE_AHEAD_TIME;
 		}
 
 		CollectAllJumpSolarsPerSystem();
@@ -572,9 +575,13 @@ namespace Cloak
 
 	void SynchronizePowerStateWithCloakState(uint clientId)
 	{
-		SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakPowerCargoId, clientCloakStats[clientId].cloakState == CloakState::Cloaked);
+		// Ensure the power drain of Cloak is disabled when Cloak is scheduled to be turned off. This is to avoid any negative energy happening while this is queued.
+		bool cloakPowerDrainActive = clientCloakStats[clientId].cloakState == CloakState::Cloaked && !clientIdsRequestingUncloak.contains(clientId);
+		bool standardPowerPlantsActive = IsFullyUncloaked(clientId);
+
+		SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakPowerCargoId, cloakPowerDrainActive);
 		for (const uint cargoId : clientCloakStats[clientId].otherPowerCargoIds)
-			SendEquipmentActivationState(clientId, cargoId, IsFullyUncloaked(clientId));
+			SendEquipmentActivationState(clientId, cargoId, standardPowerPlantsActive);
 	}
 
 	CloakReturnState TryCloak(uint clientId)
@@ -758,7 +765,7 @@ namespace Cloak
 	mstime lastSynchronizeTimeStamp = 0;
 
 	// This is executed to make sure players that spawn into a system with other cloaking players have their visibility synced.
-	void SynchronizeCloakedClients()
+	void UpdateCloakClients()
 	{
 		if (!Modules::GetModuleState("CloakModule"))
 			return;
@@ -806,7 +813,7 @@ namespace Cloak
 			SynchronizePowerStateWithCloakState(clientId);
 
 			// Uncloak when power becomes too little.
-			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= clientCloakStats[clientId].statsDefinition->powerUsage)
+			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= clientCloakStats[clientId].statsDefinition->minRequiredPower)
 				QueueUncloak(clientId);
 
 			// Schedule cloak changes

@@ -712,7 +712,7 @@ namespace Cloak
 {
     void LoadCloakSettings();
     void InitializeWithGameData();
-    void SynchronizeCloakedClients();
+    void UpdateCloakClients();
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, struct XActivateEquip const& activateEquip);
     void __stdcall FireWeapon(unsigned int clientId, struct XFireWeaponInfo const& fireWeaponInfo);

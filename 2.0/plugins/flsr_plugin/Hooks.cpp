@@ -71,21 +71,6 @@ namespace Hooks {
             Docking::HandleUndocking(iClientID);
         }
 		
-		//Insurance
-        if (Modules::GetModuleState("InsuranceModule"))
-        {
-            //Insurance-CheckInsurance Booked
-
-            std::pair<bool, bool> Booking = Insurance::CheckInsuranceBooked(iClientID);
-
-            if (Booking.first) {
-                Insurance::CreateNewInsurance(iClientID, Booking.second);
-            }
-
-            //Insurance-PlayerDied
-            Insurance::PlayerDiedEvent(false, iClientID);
-        }
-		
         if (Modules::GetModuleState("CloakModule"))
         {
             Cloak::InstallCloak(iClientID);
@@ -294,7 +279,7 @@ namespace Hooks {
 
 				    if (Modules::GetModuleState("InsuranceModule"))
 				    {
-					    Insurance::PlayerDiedEvent(true, iClientID);
+					    //Insurance::PlayerDiedEvent(true, iClientID);
 				    }
                 }
 			
@@ -320,22 +305,11 @@ namespace Hooks {
     //BaseEnter_AFTER
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID) {
         returncode = DEFAULT_RETURNCODE;
+
         //Insurance
         if (Modules::GetModuleState("InsuranceModule"))
         {
-            //Insurance Use
-            if (!Insurance::CheckPlayerDied(iClientID))
-            {
-                Insurance::UseInsurance(iClientID);
-            }
-            else {
-                Insurance::UseInsurance(iClientID);
-            }
-
-            //Insurance ReNew
-            Insurance::ReNewInsurance(iClientID);
-
-            
+            Insurance::UseInsurance(iClientID);
         }
 		
 		//AC
@@ -374,9 +348,6 @@ namespace Hooks {
         
         //Update BaseState
         ClientController::Send_ControlMsg(false, iClientID, L"_OnBaseState");
-
-        //Check CargoRem
-        Insurance::CalcRemHold(iClientID);
     }
 
 	//SPObjUpdate
@@ -640,6 +611,13 @@ namespace Hooks {
             //ConPrint(L"Spawn\n");
         }
 
+        //Insurance
+        if (Modules::GetModuleState("InsuranceModule") && !Insurance::IsInsurancePresent(iClientID))
+        {
+            const bool insuranceRequested = Insurance::IsInsuranceRequested(iClientID);
+            Insurance::CreateNewInsurance(iClientID, !insuranceRequested);
+        }
+
         //SpawnProtection
         if (Modules::GetModuleState("SpawnProtection"))
         {
@@ -665,8 +643,6 @@ namespace Hooks {
                 returncode = SKIPPLUGINS_NOFUNCTIONCALL;
             }
         }
-
-        Insurance::CalcRemHold(iClientID);
     }
 
     void __stdcall ReqShipArch_AFTER(unsigned int iArchID, unsigned int iClientID) {
@@ -751,14 +727,5 @@ namespace Hooks {
         ConPrint(L"NewCharfile: %s", wscFilename);
         */
         //SetLastNewChar to Account FlhookIni
-    }
-
-
-    void __stdcall ReqRemoveItem(unsigned short iID, int count, unsigned int client) {
-        returncode = DEFAULT_RETURNCODE;
-
-
-        Insurance::CalcRemHold(client);
-
     }
 }

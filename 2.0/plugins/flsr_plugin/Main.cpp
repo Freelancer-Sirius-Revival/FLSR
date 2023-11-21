@@ -108,9 +108,8 @@ void LoadSettings() {
     // INSURANCE-Module #########################################################################
     if (Modules::GetModuleState("InsuranceModule"))
     {
-        Insurance::set_fCostPercent = IniGetF(scPluginCfgFile, "InsuranceModule", "CostPercent", 100.0f);
-
-        ConPrint(L"Module loaded: Insurance (CostPercent: " + std::to_wstring(Insurance::set_fCostPercent) + L")\n");
+        Insurance::insuranceEquipmentCostFactor = std::max(0.0f, IniGetF(scPluginCfgFile, "InsuranceModule", "CostPercent", 100.0f) / 100.0f);
+        ConPrint(L"Module loaded: Insurance (CostFactor: " + std::to_wstring(Insurance::insuranceEquipmentCostFactor) + L")\n");
     }
 
     // ANTICHEAT-Module   ########################################################################
@@ -354,10 +353,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::RequestEvent, PLUGIN_HkIServerImpl_RequestEvent, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::ReqRemoveItem, PLUGIN_HkIServerImpl_ReqRemoveItem, 0));
-
-
-
 
     return p_PI;
 }

@@ -73,10 +73,9 @@ std::wstring ToMoneyStr(int iCash) {
     wchar_t wszBuf[32];
 
     if (iMillions)
-        swprintf_s(wszBuf, L"%d.%.3d.%.3d", iMillions, abs(iThousands),
-                   abs(iRest));
+        swprintf_s(wszBuf, L"%d,%03d,%03d", iMillions, abs(iThousands), abs(iRest));
     else if (iThousands)
-        swprintf_s(wszBuf, L"%d.%.3d", iThousands, abs(iRest));
+        swprintf_s(wszBuf, L"%d,%03d", iThousands, abs(iRest));
     else
         swprintf_s(wszBuf, L"%d", iRest);
 

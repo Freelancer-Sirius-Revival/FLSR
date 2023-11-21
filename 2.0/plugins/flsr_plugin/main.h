@@ -139,7 +139,6 @@ namespace Commands {
     void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam);
     void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam);
     void UserCmd_UV(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_INSURANCE_AUTOSAVE(uint iClientID, const std::wstring &wscParam);
     void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
@@ -516,7 +515,6 @@ namespace Hooks {
     void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
     void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
-    void __stdcall ReqRemoveItem(unsigned short iID, int count, unsigned int client);
     }
 
 namespace ClientController {
@@ -524,22 +522,8 @@ namespace ClientController {
     void Handle_ClientControlMsg(CHAT_ID cId, unsigned long lP1, void const* rdlReader, CHAT_ID cIdTo, int iP2);
 }
 
-namespace Insurance {
-
-    
-
-    enum class InsuranceType : unsigned long {
-        None = 0x0,
-        Mines = 0x1,
-        Projectiles = 0x2,
-        Countermeasures = 0x4,
-        ShieldBatteries = 0x8,
-        Nanobots = 0x10,
-        Equipment = 0x20,
-        All = 0x40,
-        Invalid = 0x80,
-    };
-
+namespace Insurance
+{
     template<typename T>
     constexpr inline T operator~ (T a) { return static_cast<T>(~static_cast<typename std::underlying_type<T>::type>(a)); }
 
@@ -561,82 +545,13 @@ namespace Insurance {
     template<typename T>
     constexpr inline T& operator^= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) ^= static_cast<typename std::underlying_type<T>::type>(b)); }
 
+    extern float insuranceEquipmentCostFactor;
 
-    extern struct PlayerDied {
-
-        std::wstring wscCharname;
-        bool bDied;
-
-        PlayerDied() {
-            wscCharname = L"";
-            bDied = false;
-        }
-
-        PlayerDied(std::wstring wscCharname, bool bDied) {
-            this->wscCharname = wscCharname;
-            this->bDied = bDied;
-        }
-
-    };
-
-    extern struct BookInsuranceEvent {
-
-        std::wstring wscCharname;
-        bool bFreeItem;
-
-        BookInsuranceEvent() {
-            wscCharname = L"";
-            bFreeItem = false;
-        }
-
-        BookInsuranceEvent(std::wstring wscCharname, bool bFreeItem) {
-            this->wscCharname = wscCharname;
-            this->bFreeItem = bFreeItem;
-
-        }
-    };
-
-    extern struct PriceList {
-        CARGO_INFO CARGO_INFO;
-		GoodInfo GoodInfo;
-        bool bFreeInsurance;
-        bool bItemisFree;
-        Archetype::AClassType aClassType;
-        bool bIsAmmo;
-
-    };
-
-    extern struct RestoreEquip {
-        CARGO_INFO CARGO_INFO;
-        float fPrice;
-        bool bFreeInsurance;
-        bool bItemisFree;
-    };
-
-    extern std::map<std::wstring, std::list<PriceList>> mPriceList;
-    extern std::list<PlayerDied> lPlayerDied;
-    extern std::list<BookInsuranceEvent> lBookInsuranceEvent;
-    extern float set_fCostPercent;
-
-    extern bool Insurance_Module;
-    void CreateNewInsurance(uint iClientID, bool bFreeItem);
-    void UseInsurance(uint iClientID);
-    void PlayerDiedEvent(bool bDied, uint iClientID);
-    bool CheckPlayerDied(uint iClientID);
-    bool FindHardpointCargolist(std::list<CARGO_INFO>& cargolist, CacheString& hardpoint);
-    void BookInsurance(uint iClientID, bool bFreeItem);
-    std::pair<bool, bool> CheckInsuranceBooked(uint iClientID);
-    int CalcInsurance(int iClientID);
-    bool insurace_exists(const std::string& name);
-    void ReNewInsurance(uint iClientID);
-    bool isAmmoClass(Archetype::AClassType aType, uint iClientID);
-    bool isInsurableClass(Archetype::AClassType aType, uint iClientID);
-    std::string GetInsuranceTypeString(InsuranceType type);
-    void SetInsuranceTypeString(uint iClientID, InsuranceType type, const std::string& value);
-    InsuranceType GetInsuranceTypeFromString(const std::string& value);
-    std::list<InsuranceType> GetInsuranceTypesFromMask(InsuranceType insuranceMask);
-    std::pair<float, float> CalcRemHold(uint iClientID);
-    bool isAddPossible(float fVolumetoAdd, float fHold, float fMaxHold);
+    void CreateNewInsurance(uint clientId, bool onlyFreeItems);
+    void UseInsurance(uint clientId);
+    bool IsInsuranceRequested(uint clientId);
+    bool IsInsurancePresent(uint clientId);
+    void UserCMD_INSURANCE(uint clientId, const std::wstring& argumentsWS);
 }
 
 namespace AntiCheat {

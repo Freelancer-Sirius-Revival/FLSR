@@ -56,23 +56,23 @@ namespace ClientController {
 
 
             //EquipWhiteList
-            if (Modules::GetModuleState("EquipWhiteListModule"))
-            {
-                if (Tools::startsWith(scData, "MOUNTING "))
-                {
-                    //Get Data
-                    std::string scGoodID = scData.substr(9);
-                    uint iGoodID = ToInt(stows(scGoodID));
-                    //EquipWhiteList::CC_CheckEquipWhiteList(iClientID, iGoodID);
-                }
-                if (Tools::startsWith(scData, "shipID: "))
-                {
-                    //Get Data
-                    std::string scShipArchID = scData.substr(8);
-                    uint iShipArchID = stoi(scShipArchID);
-                    EquipWhiteList::SendList(iShipArchID, iClientID, true);
-                }
-            }
+            //if (Modules::GetModuleState("EquipWhiteListModule"))
+            //{
+            //    if (Tools::startsWith(scData, "MOUNTING "))
+            //    {
+            //        //Get Data
+            //        std::string scGoodID = scData.substr(9);
+            //        uint iGoodID = ToInt(stows(scGoodID));
+            //        //EquipWhiteList::CC_CheckEquipWhiteList(iClientID, iGoodID);
+            //    }
+            //    if (Tools::startsWith(scData, "shipID: "))
+            //    {
+            //        //Get Data
+            //        std::string scShipArchID = scData.substr(8);
+            //        uint iShipArchID = stoi(scShipArchID);
+            //        EquipWhiteList::SendList(iShipArchID, iClientID, true);
+            //    }
+            //}
             //Cloak
             /*if (Modules::GetModuleState("CloakModule"))
             {

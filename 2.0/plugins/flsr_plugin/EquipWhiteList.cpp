@@ -1,194 +1,175 @@
 #include "Main.h"
 
-namespace EquipWhiteList {
+namespace EquipWhiteList
+{
+	const uint TIMER_INTERVAL = 50;
+	const mstime UNMOUNT_CHECK_DELAY = 200;
 
-	std::list<EquipWhiteListEntry> lEquipWhiteList;
+	static std::map<uint, std::vector<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
+	static std::map<uint, mstime> delayedClientIdEquipmentChecks;
 
 	void LoadEquipWhiteList()
 	{
-		//Read Settings
-		char szCurDir[MAX_PATH];
-		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scEquipWhiteList = std::string(szCurDir) + Globals::Equip_WHITELIST_FILE;
+		char currentDirectory[MAX_PATH];
+		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
+		std::string configFilePath = std::string(currentDirectory) + Globals::Equip_WHITELIST_FILE;
 
-		//Clear old data
-		lEquipWhiteList.clear();
-
-		//Load EquipWhiteList Equipment
-		std::list<INISECTIONVALUE> lEquip;
-		IniGetSection(scEquipWhiteList, "Equipment", lEquip);
-
-		for (std::list<INISECTIONVALUE>::iterator i = lEquip.begin(); i != lEquip.end(); i++) {
-			std::string scEquipNickname = (*i).scValue;
-			EquipWhiteListEntry NewEquipWhiteList;
-			NewEquipWhiteList.scEquipNickname = scEquipNickname;
-			NewEquipWhiteList.iEquipID = CreateID(scEquipNickname.c_str());
-
-			//Load Ships of Equipment
-			std::list<INISECTIONVALUE> lShips;
-			IniGetSection(scEquipWhiteList, scEquipNickname, lShips);
-			std::vector<std::pair<uint, std::string>> vShip; // ShipID, ShipNickname
-
-			if (lShips.size() == 0)
+		allowedEquipmentArchetypeIdsPerShipArchetypeId.clear();
+		delayedClientIdEquipmentChecks.clear();
+		INI_Reader ini;
+		if (ini.open(configFilePath.c_str(), false))
+		{
+			while (ini.read_header())
 			{
-				//ConPrint(stows(scEquipNickname) + L"\n");
-				vShip.push_back(std::make_pair(CreateID("none"), "none"));
-				NewEquipWhiteList.vShip = vShip;
-			}
-			else {
-
-				for (std::list<INISECTIONVALUE>::iterator j = lShips.begin(); j != lShips.end(); j++) {
-					std::string scShipNickname = (*j).scValue;
-					vShip.push_back(std::make_pair(CreateID(scShipNickname.c_str()), scShipNickname));
-
-
+				const uint equipmentArchetypeId = CreateID(ini.get_header_ptr());
+				while (ini.read_value())
+				{
+					if (ini.is_value("ship"))
+						allowedEquipmentArchetypeIdsPerShipArchetypeId[equipmentArchetypeId].push_back(CreateID(ini.get_value_string(0)));
 				}
-				NewEquipWhiteList.vShip = vShip;
 			}
-				
-			lEquipWhiteList.push_back(NewEquipWhiteList);
+			ini.close();
 		}
 	}
 
-	bool ReqAddItem_CheckEquipWhiteList(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID)
+	bool UnmountNotAllowedEquipment(uint clientId, const EquipDescList& equipmentList)
 	{
-		//Check for WhiteListEquip
-		uint iShipArchIDPlayer;
-		pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
+		delayedClientIdEquipmentChecks.erase(clientId);
+		if (!HkIsValidClientID(clientId))
+			return false;
 
-		std::list<EquipWhiteListEntry>::iterator EquipWhiteListEntry = lEquipWhiteList.begin();
-		while (EquipWhiteListEntry != lEquipWhiteList.end()) {
-
-
-			//Check for Equip
-			if (EquipWhiteListEntry->iEquipID == goodID)
+		std::vector<EquipDesc> illegalEquipments;
+		for (const auto& equip : equipmentList.equip)
+		{
+			if (equip.bMounted && allowedEquipmentArchetypeIdsPerShipArchetypeId.contains(equip.iArchID))
 			{
-
-				//Loop ShipList
-				std::vector<std::pair<uint, std::string>> vShip = EquipWhiteListEntry->vShip;
-				int index = 0;
-				while (index < vShip.size()) {
-					std::pair<uint, std::string> pShipData = vShip.at(index);
-					if (iShipArchIDPlayer == pShipData.first)
+				bool foundMatchingShipArchetype = false;
+				uint shipArchetypeId;
+				pub::Player::GetShipID(clientId, shipArchetypeId);
+				for (const auto& allowedShipArchetypeId : allowedEquipmentArchetypeIdsPerShipArchetypeId[equip.iArchID])
+				{
+					if (shipArchetypeId == allowedShipArchetypeId)
 					{
-						//Player flys a listed Ship
-						//PrintUserCmdText(iClientID, L"Player flys a listed Ship");
-						return false;
-					}
-					else {
-						//Player dont fly a listed Ship
-						//PrintUserCmdText(iClientID, L"Player dont fly a listed Ship");
-
-						pub::Player::AddCargo(iClientID, goodID, 1, 1, false);
-						pub::Player::SendNNMessage(iClientID, 0x98ACBE43);
-						pub::Player::SendNNMessage(iClientID, 0x8D2CDF44);
-
-
-						return true;
+						foundMatchingShipArchetype = true;
+						break;
 					}
 				}
-				//NO SHIP
-				//Player dont fly a listed Ship
-				//PrintUserCmdText(iClientID, L"Player dont fly a listed Ship");
-
-				pub::Player::AddCargo(iClientID, goodID, 1, 1, false);
-				pub::Player::SendNNMessage(iClientID, 0x98ACBE43);
-				pub::Player::SendNNMessage(iClientID, 0x8D2CDF44);
-
-
-				return true;
+				if (!foundMatchingShipArchetype)
+				{
+					illegalEquipments.push_back(equip);
+				}
 			}
-			EquipWhiteListEntry++;
 		}
-		//Equip not found in WhiteList
-		//PrintUserCmdText(iClientID, L"Equip not found in WhiteList");
+
+		if (!illegalEquipments.empty())
+		{
+			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("no_place_to_mount"));
+			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("loaded_into_cargo_hold"));
+
+			for (const auto& equip : illegalEquipments)
+			{
+				pub::Player::RemoveCargo(clientId, equip.sID, equip.iCount);
+				pub::Player::AddCargo(clientId, equip.iArchID, equip.iCount, equip.get_status(), false);
+			}
+			return true;
+		}
 		return false;
 	}
 
-	void SendList(uint iShipArch, uint iClientID, bool boldShip)
+	// Safe-guard to make sure when the Whitelist is modified, players will get the changes when docking.
+	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 	{
-		//Check for WhiteListEquip
-		uint iShipArchIDPlayer = iShipArch;
-		std::wstring wscCCMessage = L"";
-		std::list<EquipWhiteListEntry>::iterator iterEquipWhiteListEntry = lEquipWhiteList.begin();
-		while (iterEquipWhiteListEntry != lEquipWhiteList.end()) {
-			std::vector<std::pair<uint, std::string>> vShip = iterEquipWhiteListEntry->vShip;
-			int index = 0;
-			bool bShipFound = false;
-			while (index < vShip.size()) {
-				
-				std::pair<uint, std::string> pShipData = vShip.at(index);
-				if (iShipArchIDPlayer == pShipData.first)
-				{
-					bShipFound = true;
-				}
-				if (pShipData.second == "none")
-				{
-					bShipFound = false;
-				}
+		returncode = DEFAULT_RETURNCODE;
 
-				index++;
-			}
-			if (!bShipFound)
-			{
-				if (wscCCMessage != L"")
-				{
-					wscCCMessage = wscCCMessage + L"," + std::to_wstring(iterEquipWhiteListEntry->iEquipID);
-				}
-				else 
-				{	
-					wscCCMessage = L"Blocklist={" + std::to_wstring(iterEquipWhiteListEntry->iEquipID);
-				}
-			}
-			iterEquipWhiteListEntry++;
-		}
-		if (boldShip)
+		if (Modules::GetModuleState("EquipWhiteListModule") && HkIsValidClientID(clientId))
 		{
-			//Check for WhiteListEquip
-			pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-			std::list<EquipWhiteListEntry>::iterator iterEquipWhiteListEntry = lEquipWhiteList.begin();
-			while (iterEquipWhiteListEntry != lEquipWhiteList.end()) {
-				std::vector<std::pair<uint, std::string>> vShip = iterEquipWhiteListEntry->vShip;
-				int index = 0;
-				bool bShipFound = false;
-				while (index < vShip.size()) {
+			if (UnmountNotAllowedEquipment(clientId, Players[clientId].equipDescList))
+				PrintUserCmdText(clientId, L"Some equipment has been ummounted due to changed requirements.");
+		}
+	}
 
-					std::pair<uint, std::string> pShipData = vShip.at(index);
-					if (iShipArchIDPlayer == pShipData.first)
-					{
-						bShipFound = true;
-					}
-					if (pShipData.second == "none")
-					{
-						bShipFound = false;
-					}
+	// Safe-guard to make sure when the Whitelist is modified after players changed equipment the last time.
+	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
 
-					index++;
-				}
-				if (!bShipFound)
+		if (Modules::GetModuleState("CloakModule") && HkIsValidClientID(clientId))
+		{
+			if (UnmountNotAllowedEquipment(clientId, Players[clientId].equipDescList))
+				PrintUserCmdText(clientId, L"Some equipment has been ummounted due to changed requirements.");
+		}
+	}
+
+	// Called when equipment is being mounted/unmounted or it is transferred to a new ship.
+	// Always happens BEFORE ReqShipArch_AFTER. To still use the new ship archetype, delay the actual checks.
+	void __stdcall ReqEquipment_AFTER(class EquipDescList const& equipDescriptorList, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("EquipWhiteListModule") && HkIsValidClientID(clientId))
+		{
+			delayedClientIdEquipmentChecks[clientId] = timeInMS();
+		}
+	}
+
+	// Called when equipment is being added to the ship from a trader.
+	void __stdcall ReqAddItem_AFTER(unsigned int goodArchetypeId, char const* hardpoint, int count, float status, bool mounted, uint clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("EquipWhiteListModule"))
+		{
+			if (mounted && allowedEquipmentArchetypeIdsPerShipArchetypeId.contains(goodArchetypeId))
+			{
+				uint shipArchetypeId;
+				pub::Player::GetShipID(clientId, shipArchetypeId);
+				for (const auto& allowedShipArchetypeId : allowedEquipmentArchetypeIdsPerShipArchetypeId[goodArchetypeId])
 				{
-					if (wscCCMessage != L"")
+					if (shipArchetypeId == allowedShipArchetypeId)
+						return;
+				}
+
+				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("no_place_to_mount"));
+				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("loaded_into_cargo_hold"));
+
+				const auto hardpointString = std::string(hardpoint);
+				for (const auto& equip : Players[clientId].equipDescList.equip)
+				{
+					if ((equip.iArchID == goodArchetypeId) && (std::string(equip.szHardPoint.value) == hardpointString))
 					{
-						wscCCMessage = wscCCMessage + L"," + std::to_wstring(iterEquipWhiteListEntry->iEquipID);
-					}
-					else
-					{
-						if (Tools::startsWith(wstos(wscCCMessage), "Blocklist={"))
-						{
-							wscCCMessage = wscCCMessage + L"," + std::to_wstring(iterEquipWhiteListEntry->iEquipID);
-						}
-						else
-						{
-							wscCCMessage = L"Blocklist={" + std::to_wstring(iterEquipWhiteListEntry->iEquipID);
-						}
+						pub::Player::RemoveCargo(clientId, equip.sID, equip.iCount);
+						pub::Player::AddCargo(clientId, goodArchetypeId, equip.iCount, status, false);
+						return;
 					}
 				}
-				iterEquipWhiteListEntry++;
 			}
 		}
-		
-		wscCCMessage = wscCCMessage + L"}";
-		//ConPrint(L"CCMessage: %s\n", wscCCMessage.c_str());
-		ClientController::Send_ControlMsg(false, iClientID, wscCCMessage);		
+	}
+
+	// Safe-guard. Called when ship was purchased. This always happens AFTER ReqEquipment and is the reason for the slight time delay before checks truly happen.
+	void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("EquipWhiteListModule") && HkIsValidClientID(clientId))
+		{
+			delayedClientIdEquipmentChecks[clientId] = timeInMS();
+		}
+	}
+
+	// Process any delayed equipment checks.
+	void ProcessChangedEquipments()
+	{
+		if (Modules::GetModuleState("EquipWhiteListModule"))
+		{
+			const mstime now = timeInMS() - UNMOUNT_CHECK_DELAY;
+			for (const auto& timeStampClientId : delayedClientIdEquipmentChecks)
+			{
+				if ((now >= timeStampClientId.second) && HkIsValidClientID(timeStampClientId.first))
+				{
+					UnmountNotAllowedEquipment(timeStampClientId.first, Players[timeStampClientId.first].equipDescList);
+				}
+			}
+		}
 	}
 }

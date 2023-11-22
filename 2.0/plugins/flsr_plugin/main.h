@@ -760,19 +760,16 @@ namespace Mark
     void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
 }
 
-namespace EquipWhiteList {
-
-	struct EquipWhiteListEntry {
-		std::string scEquipNickname;
-		uint iEquipID;
-		std::vector<std::pair<uint, std::string>> vShip; // ShipID, ShipNickname
-	};
-
-    extern std::list<EquipWhiteListEntry> lEquipWhiteList;
-
+namespace EquipWhiteList
+{
     void LoadEquipWhiteList();
-    bool ReqAddItem_CheckEquipWhiteList(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID);
-    void SendList(uint iShipArch, uint iClientID, bool oldShip);
+    void ProcessChangedEquipments();
+    extern const uint TIMER_INTERVAL;
+    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
+    void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
+    void __stdcall ReqEquipment_AFTER(class EquipDescList const& equipDescriptorList, unsigned int clientId);
+    void __stdcall ReqAddItem_AFTER(unsigned int goodArchetypeId, char const* hardpoint, int count, float status, bool mounted, uint clientId);
+    void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId);
 }
 
 namespace SQL {

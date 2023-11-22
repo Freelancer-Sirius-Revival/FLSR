@@ -254,28 +254,6 @@ namespace Hooks {
                 }
             }
         }
-
-            if (iClientID) { // a player was killed
-              
-
-                if (iClientID != 0) {
-
-                    // Insurance-PlayerDied
-
-				    if (Modules::GetModuleState("InsuranceModule"))
-				    {
-					    //Insurance::PlayerDiedEvent(true, iClientID);
-				    }
-                }
-			
-                //EquipWhiteList
-                if (Modules::GetModuleState("EquipWhiteListModule"))
-                {
-                    uint iShipArchIDPlayer;
-                    pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-                    EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
-                }
-            }
     }
 
     //BaseEnter_AFTER
@@ -299,14 +277,6 @@ namespace Hooks {
         if (Modules::GetModuleState("PlayerHunt"))
         {
 			PlayerHunt::CheckDock(iBaseID, iClientID);
-        }
-
-        //EquipWhiteList
-        if (Modules::GetModuleState("EquipWhiteListModule"))
-        {
-            uint iShipArchIDPlayer;
-            pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-            EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
         }
 
         //PathSelection
@@ -511,14 +481,6 @@ namespace Hooks {
             AntiCheat::TimingAC::Init(iClientID);
             AntiCheat::PowerAC::Init(iClientID);
         }
-		
-        //EquipWhiteList
-        if (Modules::GetModuleState("EquipWhiteListModule"))
-        {
-            uint iShipArchIDPlayer;
-            pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-            EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);        
-        }
 
 		//CarrierModule
         if (Modules::GetModuleState("CarrierModule"))
@@ -542,46 +504,6 @@ namespace Hooks {
 
         //Update BaseState
         ClientController::Send_ControlMsg(false, iClientID, L"_InSpaceState");
-    }
-
-    void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count,float status, bool mounted, uint iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-        
-		//EquipWhiteList
-        if (Modules::GetModuleState("EquipWhiteListModule"))
-        {
-            uint iShipArchIDPlayer;
-            pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-            EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
-            if (EquipWhiteList::ReqAddItem_CheckEquipWhiteList(goodID, hardpoint, count, status, mounted, iClientID)) {
-                //PrintUserCmdText(iClientID, L"Item not added");
-                //pub::Audio::PlaySoundEffect(iClientID, CreateID("no_place_to_mount"));
-                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            }
-        }
-    }
-
-    void __stdcall ReqShipArch_AFTER(unsigned int iArchID, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-		
-        //EquipWhiteList
-        if (Modules::GetModuleState("EquipWhiteListModule"))
-        {
-            EquipWhiteList::SendList(iArchID, iClientID, false);
-        }
-    }
-
-    void __stdcall ReqEquipment(class EquipDescList const& edl, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-		
-        //EquipWhiteList
-        if (Modules::GetModuleState("EquipWhiteListModule"))
-        {
-            uint iShipArchIDPlayer;
-            pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-            EquipWhiteList::SendList(iShipArchIDPlayer, iClientID, false);
-        }
-		
     }
 	
     void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state)

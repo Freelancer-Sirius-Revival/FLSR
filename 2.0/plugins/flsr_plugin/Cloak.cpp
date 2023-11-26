@@ -116,6 +116,7 @@ namespace Cloak
 		uint cloakPowerCargoId = 0;
 		std::vector<uint> otherPowerCargoIds;
 		bool shieldPresent = false;
+		bool cloakStateChangedSinceLastTick = false;
 		CloakState cloakState = CloakState::Cloaked;
 		bool initialUncloakCompleted = false;
 		mstime cloakTimeStamp = 0;
@@ -438,7 +439,7 @@ namespace Cloak
 
 		uint shipArchetypeId;
 		pub::Player::GetShipID(clientId, shipArchetypeId);
-		for (int index = 0; index < shipEffects.size(); index++)
+		for (size_t index = 0; index < shipEffects.size(); index++)
 		{
 			if (shipEffects[index].shipArchetypeId == shipArchetypeId)
 			{
@@ -450,7 +451,7 @@ namespace Cloak
 			return;
 
 		std::list<CARGO_INFO> cargoList = GetClientCargoList(clientId);
-		for (int index = 0; index < cloakDefinitions.size(); index++)
+		for (size_t index = 0; index < cloakDefinitions.size(); index++)
 		{
 			for (const auto& cargo : cargoList)
 			{
@@ -616,6 +617,7 @@ namespace Cloak
 			StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->cloakFuseId);
 			clientCloakStats[clientId].cloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Cloaking;
+			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 			SynchronizeWeaponGroupsWithCloakState(clientId);
 			result = CloakReturnState::Successful;
 		}
@@ -649,6 +651,7 @@ namespace Cloak
 			}
 			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Uncloaking;
+			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 			SynchronizeWeaponGroupsWithCloakState(clientId);
 			return true;
 		}
@@ -740,10 +743,12 @@ namespace Cloak
 		if (cloakState == CloakState::Cloaking)
 		{
 			cloakState = currentTime - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->cloakDuration ? CloakState::Cloaked : CloakState::Cloaking;
+			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 		}
 		else if (cloakState == CloakState::Uncloaking)
 		{
 			cloakState = currentTime - clientCloakStats[clientId].uncloakTimeStamp > clientCloakStats[clientId].effectsDefinition->uncloakDuration ? CloakState::Uncloaked : CloakState::Uncloaking;
+			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 			if (!clientCloakStats[clientId].initialUncloakCompleted && cloakState == CloakState::Uncloaked)
 				clientCloakStats[clientId].initialUncloakCompleted = true;
 		}
@@ -752,6 +757,16 @@ namespace Cloak
 			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->cloakFuseId);
 			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
 		}
+	}
+
+	void UnmarkFromAllClients(uint clientId)
+	{
+		uint shipId;
+		pub::Player::GetShip(clientId, shipId);
+		if (!shipId)
+			return;
+
+		Mark::UnmarkAndUnregisterObjectForEveryone(shipId);
 	}
 
 	mstime lastSynchronizeTimeStamp = 0;
@@ -803,6 +818,14 @@ namespace Cloak
 
 			SynchronizeShieldStateWithCloakState(clientId);
 			SynchronizePowerStateWithCloakState(clientId);
+
+			// Make sure to remove this player from everyone's mark list (clearing them from their scanners).
+			if (clientCloakStats[clientId].cloakStateChangedSinceLastTick)
+			{
+				clientCloakStats[clientId].cloakStateChangedSinceLastTick = false;
+				if (cloakState == CloakState::Cloaked)
+					UnmarkFromAllClients(clientId);
+			}
 
 			// Uncloak when power becomes too little.
 			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= clientCloakStats[clientId].statsDefinition->minRequiredPower)

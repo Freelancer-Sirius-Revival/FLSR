@@ -130,7 +130,6 @@ namespace Commands {
     void AdminCmd_Stalk(CCmds *cmds, std::wstring Charname = L"");
     void CmdHelp_Callback(CCmds *classptr);
     bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd);
-    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam);
     void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam);
     void UserCMD_DOCKACCEPT(uint iClientID, const std::wstring &wscParam);
     void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam);
@@ -140,8 +139,6 @@ namespace Commands {
     void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam);
     void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam);
     void UserCmd_UV(uint iClientID, const std::wstring &wscParam);
-    void UserCmd_CLOAK(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_UNCLOAK(uint iClientID, const std::wstring& wscParam);
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
     void UserCmd_Tag(uint iClientID, const std::wstring& wscParam);
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam);
@@ -514,7 +511,6 @@ namespace Hooks {
 	void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
     void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state);
     void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
-    void __stdcall RequestEvent(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }
 
@@ -712,78 +708,25 @@ namespace CustomMissions {
 
 }
 
-namespace Cloak {
-
-
-    void InstallCloak(uint iClientID);
-	void CloakInstallTimer2000ms();
-    void WarmUpCloakTimer1000ms();
-    void DoCloakingTimer250ms();
-	void UncloakGroup(uint iClientID);
+namespace Cloak
+{
     void LoadCloakSettings();
-    bool Check_Dock_Call(uint iShip, uint iDockTarget, uint iCancel, enum DOCK_HOST_RESPONSE response);
-    bool Check_GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
-    bool Check_Cloak(uint iClientID);
-    void StartCloakPlayer(uint iClientID);
-    void DoCloak(uint iClientID);
-    void UncloakPlayer(uint iClientID);
-    void UpdateShipEnergyTimer();
-    bool Check_RequestEventFormaDocking(int iIsFormationRequest, unsigned int iShip, unsigned int iDockTarget, unsigned int p4, unsigned long p5, unsigned int iClientID);
-    void CloakSync(uint iClientID);
-    void KillShield(uint iClientID);
-
-    struct CloakDeviceInfo {
-		
-        std::string scCloakDeviceNickname;
-        uint iCloakDeviceArchID;
-        float fCloakCapacity;
-		float fPowerUsageToRecharge;
-		float fCloakPowerUsageWhileCloaked;
-        float fMinRequiredCapacityToCloak;
-        bool bUseShipPowerToRecharge;
-        bool bShieldDownOnCloaking;
-        bool bShieldDownWhileCloaking;
-		bool bCanUseCloakModule;
-        int iCloakWarmUpDuration;
-        int iCloakEffectDuration;
-        int iUncloakEffectDuration;
-		
-    };
-
-    struct PlayerCloakInfo {
-        bool bInitialCloak = false;
-        bool bCanCloak = false;
-        bool bIsCloaking = false;
-        bool bWantsCloak = false;
-        bool bCloaked = false;
-        int iCloakSlot = 0;
-        uint iCloakDeviceArchID;
-        mstime tmCloakTime = timeInMS();
-		mstime tmUnCloakTime = timeInMS();
-        bool bIsinGroup = false;
-		uint iGroupID = 0;
-        float fCloakCap = 0.0f;
-		float fEnergy = 0.0f;
-        CloakDeviceInfo PlayerCloakData;
-		bool bShowUI = false;
-        bool bAllowUncloak = true;
-        bool bAllowCloak = false;
-        bool bPlayerShield = false;
-    };
-	
-    struct WarmUpCloak {
-        bool bRdy = false;
-        mstime msStart = 0;
-    };
-    
-    // extern IMPORT PlayerCloakInfo PlayerCloakData[MAX_CLIENT_ID + 1];
-    // extern IMPORT WarmUpCloak PlayerWarmUpCloak[MAX_CLIENT_ID + 1];
-
-	extern std::list<CloakDeviceInfo> lCloakDeviceList;
-	extern std::map<std::wstring, PlayerCloakInfo> mPlayerCloakData;
-    extern std::map<std::wstring, WarmUpCloak> mPlayerWarmUpCloak;
-
-
+    void InitializeWithGameData();
+    void UpdateCloakClients();
+    extern const uint TIMER_INTERVAL;
+    void __stdcall ActivateEquip(unsigned int clientId, struct XActivateEquip const& activateEquip);
+    void __stdcall FireWeapon(unsigned int clientId, struct XFireWeaponInfo const& fireWeaponInfo);
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+    void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
+    void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane);
+    int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
+    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
+    void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
+    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
+    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
+    void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise);
+    void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
+    void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);
 }
 
 namespace Crafting

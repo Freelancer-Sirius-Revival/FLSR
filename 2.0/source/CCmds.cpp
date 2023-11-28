@@ -342,7 +342,7 @@ void CCmds::CmdAddCargo(const std::wstring& wscCharname,
     RIGHT_CHECK(RIGHT_CARGO);
 
     if (HKSUCCESS(
-        HkAddCargo(wscCharname, wscGood, iCount, iMission ? true : false)))
+        HkAddCargo(wscCharname, wscGood, iCount ? iCount : 1, iMission ? true : false)))
         Print(L"OK\n");
     else
         PrintError();

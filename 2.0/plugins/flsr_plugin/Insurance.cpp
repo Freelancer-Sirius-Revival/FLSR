@@ -407,21 +407,29 @@ namespace Insurance
                 }
             }
 
+            if (insuredCargo.cargoInfo.iCount <= foundCurrentCargoCount)
+            {
+                continue;
+            }
+
             if (isArchetypeTypeConsumable(archetypeType))
             {
-                float remainingHoldSize;
-                pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-                const uint itemsToAdd = insuredCargo.CARGO_INFO.iCount - foundCurrentCargoCount;
-                const uint maxItemsToAdd = equipment->fVolume > 0.0f ? static_cast<uint>(remainingHoldSize / equipment->fVolume) : itemsToAdd;
-                const uint actualItemsToAdd = std::min(itemsToAdd, maxItemsToAdd);
-                consumablesCouldNotBeRestored = consumablesCouldNotBeRestored || actualItemsToAdd != itemsToAdd;
-                if ((actualItemsToAdd > 0) && (Tools::FLSRHkAddCargo(characterNameWS, insuredCargo.CARGO_INFO.iArchID, actualItemsToAdd, false) == HKE_OK))
+                uint itemsToAdd = std::max(insuredCargo.cargoInfo.iCount - foundCurrentCargoCount, 0);
+                if (equipment->fVolume > 0.0f)
                 {
-                    totalRestorationPrice += actualItemsToAdd * insuredCargo.fPrice;
+                    float remainingHoldSize;
+                    pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
+                    const uint actualItemsToAdd = std::min(itemsToAdd, static_cast<uint>(remainingHoldSize / equipment->fVolume));
+                    consumablesCouldNotBeRestored = consumablesCouldNotBeRestored || actualItemsToAdd != itemsToAdd;
+                    itemsToAdd = actualItemsToAdd;
+                }
+                if ((itemsToAdd > 0) && (Tools::FLSRHkAddCargo(characterNameWS, insuredCargo.cargoInfo.iArchID, itemsToAdd, false) == HKE_OK))
+                {
+                    totalRestorationPrice += itemsToAdd * insuredCargo.price;
                     somethingWasRestored = true;
                 }
             }
-            else if (isArchetypeTypeEquipment(archetypeType) && foundCurrentCargoCount == 0)
+            else if (IsArchetypeTypeEquipment(archetypeType) && foundCurrentCargoCount == 0)
             {
                 std::string hardpoint = insuredCargo.CARGO_INFO.hardpoint.value;
                 if (HkAddEquip(ARG_CLIENTID(clientId), insuredCargo.CARGO_INFO.iArchID, hardpoint) == HKE_OK)

@@ -231,41 +231,56 @@ namespace Insurance
 
     void CreateNewInsurance(uint clientId, bool onlyFreeItems)
     {
-        std::list<InsuredCargoItem> insuredCargoList = CollectInsuredCargo(clientId, onlyFreeItems);
-
         int playerCash = 0;
-        if (HK_ERROR error = HkGetCash(ARG_CLIENTID(clientId), playerCash); error != HKE_OK)
+        if (!onlyFreeItems)
         {
-            PrintUserCmdText(clientId, L"ERR Get cash failed err=" + HkErrGetText(error));
+            if (HK_ERROR error = HkGetCash(ARG_CLIENTID(clientId), playerCash); error != HKE_OK)
+            {
+                PrintUserCmdText(clientId, L"ERR Get cash failed err=" + HkErrGetText(error));
+                return;
+            }
+        }
+
+        std::list<InsuredCargoItem> insuredCargoList = CollectInsuredCargo(clientId, onlyFreeItems);
+        if (!onlyFreeItems && (insuredCargoList.size() == 0))
+        {
+            PrintUserCmdText(clientId, L"You own nothing that needs to be insured.");
             return;
         }
 
-        const int totalPrice = !onlyFreeItems ? CalculateInsuranceCost(insuredCargoList) : 0;
+        int totalPrice = !onlyFreeItems ? CalculateInsuranceCost(insuredCargoList) : 0;
 
         if (totalPrice > playerCash)
         {
             PrintUserCmdText(clientId, L"Insurance failed. You need to own at least $" + ToMoneyStr(totalPrice) + L".");
-            return;
+            // If the player has not enough money, proceed with only free items which always must be insured.
+            totalPrice = 0;
+            onlyFreeItems = true;
+            insuredCargoList = CollectInsuredCargo(clientId, onlyFreeItems);
+            if (insuredCargoList.size() == 0)
+                return;
         }
 
-        const std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-        if (HK_ERROR error = HkAddCash(characterNameWS, -totalPrice); error != HKE_OK)
+        if (totalPrice > 0)
         {
-            PrintUserCmdText(clientId, L"ERR Remove cash failed err=" + HkErrGetText(error));
-            return;
+            if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), -totalPrice); error != HKE_OK)
+            {
+                PrintUserCmdText(clientId, L"ERR Remove cash failed err=" + HkErrGetText(error));
+                return;
+            }
         }
 
         if (HkAntiCheat(clientId) != HKE_OK)
         {
             PrintUserCmdText(clientId, L"ERR Insurance-Booking failed");
+            const std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
             AddLog("NOTICE: Possible cheating when book Insurance %s credits from %s ", wstos(ToMoneyStr(totalPrice)).c_str(), wstos(characterNameWS).c_str());
             return;
         }
 
         char currentDirectory[MAX_PATH];
         GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-        std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
-        const std::string characterName = wstos(characterNameWS);
+        const std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
         std::wstring characterFileNameWS;
         if (HK_ERROR error = HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS); error != HKE_OK)
         {
@@ -301,8 +316,7 @@ namespace Insurance
 
         if (onlyFreeItems)
         {
-            if (insuredCargoList.size() > 0)
-                PrintUserCmdText(clientId, L"Pre-mounted equipment is insured.");
+            PrintUserCmdText(clientId, L"Pre-mounted equipment is insured.");
         }
         else
         {

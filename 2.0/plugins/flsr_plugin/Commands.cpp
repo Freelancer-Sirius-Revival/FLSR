@@ -1226,7 +1226,17 @@ namespace Commands {
         {L"/cloak", Cloak::UserCmd_CLOAK},
         {L"/c", Cloak::UserCmd_CLOAK},
         {L"/uncloak", Cloak::UserCmd_UNCLOAK},
-        {L"/uc", Cloak::UserCmd_UNCLOAK}
+        {L"/uc", Cloak::UserCmd_UNCLOAK},
+        {L"/mark", Mark::UserCmd_Mark},
+        {L"/m", Mark::UserCmd_Mark},
+        {L"/groupmark", Mark::UserCmd_GroupMark},
+        {L"/gm", Mark::UserCmd_GroupMark},
+        {L"/unmark", Mark::UserCmd_UnMark},
+        {L"/um", Mark::UserCmd_UnMark},
+        {L"/groupunmark", Mark::UserCmd_UnGroupMark},
+        {L"/gum", Mark::UserCmd_UnGroupMark},
+        {L"/unmarkall", Mark::UserCmd_UnMarkAll},
+        {L"/uma", Mark::UserCmd_UnMarkAll}
 
 
 

@@ -105,14 +105,6 @@ namespace Cloak
 		std::string cloakingDeviceHardpoint = "";
 	};
 
-	enum CloakState
-	{
-		Uncloaked,
-		Cloaking,
-		Cloaked,
-		Uncloaking
-	};
-
 	struct ClientCloakStats
 	{
 		CShip* ship = 0;
@@ -832,6 +824,23 @@ namespace Cloak
 				result.push_back(cargo.iID);
 		}
 		return result;
+	}
+
+	CloakState GetClientCloakState(uint clientId)
+	{
+		if (clientCloakStats.contains(clientId))
+			return clientCloakStats[clientId].cloakState;
+		return CloakState::Uncloaked;
+	}
+
+	CloakState FindShipCloakState(uint shipId)
+	{
+		for (const auto& cloakStats: clientCloakStats)
+		{
+			if (cloakStats.second.ship && cloakStats.second.ship->iID == shipId)
+				return cloakStats.second.cloakState;
+		}
+		return CloakState::Uncloaked;
 	}
 
 	bool ToggleClientCloakActivator(uint clientId, bool active)

@@ -710,9 +710,19 @@ namespace CustomMissions {
 
 namespace Cloak
 {
+    enum CloakState
+    {
+        Uncloaked,
+        Cloaking,
+        Cloaked,
+        Uncloaking
+    };
+
     void LoadCloakSettings();
     void InitializeWithGameData();
     void UpdateCloakClients();
+    CloakState GetClientCloakState(uint clientId);
+    CloakState FindShipCloakState(uint shipId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, struct XActivateEquip const& activateEquip);
     void __stdcall FireWeapon(unsigned int clientId, struct XFireWeaponInfo const& fireWeaponInfo);
@@ -733,6 +743,21 @@ namespace Crafting
 {
     void LoadSettings();
     bool UserCmd_Craft(uint clientId, const std::wstring& argumentsWS);
+}
+
+namespace Mark
+{
+    void MarkAndRegisterObject(uint clientId, uint targetId);
+    void UnmarkAndUnregisterObject(uint clientId, uint targetId);
+    void UnmarkAndUnregisterObjectForEveryone(uint targetId);
+    void UserCmd_Mark(uint clientId, const std::wstring& wscParam);
+    void UserCmd_GroupMark(uint clientId, const std::wstring& wscParam);
+    void UserCmd_UnMark(uint clientId, const std::wstring& wscParam);
+    void UserCmd_UnGroupMark(uint clientId, const std::wstring& wscParam);
+    void UserCmd_UnMarkAll(uint clientId, const std::wstring& wscParam);
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+    void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
+    void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
 }
 
 namespace EquipWhiteList {

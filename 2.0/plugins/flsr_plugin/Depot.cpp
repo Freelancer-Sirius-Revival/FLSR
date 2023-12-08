@@ -194,7 +194,6 @@ namespace Depot {
 
         //Send to Client
         ConPrint(wscCCMessage + L"\n");
-        ClientController::Send_ControlMsg(false, iClientID, wscCCMessage);
         GetPlayerEquip(iClientID);
     }
  
@@ -266,7 +265,6 @@ namespace Depot {
 
         //Send to Client
         ConPrint(wscCCMessage + L"\n");
-        ClientController::Send_ControlMsg(false, iClientID, wscCCMessage);
 
     }
 

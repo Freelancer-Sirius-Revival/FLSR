@@ -116,7 +116,6 @@
     <ClCompile Include="PathSelection.cpp" />
     <ClCompile Include="PlayerHunt.cpp" />
     <ClCompile Include="PopUp.cpp" />
-    <ClCompile Include="ClientController.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="PVP.cpp" />
     <ClCompile Include="SendCash.cpp" />

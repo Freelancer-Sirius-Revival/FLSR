@@ -212,12 +212,6 @@ namespace Docking {
 
             lUndockRelocate.push_back(NewRelocate);
 
-            
-          
-            
-
-            ClientController::Send_ControlMsg(true, iClientID, L"_ForceChangeSystem " + stows(std::to_string(iSysIDCarrier)));
-
 
 
             //PrintUserCmdText(iClientID, L"SYSBEAM");

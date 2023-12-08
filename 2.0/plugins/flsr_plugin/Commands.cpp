@@ -1134,8 +1134,6 @@ namespace Commands {
 
     // Contributor TextBox
     void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam) {
-        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE Contributor");
-
         FmtStr caption(0, 0);
         caption.begin_mad_lib(PopUp::iContributor_Head);
         caption.end_mad_lib();

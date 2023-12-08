@@ -378,7 +378,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::HkCb_AddDmgEntry, PLUGIN_HkCb_AddDmgEntry, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SPObjUpdate,PLUGIN_HkIServerImpl_SPObjUpdate, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SubmitChat,PLUGIN_HkIServerImpl_SubmitChat, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SPMunitionCollision, PLUGIN_HkIServerImpl_SPMunitionCollision, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));

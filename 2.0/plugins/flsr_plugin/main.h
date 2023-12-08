@@ -497,7 +497,6 @@ namespace Hooks {
     void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill);
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID);
     void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui, unsigned int iClientID);
-    void __stdcall SubmitChat(CHAT_ID cId, unsigned long lP1, void const *rdlReader, CHAT_ID cIdTo, int iP2);
     int __cdecl Dock_Call(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response);
 	void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci, unsigned int iClientID);
     void __stdcall JumpInComplete(unsigned int iSystemID, unsigned int iShipID);
@@ -505,43 +504,13 @@ namespace Hooks {
     void ClearClientInfo(unsigned int iClientID);
     void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn);
     void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID);
-    void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID);
-    void __stdcall ReqShipArch_AFTER(unsigned int iArchID, unsigned int iClientID);
-	void __stdcall ReqEquipment(class EquipDescList const& edl, unsigned int iClientID);
-	void __stdcall GoTradelane(unsigned int iClientID, struct XGoTradelane const& gtl);
     void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state);
     void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }
 
-namespace ClientController {
-    void Send_ControlMsg(bool sHook, uint iClientID, std::wstring wscText, ...);
-    void Handle_ClientControlMsg(CHAT_ID cId, unsigned long lP1, void const* rdlReader, CHAT_ID cIdTo, int iP2);
-}
-
 namespace Insurance
 {
-    template<typename T>
-    constexpr inline T operator~ (T a) { return static_cast<T>(~static_cast<typename std::underlying_type<T>::type>(a)); }
-
-    template<typename T>
-    constexpr inline T operator| (T a, T b) { return static_cast<T>(static_cast<typename std::underlying_type<T>::type>(a) | static_cast<typename std::underlying_type<T>::type>(b)); }
-
-    template<typename T>
-    constexpr inline T operator& (T a, T b) { return static_cast<T>(static_cast<typename std::underlying_type<T>::type>(a) & static_cast<typename std::underlying_type<T>::type>(b)); }
-
-    template<typename T>
-    constexpr inline T operator^ (T a, T b) { return static_cast<T>(static_cast<typename std::underlying_type<T>::type>(a) ^ static_cast<typename std::underlying_type<T>::type>(b)); }
-
-    template<typename T>
-    constexpr inline T& operator|= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) |= static_cast<typename std::underlying_type<T>::type>(b)); }
-
-    template<typename T>
-    constexpr inline T& operator&= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) &= static_cast<typename std::underlying_type<T>::type>(b)); }
-
-    template<typename T>
-    constexpr inline T& operator^= (T& a, T b) { return reinterpret_cast<T&>(reinterpret_cast<typename std::underlying_type<T>::type&>(a) ^= static_cast<typename std::underlying_type<T>::type>(b)); }
-
     extern float insuranceEquipmentCostFactor;
 
     void CreateNewInsurance(uint clientId, bool onlyFreeItems);

@@ -155,7 +155,6 @@ namespace CustomMissions {
 			
 			DataToSend = "WPBP[x={" + x + "},y={" + y + "},z={" + z + "},sysID={" + sysID + "},objectID={" + objectID + "},numberofWP=" + std::to_string(iCountWaypoints) + "]";
 
-			ClientController::Send_ControlMsg(true, iClientID, stows(DataToSend)); // This dont work
 			PrintUserCmdText(iClientID, L"Sending WP: %s", stows(DataToSend));// This work
 		}
 		else
@@ -174,7 +173,6 @@ namespace CustomMissions {
 				DataToSend += std::to_string((*i).iSystemID);
 				DataToSend += "}";
 
-				ClientController::Send_ControlMsg(true, iClientID, stows(DataToSend)); // This dont work
 				PrintUserCmdText(iClientID, L"Sending WP: %s", stows(DataToSend));// This work
 			}
 		}

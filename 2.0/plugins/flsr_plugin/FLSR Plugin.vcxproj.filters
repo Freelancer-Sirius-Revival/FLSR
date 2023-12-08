@@ -41,9 +41,6 @@
     <ClCompile Include="Hooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ClientController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SendCash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

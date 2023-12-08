@@ -14,12 +14,6 @@ namespace Hooks {
     //CharacterSelect
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID) {
         returncode = DEFAULT_RETURNCODE;
-      
-        //InfoCardUpdate
-        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE CharacterSelect");
-
-        //Update BaseState
-        ClientController::Send_ControlMsg(false, iClientID, L"_ResetBaseState");       
 
         //NewPlayerMessage
         Tools::HkNewPlayerMessage(iClientID, cId);
@@ -43,12 +37,6 @@ namespace Hooks {
             AntiCheat::PowerAC::Init(iClientID);
         }
 		
-        //Update InfoCards
-        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE LaunchComplete");
-        
-        //Update BaseState
-        ClientController::Send_ControlMsg(false, iClientID, L"_InSpaceState");
-
         //Show WelcomePopUp
         if (Modules::GetModuleState("WelcomeMSG"))
         {
@@ -277,9 +265,6 @@ namespace Hooks {
         {
             PathSelection::Install_Unlawful(iClientID);
         }
-        
-        //Update BaseState
-        ClientController::Send_ControlMsg(false, iClientID, L"_OnBaseState");
     }
 
 	//SPObjUpdate
@@ -291,13 +276,6 @@ namespace Hooks {
             AntiCheat::TimingAC::CheckTimeStamp(ui, iClientID);
             AntiCheat::SpeedAC::CheckSpeedCheat(ui, iClientID);
         }
-    }
-
-	//SubmitChat
-    void __stdcall SubmitChat(CHAT_ID cId, unsigned long lP1, void const *rdlReader, CHAT_ID cIdTo, int iP2) {
-        returncode = DEFAULT_RETURNCODE;
-
-        ClientController::Handle_ClientControlMsg(cId, lP1, rdlReader, cIdTo, iP2);
     }
 
 	//Dock_Call
@@ -443,8 +421,6 @@ namespace Hooks {
           AntiCheat::PowerAC::Init(iClientID);
 
         }
-
-        ClientController::Send_ControlMsg(true, iClientID, L"_INFOCARDUPDATE ClearClientInfo");
     }
 
     void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn) {
@@ -481,9 +457,6 @@ namespace Hooks {
             const bool insuranceRequested = Insurance::IsInsuranceRequested(iClientID);
             Insurance::CreateNewInsurance(iClientID, !insuranceRequested);
         }
-
-        //Update BaseState
-        ClientController::Send_ControlMsg(false, iClientID, L"_InSpaceState");
     }
 	
     void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state)

@@ -1,58 +1,81 @@
 #include "main.h"
 
-namespace SpawnProtection {
-
-    // Definition der Map zur Speicherung der letzten Spawn-Zeitpunkte pro iClientID
-    std::map<uint, mstime> g_lastSpawnTimes;
-    uint g_spawnProtectionDuration;
+namespace SpawnProtection
+{
+    const mstime TIMER_INTERVAL = 500;
+    static std::map<uint, mstime> invincibleEndTimePerShip;
+    static mstime invincibleDuration = 0;
 
     bool LoadSettings()
     {
-        // Konfigpfad
         char szCurDir[MAX_PATH];
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
         std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
-        g_spawnProtectionDuration = IniGetI(scPluginCfgFile, "SpawnProtection", "ProtectionDuration", 0);
-        if (g_spawnProtectionDuration == 0) {
-            ConPrint(L"ERROR: No ProtectionDuration found in config file!\n");
-            return false;
-        }
-
+        invincibleDuration = IniGetI(scPluginCfgFile, "SpawnProtection", "ProtectionDuration", 0) * 1000;
         return true;
 	}
 
-    // Schutzzeitdauer in Sekunden
-
-    // Funktion zum Speichern des letzten Spawn-Zeitpunkts für einen bestimmten iClientID
-    void SetLastSpawnTime(uint iClientID, mstime spawnTimestamp) {
-        g_lastSpawnTimes[iClientID] = spawnTimestamp;
-    }
-
-    // Funktion zum Abrufen des letzten Spawn-Zeitpunkts für einen bestimmten iClientID
-    mstime GetLastSpawnTime(uint iClientID) {
-        auto it = g_lastSpawnTimes.find(iClientID);
-        if (it != g_lastSpawnTimes.end()) {
-            return it->second;
-        }
-        return 0; // Falls kein Eintrag für die iClientID vorhanden ist
-    }
-
-    // Beispiel-Funktion, die den letzten Spawn-Zeitpunkt für einen iClientID aktualisiert
-    void UpdateLastSpawnTime(uint iClientID) {
-        mstime currentTimestamp = timeInMS(); // Hier musst du den tatsächlichen Timestamp einfügen
-        SetLastSpawnTime(iClientID, currentTimestamp);
-    }
-
-    bool IsSpawnProtectionActive(uint iClientID)
+    void SetInvincible(uint shipId)
     {
-        mstime currentTime = timeInMS();
-        mstime lastSpawnTime = g_lastSpawnTimes[iClientID];
-        uint protectionDuration = g_spawnProtectionDuration * 1000;
-
-        return (currentTime - lastSpawnTime) < protectionDuration;
+        pub::SpaceObj::SetInvincible(shipId, true, true, 0);
+        invincibleEndTimePerShip[shipId] = timeInMS() + invincibleDuration;
     }
 
+    void UpdateInvincibleStates()
+    {
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            const mstime now = timeInMS();
+            for (const auto& invincibleShipTime : invincibleEndTimePerShip)
+            {
+                if (now > invincibleShipTime.second)
+                {
+                    if (pub::SpaceObj::ExistsAndAlive(invincibleShipTime.first) == 0) // 0 -> true
+                        pub::SpaceObj::SetInvincible(invincibleShipTime.first, false, false, 0);
+                    invincibleEndTimePerShip.erase(invincibleShipTime.first);
+                }
+            }
+        }
+    }
 
+    void __stdcall SystemSwitchOutComplete(unsigned int shipId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
 
-} // namespace SpawnProtection
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            SetInvincible(shipId);
+        }
+    }
+
+    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            SetInvincible(shipId);
+        }
+    }
+
+    void __stdcall LaunchComplete(unsigned int baseId, unsigned int shipId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            SetInvincible(shipId);
+        }
+    }
+
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("SpawnProtection"))
+        {
+            SetInvincible(shipId);
+        }
+    }
+}

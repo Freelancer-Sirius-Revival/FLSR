@@ -5,7 +5,7 @@ namespace Timers {
     TIMER Timers[] = {
         { Cloak::UpdateCloakClients, Cloak::TIMER_INTERVAL, 0 },
         { EquipWhiteList::ProcessChangedEquipments, EquipWhiteList::TIMER_INTERVAL, 0 },
-       {Docking::DockRequest3000ms, 3000, 0},
+        { SpawnProtection::UpdateInvincibleStates, SpawnProtection::TIMER_INTERVAL, 0 },
        {PathSelection::ModUnlawfulChar500ms, 500, 0},
         { GroupReputation::CleanDestroyedShipRegistry, 1000 },
        {Tools::CharSelectMenu, 2000, 0},

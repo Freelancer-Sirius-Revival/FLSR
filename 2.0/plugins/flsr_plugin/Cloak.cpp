@@ -256,7 +256,7 @@ namespace Cloak
 		}
 	}
 
-	bool initialized = false;
+	static bool initialized = false;
 
 	// This must be executed AFTER LoadCloakSettings and when the game data has already been stored to memory.
 	void InitializeWithGameData()

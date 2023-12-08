@@ -72,13 +72,6 @@ namespace Hooks {
     void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1, float damage, enum DamageEntry::SubObjFate fate) {
         returncode = DEFAULT_RETURNCODE;
 
-        if (SpawnProtection::IsSpawnProtectionActive(iDmgTo))
-        {
-            //ConPrint(L"DMG WHILE PROTECTED\n");
-            returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            return;
-		}
-
         //NPCs always do damage
         if (!dmg->is_inflictor_a_player())
         {
@@ -438,13 +431,6 @@ namespace Hooks {
             
 
 		}
-
-        if (Modules::GetModuleState("SpawnProtection"))
-        {
-            SpawnProtection::UpdateLastSpawnTime(iClientID);
-        }
-        
-
     }
 
     /// Clear client info when a client connects.
@@ -494,12 +480,6 @@ namespace Hooks {
         {
             const bool insuranceRequested = Insurance::IsInsuranceRequested(iClientID);
             Insurance::CreateNewInsurance(iClientID, !insuranceRequested);
-        }
-
-        //SpawnProtection
-        if (Modules::GetModuleState("SpawnProtection"))
-        {
-            SpawnProtection::UpdateLastSpawnTime(iClientID);
         }
 
         //Update BaseState

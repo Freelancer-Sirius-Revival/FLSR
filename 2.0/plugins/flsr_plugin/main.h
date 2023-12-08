@@ -1135,19 +1135,16 @@ namespace Discord {
 } // namespace DiscordBot
 
 
-namespace SpawnProtection {
-
-    extern std::map<uint, mstime> g_lastSpawnTimes;
-    extern uint g_spawnProtectionDuration;
+namespace SpawnProtection
+{
+    extern const mstime TIMER_INTERVAL;
     bool LoadSettings();
-    void SetLastSpawnTime(uint iClientID, mstime spawnTimestamp);
-    mstime GetLastSpawnTime(uint iClientID);
-    void UpdateLastSpawnTime(uint iClientID);;
-    bool IsSpawnProtectionActive(uint iClientID);
-
-
-
-} // namespace SpawnProtection
+    void UpdateInvincibleStates();
+    void __stdcall SystemSwitchOutComplete(unsigned int shipId, unsigned int clientId);
+    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
+    void __stdcall LaunchComplete(unsigned int baseId, unsigned int shipId);
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+}
 
 namespace GroupReputation
 {

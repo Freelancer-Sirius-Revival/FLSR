@@ -227,7 +227,7 @@ void LoadSettings() {
         //Load DiscordBot
         if (SpawnProtection::LoadSettings())
         {
-            ConPrint(L"Module loaded: SpawnProtection - ProtectionTime: " + std::to_wstring(SpawnProtection::g_spawnProtectionDuration) + L" Sec\n");
+            ConPrint(L"Module loaded: SpawnProtection");
         }
         else {
             //Missing Config
@@ -356,6 +356,11 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqAddItem_AFTER, PLUGIN_HkIServerImpl_ReqAddItem_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqEquipment_AFTER, PLUGIN_HkIServerImpl_ReqEquipment_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqShipArch_AFTER, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::SystemSwitchOutComplete, PLUGIN_HkIServerImpl_SystemSwitchOutComplete, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LoadSettings, PLUGIN_LoadSettings, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));

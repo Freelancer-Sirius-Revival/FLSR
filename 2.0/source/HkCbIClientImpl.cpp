@@ -1179,6 +1179,14 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2) {
 
     // load universe / we load the universe directly before the server becomes
     // internet accessible
+    Universe::ISystem* system = Universe::GetFirstSystem();
+    while (system)
+    {
+        if (!std::string(system->file).empty())
+            pub::System::LoadSystem(system->id);
+        system = Universe::GetNextSystem();
+    }
+
     lstBases.clear();
     Universe::IBase *base = Universe::GetFirstBase();
     while (base) {
@@ -1202,7 +1210,6 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2) {
         bi.iBaseID = CreateID(szBaseName);
 		bi.iSystemID = base->iSystemID;
         lstBases.push_back(bi);
-        pub::System::LoadSystem(base->iSystemID);
 
         base = Universe::GetNextBase();
     }

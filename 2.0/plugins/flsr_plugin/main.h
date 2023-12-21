@@ -1177,6 +1177,14 @@ namespace SpawnProtection {
 
 } // namespace SpawnProtection
 
+namespace GroupReputation
+{
+    void InitializeWithGameData();
+    void BaseDestroyed(uint objectId, uint clientId);
+    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
+    void CleanDestroyedShipRegistry();
+}
+
 namespace API {
 
     extern ushort;

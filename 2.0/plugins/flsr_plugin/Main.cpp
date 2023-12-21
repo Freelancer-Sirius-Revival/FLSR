@@ -354,5 +354,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
 
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::BaseDestroyed, PLUGIN_BaseDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+
     return p_PI;
 }

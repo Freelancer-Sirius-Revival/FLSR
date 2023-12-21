@@ -86,6 +86,7 @@
     <ClCompile Include="Docking.cpp" />
     <ClCompile Include="EquipWhiteList.cpp" />
     <ClCompile Include="FuseControl.cpp" />
+    <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Modules.cpp" />

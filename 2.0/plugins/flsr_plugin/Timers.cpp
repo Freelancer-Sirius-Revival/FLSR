@@ -10,6 +10,7 @@ namespace Timers {
        {Cloak::UpdateShipEnergyTimer, 1500, 0},
        {Docking::DockRequest3000ms, 3000, 0},
        {PathSelection::ModUnlawfulChar500ms, 500, 0},
+        { GroupReputation::CleanDestroyedShipRegistry, 1000 },
        {Tools::CharSelectMenu, 2000, 0},
       // {SrvCtrlObj::Timer1000ms, 1000, 0}
 

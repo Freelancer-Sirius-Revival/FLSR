@@ -80,6 +80,7 @@
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
     <ClCompile Include="Commands.cpp" />
+    <ClCompile Include="Crafting.cpp" />
     <ClCompile Include="CustomMissions.cpp" />
     <ClCompile Include="Depot.cpp" />
     <ClCompile Include="Discord.cpp" />

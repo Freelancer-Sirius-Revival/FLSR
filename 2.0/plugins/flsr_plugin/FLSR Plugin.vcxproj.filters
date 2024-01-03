@@ -95,6 +95,9 @@
     <ClCompile Include="GroupRep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Crafting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">

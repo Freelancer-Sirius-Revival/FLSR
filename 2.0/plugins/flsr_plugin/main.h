@@ -57,6 +57,7 @@ namespace Globals {
     const std::string PATHSELECTION_CONFIG_FILE = "\\flhook_plugins\\flsr-pathselection.cfg";
     const std::string CARRIER_CONFIG_FILE = "\\flhook_plugins\\FLSR-Carrier.cfg";
     const std::string CLOAK_CONFIG_FILE = "\\flhook_plugins\\FLSR-Cloak.cfg";
+    const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
     const std::string FLHOOKUSER_FILE = "\\flhookuser.ini";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
     const std::string INSURANCE_STORE = "\\flhook_plugins\\flsr-insurance\\";
@@ -783,6 +784,12 @@ namespace Cloak {
     extern std::map<std::wstring, WarmUpCloak> mPlayerWarmUpCloak;
 
 
+}
+
+namespace Crafting
+{
+    void LoadSettings();
+    bool UserCmd_Craft(uint clientId, const std::wstring& argumentsWS);
 }
 
 namespace EquipWhiteList {

@@ -114,6 +114,8 @@ namespace Cloak
 		uint cloakCargoId = 0;
 		uint instantCloakCargoId = 0;
 		uint cloakPowerCargoId = 0;
+		uint engineCargoId = 0;
+		bool engineKillActive = false;
 		std::vector<uint> otherPowerCargoIds;
 		bool shieldPresent = false;
 		bool cloakStateChangedSinceLastTick = false;
@@ -142,8 +144,8 @@ namespace Cloak
 	static std::vector<ShipEffectDefinition> shipEffects;
 	static std::map<uint, ClientCloakStats> clientCloakStats;
 
-	static std::map<uint, std::vector<uint>> jumpGatesPerSystem;
-	static std::map<uint, std::vector<uint>> jumpHolesPerSystem;
+	static std::map<uint, std::vector<Vector>> jumpGatePositionsPerSystem;
+	static std::map<uint, std::vector<Vector>> jumpHolePositionsPerSystem;
 
 	static std::set<uint> clientIdsRequestingUncloak;
 
@@ -154,7 +156,7 @@ namespace Cloak
 	{
 		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakStats.contains(clientId))
 		{
-			uint shipId = 0;
+			uint shipId;
 			pub::Player::GetShip(clientId, shipId);
 			return shipId;
 		}
@@ -175,17 +177,25 @@ namespace Cloak
 			pub::SpaceObj::GetType(solar->iID, type);
 			if (type == OBJ_JUMP_GATE && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
-				jumpGatesPerSystem[solar->iSystem].push_back(solar->iID);
+				Vector position;
+				Matrix orientation;
+				pub::SpaceObj::GetLocation(solar->iID, position, orientation);
+				jumpGatePositionsPerSystem[solar->iSystem].push_back(position);
 			}
 			else if (type == OBJ_JUMP_HOLE && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
-				jumpHolesPerSystem[solar->iSystem].push_back(solar->iID);
+				Vector position;
+				Matrix orientation;
+				pub::SpaceObj::GetLocation(solar->iID, position, orientation);
+				jumpHolePositionsPerSystem[solar->iSystem].push_back(position);
 			}
 		}
 	}
 
 	void ClearClientData(uint clientId)
 	{
+		if (clientCloakStats[clientId].ship)
+			clientCloakStats[clientId].ship->Release();
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
@@ -489,7 +499,7 @@ namespace Cloak
 		if (!clientStats.statsDefinition)
 			return;
 
-		// Find all other power plants
+		// Find all other power plants and the engine
 		for (const auto& cargo : cargoList)
 		{
 			if (cargo.bMounted &&
@@ -498,8 +508,12 @@ namespace Cloak
 				cargo.iArchID != clientStats.effectsDefinition->cloakingDeviceArchetypeId)
 			{
 				const Archetype::Equipment* equipment = Archetype::GetEquipment(cargo.iArchID);
+
 				if (equipment && equipment->get_class_type() == Archetype::AClassType::POWER)
 					clientStats.otherPowerCargoIds.push_back(cargo.iID);
+
+				if (equipment && equipment->get_class_type() == Archetype::AClassType::ENGINE)
+					clientStats.engineCargoId = cargo.iID;
 			}
 		}
 
@@ -708,22 +722,25 @@ namespace Cloak
 	void CheckPlayerInNoCloakZones(uint clientId, uint clientSystemId, uint clientShipId)
 	{
 		bool insideNoCloakZone = false;
-		if (jumpGatesPerSystem.contains(clientSystemId))
+		Vector shipPosition;
+		Matrix shipOrientation;
+		pub::SpaceObj::GetLocation(clientShipId, shipPosition, shipOrientation);
+		if (jumpGatePositionsPerSystem.contains(clientSystemId))
 		{
-			for (const uint& jumpGateId : jumpGatesPerSystem[clientSystemId])
+			for (const Vector& jumpGatePosition : jumpGatePositionsPerSystem[clientSystemId])
 			{
-				if (HkDistance3DByShip(jumpGateId, clientShipId) < jumpGateDecloakRadius)
+				if (HkDistance3D(jumpGatePosition, shipPosition) < jumpGateDecloakRadius)
 				{
 					insideNoCloakZone = true;
 					break;
 				}
 			}
 		}
-		if (!insideNoCloakZone && jumpHolesPerSystem.contains(clientSystemId))
+		if (!insideNoCloakZone && jumpHolePositionsPerSystem.contains(clientSystemId))
 		{
-			for (const uint& jumpHoleId : jumpHolesPerSystem[clientSystemId])
+			for (const Vector& jumpHolePosition : jumpHolePositionsPerSystem[clientSystemId])
 			{
-				if (HkDistance3DByShip(jumpHoleId, clientShipId) < jumpHoleDecloakRadius)
+				if (HkDistance3D(jumpHolePosition, shipPosition) < jumpHoleDecloakRadius)
 				{
 					insideNoCloakZone = true;
 					break;
@@ -893,9 +910,13 @@ namespace Cloak
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId) && clientCloakStats[clientId].activatorCargoId == activateEquip.sID)
+		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
 		{
-			ToggleClientCloakActivator(clientId, activateEquip.bActivate);
+			if (clientCloakStats[clientId].activatorCargoId == activateEquip.sID)
+				ToggleClientCloakActivator(clientId, activateEquip.bActivate);
+
+			if (clientCloakStats[clientId].engineCargoId == activateEquip.sID)
+				clientCloakStats[clientId].engineKillActive = !activateEquip.bActivate;
 		}
 	}
 
@@ -986,13 +1007,29 @@ namespace Cloak
 		}
 	}
 
-	void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const& updateInfo, unsigned int clientId)
+	void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			AttemptInitialUncloak(clientId);
+
+			// Fix bug of Throttle on server not being correctly set.
+			if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].ship)
+			{
+				clientCloakStats[clientId].ship->set_throttle(updateInfo.fThrottle);
+
+				// Setting Throttle on the ship makes the server think that engine was turned on again.
+				if (clientCloakStats[clientId].engineKillActive)
+				{
+					XActivateEquip activateEquipment;
+					activateEquipment.bActivate = false;
+					activateEquipment.iSpaceID = clientCloakStats[clientId].ship->iID;
+					activateEquipment.sID = clientCloakStats[clientId].engineCargoId;
+					Server.ActivateEquip(clientId, activateEquipment);
+				}
+			}
 		}
 	}
 
@@ -1002,6 +1039,24 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
+			ClearClientData(clientId);
+		}
+	}
+
+	void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("CloakModule"))
+		{
+			if (!killed)
+				return;
+			const CShip* ship = (CShip*)ecx[4];
+			if (!ship)
+				return;
+			const uint clientId = ship->GetOwnerPlayer();
+			if (!clientId)
+				return;
 			ClearClientData(clientId);
 		}
 	}
@@ -1033,29 +1088,14 @@ namespace Cloak
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		if (activateCruise.bActivate)
+		if (Modules::GetModuleState("CloakModule") && activateCruise.bActivate && IsValidCloakableClient(clientId) && clientCloakStats[clientId].engineCargoId)
 		{
-			uint shipId;
-			pub::Player::GetShip(clientId, shipId);
-			if (shipId)
-			{
-				for (const auto& equip : Players[clientId].equipDescList.equip)
-				{
-					if (!equip.is_internal() && equip.get_count() != 1)
-						continue;
-
-					const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
-					if (equipment && equipment->get_class_type() == Archetype::AClassType::ENGINE)
-					{
-						XActivateEquip activateEquipment;
-						activateEquipment.bActivate = activateCruise.bActivate;
-						activateEquipment.iSpaceID = shipId;
-						activateEquipment.sID = equip.sID;
-						Server.ActivateEquip(clientId, activateEquipment);
-						return;
-					}
-				}
-			}
+			XActivateEquip activateEquipment;
+			activateEquipment.bActivate = true;
+			activateEquipment.iSpaceID = clientCloakStats[clientId].ship->iID;
+			activateEquipment.sID = clientCloakStats[clientId].engineCargoId;
+			Server.ActivateEquip(clientId, activateEquipment);
+			clientCloakStats[clientId].engineKillActive = false;
 		}
 	}
 }

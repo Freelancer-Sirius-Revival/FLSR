@@ -732,8 +732,9 @@ namespace Cloak
     int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
     void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
-    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
+    void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
+    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
     void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise);
     void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
     void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);

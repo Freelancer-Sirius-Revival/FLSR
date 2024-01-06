@@ -108,7 +108,6 @@ namespace Cloak
 		bool engineKillActive = false;
 		std::vector<uint> powerCargoIds;
 		bool shieldPresent = false;
-		bool cloakStateChangedSinceLastTick = false;
 		CloakState cloakState = CloakState::Cloaked;
 		bool initialUncloakCompleted = false;
 		mstime cloakTimeStamp = 0;
@@ -184,7 +183,10 @@ namespace Cloak
 	void ClearClientData(uint clientId)
 	{
 		if (clientCloakStats[clientId].ship)
+		{
+			Mark::ShowObjectMark(clientCloakStats[clientId].ship->iID);
 			clientCloakStats[clientId].ship->Release();
+		}
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
@@ -582,7 +584,6 @@ namespace Cloak
 			StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->cloakFuseId);
 			clientCloakStats[clientId].cloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Cloaking;
-			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 			SynchronizeWeaponGroupsWithCloakState(clientId);
 			result = CloakReturnState::Successful;
 		}
@@ -615,7 +616,6 @@ namespace Cloak
 			}
 			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Uncloaking;
-			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 			SynchronizeWeaponGroupsWithCloakState(clientId);
 			return true;
 		}
@@ -710,12 +710,10 @@ namespace Cloak
 		if (cloakState == CloakState::Cloaking)
 		{
 			cloakState = currentTime - clientCloakStats[clientId].cloakTimeStamp > clientCloakStats[clientId].effectsDefinition->cloakDuration ? CloakState::Cloaked : CloakState::Cloaking;
-			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 		}
 		else if (cloakState == CloakState::Uncloaking)
 		{
 			cloakState = currentTime - clientCloakStats[clientId].uncloakTimeStamp > clientCloakStats[clientId].effectsDefinition->uncloakDuration ? CloakState::Uncloaked : CloakState::Uncloaking;
-			clientCloakStats[clientId].cloakStateChangedSinceLastTick = true;
 			if (!clientCloakStats[clientId].initialUncloakCompleted && cloakState == CloakState::Uncloaked)
 				clientCloakStats[clientId].initialUncloakCompleted = true;
 		}
@@ -724,16 +722,6 @@ namespace Cloak
 			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->cloakFuseId);
 			StopFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
 		}
-	}
-
-	void UnmarkFromAllClients(uint clientId)
-	{
-		uint shipId;
-		pub::Player::GetShip(clientId, shipId);
-		if (!shipId)
-			return;
-
-		Mark::UnmarkAndUnregisterObjectForEveryone(shipId);
 	}
 
 	void FireCloakActivator(uint clientId)
@@ -794,9 +782,19 @@ namespace Cloak
 			// Uncloak player in no-cloak-zones
 			CheckPlayerInNoCloakZones(clientId, playerData->iSystemID, playerData->iShipID);
 
+			const CloakState oldCloakState = cloakState;
 			// Cloak state update when effect time has passed
 			// This also sets the initial uncloaked flag.
 			UpdateStateByEffectTimings(clientId, now);
+
+			// Make sure to remove this player from everyone's mark list when the cloak state changed.
+			if (oldCloakState != cloakState)
+			{
+				if (cloakState == CloakState::Cloaked)
+					Mark::HideObjectMark(clientCloakStats[clientId].ship->iID);
+				else
+					Mark::ShowObjectMark(clientCloakStats[clientId].ship->iID);
+			}
 
 			// The rest in the update loop should be ignored for not initially uncloaked ships.
 			if (!clientCloakStats[clientId].initialUncloakCompleted)
@@ -805,22 +803,15 @@ namespace Cloak
 			SynchronizeShieldStateWithCloakState(clientId);
 			SynchronizePowerStateWithCloakState(clientId);
 
-			// Make sure to remove this player from everyone's mark list (clearing them from their scanners).
-			if (clientCloakStats[clientId].cloakStateChangedSinceLastTick)
-			{
-				clientCloakStats[clientId].cloakStateChangedSinceLastTick = false;
-				if (cloakState == CloakState::Cloaked)
-					UnmarkFromAllClients(clientId);
-			}
-
 			// Uncloak when power is empty.
 			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= 0.0f)
 				QueueUncloak(clientId);
 
-			// Schedule cloak changes
+			// Schedule cloak changes.
 			if (clientIdsRequestingUncloak.contains(clientId))
 				QueueUncloak(clientId);
 
+			// Consume energy.
 			if (cloakState == CloakState::Cloaked)
 				FireCloakActivator(clientId);
 		}

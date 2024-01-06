@@ -748,6 +748,8 @@ namespace Crafting
 
 namespace Mark
 {
+    void HideObjectMark(uint id);
+    void ShowObjectMark(uint id);
     void MarkAndRegisterObject(uint clientId, uint targetId);
     void UnmarkAndUnregisterObject(uint clientId, uint targetId);
     void UnmarkAndUnregisterObjectForEveryone(uint targetId);
@@ -756,7 +758,7 @@ namespace Mark
     void UserCmd_UnMark(uint clientId, const std::wstring& wscParam);
     void UserCmd_UnGroupMark(uint clientId, const std::wstring& wscParam);
     void UserCmd_UnMarkAll(uint clientId, const std::wstring& wscParam);
-    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId);
     void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
     void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
 }

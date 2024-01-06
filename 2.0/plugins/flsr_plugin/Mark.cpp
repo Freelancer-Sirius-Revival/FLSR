@@ -8,6 +8,41 @@ namespace Mark
     // Contains a set of marked targets per system per character file name.
     static std::map<std::wstring, std::map<uint, std::set<uint>>> markedObjectsPerCharacter;
 
+    // Contains a set of object ids which can be targetted for marking, but will not be marked visibly to the player.
+    static std::set<uint> hiddenMarkedIds;
+
+    void HideObjectMark(uint id)
+    {
+        if (hiddenMarkedIds.contains(id))
+            return;
+
+        hiddenMarkedIds.insert(id);
+        for (const auto& clientIdTargetIds : currentlyMarkedObjectsPerClient)
+        {
+            for (const uint targetId : clientIdTargetIds.second)
+                pub::Player::MarkObj(clientIdTargetIds.first, targetId, 0);
+        }
+    }
+
+    void ShowObjectMark(uint id)
+    {
+        if (!hiddenMarkedIds.contains(id))
+            return;
+
+        hiddenMarkedIds.erase(id);
+        for (const auto& clientIdTargetIds : currentlyMarkedObjectsPerClient)
+        {
+            for (const uint targetId : clientIdTargetIds.second)
+                pub::Player::MarkObj(clientIdTargetIds.first, targetId, 1);
+        }
+    }
+
+    void TryRemoveInvisibleMarkId(uint id)
+    {
+        if (pub::SpaceObj::ExistsAndAlive(id) != 0) // 0 -> true
+            hiddenMarkedIds.erase(id);
+    }
+
     bool TryMarkObject(uint clientId, uint targetId)
     {
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
@@ -27,9 +62,12 @@ namespace Mark
             if (Cloak::FindShipCloakState(targetId) == Cloak::CloakState::Cloaked)
                 return false;
 
-            pub::Player::MarkObj(clientId, targetId, 1);
             currentlyMarkedObjectsPerClient[clientId].insert(targetId);
-            pub::Audio::PlaySoundEffect(clientId, CreateID("ui_select_add"));
+            if (!hiddenMarkedIds.contains(targetId))
+            {
+                pub::Player::MarkObj(clientId, targetId, 1);
+                pub::Audio::PlaySoundEffect(clientId, CreateID("ui_select_add"));
+            }
             return true;
         }
         return false;
@@ -50,19 +88,21 @@ namespace Mark
         return false;
     }
 
-    void UnmarkAllObjects(uint clientId)
+    void UnmarkAllObjects(uint clientId, boolean noSound = false)
     {
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
             return;
 
         if (currentlyMarkedObjectsPerClient.contains(clientId))
         {
+            if (!noSound && currentlyMarkedObjectsPerClient[clientId].size() > 0)
+                pub::Audio::PlaySoundEffect(clientId, CreateID("ui_select_remove"));
+
             for (const uint& targetId : currentlyMarkedObjectsPerClient[clientId])
             {
                 pub::Player::MarkObj(clientId, targetId, 0);
             }
             currentlyMarkedObjectsPerClient[clientId].clear();
-            pub::Audio::PlaySoundEffect(clientId, CreateID("ui_select_remove"));
         }
     }
 
@@ -76,11 +116,14 @@ namespace Mark
             return;
         uint targetSystemId;
         pub::SpaceObj::GetSystem(targetId, targetSystemId);
-        markedObjectsPerCharacter[characterFileNameWS][targetSystemId].insert(targetId);
+        if (targetSystemId)
+            markedObjectsPerCharacter[characterFileNameWS][targetSystemId].insert(targetId);
     }
 
     void UnregisterObject(uint clientId, uint targetId)
     {
+        TryRemoveInvisibleMarkId(targetId);
+
         if (!HkIsValidClientID(clientId))
             return;
 
@@ -89,12 +132,15 @@ namespace Mark
             return;
         uint targetSystemId;
         pub::SpaceObj::GetSystem(targetId, targetSystemId);
-        if (markedObjectsPerCharacter.contains(characterFileNameWS) && markedObjectsPerCharacter[characterFileNameWS].contains(targetSystemId))
+        if (targetSystemId && markedObjectsPerCharacter.contains(characterFileNameWS) && markedObjectsPerCharacter[characterFileNameWS].contains(targetSystemId))
             markedObjectsPerCharacter[characterFileNameWS][targetSystemId].erase(targetId);
     }
 
     void UpdateAndMarkCurrentSystemMarks(uint clientId)
     {
+        for (const uint id : hiddenMarkedIds)
+            TryRemoveInvisibleMarkId(id);
+
         if (!HkIsValidClientID(clientId))
             return;
 
@@ -102,7 +148,7 @@ namespace Mark
         if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) != HKE_OK)
             return;
 
-        const bool characterNotInSpace = HkIsInCharSelectMenu(clientId);
+        const bool characterInSpace = !HkIsInCharSelectMenu(clientId);
 
         uint clientSystemId;
         pub::Player::GetSystem(clientId, clientSystemId);
@@ -118,10 +164,11 @@ namespace Mark
                 }
                 else
                 {
-                    if (!characterNotInSpace)
+                    if (characterInSpace)
                     {
-                        pub::Player::MarkObj(clientId, targetId, 1);
                         currentlyMarkedObjectsPerClient[clientId].insert(targetId);
+                        if (!hiddenMarkedIds.contains(targetId))
+                            pub::Player::MarkObj(clientId, targetId, 1);
                     }
                     ++iterator;
                 }
@@ -143,7 +190,9 @@ namespace Mark
 
     void UnmarkAndUnregisterObjectForEveryone(uint targetId)
     {
-        struct PlayerData* playerData = 0;
+        TryRemoveInvisibleMarkId(targetId);
+
+        PlayerData* playerData = 0;
         while (playerData = Players.traverse_active(playerData))
         {
             const uint clientId = HkGetClientIdFromPD(playerData);
@@ -172,7 +221,11 @@ namespace Mark
     {
         uint shipId, targetId;
         pub::Player::GetShip(clientId, shipId);
+        if (!shipId)
+            return;
         pub::SpaceObj::GetTarget(shipId, targetId);
+        if (!targetId)
+            return;
         MarkAndRegisterObject(clientId, targetId);
     }
 
@@ -180,19 +233,25 @@ namespace Mark
     {
         uint shipId, targetId;
         pub::Player::GetShip(clientId, shipId);
+        if (!shipId)
+            return;
         pub::SpaceObj::GetTarget(shipId, targetId);
+        if (!targetId)
+            return;
         const auto groupMembers = GetGroupMemberClientIds(clientId);
         for (const auto& member : groupMembers)
-        {
             MarkAndRegisterObject(member.iClientID, targetId);
-        }
     }
 
     void UserCmd_UnMark(uint clientId, const std::wstring& wscParam)
     {
         uint shipId, targetId;
         pub::Player::GetShip(clientId, shipId);
+        if (!shipId)
+            return;
         pub::SpaceObj::GetTarget(shipId, targetId);
+        if (!targetId)
+            return;
         UnmarkAndUnregisterObject(clientId, targetId);
     }
 
@@ -200,12 +259,14 @@ namespace Mark
     {
         uint shipId, targetId;
         pub::Player::GetShip(clientId, shipId);
+        if (!shipId)
+            return;
         pub::SpaceObj::GetTarget(shipId, targetId);
+        if (!targetId)
+            return;
         const auto groupMembers = GetGroupMemberClientIds(clientId);
         for (const auto& member : groupMembers)
-        {
             UnmarkAndUnregisterObject(member.iClientID, targetId);
-        }
     }
 
     void UserCmd_UnMarkAll(uint clientId, const std::wstring& wscParam)
@@ -219,15 +280,11 @@ namespace Mark
         markedObjectsPerCharacter[characterFileNameWS].clear();
     }
 
-    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
+    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
-
-        uint clientId = HkGetClientIDByShip(shipId);
-        if (!clientId)
-            return;
-
-        UnmarkAllObjects(clientId);
+        
+        UnmarkAllObjects(clientId, true);
         UpdateAndMarkCurrentSystemMarks(clientId);
     }
 
@@ -235,7 +292,8 @@ namespace Mark
     {
         returncode = DEFAULT_RETURNCODE;
 
-        currentlyMarkedObjectsPerClient[clientId].clear();
+        if (currentlyMarkedObjectsPerClient.contains(clientId))
+            currentlyMarkedObjectsPerClient[clientId].clear();
         UpdateAndMarkCurrentSystemMarks(clientId);
     }
 
@@ -243,6 +301,7 @@ namespace Mark
     {
         returncode = DEFAULT_RETURNCODE;
 
-        currentlyMarkedObjectsPerClient[clientId].clear();
+        if (currentlyMarkedObjectsPerClient.contains(clientId))
+            currentlyMarkedObjectsPerClient[clientId].clear();
     }
 }

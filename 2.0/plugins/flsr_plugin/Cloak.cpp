@@ -649,22 +649,7 @@ namespace Cloak
 		if (!dockTargetId || dockPortIndex == -1 || response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
 			return true;
 
-		if (!IsFullyUncloaked(clientId))
-		{
-			PrintUserCmdText(clientId, L"Docking with activated cloak not possible!");
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
-			
-			// Cancel entering Formation when their docking is in process.
-			uint dockTargetType;
-			pub::SpaceObj::GetType(dockTargetId, dockTargetType);
-			if (dockTargetType == OBJ_JUMP_HOLE || dockTargetType == OBJ_JUMP_GATE)
-			{
-				Vector formationOffset;
-				HookClient->Send_FLPACKET_SERVER_FORMATION_UPDATE(clientId, ship, formationOffset);
-			}
-			return false;
-		}
-
+		QueueUncloak(clientId);
 		clientCloakStats[clientId].dockingManeuverActive = true;
 		return true;
 	}

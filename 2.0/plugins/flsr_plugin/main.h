@@ -730,6 +730,7 @@ namespace Cloak
     void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
     void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane);
     int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
+    void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
     void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId);

@@ -101,7 +101,7 @@ namespace Cloak
 
 	struct ClientCloakStats
 	{
-		CShip* ship = 0;
+		uint shipId = 0;
 		IObjInspectImpl* shipInspect = 0;
 		uint activatorCargoId = 0;
 		uint activatorArchetypeId = 0;
@@ -200,11 +200,8 @@ namespace Cloak
 
 	void ClearClientData(const uint clientId)
 	{
-		if (clientCloakStats[clientId].ship)
-		{
-			Mark::ShowObjectMark(clientCloakStats[clientId].ship->iID);
-			clientCloakStats[clientId].ship->Release();
-		}
+		if (clientCloakStats[clientId].shipId)
+			Mark::ShowObjectMark(clientCloakStats[clientId].shipId);
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
@@ -409,7 +406,7 @@ namespace Cloak
 	{
 		XActivateEquip activateEquipment;
 		activateEquipment.bActivate = active;
-		activateEquipment.iSpaceID = clientCloakStats[clientId].ship->iID;
+		activateEquipment.iSpaceID = clientCloakStats[clientId].shipId;
 		activateEquipment.sID = cargoId;
 		Server.ActivateEquip(clientId, activateEquipment);
 		HookClient->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
@@ -496,10 +493,12 @@ namespace Cloak
 
 		uint shipId;
 		pub::Player::GetShip(clientId, shipId);
-		clientStats.ship = (CShip*)CObject::Find(shipId, CObject::CSHIP_OBJECT);
-		clientStats.shipInspect = HkGetInspect(clientId);
+		if (!shipId)
+			return;
 
-		if (!clientStats.ship || !clientStats.shipInspect)
+		clientStats.shipId = shipId;
+		clientStats.shipInspect = HkGetInspect(clientId);
+		if (!clientStats.shipInspect)
 			return;
 
 		float currentShieldCapacity;
@@ -760,7 +759,7 @@ namespace Cloak
 		if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].activatorCargoId)
 		{
 			XFireWeaponInfo info;
-			info.iObject = clientCloakStats[clientId].ship->iID;
+			info.iObject = clientCloakStats[clientId].shipId;
 			ushort slot[2] = { (ushort)clientCloakStats[clientId].activatorCargoId, 0 };
 			info.sHpIdsBegin = &slot[0];
 			info.sHpIdsLast = &slot[1];
@@ -822,9 +821,9 @@ namespace Cloak
 			if (oldCloakState != cloakState)
 			{
 				if (cloakState == CloakState::Cloaked)
-					Mark::HideObjectMark(clientCloakStats[clientId].ship->iID);
+					Mark::HideObjectMark(clientCloakStats[clientId].shipId);
 				else
-					Mark::ShowObjectMark(clientCloakStats[clientId].ship->iID);
+					Mark::ShowObjectMark(clientCloakStats[clientId].shipId);
 			}
 
 			// The rest in the update loop should be ignored for not initially uncloaked ships.
@@ -835,8 +834,14 @@ namespace Cloak
 			SynchronizePowerStateWithCloakState(clientId);
 
 			// Uncloak when power is empty.
-			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= 0.0f)
-				QueueUncloak(clientId, UncloakReason::Power);
+			if (cloakState == CloakState::Cloaked)
+			{
+				float power;
+				clientCloakStats[clientId].shipInspect->get_power(power);
+				PrintUserCmdText(clientId, std::to_wstring(power));
+				if (power <= 0.0f)
+					QueueUncloak(clientId, UncloakReason::Power);
+			}
 
 			// Schedule cloak changes.
 			if (clientIdsRequestingUncloak.contains(clientId))
@@ -871,7 +876,7 @@ namespace Cloak
 	{
 		for (const auto& cloakStats: clientCloakStats)
 		{
-			if (cloakStats.second.ship && cloakStats.second.ship->iID == shipId)
+			if (cloakStats.second.shipId == shipId)
 				return cloakStats.second.cloakState;
 		}
 		return CloakState::Uncloaked;
@@ -975,13 +980,22 @@ namespace Cloak
 			QueueUncloak(clientId, UncloakReason::Docking);
 	}
 
-	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			ClearClientData(clientId);
+		}
+	}
+
+	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("CloakModule"))
+		{
 			RemoveCloakingDevices(clientId);
 		}
 	}
@@ -1000,7 +1014,7 @@ namespace Cloak
 		{
 			XActivateEquip activateEquipment;
 			activateEquipment.bActivate = active;
-			activateEquipment.iSpaceID = clientCloakStats[clientId].ship->iID;
+			activateEquipment.iSpaceID = clientCloakStats[clientId].shipId;
 			activateEquipment.sID = clientCloakStats[clientId].engineCargoId;
 			Server.ActivateEquip(clientId, activateEquipment);
 			clientCloakStats[clientId].engineKillActive = !active;
@@ -1018,11 +1032,18 @@ namespace Cloak
 			// Fix bug of Throttle on server not being correctly set.
 			if (IsValidCloakableClient(clientId))
 			{
-				clientCloakStats[clientId].ship->set_throttle(updateInfo.fThrottle);
+				// When saving the CShip result via CObject::Find permanently it always crashed the server
+				// when a player with Cloak + Energy-using Engine docked to a base on zero energy.
+				// Instead get it via the InspectionObj in the hope this is more performant than Find on each invokation.
+				CShip* ship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)clientCloakStats[clientId].shipInspect);
+				if (ship)
+				{
+					ship->set_throttle(updateInfo.fThrottle);
 
-				// Setting Throttle on the ship makes the server think that engine was turned on again.
-				if (clientCloakStats[clientId].engineKillActive)
-					SetServerSideEngineState(clientId, false);
+					// Setting Throttle on the ship makes the server think that engine was turned on again.
+					if (clientCloakStats[clientId].engineKillActive)
+						SetServerSideEngineState(clientId, false);
+				}
 			}
 		}
 	}

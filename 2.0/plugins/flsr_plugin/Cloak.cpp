@@ -913,22 +913,18 @@ namespace Cloak
 	void __stdcall FireWeapon(unsigned int clientId, XFireWeaponInfo const& fireWeaponInfo)
 	{
 		returncode = DEFAULT_RETURNCODE;
+
 		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
 		{
-			bool activatorFound = false;
 			const size_t size = ((size_t)fireWeaponInfo.sHpIdsLast - (size_t)fireWeaponInfo.sHpIdsBegin) / 2;
 			for (size_t index = 0; index < size; index++)
-				activatorFound = activatorFound || (fireWeaponInfo.sHpIdsBegin[index] == clientCloakStats[clientId].activatorCargoId);
-
-			if (activatorFound)
 			{
-				const auto cloakState = clientCloakStats[clientId].cloakState;
-				const bool activate = !(cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
-				if (ToggleClientCloakActivator(clientId, activate))
-					SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, activate);
-
-				// Prevent creating a projectile in space by the Activator.
-				returncode = NOFUNCTIONCALL;
+				if (fireWeaponInfo.sHpIdsBegin[index] == clientCloakStats[clientId].activatorCargoId)
+				{
+					if (clientCloakStats[clientId].cloakState == CloakState::Uncloaked && ToggleClientCloakActivator(clientId, true))
+						SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, true);
+					break;
+				}
 			}
 		}
 	}
@@ -966,9 +962,7 @@ namespace Cloak
 		returncode = DEFAULT_RETURNCODE;
 
 		if (Modules::GetModuleState("CloakModule") && !CheckDockCall(ship, dockTargetId, dockPortIndex, response))
-		{
 			returncode = NOFUNCTIONCALL;
-		}
 
 		return 0;
 	}
@@ -978,9 +972,7 @@ namespace Cloak
 		returncode = DEFAULT_RETURNCODE;
 
 		if (Modules::GetModuleState("CloakModule"))
-		{
 			QueueUncloak(clientId, UncloakReason::Docking);
-		}
 	}
 
 	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
@@ -998,11 +990,8 @@ namespace Cloak
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		if (Modules::GetModuleState("CloakModule"))
-		{
-			if (!EquipCloakingDevices(clientId))
-				RemoveCloakingDevices(clientId);
-		}
+		if (Modules::GetModuleState("CloakModule") && !EquipCloakingDevices(clientId))
+			RemoveCloakingDevices(clientId);
 	}
 
 	void SetServerSideEngineState(const uint clientId, const bool active)
@@ -1027,7 +1016,7 @@ namespace Cloak
 			AttemptInitialUncloak(clientId);
 
 			// Fix bug of Throttle on server not being correctly set.
-			if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].ship)
+			if (IsValidCloakableClient(clientId))
 			{
 				clientCloakStats[clientId].ship->set_throttle(updateInfo.fThrottle);
 
@@ -1043,9 +1032,7 @@ namespace Cloak
 		returncode = DEFAULT_RETURNCODE;
 
 		if (Modules::GetModuleState("CloakModule"))
-		{
 			ClearClientData(clientId);
-		}
 	}
 
 	void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed)
@@ -1078,9 +1065,7 @@ namespace Cloak
 	void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam)
 	{
 		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
-		{
 			ToggleClientCloakActivator(clientId, false);
-		}
 	}
 
 	/**
@@ -1095,8 +1080,6 @@ namespace Cloak
 		returncode = DEFAULT_RETURNCODE;
 
 		if (Modules::GetModuleState("CloakModule") && activateCruise.bActivate)
-		{
 			SetServerSideEngineState(clientId, true);
-		}
 	}
 }

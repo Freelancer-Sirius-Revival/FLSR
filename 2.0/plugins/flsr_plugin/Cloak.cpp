@@ -72,6 +72,10 @@
 
 namespace Cloak
 {
+	const uint FIRE_DRY_ID = CreateID("fire_dry");
+	const uint WARNING_NN_ID = pub::GetNicknameId("warning");
+	const uint JUMP_GATE_NN_ID = pub::GetNicknameId("object_jump_gate");
+	const uint JUMP_HOLE_NN_ID = pub::GetNicknameId("object_jump_hole");
 	const uint SHIELD_SLOT_ID = 65521;
 	// The main update loop's interval.
 	const uint TIMER_INTERVAL = 100;
@@ -112,6 +116,7 @@ namespace Cloak
 		bool initialUncloakCompleted = false;
 		mstime cloakTimeStamp = 0;
 		mstime uncloakTimeStamp = 0;
+		mstime lastDrySoundTimeStamp = 0;
 		bool insideNoCloakZone = false;
 		bool dockingManeuverActive = false;
 		ShipEffectDefinition* effectsDefinition = 0;
@@ -128,6 +133,19 @@ namespace Cloak
 		NotInitialized
 	};
 
+	enum class UncloakReason
+	{
+		Initial,
+		User,
+		Destroyed,
+		Power,
+		Docking,
+		JumpGate,
+		JumpHole,
+		Anomaly,
+		Disrupted
+	};
+
 	static std::set<uint> cloakActivatorArchetypeIds;
 	static std::vector<ShipEffectDefinition> shipEffects;
 	static std::map<uint, ClientCloakStats> clientCloakStats;
@@ -135,7 +153,7 @@ namespace Cloak
 	static std::map<uint, std::vector<Vector>> jumpGatePositionsPerSystem;
 	static std::map<uint, std::vector<Vector>> jumpHolePositionsPerSystem;
 
-	static std::set<uint> clientIdsRequestingUncloak;
+	static std::map<uint, UncloakReason> clientIdsRequestingUncloak;
 
 	static std::map<uint, std::vector<uint>> clientCloakScanners;
 	static std::map<uint, std::vector<uint>> clientCloakDisruptors;
@@ -544,7 +562,17 @@ namespace Cloak
 			SendEquipmentActivationState(clientId, cargoId, powerPlantsActive);
 	}
 
-	CloakReturnState TryCloak(uint clientId)
+	void PlayDrySound(const uint clientId)
+	{
+		const mstime now = timeInMS();
+		if (now - clientCloakStats[clientId].lastDrySoundTimeStamp > 1000)
+		{
+			clientCloakStats[clientId].lastDrySoundTimeStamp = timeInMS();
+			pub::Audio::PlaySoundEffect(clientId, FIRE_DRY_ID);
+		}
+	}
+
+	CloakReturnState TryCloak(const uint clientId)
 	{
 		CloakReturnState result = CloakReturnState::None;
 
@@ -564,17 +592,17 @@ namespace Cloak
 		else if (clientCloakStats[clientId].dockingManeuverActive || ClientInfo[clientId].bTradelane)
 		{
 			result = CloakReturnState::DockSequence;
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
+			PlayDrySound(clientId);
 		}
 		else if (clientCloakStats[clientId].insideNoCloakZone)
 		{
 			result = CloakReturnState::Blocked;
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
+			PlayDrySound(clientId);
 		}
 		else if (timeInMS() - clientCloakStats[clientId].uncloakTimeStamp < clientCloakStats[clientId].effectsDefinition->uncloakDuration)
 		{
 			result = CloakReturnState::NotReady;
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
+			PlayDrySound(clientId);
 		}
 
 		if (result == CloakReturnState::None)
@@ -594,7 +622,7 @@ namespace Cloak
 		return result;
 	}
 
-	bool TryUncloak(const uint clientId)
+	bool TryUncloak(const uint clientId, const UncloakReason reason)
 	{
 		const CloakState cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Uncloaked || cloakState == CloakState::Uncloaking)
@@ -612,7 +640,21 @@ namespace Cloak
 			if (clientCloakStats[clientId].initialUncloakCompleted)
 			{
 				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
-				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("deactivated"));
+				switch (reason)
+				{
+					case UncloakReason::JumpGate:
+						pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
+						pub::Player::SendNNMessage(clientId, JUMP_GATE_NN_ID);
+						break;
+
+					case UncloakReason::JumpHole:
+						pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
+						pub::Player::SendNNMessage(clientId, JUMP_HOLE_NN_ID);
+						break;
+
+					default:
+						break;
+				}
 			}
 			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Uncloaking;
@@ -622,19 +664,20 @@ namespace Cloak
 		return false;
 	}
 
-	void QueueUncloak(const uint clientId)
+	void QueueUncloak(const uint clientId, const UncloakReason reason)
 	{
 		if (!IsValidCloakableClient(clientId) || !clientCloakStats[clientId].initialUncloakCompleted)
 			return;
 
-		if (!TryUncloak(clientId))
-			clientIdsRequestingUncloak.insert(clientId);
+		// Try to uncloak. If it fails, queue the attempt. Do not override already existing uncloak reasons.
+		if (!TryUncloak(clientId, reason) && !clientIdsRequestingUncloak.contains(clientId))
+			clientIdsRequestingUncloak[clientId] = reason;
 	}
 
 	void AttemptInitialUncloak(uint clientId)
 	{
 		if (IsValidCloakableClient(clientId) && !clientCloakStats[clientId].initialUncloakCompleted && clientCloakStats[clientId].cloakState == CloakState::Cloaked)
-			TryUncloak(clientId);
+			TryUncloak(clientId, UncloakReason::Initial);
 	}
 
 	bool CheckDockCall(const uint ship, const uint dockTargetId, const uint dockPortIndex, const DOCK_HOST_RESPONSE response)
@@ -649,7 +692,7 @@ namespace Cloak
 		if (!dockTargetId || dockPortIndex == -1 || response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
 			return true;
 
-		QueueUncloak(clientId);
+		QueueUncloak(clientId, UncloakReason::Docking);
 		clientCloakStats[clientId].dockingManeuverActive = true;
 		return true;
 	}
@@ -657,6 +700,7 @@ namespace Cloak
 	void CheckPlayerInNoCloakZones(const uint clientId, const uint clientSystemId, const uint clientShipId)
 	{
 		bool insideNoCloakZone = false;
+		UncloakReason uncloakReason;
 		Vector shipPosition;
 		Matrix shipOrientation;
 		pub::SpaceObj::GetLocation(clientShipId, shipPosition, shipOrientation);
@@ -667,6 +711,7 @@ namespace Cloak
 				if (HkDistance3D(jumpGatePosition, shipPosition) < jumpGateDecloakRadius)
 				{
 					insideNoCloakZone = true;
+					uncloakReason = UncloakReason::JumpGate;
 					break;
 				}
 			}
@@ -678,6 +723,7 @@ namespace Cloak
 				if (HkDistance3D(jumpHolePosition, shipPosition) < jumpHoleDecloakRadius)
 				{
 					insideNoCloakZone = true;
+					uncloakReason = UncloakReason::JumpHole;
 					break;
 				}
 			}
@@ -686,7 +732,7 @@ namespace Cloak
 		clientCloakStats[clientId].insideNoCloakZone = insideNoCloakZone;
 		const CloakState cloakState = clientCloakStats[clientId].cloakState;
 		if (insideNoCloakZone && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
-			QueueUncloak(clientId);
+			QueueUncloak(clientId, uncloakReason);
 	}
 
 	void UpdateStateByEffectTimings(const uint clientId, const mstime currentTime)
@@ -751,7 +797,7 @@ namespace Cloak
 			if (!clientCloakStats[clientId].activatorCargoId || !HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
 			{
 				clientCloakStats[clientId].activatorCargoId = 0;
-				QueueUncloak(clientId);
+				QueueUncloak(clientId, UncloakReason::Destroyed);
 			}
 
 			const CloakState& cloakState = clientCloakStats[clientId].cloakState;
@@ -790,11 +836,11 @@ namespace Cloak
 
 			// Uncloak when power is empty.
 			if (cloakState == CloakState::Cloaked && clientCloakStats[clientId].ship->get_power() <= 0.0f)
-				QueueUncloak(clientId);
+				QueueUncloak(clientId, UncloakReason::Power);
 
 			// Schedule cloak changes.
 			if (clientIdsRequestingUncloak.contains(clientId))
-				QueueUncloak(clientId);
+				QueueUncloak(clientId, clientIdsRequestingUncloak[clientId]);
 
 			// Consume energy.
 			if (cloakState == CloakState::Cloaked)
@@ -838,10 +884,6 @@ namespace Cloak
 		{
 			switch (TryCloak(clientId))
 			{
-				case CloakReturnState::Blocked:
-					PrintUserCmdText(clientId, L"Cloak blocked!");
-					break;
-
 				case CloakReturnState::Successful:
 					successful = true;
 					break;
@@ -849,7 +891,7 @@ namespace Cloak
 		}
 		else
 		{
-			successful = TryUncloak(clientId);
+			successful = TryUncloak(clientId, UncloakReason::User);
 		}
 		return successful;
 	}
@@ -901,7 +943,8 @@ namespace Cloak
 			if (!clientId)
 				return;
 
-			QueueUncloak(clientId);
+			QueueUncloak(clientId, UncloakReason::User);
+
 			if (IsValidCloakableClient(clientId))
 				clientCloakStats[clientId].dockingManeuverActive = false;
 		}
@@ -936,7 +979,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			QueueUncloak(clientId);
+			QueueUncloak(clientId, UncloakReason::Docking);
 		}
 	}
 

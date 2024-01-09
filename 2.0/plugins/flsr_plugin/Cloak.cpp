@@ -1070,7 +1070,8 @@ namespace Cloak
 	{
 		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
 		{
-			ToggleClientCloakActivator(clientId, true);
+			const CloakState cloakState = clientCloakStats[clientId].cloakState;
+			ToggleClientCloakActivator(clientId, cloakState == CloakState::Uncloaked || cloakState == CloakState::Uncloaking);
 		}
 	}
 

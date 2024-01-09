@@ -710,7 +710,7 @@ namespace CustomMissions {
 
 namespace Cloak
 {
-    enum CloakState
+    enum class CloakState
     {
         Uncloaked,
         Cloaking,
@@ -721,8 +721,8 @@ namespace Cloak
     void LoadCloakSettings();
     void InitializeWithGameData();
     void UpdateCloakClients();
-    CloakState GetClientCloakState(uint clientId);
-    CloakState FindShipCloakState(uint shipId);
+    CloakState GetClientCloakState(const uint clientId);
+    CloakState FindShipCloakState(const uint shipId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
     void __stdcall FireWeapon(unsigned int clientId, XFireWeaponInfo const& fireWeaponInfo);

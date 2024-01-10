@@ -11,7 +11,26 @@ namespace Mark
     // Contains a set of object ids which can be targetted for marking, but will not be marked visibly to the player.
     static std::set<uint> hiddenMarkedIds;
 
-    void HideObjectMark(uint id)
+    /**
+    * Generally we assume that objects which will be marked MUST exist for the client and server. Otherwise it may cause a crash.
+    * Objects which have already been marked can be safely unmarked.
+    */
+
+    bool IsTargetInSameSystemAsPlayer(const uint clientId, const uint targetId)
+    {
+        uint clientSystemId, targetSystemId;
+        pub::Player::GetSystem(clientId, clientSystemId);
+        pub::SpaceObj::GetSystem(targetId, targetSystemId);
+        return clientSystemId != 0 && clientSystemId == targetSystemId;
+    }
+
+    void TryRemoveInvisibleMarkId(const uint id)
+    {
+        if (pub::SpaceObj::ExistsAndAlive(id) != 0) // 0 -> true
+            hiddenMarkedIds.erase(id);
+    }
+
+    void HideObjectMark(const uint id)
     {
         if (hiddenMarkedIds.contains(id))
             return;
@@ -24,7 +43,7 @@ namespace Mark
         }
     }
 
-    void ShowObjectMark(uint id)
+    void ShowObjectMark(const uint id)
     {
         if (!hiddenMarkedIds.contains(id))
             return;
@@ -33,17 +52,12 @@ namespace Mark
         for (const auto& clientIdTargetIds : currentlyMarkedObjectsPerClient)
         {
             for (const uint targetId : clientIdTargetIds.second)
-                pub::Player::MarkObj(clientIdTargetIds.first, targetId, 1);
+                if (IsTargetInSameSystemAsPlayer(clientIdTargetIds.first, targetId))
+                    pub::Player::MarkObj(clientIdTargetIds.first, targetId, 1);
         }
     }
 
-    void TryRemoveInvisibleMarkId(uint id)
-    {
-        if (pub::SpaceObj::ExistsAndAlive(id) != 0) // 0 -> true
-            hiddenMarkedIds.erase(id);
-    }
-
-    bool TryMarkObject(uint clientId, uint targetId)
+    bool TryMarkObject(const uint clientId, const uint targetId)
     {
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
             return false;
@@ -54,14 +68,8 @@ namespace Mark
         if (shipId == targetId)
             return false;
 
-        uint clientSystemId, targetSystemId;
-        pub::Player::GetSystem(clientId, clientSystemId);
-        pub::SpaceObj::GetSystem(targetId, targetSystemId);
-        if (clientSystemId == targetSystemId && (!currentlyMarkedObjectsPerClient.contains(clientId) || !currentlyMarkedObjectsPerClient[clientId].contains(targetId)))
+        if (IsTargetInSameSystemAsPlayer(clientId, targetId) && (!currentlyMarkedObjectsPerClient.contains(clientId) || !currentlyMarkedObjectsPerClient[clientId].contains(targetId)))
         {
-            if (Cloak::FindShipCloakState(targetId) == Cloak::CloakState::Cloaked)
-                return false;
-
             currentlyMarkedObjectsPerClient[clientId].insert(targetId);
             if (!hiddenMarkedIds.contains(targetId))
             {
@@ -73,7 +81,7 @@ namespace Mark
         return false;
     }
 
-    bool TryUnmarkObject(uint clientId, uint targetId)
+    bool TryUnmarkObject(const uint clientId, const uint targetId)
     {
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
             return false;
@@ -88,7 +96,7 @@ namespace Mark
         return false;
     }
 
-    void UnmarkAllObjects(uint clientId, boolean noSound = false)
+    void UnmarkAllObjects(const uint clientId, const boolean noSound = false)
     {
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
             return;
@@ -99,14 +107,13 @@ namespace Mark
                 pub::Audio::PlaySoundEffect(clientId, CreateID("ui_select_remove"));
 
             for (const uint& targetId : currentlyMarkedObjectsPerClient[clientId])
-            {
                 pub::Player::MarkObj(clientId, targetId, 0);
-            }
+
             currentlyMarkedObjectsPerClient[clientId].clear();
         }
     }
 
-    void RegisterObject(uint clientId, uint targetId)
+    void RegisterObject(const uint clientId, const uint targetId)
     {
         if (!HkIsValidClientID(clientId))
             return;
@@ -136,7 +143,7 @@ namespace Mark
             markedObjectsPerCharacter[characterFileNameWS][targetSystemId].erase(targetId);
     }
 
-    void UpdateAndMarkCurrentSystemMarks(uint clientId)
+    void UpdateAndMarkCurrentSystemMarks(const uint clientId)
     {
         for (const uint id : hiddenMarkedIds)
             TryRemoveInvisibleMarkId(id);
@@ -176,19 +183,19 @@ namespace Mark
         }
     }
 
-    void MarkAndRegisterObject(uint clientId, uint targetId)
+    void MarkAndRegisterObject(const uint clientId, const uint targetId)
     {
         TryMarkObject(clientId, targetId);
         RegisterObject(clientId, targetId);
     }
 
-    void UnmarkAndUnregisterObject(uint clientId, uint targetId)
+    void UnmarkAndUnregisterObject(const uint clientId, const uint targetId)
     {
         TryUnmarkObject(clientId, targetId);
         UnregisterObject(clientId, targetId);
     }
 
-    void UnmarkAndUnregisterObjectForEveryone(uint targetId)
+    void UnmarkAndUnregisterObjectForEveryone(const uint targetId)
     {
         TryRemoveInvisibleMarkId(targetId);
 
@@ -207,7 +214,7 @@ namespace Mark
         }
     }
 
-    std::list<GROUP_MEMBER> GetGroupMemberClientIds(uint clientId)
+    std::list<GROUP_MEMBER> GetGroupMemberClientIds(const uint clientId)
     {
         std::list<GROUP_MEMBER> members;
         if (!HkIsValidClientID(clientId))

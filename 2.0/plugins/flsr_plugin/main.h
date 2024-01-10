@@ -721,8 +721,6 @@ namespace Cloak
     void LoadCloakSettings();
     void InitializeWithGameData();
     void UpdateCloakClients();
-    CloakState GetClientCloakState(const uint clientId);
-    CloakState FindShipCloakState(const uint shipId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
     void __stdcall FireWeapon(unsigned int clientId, XFireWeaponInfo const& fireWeaponInfo);
@@ -749,11 +747,11 @@ namespace Crafting
 
 namespace Mark
 {
-    void HideObjectMark(uint id);
-    void ShowObjectMark(uint id);
-    void MarkAndRegisterObject(uint clientId, uint targetId);
-    void UnmarkAndUnregisterObject(uint clientId, uint targetId);
-    void UnmarkAndUnregisterObjectForEveryone(uint targetId);
+    void HideObjectMark(const uint id);
+    void ShowObjectMark(const uint id);
+    void MarkAndRegisterObject(const uint clientId, const uint targetId);
+    void UnmarkAndUnregisterObject(const uint clientId, const uint targetId);
+    void UnmarkAndUnregisterObjectForEveryone(const uint targetId);
     void UserCmd_Mark(uint clientId, const std::wstring& wscParam);
     void UserCmd_GroupMark(uint clientId, const std::wstring& wscParam);
     void UserCmd_UnMark(uint clientId, const std::wstring& wscParam);

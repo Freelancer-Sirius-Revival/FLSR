@@ -155,9 +155,6 @@ namespace Cloak
 
 	static std::map<uint, UncloakReason> clientIdsRequestingUncloak;
 
-	static std::map<uint, std::vector<uint>> clientCloakScanners;
-	static std::map<uint, std::vector<uint>> clientCloakDisruptors;
-
 	bool IsValidCloakableClient(const uint clientId)
 	{
 		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakStats.contains(clientId))
@@ -201,7 +198,10 @@ namespace Cloak
 	void ClearClientData(const uint clientId)
 	{
 		if (clientCloakStats[clientId].shipId)
+		{
+			Mark::UnmarkAndUnregisterObjectForEveryone(clientCloakStats[clientId].shipId);
 			Mark::ShowObjectMark(clientCloakStats[clientId].shipId);
+		}
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
@@ -852,34 +852,6 @@ namespace Cloak
 				FireCloakActivator(clientId);
 		}
 		lastSynchronizeTimeStamp = now;
-	}
-
-	std::vector<uint> FindMountedEquipments(const std::list<CARGO_INFO>& cargoList, const uint archetypeId)
-	{
-		std::vector<uint> result;
-		for (const auto& cargo : cargoList)
-		{
-			if (cargo.bMounted && cargo.iArchID == archetypeId)
-				result.push_back(cargo.iID);
-		}
-		return result;
-	}
-
-	CloakState GetClientCloakState(const uint clientId)
-	{
-		if (clientCloakStats.contains(clientId))
-			return clientCloakStats[clientId].cloakState;
-		return CloakState::Uncloaked;
-	}
-
-	CloakState FindShipCloakState(const uint shipId)
-	{
-		for (const auto& cloakStats: clientCloakStats)
-		{
-			if (cloakStats.second.shipId == shipId)
-				return cloakStats.second.cloakState;
-		}
-		return CloakState::Uncloaked;
 	}
 
 	bool ToggleClientCloakActivator(const uint clientId, const bool active)

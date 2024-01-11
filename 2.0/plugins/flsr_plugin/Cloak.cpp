@@ -99,6 +99,13 @@ namespace Cloak
 		std::string cloakingDeviceHardpoint = "";
 	};
 
+	enum class NoCloakZone
+	{
+		None,
+		JumpGate,
+		JumpHole
+	};
+
 	struct ClientCloakStats
 	{
 		uint shipId = 0;
@@ -117,7 +124,7 @@ namespace Cloak
 		mstime cloakTimeStamp = 0;
 		mstime uncloakTimeStamp = 0;
 		mstime lastDrySoundTimeStamp = 0;
-		bool insideNoCloakZone = false;
+		NoCloakZone insideNoCloakZoneOfType = NoCloakZone::None;
 		bool dockingManeuverActive = false;
 		ShipEffectDefinition* effectsDefinition = 0;
 	};
@@ -593,9 +600,21 @@ namespace Cloak
 			result = CloakReturnState::DockSequence;
 			PlayDrySound(clientId);
 		}
-		else if (clientCloakStats[clientId].insideNoCloakZone)
+		else if (clientCloakStats[clientId].insideNoCloakZoneOfType != NoCloakZone::None)
 		{
 			result = CloakReturnState::Blocked;
+			switch (clientCloakStats[clientId].insideNoCloakZoneOfType)
+			{
+				case NoCloakZone::JumpGate:
+					pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
+					pub::Player::SendNNMessage(clientId, JUMP_GATE_NN_ID);
+					break;
+
+				case NoCloakZone::JumpHole:
+					pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
+					pub::Player::SendNNMessage(clientId, JUMP_HOLE_NN_ID);
+					break;
+			}
 			PlayDrySound(clientId);
 		}
 		else if (timeInMS() - clientCloakStats[clientId].uncloakTimeStamp < clientCloakStats[clientId].effectsDefinition->uncloakDuration)
@@ -698,7 +717,7 @@ namespace Cloak
 
 	void CheckPlayerInNoCloakZones(const uint clientId, const uint clientSystemId, const uint clientShipId)
 	{
-		bool insideNoCloakZone = false;
+		NoCloakZone insideNoCloakZone = NoCloakZone::None;
 		UncloakReason uncloakReason;
 		Vector shipPosition;
 		Matrix shipOrientation;
@@ -709,28 +728,28 @@ namespace Cloak
 			{
 				if (HkDistance3D(jumpGatePosition, shipPosition) < jumpGateDecloakRadius)
 				{
-					insideNoCloakZone = true;
+					insideNoCloakZone = NoCloakZone::JumpGate;
 					uncloakReason = UncloakReason::JumpGate;
 					break;
 				}
 			}
 		}
-		if (!insideNoCloakZone && jumpHolePositionsPerSystem.contains(clientSystemId))
+		if (insideNoCloakZone != NoCloakZone::None && jumpHolePositionsPerSystem.contains(clientSystemId))
 		{
 			for (const Vector& jumpHolePosition : jumpHolePositionsPerSystem[clientSystemId])
 			{
 				if (HkDistance3D(jumpHolePosition, shipPosition) < jumpHoleDecloakRadius)
 				{
-					insideNoCloakZone = true;
+					insideNoCloakZone = NoCloakZone::JumpHole;
 					uncloakReason = UncloakReason::JumpHole;
 					break;
 				}
 			}
 		}
 
-		clientCloakStats[clientId].insideNoCloakZone = insideNoCloakZone;
+		clientCloakStats[clientId].insideNoCloakZoneOfType = insideNoCloakZone;
 		const CloakState cloakState = clientCloakStats[clientId].cloakState;
-		if (insideNoCloakZone && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
+		if (insideNoCloakZone != NoCloakZone::None && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
 			QueueUncloak(clientId, uncloakReason);
 	}
 
@@ -838,7 +857,6 @@ namespace Cloak
 			{
 				float power;
 				clientCloakStats[clientId].shipInspect->get_power(power);
-				PrintUserCmdText(clientId, std::to_wstring(power));
 				if (power <= 0.0f)
 					QueueUncloak(clientId, UncloakReason::Power);
 			}

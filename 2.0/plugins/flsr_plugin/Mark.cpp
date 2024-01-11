@@ -39,7 +39,10 @@ namespace Mark
         for (const auto& clientIdTargetIds : currentlyMarkedObjectsPerClient)
         {
             for (const uint targetId : clientIdTargetIds.second)
-                pub::Player::MarkObj(clientIdTargetIds.first, targetId, 0);
+            {
+                if (targetId == id)
+                    pub::Player::MarkObj(clientIdTargetIds.first, targetId, 0);
+            }
         }
     }
 
@@ -52,8 +55,10 @@ namespace Mark
         for (const auto& clientIdTargetIds : currentlyMarkedObjectsPerClient)
         {
             for (const uint targetId : clientIdTargetIds.second)
-                if (IsTargetInSameSystemAsPlayer(clientIdTargetIds.first, targetId))
+            {
+                if (targetId == id && IsTargetInSameSystemAsPlayer(clientIdTargetIds.first, targetId))
                     pub::Player::MarkObj(clientIdTargetIds.first, targetId, 1);
+            }
         }
     }
 

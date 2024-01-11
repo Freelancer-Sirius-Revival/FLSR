@@ -930,7 +930,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			uint clientId = HkGetClientIDByShip(shipId);
+			const uint clientId = HkGetClientIDByShip(shipId);
 			if (!clientId)
 				return;
 

@@ -16,7 +16,7 @@ namespace SpawnProtection
         return true;
 	}
 
-    void SetInvincible(uint shipId)
+    void SetInvincible(const uint shipId)
     {
         pub::SpaceObj::SetInvincible(shipId, true, true, 0);
         invincibleEndTimePerShip[shipId] = timeInMS() + invincibleDuration;
@@ -39,43 +39,57 @@ namespace SpawnProtection
         }
     }
 
-    void __stdcall SystemSwitchOutComplete(unsigned int shipId, unsigned int clientId)
+    void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
 
         if (Modules::GetModuleState("SpawnProtection"))
-        {
             SetInvincible(shipId);
-        }
     }
 
-    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+    void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
 
         if (Modules::GetModuleState("SpawnProtection"))
-        {
             SetInvincible(shipId);
-        }
     }
 
-    void __stdcall LaunchComplete(unsigned int baseId, unsigned int shipId)
+    void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId)
     {
         returncode = DEFAULT_RETURNCODE;
 
         if (Modules::GetModuleState("SpawnProtection"))
-        {
             SetInvincible(shipId);
-        }
     }
 
-    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
+    void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId)
     {
         returncode = DEFAULT_RETURNCODE;
 
         if (Modules::GetModuleState("SpawnProtection"))
-        {
             SetInvincible(shipId);
+    }
+
+    bool AllowPlayerDamage(uint clientId, uint targetClientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        bool preventNpcDamage;
+        bool preventPlayerDamage;
+        float threshold;
+        uint shipId;
+        pub::Player::GetShip(targetClientId, shipId);
+        if (shipId)
+        {
+            pub::SpaceObj::GetInvincible(shipId, preventNpcDamage, preventPlayerDamage, threshold);
+            if (preventPlayerDamage)
+            {
+                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+                return false;
+            }
         }
+
+        return true;
     }
 }

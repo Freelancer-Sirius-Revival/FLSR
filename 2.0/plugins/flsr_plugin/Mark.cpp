@@ -118,6 +118,19 @@ namespace Mark
         }
     }
 
+    bool IsRegisteredObject(const uint clientId, const uint targetId)
+    {
+        if (!HkIsValidClientID(clientId))
+            return false;
+
+        std::wstring characterFileNameWS;
+        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) != HKE_OK)
+            return false;
+        uint targetSystemId;
+        pub::SpaceObj::GetSystem(targetId, targetSystemId);
+        return targetSystemId && markedObjectsPerCharacter[characterFileNameWS][targetSystemId].contains(targetId);
+    }
+
     void RegisterObject(const uint clientId, const uint targetId)
     {
         if (!HkIsValidClientID(clientId))
@@ -238,7 +251,11 @@ namespace Mark
         pub::SpaceObj::GetTarget(shipId, targetId);
         if (!targetId)
             return;
-        MarkAndRegisterObject(clientId, targetId);
+
+        if (!IsRegisteredObject(clientId, targetId))
+            MarkAndRegisterObject(clientId, targetId);
+        else
+            UnmarkAndUnregisterObject(clientId, targetId);
     }
 
     void UserCmd_GroupMark(uint clientId, const std::wstring& wscParam)

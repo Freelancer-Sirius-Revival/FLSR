@@ -204,11 +204,7 @@ namespace Cloak
 
 	void ClearClientData(const uint clientId)
 	{
-		if (clientCloakStats[clientId].shipId)
-		{
-			Mark::UnmarkAndUnregisterObjectForEveryone(clientCloakStats[clientId].shipId);
-			Mark::ShowObjectMark(clientCloakStats[clientId].shipId);
-		}
+		Mark::RemoveCloakedPlayer(clientId);
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
@@ -793,6 +789,7 @@ namespace Cloak
 	}
 
 	static mstime lastSynchronizeTimeStamp = 0;
+	static std::map<uint, CloakState> previousCloakStates;
 
 	// This is executed to make sure players that spawn into a system with other cloaking players have their visibility synced.
 	void UpdateCloakClients()
@@ -831,19 +828,9 @@ namespace Cloak
 			// Uncloak player in no-cloak-zones
 			CheckPlayerInNoCloakZones(clientId, playerData->iSystemID, playerData->iShipID);
 
-			const CloakState oldCloakState = cloakState;
 			// Cloak state update when effect time has passed
 			// This also sets the initial uncloaked flag.
 			UpdateStateByEffectTimings(clientId, now);
-
-			// Make sure to remove this player from everyone's mark list when the cloak state changed.
-			if (oldCloakState != cloakState)
-			{
-				if (cloakState == CloakState::Cloaked)
-					Mark::HideObjectMark(clientCloakStats[clientId].shipId);
-				else
-					Mark::ShowObjectMark(clientCloakStats[clientId].shipId);
-			}
 
 			// The rest in the update loop should be ignored for not initially uncloaked ships.
 			if (!clientCloakStats[clientId].initialUncloakCompleted)
@@ -868,8 +855,26 @@ namespace Cloak
 			// Consume energy.
 			if (cloakState == CloakState::Cloaked)
 				FireCloakActivator(clientId);
+
+			// Make sure to remove this player from everyone's mark list when the cloak state changed.
+			if (previousCloakStates[clientId] != cloakState)
+			{
+				if (cloakState == CloakState::Cloaked)
+					Mark::AddCloakedPlayer(clientId);
+				else
+					Mark::RemoveCloakedPlayer(clientId);
+			}
+			previousCloakStates[clientId] = cloakState;
 		}
 		lastSynchronizeTimeStamp = now;
+		previousCloakStates.clear();
+	}
+
+	CloakState GetClientCloakState(uint clientId)
+	{
+		if (clientCloakStats.contains(clientId))
+			return clientCloakStats[clientId].cloakState;
+		return CloakState::Uncloaked;
 	}
 
 	bool ToggleClientCloakActivator(const uint clientId, const bool active)

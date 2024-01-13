@@ -721,6 +721,7 @@ namespace Cloak
     void LoadCloakSettings();
     void InitializeWithGameData();
     void UpdateCloakClients();
+    CloakState GetClientCloakState(uint clientId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
     void __stdcall FireWeapon(unsigned int clientId, XFireWeaponInfo const& fireWeaponInfo);
@@ -747,19 +748,21 @@ namespace Crafting
 
 namespace Mark
 {
-    void HideObjectMark(const uint id);
-    void ShowObjectMark(const uint id);
-    void MarkAndRegisterObject(const uint clientId, const uint targetId);
-    void UnmarkAndUnregisterObject(const uint clientId, const uint targetId);
-    void UnmarkAndUnregisterObjectForEveryone(const uint targetId);
-    void UserCmd_Mark(uint clientId, const std::wstring& wscParam);
-    void UserCmd_GroupMark(uint clientId, const std::wstring& wscParam);
-    void UserCmd_UnMark(uint clientId, const std::wstring& wscParam);
-    void UserCmd_UnGroupMark(uint clientId, const std::wstring& wscParam);
-    void UserCmd_UnMarkAll(uint clientId, const std::wstring& wscParam);
+    extern const uint CLEAR_ROTATION_TIMER_INTERVAL;
+    void AddCloakedPlayer(const uint clientId);
+    void RemoveCloakedPlayer(const uint clientId);
+    void RotateClearNonExistingTargetIds();
+    void UserCmd_Mark(const uint clientId, const std::wstring& wscParam);
+    void UserCmd_GroupMark(const uint clientId, const std::wstring& wscParam);
+    void UserCmd_UnMark(const uint clientId, const std::wstring& wscParam);
+    void UserCmd_UnGroupMark(const uint clientId, const std::wstring& wscParam);
+    void UserCmd_UnMarkAll(const uint clientId, const std::wstring& wscParam);
     void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId);
     void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
     void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
+    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
+    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
+    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
 }
 
 namespace EquipWhiteList

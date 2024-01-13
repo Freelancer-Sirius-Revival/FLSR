@@ -351,7 +351,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::SystemSwitchOutComplete_After, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
     
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));

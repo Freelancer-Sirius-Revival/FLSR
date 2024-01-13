@@ -106,7 +106,7 @@ namespace Crafting
         return filteredCargoList;
     }
 
-	bool Craft(const uint clientId, const std::string& recipeName, const int count)
+	bool Craft(const uint clientId, const std::string& recipeName, const int batchCount)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
@@ -157,7 +157,7 @@ namespace Crafting
 			{
 				if (cargo.iArchID == ingredientWithCount.first)
 				{
-					const int multipliedIngredientCount = ingredientWithCount.second * count;
+					const int multipliedIngredientCount = ingredientWithCount.second * batchCount;
 					if (cargo.iCount < multipliedIngredientCount)
 						break;
 					foundCargosAndRequiredCount.push_back({ cargo, multipliedIngredientCount });
@@ -167,7 +167,7 @@ namespace Crafting
 		if (foundCargosAndRequiredCount.size() != recipe.ingredientArchetypeIdsWithCount.size())
 		{
 			pub::Player::SendNNMessage(clientId, NONE_AVAILABLE_ID);
-			PrintUserCmdText(clientId, L"Parts are missing to craft " + std::to_wstring(count) + L" '" + recipe.originalName + L"'!");
+			PrintUserCmdText(clientId, L"Parts are missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 			return false;
 		}
 
@@ -175,7 +175,7 @@ namespace Crafting
 		const Archetype::Equipment* equipment = Archetype::GetEquipment(recipe.archetypeId);
 		if (!equipment)
 			return false;
-		float totalVolumeNeeded = equipment->fVolume * count;
+		float totalVolumeNeeded = equipment->fVolume * recipe.count * batchCount;
 		for (const auto& foundCargoAndRequiredCount : foundCargosAndRequiredCount)
 		{
 			const Archetype::Equipment* equipment = Archetype::GetEquipment(foundCargoAndRequiredCount.first.iArchID);
@@ -188,7 +188,7 @@ namespace Crafting
 		if (remainingHoldSize - totalVolumeNeeded < 0.0f)
 		{
 			pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
-			PrintUserCmdText(clientId, L"Not enough cargo space left to craft " + std::to_wstring(count) + L" '" + recipe.originalName + L"'!");
+			PrintUserCmdText(clientId, L"Not enough cargo space left to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 			return false;
 		}
 
@@ -199,12 +199,12 @@ namespace Crafting
 			if (HkRemoveCargo(characterNameWS, foundCargoAndRequiredCount.first.iID, foundCargoAndRequiredCount.second) != HKE_OK)
 				return false;
 		}
-		if (Tools::FLSRHkAddCargo(characterNameWS, recipe.archetypeId, count, false) == HKE_OK)
+		if (Tools::FLSRHkAddCargo(characterNameWS, recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
 		{
 			if (successSoundId)
 				pub::Audio::PlaySoundEffect(clientId, successSoundId);
 			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
-			PrintUserCmdText(clientId, L"Successfully crafted " + std::to_wstring(count) + L" '" + recipe.originalName + L"'.");
+			PrintUserCmdText(clientId, L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'.");
 			return true;
 		}
 		return false;

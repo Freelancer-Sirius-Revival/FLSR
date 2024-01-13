@@ -227,7 +227,7 @@ void LoadSettings() {
         //Load DiscordBot
         if (SpawnProtection::LoadSettings())
         {
-            ConPrint(L"Module loaded: SpawnProtection");
+            ConPrint(L"Module loaded: SpawnProtection\n");
         }
         else {
             //Missing Config

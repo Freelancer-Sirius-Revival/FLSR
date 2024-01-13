@@ -1,13 +1,16 @@
 #include "main.h"
 
 /**
+* [General]
+* success_sound_nickname = 
+* fail_sound_nickname = 
+* 
 * [Foo Bar]
 * product = item_nickname, count
 * ingredient = item_nickname, count
 * ...
 * base_nickname = base_name
 * ...
-* 
 */
 
 namespace Crafting
@@ -23,6 +26,13 @@ namespace Crafting
 
 	static std::map<std::string, Recipe> recipes;
 
+	static uint successSoundId = 0;
+	static uint failSoundId = 0;
+
+	const uint INSUFFICIENT_CARGO_SPACE_ID = pub::GetNicknameId("insufficient_cargo_space");
+	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
+	const uint NONE_AVAILABLE_ID = pub::GetNicknameId("none_available");
+
 	void LoadSettings()
 	{
 		char currentDirectory[MAX_PATH];
@@ -34,35 +44,52 @@ namespace Crafting
 		{
 			while (ini.read_header())
 			{
-				Recipe recipe;
-				recipe.originalName = stows(ini.get_header_ptr());
-				std::string recipeNameLower = ToLower(wstos(recipe.originalName));
-				while (ini.read_value())
+				if (ini.is_header("General"))
 				{
-					if (ini.is_value("product"))
+					while (ini.read_value())
 					{
-						recipe.archetypeId = CreateID(ini.get_value_string(0));
-						recipe.count = ini.get_value_int(1);
-					}
-					else if (ini.is_value("ingredient"))
-					{
-						recipe.ingredientArchetypeIdsWithCount.push_back({ CreateID(ini.get_value_string(0)), ini.get_value_int(1) });
-					}
-					else if (ini.is_value("base_nickname"))
-					{
-						recipe.validBaseIds.insert(CreateID(ini.get_value_string(0)));
+						if (ini.is_value("success_sound_nickname"))
+						{
+							successSoundId = CreateID(ini.get_value_string(0));
+						}
+						else if (ini.is_value("fail_sound_nickname"))
+						{
+							failSoundId = CreateID(ini.get_value_string(0));
+						}
 					}
 				}
-				if (recipe.archetypeId && recipe.count && !recipe.ingredientArchetypeIdsWithCount.empty())
+				else
 				{
-					recipes[recipeNameLower] = recipe;
+					Recipe recipe;
+					recipe.originalName = stows(ini.get_header_ptr());
+					std::string recipeNameLower = ToLower(wstos(recipe.originalName));
+					while (ini.read_value())
+					{
+						if (ini.is_value("product"))
+						{
+							recipe.archetypeId = CreateID(ini.get_value_string(0));
+							recipe.count = ini.get_value_int(1);
+						}
+						else if (ini.is_value("ingredient"))
+						{
+							recipe.ingredientArchetypeIdsWithCount.push_back({ CreateID(ini.get_value_string(0)), ini.get_value_int(1) });
+						}
+						else if (ini.is_value("base_nickname"))
+						{
+							recipe.validBaseIds.insert(CreateID(ini.get_value_string(0)));
+						}
+					}
+					if (recipe.archetypeId && recipe.count && !recipe.ingredientArchetypeIdsWithCount.empty())
+					{
+						recipes[recipeNameLower] = recipe;
+					}
 				}
 			}
 			ini.close();
 		}
 	}
 
-    std::vector<CARGO_INFO> GetUnmountedCargoList(uint clientId)
+    std::vector<CARGO_INFO> GetUnmountedCargoList(const uint clientId)
     {
         int remainingHoldSize;
         std::list<CARGO_INFO> cargoList;
@@ -79,25 +106,25 @@ namespace Crafting
         return filteredCargoList;
     }
 
-	void Craft(uint clientId, std::string recipeName, int count)
+	bool Craft(const uint clientId, const std::string& recipeName, const int count)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
-			return;
+			return false;
 
 		// Check if the recipe exists.
 		if (recipeName.empty())
 		{
 			PrintUserCmdText(clientId, L"Schematic name must be given to craft it!");
-			return;
+			return false;
 		}
 
 		std::string recipeNameLower = ToLower(recipeName);
 		if (!recipes.contains(recipeNameLower))
 		{
 			PrintUserCmdText(clientId, L"Schematic '" + stows(recipeName) + L"' does not exist!");
-			return;
+			return false;
 		}
-		const auto& recipe = recipes[recipeNameLower];
+		const Recipe& recipe = recipes[recipeNameLower];
 
 		// Check if the player is docked on the requested base.
 		uint shipId;
@@ -111,14 +138,14 @@ namespace Crafting
 				if (!recipe.validBaseIds.contains(baseId))
 				{
 					PrintUserCmdText(clientId, L"You must be docked on a specific base to craft '" + recipe.originalName + L"'!");
-					return;
+					return false;
 				}
 			}
 		}
 		else
 		{
 			PrintUserCmdText(clientId, L"You must be docked to craft items!");
-			return;
+			return false;
 		}
 
 		// Check if the required ingredients are in the cargo hold.
@@ -139,28 +166,30 @@ namespace Crafting
 		}
 		if (foundCargosAndRequiredCount.size() != recipe.ingredientArchetypeIdsWithCount.size())
 		{
+			pub::Player::SendNNMessage(clientId, NONE_AVAILABLE_ID);
 			PrintUserCmdText(clientId, L"Parts are missing to craft " + std::to_wstring(count) + L" '" + recipe.originalName + L"'!");
-			return;
+			return false;
 		}
 
 		// Check if there's enough cargo hold to add the produced item.
 		const Archetype::Equipment* equipment = Archetype::GetEquipment(recipe.archetypeId);
 		if (!equipment)
-			return;
+			return false;
 		float totalVolumeNeeded = equipment->fVolume * count;
 		for (const auto& foundCargoAndRequiredCount : foundCargosAndRequiredCount)
 		{
 			const Archetype::Equipment* equipment = Archetype::GetEquipment(foundCargoAndRequiredCount.first.iArchID);
 			if (!equipment)
-				return;
+				return false;
 			totalVolumeNeeded -= equipment->fVolume * foundCargoAndRequiredCount.second;
 		}
 		float remainingHoldSize;
 		pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
 		if (remainingHoldSize - totalVolumeNeeded < 0.0f)
 		{
+			pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
 			PrintUserCmdText(clientId, L"Not enough cargo space left to craft " + std::to_wstring(count) + L" '" + recipe.originalName + L"'!");
-			return;
+			return false;
 		}
 
 		// Exchange the items in the cargo hold.
@@ -168,15 +197,20 @@ namespace Crafting
 		for (const auto& foundCargoAndRequiredCount : foundCargosAndRequiredCount)
 		{
 			if (HkRemoveCargo(characterNameWS, foundCargoAndRequiredCount.first.iID, foundCargoAndRequiredCount.second) != HKE_OK)
-				return;
+				return false;
 		}
 		if (Tools::FLSRHkAddCargo(characterNameWS, recipe.archetypeId, count, false) == HKE_OK)
 		{
+			if (successSoundId)
+				pub::Audio::PlaySoundEffect(clientId, successSoundId);
+			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
 			PrintUserCmdText(clientId, L"Successfully crafted " + std::to_wstring(count) + L" '" + recipe.originalName + L"'.");
+			return true;
 		}
+		return false;
 	}
 
-	bool UserCmd_Craft(uint clientId, const std::wstring& argumentsWS)
+	bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS)
 	{
 		returncode = DEFAULT_RETURNCODE;
 		if (Modules::GetModuleState("Crafting"))
@@ -191,7 +225,11 @@ namespace Crafting
 				{
 					recipeName = Trim(arguments.substr(0, lastWhiteSpace));
 				}
-				Craft(clientId, wstos(recipeName), std::min(1000, std::max(1, count)));
+				if (!Craft(clientId, wstos(recipeName), std::min(1000, std::max(1, count))))
+				{
+					if (failSoundId)
+						pub::Audio::PlaySoundEffect(clientId, failSoundId);
+				}
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}

@@ -742,7 +742,7 @@ namespace Cloak
 namespace Crafting
 {
     void LoadSettings();
-    bool UserCmd_Craft(uint clientId, const std::wstring& argumentsWS);
+    bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS);
 }
 
 namespace Mark

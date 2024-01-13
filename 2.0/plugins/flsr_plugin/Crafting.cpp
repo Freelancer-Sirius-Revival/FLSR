@@ -7,6 +7,7 @@
 * 
 * [Foo Bar]
 * product = item_nickname, count
+* cost = money
 * ingredient = item_nickname, count
 * ...
 * base_nickname = base_name
@@ -20,6 +21,7 @@ namespace Crafting
 		std::wstring originalName = L"";
 		uint archetypeId = 0;
 		int count = 0;
+		int cost = 0;
 		std::vector<std::pair<uint, int>> ingredientArchetypeIdsWithCount;
 		std::set<uint> validBaseIds;
 	};
@@ -29,6 +31,7 @@ namespace Crafting
 	static uint successSoundId = 0;
 	static uint failSoundId = 0;
 
+	const uint NOT_ENOUGH_MONEY = pub::GetNicknameId("not_enough_money");
 	const uint INSUFFICIENT_CARGO_SPACE_ID = pub::GetNicknameId("insufficient_cargo_space");
 	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
 	const uint NONE_AVAILABLE_ID = pub::GetNicknameId("none_available");
@@ -69,6 +72,10 @@ namespace Crafting
 						{
 							recipe.archetypeId = CreateID(ini.get_value_string(0));
 							recipe.count = ini.get_value_int(1);
+						}
+						else if (ini.is_value("cost"))
+						{
+							recipe.cost = ini.get_value_int(0);
 						}
 						else if (ini.is_value("ingredient"))
 						{
@@ -164,6 +171,21 @@ namespace Crafting
 				}
 			}
 		}
+
+		const std::wstring& characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
+		if (recipe.cost)
+		{
+			int currentCash;
+			if (HkGetCash(characterNameWS, currentCash) != HKE_OK)
+				return false;
+			if (currentCash < (recipe.cost * batchCount))
+			{
+				pub::Player::SendNNMessage(clientId, NOT_ENOUGH_MONEY);
+				PrintUserCmdText(clientId, L"Credits are missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+				return false;
+			}
+		}
+
 		if (foundCargosAndRequiredCount.size() != recipe.ingredientArchetypeIdsWithCount.size())
 		{
 			pub::Player::SendNNMessage(clientId, NONE_AVAILABLE_ID);
@@ -193,12 +215,16 @@ namespace Crafting
 		}
 
 		// Exchange the items in the cargo hold.
-		const std::wstring& characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
 		for (const auto& foundCargoAndRequiredCount : foundCargosAndRequiredCount)
 		{
 			if (HkRemoveCargo(characterNameWS, foundCargoAndRequiredCount.first.iID, foundCargoAndRequiredCount.second) != HKE_OK)
 				return false;
 		}
+
+		if (recipe.cost)
+			if (HkAddCash(characterNameWS, -recipe.cost * batchCount) != HKE_OK)
+				return false;
+
 		if (Tools::FLSRHkAddCargo(characterNameWS, recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
 		{
 			if (successSoundId)

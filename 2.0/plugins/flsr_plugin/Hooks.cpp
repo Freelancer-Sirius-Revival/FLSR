@@ -434,7 +434,7 @@ namespace Hooks {
     }
 
     /// Clear client info when a client connects.
-    void __stdcall ClearClientInfo(unsigned int iClientID) {
+    void ClearClientInfo(unsigned int iClientID) {
 		//AC
         if (Modules::GetModuleState("ACModule"))
         {

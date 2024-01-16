@@ -502,7 +502,7 @@ namespace Hooks {
 	void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci, unsigned int iClientID);
     void __stdcall JumpInComplete(unsigned int iSystemID, unsigned int iShipID);
 	void __stdcall SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID);
-    void __stdcall ClearClientInfo(unsigned int iClientID);
+    void ClearClientInfo(unsigned int iClientID);
     void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn);
     void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID);
     void __stdcall ReqAddItem(unsigned int goodID, char const* hardpoint, int count, float status, bool mounted, uint iClientID);

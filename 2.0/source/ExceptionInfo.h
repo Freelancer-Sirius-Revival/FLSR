@@ -45,13 +45,21 @@ struct __vcrt_ptd {
 extern "C" __vcrt_ptd *__cdecl __vcrt_getptd();
 
 inline const EXCEPTION_RECORD *GetCurrentExceptionRecord() {
+#ifdef _DEBUG
+    return 0;
+#else
     auto p = __vcrt_getptd();
     return (EXCEPTION_RECORD *)p->_curexception;
+#endif // DEBUG
 }
 
 inline const _CONTEXT *GetCurrentExceptionContext() {
+#ifdef _DEBUG
+    return 0;
+#else
     auto p = __vcrt_getptd();
     return (_CONTEXT *)p->_curcontext;
+#endif // DEBUG
 }
 
 //-----------------------------------------------------------------------------------------------------------

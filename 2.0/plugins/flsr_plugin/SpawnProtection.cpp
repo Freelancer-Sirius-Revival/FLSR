@@ -27,15 +27,18 @@ namespace SpawnProtection
         if (Modules::GetModuleState("SpawnProtection"))
         {
             const mstime now = timeInMS();
+            std::vector<uint> shipIdsToDelete;
             for (const auto& invincibleShipTime : invincibleEndTimePerShip)
             {
                 if (now > invincibleShipTime.second)
                 {
                     if (pub::SpaceObj::ExistsAndAlive(invincibleShipTime.first) == 0) // 0 -> true
                         pub::SpaceObj::SetInvincible(invincibleShipTime.first, false, false, 0);
-                    invincibleEndTimePerShip.erase(invincibleShipTime.first);
+                    shipIdsToDelete.push_back(invincibleShipTime.first);
                 }
             }
+            for (const uint shipId : shipIdsToDelete)
+                invincibleEndTimePerShip.erase(shipId);
         }
     }
 

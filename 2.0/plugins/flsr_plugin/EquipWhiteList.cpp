@@ -5,6 +5,9 @@ namespace EquipWhiteList
 	const uint TIMER_INTERVAL = 50;
 	const mstime UNMOUNT_CHECK_DELAY = 200;
 
+	const uint NO_PLACE_TO_MOUNT_ID = pub::GetNicknameId("no_place_to_mount");
+	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
+
 	static std::map<uint, std::vector<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
 	static std::map<uint, mstime> delayedClientIdEquipmentChecks;
 
@@ -63,8 +66,8 @@ namespace EquipWhiteList
 
 		if (!illegalEquipments.empty())
 		{
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("no_place_to_mount"));
-			pub::Player::SendNNMessage(clientId, pub::GetNicknameId("loaded_into_cargo_hold"));
+			pub::Player::SendNNMessage(clientId, NO_PLACE_TO_MOUNT_ID);
+			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
 
 			for (const auto& equip : illegalEquipments)
 			{
@@ -129,8 +132,8 @@ namespace EquipWhiteList
 						return;
 				}
 
-				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("no_place_to_mount"));
-				pub::Player::SendNNMessage(clientId, pub::GetNicknameId("loaded_into_cargo_hold"));
+				pub::Player::SendNNMessage(clientId, NO_PLACE_TO_MOUNT_ID);
+				pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
 
 				const auto hardpointString = std::string(hardpoint);
 				for (const auto& equip : Players[clientId].equipDescList.equip)
@@ -163,13 +166,15 @@ namespace EquipWhiteList
 		if (Modules::GetModuleState("EquipWhiteListModule"))
 		{
 			const mstime now = timeInMS() - UNMOUNT_CHECK_DELAY;
+			std::vector<uint> clientIdsToUnmountFrom;
 			for (const auto& timeStampClientId : delayedClientIdEquipmentChecks)
 			{
 				if ((now >= timeStampClientId.second) && HkIsValidClientID(timeStampClientId.first))
-				{
-					UnmountNotAllowedEquipment(timeStampClientId.first, Players[timeStampClientId.first].equipDescList);
-				}
+					clientIdsToUnmountFrom.push_back(timeStampClientId.first);
 			}
+
+			for (const uint clientIdToUnmountFrom : clientIdsToUnmountFrom)
+				UnmountNotAllowedEquipment(clientIdToUnmountFrom, Players[clientIdToUnmountFrom].equipDescList);
 		}
 	}
 }

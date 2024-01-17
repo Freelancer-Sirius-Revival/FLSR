@@ -218,10 +218,14 @@ namespace GroupReputation
     void CleanDestroyedShipRegistry()
     {
         const mstime now = timeInMS();
+        std::vector<uint> shipIdsToRemove;
         for (const auto& shipIdTimeStamp : destroyedShipIdsWithTimeStamp)
         {
             if (shipIdTimeStamp.second + 30000 < now)
-                destroyedShipIdsWithTimeStamp.erase(shipIdTimeStamp.first);
+                shipIdsToRemove.push_back(shipIdTimeStamp.first);
         }
+
+        for (const uint shipId : shipIdsToRemove)
+            destroyedShipIdsWithTimeStamp.erase(shipId);
     }
 }

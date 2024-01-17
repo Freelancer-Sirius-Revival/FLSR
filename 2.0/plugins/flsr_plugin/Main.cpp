@@ -46,49 +46,11 @@ void LoadSettings() {
         //PVP::UpdateDuelRanking(L"test", true);
 
     }
-	
-    // CARRIER-Module ###########################################################################
+
     if (Modules::GetModuleState("CarrierModule"))
     {
-        //Read Settings
-        char szCurDir[MAX_PATH];
-        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scCarrier = std::string(szCurDir) + Globals::CARRIER_CONFIG_FILE;
-        
-        //Lade CarrierIDs
-        Docking::lCarrierConfig.clear();
-        for (int i = 0;; i++) {
-            char szBuf[64];
-            sprintf(szBuf, "Carrier%u", i);
-            std::string CarrierNickname = IniGetS(scCarrier, "Carrier", szBuf, "");
-
-            if (CarrierNickname == "")
-                break;
-
-            // CarrierKonfig in die Liste
-            Docking::CarrierConfig NewCarrierConfig;
-            NewCarrierConfig.iShipArch = CreateID(CarrierNickname.c_str());
-            NewCarrierConfig.iSlots = IniGetI(scCarrier, "Carrierslots", CarrierNickname, 5);
-            NewCarrierConfig.sInterior = IniGetS(scCarrier, "Carrierinterior", CarrierNickname, "Li_Proxy_Li_Battleship_Base");
-			NewCarrierConfig.fx_Undock = IniGetF(scCarrier, "CarrierOffset", CarrierNickname + "-y", 0.0f);
-			NewCarrierConfig.fy_Undock = IniGetF(scCarrier, "CarrierOffset", CarrierNickname + "-z", 0.0f);
-            NewCarrierConfig.fz_Undock = IniGetF(scCarrier, "CarrierOffset", CarrierNickname + "-x", 0.0f);
-
-            //ConPrint(stows(CarrierNickname) + L"\n");
-            //ConPrint(std::to_wstring(NewCarrierConfig.iShipArch) + L"\n");
-            //ConPrint(std::to_wstring(NewCarrierConfig.iSlots) + L"\n");
-
-
-            Docking::lCarrierConfig.push_back(NewCarrierConfig);
-        }
-
-        //LadeCarrier Request Timeout
-        Docking::msRequestTimeout = IniGetI(scCarrier, "CarrierModule", "DockRequestTimeout", 10000);
-        
-        Docking::fDockRange = IniGetF(scCarrier, "CarrierModule", "DockRange", 200.0f);
-
-
-        ConPrint(L"Module loaded: Carrier (" + stows(std::to_string(Docking::lCarrierConfig.size())) + L" Carriers loaded)\n");
+        ConPrint(L"Module loaded: Carrier\n");
+        Docking::LoadSettings();
     }
 
     // POPUP-Module #############################################################################
@@ -362,6 +324,15 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqEquipment_AFTER, PLUGIN_HkIServerImpl_ReqEquipment_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqShipArch_AFTER, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
 
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::ReqShipArch_AFTER, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::SystemSwitchOutComplete_After, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::LaunchComplete_AFTER, PLUGIN_HkIServerImpl_LaunchComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::JumpInComplete_AFTER, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
@@ -373,7 +344,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::UserCmd_Process, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::ExecuteCommandString_Callback,PLUGIN_ExecuteCommandString_Callback, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::CmdHelp_Callback, PLUGIN_CmdHelp_Callback, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::HkCb_AddDmgEntry, PLUGIN_HkCb_AddDmgEntry, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));

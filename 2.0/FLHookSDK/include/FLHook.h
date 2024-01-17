@@ -596,6 +596,7 @@ IMPORT std::wstring GetParam(const std::wstring& wscLine, wchar_t wcSplitChar, u
 IMPORT std::string GetParam(std::string scLine, char cSplitChar, uint iPos);
 IMPORT std::wstring ReplaceStr(const std::wstring& wscSource, const std::wstring& wscSearchFor, const std::wstring& wscReplaceWith);
 IMPORT void IniDelSection(const std::string& scFile, const std::string& scApp);
+IMPORT void IniDelete(const std::string& scFile, const std::string& scApp, const std::string& scKey);
 IMPORT void IniWriteW(const std::string& scFile, const std::string& scApp, const std::string& scKey, const std::wstring& wscValue);
 IMPORT std::wstring IniGetWS(const std::string& scFile, const std::string& scApp, const std::string& scKey, const std::wstring& wscDefault);
 IMPORT std::wstring ToMoneyStr(int iCash);

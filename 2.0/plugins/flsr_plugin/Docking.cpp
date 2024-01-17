@@ -1,511 +1,913 @@
 #include "Main.h"
 
-namespace Docking {
-
-    mstime msRequestTimeout = 10000;
-    float fDockRange = 200.0f;
-    bool Carrier_Module = false;
-    std::list<CarrierList> lCarrierList;
-    std::list<CarrierDockedPlayers> lCarrierDockedPlayers;
-    std::list<CarrierDockRequest> lCarrierDockRequest;
-    std::list<CarrierConfig> lCarrierConfig;
-    std::list<UndockRelocate> lUndockRelocate;
-
-    //Thanks Disco
-    bool FLSR_SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID,unsigned int iSystem,bool bstalkmode) {
-        static PBYTE SwitchOut = 0;
-        if (!SwitchOut) {
-            SwitchOut = (PBYTE)hModServer + 0xf600;
-
-            DWORD dummy;
-            VirtualProtect(SwitchOut + 0xd7, 200, PAGE_EXECUTE_READWRITE, &dummy);
-        }
-
-        Vector pos;
-        Matrix ornt;
-        pub::SpaceObj::GetLocation(iShip, pos, ornt);
-
-        // Patch the system switch out routine to put the ship in a
-        // system of our choosing.
-
-        SwitchOut[0x0d7] = 0xeb; // ignore exit object
-        SwitchOut[0x0d8] = 0x40;
-        SwitchOut[0x119] = 0xbb; // set the destination system
-        *(PDWORD)(SwitchOut + 0x11a) = iSystem;
-        SwitchOut[0x266] = 0x45;               // don't generate warning
-        *(float *)(SwitchOut + 0x2b0) = pos.z; // set entry location
-        *(float *)(SwitchOut + 0x2b8) = pos.y;
-        *(float *)(SwitchOut + 0x2c0) = pos.x;
-        *(float *)(SwitchOut + 0x2c8) = ornt.data[2][2];
-        *(float *)(SwitchOut + 0x2d0) = ornt.data[1][1];
-        *(float *)(SwitchOut + 0x2d8) = ornt.data[0][0];
-        *(float *)(SwitchOut + 0x2e0) = ornt.data[2][1];
-        *(float *)(SwitchOut + 0x2e8) = ornt.data[2][0];
-        *(float *)(SwitchOut + 0x2f0) = ornt.data[1][2];
-        *(float *)(SwitchOut + 0x2f8) = ornt.data[1][0];
-        *(float *)(SwitchOut + 0x300) = ornt.data[0][2];
-        *(float *)(SwitchOut + 0x308) = ornt.data[0][1];
-        *(PDWORD)(SwitchOut + 0x388) = 0x03ebc031; // ignore entry object
-
-        //Adminstalk
-        if (bstalkmode) {
-            //    pub::SpaceObj::SetInvincible(iShip, true, true, 0);
-        } else {
-            //    pub::SpaceObj::SetInvincible(iShip, false, false, 0);
-        }
-
-        Server.SystemSwitchOutComplete(iShip, iClientID);
-        SwitchOut[0x0d7] = 0x0f;
-        SwitchOut[0x0d8] = 0x84;
-        SwitchOut[0x119] = 0x87;
-        *(PDWORD)(SwitchOut + 0x11a) = 0x1b8;
-        *(PDWORD)(SwitchOut + 0x25d) = 0x1cf7f;
-        SwitchOut[0x266] = 0x1a;
-        *(float *)(SwitchOut + 0x2b0) = *(float *)(SwitchOut + 0x2b8) = *(float *)(SwitchOut + 0x2c0) = 0;
-        *(float *)(SwitchOut + 0x2c8) = *(float *)(SwitchOut + 0x2d0) = *(float *)(SwitchOut + 0x2d8) = 1;
-        *(float *)(SwitchOut + 0x2e0) = *(float *)(SwitchOut + 0x2e8) =
-        *(float *)(SwitchOut + 0x2f0) = *(float *)(SwitchOut + 0x2f8) =
-        *(float *)(SwitchOut + 0x300) = *(float *)(SwitchOut + 0x308) = 0;
-        *(PDWORD)(SwitchOut + 0x388) = 0xcf8b178b;
-
-        return true;
-    }
-
-
-
-    // DockOnProxyCarrierBase Beam
-    void DockOnProxyCarrierBase(std::string scBasename, uint iClientID, std::string scCarrierBase, uint iCarrierID) {
-        // Konfigpfad
-        char szCurDir[MAX_PATH];
-        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
-        std::string Charname = wstos(wscCharname);
-        std::wstring wscFilename;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-        std::string scFilename = wstos(wscFilename);
-        //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
-        std::wstring wscCharnameCarrier = (wchar_t *)Players.GetActiveCharacterName(iCarrierID);
-        std::string CharnameCarrier = wstos(wscCharnameCarrier);
-        //std::string base64_CharnameCarrier = Tools::base64_encode((const unsigned char *)CharnameCarrier.c_str(), CharnameCarrier.length());
-        std::wstring wscCarrierFilename;
-        HkGetCharFileName(ARG_CLIENTID(iCarrierID), wscCarrierFilename);
-        std::string scCarrierFilename = wstos(wscCarrierFilename);
-        
-
-        // Speichere Dockdata (prevent Servercrash dataloss)
-        IniWrite(scPluginCfgFile, "Carrier-Docked_" + scFilename, "DockedProxyBase", scBasename);
-        IniWrite(scPluginCfgFile, "Carrier-Docked_" + scFilename, "CarrierDockedBase", scCarrierBase);
-        IniWrite(scPluginCfgFile, "Carrier-Docked_" + scFilename, "CarrierCharname", scCarrierFilename);
-
-        uint iBaseID;
-        if (pub::GetBaseID(iBaseID, scBasename.c_str()) == -4) {
-            return;
-        }
-
-        uint iSysID;
-        pub::Player::GetSystem(iClientID, iSysID);
-        Universe::IBase *base = Universe::get_base(iBaseID);
-
-        pub::Player::ForceLand(iClientID, iBaseID); // beam
-
-        // if not in the same system, emulate F1 charload
-        if (base->iSystemID != iSysID) {
-            Server.BaseEnter(iBaseID, iClientID);
-            Server.BaseExit(iBaseID, iClientID);
-            std::wstring wscCharFileName;
-            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-            wscCharFileName += L".fl";
-            CHARACTER_ID cID;
-            strcpy(cID.szCharFilename, wstos(wscCharFileName.substr(0, 14)).c_str());
-            Server.CharacterSelect(cID, iClientID);
-        }
-        return;
-    }
-
-    // UndockProxyCarrierBase
-    void UndockProxyBase(uint iCarrierId, uint iClientID, float fx_Undock, float fy_Undock, float fz_Undock, bool bstalkmode) {
-        // Konfigpfad
-        char szCurDir[MAX_PATH];
-        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
-        std::string Charname = wstos(wscCharname);
-        //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
-        std::wstring wscFilename;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-        std::string scFilename = wstos(wscFilename);
-        std::string IniNamePlayer = "Carrier-Docked_" + scFilename;
-        std::wstring wscCharnameCarrier = (wchar_t *)Players.GetActiveCharacterName(iCarrierId);
-
-        // Speichere IDS
-        IniWrite(scPluginCfgFile, IniNamePlayer, "ClientID", std::to_string(iClientID));
-
-        // Hole Carrier Schiff
-        uint iShip_Carrier;
-        pub::Player::GetShip(iCarrierId, iShip_Carrier);
-
-        // Hole Carrier System
-        uint iSysIDCarrier;
-        pub::Player::GetSystem(iCarrierId, iSysIDCarrier);
-        IniWrite(scPluginCfgFile, "Carrier-Docked_" + scFilename, "CarrierSys", std::to_string(iSysIDCarrier));
-
-        // HolePlayer Info (Carrier)
-        HKPLAYERINFO p;
-        if (HkGetPlayerInfo((wchar_t *)Players.GetActiveCharacterName(iCarrierId), p, false) != HKE_OK) {
-            PrintUserCmdText(iClientID, L"ERR");
-            return;
-        }
-
-        // Hole Carrier Pos/Rot
-        Vector pos;
-        Matrix rot;
-        pub::SpaceObj::GetLocation(p.iShip, pos, rot);
-
-        // Speichere Carrier Pos - DEBUG
-        // IniWrite(scPluginCfgFile, IniNamePlayer, "CarrierX",
-        // std::to_string(pos.x)); IniWrite(scPluginCfgFile, IniNamePlayer,
-        // "CarrierY", std::to_string(pos.y)); IniWrite(scPluginCfgFile,
-        // IniNamePlayer, "CarrierZ", std::to_string(pos.z));
-
-        // Speichere Carrier Rot - DEBUG
-        // IniWrite(scPluginCfgFile, IniNamePlayer, "CarrierR1",
-        // std::to_string(rot.data[0][0])); IniWrite(scPluginCfgFile, IniNamePlayer,
-        // "CarrierR2", std::to_string(rot.data[0][1])); IniWrite(scPluginCfgFile,
-        // IniNamePlayer, "CarrierR3", std::to_string(rot.data[0][2]));
-        // IniWrite(scPluginCfgFile, IniNamePlayer, "CarrierR4",
-        // std::to_string(rot.data[1][0])); IniWrite(scPluginCfgFile, IniNamePlayer,
-        // "CarrierR5", std::to_string(rot.data[1][1])); IniWrite(scPluginCfgFile,
-        // IniNamePlayer, "CarrierR6", std::to_string(rot.data[1][2]));
-        // IniWrite(scPluginCfgFile, IniNamePlayer, "CarrierR7",
-        // std::to_string(rot.data[2][0])); IniWrite(scPluginCfgFile, IniNamePlayer,
-        // "CarrierR8", std::to_string(rot.data[2][1])); IniWrite(scPluginCfgFile,
-        // IniNamePlayer, "CarrierR9", std::to_string(rot.data[2][2]));
-
-        // Hole Player Schiff
-        uint iShip_Player;
-        pub::Player::GetShip(iClientID, iShip_Player);
-
-        // Hole Player System
-        uint iSysIDPlayer;
-        pub::Player::GetSystem(iClientID, iSysIDPlayer);
-
-        //Überprüfe ob Player im selben System ist wie der Carrier (Sollte niemals vorkommen bei einem Carrier!)
-        if (iSysIDPlayer != iSysIDCarrier) {
-            // Setze Schiff auf Unsichtbar um SPOTANTE SELBST EXPLOSIONEN zu
-            // vermeiden
-            // pub::SpaceObj::SetInvincible(iShip_Player, true, true, 0);
-
-            // Teleport
-           // FLSR_SystemSwitchOutComplete(iShip_Player, iClientID, iSysIDCarrier, bstalkmode);
-            UndockRelocate NewRelocate;
-			NewRelocate.fx_Undock = fx_Undock;
-			NewRelocate.fy_Undock = fy_Undock;
-			NewRelocate.fz_Undock = fz_Undock;
-			NewRelocate.iClientID = iClientID;
-			NewRelocate.pos = pos;
-			NewRelocate.rot = rot;
-			NewRelocate.bStalkMode = bstalkmode;
-            NewRelocate.iShip = iShip_Player;
-			NewRelocate.iSystem = iSysIDCarrier;
-            
-
-            lUndockRelocate.push_back(NewRelocate);
-
-
-
-            //PrintUserCmdText(iClientID, L"SYSBEAM");
-        }
-
-      
-
-        
-        return;
-    }
-
-    void DockRequest3000ms() {
-
-
-
-        
-        // Überprüfe auf DockRequest
-        std::list<CarrierDockRequest>::iterator iterDockRequest = lCarrierDockRequest.begin();
-        while (iterDockRequest != lCarrierDockRequest.end()) {
-            if (!iterDockRequest->bSend) {
-                std::wstring Charname = (wchar_t *)Players.GetActiveCharacterName( iterDockRequest->iPlayerID);
-                PrintUserCmdText(iterDockRequest->iCarrierID, Charname + L" request to dock. Type /dockaccept " + Charname + L" to accept his request.");
-
-                // Update the Request
-                CarrierDockRequest UpdateDockRequest;
-                UpdateDockRequest.iPlayerID = iterDockRequest->iPlayerID;
-                UpdateDockRequest.iCarrierID = iterDockRequest->iCarrierID;
-                UpdateDockRequest.tmRequestTime = iterDockRequest->tmRequestTime;
-                UpdateDockRequest.bSend = true;
-                UpdateDockRequest.sInterior = iterDockRequest->sInterior;
-				UpdateDockRequest.fx_Undock = iterDockRequest->fx_Undock;
-				UpdateDockRequest.fy_Undock = iterDockRequest->fy_Undock;
-				UpdateDockRequest.fz_Undock = iterDockRequest->fz_Undock;
-                lCarrierDockRequest.erase(iterDockRequest);
-                lCarrierDockRequest.push_back(UpdateDockRequest);
-                iterDockRequest = lCarrierDockRequest.begin();
-            }
-
-            iterDockRequest++;
-        }
-    }
-
-    void HandleUndocking(uint iClientID)
+namespace Docking
+{
+    struct CarrierDefinition
     {
-        char szCurDir[MAX_PATH];
-        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
-        std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
-        std::string Charname = wstos(wscCharname);
-        //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
-        std::wstring wscFilename;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-        std::string scFilename = wstos(wscFilename);
+        uint shipArchetypeId = 0;
+        uint slots = 0;
+        std::wstring baseNickname = L"";
+        uint baseId = 0;
+        float dockOffset[3] = { 0,0,0 };
+    };
+    static std::unordered_map<uint, CarrierDefinition> carrierDefinitionByShipArchetypeId;
 
-        //Überprüfe ob der Spieler an einer Carrier-Proxy Base gedockt ist
-        std::string DockedProxyBase = IniGetS(scPluginCfgFile, "Carrier-Docked_" + scFilename, "DockedProxyBase", "");
-        std::string CarrierDockedBase = IniGetS(scPluginCfgFile, "Carrier-Docked_" + scFilename, "CarrierDockedBase", "");
-        if (DockedProxyBase != "" && CarrierDockedBase != "") {
-            // Finde den Carrier
-            bool CarrierFound = false;
-            std::list<CarrierDockedPlayers>::iterator iterDockedPlayers = lCarrierDockedPlayers.begin();
-            while (iterDockedPlayers != lCarrierDockedPlayers.end()) {
+    enum class DockState
+    {
+        Docked,
+        Undocked,
+        Undocking
+    };
 
-                // Ist in der Carrierliste
-                if (iterDockedPlayers->iPlayerID == iClientID) {
-                    // Überprüfe ob Spieler im Space ist
-                    uint iShipCarrier;
-                    pub::Player::GetShip(iterDockedPlayers->iCarrierID, iShipCarrier);
-                    
-                    if (iShipCarrier) {
-                        // Undock
-						UndockProxyBase(iterDockedPlayers->iCarrierID, iClientID, iterDockedPlayers->fx_Undock, iterDockedPlayers->fy_Undock, iterDockedPlayers->fz_Undock, false);
-                        CarrierFound = true;
-                        return;
-                    }
-                }
+    struct CarrierAssignment
+    {
+        std::string characterFileName = "";
+        std::string carrierFileName = "";
+        uint carrierShiparchId = 0;
+        bool assigned = false;
+        DockState dockState = DockState::Undocked;
+    };
+    static std::unordered_map<uint, CarrierAssignment> carrierAssignmentByCharacterFileNameId;
+    static std::unordered_map<uint, std::wstring> lastRegularBaseNameByCharacterFileNameId;
 
-                // Hochzählen
-                iterDockedPlayers++;
-            }
+    struct Location
+    {
+        uint systemId = 0;
+        Vector position;
+        Matrix orientation;
+    };
+    static std::unordered_map<uint, Location> dockLocationByCharacterFileNameIds;
 
-            // Wenn es den Carrier nicht mehr gibt -> Docke Docke an der CarrierBase
-            if (!CarrierFound) {
-                PrintUserCmdText(
-                    iClientID,
-                    L"Carrier not in Space. Docked on last Carrierbase!");
-                HkBeam(wscCharname, stows(CarrierDockedBase));
-                IniDelSection(scPluginCfgFile, "Carrier-Docked_" + scFilename);
-                return;
-            }
-        }
+    struct UndockPath
+    {
+        std::vector<uint> remainingJumpPath;
+        bool targetLastDockLocation = false;
+    };
+    static std::unordered_map<uint, UndockPath> undockPathByClientId;
 
-        // Überprüfe ob der Spieler ein Carrier ist
-        std::list<CarrierList>::iterator iterCarrier = lCarrierList.begin();
-        while (iterCarrier != lCarrierList.end()) {
+    static std::unordered_map<uint, std::vector<uint>> shortestSystemPathToTargets;
+    // The order of systems to jump through is reversed to use pop_back() when traversing a path.
+    static std::unordered_map<uint, std::vector<uint>> shortestJumpObjectPathToTargets;
 
-            // Spieler ist selbst ein Carrier
-            if (iterCarrier->iCarrierID == iClientID) {
+    static uint dockSystemId = 0;
+    static float dockRadius = 100.0f;
 
-                //Überprüfe ob Spielerschiff ein Carrierschiff ist
-                std::list<CarrierConfig>::iterator iterCarrierConfig = lCarrierConfig.begin();
-                bool CarrierShip = false;
-                bool iCarrierSlots = 0;
-				float x_Undock = 0.0f;
-				float y_Undock = 0.0f;
-				float z_Undock = 0.0f;
-                
-                std::string sCarrierInterior = "";
-                // Get ShipArchID
-                uint iShipArchIDPlayer;
-                pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-                while (iterCarrierConfig != lCarrierConfig.end()) {
-                    if (iShipArchIDPlayer == iterCarrierConfig->iShipArch) {
+    static std::set<uint> carrierClientIdInJump;
 
-                        CarrierShip = true;
-                        iCarrierSlots = iterCarrierConfig->iSlots;
-                        sCarrierInterior = iterCarrierConfig->sInterior;
-						x_Undock = iterCarrierConfig->fx_Undock;
-						y_Undock = iterCarrierConfig->fy_Undock;
-						z_Undock = iterCarrierConfig->fz_Undock;
-                        
-                      
-                    }
+    std::string GetCarrierMapFilePath()
+    {
+        return scAcctPath + "\\carriers.ini";
+    }
 
-                    // Hochzählen
-                    iterCarrierConfig++;
-                }
+    std::string GetCharacterFileName(const uint clientId)
+    {
+        if(!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+            return "";
+        std::wstring characterFileNameWS;
+        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) != HKE_OK)
+            return "";
+        return wstos(characterFileNameWS);
+    }
 
-                if (!CarrierShip) {
+    void AssignCharacterToCarrier(const std::string& characterFileName, const std::string& carrierFileName, const uint carrierShiparchId)
+    {
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName = carrierFileName;
+        carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = true;
+        carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierShiparchId = carrierShiparchId;
+        const std::string carrierFilePath = GetCarrierMapFilePath();
+        IniWrite(carrierFilePath, characterFileName, "assignment", carrierFileName + ", true");
+        IniWrite(carrierFilePath, characterFileName, "carrier_shiparchetype", std::to_string(carrierShiparchId));
+    }
 
-                    // Disable Carrier
-                    std::list<CarrierList>::iterator iterCarrierDisable = lCarrierList.begin();
-                    while (iterCarrierDisable != lCarrierList.end()) {
-
-                        if (iterCarrierDisable->iCarrierID == iClientID) {
-                            lCarrierList.erase(iterCarrierDisable);
-                           // PrintUserCmdText(iClientID, L"Your ship has no carrier ability!");
-                            return;
-                        }
-
-                        // Hochzählen
-                        iterCarrierDisable++;
-                    }
-                } else {
-
-
-                    // Set Carrier Slots & Interior & UndockOffsets
-                    std::list<CarrierList>::iterator iterCarrierSlots = lCarrierList.begin();
-                    while (iterCarrierSlots != lCarrierList.end()) {
-
-                        if (iterCarrierSlots->iCarrierID == iClientID) {
-
-                            //PrintUserCmdText(iClientID, L"U are now a Carrier!");
-
-                            // Carrier mit Slots & Interior in die Liste
-                            CarrierList NewCarrier;
-                            NewCarrier.iCarrierID = iterCarrierSlots->iCarrierID;
-                            NewCarrier.iBaseDocked = iterCarrierSlots->iBaseDocked;
-                            NewCarrier.iDockedPlayers = iterCarrierSlots->iDockedPlayers;
-                            NewCarrier.iSlots = iCarrierSlots;
-                            NewCarrier.Interior = sCarrierInterior;
-							NewCarrier.fx_Undock = x_Undock;
-							NewCarrier.fy_Undock = y_Undock;
-							NewCarrier.fz_Undock = z_Undock;
-
-                            lCarrierList.erase(iterCarrierSlots);
-                            lCarrierList.push_back(NewCarrier);
-
-                            return;
-                        }
-
-                        // Hochzählen
-                        iterCarrierSlots++;
-                    }
-                }
-
-                return;
-            }
-
-            // Hochzählen
-            iterCarrier++;
+    void UnassignCharacterFromCarrier(const std::string& characterFileName, const std::string& carrierFileName)
+    {
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
+        {
+            carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = false;
+            IniWrite(GetCarrierMapFilePath(), characterFileName, "assignment", carrierFileName + ", false");
         }
     }
 
+    void DisconnectCharacterFromCarrier(const std::string& characterFileName, const std::string& carrierFileName)
+    {
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
+        {
+            carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName = "";
+            carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = false;
+            IniDelete(GetCarrierMapFilePath(), characterFileName, "assignment");
+        }
+    }
 
-    void DOCKACCEPT_ALL(uint iClientID) {
-        if (Modules::GetModuleState("CarrierModule")) {
-			uint iClientCarrierID = iClientID;
+    void DeleteCharacterCarrierDockLocation(const std::string& characterFileName)
+    {
+        dockLocationByCharacterFileNameIds.erase(CreateID(characterFileName.c_str()));
+        IniDelete(GetCarrierMapFilePath(), characterFileName, "carrier_dock_location");
+    }
 
-           // ConPrint(L"asdf\n");
-            // Suche dockrequest
-            std::list<Docking::CarrierDockRequest>::iterator iterDockRequest = Docking::lCarrierDockRequest.begin();
-            while (iterDockRequest != Docking::lCarrierDockRequest.end()) {
+    void RemoveCharacterFromCarrier(const std::string& characterFileName)
+    {
+        carrierAssignmentByCharacterFileNameId.erase(CreateID(characterFileName.c_str()));
+        IniDelete(GetCarrierMapFilePath(), characterFileName, "assignment");
+        IniDelete(GetCarrierMapFilePath(), characterFileName, "dock_state");
+        DeleteCharacterCarrierDockLocation(characterFileName);
+    }
 
-              //  ConPrint(L"asdf1\n");
+    bool IsCarrierBase(const uint baseId)
+    {
+        for (const auto& carrierDefinition : carrierDefinitionByShipArchetypeId)
+        {
+            if (carrierDefinition.second.baseId == baseId)
+                return true;
+        }
+        return false;
+    }
 
-                
-                // Nur eigene dockrequests
-                if (iterDockRequest->iCarrierID == iClientCarrierID) {
-                 //   ConPrint(L"asdf2\n");
+    void SaveCharacterLastRegularBase(const std::string& characterFileName, const uint baseId)
+    {
+        if (IsCarrierBase(baseId))
+            return;
+        const std::wstring baseName = HkGetBaseNickByID(baseId);
+        lastRegularBaseNameByCharacterFileNameId[CreateID(characterFileName.c_str())] = baseName;
+        IniWrite(GetCarrierMapFilePath(), characterFileName, "last_regular_base", wstos(baseName));
+    }
 
+    void SaveCharacterCarrierDockLocation(const std::string& characterFileName, const uint systemId, const Vector& position, const Matrix& orientation)
+    {
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        Location location;
+        location.systemId = systemId;
+        location.position = position;
+        location.orientation = orientation;
+        dockLocationByCharacterFileNameIds[characterFileNameId] = location;
+        IniWrite(GetCarrierMapFilePath(), characterFileName, "carrier_dock_location", std::to_string(systemId) + ", " +
+            std::to_string(position.x) + ", " + std::to_string(position.y) + ", " + std::to_string(position.z) + ", " +
+            std::to_string(orientation.data[0][0]) + ", " + std::to_string(orientation.data[0][1]) + ", " + std::to_string(orientation.data[0][2]) + ", " +
+            std::to_string(orientation.data[1][0]) + ", " + std::to_string(orientation.data[1][1]) + ", " + std::to_string(orientation.data[1][2]) + ", " +
+            std::to_string(orientation.data[2][0]) + ", " + std::to_string(orientation.data[2][1]) + ", " + std::to_string(orientation.data[2][2])
+        );
+    }
 
-                   // PrintUserCmdText(iClientID, stows(iterDockRequest->sInterior));
+    void SaveCharacterDockState(const std::string& characterFileName, const DockState dockState)
+    {
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        carrierAssignmentByCharacterFileNameId[characterFileNameId].dockState = dockState;
+        std::string dockStateString;
+        switch (dockState)
+        {
+        case DockState::Docked:
+            dockStateString = "docked";
+            break;
+        case DockState::Undocked:
+            dockStateString = "undocked";
+            break;
+        case DockState::Undocking:
+            dockStateString = "undocking";
+            break;
+        }
+        IniWrite(GetCarrierMapFilePath(), characterFileName, "dock_state", dockStateString);
+    }
 
-                    //Überprüfe die Distanz
-                    uint CarrierShip;
-                    pub::Player::GetShip(iClientCarrierID, CarrierShip);
-                    uint RequestedShip;
-                    pub::Player::GetShip(iterDockRequest->iPlayerID, RequestedShip);
-                    if (HkDistance3DByShip(CarrierShip, RequestedShip) < Docking::fDockRange) {
-
-                        // Docke Player
-                        Docking::CarrierDockedPlayers NewDockedPlayer;
-                        NewDockedPlayer.iCarrierID = iClientCarrierID;
-                        NewDockedPlayer.iPlayerID = iterDockRequest->iPlayerID;
-                        NewDockedPlayer.fx_Undock = iterDockRequest->fx_Undock;
-                        NewDockedPlayer.fy_Undock = iterDockRequest->fy_Undock;
-                        NewDockedPlayer.fz_Undock = iterDockRequest->fz_Undock;
-
-                        Docking::lCarrierDockedPlayers.push_back(NewDockedPlayer);
-
-                        PrintUserCmdText(iClientCarrierID, L"OK!");
-                       // PrintUserCmdText(iClientID, stows(iterDockRequest->sInterior));
-
-                        // Lande Player auf ProxyBase
-                        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-
-                        std::wstring wscDir;
-                        if (!HKHKSUCCESS(HkGetAccountDirName(wscCharname, wscDir)))
-                            break;
-
-                        std::wstring wscFile;
-                        HkGetCharFileName(wscCharname, wscFile);
-                        std::string scCharFile = scAcctPath + wstos(wscDir) + "\\" + wstos(wscFile) + ".fl";
-                        std::string scBasename = IniGetS(scCharFile, "Player", "base", "");
-                        if (scBasename == "")
-                        {
-                            scBasename = IniGetS(scCharFile, "Player", "last_base", "");
-                        }
-                        
-                        Docking::DockOnProxyCarrierBase(iterDockRequest->sInterior, iterDockRequest->iPlayerID, scBasename, iClientCarrierID);
-
-                        Docking::lCarrierDockRequest.erase(iterDockRequest);
-
-                    }
-                    else 
+    void ReadCharacterData()
+    {
+        INI_Reader ini;
+        if (ini.open(GetCarrierMapFilePath().c_str(), false))
+        {
+            while (ini.read_header())
+            {
+                std::string characterFileName = std::string(ini.get_header_ptr());
+                const uint characterFileNameId = CreateID(characterFileName.c_str());
+                while (ini.read_value())
+                {
+                    CarrierAssignment& assignment = carrierAssignmentByCharacterFileNameId[characterFileNameId];
+                    if (ini.is_value("assignment"))
                     {
-                        std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iterDockRequest->iPlayerID);
-                        PrintUserCmdText(iClientCarrierID, L"Player " + wscCharname + L" is too far away!");
-                        PrintUserCmdText(iterDockRequest->iPlayerID, L"U are too far away to Dock!");
+                        assignment.characterFileName = characterFileName;
+                        assignment.carrierFileName = ini.get_value_string(0);
+                        assignment.assigned = ini.get_bool(1);
+                    }
+                    if (ini.is_value("carrier_shiparchetype"))
+                        assignment.carrierShiparchId = ini.get_value_int(0);
+                    if (ini.is_value("dock_state"))
+                    {
+                        std::string dockState = ini.get_value_string(0);
+                        std::transform(dockState.begin(), dockState.end(), dockState.begin(), ::tolower);
+                        if (dockState.compare("undocked") == 0)
+                            assignment.dockState = DockState::Undocked;
+                        else if (dockState.compare("undocking") == 0)
+                            assignment.dockState = DockState::Undocking;
+                        else if (dockState.compare("docked") == 0)
+                            assignment.dockState = DockState::Docked;
+                    }
+                    if (ini.is_value("last_regular_base"))
+                        lastRegularBaseNameByCharacterFileNameId[characterFileNameId] = stows(std::string(ini.get_value_string(0)));
+                    if (ini.is_value("carrier_dock_location"))
+                    {
+                        Location& location = dockLocationByCharacterFileNameIds[characterFileNameId];
+                        location.systemId = ini.get_value_int(0);
+                        location.position.x = ini.get_value_float(1);
+                        location.position.y = ini.get_value_float(2);
+                        location.position.z = ini.get_value_float(3);
+                        location.orientation.data[0][0] = ini.get_value_float(4);
+                        location.orientation.data[0][1] = ini.get_value_float(5);
+                        location.orientation.data[0][2] = ini.get_value_float(6);
+                        location.orientation.data[1][0] = ini.get_value_float(7);
+                        location.orientation.data[1][1] = ini.get_value_float(8);
+                        location.orientation.data[1][2] = ini.get_value_float(9);
+                        location.orientation.data[2][0] = ini.get_value_float(10);
+                        location.orientation.data[2][1] = ini.get_value_float(11);
+                        location.orientation.data[2][2] = ini.get_value_float(12);
+                    }
+                }
+            }
+            ini.close();
+        }
+    }
+
+    void LoadSettings()
+    {
+        char currentDirectory[MAX_PATH];
+        GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
+        const std::string configFilePath = std::string(currentDirectory) + Globals::CARRIER_CONFIG_FILE;
+
+        carrierDefinitionByShipArchetypeId.clear();
+        INI_Reader ini;
+        if (ini.open(configFilePath.c_str(), false))
+        {
+            while (ini.read_header())
+            {
+                if (ini.is_header("General"))
+                {
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("dock_system"))
+                            dockSystemId = CreateID(ini.get_value_string(0));
+                        if (ini.is_value("dock_radius"))
+                            dockRadius = ini.get_value_float(0);
+                    }
+                }
+
+                if (ini.is_header("Ship"))
+                {
+                    CarrierDefinition definition;
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("ship_nickname"))
+                            definition.shipArchetypeId = CreateID(ini.get_value_string(0));
+                        else if (ini.is_value("slots"))
+                            definition.slots = ini.get_value_int(0);
+                        else if (ini.is_value("base_nickname"))
+                        {
+                            definition.baseNickname = stows(ini.get_value_string(0));
+                            definition.baseId = CreateID(ini.get_value_string(0));
+                        }
+                        else if (ini.is_value("dock_offset"))
+                        {
+                            definition.dockOffset[0] = ini.get_value_float(0);
+                            definition.dockOffset[1] = ini.get_value_float(1);
+                            definition.dockOffset[2] = ini.get_value_float(2);
+                        }
+                    }
+                    if (definition.shipArchetypeId && ((definition.slots > 0 && !definition.baseNickname.empty()) || definition.slots == 0))
+                        carrierDefinitionByShipArchetypeId[definition.shipArchetypeId] = definition;
+                }
+            }
+            ini.close();
+        }
+
+        if (!dockSystemId)
+            return;
+
+        std::string systemsShortestPathFilePath = "";
+        if (ini.open("freelancer.ini", false))
+        {
+            while (ini.read_header() && systemsShortestPathFilePath.empty())
+            {
+                if (ini.is_header("Freelancer"))
+                {
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("data path"))
+                        {
+                            systemsShortestPathFilePath = ini.get_value_string(0);
+                            systemsShortestPathFilePath += "\\UNIVERSE\\systems_shortest_path.ini";
+                            break;
+                        }
+                    }
+                }
+            }
+            ini.close();
+        }
+
+        if (!systemsShortestPathFilePath.empty() && ini.open(systemsShortestPathFilePath.c_str(), false))
+        {
+            while (ini.read_header())
+            {
+                if (ini.is_header("SystemConnections"))
+                {
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("Path") && CreateID(ini.get_value_string(0)) == dockSystemId)
+                        {
+                            const uint targetId = CreateID(ini.get_value_string(1));
+                            if (!targetId)
+                                continue;
+                            uint pos = 2;
+                            std::string value = ini.get_value_string(pos++);
+                            while (!value.empty())
+                            {
+                                shortestSystemPathToTargets[targetId].push_back(CreateID(value.c_str()));
+                                value = ini.get_value_string(pos++);
+                            }
+                        }
+                    }
+                }
+            }
+            ini.close();
+        }
+    }
+
+    static bool initialized = false;
+
+    // This must be executed AFTER LoadSettings and when the game data has already been stored to memory.
+    void InitializeWithGameData()
+    {
+        if (initialized)
+            return;
+        initialized = true;
+
+        std::vector<CSolar*> jumpObjects;
+        CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
+        while (solar = static_cast<CSolar*>(solar->FindNext()))
+        {
+            uint type;
+            pub::SpaceObj::GetType(solar->iID, type);
+            if (type == OBJ_AIRLOCK_GATE)
+                jumpObjects.push_back(solar);
+        }
+
+        for (const auto& systemPath : shortestSystemPathToTargets)
+        {
+            std::vector<uint> foundJumpObjectIds;
+            for (size_t index = 1; index < systemPath.second.size(); index++)
+            {
+                for (const auto& jumpObject : jumpObjects)
+                {
+                    if (jumpObject->iSystem == systemPath.second[index - 1] && jumpObject->get_dest_system() == systemPath.second[index])
+                    {
+                        foundJumpObjectIds.push_back(jumpObject->iID);
                         break;
                     }
                 }
-            
-            // Hochzählen
-            iterDockRequest++;
             }
+            // Only keep those entries which have the same amount of jump objects as system transitions are necessary (systemPath - 1). Otherwise it would be an incomplete path.
+            if (foundJumpObjectIds.size() == systemPath.second.size() - 1)
+            {
+                std::reverse(foundJumpObjectIds.begin(), foundJumpObjectIds.end());
+                shortestJumpObjectPathToTargets[systemPath.first] = foundJumpObjectIds;
+            }
+        }
 
+        ReadCharacterData();
+    }
+
+    bool AreInSameGroup(const uint clientAId, const uint clientBId)
+    {
+        if (!HkIsValidClientID(clientAId) || !HkIsValidClientID(clientBId))
+            return false;
+
+        std::list<GROUP_MEMBER> members;
+        if (HkGetGroupMembers(ARG_CLIENTID(clientAId), members) == HKE_OK)
+        {
+            for (const auto& member : members)
+            {
+                if (member.iClientID == clientBId)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    void TryDock(const uint clientId)
+    {
+        const std::string& clientFileName = GetCharacterFileName(clientId);
+        if (clientFileName.empty())
+            return;
+
+        uint systemId;
+        pub::Player::GetSystem(clientId, systemId);
+        if (!systemId)
+            return;
+
+        uint shipId;
+        pub::Player::GetShip(clientId, shipId);
+        if (!shipId)
+            return;
+
+        uint targetId;
+        pub::SpaceObj::GetTarget(shipId, targetId);
+        if (!targetId)
+            return;
+
+        uint targetClientId = HkGetClientIDByShip(targetId);
+        if (!targetClientId)
+            return;
+
+        uint targetShiparchId;
+        pub::Player::GetShipID(targetClientId, targetShiparchId);
+        if (!targetShiparchId)
+            return;
+
+        const std::string& targetFileName = GetCharacterFileName(targetClientId);
+        if (targetFileName.empty())
+            return;
+        const uint targetFileNameId = CreateID(targetFileName.c_str());
+
+        if (!carrierDefinitionByShipArchetypeId.contains(targetShiparchId) || carrierDefinitionByShipArchetypeId[targetShiparchId].slots == 0)
+            return;
+
+        uint clientShiparchId;
+        pub::Player::GetShipID(clientId, clientShiparchId);
+        if (carrierDefinitionByShipArchetypeId.contains(clientShiparchId))
+        {
+            PrintUserCmdText(clientId, L"Your ship is too big for carriers!");
+            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+            return;
+        }
+
+        if (Cloak::GetClientCloakState(clientId) != Cloak::CloakState::Uncloaked)
+        {
+            PrintUserCmdText(clientId, L"Docking with activated cloak not possible!");
+            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+            return;
+        }
+
+        const auto& carrierDefinition = carrierDefinitionByShipArchetypeId[targetShiparchId];
+
+        if (!AreInSameGroup(clientId, targetClientId))
+        {
+            PrintUserCmdText(clientId, L"The carrier must be in the same group as yours!");
+            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("dock_disallowed"));
+            return;
+        }
+
+        if (Cloak::GetClientCloakState(targetClientId) != Cloak::CloakState::Uncloaked)
+        {
+            PrintUserCmdText(clientId, L"The carrier must be fully uncloaked to dock!");
+            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+            return;
+        }
+
+        //uint filledSlots = 0;
+        //for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
+        //{
+        //    if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == targetFileNameId)
+        //        filledSlots++;
+        //}
+
+        //if (filledSlots >= carrierDefinition.slots)
+        //{
+        //    PrintUserCmdText(clientId, L"The carrier is already full!");
+        //    pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+        //    return;
+        //}
+
+        Vector shipVector;
+        Matrix shipRotation;
+        pub::SpaceObj::GetLocation(shipId, shipVector, shipRotation);
+        Vector targetVector;
+        Matrix targetRotation;
+        pub::SpaceObj::GetLocation(targetId, targetVector, targetRotation);
+        TranslateY(targetVector, targetRotation, carrierDefinition.dockOffset[0]);
+        TranslateZ(targetVector, targetRotation, carrierDefinition.dockOffset[1]);
+        TranslateX(targetVector, targetRotation, carrierDefinition.dockOffset[2]);
+        if (HkDistance3D(shipVector, targetVector) > dockRadius)
+        {
+            PrintUserCmdText(clientId, L"Too far away from carrier's dock!");
+            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("nnv_dock_too_far"));
+            return;
+        }
+
+        if (HkBeam(ARG_CLIENTID(clientId), carrierDefinition.baseNickname) == HKE_OK)
+        {
+            AssignCharacterToCarrier(clientFileName, targetFileName, carrierDefinition.shipArchetypeId);
+            SaveCharacterCarrierDockLocation(clientFileName, systemId, shipVector, shipRotation);
         }
     }
 
-    
-    void ClearCarrier(uint iClientID)
+    uint FindCarrierClientIdBySlottedClientId(const uint slottedClientId)
     {
-        char szCurDir[MAX_PATH];
-        GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-        std::string scPluginCfgFile = std::string(szCurDir) + Globals::DOCK_CONFIG_FILE;
-        std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-        std::string Charname = wstos(wscCharname);
-        //std::string base64_Charname = Tools::base64_encode((const unsigned char *)Charname.c_str(), Charname.length());
-        std::wstring wscFilename;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-        std::string scFilename = wstos(wscFilename);
+        const std::string& fileName = GetCharacterFileName(slottedClientId);
+        if (fileName.empty())
+            return 0;
+        const uint fileNameId = CreateID(fileName.c_str());
+        if (!carrierAssignmentByCharacterFileNameId.contains(fileNameId) || carrierAssignmentByCharacterFileNameId[fileNameId].carrierFileName.empty())
+            return 0;
 
-        //Überprüfe ob der Spieler an einer Carrier-Proxy Base gedockt ist
-        std::string DockedProxyBase = IniGetS(scPluginCfgFile, "Carrier-Docked_" + scFilename, "DockedProxyBase", "");
-        std::string CarrierDockedBase = IniGetS(scPluginCfgFile, "Carrier-Docked_" + scFilename, "CarrierDockedBase", "");
-        if (DockedProxyBase != "" && CarrierDockedBase != "") {
+        PlayerData* playerData = 0;
+        while (playerData = Players.traverse_active(playerData))
+        {
+            const uint clientId = HkGetClientIdFromPD(playerData);
+            if (strcmp(carrierAssignmentByCharacterFileNameId[fileNameId].carrierFileName.c_str(), GetCharacterFileName(clientId).c_str()) == 0)
+                return clientId;
+        }
+        return 0;
+    }
 
-            uint iDockedProxyBaseID;
-            if (pub::GetBaseID(iDockedProxyBaseID, DockedProxyBase.c_str()) == -4) {
+    bool IsCarrierReachable(const uint clientId, const uint carrierId)
+    {
+        if (!HkIsValidClientID(carrierId))
+            return false;
+
+        if (HkIsInCharSelectMenu(carrierId))
+            return false;
+
+        uint carrierShipId;
+        pub::Player::GetShip(carrierId, carrierShipId);
+        if (carrierShipId)
+        {
+            if (Cloak::GetClientCloakState(carrierId) != Cloak::CloakState::Uncloaked)
+            {
+                PrintUserCmdText(clientId, L"Carrier is cloaked. Cannot undock.");
+                pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));
+                pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
+                return false;
+            }
+
+            if (carrierClientIdInJump.contains(carrierId))
+            {
+                PrintUserCmdText(clientId, L"Carrier is jumping. Cannot undock.");
+                pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));
+                pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
+                return false;
+            }
+
+            const CShip* carrierShip = (CShip*)CObject::Find(carrierShipId, CObject::CSHIP_OBJECT);
+            if (carrierShip && carrierShip->is_using_tradelane())
+            {
+                PrintUserCmdText(clientId, L"Carrier is in Trade Lane. Cannot undock.");
+                pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));
+                pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
+                return false;
+            }
+        }
+
+        // This means the carrier should be docked on a base.
+        return true;
+    }
+
+    const enum JumpState
+    {
+        NoJumpPath,
+        DestinationReached,
+        Jumping,
+        Error
+    };
+
+    JumpState TryJumpToNextSystem(const uint clientId)
+    {
+        if (!undockPathByClientId.contains(clientId))
+            return JumpState::NoJumpPath;
+
+        if (undockPathByClientId[clientId].remainingJumpPath.size() == 0)
+            return JumpState::DestinationReached;
+
+        uint shipId;
+        pub::Player::GetShip(clientId, shipId);
+        if (shipId)
+        {
+            pub::SpaceObj::InstantDock(shipId, undockPathByClientId[clientId].remainingJumpPath.back(), 1);
+            undockPathByClientId[clientId].remainingJumpPath.pop_back();
+            return JumpState::Jumping;
+        }
+        return JumpState::Error;
+    }
+
+    bool TryReachCarrier(const uint clientId)
+    {
+        if (!HkIsValidClientID(clientId))
+            return false;
+
+        const std::string& clientFileName = GetCharacterFileName(clientId);
+        if (clientFileName.empty())
+            return false;
+        const uint clientFileNameId = CreateID(clientFileName.c_str());
+
+        if (undockPathByClientId.contains(clientId) && undockPathByClientId[clientId].targetLastDockLocation)
+        {
+            // Try to jump to the carrier.
+            switch (TryJumpToNextSystem(clientId))
+            {
+                // The player reached the destination system and should now be moved to the last docking location.
+                case JumpState::DestinationReached:
+                {
+                    if (!dockLocationByCharacterFileNameIds.contains(clientFileNameId))
+                        return false;
+
+                    HkRelocateClient(clientId, dockLocationByCharacterFileNameIds[clientFileNameId].position, dockLocationByCharacterFileNameIds[clientFileNameId].orientation);
+                    undockPathByClientId.erase(clientId);
+
+                    // TODO: Set last regular base for respawn!!
+
+                    RemoveCharacterFromCarrier(clientFileName);
+                    return true;
+                }
+
+                // The player is still on the way to the target system.
+                case JumpState::Jumping:
+                    return true;
+            }
+
+            return false;
+        }
+
+        const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
+        // Check if the carrier is currently reachable by jumps or base-docking.
+        if (!IsCarrierReachable(clientId, carrierId) || !undockPathByClientId.contains(clientId))
+        {
+            // Beam back to where the player came from.
+            const std::string& clientFileName = GetCharacterFileName(clientId);
+            if (clientFileName.empty())
+                return false;
+            const uint shiparchId = carrierAssignmentByCharacterFileNameId[clientFileNameId].carrierShiparchId;
+            if (!carrierDefinitionByShipArchetypeId.contains(shiparchId))
+                return false; // TODO: Jumps to this when carrier has a new non-carrier ship
+            HkBeam(ARG_CLIENTID(clientId), carrierDefinitionByShipArchetypeId[shiparchId].baseNickname);
+            return false;
+        }
+
+        // Check if the carrier is currently docked.
+        uint carrierShipId;
+        pub::Player::GetShip(carrierId, carrierShipId);
+        if (!carrierShipId)
+        {
+            std::wstring baseName;
+            // Beam the player to the same base the carrier currently is docked on.
+            uint baseId;
+            pub::Player::GetBase(carrierId, baseId);
+            // baseId can be empty if carrier just died.
+            if (baseId)
+                baseName = HkGetBaseNickByID(baseId);
+            else
+                baseName = lastRegularBaseNameByCharacterFileNameId[CreateID(GetCharacterFileName(carrierId).c_str())];
+
+            return !baseName.empty() && (HkBeam(ARG_CLIENTID(clientId), baseName) == HKE_OK);
+        }
+
+        // Try to jump to the carrier.
+        switch (TryJumpToNextSystem(clientId))
+        {
+            // The player reached the destination system and should now be moved to the carrier.
+            case JumpState::DestinationReached:
+            {
+                uint carrierShiparchId;
+                pub::Player::GetShipID(carrierId, carrierShiparchId);
+                uint carrierShipId;
+                pub::Player::GetShip(carrierId, carrierShipId);
+                if (!carrierShiparchId || !carrierShipId || !carrierDefinitionByShipArchetypeId.contains(carrierShiparchId))
+                    return false;
+                Vector carrierVector;
+                Matrix carrierRotation;
+                pub::SpaceObj::GetLocation(carrierShipId, carrierVector, carrierRotation);
+                const auto& dockOffset = carrierDefinitionByShipArchetypeId[carrierShiparchId].dockOffset;
+                TranslateY(carrierVector, carrierRotation, dockOffset[0]);
+                TranslateZ(carrierVector, carrierRotation, dockOffset[1]);
+                TranslateX(carrierVector, carrierRotation, dockOffset[2]);
+                HkRelocateClient(clientId, carrierVector, carrierRotation);
+                undockPathByClientId.erase(clientId);
+                if (carrierAssignmentByCharacterFileNameId[clientFileNameId].assigned)
+                    SaveCharacterDockState(clientFileName, DockState::Undocked);
+                else
+                    RemoveCharacterFromCarrier(clientFileName);
+                return true;
+            }
+
+            // The player is still on the way to the target system.
+            case JumpState::Jumping:
+                return true;
+        }
+
+        return false;
+    }
+
+    void __stdcall LaunchComplete(unsigned int objectId, unsigned int shipId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CarrierModule"))
+        {
+            const uint clientId = HkGetClientIDByShip(shipId);
+            if (!clientId)
+                return;
+
+            const std::string& fileName = GetCharacterFileName(clientId);
+            if (fileName.empty())
+                return;
+
+            const uint fileNameId = CreateID(fileName.c_str());
+
+            // Check if the undock happened from a carrier base.
+            uint baseId;
+            pub::SpaceObj::GetDockingTarget(objectId, baseId);
+            const CarrierAssignment& assignment = carrierAssignmentByCharacterFileNameId[fileNameId];
+            if (!carrierDefinitionByShipArchetypeId.contains(assignment.carrierShiparchId) || carrierDefinitionByShipArchetypeId[assignment.carrierShiparchId].baseId != baseId)
+                return;
+
+            // Check if the player is related to any carrier.
+            if (!carrierAssignmentByCharacterFileNameId.contains(fileNameId))
+            {
+                if (lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
+                    HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]);
+
                 return;
             }
-			
-            if (iDockedProxyBaseID != ClientInfo[iClientID].iLastExitedBaseID)
+
+            uint targetSystemId = 0;
+            const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
+            if (carrierId)
             {
-                //Undock from Carrier
-                IniDelSection(scPluginCfgFile, "Carrier-Docked_" + scFilename);
-
+                uint carrierSystemId;
+                pub::Player::GetSystem(carrierId, carrierSystemId);
+                if (carrierSystemId)
+                {
+                    targetSystemId = carrierSystemId;
+                    undockPathByClientId[clientId].targetLastDockLocation = false;
+                }
             }
-            
 
+            // If the carrier is not to be found in any system.
+            if (!targetSystemId && dockLocationByCharacterFileNameIds.contains(fileNameId))
+            {
+                // Target the location where the player docked to the carrier.
+                undockPathByClientId[clientId].targetLastDockLocation = true;
+                targetSystemId = dockLocationByCharacterFileNameIds[fileNameId].systemId;
+            }
+
+            // Check if a path to the target system exists.
+            if (shortestJumpObjectPathToTargets.contains(targetSystemId))
+            {
+                undockPathByClientId[clientId].remainingJumpPath = shortestJumpObjectPathToTargets[targetSystemId];
+            }
+            else
+            {
+                PrintUserCmdText(clientId, L"BUG: Cannot find target system. Report to developer: " + std::to_wstring(targetSystemId));
+                undockPathByClientId.erase(clientId);
+            }
+
+            TryReachCarrier(clientId);
         }
-        
     }
 
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CarrierModule"))
+        {
+            uint clientId = HkGetClientIDByShip(shipId);
+            if (clientId)
+                carrierClientIdInJump.erase(clientId);
+        }
+    }
+
+    int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CarrierModule"))
+        {
+            const uint clientId = HkGetClientIDByShip(shipId);
+            if (!clientId)
+                return 0;
+
+            carrierClientIdInJump.erase(clientId);
+
+            // Cancel docking?
+            if (dockPortIndex == -1)
+                return 0;
+
+            uint shiparchId;
+            pub::Player::GetShipID(clientId, shiparchId);
+            if (!shiparchId)
+                return 0;
+
+            if (carrierDefinitionByShipArchetypeId.contains(shiparchId))
+            {
+                uint dockTargetType;
+                pub::SpaceObj::GetType(dockTargetId, dockTargetType);
+                if (dockTargetType == OBJ_JUMP_HOLE || dockTargetType == OBJ_JUMP_GATE)
+                    carrierClientIdInJump.insert(clientId);
+                
+                return 0;
+            }
+        }
+
+        return 0;
+    }
+
+    // AIRLOCK_GATE objects do not trigger JumpOutComplete and thus SystemSwitchOutComplete must be used.
+    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CarrierModule") && undockPathByClientId.contains(clientId))
+        {
+            TryReachCarrier(clientId);
+        }
+    }
+
+    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CarrierModule"))
+        {
+            carrierClientIdInJump.erase(clientId);
+            undockPathByClientId.erase(clientId);
+
+            // Check if the player is related to any carrier.
+            const std::string& fileName = GetCharacterFileName(clientId);
+            if (!fileName.empty() && carrierAssignmentByCharacterFileNameId.contains(CreateID(fileName.c_str())))
+            {
+                auto& assignment = carrierAssignmentByCharacterFileNameId[CreateID(fileName.c_str())];
+                // Do nothing if fully undocked.
+                if (assignment.dockState == DockState::Undocked)
+                    return;
+
+                // TODO This will cause the player never be able to leave the base. TryReachCarrier will always teleport back when no undockPath given
+                // Shortcut check if carrier is even reachable. Leads to instant beam back.
+                //uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
+                //if (carrierId && !IsCarrierReachable(clientId, carrierId))
+                //    SaveCharacterDockState(fileName, DockState::Undocking);
+
+                // When logging into space.
+                if (assignment.dockState == DockState::Undocking)
+                    TryReachCarrier(clientId);
+                // When coming just out of a base. LaunchComplete does the rest.
+                else if (assignment.dockState == DockState::Docked)
+                    SaveCharacterDockState(fileName, DockState::Undocking);
+            }
+        }
+    }
+
+    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CloakModule"))
+        {
+            undockPathByClientId.erase(clientId);
+
+            const std::string& fileName = GetCharacterFileName(clientId);
+            if (fileName.empty())
+                return;
+
+            if (IsCarrierBase(baseId))
+            {
+                SaveCharacterDockState(fileName, DockState::Docked);
+            }
+            else
+            {
+                SaveCharacterLastRegularBase(fileName, baseId);
+
+                // Unassign the player from a carrier once docked to another base than the carrier's interior.
+                if (carrierAssignmentByCharacterFileNameId.contains(CreateID(fileName.c_str())))
+                    RemoveCharacterFromCarrier(fileName);
+            }
+        }
+    }
+
+    void ClearCarrier(const uint clientId)
+    {
+        const std::string& fileName = GetCharacterFileName(clientId);
+        if (!fileName.empty())
+        {
+            const uint carrierFileNameId = CreateID(fileName.c_str());
+            for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
+            {
+                if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == carrierFileNameId)
+                    DisconnectCharacterFromCarrier(assignment.second.characterFileName, fileName);
+            }
+        }
+    }
+
+    void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (Modules::GetModuleState("CarrierModule"))
+        {
+            ClearCarrier(clientId);
+        }
+    }
+
+    void UserCmd_Dock(const uint clientId, const std::wstring& wscParam)
+    {
+        if (Modules::GetModuleState("CarrierModule"))
+        {
+            TryDock(clientId);
+        }
+    }
 }

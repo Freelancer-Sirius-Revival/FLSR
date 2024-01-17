@@ -89,7 +89,7 @@ namespace Commands {
                     std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
 
 
-                    // Parameter übergeben - Betrag auf Discord-Account überweisen
+                    // Parameter ï¿½bergeben - Betrag auf Discord-Account ï¿½berweisen
 
                     // Ist der Char alt genug (Abuse-Prevention - 1h)?
                     int secs = 0;
@@ -119,12 +119,12 @@ namespace Commands {
                         return;
                     }
 
-                    // Ist genügend Geld auf dem Charakter?
+                    // Ist genï¿½gend Geld auf dem Charakter?
                     int iCash;
                     HkGetCash(wscCharname, iCash);
                     if (iCash < amount)
                     {
-                        //Nicht genügeng Geld
+                        //Nicht genï¿½geng Geld
                         PrintUserCmdText(iClientID, L"You don't have enough credits.");
                         return;
                     }
@@ -139,7 +139,7 @@ namespace Commands {
                         return;
                     }
 
-                    // Betrag auf den Discord-Account überweisen
+                    // Betrag auf den Discord-Account ï¿½berweisen
                     if (!Discord::UpdateCreditsForDiscordAccount(scDiscordID, std::to_string(amount), true))
                     {
 						PrintUserCmdText(iClientID, L"Error while updating discord balance");
@@ -259,7 +259,7 @@ namespace Commands {
     void UserCmd_pvpinvite(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("PVP"))
         {
-            // Überprüfe ob Spieler im Space ist
+            // ï¿½berprï¿½fe ob Spieler im Space ist
             uint iShip;
             pub::Player::GetShip(iClientID, iShip);
             if (!iShip)
@@ -268,7 +268,7 @@ namespace Commands {
                 return;
             }
 
-            // Überprüfe auf Target
+            // ï¿½berprï¿½fe auf Target
             uint iTargetShip;
             pub::SpaceObj::GetTarget(iShip, iTargetShip);
             if (!iTargetShip)
@@ -277,7 +277,7 @@ namespace Commands {
                 return;
             }
 
-            // Überprüfe ob Target ein Spieler ist
+            // ï¿½berprï¿½fe ob Target ein Spieler ist
             uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
             if (!iTargetClientID)
             {
@@ -385,7 +385,7 @@ namespace Commands {
             // Mutex sperren
             std::lock_guard<std::mutex> lock(m_Mutex);
 
-            // Chat-Nachricht zur Liste hinzufügen
+            // Chat-Nachricht zur Liste hinzufï¿½gen
             Discord::lChatMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
 
@@ -406,283 +406,9 @@ namespace Commands {
             // Mutex sperren
             std::lock_guard<std::mutex> lock(m_Mutex);
 
-            // Chat-Nachricht zur Liste hinzufügen
+            // Chat-Nachricht zur Liste hinzufï¿½gen
             Discord::lModMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
-    }
-
-    void UserCMD_ENABLECARRIER(uint iClientID, const std::wstring &wscParam) {
-        if (Modules::GetModuleState("CarrierModule")) {
-            bool bLastBaseUsed = false;
-            
-            // GetBase
-            uint iBase = 0;
-            pub::Player::GetBase(iClientID, iBase);
-
-            
-            
-            // Abbrechen falls nicht gedockt
-            if (iBase == 0) {
-                // Get the current character name
-                std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-                std::wstring wscBasename;
-                if (HkFLIniGet(wscCharname, L"base", wscBasename) != HKE_OK)
-                    return;
-
-                pub::GetBaseID(iBase, wstos(wscBasename).c_str());
-                
-                bLastBaseUsed = true;
-			
-            }
-            
-            //Überprüfe ob Spieler ein Carrier sein kann (Schiff)
-            // Get ShipArchID
-            uint iShipArchIDPlayer;
-            pub::Player::GetShipID(iClientID, iShipArchIDPlayer);
-            std::list<Docking::CarrierConfig>::iterator iterCarrierConfig = Docking::lCarrierConfig.begin();
-            bool bCarrierShip = false;
-            int iconfigslots;
-            while (iterCarrierConfig != Docking::lCarrierConfig.end()) 
-            {
-                if (iShipArchIDPlayer == iterCarrierConfig->iShipArch) {
-					if (iterCarrierConfig->iSlots >= 0) {
-						bCarrierShip = true;
-						iconfigslots = iterCarrierConfig->iSlots;
-                        break;
-					}
-
-
-                }
-
-                iterCarrierConfig++;
-            }
-            if (!bCarrierShip)
-                return;
-
-
-            
-            // Überprüfe ob der Spieler bereits ein Carrier ist
-            bool isCarrier = false;
-            std::list<Docking::CarrierList>::iterator iterCarrier =
-                Docking::lCarrierList.begin();
-            while (iterCarrier != Docking::lCarrierList.end()) {
-
-                if (iterCarrier->iCarrierID == iClientID) {
-                    isCarrier = true;
-                    break;
-                }
-
-                // Hochzählen
-                iterCarrier++;
-            }
-
-            if (isCarrier) {
-               // PrintUserCmdText(iClientID, L"U are already a Carrier!");
-                return;
-            }
-
-            // Carrier in die Liste
-            Docking::CarrierList NewCarrier;
-            NewCarrier.iCarrierID = iClientID;
-            NewCarrier.iBaseDocked = iBase;
-            NewCarrier.iDockedPlayers = 0;
-            NewCarrier.iSlots = iconfigslots;
-            Docking::lCarrierList.push_back(NewCarrier);
-
-            // CarrierEnabled
-            
-            if (bLastBaseUsed)
-            {
-                Docking::HandleUndocking(iClientID);
-            }
-        }
-    }
-
-    void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam) {
-        if (Modules::GetModuleState("CarrierModule")) {
-
-            // Überprüfe ob Spieler im Space ist
-            uint iShip;
-            pub::Player::GetShip(iClientID, iShip);
-            if (!iShip) {
-                PrintUserCmdText(iClientID, L"Please undock!");
-                return;
-            }
-
-            // Überprüfe auf Target
-            uint iTargetShip;
-            pub::SpaceObj::GetTarget(iShip, iTargetShip);
-            if (!iTargetShip) {
-                PrintUserCmdText(iClientID, L"Please select a target!");
-                return;
-            }
-
-            // Überprüfe ob Target ein Spieler ist
-            uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
-            if (!iTargetClientID) {
-                PrintUserCmdText(iClientID, L"Please select a player!");
-                return;
-            }
-            
-            //Überprüfe ob Spieler ein Carrier ist
-			bool bisCarrier = false;
-            std::list<Docking::CarrierList>::iterator iterCarrier1 = Docking::lCarrierList.begin();
-            while (iterCarrier1 != Docking::lCarrierList.end()) {
-
-				//
-                (L"CarrierID: %u \n", iterCarrier1->iCarrierID);
-                
-                // Spieler ist selbst ein Carrier
-                if (iterCarrier1->iCarrierID == iClientID) {
-                    return;
-
-                }
-                iterCarrier1++;
-            }
-
-            // Überprüfe ob der Spieler ein Carrier ist
-            std::list<Docking::CarrierList>::iterator iterCarrier = Docking::lCarrierList.begin();
-            while (iterCarrier != Docking::lCarrierList.end()) {
-
-                // Spieler ist selbst ein Carrier
-                if (iterCarrier->iCarrierID == iClientID) {
-                    PrintUserCmdText(iClientID, L"You are a carrier yourself!");
-                    return;
-                }
-
-                // TargetSpieler ist ein Carrier
-                if (iterCarrier->iCarrierID == iTargetClientID) {
-
-
-                   // ConPrint(std::to_wstring(iterCarrier->iSlots) + L"\n");
-                    //ConPrint(std::to_wstring(iterCarrier->iCarrierID) + L"\n");
-                    
-                    // Slots
-                    if (iterCarrier->iSlots == 0) {
-                        //PrintUserCmdText(iClientID, L"Carrier has no free capacity.");
-                        return;
-                    }
-                    if (iterCarrier->iDockedPlayers >= iterCarrier->iSlots) {
-                        //PrintUserCmdText(iClientID, L"Docked: " + std::to_wstring(iterCarrier->iDockedPlayers));
-                        //PrintUserCmdText(iClientID, L"Slots" + std::to_wstring(iterCarrier->iSlots));
-
-                        PrintUserCmdText(iClientID, L"Carrier has no free capacity.");
-                        return;
-                    }
-
-                    //Gibt es schon einen Request
-                    std::list<Docking::CarrierDockRequest>::iterator iterRequests = Docking::lCarrierDockRequest.begin();
-                    while (iterRequests != Docking::lCarrierDockRequest.end()) {
-						if (iterRequests->iPlayerID == iClientID) {
-							PrintUserCmdText(iClientID, L"You already have a request!");
-							return;
-						}
-                        iterRequests++;
-                    }
-                    
-
-                    // Distance
-                    if (HkDistance3DByShip(iShip, iTargetShip) < Docking::fDockRange) {
-                        // Carrier in die Liste
-                        Docking::CarrierDockRequest NewDockRequest;
-                        NewDockRequest.iPlayerID = iClientID;
-                        NewDockRequest.iCarrierID = iterCarrier->iCarrierID;
-                        NewDockRequest.tmRequestTime = timeInMS();
-                        NewDockRequest.iBaseCarrierDocked = iterCarrier->iBaseDocked;
-                        NewDockRequest.sInterior = iterCarrier->Interior;
-                        NewDockRequest.bSend = false;
-						NewDockRequest.fx_Undock = iterCarrier->fx_Undock;
-                        NewDockRequest.fy_Undock = iterCarrier->fy_Undock;
-                        NewDockRequest.fz_Undock = iterCarrier->fz_Undock;
-                        
-                        Docking::lCarrierDockRequest.push_back(NewDockRequest);
-                        PrintUserCmdText(iClientID, L"Dock request send!");
-                    } else {
-                        PrintUserCmdText(iClientID, L"Too far too dock!");
-                        return;
-                    }
-                }
-
-                // Hochzählen
-                iterCarrier++;
-            }
-        }
-    }
-
-    void UserCMD_DOCKACCEPT(uint iClientID, const std::wstring &wscParam) {
-        if (Modules::GetModuleState("CarrierModule")) {
-
-            std::wstring Charname = wscParam;
-            uint requestedClientId = HkGetClientIdFromCharname(Charname);
-            // Nur wenn die ClientID gültig ist den Spieler Docken
-            if (HkIsValidClientID(requestedClientId)) {
-
-                // Suche dockrequest
-                std::list<Docking::CarrierDockRequest>::iterator iterDockRequest = Docking::lCarrierDockRequest.begin();
-                while (iterDockRequest != Docking::lCarrierDockRequest.end()) {
-                    // Nur eigene dockrequests
-                    if (iterDockRequest->iCarrierID == iClientID) {
-
-                        if (iterDockRequest->iPlayerID == requestedClientId) {
-
-                            //PrintUserCmdText(iClientID, stows(iterDockRequest->sInterior));
-
-                            //Überprüfe die Distanz
-                            uint CarrierShip;
-                            pub::Player::GetShip(iClientID, CarrierShip);
-                            uint RequestedShip;
-                            pub::Player::GetShip(iterDockRequest->iPlayerID, RequestedShip);
-                            if (HkDistance3DByShip(CarrierShip, RequestedShip) < Docking::fDockRange) {
-
-                                // Docke Player
-                                Docking::CarrierDockedPlayers NewDockedPlayer;
-                                NewDockedPlayer.iCarrierID = iClientID;
-                                NewDockedPlayer.iPlayerID = requestedClientId;
-								NewDockedPlayer.fx_Undock = iterDockRequest->fx_Undock;
-								NewDockedPlayer.fy_Undock = iterDockRequest->fy_Undock;
-								NewDockedPlayer.fz_Undock = iterDockRequest->fz_Undock;
-                                
-                                Docking::lCarrierDockedPlayers.push_back( NewDockedPlayer);
-
-                                PrintUserCmdText(iClientID, L"OK!");
-                                //PrintUserCmdText(iClientID, stows(iterDockRequest->sInterior));
-
-                                // Lande Player auf ProxyBase
-                                std::wstring wscCharname = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-
-                                std::wstring wscDir;
-                                if (!HKHKSUCCESS(HkGetAccountDirName(wscCharname, wscDir)))
-                                    return;
-
-                                std::wstring wscFile;
-                                HkGetCharFileName(wscCharname, wscFile);
-                                std::string scCharFile = scAcctPath + wstos(wscDir) + "\\" + wstos(wscFile) + ".fl";
-                                std::string scBasename = IniGetS(scCharFile, "Player", "base", "");
-                                if (scBasename == "")
-                                {
-                                    scBasename = IniGetS(scCharFile, "Player", "last_base", "");
-                                }
-                                
-                                Docking::DockOnProxyCarrierBase(iterDockRequest->sInterior, requestedClientId, scBasename, iClientID);
-
-                                Docking::lCarrierDockRequest.erase(iterDockRequest);
-
-                            } else {
-                                PrintUserCmdText(iClientID, L"Player is too far away!");
-                                PrintUserCmdText(requestedClientId, L"U are too far away to Dock!");
-                                return;
-                            }
-                        }
-                    }
-                    // Hochzählen
-                    iterDockRequest++;
-                }
-
-            } else {
-                PrintUserCmdText(iClientID, L"No such Charname found!");
-                return;
-            }
-        }
     }
 
     /** Process a give cash command */
@@ -1158,33 +884,7 @@ namespace Commands {
     }
 
     */
-    
-    //ADMIN COMMANDS
-    
-    // ADMIN Stalk
-    void AdminCmd_Stalk(CCmds *cmds, std::wstring Charname) {
-
-        // Rechte Check
-        if (!(cmds->rights & RIGHT_SUPERADMIN)) {
-            cmds->Print(L"ERR No permission\n");
-            return;
-        }
-
-        // Hole ClientID
-        uint iClientID = HkGetClientIdFromCharname(cmds->GetAdminName());
-
-        PrintUserCmdText(iClientID, Charname);
-
-        // Teleport
-        if (Charname == L"") {
-			Docking::UndockProxyBase(iClientID, iClientID, 0.0f, 0.0f, 0.0f, true);
-        } else {
-            uint iCarrierID = HkGetClientIdFromCharname(Charname);
-			Docking::UndockProxyBase(iCarrierID, iClientID, 0.0f, 0.0f, 0.0f, true);
-        }
-
-        cmds->Print(L"OK\n");
-    }
+   
 	
 	//ChangeModuleState
     void AdminCmd_SwitchModuleState(CCmds* cmds, std::wstring wscModulename) {
@@ -1203,9 +903,6 @@ namespace Commands {
     USERCMD UserCmds[] = {
         {L"/uv", UserCmd_UV},
         {L"/modrequest", UserCmd_MODREQUEST},
-        {L"/enablecarrier", UserCMD_ENABLECARRIER},
-        {L"/dockrequest", UserCMD_DOCKREQUEST},
-        {L"/dockaccept", UserCMD_DOCKACCEPT},
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
         {L"/contributor", UserCMD_Contributor},
@@ -1225,6 +922,7 @@ namespace Commands {
         {L"/c", Cloak::UserCmd_CLOAK},
         {L"/uncloak", Cloak::UserCmd_UNCLOAK},
         {L"/uc", Cloak::UserCmd_UNCLOAK},
+        {L"/dock", Docking::UserCmd_Dock},
         {L"/mark", Mark::UserCmd_Mark},
         {L"/m", Mark::UserCmd_Mark},
         {L"/groupmark", Mark::UserCmd_GroupMark},
@@ -1277,20 +975,9 @@ namespace Commands {
         return false;
     }
 
-    // Admin Callback
-    void CmdHelp_Callback(CCmds *classptr) {
-        returncode = DEFAULT_RETURNCODE;
-        classptr->Print(L"stalk <charname>\n");
-    }
-
     // Admin command processing
     bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd) {
         returncode = DEFAULT_RETURNCODE;
-        if (IS_CMD("stalk")) {
-            returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            AdminCmd_Stalk(cmds, cmds->ArgStr(1));
-            return true;
-        }
         if (IS_CMD("switchModulestate")) {
             returncode = SKIPPLUGINS_NOFUNCTIONCALL;
             AdminCmd_SwitchModuleState(cmds, cmds->ArgStr(1));

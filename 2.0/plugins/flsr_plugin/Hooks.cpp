@@ -43,13 +43,6 @@ namespace Hooks {
             PopUp::WelcomeBox(iClientID);
         }
 		
-        //ProxyUndocking
-        if (Modules::GetModuleState("CarrierModule"))
-        {
-            Docking::ClearCarrier(iClientID);
-            Docking::HandleUndocking(iClientID);
-        }
-
         //Test
         //int iWorth = (int)Tools::CalcDisabledHardpointWorth(iClientID);
         //PrintUserCmdText(iClientID, std::to_wstring(iWorth));
@@ -349,66 +342,6 @@ namespace Hooks {
             AntiCheat::SpeedAC::vDunno2(iClientID);
             AntiCheat::SpeedAC::vDunno1(iClientID, 20000);
         }
-
-		//CarrierModul
-		if (Modules::GetModuleState("CarrierModule"))
-		{
-            //ConPrint(L"SystemSwitchOutComplete\n");
-
-            struct PlayerData* pd = 0;
-            while (pd = Players.traverse_active(pd)) {
-                 
-				
-             
-                // �berpr�fe auf DockRequest
-                std::list<Docking::UndockRelocate>::iterator iterRelocate = Docking::lUndockRelocate.begin();
-                while (iterRelocate != Docking::lUndockRelocate.end()) {
-
-                    if (pd->iOnlineID == iterRelocate->iClientID)
-                    {
-                        //ConPrint(L"PlayerData: %u\n", iterRelocate->iClientID);
-                        
-                        Docking::FLSR_SystemSwitchOutComplete(iterRelocate->iShip, iterRelocate->iClientID, iterRelocate->iSystem, iterRelocate->bStalkMode);
-
-                       // PrintUserCmdText(iClientID, L"RELOCATE");
-                        
-						Vector pos = iterRelocate->pos;
-						Matrix rot = iterRelocate->rot;
-                        
-                        
-
-
-                        TranslateX(pos, rot, iterRelocate->fy_Undock);
-                        TranslateY(pos, rot, iterRelocate->fz_Undock);
-                        TranslateZ(pos, rot, iterRelocate->fx_Undock);
-
-
-                        /*
-                        PrintUserCmdText(iterRelocate->iClientID, L"XOffset: " + stows(std::to_string(iterRelocate->fx_Undock)));
-                        PrintUserCmdText(iterRelocate->iClientID, L"YOffset: " + stows(std::to_string(iterRelocate->fy_Undock)));
-                        PrintUserCmdText(iterRelocate->iClientID, L"ZOffset: " + stows(std::to_string(iterRelocate->fz_Undock)));
-                        */
-                        
-                        HkRelocateClient(iterRelocate->iClientID, pos, rot);
-
-
-                        pub::SpaceObj::SetInvincible(iterRelocate->iShip, false, false, 0);
-                        
-                        Docking::lUndockRelocate.erase(iterRelocate);
-                    }
-
-
-                    
-                    iterRelocate++;
-                }
-                
-
-
-
-            }
-            
-
-		}
     }
 
     /// Clear client info when a client connects.
@@ -442,13 +375,6 @@ namespace Hooks {
             AntiCheat::SpeedAC::Init(iClientID);
             AntiCheat::TimingAC::Init(iClientID);
             AntiCheat::PowerAC::Init(iClientID);
-        }
-
-		//CarrierModule
-        if (Modules::GetModuleState("CarrierModule"))
-        {
-            Commands::UserCMD_ENABLECARRIER(iClientID, L"");
-            //ConPrint(L"Spawn\n");
         }
 
         //Insurance

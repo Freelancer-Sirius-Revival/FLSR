@@ -127,13 +127,8 @@ namespace Timers {
 }
 
 namespace Commands {
-    void AdminCmd_Stalk(CCmds *cmds, std::wstring Charname = L"");
-    void CmdHelp_Callback(CCmds *classptr);
     bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd);
     void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_DOCKACCEPT(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_DOCKREQUEST(uint iClientID, const std::wstring &wscParam);
-    void UserCMD_ENABLECARRIER(uint iClientID, const std::wstring &wscParam);
     void UserCmd_MODREQUEST(uint iClientID, const std::wstring &wscParam);
     bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd);
     void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam);
@@ -317,176 +312,18 @@ namespace Tools {
  
 }
 
-namespace Docking {
-   
-    
-
-    struct UndockRelocate {
-
-		bool bStalkMode;
-        float fx_Undock;
-        float fy_Undock;
-        float fz_Undock;
-        Vector pos;
-        Matrix rot;
-        uint iClientID;
-		uint iShip;
-		uint iSystem;
-        
-    };
- 
-
-
-    struct CarrierList {
-
-        uint iCarrierID;
-        uint iDockedPlayers;
-        uint iBaseDocked;
-        uint iSlots;
-        std::string Interior;
-        float fx_Undock;
-        float fy_Undock;
-        float fz_Undock;
-
-        CarrierList() {
-            iCarrierID = 0;
-            iDockedPlayers = 0;
-            iBaseDocked = 0;
-            iSlots = 0;
-            Interior = "";
-            fx_Undock = 0.0f;
-            fy_Undock = 0.0f;
-            fz_Undock = 0.0f;
-        }
-
-		CarrierList(uint iCarrierID, uint iDockedPlayers, uint iBaseDocked, uint iSlots, std::string Interior, float fx_Undock, float fy_Undock, float fz_Undock) {
-            this->iCarrierID = iCarrierID;
-            this->iDockedPlayers = iDockedPlayers;
-            this->iBaseDocked = iBaseDocked;
-            this->iSlots = iSlots;
-            this->Interior = Interior;
-            this->fx_Undock = fx_Undock;
-            this->fy_Undock = fy_Undock;
-            this->fz_Undock = fz_Undock;
-        }
-    };
-
-    struct CarrierDockedPlayers {
-
-        uint iCarrierID;
-        uint iPlayerID;
-        float fx_Undock;
-        float fy_Undock;
-        float fz_Undock;
-
-        CarrierDockedPlayers() {
-            iCarrierID = 0;
-            iPlayerID = 0;
-            fx_Undock = 0.0f;
-            fy_Undock = 0.0f;
-            fz_Undock = 0.0f;
-        }
-
-		CarrierDockedPlayers(uint iCarrierID, uint iPlayerID, float fx_Undock, float fy_Undock, float fz_Undock) {
-            this->iCarrierID = iCarrierID;
-            this->iPlayerID = iPlayerID;
-            this->fx_Undock = fx_Undock;
-            this->fy_Undock = fy_Undock;
-            this->fz_Undock = fz_Undock;
-        }
-    };
-
-    struct CarrierDockRequest {
-
-        uint iCarrierID;
-        uint iPlayerID;
-        mstime tmRequestTime;
-        uint iBaseCarrierDocked;
-        std::string sInterior;
-        bool bSend;
-        float fx_Undock;
-        float fy_Undock;
-        float fz_Undock;
-
-        CarrierDockRequest() {
-            iCarrierID = 0;
-            iPlayerID = 0;
-            tmRequestTime = 0;
-            iBaseCarrierDocked = 0;
-            sInterior = "test";
-            bSend = false;
-            fx_Undock = 0.0f;
-            fy_Undock = 0.0f;
-            fz_Undock = 0.0f;
-        }
-
-        CarrierDockRequest(uint iCarrierID, uint iPlayerID, mstime tmRequestTime, bool bSend, uint iBaseCarrierDocked, std::string sInterior, float fx_Undock, float fy_Undock, float fz_Undock) {
-            this->iCarrierID = iCarrierID;
-            this->iPlayerID = iPlayerID;
-            this->tmRequestTime = tmRequestTime;
-            this->iBaseCarrierDocked = iBaseCarrierDocked;
-            this->sInterior = sInterior;
-            this->bSend = bSend;
-            this->fx_Undock = fx_Undock;
-            this->fy_Undock = fy_Undock;
-            this->fz_Undock = fz_Undock;
-        }
-    };
-
-    struct CarrierConfig {
-
-        uint iShipArch;
-        uint iSlots;
-        std::string sInterior;
-        float fx_Undock;
-        float fy_Undock;
-        float fz_Undock;
-
-
-        CarrierConfig() {
-            iShipArch = 0;
-            iSlots = 0;
-            sInterior = "";
-            fx_Undock = 0.0f;
-            fy_Undock = 0.0f;
-            fz_Undock = 0.0f;
-        }
-
-		CarrierConfig(uint iShipArch, uint iSlots, std::string sInterior, float fx_Undock, float fy_Undock, float fz_Undock) {
-            this->iShipArch = iShipArch;
-            this->iSlots = iSlots;
-            this->sInterior = sInterior;
-			this->fx_Undock = fx_Undock;
-			this->fy_Undock = fy_Undock;
-			this->fz_Undock = fz_Undock;
-        }
-
-
-
-    };
-
-    // Carrier - Lists
-    extern std::list<CarrierList> lCarrierList;
-    extern std::list<CarrierDockedPlayers> lCarrierDockedPlayers;
-    extern std::list<CarrierDockRequest> lCarrierDockRequest;
-    extern std::list<CarrierConfig> lCarrierConfig;
-    extern std::list<UndockRelocate> lUndockRelocate;
-
-
-    // Carrier - Timeout
-    extern mstime msRequestTimeout;
-
-    // Carrier - Dockrange
-    extern float fDockRange;
-
-
-    void ClearCarrier(uint iClientID);
-    void HandleUndocking(uint iClientID);
-    void DockRequest3000ms();
-    bool FLSR_SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID, unsigned int iSystem, bool bstalkmode = false);
-    void DockOnProxyCarrierBase(std::string scBasename, uint iClientID, std::string scCarrierBase, uint iCarrierID);
-    void UndockProxyBase(uint iCarrierId, uint iClientID, float fx_Undock, float fy_Undock, float fz_Undock, bool bstalkmode = false);
-    void DOCKACCEPT_ALL(uint iClientID);
+namespace Docking
+{
+    void LoadSettings();
+    void InitializeWithGameData();
+    void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId);
+    void __stdcall LaunchComplete(unsigned int baseId, unsigned int shipId);
+    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+    int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
+    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId);
+    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
+    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
+    void UserCmd_Dock(const uint clientId, const std::wstring& wscParam);
 }
 
 namespace Hooks {

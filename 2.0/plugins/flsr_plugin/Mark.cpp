@@ -12,11 +12,11 @@ namespace Mark
     const uint CLEAR_ROTATION_TIMER_INTERVAL = 500;
 
     // Contains a set of currently market targets (the current system's) per client id.
-    static std::map<uint, std::set<uint>> currentlyMarkedObjectsPerClient;
+    static std::unordered_map<uint, std::set<uint>> currentlyMarkedObjectsPerClient;
 
     // Contains a set of marked targets per system per character file name.
-    static std::map<std::wstring, std::map<uint, std::set<uint>>> markedObjectsPerCharacter;
-    static std::map<std::wstring, std::set<std::wstring>> markedCharactersPerCharacter;
+    static std::unordered_map<std::wstring, std::unordered_map<uint, std::set<uint>>> markedObjectsPerCharacter;
+    static std::unordered_map<std::wstring, std::set<std::wstring>> markedCharactersPerCharacter;
 
     static std::set<std::wstring> cloakedCharacterFileNames;
 

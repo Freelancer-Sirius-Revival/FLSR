@@ -3,7 +3,7 @@
 namespace SpawnProtection
 {
     const mstime TIMER_INTERVAL = 500;
-    static std::map<uint, mstime> invincibleEndTimePerShip;
+    static std::unordered_map<uint, mstime> invincibleEndTimePerShip;
     static mstime invincibleDuration = 0;
 
     bool LoadSettings()

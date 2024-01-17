@@ -26,7 +26,7 @@ namespace Crafting
 		std::set<uint> validBaseIds;
 	};
 
-	static std::map<std::string, Recipe> recipes;
+	static std::unordered_map<std::string, Recipe> recipes;
 
 	static uint successSoundId = 0;
 	static uint failSoundId = 0;

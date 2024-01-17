@@ -9,9 +9,9 @@ namespace GroupReputation
         std::vector<std::pair<uint, float>> empathyRates;
     };
 
-    static std::map<uint, RepChangeEffects> groupReputationChangeEffects;
+    static std::unordered_map<uint, RepChangeEffects> groupReputationChangeEffects;
 
-    static std::map<uint, mstime> destroyedShipIdsWithTimeStamp;
+    static std::unordered_map<uint, mstime> destroyedShipIdsWithTimeStamp;
 
     void LoadEmpathy()
     {

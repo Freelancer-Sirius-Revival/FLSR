@@ -29,7 +29,7 @@ namespace Insurance
         Invalid
     };
 
-    const std::map<InsuranceType, std::string> insuranceTypesStrings = {
+    const std::unordered_map<InsuranceType, std::string> insuranceTypesStrings = {
         { InsuranceType::Countermeasures, "Countermeasures" },
         { InsuranceType::Equipment, "Equipment" },
         { InsuranceType::Mines, "Mines" },

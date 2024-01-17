@@ -155,12 +155,12 @@ namespace Cloak
 
 	static std::set<uint> cloakActivatorArchetypeIds;
 	static std::vector<ShipEffectDefinition> shipEffects;
-	static std::map<uint, ClientCloakStats> clientCloakStats;
+	static std::unordered_map<uint, ClientCloakStats> clientCloakStats;
 
-	static std::map<uint, std::vector<Vector>> jumpGatePositionsPerSystem;
-	static std::map<uint, std::vector<Vector>> jumpHolePositionsPerSystem;
+	static std::unordered_map<uint, std::vector<Vector>> jumpGatePositionsPerSystem;
+	static std::unordered_map<uint, std::vector<Vector>> jumpHolePositionsPerSystem;
 
-	static std::map<uint, UncloakReason> clientIdsRequestingUncloak;
+	static std::unordered_map<uint, UncloakReason> clientIdsRequestingUncloak;
 
 	bool IsValidCloakableClient(const uint clientId)
 	{
@@ -789,7 +789,7 @@ namespace Cloak
 	}
 
 	static mstime lastSynchronizeTimeStamp = 0;
-	static std::map<uint, CloakState> previousCloakStates;
+	static std::unordered_map<uint, CloakState> previousCloakStates;
 
 	// This is executed to make sure players that spawn into a system with other cloaking players have their visibility synced.
 	void UpdateCloakClients()

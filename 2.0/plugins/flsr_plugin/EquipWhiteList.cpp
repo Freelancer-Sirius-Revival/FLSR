@@ -8,8 +8,8 @@ namespace EquipWhiteList
 	const uint NO_PLACE_TO_MOUNT_ID = pub::GetNicknameId("no_place_to_mount");
 	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
 
-	static std::map<uint, std::vector<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
-	static std::map<uint, mstime> delayedClientIdEquipmentChecks;
+	static std::unordered_map<uint, std::vector<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
+	static std::unordered_map<uint, mstime> delayedClientIdEquipmentChecks;
 
 	void LoadEquipWhiteList()
 	{

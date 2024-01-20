@@ -79,6 +79,7 @@ namespace Cloak
 	const uint SHIELD_SLOT_ID = 65521;
 	// The main update loop's interval.
 	const uint TIMER_INTERVAL = 100;
+	const float LOW_ENERGY_THRESHOLD = 100.0f;
 
 	// When a player joins when another player is in cloak-transition, timings get confused.
 	// To counter this, a Cloaking Device with zero-time is used to completely cloak/uncloak at the end of the transitions to make sur the state is always where it should be.
@@ -556,10 +557,10 @@ namespace Cloak
 			SendEquipmentActivationState(clientId, SHIELD_SLOT_ID, IsFullyUncloaked(clientId));
 	}
 
-	void SynchronizePowerStateWithCloakState(const uint clientId)
+	void SynchronizePowerStateWithCloakState(const uint clientId, const float currentShipPower)
 	{
-		bool cloakPowerDrainActive = clientCloakStats[clientId].cloakState == CloakState::Cloaked && !clientIdsRequestingUncloak.contains(clientId);
-		bool powerPlantsActive = IsFullyUncloaked(clientId);
+		const CloakState cloakState = clientCloakStats[clientId].cloakState;
+		bool powerPlantsActive = (currentShipPower < LOW_ENERGY_THRESHOLD) || IsFullyUncloaked(clientId); // Make sure we can never drop to zero or negative energy. Or clients will crash.
 		for (const uint cargoId : clientCloakStats[clientId].powerCargoIds)
 			SendEquipmentActivationState(clientId, cargoId, powerPlantsActive);
 	}
@@ -837,16 +838,17 @@ namespace Cloak
 				continue;
 
 			SynchronizeShieldStateWithCloakState(clientId);
-			SynchronizePowerStateWithCloakState(clientId);
+
+			float power;
+			clientCloakStats[clientId].shipInspect->get_power(power);
 
 			// Uncloak when power is empty.
-			if (cloakState == CloakState::Cloaked)
+			if (cloakState == CloakState::Cloaked && power <= LOW_ENERGY_THRESHOLD)
 			{
-				float power;
-				clientCloakStats[clientId].shipInspect->get_power(power);
-				if (power <= 0.0f)
-					QueueUncloak(clientId, UncloakReason::Power);
+				QueueUncloak(clientId, UncloakReason::Power);
 			}
+
+			SynchronizePowerStateWithCloakState(clientId, power);
 
 			// Schedule cloak changes.
 			if (clientIdsRequestingUncloak.contains(clientId))

@@ -306,8 +306,8 @@ namespace Commands {
         //Create Popup struct
         PopUp::PopUpBox NewPopUpBox;
         NewPopUpBox.iClientID = iClientID;
-        NewPopUpBox.iHead = 520006;
-        NewPopUpBox.iBody = 520007;
+        NewPopUpBox.iHead = 524291;
+        NewPopUpBox.iBody = 524292;
         NewPopUpBox.iPage = 1;
         NewPopUpBox.iMaxPage = 1;
         NewPopUpBox.iButton = POPUPDIALOG_BUTTONS_CENTER_OK;

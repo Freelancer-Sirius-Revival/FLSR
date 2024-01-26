@@ -6,8 +6,8 @@ namespace PopUp {
 	uint iContributor_Body = 520001;
 
 	// Welcome Message - First Char on ID
-	uint iWMsg_Head = 520002;
-	uint iWMsg_Body = 520003;
+	uint iWMsg_Head = 524289;
+	uint iWMsg_Body = 524290;
 
     std::map<std::wstring, PopUpBox> mPopUpBox;
 

@@ -350,11 +350,11 @@ namespace Insurance
 {
     extern float insuranceEquipmentCostFactor;
 
-    void CreateNewInsurance(uint clientId, bool onlyFreeItems);
-    void UseInsurance(uint clientId);
-    bool IsInsuranceRequested(uint clientId);
-    bool IsInsurancePresent(uint clientId);
-    void UserCMD_INSURANCE(uint clientId, const std::wstring& argumentsWS);
+    void CreateNewInsurance(const uint clientId, bool onlyFreeItems);
+    void UseInsurance(const uint clientId);
+    bool IsInsuranceRequested(const uint clientId);
+    bool IsInsurancePresent(const uint clientId);
+    void UserCMD_INSURANCE(const uint clientId, const std::wstring& argumentsWS);
 }
 
 namespace AntiCheat {

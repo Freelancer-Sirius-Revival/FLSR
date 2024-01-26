@@ -69,7 +69,7 @@ namespace Insurance
         return (stat(name.c_str(), &buffer) == 0);
     }
 
-    std::string GetHookUserFilePath(uint clientId)
+    std::string GetHookUserFilePath(const uint clientId)
     {
         CAccount* account = Players.FindAccountFromClientID(clientId);
         std::wstring accountDirectoryWS;
@@ -78,7 +78,7 @@ namespace Insurance
         return scAcctPath + wstos(accountDirectoryWS) + Globals::FLHOOKUSER_FILE;
     }
 
-    std::set<InsuranceType> ReadEnabledInsuranceTypes(uint clientId)
+    std::set<InsuranceType> ReadEnabledInsuranceTypes(const uint clientId)
     {
         const std::string hookUserFilePath = GetHookUserFilePath(clientId);
 
@@ -97,7 +97,7 @@ namespace Insurance
         return currentInsuranceTypes;
     }
 
-    bool IsArchetypeTypeEquipment(Archetype::AClassType archetypeType)
+    bool IsArchetypeTypeEquipment(const Archetype::AClassType archetypeType)
     {
         return  archetypeType == Archetype::SHIELD_GENERATOR ||
                 archetypeType == Archetype::THRUSTER ||
@@ -107,7 +107,7 @@ namespace Insurance
                 archetypeType == Archetype::COUNTER_MEASURE_DROPPER;
     }
 
-    bool IsArchetypeTypeConsumable(Archetype::AClassType archetypeType)
+    bool IsArchetypeTypeConsumable(const Archetype::AClassType archetypeType)
     {
         return archetypeType == Archetype::MINE ||
                archetypeType == Archetype::MUNITION ||
@@ -116,7 +116,7 @@ namespace Insurance
                archetypeType == Archetype::REPAIR_KIT;
     }
 
-    int CalculateInsuranceCost(std::list<InsuredCargoItem> insuredCargoList)
+    int CalculateInsuranceCost(const std::list<InsuredCargoItem> insuredCargoList)
     {
         float totalPrice = 0.0f;
         for (auto const& cargo : insuredCargoList)
@@ -126,16 +126,16 @@ namespace Insurance
             const auto archetypeType = equipment->get_class_type();
             totalPrice += IsArchetypeTypeEquipment(archetypeType) ? price * insuranceEquipmentCostFactor : price;
         }
-        return static_cast<int>(std::max(0.0f, totalPrice));
+        return std::max(0, static_cast<int>(totalPrice));
     }
 
-    bool IsEquipmentInsuranceActive(uint clientId)
+    bool IsEquipmentInsuranceActive(const uint clientId)
     {
         const auto& insuredTypes = ReadEnabledInsuranceTypes(clientId);
         return insuredTypes.contains(InsuranceType::Equipment);
     }
 
-    bool IsConsumableInsuranceActive(Archetype::AClassType archetypeType, uint clientId)
+    bool IsConsumableInsuranceActive(const Archetype::AClassType archetypeType, const uint clientId)
     {
         const auto& insuredTypes = ReadEnabledInsuranceTypes(clientId);
         return  insuredTypes.contains(InsuranceType::Mines) && archetypeType == Archetype::MINE ||
@@ -145,7 +145,7 @@ namespace Insurance
                 insuredTypes.contains(InsuranceType::Nanobots) && archetypeType == Archetype::REPAIR_KIT;
     }
 
-    std::list<CARGO_INFO> GetCargoList(uint clientId)
+    std::list<CARGO_INFO> GetCargoList(const uint clientId)
     {
         int remainingHoldSize;
         std::list<CARGO_INFO> cargoList;
@@ -154,7 +154,7 @@ namespace Insurance
         return cargoList;
     }
 
-    std::list<InsuredCargoItem> CollectInsuredCargo(uint clientId, bool onlyFreeItems)
+    std::list<InsuredCargoItem> CollectInsuredCargo(const uint clientId, const bool onlyFreeItems)
     {
         std::list<InsuredCargoItem> insuredCargoList;
         const std::list<CARGO_INFO> cargoList = GetCargoList(clientId);
@@ -219,7 +219,7 @@ namespace Insurance
         return insuredCargoList;
     }
 
-    void CreateNewInsurance(uint clientId, bool onlyFreeItems)
+    void CreateNewInsurance(const uint clientId, bool onlyFreeItems)
     {
         int playerCash = 0;
         if (!onlyFreeItems)
@@ -314,7 +314,7 @@ namespace Insurance
         }
     }
 
-    void UseInsurance(uint clientId)
+    void UseInsurance(const uint clientId)
     {
         char currentDirectory[MAX_PATH];
         GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
@@ -444,8 +444,8 @@ namespace Insurance
         }
 
         const int insuredTotalPrice = IniGetI(insuranceFilePath, INSURANCE_INI_SECTION, TOTAL_PRICE_KEY, 0);
-        const int moneyBack = insuredTotalPrice - static_cast<int>(totalRestorationPrice);
-        if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), std::max(0, moneyBack)); error != HKE_OK)
+        const int moneyBack = std::max(0, insuredTotalPrice - static_cast<int>(totalRestorationPrice));
+        if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), moneyBack); error != HKE_OK)
         {
             PrintUserCmdText(clientId, L"ERR Add cash failed err=" + HkErrGetText(error));
         }
@@ -464,7 +464,7 @@ namespace Insurance
         remove(insuranceFilePath.c_str());
     }
 
-    bool IsInsuranceRequested(uint clientId)
+    bool IsInsuranceRequested(const uint clientId)
     {
         std::wstring characterFileNameWS;
         if (HK_ERROR error = HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS); error != HKE_OK)
@@ -473,7 +473,7 @@ namespace Insurance
         return IniGetS(hookUserFilePath, INSURANCE_PREFIX_INI_SECTION + wstos(characterFileNameWS), AUTOINSURANCE_INI_SECTION, INSURANCE_OFF_VALUE) == INSURANCE_ON_VALUE;
     }
 
-    bool IsInsurancePresent(uint clientId)
+    bool IsInsurancePresent(const uint clientId)
     {
         char currentDirectory[MAX_PATH];
         GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
@@ -530,7 +530,7 @@ namespace Insurance
         return InsuranceType::Invalid;
     }
 
-    std::string GetCurrentlyInsuredTypesJoinedString(uint clientId)
+    std::string GetCurrentlyInsuredTypesJoinedString(const uint clientId)
     {
         const std::set<InsuranceType> currentInsuranceTypes = ReadEnabledInsuranceTypes(clientId);
         std::string insuranceTypesString = "";
@@ -559,7 +559,7 @@ namespace Insurance
         return insuranceTypesString;
     }
 
-    void UserCMD_INSURANCE(uint clientId, const std::wstring& argumentsWS)
+    void UserCMD_INSURANCE(const uint clientId, const std::wstring& argumentsWS)
     {
         if (!Modules::GetModuleState("InsuranceModule"))
             return;

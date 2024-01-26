@@ -80,6 +80,8 @@ namespace Cloak
 	// The main update loop's interval.
 	const uint TIMER_INTERVAL = 100;
 	const float LOW_ENERGY_THRESHOLD = 100.0f;
+	const mstime DRY_SOUND_DEBOUNCE_TIME = 1000;
+	const mstime NEURAL_NET_DEBOUNCE_TIME = 2000;
 
 	// When a player joins when another player is in cloak-transition, timings get confused.
 	// To counter this, a Cloaking Device with zero-time is used to completely cloak/uncloak at the end of the transitions to make sur the state is always where it should be.
@@ -125,6 +127,7 @@ namespace Cloak
 		mstime cloakTimeStamp = 0;
 		mstime uncloakTimeStamp = 0;
 		mstime lastDrySoundTimeStamp = 0;
+		mstime lastNeuralNetSoundTimeStamp = 0;
 		NoCloakZone insideNoCloakZoneOfType = NoCloakZone::None;
 		bool dockingManeuverActive = false;
 		ShipEffectDefinition* effectsDefinition = 0;
@@ -568,10 +571,21 @@ namespace Cloak
 	void PlayDrySound(const uint clientId)
 	{
 		const mstime now = timeInMS();
-		if (now - clientCloakStats[clientId].lastDrySoundTimeStamp > 1000)
+		if (now - clientCloakStats[clientId].lastDrySoundTimeStamp > DRY_SOUND_DEBOUNCE_TIME)
 		{
 			clientCloakStats[clientId].lastDrySoundTimeStamp = timeInMS();
 			pub::Audio::PlaySoundEffect(clientId, FIRE_DRY_ID);
+		}
+	}
+
+	void PlayNeuralNetVoice(const uint clientId, const std::vector<uint> messageIds)
+	{
+		const mstime now = timeInMS();
+		if (now - clientCloakStats[clientId].lastNeuralNetSoundTimeStamp > NEURAL_NET_DEBOUNCE_TIME)
+		{
+			clientCloakStats[clientId].lastNeuralNetSoundTimeStamp = timeInMS();
+			for (const uint messageId : messageIds)
+				pub::Player::SendNNMessage(clientId, messageId);
 		}
 	}
 
@@ -603,13 +617,11 @@ namespace Cloak
 			switch (clientCloakStats[clientId].insideNoCloakZoneOfType)
 			{
 				case NoCloakZone::JumpGate:
-					pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
-					pub::Player::SendNNMessage(clientId, JUMP_GATE_NN_ID);
+					PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_GATE_NN_ID });
 					break;
 
 				case NoCloakZone::JumpHole:
-					pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
-					pub::Player::SendNNMessage(clientId, JUMP_HOLE_NN_ID);
+					PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_HOLE_NN_ID });
 					break;
 			}
 			PlayDrySound(clientId);
@@ -658,13 +670,11 @@ namespace Cloak
 				switch (reason)
 				{
 					case UncloakReason::JumpGate:
-						pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
-						pub::Player::SendNNMessage(clientId, JUMP_GATE_NN_ID);
+						PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_GATE_NN_ID });
 						break;
 
 					case UncloakReason::JumpHole:
-						pub::Player::SendNNMessage(clientId, WARNING_NN_ID);
-						pub::Player::SendNNMessage(clientId, JUMP_HOLE_NN_ID);
+						PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_HOLE_NN_ID });
 						break;
 
 					default:

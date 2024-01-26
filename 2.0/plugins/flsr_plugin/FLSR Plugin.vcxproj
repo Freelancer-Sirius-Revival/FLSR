@@ -102,12 +102,9 @@
     <ClCompile Include="Cloak.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
-    <ClCompile Include="CustomMissions.cpp" />
-    <ClCompile Include="Depot.cpp" />
     <ClCompile Include="Discord.cpp" />
     <ClCompile Include="Docking.cpp" />
     <ClCompile Include="EquipWhiteList.cpp" />
-    <ClCompile Include="FuseControl.cpp" />
     <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="Main.cpp" />

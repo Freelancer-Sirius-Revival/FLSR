@@ -23,16 +23,7 @@ void LoadSettings() {
         ConPrint(L"Loaded HashMap with %d entries\n", Tools::mNicknameHashMap.size());
         ConPrint(L"\n");
     }
-    
-    //Load FuseMap
-   /* if (FuseControl::ReadIniFuseConfig())
-    {
-        ConPrint(L"\n----------LOADING FLSR-FuseMap----------\n");
-        ConPrint(L"Loaded FuseMap with %d entries\n", FuseControl::mFuseMap.size());
-        ConPrint(L"\n");
-    }
-    */
-    
+        
     //Load Module-Settings
     Modules::LoadModules();
 
@@ -42,9 +33,6 @@ void LoadSettings() {
         SQL::InitializeDB();
 
         ConPrint(L"Module loaded: SQL\n");
-
-        //PVP::UpdateDuelRanking(L"test", true);
-
     }
 
     if (Modules::GetModuleState("CarrierModule"))
@@ -89,13 +77,6 @@ void LoadSettings() {
         ConPrint(L"Module loaded: AC\n");
     }
 
-    //CUSTOMMISSION-Module   ###################################################################
-    if (Modules::GetModuleState("CustomMissionModule"))
-    {
-        //Load CustomMissions
-        //CustomMissions::LoadMissions();
-    }
-
 	//EquipWhiteList-Module ######################################################################
     if (Modules::GetModuleState("EquipWhiteListModule"))
     {
@@ -111,29 +92,6 @@ void LoadSettings() {
 
         ConPrint(L"Module loaded: Cloak\n");
 
-    }
-
-    //DEPOT-Module ##############################################################################
-    if (Modules::GetModuleState("DepotModule"))
-    {
-        if (Modules::GetModuleState("SQLModule"))
-        {
-            if (Depot::LoadDepotData())
-            {
-                ConPrint(L"Module loaded: Depot (" + stows(std::to_string(Depot::lPlayerDepot.size())) + L" entries loaded)\n");                
-            }
-            else {
-                ConPrint(L"Module failed to load: DepotModule\n");
-                Modules::SwitchModuleState("DepotModule");
-            }
-
-        }
-        else
-        {
-            ConPrint(L"Depot Module not loaded! Necessary Module not loaded: SQL\n");
-            Modules::SetModuleState("DepotModule", false);
-
-        }
     }
 
     //CMPDUMPS     #############################################################################

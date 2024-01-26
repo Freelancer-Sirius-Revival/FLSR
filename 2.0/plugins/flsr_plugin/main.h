@@ -426,94 +426,6 @@ namespace AntiCheat {
     extern IMPORT AC_INFO AC_Info[MAX_CLIENT_ID + 1];
 }
 
-
-namespace CustomMissions {
-    struct PlayerWaypoint {
-        std::string X;                              // Coord X (Client convert it to float)
-        std::string Y;                              // Coord Y (Client convert it to float)
-        std::string Z;                              // Coord Z (Client convert it to float)
-        uint iSystemID;                             // ID of the WP-System
-        uint iSolarObjectID;                        // ID of the selected Object | needed for BestPath, SystemSwitch
-    };
-
-    struct CustomMission {
-		// Mission Data
-        int iMissionID;                             // Mission ID
-        std::string scMissionFilepath;              // Mission Filepath
-        std::string scMissionName;                  // Mission Name
-        std::string scMissionDesc;                  // Mission Description
-        std::string scMissionType;                  // Mission Type
-        bool bSPMission;                            // Single Player Mission
-        bool bMPMission;                            // Multi Player Mission
-
-		// Mission Reward
-        bool bRewardCredits;                        // Reward Credits
-        int iRewardCredits;                         // Reward Credits Amount
-        bool bRewardReputation;                     // Reward Reputation
-        int iRewardReputation;                      // Reward Reputation Amount
-        std::string scRewardReputationNickname;     // Reward Reputation Nickname
-        bool bRewardShip;                           // Reward Ship
-        std::string scRewardShipNickname;           // Reward Ship Nickname
-        bool bRewardEquip;                           // Reward Equipment
-        std::string scRewardEquipNickname;           // Reward Equipment Nickname
-        int iRewardEquip;                            // Reward Equipment Amount
-
-		// Trade Mission
-        std::string scTargetBaseNickname;           // Target Base Nickname
-        std::string scGoodToTradeNickname;          // Good To Trade Nickname
-        std::string iAmountToTrade;                 // Amount To Trade
-
-		// Kill NPC Mission
-        std::string scNPCType;                      // NPC Type
-        int iAmountofNPCs;                          // Amount of NPCs
-        int iAmountofWaves;                         // Amount of Waves
-        bool bRewardKill;                           // Reward Kill
-        bool bRewardGroup;                          // Reward Group
-        bool bKillNamedNPC;                         // Kill Named NPC
-        std::string scNamedNPCName;                 // Named NPC Name
-
-		// Player Hunt Mission
-        std::wstring wscPlayerCharname;             // Player Charname
-        int Bounty;                                 // Bounty
-        
-        // Mining Mision
-        std::string scGoodToMineNickname;           // Good To Mine Nickname
-        int iAmountToMine;                          // Amount To Mine	
-
-		// MissionWaypoints
-        bool bSendMissionWaypoints;                 // Send MissionWaypoints to Player
-        bool bSendMissionWaypointsToGroup;          // Send MissionWaypoints to Group
-        std::list<PlayerWaypoint> lPlayerWaypoints; // List of Waypoints
-
-        //POPUPs
-        // MissionStart POPUP
-        bool bMissionStartPopup;                    //Show a Popup on Mission start
-		int iMissionStartPopupHead;                 //The ResID of the Popup Head
-		int iMissionStartPopupBody;                 //The ResID of the Popup Body
-        //MissionEnd POPUP
-		bool bMissionEndPopup;                      //Show a Popup on Mission end
-		int iMissionEndPopupHead;                   //The ResID of the Popup Head
-		int iMissionEndPopupBody;                   //The ResID of the Popup Body
-
-        //MISSIONTEXTs
-        //MissonStart Text
-		bool bMissionStartText;                     //Show a Text on Mission start
-		int iMissionStartText;                      //The ResID of the Text
-        //MissionEnd Text
-		bool bMissionEndText;                       //Show a Text on Mission end
-		int iMissionEndText;                        //The ResID of the Text
-
-
-
-    };
-	
-    extern std::list<CustomMission> lCustomMission;
-
-    void LoadMissions();
-    void Send_WPs(uint iClientID, std::list <CustomMissions::PlayerWaypoint> lWP, bool bBestPath);
-
-}
-
 namespace Cloak
 {
     enum class CloakState
@@ -595,38 +507,6 @@ namespace SQL {
 
 }
 
-namespace Depot {
-
-    struct PlayerDepot {
-        uint iDepotID;
-        uint iBaseID;
-        std::string scAccountName;
-        uint iCapacity;		
-    };
-
-	struct PlayerDepotItem {
-		uint iDepotID;
-		uint iGoodID;
-		uint iAmount;
-        uint iIDSName;
-	};
-
-    struct PlayerCargoItem {
-        uint iGoodID;
-        uint iAmount;
-        uint iIDSName;
-    };
-
-    bool LoadDepotData();
-    std::string GetEquipNicknameFromID(uint goodID);
-    std::list<PlayerDepotItem> GetEquipFromBaseDepot(uint iClientID, bool bPrint);
-    void PlayerDepotOpen(uint iClientID);
-    void GetPlayerEquip(uint iClientID);
-
-    extern std::list<PlayerDepot> lPlayerDepot;	
-}
-
-
 namespace PathSelection {
    
     struct Reputation{
@@ -668,39 +548,6 @@ namespace PathSelection {
     void ModUnlawfulChar500ms();
 
 }
-
-namespace FuseControl {
-
-    bool ReadIniFuseConfig();
-    static void ReadIniFuseConfigFile(const std::string& filePath, bool bFuseIni);
-    
-    enum FuseType
-    {
-        FUSE_UNKNOWN,
-        FUSE_SHIP,
-        FUSE_SOLAR,
-        FUSE_COLLGRP
-
-    };
-    
-    struct Fuse {
-
-        FuseType eType;
-        std::string scShipNickname;
-        std::string scNickname;
-        float fLifeTime;
-        float fHitpoint;
-    };
-    
-    struct ClientFuse {
-        Fuse oldFuse;
-		Fuse newFuse;       
-    };
-    
-    extern IMPORT ClientFuse FuseControl[MAX_CLIENT_ID + 1];
-    extern std::map<uint, Fuse> mFuseMap;
-}
-
 
 namespace PlayerHunt {
 

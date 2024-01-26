@@ -42,12 +42,7 @@ namespace Hooks {
         {
             PopUp::WelcomeBox(iClientID);
         }
-		
-        //Test
-        //int iWorth = (int)Tools::CalcDisabledHardpointWorth(iClientID);
-        //PrintUserCmdText(iClientID, std::to_wstring(iWorth));
-        //Depot::GetEquipname(iClientID);
-    }
+		    }
 
     // HkCb_AddDmgEntry
     void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1, float damage, enum DamageEntry::SubObjFate fate) {

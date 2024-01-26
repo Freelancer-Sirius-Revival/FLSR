@@ -50,9 +50,6 @@
     <ClCompile Include="AntiCheat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CustomMissions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Cloak.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,16 +59,10 @@
     <ClCompile Include="SQL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Depot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EquipWhiteList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PathSelection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FuseControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerHunt.cpp">

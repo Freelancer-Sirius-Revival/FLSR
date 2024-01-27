@@ -39,6 +39,8 @@ namespace Crafting
 
 	void LoadSettings()
 	{
+		HkLoadStringDLLs();
+
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
 		const std::string configFilePath = std::string(currentDirectory) + Globals::CRAFTING_CONFIG_FILE;
@@ -160,41 +162,62 @@ namespace Crafting
 			return false;
 		}
 
-		// Check if the required ingredients are in the cargo hold.
-		const auto& cargoList = GetUnmountedCargoList(clientId);
-		std::vector<std::pair<CARGO_INFO, int>> foundCargosAndRequiredCount;
-		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
-		{
-			for (const auto& cargo : cargoList)
-			{
-				if (cargo.iArchID == ingredientWithCount.first)
-				{
-					const int multipliedIngredientCount = ingredientWithCount.second * batchCount;
-					if (cargo.iCount < multipliedIngredientCount)
-						break;
-					foundCargosAndRequiredCount.push_back({ cargo, multipliedIngredientCount });
-				}
-			}
-		}
-
 		const std::wstring& characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
 		if (recipe.cost)
 		{
 			int currentCash;
 			if (HkGetCash(characterNameWS, currentCash) != HKE_OK)
 				return false;
-			if (currentCash < (recipe.cost * batchCount))
+			const int totalCost = recipe.cost * batchCount;
+			const int cashDiff = currentCash - totalCost;
+			if (cashDiff < 0)
 			{
 				pub::Player::SendNNMessage(clientId, NOT_ENOUGH_MONEY);
-				PrintUserCmdText(clientId, L"Credits are missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+				PrintUserCmdText(clientId, L"$" + ToMoneyStr(-cashDiff) + L" missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 				return false;
 			}
 		}
 
-		if (foundCargosAndRequiredCount.size() != recipe.ingredientArchetypeIdsWithCount.size())
+		// Check if the required ingredients are in the cargo hold.
+		const auto& cargoList = GetUnmountedCargoList(clientId);
+		std::vector<std::pair<uint, int>> missingIngredientArchetypeIdsWithCount;
+		// Copy the ingredients and their count.
+		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
+			missingIngredientArchetypeIdsWithCount.push_back({ ingredientWithCount.first, ingredientWithCount.second * batchCount });
+
+		for (auto& ingredientWithCount : missingIngredientArchetypeIdsWithCount)
+		{
+			for (const CARGO_INFO& cargo : cargoList)
+			{
+				if (cargo.iArchID == ingredientWithCount.first)
+					ingredientWithCount.second -= cargo.iCount;
+			}
+		}
+
+		std::vector<std::wstring> missingPartsTexts;
+		for (const auto& ingredientWithCount : missingIngredientArchetypeIdsWithCount)
+		{
+			if (ingredientWithCount.second > 0)
+			{
+				const GoodInfo* goodInfo = GoodList::find_by_id(ingredientWithCount.first);
+				if (goodInfo)
+					missingPartsTexts.push_back(std::to_wstring(ingredientWithCount.second) + L" " + HkGetWStringFromIDS(goodInfo->iIDSName));
+				else
+					missingPartsTexts.push_back(L"");
+			}
+		}
+
+		if (missingPartsTexts.size() > 0)
 		{
 			pub::Player::SendNNMessage(clientId, NONE_AVAILABLE_ID);
-			PrintUserCmdText(clientId, L"Parts are missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+			std::wstring joinedMissingPartsText = L"";
+			for (uint index = 0, length = missingPartsTexts.size(); index < length; index++)
+			{
+				joinedMissingPartsText += missingPartsTexts[index];
+				if (index + 1 < length)
+					joinedMissingPartsText += L", ";
+			}
+			PrintUserCmdText(clientId, joinedMissingPartsText + L" missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 			return false;
 		}
 
@@ -203,26 +226,27 @@ namespace Crafting
 		if (!equipment)
 			return false;
 		float totalVolumeNeeded = equipment->fVolume * recipe.count * batchCount;
-		for (const auto& foundCargoAndRequiredCount : foundCargosAndRequiredCount)
+		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
 		{
-			const Archetype::Equipment* equipment = Archetype::GetEquipment(foundCargoAndRequiredCount.first.iArchID);
+			const Archetype::Equipment* equipment = Archetype::GetEquipment(ingredientWithCount.first);
 			if (!equipment)
 				return false;
-			totalVolumeNeeded -= equipment->fVolume * foundCargoAndRequiredCount.second;
+			totalVolumeNeeded -= equipment->fVolume * ingredientWithCount.second * batchCount;
 		}
 		float remainingHoldSize;
 		pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-		if (remainingHoldSize - totalVolumeNeeded < 0.0f)
+		float cargoHoldDiff = remainingHoldSize - totalVolumeNeeded;
+		if (cargoHoldDiff < 0.0f)
 		{
 			pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
-			PrintUserCmdText(clientId, L"Not enough cargo space left to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+			PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 			return false;
 		}
 
 		// Exchange the items in the cargo hold.
-		for (const auto& foundCargoAndRequiredCount : foundCargosAndRequiredCount)
+		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
 		{
-			if (HkRemoveCargo(characterNameWS, foundCargoAndRequiredCount.first.iID, foundCargoAndRequiredCount.second) != HKE_OK)
+			if (HkRemoveCargo(characterNameWS, ingredientWithCount.first, ingredientWithCount.second * batchCount) != HKE_OK)
 				return false;
 		}
 

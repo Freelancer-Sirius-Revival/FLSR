@@ -24,11 +24,12 @@ namespace Crafting
 		int cost = 0;
 		std::vector<std::pair<uint, int>> ingredientArchetypeIdsWithCount;
 		std::set<uint> validBaseIds;
+		uint successSoundId = 0;
 	};
 
 	static std::unordered_map<std::string, Recipe> recipes;
 
-	static uint successSoundId = 0;
+	static uint defaultSuccessSoundId = 0;
 	static uint failSoundId = 0;
 
 	const uint NOT_ENOUGH_MONEY = pub::GetNicknameId("not_enough_money");
@@ -53,7 +54,7 @@ namespace Crafting
 					{
 						if (ini.is_value("success_sound_nickname"))
 						{
-							successSoundId = CreateID(ini.get_value_string(0));
+							defaultSuccessSoundId = CreateID(ini.get_value_string(0));
 						}
 						else if (ini.is_value("fail_sound_nickname"))
 						{
@@ -84,6 +85,10 @@ namespace Crafting
 						else if (ini.is_value("base_nickname"))
 						{
 							recipe.validBaseIds.insert(CreateID(ini.get_value_string(0)));
+						}
+						else if (ini.is_value("success_sound_nickname"))
+						{
+							recipe.successSoundId = CreateID(ini.get_value_string(0));
 						}
 					}
 					if (recipe.archetypeId && recipe.count && !recipe.ingredientArchetypeIdsWithCount.empty())
@@ -227,8 +232,9 @@ namespace Crafting
 
 		if (Tools::FLSRHkAddCargo(characterNameWS, recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
 		{
-			if (successSoundId)
-				pub::Audio::PlaySoundEffect(clientId, successSoundId);
+			const uint soundId = recipe.successSoundId ? recipe.successSoundId : defaultSuccessSoundId;
+			if (soundId)
+				pub::Audio::PlaySoundEffect(clientId, soundId);
 			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
 			PrintUserCmdText(clientId, L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'.");
 			return true;

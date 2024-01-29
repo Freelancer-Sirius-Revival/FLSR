@@ -922,25 +922,6 @@ namespace Cloak
 		}
 	}
 
-	void __stdcall FireWeapon(unsigned int clientId, XFireWeaponInfo const& fireWeaponInfo)
-	{
-		returncode = DEFAULT_RETURNCODE;
-
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
-		{
-			const size_t size = ((size_t)fireWeaponInfo.sHpIdsLast - (size_t)fireWeaponInfo.sHpIdsBegin) / 2;
-			for (size_t index = 0; index < size; index++)
-			{
-				if (fireWeaponInfo.sHpIdsBegin[index] == clientCloakStats[clientId].activatorCargoId)
-				{
-					if (clientCloakStats[clientId].cloakState == CloakState::Uncloaked && ToggleClientCloakActivator(clientId, true))
-						SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, true);
-					break;
-				}
-			}
-		}
-	}
-
 	void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
 	{
 		returncode = DEFAULT_RETURNCODE;

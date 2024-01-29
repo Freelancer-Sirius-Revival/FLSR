@@ -256,7 +256,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo() {
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ActivateEquip, PLUGIN_HkIServerImpl_ActivateEquip, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::FireWeapon, PLUGIN_HkIServerImpl_FireWeapon, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GoTradelane, PLUGIN_HkIServerImpl_GoTradelane, 0));

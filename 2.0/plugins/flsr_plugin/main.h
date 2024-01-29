@@ -441,7 +441,6 @@ namespace Cloak
     CloakState GetClientCloakState(uint clientId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
-    void __stdcall FireWeapon(unsigned int clientId, XFireWeaponInfo const& fireWeaponInfo);
     void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
     void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
     void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane);

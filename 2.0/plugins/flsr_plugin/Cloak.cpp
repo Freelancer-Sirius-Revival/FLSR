@@ -741,7 +741,7 @@ namespace Cloak
 				}
 			}
 		}
-		if (insideNoCloakZone != NoCloakZone::None && jumpHolePositionsPerSystem.contains(clientSystemId))
+		if (insideNoCloakZone == NoCloakZone::None && jumpHolePositionsPerSystem.contains(clientSystemId))
 		{
 			for (const Vector& jumpHolePosition : jumpHolePositionsPerSystem[clientSystemId])
 			{

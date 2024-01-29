@@ -344,7 +344,7 @@ namespace Docking
         {
             uint type;
             pub::SpaceObj::GetType(solar->iID, type);
-            if (type == OBJ_AIRLOCK_GATE)
+            if (type == OBJ_JUMP_HOLE)
                 jumpObjects.push_back(solar);
         }
 
@@ -692,7 +692,7 @@ namespace Docking
         return false;
     }
 
-    void __stdcall LaunchComplete(unsigned int objectId, unsigned int shipId)
+    void __stdcall LaunchComplete_After(unsigned int objectId, unsigned int shipId)
     {
         returncode = DEFAULT_RETURNCODE;
 
@@ -760,18 +760,6 @@ namespace Docking
         }
     }
 
-    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
-    {
-        returncode = DEFAULT_RETURNCODE;
-
-        if (Modules::GetModuleState("CarrierModule"))
-        {
-            uint clientId = HkGetClientIDByShip(shipId);
-            if (clientId)
-                carrierClientIdInJump.erase(clientId);
-        }
-    }
-
     int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
     {
         returncode = DEFAULT_RETURNCODE;
@@ -807,14 +795,20 @@ namespace Docking
         return 0;
     }
 
-    // AIRLOCK_GATE objects do not trigger JumpOutComplete and thus SystemSwitchOutComplete must be used.
-    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId)
+    void __stdcall JumpInComplete_After(unsigned int systemId, unsigned int shipId)
     {
         returncode = DEFAULT_RETURNCODE;
 
-        if (Modules::GetModuleState("CarrierModule") && undockPathByClientId.contains(clientId))
+        if (Modules::GetModuleState("CarrierModule"))
         {
-            TryReachCarrier(clientId);
+            uint clientId = HkGetClientIDByShip(shipId);
+            if (clientId)
+                carrierClientIdInJump.erase(clientId);
+
+            if (undockPathByClientId.contains(clientId))
+            {
+                TryReachCarrier(clientId);
+            }
         }
     }
 
@@ -852,7 +846,7 @@ namespace Docking
         }
     }
 
-    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
 
@@ -893,7 +887,7 @@ namespace Docking
         }
     }
 
-    void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId)
+    void __stdcall ReqShipArch_After(unsigned int archetypeId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
 

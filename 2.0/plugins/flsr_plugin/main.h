@@ -316,13 +316,12 @@ namespace Docking
 {
     void LoadSettings();
     void InitializeWithGameData();
-    void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId);
-    void __stdcall LaunchComplete(unsigned int baseId, unsigned int shipId);
-    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
+    void __stdcall LaunchComplete_After(unsigned int baseId, unsigned int shipId);
+    void __stdcall JumpInComplete_After(unsigned int systemId, unsigned int shipId);
     int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
-    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId);
     void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
-    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
+    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
+    void __stdcall ReqShipArch_After(unsigned int archetypeId, unsigned int clientId);
     void UserCmd_Dock(const uint clientId, const std::wstring& wscParam);
 }
 

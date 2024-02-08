@@ -1,7 +1,7 @@
 			  Freelancer Resource Compiler
 				 by Jason Hood
 
-				  Version 1.10
+				  Version 1.11
 
 
 ===========
@@ -46,18 +46,18 @@ find the normal update now works.
 Extract the resources in INFILE to OUTFILE.  OUTFILE will either be INFILE.frc
 (in the PATH directory, replacing the extension) or OUTFILE (appending ".frc" if
 no extension is present).  Multiple INFILEs (and OUTFILEs) are allowed, but all
-will use the same set of options.  By default, an ANSI (Windows-1252) file is
-created; use "-u" to generate a Unicode (UTF-16) file.  No line will be longer
-than WIDTH, which is the current buffer width by default.  String resources
-(names) will be indented by nine spaces and HTML resources (infocards) will use
-one tab (assumed to be eight spaces).  Use INDENT to choose your own margins -
-positive to use spaces, negative to set the tab size (e.g. "-i 10" will use ten
-spaces; "-i -10" will use one tab, assumed to be ten spaces).  Strings will
-never use less than nine spaces.  Standard DLLs will always use the appropriate
-identifier (e.g. "New York" in NameResources will use 196609, not 1); use "-r"
-to indicate the identifier for your custom DLL.  It uses the position of the DLL
-within freelancer.ini's [Resources] section (e.g. NameResources is "-r 3").
-Subsequent DLLs will increase POS by one (e.g. "res2frc -r 7 custom1 custom2" is
+will use the same set of options.  By default, a system ANSI file is created;
+use "-u" to generate a Unicode (UTF-16) file.  No line will be longer than
+WIDTH, which is the current buffer width by default.  String resources (names)
+will be indented by nine spaces and HTML resources (infocards) will use one tab
+(assumed to be eight spaces).  Use INDENT to choose your own margins - positive
+to use spaces, negative to set the tab size (e.g. "-i 10" will use ten spaces;
+"-i -10" will use one tab, assumed to be ten spaces).  Strings will never use
+less than nine spaces.	Standard DLLs will always use the appropriate identifier
+(e.g. "New York" in NameResources will use 196609, not 1); use "-r" to indicate
+the identifier for your custom DLL.  It uses the position of the DLL within
+freelancer.ini's [Resources] section (e.g. NameResources is "-r 3").  Subsequent
+DLLs will increase POS by one (e.g. "res2frc -r 7 custom1 custom2" is
 effectively "res2frc -r 7 custom1 -r 8 custom2").
 
 
@@ -66,12 +66,12 @@ FORMAT
 ======
 
 An FRC file is treated as Unicode (UTF-16) if it starts with the byte-order
-mark, or if the second byte is a zero; otherwise as ANSI (Windows-1252).
-Comments start with a semicolon (";"), but only after a space or tab (meaning a
-semicolon following a word will be normal punctuation, not a comment).	Block
-comments start with ";+" and end with ";-".  They must start the line and they
-are not processed within text.	The file contains a number of "commands", a
-single character at the start of a line.
+mark, or if the second byte is a zero; otherwise as system ANSI.  Comments start
+with a semicolon (";"), but only after a space or tab (meaning a semicolon
+following a word will be normal punctuation, not a comment). Block comments
+start with ";+" and end with ";-".  They must start the line and they are not
+processed within text.	The file contains a number of "commands", a single
+character at the start of a line.
 
 L id - language
 
@@ -207,6 +207,14 @@ HISTORY
 
 Legend: - bug fix, + added, * changed.
 
+v1.11, 3 February, 2024:
+
+FRC
+- fix \c (swap nybbles when writing the color, create RRGGBB correctly).
+
+RES2FRC
++ recognise color names.
+
 v1.10, 8 May, 2012:
 
 FRC
@@ -226,5 +234,5 @@ v1.00, 27 July, 2010:
 + initial release.
 
 ================================
-Jason Hood, 8 May, 2012.
-http://freelancer.adoxa.cjb.net/
+Jason Hood, 3 February, 2024.
+http://freelancer.adoxa.vze.com/

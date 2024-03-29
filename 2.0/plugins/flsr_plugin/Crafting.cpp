@@ -185,12 +185,17 @@ namespace Crafting
 		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
 			missingIngredientArchetypeIdsWithCount.push_back({ ingredientWithCount.first, ingredientWithCount.second * batchCount });
 
+		std::unordered_map<uint, uint> foundIngredientIdByArchetypeId;
+
 		for (auto& ingredientWithCount : missingIngredientArchetypeIdsWithCount)
 		{
 			for (const CARGO_INFO& cargo : cargoList)
 			{
 				if (cargo.iArchID == ingredientWithCount.first)
+				{
 					ingredientWithCount.second -= cargo.iCount;
+					foundIngredientIdByArchetypeId[ cargo.iArchID ] = cargo.iID;
+				}
 			}
 		}
 
@@ -246,7 +251,9 @@ namespace Crafting
 		// Exchange the items in the cargo hold.
 		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
 		{
-			if (HkRemoveCargo(characterNameWS, ingredientWithCount.first, ingredientWithCount.second * batchCount) != HKE_OK)
+			const uint archetypeId = ingredientWithCount.first;
+			const int count = ingredientWithCount.second * batchCount;
+			if (!foundIngredientIdByArchetypeId.contains(archetypeId) || HkRemoveCargo(characterNameWS, foundIngredientIdByArchetypeId[archetypeId], count) != HKE_OK)
 				return false;
 		}
 

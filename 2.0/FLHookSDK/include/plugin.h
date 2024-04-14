@@ -168,6 +168,8 @@ enum PLUGIN_CALLBACKS
 	PLUGIN_HkCb_AddDmgEntry,
 	PLUGIN_HkCb_AddDmgEntry_AFTER,
 	PLUGIN_HkCb_GeneralDmg,
+	PLUGIN_HkCb_Rename,
+	PLUGIN_HkCb_Rename_AFTER,
 	PLUGIN_AllowPlayerDamage,
 	PLUGIN_SendDeathMsg,
 	PLUGIN_ShipDestroyed,

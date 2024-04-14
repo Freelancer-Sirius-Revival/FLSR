@@ -51,7 +51,6 @@ namespace Insurance
     const std::string INSURANCE_ON_VALUE = "ON";
     const std::string INSURANCE_OFF_VALUE = "OFF";
 
-    const std::string CHARACTER_NAME_KEY = "Charname";
     const std::string TOTAL_PRICE_KEY = "Worth";
     const std::string ITEMS_COUNT_KEY = "EquipCount";
     const std::string ITEM_MOUNTED_KEY = "bMounted";
@@ -99,12 +98,12 @@ namespace Insurance
 
     bool IsArchetypeTypeEquipment(const Archetype::AClassType archetypeType)
     {
-        return  archetypeType == Archetype::SHIELD_GENERATOR ||
-                archetypeType == Archetype::THRUSTER ||
-                archetypeType == Archetype::LAUNCHER ||
-                archetypeType == Archetype::GUN ||
-                archetypeType == Archetype::MINE_DROPPER ||
-                archetypeType == Archetype::COUNTER_MEASURE_DROPPER;
+        return archetypeType == Archetype::SHIELD_GENERATOR ||
+               archetypeType == Archetype::THRUSTER ||
+               archetypeType == Archetype::LAUNCHER ||
+               archetypeType == Archetype::GUN ||
+               archetypeType == Archetype::MINE_DROPPER ||
+               archetypeType == Archetype::COUNTER_MEASURE_DROPPER;
     }
 
     bool IsArchetypeTypeConsumable(const Archetype::AClassType archetypeType)
@@ -280,7 +279,6 @@ namespace Insurance
         const std::string characterFileName = wstos(characterFileNameWS);
         const std::string insuranceFilePath = insurancesDirectory + characterFileName + INSURANCE_FILE_EXTENSION;
 
-        IniWrite(insuranceFilePath, INSURANCE_INI_SECTION, CHARACTER_NAME_KEY, characterFileName);
         IniWrite(insuranceFilePath, INSURANCE_INI_SECTION, TOTAL_PRICE_KEY, std::to_string(totalPrice));
         IniWrite(insuranceFilePath, INSURANCE_INI_SECTION, ITEMS_COUNT_KEY, std::to_string(insuredCargoList.size()));
 
@@ -314,6 +312,21 @@ namespace Insurance
         }
     }
 
+    std::string GetInsuranceFilePath(const std::wstring characterFileName)
+    {
+        char currentDirectory[MAX_PATH];
+        GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
+        const std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
+        return insurancesDirectory + wstos(characterFileName) + INSURANCE_FILE_EXTENSION;
+    }
+
+    void DeleteInsuranceFileIfExisting(const std::wstring characterFileName)
+    {
+        const std::string insuranceFilePath = GetInsuranceFilePath(characterFileName);
+        if (IsInsuranceFileExisting(insuranceFilePath))
+            DeleteFile(insuranceFilePath.c_str());
+    }
+
     void UseInsurance(const uint clientId)
     {
         char currentDirectory[MAX_PATH];
@@ -327,7 +340,7 @@ namespace Insurance
         if (!IsInsuranceFileExisting(insuranceFilePath))
             return;
 
-        int insuredEquipmentCount = IniGetI(insuranceFilePath, INSURANCE_INI_SECTION, ITEMS_COUNT_KEY, 0);
+        const int insuredEquipmentCount = IniGetI(insuranceFilePath, INSURANCE_INI_SECTION, ITEMS_COUNT_KEY, 0);
 
         std::list<RestoreCargoItem> insuredCargoList;
         for (int equipmentIndex = 0; equipmentIndex < insuredEquipmentCount; equipmentIndex++)
@@ -460,8 +473,7 @@ namespace Insurance
         if (!restorationOutput.empty())
             PrintUserCmdText(clientId, restorationOutput);
 
-        // Clear insurance after usage.
-        remove(insuranceFilePath.c_str());
+        DeleteInsuranceFileIfExisting(characterFileNameWS);
     }
 
     bool IsInsuranceRequested(const uint clientId)
@@ -643,5 +655,49 @@ namespace Insurance
 
             PrintUserCmdText(clientId, L"Currently insured: " + stows(GetCurrentlyInsuredTypesJoinedString(clientId)));
         }
+    }
+
+    void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        std::wstring characterFileName;
+        if (HkGetCharFileName(info.wszCharname, characterFileName) != HKE_OK)
+            return;
+        DeleteInsuranceFileIfExisting(characterFileName);
+    }
+
+    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        const std::wstring charFileName = stows(std::string(characterId.szCharFilename).substr(0, 11));
+        DeleteInsuranceFileIfExisting(charFileName);
+    }
+
+    static std::wstring charFileNameToRename;
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        if (onlyDelete || HkGetCharFileName(charname, charFileNameToRename) != HKE_OK)
+            charFileNameToRename = L"";
+        return HKE_OK;
+    }
+
+    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        if (!charFileNameToRename.empty())
+        {
+            std::wstring characterFileName;
+            if (HkGetCharFileName(newCharname, characterFileName) == HKE_OK)
+            {
+                const std::string oldCharFilePath = GetInsuranceFilePath(charFileNameToRename);
+                const std::string newCharFilePath = GetInsuranceFilePath(characterFileName);
+                CopyFile(oldCharFilePath.c_str(), newCharFilePath.c_str(), FALSE);
+                DeleteFile(oldCharFilePath.c_str());
+            }
+        }
+        charFileNameToRename = L"";
+        return HKE_OK;
     }
 }

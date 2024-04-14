@@ -483,6 +483,7 @@ HK_ERROR HkAddCargo(const std::wstring &wscCharname,
 
 HK_ERROR HkRename(const std::wstring &wscCharname,
                   const std::wstring &wscNewCharname, bool bOnlyDelete) {
+
     HK_GET_CLIENTID_OR_LOGGED_OUT(iClientID, wscCharname);
 
     if ((iClientID == -1) && !HkGetAccountByCharname(wscCharname))
@@ -501,6 +502,8 @@ HK_ERROR HkRename(const std::wstring &wscCharname,
     if (!bOnlyDelete &&
         !(ini.open("..\\DATA\\CHARACTERS\\newcharacter.ini", false)))
         return HKE_MPNEWCHARACTERFILE_NOT_FOUND_OR_INVALID;
+
+    CALL_PLUGINS(PLUGIN_HkCb_Rename, HK_ERROR, , (const std::wstring&, const std::wstring&, bool), (wscCharname, wscNewCharname, bOnlyDelete));
 
     CAccount *acc;
     std::wstring wscOldCharname;
@@ -530,6 +533,7 @@ HK_ERROR HkRename(const std::wstring &wscCharname,
         HkLockAccountAccess(acc, true); // also kicks player on this account
         Players.DeleteCharacterFromName(str);
         HkUnlockAccountAccess(acc);
+        CALL_PLUGINS(PLUGIN_HkCb_Rename_AFTER, HK_ERROR, , (const std::wstring&, const std::wstring&, bool), (wscCharname, wscNewCharname, bOnlyDelete));
         return HKE_OK;
     }
 
@@ -625,6 +629,8 @@ HK_ERROR HkRename(const std::wstring &wscCharname,
         scValue += szBuf;
     }
     IniWrite(scNewCharfilePath, "Player", "Name", scValue);
+
+    CALL_PLUGINS(PLUGIN_HkCb_Rename_AFTER, HK_ERROR, , (const std::wstring&, const std::wstring&, bool), (wscCharname, wscNewCharname, bOnlyDelete));
 
     // Re-encode the char file if needed.
     if (!set_bDisableCharfileEncryption)

@@ -90,7 +90,7 @@ namespace Docking
         }
     }
 
-    void DisconnectCharacterFromCarrier(const std::string& characterFileName, const std::string& carrierFileName)
+    void DisconnectCharacterFromCarrier(const std::string& characterFileName)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
@@ -628,9 +628,6 @@ namespace Docking
         if (!IsCarrierReachable(clientId, carrierId) || !undockPathByClientId.contains(clientId))
         {
             // Beam back to where the player came from.
-            const std::string& clientFileName = GetCharacterFileName(clientId);
-            if (clientFileName.empty())
-                return false;
             const uint shiparchId = carrierAssignmentByCharacterFileNameId[clientFileNameId].carrierShiparchId;
             if (!carrierDefinitionByShipArchetypeId.contains(shiparchId))
                 return false; // TODO: Jumps to this when carrier has a new non-carrier ship
@@ -873,18 +870,21 @@ namespace Docking
         }
     }
 
+    void ClearCarrier(const std::string carrierFileName)
+    {
+        const uint carrierFileNameId = CreateID(carrierFileName.c_str());
+        for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
+        {
+            if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == carrierFileNameId)
+                DisconnectCharacterFromCarrier(assignment.second.characterFileName);
+        }
+    }
+
     void ClearCarrier(const uint clientId)
     {
         const std::string& fileName = GetCharacterFileName(clientId);
         if (!fileName.empty())
-        {
-            const uint carrierFileNameId = CreateID(fileName.c_str());
-            for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
-            {
-                if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == carrierFileNameId)
-                    DisconnectCharacterFromCarrier(assignment.second.characterFileName, fileName);
-            }
-        }
+            ClearCarrier(fileName);
     }
 
     void __stdcall ReqShipArch_After(unsigned int archetypeId, unsigned int clientId)
@@ -895,6 +895,89 @@ namespace Docking
         {
             ClearCarrier(clientId);
         }
+    }
+
+    void DeleteCharacterFromRecords(const std::string& characterFileName)
+    {
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        carrierAssignmentByCharacterFileNameId.erase(characterFileNameId);
+        dockLocationByCharacterFileNameIds.erase(characterFileNameId);
+        lastRegularBaseNameByCharacterFileNameId.erase(characterFileNameId);
+        IniDelSection(GetCarrierMapFilePath(), characterFileName);
+
+        // Throw off every character that is docked here.
+        ClearCarrier(characterFileName);
+    }
+
+    void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        std::wstring characterFileNameWS;
+        if (HkGetCharFileName(info.wszCharname, characterFileNameWS) != HKE_OK)
+            return;
+        DeleteCharacterFromRecords(wstos(characterFileNameWS));
+    }
+
+    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        const std::string characterFileName = std::string(characterId.szCharFilename).substr(0, 11);
+        DeleteCharacterFromRecords(characterFileName);
+    }
+
+    void MoveCharacterInRecords(const std::string& oldCharacterFileName, const std::string& newCharacterFileName)
+    {
+        const uint oldCharacterFileNameId = CreateID(oldCharacterFileName.c_str());
+        const uint newCharacterFileNameId = CreateID(newCharacterFileName.c_str());
+
+        carrierAssignmentByCharacterFileNameId[newCharacterFileNameId] = carrierAssignmentByCharacterFileNameId[oldCharacterFileNameId];
+        carrierAssignmentByCharacterFileNameId.erase(oldCharacterFileNameId);
+
+        dockLocationByCharacterFileNameIds[newCharacterFileNameId] = dockLocationByCharacterFileNameIds[oldCharacterFileNameId];
+        dockLocationByCharacterFileNameIds.erase(oldCharacterFileNameId);
+
+        lastRegularBaseNameByCharacterFileNameId[newCharacterFileNameId] = lastRegularBaseNameByCharacterFileNameId[oldCharacterFileNameId];
+        lastRegularBaseNameByCharacterFileNameId.erase(oldCharacterFileNameId);
+
+        const std::string carrierFilePath = GetCarrierMapFilePath();
+        std::list<INISECTIONVALUE> keyValues;
+        IniGetSection(carrierFilePath, oldCharacterFileName, keyValues);
+        for (const INISECTIONVALUE keyValue : keyValues)
+            IniWrite(carrierFilePath, newCharacterFileName, keyValue.scKey, keyValue.scValue);
+        IniDelSection(carrierFilePath, oldCharacterFileName);
+
+        // Re-assign all clients that are docked to this character.
+        for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
+        {
+            if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == oldCharacterFileNameId)
+            {
+                carrierAssignmentByCharacterFileNameId[assignment.first].carrierFileName = newCharacterFileName;
+                IniWrite(carrierFilePath, assignment.second.characterFileName, "assignment", newCharacterFileName + ", " + (assignment.second.assigned ? "true" : "false"));
+            }
+        }
+    }
+
+    static std::wstring characterFileNameToRename;
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
+            characterFileNameToRename = L"";
+        return HKE_OK;
+    }
+
+    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        if (!characterFileNameToRename.empty())
+        {
+            std::wstring newCharacterFileName;
+            if (HkGetCharFileName(newCharname, newCharacterFileName) == HKE_OK)
+                MoveCharacterInRecords(wstos(characterFileNameToRename), wstos(newCharacterFileName));
+        }
+        characterFileNameToRename = L"";
+        return HKE_OK;
     }
 
     void UserCmd_Dock(const uint clientId, const std::wstring& wscParam)

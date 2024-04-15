@@ -669,35 +669,35 @@ namespace Insurance
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
-        const std::wstring charFileName = stows(std::string(characterId.szCharFilename).substr(0, 11));
-        DeleteInsuranceFileIfExisting(charFileName);
+        const std::wstring characterFileName = stows(std::string(characterId.szCharFilename).substr(0, 11));
+        DeleteInsuranceFileIfExisting(characterFileName);
     }
 
-    static std::wstring charFileNameToRename;
+    static std::wstring characterFileNameToRename;
 
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
         returncode = DEFAULT_RETURNCODE;
-        if (onlyDelete || HkGetCharFileName(charname, charFileNameToRename) != HKE_OK)
-            charFileNameToRename = L"";
+        if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
+            characterFileNameToRename = L"";
         return HKE_OK;
     }
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
         returncode = DEFAULT_RETURNCODE;
-        if (!charFileNameToRename.empty())
+        if (!characterFileNameToRename.empty())
         {
             std::wstring characterFileName;
             if (HkGetCharFileName(newCharname, characterFileName) == HKE_OK)
             {
-                const std::string oldCharFilePath = GetInsuranceFilePath(charFileNameToRename);
+                const std::string oldCharFilePath = GetInsuranceFilePath(characterFileNameToRename);
                 const std::string newCharFilePath = GetInsuranceFilePath(characterFileName);
                 CopyFile(oldCharFilePath.c_str(), newCharFilePath.c_str(), FALSE);
                 DeleteFile(oldCharFilePath.c_str());
             }
         }
-        charFileNameToRename = L"";
+        characterFileNameToRename = L"";
         return HKE_OK;
     }
 }

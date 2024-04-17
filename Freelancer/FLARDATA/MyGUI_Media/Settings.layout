@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Window" skin="WindowCS" position="0 0 590 825" layer="Overlapped" name="SettingsWindow">
+        <Property key="Caption" value="Settings"/>
+        <Property key="MinSize" value="200 200"/>
+        <Property key="Snap" value="true"/>
+        <Widget type="ScrollView" skin="ScrollViewEmpty" position="0 0 580 790" align="Stretch" name="ScrollView">
+            <Property key="CanvasSize" value="580 780"/>
+            <Property key="VisibleHScroll" value="true"/>
+            <Property key="VisibleVScroll" value="true"/>
+            <Property key="CanvasAlign" value="Default"/>
+            <Widget type="Button" skin="CheckBox" position="15 145 380 20" name="CheckboxNewLighting">
+                <Property key="Caption" value="Enable New Lighting (Old Lighting Not Exactly Like FL)"/>
+                <Property key="Enabled" value="true"/>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="15 170 360 20" name="CheckboxEnvironmentMaps">
+                <Property key="Caption" value="Enable Environment Maps (Starsphere Reflection)"/>
+                <Property key="Enabled" value="true"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="350 745 115 35" name="ButtonSave">
+                <Property key="Caption" value="Save Settings"/>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="15 490 130 20" name="CheckboxShadows">
+                <Property key="Caption" value="Enable Shadows"/>
+                <Property key="Enabled" value="true"/>
+                <Property key="Depth" value="-1"/>
+                <Property key="Alpha" value="1"/>
+            </Widget>
+            <Widget type="Widget" skin="PanelSkin" position="5 500 570 170" name="GroupBoxShadows">
+                <Property key="Enabled" value="true"/>
+                <Property key="Depth" value="0"/>
+                <Widget type="ComboBox" skin="ComboBox" position="175 35 100 25" name="ComboBoxShadowSplitPlanes">
+                    <Property key="ModeDrop" value="true"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 40 150 15">
+                    <Property key="Caption" value="Number of Split Planes:"/>
+                </Widget>
+                <Widget type="ComboBox" skin="ComboBox" position="175 60 100 25" name="ComboBoxShadowMapSize">
+                    <Property key="ModeDrop" value="true"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 65 125 15">
+                    <Property key="Caption" value="Shadow Map Size:"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 90 155 15">
+                    <Property key="Caption" value="Shadow Casting Lights:"/>
+                </Widget>
+                <Widget type="ComboBox" skin="ComboBox" position="175 85 60 25" name="ComboBoxShadowLightCount">
+                    <Property key="ModeDrop" value="true"/>
+                    <Property key="AddItem" value="1"/>
+                    <Property key="AddItem" value="2"/>
+                </Widget>
+                <Widget type="ComboBox" skin="ComboBox" position="175 10 100 25" name="ComboBoxShadowQuality">
+                    <Property key="ModeDrop" value="true"/>
+                    <Property key="AddItem" value="Custom"/>
+                    <Property key="AddItem" value="Very Low"/>
+                    <Property key="AddItem" value="Low"/>
+                    <Property key="AddItem" value="Medium"/>
+                    <Property key="AddItem" value="High"/>
+                    <Property key="AddItem" value="Very High"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 15 115 15">
+                    <Property key="Caption" value="Shadow Quality:"/>
+                </Widget>
+                <Widget type="Button" skin="CheckBox" position="10 135 195 20" name="CheckboxAsteroidShadows">
+                    <Property key="Caption" value="Enable Asteroid Shadows"/>
+                    <Property key="Enabled" value="true"/>
+                </Widget>
+                <Widget type="Button" skin="CheckBox" position="10 110 245 20" name="CheckboxShadowPCF">
+                    <Property key="Caption" value="Enable Shadow Antialiasing (PCF)"/>
+                    <Property key="Enabled" value="true"/>
+                </Widget>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="15 275 175 20" name="CheckboxPostpocessing">
+                <Property key="Caption" value="Enable Postprocessing"/>
+                <Property key="Depth" value="-1"/>
+            </Widget>
+            <Widget type="Widget" skin="PanelSkin" position="5 285 570 110" name="GroupBoxPostprocessing">
+                <Property key="Enabled" value="true"/>
+                <Widget type="Button" skin="CheckBox" position="10 35 400 20" name="CheckBoxAutomaticExposure">
+                    <Property key="Caption" value="Enable Automatic Camera Exposure (Early Version)"/>
+                </Widget>
+                <Widget type="Button" skin="CheckBox" position="10 60 350 20" name="CheckboxLightScattering">
+                    <Property key="Caption" value="Enable Light Scattering (Nebula + Asteroid Fields)"/>
+                </Widget>
+                <Widget type="ComboBox" skin="ComboBox" position="110 10 195 25" name="ComboBoxTonemapping">
+                    <Property key="ModeDrop" value="true"/>
+                    <Property key="AddItem" value="GT Sport (More Realistic)"/>
+                    <Property key="AddItem" value="ACES (More Contrast)"/>
+                    <Property key="Caption" value="GT Sport (More Realistic)"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 15 95 15">
+                    <Property key="Caption" value="Tonemapping:"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 85 170 15">
+                    <Property key="Caption" value="Light Scattering Sun limit:"/>
+                </Widget>
+                <Widget type="ComboBox" skin="ComboBox" position="180 80 60 25" name="ComboBoxLightScatteringSunLimit">
+                    <Property key="ModeDrop" value="true"/>
+                </Widget>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="15 195 195 20" name="CheckboxParallaxMaps">
+                <Property key="Caption" value="Enable Parallax Mapping"/>
+                <Property key="Enabled" value="true"/>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="15 220 395 20" name="CheckboxHQDiffuse">
+                <Property key="Caption" value="Enable High Quality Diffuse Lighting (Planets, Rocks etc.)"/>
+                <Property key="Enabled" value="true"/>
+            </Widget>
+            <Widget type="EditBox" skin="WordWrapEmpty" position="15 55 560 35">
+                <Property key="Caption" value="Warning: Main menu background scene does not use correct rendering yet (do not use for settings testing)"/>
+                <Property key="WordWrap" value="true"/>
+                <Property key="TextColour" value="1 0.187135 0.187135"/>
+            </Widget>
+            <Widget type="ComboBox" skin="ComboBox" position="310 90 60 25" name="ComboBoxMSAA">
+                <Property key="AddItem" value="Off"/>
+                <Property key="AddItem" value="2x"/>
+                <Property key="AddItem" value="4x"/>
+                <Property key="AddItem" value="8x"/>
+                <Property key="ModeDrop" value="true"/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="15 95 280 20">
+                <Property key="Caption" value="Antialiasing (MSAA, Needs Game Restart):"/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="15 120 290 20">
+                <Property key="Caption" value="Anisotropic Filtering (Needs Game Restart):"/>
+            </Widget>
+            <Widget type="ComboBox" skin="ComboBox" position="310 115 60 25" name="ComboBoxAnistropicFiltering">
+                <Property key="ModeDrop" value="true"/>
+                <Property key="AddItem" value="Off"/>
+                <Property key="AddItem" value="2x"/>
+                <Property key="AddItem" value="4x"/>
+                <Property key="AddItem" value="8x"/>
+                <Property key="AddItem" value="16x"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="110 745 115 35" name="ButtonUndoChanges">
+                <Property key="Caption" value="Undo Changes"/>
+            </Widget>
+            <Widget type="Widget" skin="PanelSkin" position="5 680 570 60">
+                <Widget type="Button" skin="CheckBox" position="10 10 415 25" name="CheckBoxDisableGUI">
+                    <Property key="Caption" value="Disable FL GUI Rendering (for Videos etc.)"/>
+                </Widget>
+                <Widget type="Button" skin="CheckBox" position="10 35 105 20" name="CheckBoxShowFPS">
+                    <Property key="Caption" value="Show FPS"/>
+                </Widget>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="15 670 175 15">
+                <Property key="Caption" value="Miscellaneous"/>
+            </Widget>
+            <Widget type="EditBox" skin="WordWrapEmpty" position="175 20 400 35" name="WordWrapGraphicsCard">
+                <Property key="WordWrap" value="true"/>
+                <Property key="TextColour" value="0.959064 0.916189 0.381382"/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="15 20 160 20">
+                <Property key="Caption" value="Selected Graphics Card:"/>
+                <Property key="TextColour" value="0.959064 0.916189 0.381382"/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="15 0 120 20">
+                <Property key="Caption" value="Renderer Version: "/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="135 0 440 20" name="TextBoxRendererVersion"/>
+            <Widget type="Widget" skin="PanelSkin" position="5 415 570 75" name="GroupBoxClusteredShading">
+                <Widget type="ComboBox" skin="ComboBox" position="180 5 60 30" name="ComboBoxMaxLights">
+                    <Property key="ModeDrop" value="true"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="10 10 155 20">
+                    <Property key="Caption" value="Max. Number of Lights:"/>
+                </Widget>
+                <Widget type="Button" skin="CheckBox" position="10 35 550 25" name="CheckBoxReplaceFakeLights">
+                    <Property key="Caption" value="Replace Fake Lights with Real Lights (Needs Postprocessing + At Least 4x MSAA)"/>
+                </Widget>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="10 405 210 20" name="CheckBoxClusteredShading">
+                <Property key="Caption" value="Enable Clustered Shading"/>
+            </Widget>
+            <Widget type="Button" skin="CheckBox" position="15 245 530 25" name="CheckBoxPreciseSRGB">
+                <Property key="Caption" value="Always Use Accurate SRGB Color Conversion (Slower, But Better Colors)"/>
+            </Widget>
+        </Widget>
+    </Widget>
+    <CodeGeneratorSettings/>
+</MyGUI>

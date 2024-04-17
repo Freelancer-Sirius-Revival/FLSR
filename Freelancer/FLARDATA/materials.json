@@ -1,0 +1,102 @@
+{
+    "DefaultMaterial": {
+        "Roughness" : 0.4,
+        "Metalness" : 0.9,
+        "RoughnessTextureBias" : 0.03
+    },  
+    "ExactMatchedMaterials": [	
+	    {
+            "TextureNames": [
+                "atmosphere", "cratermoon", "desert_clouds_01", "desert_clouds_02", "desert_clouds_cap", "desert_med_01", "desert_med_02", "desert_med_cap", "desert_red_01", "desert_red_02", "desert_red_cap", "desert_rock_01", "desert_rock_02", "desert_rock_cap", "desert01", "desert02", "desertcap", "detailmap_city", "detailmap_crater_high", "detailmap_crater_low", "detailmap_crater_mid", "detailmap_ground01", "detailmap_lava", "detailmap_ocean", "detailmap_rock01", "earthcity01", "earthcity02", "earthcitycap", "earthgaia", "earthgaiacap", "earthgrncld01", "earthgrncld02", "earthgrncldcap", "earthlike01", "earthlike02", "earthlikecap", "earthsnwcld01", "earthsnwcld02", "earthsnwcldcap", "gasblucld01", "gasblucld02", "gasblucldcap", "gasgrncld01", "gasgrncld02", "gasgrncldcap", "gasicecld", "gasorgcld01", "gasorgcld02", "gasorgcldcap", "gaspurcld01", "gaspurcld02", "gaspurcldcap", "gasyelcld", "greenwater01", "greenwater02", "greenwatercap", "icegrey01", "icegrey02", "icegreycap", "icelndwat01", "icelndwat02", "icelndwatcap", "icemntcld01", "icemntcld02", "icemntcldcap", "icemoon", "icepurple01", "icepurple02", "icepurplecap", "icewatcld01", "icewatcld02", "icewatcldcap", "icewatind01", "icewatind02", "icewatindcap", "icewhiteblue01", "icewhiteblue02", "icewhitebluecap", "indust01", "indust02", "industcap", "jupiter_eirope", "jupiter_ganimed", "jupiter_io", "mercury01", "mercury02", "mercurycap", "moon_body.tga", "moonblu", "moonred", "moonyellow", "neptuncap", "neptunside", "neutron", "NUPS_fun_pl01_side1.tga", "NUPS_fun_pl02_side1.tga", "NUPS_fun_pl03_side1.tga", "nups_pla_des01_atmosphere.tga", "nups_pla_des01_side1.tga", "nups_pla_des01_side2.tga", "nups_pla_des01_side3.tga", "nups_pla_des01_side4.tga", "nups_pla_des01_sidebottom.tga", "nups_pla_des01_sidetop.tga", "NUPS_planet_capricacap1", "NUPS_planet_capricacap2", "NUPS_planet_capricaside", "NUPS_planet_scorpio01_bottom.tga", "NUPS_planet_scorpio01_side1.tga", "NUPS_planet_scorpio01_side2.tga", "NUPS_planet_scorpio01_side3.tga", "NUPS_planet_scorpio01_side4.tga", "NUPS_planet_scorpio01_top.tga", "ocean_bluclds_01", "ocean_bluclds_02", "ocean_bluclds_cap", "ocean_bluislclds_01", "ocean_bluislclds_02", "ocean_bluislclds_cap", "ocean_blusmlcld_01", "ocean_blusmlcld_02", "ocean_blusmlcld_cap", "ocean_drkclds_01", "ocean_drkclds_02", "ocean_drkclds_cap", "ocean_grnclds_01", "ocean_grnclds_02", "ocean_grnclds_cap", "plutoside", "rckbrn_01", "rckbrn_02", "rckbrn_cap", "rockdes_01", "rockdes_02", "rockdes_cap", "rockmnt", "rockmnt_01", "rockmnt_cap", "saturncap1", "saturncap2", "saturnside", "sw_planet1_earthside1.tga", "sw_planet1_earthside2.tga", "sw_planet1_earthside3.tga", "sw_planet1_earthside4.tga", "sw_planet1_earthsidebottom.tga", "sw_planet1_earthsidetop.tga", "upiter01", "upiter02", "upitercap", "uranusside", "venus"
+            ],
+            "Roughness" : 1.0,
+            "Metalness" : 0.0
+        },
+        {
+            "TextureNames": [
+                "tree_64.tga","Sprauge_Grass.tga"
+            ],
+            "Roughness" : 0.2,
+            "Metalness" : 0.1
+        },
+        {
+            "TextureNames": [
+                "APE.TGA", "br_bartender_head02.TGA", "br_brighton_head02.TGA", "br_captain_head01.tga", "br_carina_head02.TGA", "br_darcy_head01.tga", "br_kaitlyn_head01.tga", "br_newscaster_head01.TGA", "br_quigly_head02.TGA", "br_sales_head02.TGA", "br_tobias_head.tga", "eyeblue.tga", "eyebrown.tga", "eyebrown_grey.TGA", "eyebrown_juni.TGA", "eyebrown_Orillion.TGA", "eyebrown_shiny.TGA", "eyegreen.tga", "eyeshinehilights2.tga", "eyetealblue.tga", "eyetealblueDARK.TGA", "eyetealblueTRENT.TGA", "ge_female1_head02.TGA", "ge_male1_head02.TGA", "ge_male2_head02.TGA", "ge_male3_head02.TGA", "ge_male4_head02.TGA", "ge_male6_head02.TGA", "ge_male7_head02.TGA", "ku_bartender_head02.TGA", "ku_captain_head02.TGA", "ku_edo_head01.tga", "ku_kym_head02.TGA", "ku_newscaster_head02.TGA", "ku_sales_head02.TGA", "ku_tashi_head02.TGA", "ku_tenji_head01.tga", "li_bartender_head01.tga", "li_captain_head02.TGA", "li_hatcher_head02.TGA", "li_newscaster_head02.TGA", "li_rockford_head01.tga", "li_sales_head02.TGA", "li_scrote_head02.TGA", "mandril.TGA", "N-dtl2-256.TGA_0", "pi_pirate1_head02.TGA", "pi_pirate2_head02.TGA", "pi_pirate3_head_HURT.TGA", "pi_pirate3_head02.TGA", "pi_pirate4_head02.TGA", "pi_pirate5_head04.TGA", "pl_female1_head02.TGA", "pl_female2_head02.TGA", "pl_female3_head01.tga", "pl_female4_head03.TGA", "pl_female5_head02.TGA", "pl_female6_head02.tga", "pl_male1_head03.TGA", "pl_male2_head03.TGA", "pl_male3_head02.TGA", "pl_male4_head01.tga", "pl_male5_head02.tga", "pl_male6_head02.TGA", "pl_male7_head01.tga", "pl_male8_head.tga", "rh_alaric_head02.TGA", "rh_bartender_head02.TGA", "rh_captain_head03.TGA", "rh_dedrich_head02.TGA", "rh_gruenwald_head02.TGA", "rh_hassler_head02.tga", "rh_newscaster_head02.tga", "rh_reichman_head02.TGA", "rh_sales_head02.TGA", "rh_wilhelm_head03.TGA", "sc_male1_head02.TGA", "sc_male2_head02.TGA", "sh_female1_head02.TGA", "sh_female2_head02.TGA", "sh_male1_head01.tga", "sh_male2_head01.tga", "sh_male3_head02.TGA", "sh_male4_head02.TGA", "Syd_head02.TGA", "teeth_white1.bmp",
+				"Female_Hand.TGA", "Female_Hand_black.TGA", "Male_Hand.tga", "Male_Hand_black.TGA"				
+            ],
+            "Roughness" : 0.6,
+            "Metalness" : 0.0
+        },  
+		{
+            "TextureNames": [
+                "robot01.TGA","robotB.TGA", "robotA.TGA", "robotC.TGA"
+            ],
+            "Roughness" : 0.3,
+            "Metalness" : 0.9
+        }, 
+		{
+            "TextureNames": [
+                "2P_S 13.tga", "2P_S 14.tga", "br_carina_body_1.tga", "br_carina_body_2.tga", "br_carina_body_3.tga", "br_commtrader_body_1.tga", "br_commtrader_body_2.tga", "br_commtrader_body_3.tga", "br_darcey_body_1.tga", "br_darcey_body_2.tga", "br_darcey_body_3.tga", "br_female_elite_1.tga", "br_female_elite_2.tga", "br_female_elite_3.tga", "br_female_guard_1 01.tga", "br_female_guard_2 01.tga", "br_female_guard_3 01.tga", "br_kaitlyn_body_1.tga", "br_kaitlyn_body_2.tga", "br_kaitlyn_body_3.tga", "br_male_elite_1.TGA", "br_male_elite_2.TGA", "br_male_elite_3.tga", "br_male_guard_1.tga", "br_male_guard_2.tga", "br_male_guard_3.TGA", "br_shipdealer_body_1.tga", "br_shipdealer_body_2.tga", "br_shipdealer_body_3.tga", "bretonia_equip_25.tga", "brighton01.TGA", "brighton02.TGA", "brighton03.TGA", "escpod.TGA", "ku_commtrader_body_1 .tga", "ku_commtrader_body_2 .tga", "ku_commtrader_body_3.tga", "ku_edo_body_1.tga", "ku_edo_body_2.tga", "ku_edo_body_3.tga", "ku_shipdealer_body_1.tga", "ku_shipdealer_body_2.tga", "ku_shipdealer_body_3.tga", "kufemgrd1.tga", "kufemgrd2.tga", "kufemgrd3.tga", "kufmelite1.tga", "kufmelite2.tga", "kufmelite3.tga", "kukym_bust1.TGA", "kukym_bust2.TGA", "kukym_bust3.TGA", "kukym1.tga", "kukym2.tga", "kukym3.tga", "kumelite1.tga", "kumgrd1.tga", "kumgrd2.tga", "kumgrd3.tga", "li_commtrader_body_1.tga", "li_commtrader_body_2.tga", "li_commtrader_body_3.tga", "li_elite_female_1.tga", "li_elite_female_2.tga", "li_elite_female_3.tga", "li_elite_male_1.tga", "li_elite_male_2.tga", "li_elite_male_3.tga", "li_guard_female_1.TGA", "li_guard_female_2.TGA", "li_guard_female_3.TGA", "li_guard_male_1.tga", "li_guard_male_2.tga", "li_guard_male_3.tga", "li_hatcher_body_1.tga", "li_hatcher_body_2.TGA", "li_hatcher_body_3.TGA", "li_Rockford_body_1.tga", "li_Rockford_body_2.tga", "li_Rockford_body_3.tga", "li_scrote_body_1.tga", "li_scrote_body_2.tga", "li_scrote_body_3.tga", "li_shipdealer_body_1.tga", "li_shipdealer_body_2.tga", "li_shipdealer_body_3.tga", "li_Tilton_body_1a.TGA", "li_Tilton_body_2a.TGA", "li_Tilton_body_3a.tga", "pi_Orillion_body_1.tga", "pi_Orillion_body_2.TGA", "pi_Orillion_body_3.TGA", "pi_pirate1_body_1.tga", "pi_pirate1_body_2.tga", "pi_pirate1_body_3.tga", "pi_pirate2_body_1.TGA", "pi_pirate2_body_2.TGA", "pi_pirate2_body_3.TGA", "pi_pirate3_body_1.TGA", "pi_pirate3_body_2.tga", "pi_pirate3_body_3.TGA", "pi_pirate4_body_1.TGA", "pi_pirate4_body_2.TGA", "pi_pirate4_body_3.TGA", "pi_pirate5_body_1.TGA", "pi_pirate5_body_2.TGA", "pi_pirate5_body_3.TGA", "pi_pirate6_body_1.TGA", "pi_pirate6_body_2.TGA", "pi_pirate6_body_3.TGA", "pi_pirate7_body_1.TGA", "pi_pirate7_body_2.TGA", "pi_pirate7_body_3.TGA", "pi_pirate8_body_1.TGA", "pi_pirate8_body_2.TGA", "pi_pirate8_body_3.TGA", "pl_female1_ 1 JY.TGA", "pl_female1_ 2 JY.TGA", "pl_female1_ 3 JY.TGA", "pl_female1_ 4 JY.TGA", "pl_female1_1 PE.TGA", "pl_female1_1 PE_bust.TGA", "pl_female1_2 PE.tga", "pl_female1_2 PE_bust.TGA", "pl_female1_3 PE.tga", "pl_female1_3 PE_bust.TGA", "pl_female2_1 JY.tga", "pl_female2_1 PE.tga", "pl_female2_2 JY.tga", "pl_female2_2 PE.tga", "pl_female2_3 JY.tga", "pl_female2_3 PE.TGA", "pl_female2_4 JY.TGA", "pl_female6_head02.tga", "pl_male1_1 JY.tga", "pl_male1_1 PE.tga", "pl_male1_2 JY.tga", "pl_male1_2 PE.tga", "pl_male1_3 JY.tga", "pl_male1_3 PE.tga", "pl_male2_ 1 JY.tga", "pl_male2_ 2 JY.tga", "pl_male2_ 3 JY.tga", "pl_male2_1 PE.tga", "pl_male2_2 PE.TGA", "pl_male2_3 PE.TGA", "pl_male3_1 JY.tga", "pl_male3_1 PE.TGA", "pl_male3_2 JY.tga", "pl_male3_2 PE.TGA", "pl_male3_3 JY.tga", "pl_male3_3 PE.TGA", "pl_male3_4 JY.tga", "Quigley 1 01.tga", "Quigley 2 01.tga", "Quigley 3 01.tga", "rh_commtrader_body_1 .tga", "rh_commtrader_body_2 .tga", "rh_commtrader_body_3 .tga", "rh_didrbod_1.tga", "rh_didrbod_2.tga", "rh_didrbod_3.tga", "rh_elite_female_1.tga", "rh_elite_female_2.tga", "rh_elite_female_3.tga", "rh_elite_male_1.tga", "rh_elite_male_2.tga", "rh_elite_male_3.tga", "rh_gruenwald_body_1.tga", "rh_gruenwald_body_2.tga", "rh_gruenwald_body_3.tga", "rh_guard_female_1.tga", "rh_guard_female_2.tga", "rh_guard_female_3.tga", "rh_guard_male_1.tga", "rh_guard_male_2.tga", "rh_guard_male_3.tga", "rh_reichman_body_1.tga", "rh_reichman_body_2.tga", "rh_reichman_body_3.tga", "rh_shipdealer_body_1.tga", "rh_shipdealer_body_2.tga", "rh_shipdealer_body_3.tga", "rh_wilhelm_body_1.tga", "rh_wilhelm_body_2.tga", "rh_wilhelm_body_3.tga", "sc_female1_1.TGA", "sc_female1_2.TGA", "sc_female1_3.TGA", "sc_scientist1_1.TGA", "sc_scientist1_2.TGA", "sc_scientist1_3.TGA", "sc_scientist2_1.TGA", "sc_scientist2_2.TGA", "sc_scientist2_3.TGA", "sc_scientist3_1.TGA", "sc_scientist3_2.TGA", "sc_scientist3_3.TGA", "sc_scientist4_1.TGA", "sc_scientist4_2.TGA", "sc_scientist4_3.TGA", "sh_female1_body_1.tga", "sh_female1_body_2.tga", "sh_female1_body_3.tga", "sh_male1_body_1.tga", "sh_male1_body_2.tga", "sh_male1_body_3.tga", "sh_male2_body_1.tga", "sh_male2_body_2.tga", "sh_male2_body_3.tga", "sh_male3_body_1.tga", "sh_male3_body_2.tga", "sh_male3_body_3.tga", "WORM.TGA", "x_li_bartender_body_1.tga", "x_li_bartender_body_2.tga", "x_li_bartender_body_3.tga"        
+            ],
+            "Roughness" : 0.8,
+            "Metalness" : 0.0
+        },
+        {
+            "TextureNames": [
+                "pl_trent_1.tga","pl_trent_2.tga","pl_trent_3.tga","pl_trent_4.tga"         
+            ],
+            "Roughness" : 0.9,
+            "Metalness" : 0.5
+        },
+        {
+            "TextureNames": [
+                "li_bartender_body_1.tga","li_bartender_body_2.tga","li_bartender_body_3.tga",
+				"br_bartender_body_1.tga","br_bartender_body_2.tga","br_bartender_body_3.tga",
+				"ku_bartender_body 1.tga", "ku_bartender_body 2.tga", "ku_bartender_body 3.tga",
+				"rh_bartender_body_1.tga", "rh_bartender_body_2.tga", "rh_bartender_body_3.tga",
+				"l_bar#3_18.tga030106132759"
+            ],
+            "Roughness" : 0.9,
+            "Metalness" : 0.3
+        },
+        {
+            "TextureNames": [
+                "bottles01.tga","glass01.tga","lib_bar_n_klava.tga"
+            ],
+            "Roughness" : 0.01,
+            "Metalness" : 0.0
+        },
+		{           
+			"TextureNames": [
+                "ast_icecrystal.tga","ice asteroid.tga","ice_block.tga","ice_carbon.tga","order base_snow straight.tga021126124128","order base_snow in corner.tga021126124128"
+            ],
+            "Roughness" : 0.1,
+            "Metalness" : 0.0,
+			"RoughnessTextureBias" : -0.1
+        },
+        {
+            "TextureName": "space_girder01.tgaspace_girder_op.tga",
+            "Roughness" : 0.01,
+            "Metalness" : 0.99,  
+            "AlphaTestValue" : 0.9
+        },
+        {
+            "TextureName": "x_pnl_a.tga",
+            "AlphaTestValue" : 0.9
+        },
+		{
+            "TextureName": "bad_obsidian.tga",
+            "Metalness" : 0.0,
+            "RoughnessTextureBias" : 0.5
+        },
+        {
+            "TextureNames": [
+            "lavastroid.tga","lavastroid02.tga","rock_detail.tga","rock3b.tga","rock3c.tga","rock3d128.tga","rock4.PSD","asteroid_rock_01.tga","atlantis_stone.tga","minable.tga","mineable_grayscale.tga","mineable_plain.tga","minedout.tga","nomad02.tga","nomad_01.tga",
+			"order base_snow rock.tga021126124128","order base_cliff.tga021126124128","order base Transiton End Corner.tga021126124128","order base Transiton Fade.tga021126124128","order base Transiton Corner.tga021126124128","uranium_tile.tga","uranium_tile1.tga","mineable_beryl.tga"
+            ],
+            "Metalness" : 0.0,
+			"Roughness" : 0.9,
+            "RoughnessTextureBias" : 0.45
+        }
+    ]
+}

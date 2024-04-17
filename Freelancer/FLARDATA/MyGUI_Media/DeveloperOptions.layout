@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Window" skin="WindowCS" position="0 0 285 345" align="Center" layer="Overlapped" name="WindowDeveloperOptions">
+        <Property key="Visible" value="true"/>
+        <Property key="Enabled" value="true"/>
+        <Property key="Caption" value="Developer Options"/>
+        <Widget type="ScrollView" skin="ScrollViewEmpty" position="0 0 275 310" align="Stretch">
+            <Property key="CanvasAlign" value="Left Top"/>
+            <Property key="CanvasSize" value="275 300"/>
+            <Widget type="Button" skin="Button" position="15 10 155 40" name="ButtonEditDefaultMat">
+                <Property key="Caption" value="Edit default material"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="20 70 180 40" name="ButtonPickMaterial">
+                <Property key="Caption" value="Pick material for editing"/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position="20 50 230 20">
+                <Property key="Caption" value="Note: Picking only works in space!"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="20 115 140 35" name="ButtonReloadTextures">
+                <Property key="Caption" value="Reload Textures"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="20 155 140 35" name="ButtonReloadMaterials">
+                <Property key="Caption" value="Reload Materials"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="20 195 140 35" name="ButtonReloadShader">
+                <Property key="Caption" value="Reload Shader"/>
+            </Widget>
+            <Widget type="Button" skin="Button" position="20 265 140 35" name="ButtonSaveMaterials">
+                <Property key="Caption" value="Save Materials"/>
+            </Widget>
+            <Widget type="EditBox" skin="TextBox" position="20 230 245 35" name="EditboxSaveMaterials">
+                <Property key="MultiLine" value="true"/>
+                <Property key="WordWrap" value="true"/>
+                <Property key="ReadOnly" value="true"/>
+            </Widget>
+        </Widget>
+    </Widget>
+    <CodeGeneratorSettings/>
+</MyGUI>

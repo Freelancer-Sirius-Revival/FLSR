@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Window" skin="WindowCS" position="0 0 440 315" layer="Overlapped" name="WindowEditMaterial">
+        <Property key="Visible" value="false"/>
+        <Property key="Enabled" value="true"/>
+        <Property key="Caption" value="Edit Material"/>
+        <Widget type="ScrollView" skin="ScrollViewEmpty" position="0 0 430 280" align="Stretch">
+            <Property key="CanvasSize" value="430 280"/>
+            <Property key="CanvasAlign" value="Left Top"/>
+            <Widget type="Button" skin="Button" position="-40 -85 110 45"/>
+            <Widget type="TextBox" skin="TextBox" position="15 10 105 20">
+                <Property key="Caption" value="Texture Name:"/>
+            </Widget>
+            <Widget type="EditBox" skin="EditBox" position="120 10 280 40" name="EditBoxTextureName">
+                <Property key="MultiLine" value="true"/>
+                <Property key="ReadOnly" value="true"/>
+                <Property key="WordWrap" value="true"/>
+            </Widget>
+            <Widget type="Widget" skin="PanelEmpty" position="10 55 415 55">
+                <Widget type="ScrollBar" skin="SliderH" position="105 30 270 20" name="SliderRoughness">
+                    <Property key="MoveToClick" value="true"/>
+                    <Property key="Range" value="101"/>
+                    <Property key="Page" value="1"/>
+                    <Property key="RangePosition" value="1"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="5 5 80 20">
+                    <Property key="Caption" value="Roughness:"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="90 30 10 20">
+                    <Property key="Caption" value="0"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="380 30 15 20">
+                    <Property key="Caption" value="1"/>
+                </Widget>
+                <Widget type="EditBox" skin="EditBox" position="220 5 45 20" name="EditBoxRoughness">
+                    <Property key="WordWrap" value="false"/>
+                    <Property key="MultiLine" value="false"/>
+                    <Property key="ReadOnly" value="false"/>
+                </Widget>
+            </Widget>
+            <Widget type="Widget" skin="PanelEmpty" position="10 115 415 55">
+                <Widget type="ScrollBar" skin="SliderH" position="105 30 270 20" name="SliderMetalness">
+                    <Property key="MoveToClick" value="true"/>
+                    <Property key="Range" value="101"/>
+                    <Property key="Page" value="1"/>
+                    <Property key="RangePosition" value="1"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="5 5 80 20">
+                    <Property key="Caption" value="Metalness:"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="90 30 10 20">
+                    <Property key="Caption" value="0"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="380 30 15 20">
+                    <Property key="Caption" value="1"/>
+                </Widget>
+                <Widget type="EditBox" skin="EditBox" position="220 5 45 20" name="EditBoxMetalness">
+                    <Property key="WordWrap" value="false"/>
+                    <Property key="MultiLine" value="false"/>
+                    <Property key="ReadOnly" value="false"/>
+                </Widget>
+            </Widget>
+            <Widget type="Widget" skin="PanelEmpty" position="10 175 415 55">
+                <Widget type="ScrollBar" skin="SliderH" position="105 30 270 20" name="SliderRoughnessTextureBias">
+                    <Property key="MoveToClick" value="true"/>
+                    <Property key="Range" value="201"/>
+                    <Property key="Page" value="1"/>
+                    <Property key="RangePosition" value="1"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="5 5 165 20">
+                    <Property key="Caption" value="Roughness Texture Bias:"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="90 30 15 20">
+                    <Property key="Caption" value="-1"/>
+                </Widget>
+                <Widget type="TextBox" skin="TextBox" position="380 30 15 20">
+                    <Property key="Caption" value="1"/>
+                </Widget>
+                <Widget type="EditBox" skin="EditBox" position="220 5 45 20" name="EditBoxRoughnessTextureBias">
+                    <Property key="WordWrap" value="false"/>
+                    <Property key="MultiLine" value="false"/>
+                    <Property key="ReadOnly" value="false"/>
+                </Widget>
+            </Widget>
+            <Widget type="Button" skin="Button" position="165 240 120 35" name="ButtonResetCurrentMaterial">
+                <Property key="Caption" value="Reset"/>
+            </Widget>
+        </Widget>
+    </Widget>
+    <CodeGeneratorSettings/>
+</MyGUI>

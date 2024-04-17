@@ -240,8 +240,6 @@ namespace Tools {
     std::vector<std::string> HkGetCollisionGroups(uint iClientID, bool bOnly);
     bool startsWith(std::string_view str, std::string_view prefix);
     bool endsWith(std::string_view str, std::string_view suffix);
-    std::vector<std::string> GetHardpointsFromCollGroup(uint iClientID);
-    float CalcDisabledHardpointWorth(uint iClientID);
     void replace_first(std::string &s, std::string const &toReplace,std::string const &replaceWith);
     std::string StringBetween(std::string str, std::string first, std::string last);
     bool GetB(std::string svalue);
@@ -253,7 +251,6 @@ namespace Tools {
     bool IsPlayerInRange(uint iClientID, uint iClientID2, float fDistance);
     void get_cmpfiles(const std::filesystem::path& path);
     void get_cmpExceptions();
-    std::vector<std::string> getHardpoints(std::string scParent, std::list<CMPDump_Entry> CMPList);
 
     bool isValidPlayer(uint iClientID, bool bCharfile);
     void CharSelectMenu();

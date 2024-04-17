@@ -162,9 +162,6 @@ void LoadSettings() {
         if (obj) {
             CShip* cship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)obj);
             if (cship) {
-                //PrintUserCmdText(iClientID, stows(cship->shiparch()->szName)); //CMP Name
-                //PrintUserCmdText(iClientID, stows(cship->shiparch()->cg->name.value)); //CollGroupName
-
                 std::string sShipfile = cship->shiparch()->szName;
                 std::filesystem::path f(sShipfile);
                 
@@ -281,13 +278,6 @@ void LoadSettings() {
                 }
                 in.close();
 
-                //Print CMP Dump - DEBUG
-                /*
-                for (std::list<CMPDump_Entry>::iterator it = lCMPDump.begin(); it != lCMPDump.end(); ++it) {
-                    ConPrint(L"CMPEntry: " + stows(it->scData) + L" isCollGroup: " + std::to_wstring(it->bisCollGroup) + L" hasParent: " + std::to_wstring(it->bhasParent) + L" ParentData: " +stows(it->scParent) + L" \n");
-
-                }
-                */
 
                 //Check which Hardpoints are damaged
                 std::vector<std::string> vDamagedCollGrps = HkGetCollisionGroups(iClientID, true);
@@ -299,25 +289,10 @@ void LoadSettings() {
                     scCollGroup_Charfile = scCollGroup_Charfile.substr(pos + 1, scCollGroup_Charfile.length());
                     std::string scCollGroup = StringBetween(scCollGroup_Charfile, " ", ",");
 
-                    //Print to Console
-                    //ConPrint(L"Damaged CollGrp: " + stows(scCollGroup) + L" \n");
-
                     //Check for Hardpoints on CollGrp
                     for (std::list<CMPDump_Entry>::iterator CMPDump_iter = lCMPDump.begin(); CMPDump_iter != lCMPDump.end(); ++CMPDump_iter) {
                         if (CMPDump_iter->scParent == scCollGroup)
                         {
-                            //Print to Console
-                            /*
-                            if (!CMPDump_iter->bisCollGroup)
-                            {
-                                ConPrint(L"Hardpoint: " + stows(CMPDump_iter->scData) + L" \n");
-                            }
-                            else {
-                                ConPrint(L"SubCollGrp: " + stows(CMPDump_iter->scData) + L" \n");
-
-                            }
-                            */
-
                             //Add Hardpoint to List
                             if (!CMPDump_iter->bisCollGroup)
                             {
@@ -341,12 +316,6 @@ void LoadSettings() {
             }
         }
 
-        //Damaged Hardpoints to ConPrint
-        for (std::vector<std::string>::iterator it = vDamagedHardPoints.begin(); it != vDamagedHardPoints.end(); ++it) {
-            //ConPrint(L"Damaged Hardpoint: " + stows(*it) + L" \n");
-        }
-
-
         return vDamagedHardPoints;
 
     }
@@ -362,7 +331,7 @@ void LoadSettings() {
 
         // Add mounted Equip to list
         std::list<CARGO_INFO> lstMounted;
-        float fValue;
+        float fValue = 0;
         for (auto& cargo : lstCargo) {
             if (!cargo.bMounted)
                 continue;
@@ -449,8 +418,8 @@ float fShipFractionOverride(uint iClientID) {
 void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
-    
-  
+
+    MapClients[iClientID].DeathPenaltyCredits = 0;
     // No point in processing anything if there is no death penalty
     if (set_fDeathPenalty) {
 
@@ -464,11 +433,15 @@ void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
 
             //NEKURA - FLSR Adjust Calc | START
             float iWorth = CaclDestroyedHardpointWorth(iClientID);
-            fValue = fValue - iWorth;
+            fValue -= iWorth;
             // NEKURA - FLSR Adjust Calc | END
 
             // Calculate what the death penalty would be upon death
-            MapClients[iClientID].DeathPenaltyCredits = (int)(fValue * fShipFractionOverride(set_fDeathPenalty));
+            const int finalValue = std::trunc(fValue * fShipFractionOverride(set_fDeathPenalty));
+            if (finalValue < 0)
+                ConPrint(L"Death penalty is negative! " + std::to_wstring(finalValue));
+            else
+                MapClients[iClientID].DeathPenaltyCredits = finalValue;
 
             // Should we print a death penalty notice?
             if (MapClients[iClientID].bDisplayDPOnLaunch)
@@ -477,8 +450,7 @@ void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
                     L"Notice: the death penalty for your ship will be " +
                         ToMoneyStr(MapClients[iClientID].DeathPenaltyCredits) +
                         L" credits.  Type /dp for more information.");
-        } else
-            MapClients[iClientID].DeathPenaltyCredits = 0;
+        }
     }
 }
 

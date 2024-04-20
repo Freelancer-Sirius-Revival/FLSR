@@ -41,7 +41,7 @@ namespace Docking
     struct UndockPath
     {
         std::vector<uint> remainingJumpPath;
-        bool targetLastDockLocation = false;
+        Location lastDockLocation;
     };
     static std::unordered_map<uint, UndockPath> undockPathByClientId;
 
@@ -597,7 +597,7 @@ namespace Docking
             return;
         const uint clientFileNameId = CreateID(clientFileName.c_str());
 
-        if (undockPathByClientId.contains(clientId) && undockPathByClientId[clientId].targetLastDockLocation)
+        if (undockPathByClientId.contains(clientId) && undockPathByClientId[clientId].lastDockLocation.systemId)
         {
             // Try to jump to the carrier.
             switch (TryJumpToNextSystem(clientId))
@@ -605,15 +605,11 @@ namespace Docking
                 // The player reached the destination system and should now be moved to the last docking location.
                 case JumpState::DestinationReached:
                 {
-                    if (!dockLocationByCharacterFileNameIds.contains(clientFileNameId))
-                        return;
-
-                    HkRelocateClient(clientId, dockLocationByCharacterFileNameIds[clientFileNameId].position, dockLocationByCharacterFileNameIds[clientFileNameId].orientation);
+                    const Location& location = undockPathByClientId[clientId].lastDockLocation;
+                    HkRelocateClient(clientId, location.position, location.orientation);
                     undockPathByClientId.erase(clientId);
-
-                    // TODO: Set last regular base for respawn!!
-
                     RemoveCharacterFromCarrier(clientFileName);
+                    DeleteCharacterCarrierDockLocation(clientFileName);
                     return;
                 }
 
@@ -625,15 +621,17 @@ namespace Docking
             return;
         }
 
+        if (!IsLinkedToCarrier(clientFileNameId))
+            return;
+
         const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
         // Check if the carrier is currently reachable by jumps or base-docking.
         if (!IsCarrierReachable(clientId, carrierId) || !undockPathByClientId.contains(clientId))
         {
             // Beam back to where the player came from.
             const uint shiparchId = carrierAssignmentByCharacterFileNameId[clientFileNameId].carrierShiparchId;
-            if (!carrierDefinitionByShipArchetypeId.contains(shiparchId))
-                return; // TODO: Jumps to this when carrier has a new non-carrier ship
-            HkBeam(ARG_CLIENTID(clientId), carrierDefinitionByShipArchetypeId[shiparchId].baseNickname);
+            if (carrierDefinitionByShipArchetypeId.contains(shiparchId))
+                HkBeam(ARG_CLIENTID(clientId), carrierDefinitionByShipArchetypeId[shiparchId].baseNickname);
             return;
         }
 
@@ -681,7 +679,10 @@ namespace Docking
                 if (carrierAssignmentByCharacterFileNameId[clientFileNameId].assigned)
                     SaveCharacterDockState(clientFileName, DockState::Undocked);
                 else
+                {
                     RemoveCharacterFromCarrier(clientFileName);
+                    DeleteCharacterCarrierDockLocation(clientFileName);
+                }
                 return;
             }
 
@@ -715,34 +716,37 @@ namespace Docking
             if (!IsCarrierBase(baseId))
                 return;
 
-            // Check if the player should even start from a carrier.
-            if (!IsLinkedToCarrier(fileNameId))
-            {
-                if (lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
-                    HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]);
-
-                return;
-            }
-
             uint targetSystemId = 0;
-            const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
-            if (carrierId)
+            undockPathByClientId[clientId].lastDockLocation.systemId = 0;
+            // Check if the player should try to start from a carrier.
+            if (IsLinkedToCarrier(fileNameId))
             {
-                uint carrierSystemId;
-                pub::Player::GetSystem(carrierId, carrierSystemId);
-                if (carrierSystemId)
+                const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
+                if (carrierId)
                 {
-                    targetSystemId = carrierSystemId;
-                    undockPathByClientId[clientId].targetLastDockLocation = false;
+                    uint carrierSystemId;
+                    pub::Player::GetSystem(carrierId, carrierSystemId);
+                    if (carrierSystemId)
+                        targetSystemId = carrierSystemId;
                 }
             }
 
-            // If the carrier is not to be found in any system.
+            // If the carrier is not found in any system try to return to the last dock-in position.
             if (!targetSystemId && dockLocationByCharacterFileNameIds.contains(fileNameId))
             {
                 // Target the location where the player docked to the carrier.
-                undockPathByClientId[clientId].targetLastDockLocation = true;
-                targetSystemId = dockLocationByCharacterFileNameIds[fileNameId].systemId;
+                undockPathByClientId[clientId].lastDockLocation = dockLocationByCharacterFileNameIds[fileNameId];
+                targetSystemId = undockPathByClientId[clientId].lastDockLocation.systemId;
+            }
+
+            // If still no target location was found then directly beam back to the last regular base.
+            if (!targetSystemId && lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
+            {
+                if (HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]) == HKE_OK)
+                {
+                    undockPathByClientId.erase(clientId);
+                    return;
+                }
             }
 
             // Check if a path to the target system exists.
@@ -806,9 +810,7 @@ namespace Docking
                 carrierClientIdInJump.erase(clientId);
 
             if (undockPathByClientId.contains(clientId))
-            {
                 TryReachCarrier(clientId);
-            }
         }
     }
 

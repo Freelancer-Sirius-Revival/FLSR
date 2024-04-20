@@ -1,5 +1,40 @@
 #include "Main.h"
 
+/**
+* CARRIER PLUGIN
+*
+* by Skotty
+* 
+* Players can dock to Carriers when:
+    Player and Carrier are in same Group
+    Carrier has slots free
+    Player is no carrier
+    Player is completely uncloaked
+    Carrier is completely uncloaked
+
+* Players cannot undock from Carrier when:
+    Carrier is cloaked
+    Carrier is in Tradelane
+    Carrier is docking with jump object/in jump tunnel
+
+* Players will always undock to:
+    Carrier's current position in space when it is in space
+    Carrier's base when it is docked/dead
+    Last dock-in position of the player if carrier is not logged in/sold ship
+    Player's last regular base if carrier was left while being unrelated to any carrier (Fallback)
+
+* Save last dock state with carriers
+
+* Slots will be filled when:
+    Player enters the Carrier
+
+* Slots will be freed when:
+    Carrier sells ship
+    Player lands on a different base
+    Player leaves carrier while Carrier is not logged in
+    Player (forcefully gets) unassigned & leaves carrier
+*/
+
 namespace Docking
 {
     struct CarrierDefinition

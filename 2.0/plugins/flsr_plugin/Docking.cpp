@@ -69,9 +69,13 @@ namespace Docking
         return wstos(characterFileNameWS);
     }
 
+    /**
+    * Assigning a character to a carrier means they will respawn from this carrier each time they die.
+    */
     void AssignCharacterToCarrier(const std::string& characterFileName, const std::string& carrierFileName, const uint carrierShiparchId)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
+        carrierAssignmentByCharacterFileNameId[characterFileNameId].characterFileName = characterFileName;
         carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName = carrierFileName;
         carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = true;
         carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierShiparchId = carrierShiparchId;
@@ -80,24 +84,16 @@ namespace Docking
         IniWrite(carrierFilePath, characterFileName, "carrier_shiparchetype", std::to_string(carrierShiparchId));
     }
 
-    void UnassignCharacterFromCarrier(const std::string& characterFileName, const std::string& carrierFileName)
+    /**
+    * Unassigning a character from a carrier means they will still only spawn from the carrier one last time.
+    */
+    void UnassignCharacterFromCarrier(const std::string& characterFileName)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
         {
             carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = false;
-            IniWrite(GetCarrierMapFilePath(), characterFileName, "assignment", carrierFileName + ", false");
-        }
-    }
-
-    void DisconnectCharacterFromCarrier(const std::string& characterFileName)
-    {
-        const uint characterFileNameId = CreateID(characterFileName.c_str());
-        if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
-        {
-            carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName = "";
-            carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = false;
-            IniDelete(GetCarrierMapFilePath(), characterFileName, "assignment");
+            IniWrite(GetCarrierMapFilePath(), characterFileName, "assignment", carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName + ", false");
         }
     }
 
@@ -107,12 +103,18 @@ namespace Docking
         IniDelete(GetCarrierMapFilePath(), characterFileName, "carrier_dock_location");
     }
 
-    void RemoveCharacterFromCarrier(const std::string& characterFileName)
+    void RemoveCharacterFromCarrier(const std::string characterFileName)
     {
+        const std::string& carrierFilePath = GetCarrierMapFilePath();
         carrierAssignmentByCharacterFileNameId.erase(CreateID(characterFileName.c_str()));
-        IniDelete(GetCarrierMapFilePath(), characterFileName, "assignment");
-        IniDelete(GetCarrierMapFilePath(), characterFileName, "dock_state");
-        DeleteCharacterCarrierDockLocation(characterFileName);
+        IniDelete(carrierFilePath, characterFileName, "assignment");
+        IniDelete(carrierFilePath, characterFileName, "dock_state");
+        IniDelete(carrierFilePath, characterFileName, "carrier_shiparchetype");
+    }
+
+    bool IsLinkedToCarrier(const uint characterFileNameId)
+    {
+        return carrierAssignmentByCharacterFileNameId.contains(characterFileNameId) && !carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName.empty();
     }
 
     bool IsCarrierBase(const uint baseId)
@@ -157,15 +159,15 @@ namespace Docking
         std::string dockStateString;
         switch (dockState)
         {
-        case DockState::Docked:
-            dockStateString = "docked";
-            break;
-        case DockState::Undocked:
-            dockStateString = "undocked";
-            break;
-        case DockState::Undocking:
-            dockStateString = "undocking";
-            break;
+            case DockState::Docked:
+                dockStateString = "docked";
+                break;
+            case DockState::Undocked:
+                dockStateString = "undocked";
+                break;
+            case DockState::Undocking:
+                dockStateString = "undocking";
+                break;
         }
         IniWrite(GetCarrierMapFilePath(), characterFileName, "dock_state", dockStateString);
     }
@@ -503,7 +505,7 @@ namespace Docking
         if (fileName.empty())
             return 0;
         const uint fileNameId = CreateID(fileName.c_str());
-        if (!carrierAssignmentByCharacterFileNameId.contains(fileNameId) || carrierAssignmentByCharacterFileNameId[fileNameId].carrierFileName.empty())
+        if (!IsLinkedToCarrier(fileNameId))
             return 0;
 
         PlayerData* playerData = 0;
@@ -585,14 +587,14 @@ namespace Docking
         return JumpState::Error;
     }
 
-    bool TryReachCarrier(const uint clientId)
+    void TryReachCarrier(const uint clientId)
     {
         if (!HkIsValidClientID(clientId))
-            return false;
+            return;
 
         const std::string& clientFileName = GetCharacterFileName(clientId);
         if (clientFileName.empty())
-            return false;
+            return;
         const uint clientFileNameId = CreateID(clientFileName.c_str());
 
         if (undockPathByClientId.contains(clientId) && undockPathByClientId[clientId].targetLastDockLocation)
@@ -604,7 +606,7 @@ namespace Docking
                 case JumpState::DestinationReached:
                 {
                     if (!dockLocationByCharacterFileNameIds.contains(clientFileNameId))
-                        return false;
+                        return;
 
                     HkRelocateClient(clientId, dockLocationByCharacterFileNameIds[clientFileNameId].position, dockLocationByCharacterFileNameIds[clientFileNameId].orientation);
                     undockPathByClientId.erase(clientId);
@@ -612,15 +614,15 @@ namespace Docking
                     // TODO: Set last regular base for respawn!!
 
                     RemoveCharacterFromCarrier(clientFileName);
-                    return true;
+                    return;
                 }
 
                 // The player is still on the way to the target system.
                 case JumpState::Jumping:
-                    return true;
+                    return;
             }
 
-            return false;
+            return;
         }
 
         const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
@@ -630,9 +632,9 @@ namespace Docking
             // Beam back to where the player came from.
             const uint shiparchId = carrierAssignmentByCharacterFileNameId[clientFileNameId].carrierShiparchId;
             if (!carrierDefinitionByShipArchetypeId.contains(shiparchId))
-                return false; // TODO: Jumps to this when carrier has a new non-carrier ship
+                return; // TODO: Jumps to this when carrier has a new non-carrier ship
             HkBeam(ARG_CLIENTID(clientId), carrierDefinitionByShipArchetypeId[shiparchId].baseNickname);
-            return false;
+            return;
         }
 
         // Check if the carrier is currently docked.
@@ -650,7 +652,9 @@ namespace Docking
             else
                 baseName = lastRegularBaseNameByCharacterFileNameId[CreateID(GetCharacterFileName(carrierId).c_str())];
 
-            return !baseName.empty() && (HkBeam(ARG_CLIENTID(clientId), baseName) == HKE_OK);
+            if (!baseName.empty())
+                HkBeam(ARG_CLIENTID(clientId), baseName);
+            return;
         }
 
         // Try to jump to the carrier.
@@ -664,7 +668,7 @@ namespace Docking
                 uint carrierShipId;
                 pub::Player::GetShip(carrierId, carrierShipId);
                 if (!carrierShiparchId || !carrierShipId || !carrierDefinitionByShipArchetypeId.contains(carrierShiparchId))
-                    return false;
+                    return;
                 Vector carrierVector;
                 Matrix carrierRotation;
                 pub::SpaceObj::GetLocation(carrierShipId, carrierVector, carrierRotation);
@@ -678,15 +682,15 @@ namespace Docking
                     SaveCharacterDockState(clientFileName, DockState::Undocked);
                 else
                     RemoveCharacterFromCarrier(clientFileName);
-                return true;
+                return;
             }
 
             // The player is still on the way to the target system.
             case JumpState::Jumping:
-                return true;
+                return;
         }
 
-        return false;
+        return;
     }
 
     void __stdcall LaunchComplete_After(unsigned int objectId, unsigned int shipId)
@@ -708,12 +712,11 @@ namespace Docking
             // Check if the undock happened from a carrier base.
             uint baseId;
             pub::SpaceObj::GetDockingTarget(objectId, baseId);
-            const CarrierAssignment& assignment = carrierAssignmentByCharacterFileNameId[fileNameId];
-            if (!carrierDefinitionByShipArchetypeId.contains(assignment.carrierShiparchId) || carrierDefinitionByShipArchetypeId[assignment.carrierShiparchId].baseId != baseId)
+            if (!IsCarrierBase(baseId))
                 return;
 
-            // Check if the player is related to any carrier.
-            if (!carrierAssignmentByCharacterFileNameId.contains(fileNameId))
+            // Check if the player should even start from a carrier.
+            if (!IsLinkedToCarrier(fileNameId))
             {
                 if (lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
                     HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]);
@@ -819,10 +822,11 @@ namespace Docking
             undockPathByClientId.erase(clientId);
 
             // Check if the player is related to any carrier.
-            const std::string& fileName = GetCharacterFileName(clientId);
-            if (!fileName.empty() && carrierAssignmentByCharacterFileNameId.contains(CreateID(fileName.c_str())))
+            const std::string& characterFileName = GetCharacterFileName(clientId);
+            const uint characterFileNameId = CreateID(characterFileName.c_str());
+            if (IsLinkedToCarrier(characterFileNameId))
             {
-                auto& assignment = carrierAssignmentByCharacterFileNameId[CreateID(fileName.c_str())];
+                const auto& assignment = carrierAssignmentByCharacterFileNameId[characterFileNameId];
                 // Do nothing if fully undocked.
                 if (assignment.dockState == DockState::Undocked)
                     return;
@@ -838,7 +842,7 @@ namespace Docking
                     TryReachCarrier(clientId);
                 // When coming just out of a base. LaunchComplete does the rest.
                 else if (assignment.dockState == DockState::Docked)
-                    SaveCharacterDockState(fileName, DockState::Undocking);
+                    SaveCharacterDockState(characterFileName, DockState::Undocking);
             }
         }
     }
@@ -851,21 +855,23 @@ namespace Docking
         {
             undockPathByClientId.erase(clientId);
 
-            const std::string& fileName = GetCharacterFileName(clientId);
-            if (fileName.empty())
+            const std::string& characterFileName = GetCharacterFileName(clientId);
+            if (characterFileName.empty())
                 return;
+            const uint characterFileNameId = CreateID(characterFileName.c_str());
 
             if (IsCarrierBase(baseId))
             {
-                SaveCharacterDockState(fileName, DockState::Docked);
+                SaveCharacterDockState(characterFileName, DockState::Docked);
             }
             else
             {
-                SaveCharacterLastRegularBase(fileName, baseId);
-
+                SaveCharacterLastRegularBase(characterFileName, baseId);
                 // Unassign the player from a carrier once docked to another base than the carrier's interior.
-                if (carrierAssignmentByCharacterFileNameId.contains(CreateID(fileName.c_str())))
-                    RemoveCharacterFromCarrier(fileName);
+                if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
+                    RemoveCharacterFromCarrier(characterFileName);
+                if (dockLocationByCharacterFileNameIds.contains(characterFileNameId))
+                    DeleteCharacterCarrierDockLocation(characterFileName);
             }
         }
     }
@@ -873,11 +879,14 @@ namespace Docking
     void ClearCarrier(const std::string carrierFileName)
     {
         const uint carrierFileNameId = CreateID(carrierFileName.c_str());
+        std::vector<std::string> characterFileNamesToRemove;
         for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
         {
             if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == carrierFileNameId)
-                DisconnectCharacterFromCarrier(assignment.second.characterFileName);
+                characterFileNamesToRemove.push_back(assignment.second.characterFileName);
         }
+        for (const std::string& characterFileName : characterFileNamesToRemove)
+            RemoveCharacterFromCarrier(characterFileName);
     }
 
     void ClearCarrier(const uint clientId)
@@ -930,14 +939,24 @@ namespace Docking
         const uint oldCharacterFileNameId = CreateID(oldCharacterFileName.c_str());
         const uint newCharacterFileNameId = CreateID(newCharacterFileName.c_str());
 
-        carrierAssignmentByCharacterFileNameId[newCharacterFileNameId] = carrierAssignmentByCharacterFileNameId[oldCharacterFileNameId];
-        carrierAssignmentByCharacterFileNameId.erase(oldCharacterFileNameId);
+        if (carrierAssignmentByCharacterFileNameId.contains(oldCharacterFileNameId))
+        {
+            carrierAssignmentByCharacterFileNameId[newCharacterFileNameId] = carrierAssignmentByCharacterFileNameId[oldCharacterFileNameId];
+            carrierAssignmentByCharacterFileNameId[newCharacterFileNameId].characterFileName = newCharacterFileName;
+            carrierAssignmentByCharacterFileNameId.erase(oldCharacterFileNameId);
+        }
 
-        dockLocationByCharacterFileNameIds[newCharacterFileNameId] = dockLocationByCharacterFileNameIds[oldCharacterFileNameId];
-        dockLocationByCharacterFileNameIds.erase(oldCharacterFileNameId);
+        if (dockLocationByCharacterFileNameIds.contains(oldCharacterFileNameId))
+        {
+            dockLocationByCharacterFileNameIds[newCharacterFileNameId] = dockLocationByCharacterFileNameIds[oldCharacterFileNameId];
+            dockLocationByCharacterFileNameIds.erase(oldCharacterFileNameId);
+        }
 
-        lastRegularBaseNameByCharacterFileNameId[newCharacterFileNameId] = lastRegularBaseNameByCharacterFileNameId[oldCharacterFileNameId];
-        lastRegularBaseNameByCharacterFileNameId.erase(oldCharacterFileNameId);
+        if (lastRegularBaseNameByCharacterFileNameId.contains(oldCharacterFileNameId))
+        {
+            lastRegularBaseNameByCharacterFileNameId[newCharacterFileNameId] = lastRegularBaseNameByCharacterFileNameId[oldCharacterFileNameId];
+            lastRegularBaseNameByCharacterFileNameId.erase(oldCharacterFileNameId);
+        }
 
         const std::string carrierFilePath = GetCarrierMapFilePath();
         std::list<INISECTIONVALUE> keyValues;

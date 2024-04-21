@@ -20,8 +20,8 @@
 * Players will always undock to:
     Carrier's current position in space when it is in space
     Carrier's base when it is docked/dead
-    Last dock-in position of the player if carrier is not logged in/sold ship
-    Player's last regular base if carrier was left while being unrelated to any carrier (Fallback)
+    Last dock-in position of the player/carrier's last docked base (whichever happened  most recent) if carrier is not logged in/sold ship
+    Player's/carrier last regular base if carrier (whichever happened  most recent) was left while being unrelated to any carrier (Fallback)
 
 * Save last dock state with carriers
 
@@ -427,6 +427,19 @@ namespace Docking
         return false;
     }
 
+    bool IsCarrier(const uint clientId)
+    {
+        if (!HkIsValidClientID(clientId))
+            return false;
+
+        uint shiparchId;
+        pub::Player::GetShipID(clientId, shiparchId);
+        if (!shiparchId)
+            return false;
+
+        return carrierDefinitionByShipArchetypeId.contains(shiparchId) && carrierDefinitionByShipArchetypeId[shiparchId].slots > 0;
+    }
+
     void TryDock(const uint clientId)
     {
         const std::string& clientFileName = GetCharacterFileName(clientId);
@@ -462,7 +475,7 @@ namespace Docking
             return;
         const uint targetFileNameId = CreateID(targetFileName.c_str());
 
-        if (!carrierDefinitionByShipArchetypeId.contains(targetShiparchId) || carrierDefinitionByShipArchetypeId[targetShiparchId].slots == 0)
+        if (!IsCarrier(targetClientId))
             return;
 
         uint clientShiparchId;
@@ -909,6 +922,18 @@ namespace Docking
                     RemoveCharacterFromCarrier(characterFileName);
                 if (dockLocationByCharacterFileNameIds.contains(characterFileNameId))
                     DeleteCharacterCarrierDockLocation(characterFileName);
+
+                if (IsCarrier(clientId))
+                {
+                    for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
+                    {
+                        if (assignment.second.carrierFileName == characterFileName)
+                        {
+                            SaveCharacterLastRegularBase(assignment.second.characterFileName, baseId);
+                            DeleteCharacterCarrierDockLocation(assignment.second.characterFileName);
+                        }
+                    }
+                }
             }
         }
     }

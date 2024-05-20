@@ -4,7 +4,8 @@ File: freelancer.exe
 1DD5A8: Disable right click firing CMs (2) | FL: 80 | FLSR: 79
 1745D9: Changes main menu button click areas to work on every aspect ratio (1) | FL: DF 6C | FLSR: EB 02
 1745E6: Changes main menu button click areas to work on every aspect ratio (1) | FL: D8 0D 54 25 | FLSR: D9 05 7C 20
-08D89B: Show all group members on the nav map. (1) | FL: 90 90 90 90 90 | FLSR: 83 C5 18 EB 50 
+08D89B: Show all group members on the nav map. (1) | FL: 90 90 90 90 90 | FLSR: 83 C5 18 EB 50
 08D997: Show all group members on the nav map. (2) | FL: 55 | FLSR: 00
 096325: Group member's NAV position refreshes every second #1. | FL: 40 3E | FLSR: CC 2E
 096338: Group member's NAV position refreshes every second #2. | FL: 40 3E | FLSR: CC 2E
+02D7B8: Reduce possible FPS loss over time. | FL: 6A 01 | FLSR: EB DD

@@ -1,3 +1,0 @@
-File: rp8.dll
-
-004467: Prevents the "D3DERR_INVALIDCALL" error spam from occurring in FLSpew.txt. | FL: 7D | FLSR: EB

@@ -1,0 +1,60 @@
+File: EXE\server.dll
+
+# Fix explosion damage not causing full damage (or no damage) on large ships and bases. - M0tah
+00960C: 00	[ 0C ]
+# Energy weapons don't damage power. - adoxa
+00AFC0: C2 08 00	[ D9 44 24 ]
+# Need level to buy ships/equipment in MP (outdated version of this hack!!)
+0112A3: 00 	[ 1D ]
+# Update objects once (fixes bug that causes solar guns reduce refire delay when multiple players are around). - adoxa
+02C057: 75 0B C7 84 8C 9C 00 00 00 00 00 00 00 41 83 C2 04 39 C1 7C E9 EB	[ 74 0A 41 83 C2 04 3B C8 7C F4 EB 0B C7 84 8C 9C 00 00 00 00 00 00 ]
+
+# Maximum credits that a player can have in MP. (1) - adoxa
+06F46E: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (2)- adoxa
+06F475: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (3) - adoxa
+06F4A6: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (4) - adoxa
+06F4AD: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (5) - adoxa
+06F51E: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (6) - adoxa
+06F525: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (7) - adoxa
+06FB9B: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (8) - adoxa
+06FBA3: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (9) - adoxa
+06FBAE: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (10) - adoxa
+06FC00: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (11) - adoxa
+06FC08: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (12) - adoxa
+06FC1C: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (13) - adoxa
+07543C: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (14) - adoxa
+075443: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (15) - adoxa
+0754E0: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (16) - adoxa
+0754E7: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (17) - adoxa
+076426: 2147483647i	[ 999999999i ]
+# Maximum credits that a player can have in MP. (18) - adoxa
+07642D: 2147483647i	[ 999999999i ]
+
+# Respawn time for any solar object to regain full health once destroyed in MP. - w0dk4
+085530: 600d	[ 60d ]
+# Square of NPC disappear distance in MP. - Dev
+086AEC: 25000000f	[ 6250000f ]
+# Square of player disappear distance in MP. - Dev
+086AF0: 400000000f	[ 25000000f ]
+# Square of grouped player disappear distance in MP. - Dev
+086AF4: 400000000f	[ 100000000f ]
+# Resale % for ships. - FriendlyFire
+08AE78: 0.5f	[ 0.8f ]
+# Resale % for equipment. - fox
+08AE7C: 0.5f	[ 0.3f ]

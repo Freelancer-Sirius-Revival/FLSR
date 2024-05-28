@@ -25,6 +25,9 @@ File: EXE\server.dll
 # Update objects once (fixes bug that causes solar guns reduce refire delay when multiple players are around). - adoxa
 02C057: 75 0B C7 84 8C 9C 00 00 00 00 00 00 00 41 83 C2 04 39 C1 7C E9 EB	[ 74 0A 41 83 C2 04 3B C8 7C F4 EB 0B C7 84 8C 9C 00 00 00 00 00 00 ]
 
+# Enable undocking hail in multiplayer. - Laz
+173DA: EB	[ 74 ]
+
 
 ##########################################
 # Players

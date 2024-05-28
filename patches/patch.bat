@@ -2,6 +2,7 @@ xcopy originals\*.* .\ /s /y
 
 bwpatchw.exe -f DLLS/BIN/Content.dll.patch
 
+bwpatchw.exe -f EXE/common.dll.patch
 bwpatchw.exe -f EXE/ebueula.dll.patch
 bwpatchw.exe -f EXE/FLServer.exe.patch
 bwpatchw.exe -f EXE/Freelancer.exe.patch

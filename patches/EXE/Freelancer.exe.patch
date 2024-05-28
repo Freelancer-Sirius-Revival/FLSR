@@ -1,24 +1,239 @@
 File: EXE\Freelancer.exe
 
-# Disable right click firing CMs. (1) - BC46
-12D279: 39 F1 74 03 30 C0 C3	[ 90 90 90 90 90 90 90 ]
-# Disable right click firing CMs. (2) - BC46
-1DD5A8: 79	[ 80 ]
 
-# Changes main menu button click areas to work on every aspect ratio. (1) - BC46
+# Allows Freelancer to use 4GB of virtual memory instead of 2GB. - BC46
+00014E: 2F	[ 0F ]
+
+# Never load EBUEula.dll from the root Freelancer folder (Freelancer.exe). - BC46
+1B2D72: EB 0F	[ 68 80 ]
+
+# Changes the CreateMutex lpName parameter to an empty string, allowing multiple instances of Freelancer to run simultaneously. - M0tah
+1E6DCC: " "	[ "F" ]
+
+
+##########################################
+# Interface
+##########################################
+
+# Shows the current worth in Multiplayer. - adoxa
+0A8004: 1A	[ 05 ]
+
+# Range at which an object is no longer "unknown". - FriendlyFire
+0D1750: 10000f	[ 14000f ]
+
+# Remove class info from equipment. - adoxa
+07C943: 90 E9	[ 0F 87 ]
+
+# Remove automatically generated portion of equipment infocards. - M0tah
+0840B3: 90 E9	[ 0F 84 ]
+
+
+##############
+# Main Menu
+##############
+
+# Remove the "NEW GAME" and "LOAD GAME" buttons on the main menu. - adoxa
+174634: E8 47 E5 EA FF 83 7C 24 50 01 77 11 DB 05 4C 46 57 00 EB 0D	[ C7 44 24 70 00 00 00 00 C7 44 24 74 00 00 00 00 C7 44 24 78 ]
+1746CA: 00 00	[ 80 3E ]
+174707: 00 00	[ 80 3E ]
+
+# Fixes a bug that causes the clickable area height of the main menu buttons to be incorrect on higher resolutions. - BC46
 1745D9: EB 02	[ DF 6C ]
-# Changes main menu button click areas to work on every aspect ratio. (2) - BC46
 1745E6: D9 05 7C 20	[ D8 0D 54 25 ]
 
-# Show all group members on the nav map. (1) - BC46
+# Interface volume can be controlled independently, thus no longer relying on the sound effects volume. - BC46
+0B1503: 83	[ 38 ]
+
+# Ambience volume can be controlled independently, thus no longer relying on the music volume. - BC46
+0B1554: 84	[ 39 ]
+
+# Increases the maximum value for the "TOTAL SOUND ELEMENTS" slider in the audio options menu. - BC46
+0B1375: 100b	[ 32b ]
+
+# Gamma ranges from 0.75 to 1.75, not 1.0 to 2.0. - BC46
+0244F7: F8 EB 5D	[ B8 89 5C ]
+
+# Bypasses the ESRB notice when entering the Multiplayer menu. - adoxa
+166C2B: EB	[ 75 ]
+
+# Prevents IPv6 addresses from being displayed in the server list. - adoxa
+1ACF6A: 40 74 63 48 51 8D 54 E4 20 52 83 E9 08	[ 51 8D 4C 24 20 51 8D 8C 24 C8 00 00 00 ]
+
+# Filter out incompatible builds on server by default. - FriendlyFire, adoxa
+1628F4: 50	[ 48 ]
+
+
+##############
+# Chat
+##############
+
+# Increases the maximum number of chat lines in the chat history window. - M0tah
+0691D1: 127b	[ 32b ]
+
+# Increases the maximum number of characters in the chat input box. - M0tah
+06A440: 127b	[ 80b ]
+
+
+##############
+# In Space
+##############
+
+# Includes player ships in the contact list's ship filter. - adoxa
+0D094B: 74 04 FE C8 75 C4	[ 0F 85 2A 05 00 00 ]
+
+# Increases the distance at which "Far" is displayed rather than the actual distance for entries in the contact list. - Dev
+0D2C94: 999999i	[ 99999i ]
+
+# Removes the cruise speed display limit (300). - ???
+0D5936: 90 E9	[ 0F 85 ]
+
+# Disables the typing effect for the target ship name and sub-target name text elements. All offsets must be changed. - adoxa
+0E111B: 00	[ 01 ]
+0E11AF: 00	[ 01 ]
+0E1A61: 00	[ 01 ]
+0E21CF: 00	[ 01 ]
+0E32B6: 00	[ 01 ]
+0E32CA: 00	[ 01 ]
+0E47B2: 00	[ 01 ]
+0E47C6: 00	[ 01 ]
+
+# Increases the width of the gauge bars. - Dev
+1D7E50: 1d	[ 0.8d ]
+
+# Drop cargo dialog timeout. - adoxa
+08AEBE: 5f	[ 20f ]
+1D2688: 5f	[ 20f ]
+
+# Square of max distance that a ship can be selected. - Dev
+1D15B8: 25000000f	[ 100000000f ]
+
+# Screen shake when hull is hit. - w0dk4
+11DB5C: 0.002f	[ 0.02f ]
+
+# Screen shake when shield is hit. - w0dk4
+11DB89: 0.002f	[ 0.005f ]
+
+# Add faction name to players in contact list. - M0tah
+0D3180: 00	[ E6 ]
+
+# Vertical offset of player name in contact list. - M0tah
+1D7BF0: 0.0d	[ 0.004d ]
+
+# Selected object 3d-view forced to top-down perspective. - WhiskasTM
+0E3D09: B1 01 90	[ 0F 95 C1 ]
+
+# Remove flashing in wireframe for items with hit_pts = 0 (replace second-last hex with: 4E for yellow, 58 for aqua, 15 for dark blue). - adoxa
+0E6F67: D9 5C E4 18 8B 4C E4 18 85 C9 7E 1D 81 F9 00 00 80 3F 74 15 90	[ D9 54 24 18 D8 1D 74 74 5C 00 DF E0 F6 C4 41 75 18 8B 4C 24 18 ]
+
+
+##############
+# On Base
+##############
+
+# Items with "ids_name = 0" show up in repair list. - adoxa
+0B3C42: 00	[ E9 ]
+
+# Scale ship to fill the preview. - adoxa
+1855C0: EB	[ 74 ]
+
+
+##############
+# Map
+##############
+
+# Show all group members on the nav map. - BC46
 08D89B: 83 C5 18 EB 50	[ 90 90 90 90 90 ]
-# Show all group members on the nav map. (2) - BC46
 08D997: 00	[ 55 ]
 
-# Group member's NAV position refreshes every second. (1) - BC46
+# Group member's NAV position refreshes every second. - BC46
 096325: CC 2E	[ 40 3E ]
-# Group member's NAV position refreshes every second. (2) - BC46
 096338: CC 2E	[ 40 3E ]
 
-# Reduce possible FPS loss over time. - BC46
+
+##########################################
+# Controls
+##########################################
+
+# Keyboard moves ship in turret view. - adoxa
+0C7903: 00	[ 42 ]
+0DBB12: EB	[ 74 ]
+0DBB58: EB	[ 74 ]
+0DBB9E: EB	[ 74 ]
+0DBBE4: EB	[ 74 ]
+
+# Camera is independent of ship movement in turret view. - adoxa
+11D89C: E8 2F 82 0A 00 90	[ D9 1D 7C 52 67 00 ]
+11D8BB: E8 F0 81 0A 00 90	[ D9 1D 70 52 67 00 ]
+1C5AB0: D9 15 70 52 67 00 D8 0D 84 90 67 00 D9 1D 7C 90 67 00 C3	[ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ]
+1C5AD0: D9 15 7C 52 67 00 EB DE	[ 00 00 00 00 00 00 00 00 ]
+
+# Disable camera level during turret view (fixes ship movement bugs in this view). - adoxa
+14A65B: 9C A1 44 97 67 00 83 C0 F8 50 FF 15 70 64 5C 00 59 91 9D 74 0D A0 CA EC 67 00 88 81 F9 00 00 00 EB 25 B0 00 86 81 F9 00 00 00 A2 CA EC 67 00	[ A1 A0 4A 67 00 8A 88 B9 05 00 00 84 C9 74 38 A1 44 97 67 00 85 C0 74 05 83 C0 F8 EB 02 33 C0 50 FF 15 70 64 5C 00 83 C4 04 85 C0 74 08 8B C8 ]
+
+
+##########################################
+# Weapons
+##########################################
+
+# Prevent Countermeasure droppers from being activated by right-clicking. - BC46
+12D279: 39 F1 74 03 30 C0 C3	[ 90 90 90 90 90 90 90 ]
+1DD5A8: 79	[ 80 ]
+
+# Missiles continuously fire when holding button. - adoxa
+11D281: 00	[ 1D ]
+
+
+##########################################
+# Markets
+##########################################
+
+# Maximum value of any single good. ~Dev
+1CAEE8: 999999999f	[ 9999999f ]
+
+# Resale % for ships. - Dev
+1D6D38: 0.5f	[ 0.8f ]
+
+# Resale % for equipment. - fox
+1D0E2C: 0.5f	[ 0.3f ]
+
+# Need level to buy ships/equipment in MP. - adoxa
+08049A: 00	[ 28 ]
+082E96: 00	[ 0A ]
+0B948E: 00	[ 1B ]
+13E1F8: 89 35 8C 33 67 00 EB 47	[ 90 90 90 90 90 90 90 90 ]
+13E23D: BA	[ 09 ]
+
+# Allows the purchase of equipment that cannot be mounted on the player's ship. - BC46
+08050B: EB	[ 75 ]
+
+# Allows the purchase of equipment for which no free hardpoint is available on the player's ship. - BC46
+08053E: E9 8B 01 00 00 90	[ 0F 85 8A 01 00 00 ]
+
+
+##########################################
+# Rendering
+##########################################
+
+# Prevents intentional framerate drops to 25 from occurring during cutscenes. - BC46
+158A10: C0	[ BC ]
+
+# Increases the poly flipping distance, which allows jumpholes and other effects to be seen from further away. - Dev
+1C8910: 50000f	[ 20000f ]
+
+# Increases the maximum draw distance for space objects like battleships and trade lanes. - FriendlyFire
+213EC8: 999999f	[ 10000f ]
+
+# Fix bug with low resolution textures on some systems (sets maximum to 8192 instead of 128). - Schmackbolzen
+01AD6F: 00 20	[ 80 00 ]
+
+# Prevents sudden frame drops from occurring in space. Effectively removes Sleep(1) from the delta time calculation. - BC46
 02D7B8: EB DD	[ 6A 01 ]
+
+# Display sun spines within tradelane. - adoxa
+111BA5: EB	[ 74 ]
+
+# Display sun spines within asteroid fields. - adoxa
+111C80: EB	[ 74 ]
+
+# Activate [light] lightsource_cone entries. - adoxa
+131D2B: B0 01 90	[ 0F 94 C0 ]

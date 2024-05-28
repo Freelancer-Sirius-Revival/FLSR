@@ -1,3 +1,5 @@
 File: EXE\FLServer.exe
 
 
+# Never load EBUEula.dll from the root Freelancer folder (FLServer.exe). - BC46
+00B865: 89 CE 31 C0 EB 03	[ 68 C4 57 42 00 8B ]

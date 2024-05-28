@@ -1,4 +1,5 @@
 File: EXE\rendcomp.dll
 
+
 # Always use high-quality sphere rendering. Makes planets look more round from far distances. - adoxa
 00C499: 00	[ 02 ]

@@ -1,51 +1,51 @@
 File: DLLS\BIN\Content.dll
 
+
+##########################################
+# NPCs
+##########################################
+
 # Max range at which NPCs will scan your cargo. - Dev
 06C470: 1500i	[ 500i ]
 
-# Rank level limit - adoxa
-0A9D8E: 100b	[ 40b ]
+# NPC max spawn distance in SP and MP. - Dev
+11BC68: 5000d	[ 2500d ]
 
-# Make MP job difficulty exactly between min and max difficulty in mbases.ini. - adoxa
-0AAD7A: 89 44 E4 04 D9 44 E4 20 D8 64 E4 1C EB 04 66 B8 FB 06 DB 44 E4 04 D8 0D D0 97 39 06 DE C9 D8 44 E4 1C 5E 83 C4 10 C3	[ 99 B9 03 00 00 00 F7 F9 85 D2 74 33 D9 05 30 B2 FB 06 DD 5C 24 04 FF D6 99 DD 44 24 04 B9 03 00 00 00 F7 F9 8D 54 12 ]
-
-# Jump gates test reputation. - adoxa
-0CC985: 00	[ 40 ]
-
-# Hostile docking reputation. - adoxa
-11BCF4: -0.4f	[ -0.6f ]
+# Initial NPC max spawn distance in SP and MP. - Dev
+11BC80: 2000d	[ 1775d ]
 
 # Maximum distance that NPCs will persist in MP. - Dev
 0D3D6E: 5000f	[ 2500f ]
-# Distance at which NPC wave ships in randommissions are created. - Vita
-0F17D9: 3000f	[ 2625f ]
+
 # Distance over which NPC spawning will ignore density cap in MP (shared spawn density by players). - Dev
 117A68: 5000f	[ 7500f ]
-
-# NPC max spawn distance in SP and MP. - Dev
-11BC68: 5000d	[ 2500d ]
-# Initial NPC max spawn distance in SP and MP. - Dev
-11BC80: 2000d	[ 1775d ]
 
 # Time given to drop cargo. - adoxa
 118130: 5f	[ 20f ]
 
-# Adjustment for maximum reputation (lowest/highest rep +-adjustment). - adoxa
-11B930: 0d	[ 0.1d ]
 
-# Reputation needed for lawful factions to show rumors. - adoxa
-12E354: 0f	[ 0.2f ]
-# Reputation needed for unlawful factions to show rumors. - adoxa
-12E358: 0.2f	[ 0.4f ]
+##########################################
+# Random Missions
+##########################################
+
+# Make MP job difficulty exactly between min and max difficulty in mbases.ini. - adoxa
+0AAD7A: 89 44 E4 04 D9 44 E4 20 D8 64 E4 1C EB 04 66 B8 FB 06 DB 44 E4 04 D8 0D D0 97 39 06 DE C9 D8 44 E4 1C 5E 83 C4 10 C3	[ 99 B9 03 00 00 00 F7 F9 85 D2 74 33 D9 05 30 B2 FB 06 DD 5C 24 04 FF D6 99 DD 44 24 04 B9 03 00 00 00 F7 F9 8D 54 12 ]
+
+# Distance at which NPC wave ships in randommissions are created. - Vita
+0F17D9: 3000f	[ 2625f ]
 
 # Distance at which mission target solars in randommissions are created. - Vital
 11C2B0: 15000f	[ 7500f ]
+
 # Distance at which NPC mission target ships in randommissions are created. - Vital
 11C2C4: 3500f	[ 2500f ]
+
 # Core retreat distance from randommission waypoint. - Vital
 11C2C8: 4250f	[ 3500f ]
+
 # Max range at which randommission NPCs will engage enemies; outside of this range, their behavior will be strange (fly around in circles, ignore fire, etc.). - Vital
 11C2CC: 3000f   [ 2000f ]
+
 # Distance from 1st mission waypoint that second waypoint (and ships at it) in randommissions are created. - Vital
 11CBCC: 7500f	[ 6000f ]
 
@@ -55,3 +55,30 @@ File: DLLS\BIN\Content.dll
 # Weighted vector used to determine how many ships should occur in random missions. Starts at 0 ships up to 8 ships. (MP) - adoxa
 11CC7C: 0f 0f 1f 2f 4f 6f 5f 3f 2f	[ 0f 0f 2f 3f 9f 6f 4f 2f 1f ]
 
+
+##########################################
+# Reputation
+##########################################
+
+# Jump gates test reputation. - adoxa
+0CC985: 00	[ 40 ]
+
+# Hostile docking reputation. - adoxa
+11BCF4: -0.4f	[ -0.6f ]
+
+# Adjustment for maximum reputation (lowest/highest rep +-adjustment). - adoxa
+11B930: 0d	[ 0.1d ]
+
+# Reputation needed for lawful factions to show rumors. - adoxa
+12E354: 0f	[ 0.2f ]
+
+# Reputation needed for unlawful factions to show rumors. - adoxa
+12E358: 0.2f	[ 0.4f ]
+
+
+##########################################
+# Players
+##########################################
+
+# Rank level limit - adoxa
+0A9D8E: 100b	[ 40b ]

@@ -1,0 +1,5 @@
+File: EXE\ebueula.dll
+
+
+# Never show the EULA when launching the game by bypassing the registry key check. - BC46
+0019E0: 89 F0 C3	[ 83 EC 08 ]

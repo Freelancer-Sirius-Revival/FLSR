@@ -2,6 +2,8 @@
 textResources/FLSR-Texts.frc
 textResources/FLSR.frc
 
-# Ignore modified DLLs but keep original DLLs checked in
+# Ignore modified DLLs/EXEs but keep original DLLs checked in
 patches/**/*.dll
+patches/**/*.exe
 !patches/**/originals/**/*.dll
+!patches/**/originals/**/*.exe

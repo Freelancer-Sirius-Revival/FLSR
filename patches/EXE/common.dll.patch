@@ -1,0 +1,94 @@
+File: EXE\common.dll
+
+
+# Disable ArchDB::Get random mission spew warning. - adoxa
+0995B6: 90 90	[ FF 10 ]
+0995FC: 90 90	[ FF 12 ]
+
+##########################################
+# NPCs
+##########################################
+
+# NPCs use scanner (enables CMs). - adoxa
+13E52C: 00	[ 04 ]
+
+# Remove FIGHTER / FREIGHTER testing on Player for attack_preference in JobBlocks. - adoxa
+08E6D8: EB	[ 74 ]
+
+# Disable PlayerEnemyClamp altogether; instead making NPC enemy target selection random. - adoxa
+08E86A: EB 39	[ 7E 31 ]
+
+# Force NPCs to use correct chase behavior for shiptypes that are not FIGHTER or FREIGHTER - Aingar
+66148: 7F	[ 03 ]
+
+# Formation Members will use their thrusters - Venemon
+763B6: 90 90	[ 84 C0 ]
+
+
+##########################################
+# Weapons
+##########################################
+
+# Allow mine dropping in cruise. - WhiskasTM
+03A2B3: 09	[ 06 ]
+
+# Exclude cloaking device from total hit points (Part 1). - adoxa
+04B4D2: 0E	[ 1E ]
+04B582: 0E	[ 1E ]
+04B63E: 0E	[ 1E ]
+
+
+##########################################
+# Reputation
+##########################################
+
+# Reputation over which will give you affiliation with that faction (faction name appears in space before your name). - Dev
+18D5D4: 0.999f	[ 0.9f ]
+
+
+# Adjust cruise speed according to drag_modifier. - adoxa
+053796: EB	[ 74 ]
+
+# Drop out of cruise once power reaches 0. - adoxa
+03659E: 79	[ 4F ]
+036618: 8B 8E 94 01 00 00 EB 14	[ 90 90 90 90 90 90 90 90 ]
+036634: E3 B8 6A 00 E8 A3 D5 03 00 EB AF	[ 90 90 90 90 90 90 90 90 90 90 90 ]
+
+
+##########################################
+# World
+##########################################
+
+# Make drag_modifier independent of interference/damage. - adoxa
+0DAD24: 41 74	[ 05 7B ]
+
+# Some planets keep on spinning. - adoxa
+0E698E: EB	[ 7C ]
+
+# Trade lane travel speed (beware, values over 2500 may have adverse side-effects). - Lord of Lunacy
+13F3CC: 5000f	[ 2500f ]
+
+# Docking speed. - adoxa
+18BDB8: 25f	[ 18f ]
+
+# Relative speed after launching (station). - adoxa
+06DE13: 1f	[ 0.5f ]
+
+
+##########################################
+# Players
+##########################################
+
+# Max dock acknowledge distance. - Dev
+18BDB4: 1250f	[ 1000f ]
+
+# Max docking initiation distance. - Dev
+13F48C: 999999f	[ 10000f ]
+
+# Default repair price ratio (ships and collision groups) (both offsets must be changed). - FriendlyFire
+004A28: 0.03125f	[ 0.33f ]
+0057FA: 0.03125f	[ 0.33f ]
+
+# Always display the end points of trade lanes on the Nav Map. Effectively adds "visit = 1" to each ring Object. - adoxa
+0D6431: 44 00	[ ED 02 ]
+0D6461: 50 8D 8B D4 00 00 00 6A 40 51 E8 B0 FB FC FF 83 C4 0C 89 83 D0 00 00 00 C6 83 14 01 00 00 01 E9 9D 02 00 00	[ 83 C9 FF 33 C0 8B FE F2 AE F7 D1 49 8B C1 83 F8 40 8D 93 D4 00 00 00 72 05 B8 3F 00 00 00 8B C8 8B FA 8B D1 ]

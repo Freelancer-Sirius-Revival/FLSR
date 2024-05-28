@@ -30,6 +30,9 @@ File: EXE\server.dll
 # Players
 ##########################################
 
+# Disable encryption on creating MP character. - adoxa
+06BFA6: 14 B3	[ E4 B4 ]
+
 # Maximum credits that a player can have in MP. - adoxa
 06F46E: 2147483647i	[ 999999999i ]
 06F475: 2147483647i	[ 999999999i ]

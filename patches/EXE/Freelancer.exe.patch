@@ -178,12 +178,6 @@ File: EXE\Freelancer.exe
 0DBB9E: EB	[ 74 ]
 0DBBE4: EB	[ 74 ]
 
-# Camera is independent of ship movement in turret view. - adoxa
-# 11D89C: E8 2F 82 0A 00 90	[ D9 1D 7C 52 67 00 ]
-# 11D8BB: E8 F0 81 0A 00 90	[ D9 1D 70 52 67 00 ]
-# 1C5AB0: D9 15 70 52 67 00 D8 0D 84 90 67 00 D9 1D 7C 90 67 00 C3	[ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ]
-# 1C5AD0: D9 15 7C 52 67 00 EB DE	[ 00 00 00 00 00 00 00 00 ]
-
 # Disable camera level during turret view (fixes ship movement bugs in this view). - adoxa
 14A65B: 9C A1 44 97 67 00 83 C0 F8 50 FF 15 70 64 5C 00 59 91 9D 74 0D A0 CA EC 67 00 88 81 F9 00 00 00 EB 25 B0 00 86 81 F9 00 00 00 A2 CA EC 67 00	[ A1 A0 4A 67 00 8A 88 B9 05 00 00 84 C9 74 38 A1 44 97 67 00 85 C0 74 05 83 C0 F8 EB 02 33 C0 50 FF 15 70 64 5C 00 83 C4 04 85 C0 74 08 8B C8 ]
 

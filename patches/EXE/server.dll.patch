@@ -71,3 +71,6 @@ File: EXE\server.dll
 
 # Resale % for equipment. - fox
 08AE7C: 0.5f	[ 0.3f ]
+
+# Need reputation to buy ships/equipment in MP. - adoxa
+0112A3: 00	[ 1D ]

@@ -200,13 +200,6 @@ File: EXE\Freelancer.exe
 # Resale % for equipment. - fox
 1D0E2C: 0.5f	[ 0.3f ]
 
-# Need level to buy ships/equipment in MP. - adoxa
-08049A: 00	[ 28 ]
-082E96: 00	[ 0A ]
-0B948E: 00	[ 1B ]
-13E1F8: 89 35 8C 33 67 00 EB 47	[ 90 90 90 90 90 90 90 90 ]
-13E23D: BA	[ 09 ]
-
 # Allows the purchase of equipment that cannot be mounted on the player's ship. - BC46
 08050B: EB	[ 75 ]
 

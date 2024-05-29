@@ -125,6 +125,15 @@ File: EXE\Freelancer.exe
 # Remove flashing in wireframe for items with hit_pts = 0 (replace second-last hex with: 4E for yellow, 58 for aqua, 15 for dark blue). - adoxa
 0E6F67: D9 5C E4 18 8B 4C E4 18 85 C9 7E 1D 81 F9 00 00 80 3F 74 15 90	[ D9 54 24 18 D8 1D 74 74 5C 00 DF E0 F6 C4 41 75 18 8B 4C 24 18 ]
 
+# Reduces the time between contact list refreshes. - Dev
+1D7964: 1.5f	[ 3f ]
+
+# Reduces the time between weapon list refresh. - fox
+1D8484: 0.1f	[ 1f ]
+
+# Multiplier for subtargeting HUD animations (make smaller for faster). - Dev
+0DFC09: 0.00001f	[ 0.6f ]
+
 
 ##############
 # On Base

@@ -11,8 +11,6 @@ com_costume = %%COMM_COSTUME%%
 system = %%HOME_SYSTEM%%
 base = %%HOME_BASE%%
 
-rep_group = fc_fl_grp
-
 house = 0, li_n_grp
 house = 0, li_lsf_grp
 house = 0, li_p_grp
@@ -82,7 +80,7 @@ house = 0, cl_06_grp
 house = 0, cl_07_grp
 house = 0, cl_08_grp
 house = 0, cl_09_grp
-house = 1, fc_fl_grp
+house = 0, fc_fl_grp
 
 ;Li01
 visit = 2208796239,1

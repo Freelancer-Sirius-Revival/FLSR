@@ -70,7 +70,7 @@ File: DLLS\BIN\Content.dll
 11BCF4: -0.4f	[ -0.6f ]
 
 # Adjustment for maximum reputation (lowest/highest rep +-adjustment). - adoxa
-11B930: 0.002d	[ 0.1d ]
+11B930: 0.0001d	[ 0.1d ]
 
 # Reputation needed for lawful factions to show rumors. - adoxa
 12E354: 0f	[ 0.2f ]

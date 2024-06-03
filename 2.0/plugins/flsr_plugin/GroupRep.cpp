@@ -13,6 +13,8 @@ namespace GroupReputation
 
     static std::unordered_map<uint, mstime> destroyedShipIdsWithTimeStamp;
 
+    static float maxReputationThreshold = 0.9f;
+
     void LoadEmpathy()
     {
         std::string dataPath;
@@ -70,6 +72,30 @@ namespace GroupReputation
         }
     }
 
+    HMODULE LoadContentDll()
+    {
+        INI_Reader ini;
+        if (ini.open("freelancer.ini", false))
+        {
+            while (ini.read_header())
+            {
+                if (ini.is_header("Initial MP DLLs"))
+                {
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("path"))
+                        {
+                            const std::string dataPath = ini.get_value_string(0);
+                            return GetModuleHandle((dataPath + "\\Content.dll").c_str());
+                        }
+                    }
+                }
+            }
+            ini.close();
+        }
+        return 0;
+    }
+
     static bool initialized = false;
 
     void InitializeWithGameData()
@@ -79,6 +105,10 @@ namespace GroupReputation
         initialized = true;
 
         LoadEmpathy();
+
+        const auto contentHandle = LoadContentDll;
+        if (contentHandle)
+            maxReputationThreshold = 1.0f - *(double*)(DWORD(contentHandle) + 0x11B930);
     }
 
     void ChangeReputationRelative(int clientReputationId, int groupId, float value)
@@ -88,7 +118,7 @@ namespace GroupReputation
 
         float currentValue;
         pub::Reputation::GetGroupFeelingsTowards(clientReputationId, groupId, currentValue);
-        pub::Reputation::SetReputation(clientReputationId, groupId, currentValue + value);
+        pub::Reputation::SetReputation(clientReputationId, groupId, std::max(-maxReputationThreshold, std::min(currentValue + value, maxReputationThreshold)));
     }
 
     void ChangeReputationOfGroup(uint clientId, uint otherGroupId)

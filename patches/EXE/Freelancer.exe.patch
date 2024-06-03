@@ -8,7 +8,7 @@ File: EXE\Freelancer.exe
 1B2D72: EB 0F	[ 68 80 ]
 
 # Changes the CreateMutex lpName parameter to an empty string, allowing multiple instances of Freelancer to run simultaneously. - M0tah
-1E6DCC: " "	[ "F" ]
+1E6DCC: 00	[ "F" ]
 
 
 ##########################################

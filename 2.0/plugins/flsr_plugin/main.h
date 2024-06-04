@@ -135,7 +135,6 @@ namespace Commands {
     void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam);
     void UserCmd_UV(uint iClientID, const std::wstring &wscParam);
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam);
-    void UserCmd_Tag(uint iClientID, const std::wstring& wscParam);
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam);
     
     typedef void (*_UserCmdProc)(uint, const std::wstring &);
@@ -428,6 +427,19 @@ namespace AntiCheat {
     };
 
     extern IMPORT AC_INFO AC_Info[MAX_CLIENT_ID + 1];
+}
+
+namespace IFF
+{
+    void ReadCharacterData();
+    void UserCmd_Hostile(const uint clientId, const std::wstring& arguments);
+    void UserCmd_Neutral(const uint clientId, const std::wstring& arguments);
+    void UserCmd_Allied(const uint clientId, const std::wstring& arguments);
+    bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
+    void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);
+    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
+    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 }
 
 namespace Cloak

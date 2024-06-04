@@ -812,7 +812,10 @@ namespace Commands {
         {L"/groupunmark", Mark::UserCmd_UnGroupMark},
         {L"/gum", Mark::UserCmd_UnGroupMark},
         {L"/unmarkall", Mark::UserCmd_UnMarkAll},
-        {L"/uma", Mark::UserCmd_UnMarkAll}
+        {L"/uma", Mark::UserCmd_UnMarkAll},
+        {L"/hostile", IFF::UserCmd_Hostile},
+        {L"/neutral", IFF::UserCmd_Neutral},
+        {L"/allied", IFF::UserCmd_Allied}
     };
 
     // User command processing

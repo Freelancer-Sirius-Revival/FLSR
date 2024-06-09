@@ -425,7 +425,7 @@ void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1,
                                 enum DamageEntry::SubObjFate fate) {
     returncode = DEFAULT_RETURNCODE;
     if (iDmgToSpaceID && dmg->get_inflictor_id()) {
-        if (dmg->get_cause() == 0x06) {
+        if (dmg->get_cause() == DamageCause::CruiseDisrupter) {
             float curr, max;
             pub::SpaceObj::GetHealth(iDmgToSpaceID, curr, max);
             uint client = HkGetClientIDByShip(iDmgToSpaceID);

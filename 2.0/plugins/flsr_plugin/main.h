@@ -484,6 +484,9 @@ namespace Mark
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
     void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
+    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
+    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 }
 
 namespace EquipWhiteList

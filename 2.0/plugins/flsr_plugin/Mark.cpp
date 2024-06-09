@@ -52,12 +52,12 @@ namespace Mark
         PlayerData* playerData = 0;
         while (playerData = Players.traverse_active(playerData))
         {
-            const uint otherClientId = HkGetClientIdFromPD(playerData);
+            const uint clientId = HkGetClientIdFromPD(playerData);
             std::wstring otherCharacterFileName;
-            if (HkGetCharFileName(ARG_CLIENTID(otherClientId), otherCharacterFileName) != HKE_OK)
+            if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), otherCharacterFileName) != HKE_OK)
                 continue;
             if (otherCharacterFileName.compare(characterFileName) == 0)
-                return otherClientId;
+                return clientId;
         }
         return 0;
     }
@@ -155,7 +155,7 @@ namespace Mark
             return;
 
         std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
             return;
 
         // Mark static objects or NPCs
@@ -176,7 +176,7 @@ namespace Mark
             return;
 
         std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
             return;
 
         uint targetSystemId;
@@ -211,7 +211,7 @@ namespace Mark
     void Unmark(const uint clientId, const uint targetId)
     {
         std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
             return;
 
         const uint targetClientId = HkGetClientIDByShip(targetId);
@@ -235,7 +235,7 @@ namespace Mark
     void UnmarkAll(const uint clientId)
     {
         std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
             return;
 
         markedCharactersPerCharacter[characterFileName].clear();
@@ -297,7 +297,7 @@ namespace Mark
     void AddCloakedPlayer(const uint clientId)
     {
         std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
             return;
 
         cloakedCharacterFileNames.insert(characterFileName);
@@ -313,7 +313,7 @@ namespace Mark
     void RemoveCloakedPlayer(const uint clientId)
     {
         std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
             return;
 
         cloakedCharacterFileNames.erase(characterFileName);
@@ -451,12 +451,6 @@ namespace Mark
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state)
     {
         returncode = DEFAULT_RETURNCODE;
-
-        uint shipId;
-        pub::Player::GetShip(clientId, shipId);
-        if (shipId)
-            RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(shipId);
-
         currentlyMarkedObjectsPerClient.erase(clientId);
     }
 
@@ -472,10 +466,18 @@ namespace Mark
         {
             RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(ship->iID);
 
-            // Despawned NPCs will be removed forever. 
             const uint clientId = ship->GetOwnerPlayer();
-            if (!clientId)
+            if (clientId)
+            {
+                std::wstring characterFileName;
+                if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) == HKE_OK)
+                    cloakedCharacterFileNames.erase(characterFileName);
+            }
+            else
+            {
+                // Remove despawned NPCs
                 UnmarkEverywhere(ship->iID);
+            }
         }
         else
         {
@@ -490,5 +492,74 @@ namespace Mark
                 DisposeCharacterEverywhere(characterFileName);
             }
         }
+    }
+
+    void ClearCharacteData(const std::wstring characterFileName)
+    {
+        if (markedObjectsPerCharacter.contains(characterFileName))
+            markedObjectsPerCharacter.erase(characterFileName);
+        if (markedCharactersPerCharacter.contains(characterFileName))
+            markedCharactersPerCharacter.erase(characterFileName);
+        cloakedCharacterFileNames.erase(characterFileName);
+    }
+
+    void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        std::wstring characterFileName;
+        if (HkGetCharFileName(info.wszCharname, characterFileName) != HKE_OK)
+            return;
+        DisposeCharacterEverywhere(characterFileName);
+        ClearCharacteData(characterFileName);
+    }
+
+    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        const std::wstring characterFileName = stows(std::string(characterId.szCharFilename).substr(0, 11));
+        DisposeCharacterEverywhere(characterFileName);
+        ClearCharacteData(characterFileName);
+    }
+
+    static std::wstring characterFileNameToRename;
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
+            characterFileNameToRename = L"";
+        return HKE_OK;
+    }
+
+    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        if (!characterFileNameToRename.empty())
+        {
+            std::wstring characterFileName;
+            if (HkGetCharFileName(newCharname, characterFileName) == HKE_OK)
+            {
+                if (markedObjectsPerCharacter.contains(characterFileNameToRename))
+                {
+                    markedObjectsPerCharacter[characterFileName] = markedObjectsPerCharacter[characterFileNameToRename];
+                    markedObjectsPerCharacter.erase(characterFileNameToRename);
+                }
+                if (markedCharactersPerCharacter.contains(characterFileNameToRename))
+                {
+                    markedCharactersPerCharacter[characterFileName] = markedCharactersPerCharacter[characterFileNameToRename];
+                    markedCharactersPerCharacter.erase(characterFileNameToRename);
+                }
+                for (auto& otherCharacter : markedCharactersPerCharacter)
+                {
+                    if (otherCharacter.second.contains(characterFileNameToRename))
+                    {
+                        otherCharacter.second.erase(characterFileNameToRename);
+                        otherCharacter.second.insert(characterFileName);
+                    }
+                }
+            }
+        }
+        characterFileNameToRename = L"";
+        return HKE_OK;
     }
 }

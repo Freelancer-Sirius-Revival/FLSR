@@ -1219,7 +1219,19 @@ public:
 	SubObjFate fate;
 };
 
-enum DamageCause;
+enum class DamageCause
+{
+	Unknown = 0x0,
+	Collision = 0x1,
+	Gun = 0x2,
+	MissileTorpedo = 0x5,
+	CruiseDisrupter = 0x6,
+	Mine = 0x7,
+	Suicide = 0x8,
+	DummyDisrupter = 0xC0, // Defined by Hook's feature to not let disruptors enable engine kill.
+	UnkDisrupter = 0x15,
+	Admin = 0x18
+};
 
 struct IMPORT DamageList
 {

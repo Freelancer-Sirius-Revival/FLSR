@@ -214,7 +214,7 @@ namespace Docking
         {
             while (ini.read_header())
             {
-                std::string characterFileName = std::string(ini.get_header_ptr());
+                const std::string characterFileName = std::string(ini.get_header_ptr());
                 const uint characterFileNameId = CreateID(characterFileName.c_str());
                 while (ini.read_value())
                 {

@@ -1,78 +1,20 @@
 #include "Main.h"
 
 namespace Commands {
-    //Test Commands
-    /*
-    void UserCmd_TESTDEPOT(uint iClientID, const std::wstring& wscParam) {
-        Depot::PlayerDepotOpen(iClientID);
-        
-    }
 
-    void UserCmd_TESTAC(uint iClientID, const std::wstring &wscParam) {
-        std::wstring wscType = wscParam;
-        std::string scType = wstos(wscType);
-        AntiCheat::Reporting::ReportCheater(iClientID, scType, "");
-    }
-
-    void UserCmd_TESTCC(uint iClientID, const std::wstring& wscParam) {
-        std::wstring wscMsg = wscParam;
-        ClientController::Send_ControlMsg(false, iClientID, wscMsg);
-    }
-
-
-
-    void UserCmd_TESTINSURANCE(uint iClientID, const std::wstring& wscParam) {
-        Tools::GetHardpointsFromCollGroup(iClientID);
-    }
-
-    void UserCmd_TESTWP(uint iClientID, const std::wstring& wscParam) {
-        std::wstring wscMsg = wscParam;
-        std::list <CustomMissions::PlayerWaypoint> lWP;
-        uint iSysID;
-        pub::Player::GetSystem(iClientID, iSysID);
-        CustomMissions::PlayerWaypoint TestWP;
-		TestWP.iSystemID = iSysID;
-        TestWP.iSolarObjectID = 0;
-        TestWP.X = "-33356";
-        TestWP.Y = "0";
-        TestWP.Z = "-500";
-        CustomMissions::PlayerWaypoint TestWP2;
-        TestWP2.iSystemID = iSysID;
-		TestWP2.iSolarObjectID = 0;
-        TestWP2.X = "-12345";
-        TestWP2.Y = "0";
-        TestWP2.Z = "-500";
-        CustomMissions::PlayerWaypoint TestWP3;
-        TestWP3.iSystemID = iSysID;
-		TestWP3.iSolarObjectID = 0;
-        TestWP3.X = "-23333";
-        TestWP3.Y = "0";
-        TestWP3.Z = "-500";
-        lWP.push_back(TestWP);
-        lWP.push_back(TestWP2);
-        lWP.push_back(TestWP3);
-        CustomMissions::Send_WPs(iClientID, lWP, true);
-    }
-    
-      void UserCmd_testcloak(uint iClientID, const std::wstring& wscParam) {
-        ClientController::Send_ControlMsg(true, iClientID, L"_cloaktoggle");
-
-    }
-        */
-
-    // Discord
+        // Discord
     void UserCMD_BANK(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("DiscordBot"))
         {
-			std::wstring wscCharFileName;
-			HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-			std::string scCharfile = wstos(wscCharFileName);
-			std::string scDiscordID = Discord::GetDiscordIDForChar(scCharfile);
+            std::wstring wscCharFileName;
+            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
+            std::string scCharfile = wstos(wscCharFileName);
+            std::string scDiscordID = Discord::GetDiscordIDForChar(scCharfile);
             if (scDiscordID == "") // No Link Request
             {
-				PrintUserCmdText(iClientID, L"Char not linked!");
-				return;
-			}
+                PrintUserCmdText(iClientID, L"Char not linked!");
+                return;
+            }
             else
             {
 
@@ -129,7 +71,7 @@ namespace Commands {
                         return;
                     }
 
-                    
+
                     // The last error.
                     HK_ERROR err;
 
@@ -142,9 +84,9 @@ namespace Commands {
                     // Betrag auf den Discord-Account �berweisen
                     if (!Discord::UpdateCreditsForDiscordAccount(scDiscordID, std::to_string(amount), true))
                     {
-						PrintUserCmdText(iClientID, L"Error while updating discord balance");
-						return;
-					}
+                        PrintUserCmdText(iClientID, L"Error while updating discord balance");
+                        return;
+                    }
 
                     // Erfolgmeldung anzeigen
                     PrintUserCmdText(iClientID, L"Successfully deposited " + wscParam + L" credits to your account.");
@@ -153,8 +95,8 @@ namespace Commands {
 
 
 
-			}
-		}   
+            }
+        }
 
 
     }
@@ -168,7 +110,7 @@ namespace Commands {
             HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
             std::string scCharfile = wstos(wscCharFileName);
             std::string sha1PW = Tools::sha1(wstos(wscParam));
- 
+
 
             //Get 2FA
             std::string scValid = Discord::GetValidationForChar(scCharfile);
@@ -179,9 +121,9 @@ namespace Commands {
             }
             else if (scValid == "TRUE") // Already Linked
             {
-				PrintUserCmdText(iClientID, L"Char already linked!");
-				return;
-			}
+                PrintUserCmdText(iClientID, L"Char already linked!");
+                return;
+            }
 
 
             if (scValid == sha1PW)
@@ -207,8 +149,8 @@ namespace Commands {
             }
             else
             {
-				PrintUserCmdText(iClientID, L"Wrong Pass!");
-			}
+                PrintUserCmdText(iClientID, L"Wrong Pass!");
+            }
 
         }
     }
@@ -239,7 +181,7 @@ namespace Commands {
         }
 
     }
-    
+
     void UserCmd_pvpclear(uint iClientID, const std::wstring& wscParam) {
         if (Modules::GetModuleState("PVP"))
         {
@@ -290,7 +232,7 @@ namespace Commands {
         }
 
     }
-	
+
 
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
 
@@ -302,7 +244,7 @@ namespace Commands {
 
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
 
-        
+
         //Create Popup struct
         PopUp::PopUpBox NewPopUpBox;
         NewPopUpBox.iClientID = iClientID;
@@ -311,68 +253,21 @@ namespace Commands {
         NewPopUpBox.iPage = 1;
         NewPopUpBox.iMaxPage = 1;
         NewPopUpBox.iButton = POPUPDIALOG_BUTTONS_CENTER_OK;
-        
+
         std::wstring wscCharFileName;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
 
         //Setup New Popup
-		PopUp::mPopUpBox[wscCharFileName] = NewPopUpBox;
-        
+        PopUp::mPopUpBox[wscCharFileName] = NewPopUpBox;
+
         //OpenPopup
-		PopUp::OpenPopUp(iClientID);
-        
+        PopUp::OpenPopUp(iClientID);
+
     }
 
-    void UserCmd_Tag(uint iClientID, const std::wstring& wscParam)
-    {
-        std::wstring wscError[] =
-        {
-            L"Error: Invalid parameters",
-            L"Usage: /tag <faction name>"
-        };     
-
-		std::wstring wscParameters = wscParam;
-        wscParameters = Trim(wscParameters);
-
-        if (wscParameters.length())
-        {
-            wscParameters = ToLower(wscParameters);
-            uint iGroup = Tools::GetiGroupOfFaction(wscParameters);
-      
-            
-            
-            if (iGroup)
-            {
-                int iRep;
-                pub::Player::GetRep(iClientID, iRep);
-                uint iIDS = Reputation::get_name(iGroup);
-                std::wstring wscFaction = HkGetWStringFromIDS(iIDS);
-                float fRep;
-                pub::Reputation::GetGroupFeelingsTowards(iRep, iGroup, fRep);
-                if (fRep < 0.6f)
-                {
-                    PrintUserCmdText(iClientID, L"Error: your reputation of %g to " + wscFaction + L" is less than the required %g.", fRep, 0.6f);
-                }
-                else
-                {
-                    pub::Reputation::SetAffiliation(iRep, iGroup);
-                    PrintUserCmdText(iClientID, L"Affiliation changed to " + wscFaction);
-                }
-            }
-            else
-            {
-                PrintUserCmdText(iClientID, L"Error: could not find faction");
-            }
-        }
-        else
-        {
-            PrintUserCmdText(iClientID, L"Error: could not find faction");
-        }
-    }
-
-    void UserCmd_UV(uint iClientID, const std::wstring &wscParam) {
+    void UserCmd_UV(uint iClientID, const std::wstring& wscParam) {
         std::wstring Chat = wscParam;
-        std::wstring Charname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
+        std::wstring Charname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
         Chat::HkSendUChat(Charname, Chat);
 
         //Discord
@@ -392,10 +287,10 @@ namespace Commands {
 
     }
 
-    void UserCmd_MODREQUEST(uint iClientID, const std::wstring &wscParam) {
+    void UserCmd_MODREQUEST(uint iClientID, const std::wstring& wscParam) {
         std::wstring Chat = wscParam;
         std::wstring Charname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-        PrintUserCmdText (iClientID, L"Your request has been sent to the moderators.");
+        PrintUserCmdText(iClientID, L"Your request has been sent to the moderators.");
         //Discord
         Discord::ChatMessage ChatMsg;
         ChatMsg.wscCharname = Charname;
@@ -412,13 +307,13 @@ namespace Commands {
     }
 
     /** Process a give cash command */
-    void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam) {
+    void UserCMD_SendCash(uint iClientID, const std::wstring& wscParam) {
         // The last error.
         HK_ERROR err;
 
         // Get the current character name
         std::wstring wscCharname =
-            (const wchar_t *)Players.GetActiveCharacterName(iClientID);
+            (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
         // Get the parameters from the user command.
         std::wstring wscTargetCharname = GetParam(wscParam, L' ', 0);
@@ -460,9 +355,9 @@ namespace Commands {
         }
         if (cash < SendCash::set_iMinTransfer || cash < 0) {
             PrintUserCmdText(iClientID,
-                             L"ERR Transfer too small, minimum transfer " +
-                                 ToMoneyStr(SendCash::set_iMinTransfer) +
-                                 L" credits");
+                L"ERR Transfer too small, minimum transfer " +
+                ToMoneyStr(SendCash::set_iMinTransfer) +
+                L" credits");
             return;
         }
         if (iCash < cash) {
@@ -485,7 +380,7 @@ namespace Commands {
         int iExpectedCash = 0;
         if ((err = HkGetCash(wscTargetCharname, iExpectedCash)) != HKE_OK) {
             PrintUserCmdText(iClientID,
-                             L"ERR Get cash failed err=" + HkErrGetText(err));
+                L"ERR Get cash failed err=" + HkErrGetText(err));
             return;
         }
         iExpectedCash += cash;
@@ -501,10 +396,10 @@ namespace Commands {
                     "to %s (%s)",
                     wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname)))
-                        .c_str(),
+                    .c_str(),
                     wstos(wscTargetCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                        .c_str());
+                    .c_str());
                 return;
             }
             HkSaveChar(targetClientId);
@@ -520,10 +415,10 @@ namespace Commands {
                     "to %s (%s) %u %u",
                     wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname)))
-                        .c_str(),
+                    .c_str(),
                     wstos(wscTargetCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                        .c_str(),
+                    .c_str(),
                     iClientID, targetClientId);
                 return;
             }
@@ -533,7 +428,7 @@ namespace Commands {
         // save completes before allowing the cash to be added to the target ship.
         if ((err = HkAddCash(wscCharname, 0 - cash)) != HKE_OK) {
             PrintUserCmdText(iClientID,
-                             L"ERR Remove cash failed err=" + HkErrGetText(err));
+                L"ERR Remove cash failed err=" + HkErrGetText(err));
             return;
         }
 
@@ -546,7 +441,7 @@ namespace Commands {
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
                 wstos(wscTargetCharname).c_str(),
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                    .c_str());
+                .c_str());
             return;
         }
         HkSaveChar(iClientID);
@@ -554,7 +449,7 @@ namespace Commands {
         // Add cash to target character
         if ((err = HkAddCash(wscTargetCharname, cash)) != HKE_OK) {
             PrintUserCmdText(iClientID,
-                             L"ERR Add cash failed err=" + HkErrGetText(err));
+                L"ERR Add cash failed err=" + HkErrGetText(err));
             return;
         }
 
@@ -568,10 +463,10 @@ namespace Commands {
                     "to %s (%s)",
                     wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname)))
-                        .c_str(),
+                    .c_str(),
                     wstos(wscTargetCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                        .c_str());
+                    .c_str());
                 return;
             }
             HkSaveChar(targetClientId);
@@ -589,7 +484,7 @@ namespace Commands {
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
                 wstos(wscTargetCharname).c_str(),
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                    .c_str(),
+                .c_str(),
                 wstos(ToMoneyStr(iCurrCash)).c_str(),
                 wstos(ToMoneyStr(iExpectedCash)).c_str());
             PrintUserCmdText(iClientID, L"ERR Transfer failed");
@@ -599,8 +494,8 @@ namespace Commands {
         // If the target player is online then send them a message saying
         // telling them that they've received the cash.
         std::wstring msg = L"You have received " + ToMoneyStr(cash) +
-                           L" credits from " +
-                           ((bAnon) ? L"anonymous" : wscCharname);
+            L" credits from " +
+            ((bAnon) ? L"anonymous" : wscCharname);
         if (targetClientId != -1 && !HkIsInCharSelectMenu(targetClientId)) {
             PrintUserCmdText(targetClientId, L"%s", msg.c_str());
         }
@@ -609,34 +504,34 @@ namespace Commands {
         // of the transfer. The ini is cleared when ever the character logs in.
         else {
             std::wstring msg = L"You have received " + ToMoneyStr(cash) +
-                               L" credits from " +
-                               ((bAnon) ? L"anonymous" : wscCharname);
+                L" credits from " +
+                ((bAnon) ? L"anonymous" : wscCharname);
             SendCash::LogTransfer(wscTargetCharname, msg);
         }
 
         AddLog("Send %s credits from %s (%s) to %s (%s)",
-               wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
-               wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
-               wstos(wscTargetCharname).c_str(),
-               wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                   .c_str());
+            wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
+            wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
+            wstos(wscTargetCharname).c_str(),
+            wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
+            .c_str());
 
         // A friendly message explaining the transfer.
         msg = L"You have sent " + ToMoneyStr(cash) + L" credits to " +
-              wscTargetCharname;
+            wscTargetCharname;
         if (bAnon)
             msg += L" anonymously";
         PrintUserCmdText(iClientID, L"%s", msg.c_str());
         return;
     }
 
-    void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam) {
+    void UserCMD_SendCash$(uint iClientID, const std::wstring& wscParam) {
         // The last error.
         HK_ERROR err;
 
         // Get the current character name
         std::wstring wscCharname =
-            (const wchar_t *)Players.GetActiveCharacterName(iClientID);
+            (const wchar_t*)Players.GetActiveCharacterName(iClientID);
 
         // Get the parameters from the user command.
 
@@ -649,7 +544,7 @@ namespace Commands {
         }
 
         std::wstring wscTargetCharname =
-            (const wchar_t *)Players.GetActiveCharacterName(iClientIDTarget);
+            (const wchar_t*)Players.GetActiveCharacterName(iClientIDTarget);
         std::wstring wscCash = GetParam(wscParam, L' ', 1);
         std::wstring wscAnon = GetParam(wscParam, L' ', 2);
         wscCash = ReplaceStr(wscCash, L".", L"");
@@ -688,9 +583,9 @@ namespace Commands {
         }
         if (cash < SendCash::set_iMinTransfer || cash < 0) {
             PrintUserCmdText(iClientID,
-                             L"ERR Transfer too small, minimum transfer " +
-                                 ToMoneyStr(SendCash::set_iMinTransfer) +
-                                 L" credits");
+                L"ERR Transfer too small, minimum transfer " +
+                ToMoneyStr(SendCash::set_iMinTransfer) +
+                L" credits");
             return;
         }
         if (iCash < cash) {
@@ -713,7 +608,7 @@ namespace Commands {
         int iExpectedCash = 0;
         if ((err = HkGetCash(wscTargetCharname, iExpectedCash)) != HKE_OK) {
             PrintUserCmdText(iClientID,
-                             L"ERR Get cash failed err=" + HkErrGetText(err));
+                L"ERR Get cash failed err=" + HkErrGetText(err));
             return;
         }
         iExpectedCash += cash;
@@ -729,10 +624,10 @@ namespace Commands {
                     "to %s (%s)",
                     wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname)))
-                        .c_str(),
+                    .c_str(),
                     wstos(wscTargetCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                        .c_str());
+                    .c_str());
                 return;
             }
             HkSaveChar(targetClientId);
@@ -748,10 +643,10 @@ namespace Commands {
                     "to %s (%s) %u %u",
                     wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname)))
-                        .c_str(),
+                    .c_str(),
                     wstos(wscTargetCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                        .c_str(),
+                    .c_str(),
                     iClientID, targetClientId);
                 return;
             }
@@ -761,7 +656,7 @@ namespace Commands {
         // save completes before allowing the cash to be added to the target ship.
         if ((err = HkAddCash(wscCharname, 0 - cash)) != HKE_OK) {
             PrintUserCmdText(iClientID,
-                             L"ERR Remove cash failed err=" + HkErrGetText(err));
+                L"ERR Remove cash failed err=" + HkErrGetText(err));
             return;
         }
 
@@ -774,7 +669,7 @@ namespace Commands {
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
                 wstos(wscTargetCharname).c_str(),
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                    .c_str());
+                .c_str());
             return;
         }
         HkSaveChar(iClientID);
@@ -782,7 +677,7 @@ namespace Commands {
         // Add cash to target character
         if ((err = HkAddCash(wscTargetCharname, cash)) != HKE_OK) {
             PrintUserCmdText(iClientID,
-                             L"ERR Add cash failed err=" + HkErrGetText(err));
+                L"ERR Add cash failed err=" + HkErrGetText(err));
             return;
         }
 
@@ -796,10 +691,10 @@ namespace Commands {
                     "to %s (%s)",
                     wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname)))
-                        .c_str(),
+                    .c_str(),
                     wstos(wscTargetCharname).c_str(),
                     wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                        .c_str());
+                    .c_str());
                 return;
             }
             HkSaveChar(targetClientId);
@@ -817,7 +712,7 @@ namespace Commands {
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
                 wstos(wscTargetCharname).c_str(),
                 wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                    .c_str(),
+                .c_str(),
                 wstos(ToMoneyStr(iCurrCash)).c_str(),
                 wstos(ToMoneyStr(iExpectedCash)).c_str());
             PrintUserCmdText(iClientID, L"ERR Transfer failed");
@@ -827,8 +722,8 @@ namespace Commands {
         // If the target player is online then send them a message saying
         // telling them that they've received the cash.
         std::wstring msg = L"You have received " + ToMoneyStr(cash) +
-                           L" credits from " +
-                           ((bAnon) ? L"anonymous" : wscCharname);
+            L" credits from " +
+            ((bAnon) ? L"anonymous" : wscCharname);
         if (targetClientId != -1 && !HkIsInCharSelectMenu(targetClientId)) {
             PrintUserCmdText(targetClientId, L"%s", msg.c_str());
         }
@@ -837,21 +732,21 @@ namespace Commands {
         // of the transfer. The ini is cleared when ever the character logs in.
         else {
             std::wstring msg = L"You have received " + ToMoneyStr(cash) +
-                               L" credits from " +
-                               ((bAnon) ? L"anonymous" : wscCharname);
+                L" credits from " +
+                ((bAnon) ? L"anonymous" : wscCharname);
             SendCash::LogTransfer(wscTargetCharname, msg);
         }
 
         AddLog("Send %s credits from %s (%s) to %s (%s)",
-               wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
-               wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
-               wstos(wscTargetCharname).c_str(),
-               wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
-                   .c_str());
+            wstos(ToMoneyStr(cash)).c_str(), wstos(wscCharname).c_str(),
+            wstos(HkGetAccountID(HkGetAccountByCharname(wscCharname))).c_str(),
+            wstos(wscTargetCharname).c_str(),
+            wstos(HkGetAccountID(HkGetAccountByCharname(wscTargetCharname)))
+            .c_str());
 
         // A friendly message explaining the transfer.
         msg = L"You have sent " + ToMoneyStr(cash) + L" credits to " +
-              wscTargetCharname;
+            wscTargetCharname;
         if (bAnon)
             msg += L" anonymously";
         PrintUserCmdText(iClientID, L"%s", msg.c_str());
@@ -859,7 +754,7 @@ namespace Commands {
     }
 
     // Contributor TextBox
-    void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam) {
+    void UserCMD_Contributor(uint iClientID, const std::wstring& wscParam) {
         FmtStr caption(0, 0);
         caption.begin_mad_lib(PopUp::iContributor_Head);
         caption.end_mad_lib();
@@ -872,30 +767,16 @@ namespace Commands {
         return;
     }
 
-    //Not used commands
-
-    /*
-    
-        // MissionGroup Bug
-    void UserCMD_Clear(uint iClientID, const std::wstring &wscParam) {
-
-        Tools::HkClearMissionBug(iClientID);
-        return;
-    }
-
-    */
-   
-	
-	//ChangeModuleState
+    //ChangeModuleState
     void AdminCmd_SwitchModuleState(CCmds* cmds, std::wstring wscModulename) {
-		
-		// Rechte Check
-		if (!(cmds->rights & RIGHT_SUPERADMIN)) {
-			cmds->Print(L"ERR No permission\n");
-			return;
-		}
-		
-		//Switch Module State
+
+        // Rechte Check
+        if (!(cmds->rights & RIGHT_SUPERADMIN)) {
+            cmds->Print(L"ERR No permission\n");
+            return;
+        }
+
+        //Switch Module State
         Modules::SwitchModuleState(wstos(wscModulename));
         cmds->Print(L"OK\n");
     }
@@ -908,7 +789,6 @@ namespace Commands {
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", Insurance::UserCMD_INSURANCE},
         {L"/help", UserCmd_HELP},
-        {L"/tag", UserCmd_Tag},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
         {L"/pvpduel", UserCmd_pvpduel},
         {L"/pvpffa", UserCmd_pvpffa},
@@ -932,29 +812,15 @@ namespace Commands {
         {L"/groupunmark", Mark::UserCmd_UnGroupMark},
         {L"/gum", Mark::UserCmd_UnGroupMark},
         {L"/unmarkall", Mark::UserCmd_UnMarkAll},
-        {L"/uma", Mark::UserCmd_UnMarkAll}
-
-
-
-        //Not Used Commands
-        /*
-        
-         {L"/clear", UserCMD_Clear},
-
-        */
-
-		//Test Commands
-        /*{L"/testcloak", UserCmd_testcloak},
-        {L"/testac", UserCmd_TESTAC},
-        {L"/testcc", UserCmd_TESTCC},
-        {L"/testdepot", UserCmd_TESTDEPOT},
-        {L"/testins", UserCmd_TESTINSURANCE},
-        */
-
+        {L"/uma", Mark::UserCmd_UnMarkAll},
+        {L"/hostile", IFF::UserCmd_Hostile},
+        {L"/neutral", IFF::UserCmd_Neutral},
+        {L"/allied", IFF::UserCmd_Allied},
+        {L"/iff", IFF::UserCmd_Attitude}
     };
 
     // User command processing
-    bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd) {
+    bool UserCmd_Process(uint iClientID, const std::wstring& wscCmd) {
         std::wstring wscCmdLower = ToLower(wscCmd);
         for (uint i = 0; (i < sizeof(UserCmds) / sizeof(USERCMD)); i++) {
             if (wscCmdLower.find(ToLower(UserCmds[i].wszCmd)) == 0) {
@@ -966,17 +832,17 @@ namespace Commands {
                 }
                 UserCmds[i].proc(iClientID, wscParam);
                 returncode = SKIPPLUGINS_NOFUNCTIONCALL; // we handled the command,
-                                                         // return immediatly
+                // return immediatly
                 return true;
             }
         }
         returncode = DEFAULT_RETURNCODE; // we did not handle the command, so let
-                                         // other plugins or FLHook kick in
+        // other plugins or FLHook kick in
         return false;
     }
 
     // Admin command processing
-    bool ExecuteCommandString_Callback(CCmds *cmds, const std::wstring &wscCmd) {
+    bool ExecuteCommandString_Callback(CCmds* cmds, const std::wstring& wscCmd) {
         returncode = DEFAULT_RETURNCODE;
         if (IS_CMD("switchModulestate")) {
             returncode = SKIPPLUGINS_NOFUNCTIONCALL;

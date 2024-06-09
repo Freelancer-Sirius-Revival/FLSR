@@ -542,7 +542,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
         uint iKillerID = 0;
         if (iClientID) {
             DamageList dmg;
-            if (!dmg.get_cause())
+            if (dmg.get_cause() != DamageCause::Unknown)
                 dmg = ClientInfo[iClientID].dmgLast;
             uint iClientIDKiller = HkGetClientIDByShip(dmg.get_inflictor_id());
             if (iClientIDKiller && (iClientID != iClientIDKiller)) {

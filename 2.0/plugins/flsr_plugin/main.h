@@ -434,6 +434,7 @@ namespace IFF
     void UserCmd_Hostile(const uint clientId, const std::wstring& arguments);
     void UserCmd_Neutral(const uint clientId, const std::wstring& arguments);
     void UserCmd_Allied(const uint clientId, const std::wstring& arguments);
+    void UserCmd_Attitude(const uint clientId, const std::wstring& arguments);
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
     void __stdcall HkCb_AddDmgEntry(DamageList* damageList, unsigned short subObjectId, float hitpoints, DamageEntry::SubObjFate fate);
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);

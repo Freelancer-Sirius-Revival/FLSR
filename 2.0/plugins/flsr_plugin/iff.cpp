@@ -237,6 +237,33 @@ namespace IFF
         }
     }
 
+    std::wstring GetAttitudeDisplayString(const Attitude attitude)
+    {
+        switch (attitude)
+        {
+        case Attitude::Hostile:
+            return L"hostile";
+
+        case Attitude::Neutral:
+            return L"neutral";
+
+        case Attitude::Allied:
+            return L"friendly";
+        }
+    }
+
+    void UserCmd_Attitude(const uint clientId, const std::wstring& arguments)
+    {
+        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        if (HkIsValidClientID(GetClientId(targetCharacterName)))
+        {
+            const auto& attitude = GetAttitudeTowards({ GetCharacterName(clientId), targetCharacterName });
+            PrintUserCmdText(clientId, L"You are " + GetAttitudeDisplayString(attitude.first) + L" towards " + targetCharacterName + L", and they are " + GetAttitudeDisplayString(attitude.second) + L" towards you.");
+        }
+        else
+            PrintUserCmdText(clientId, L"Character '" + targetCharacterName + L"' is not logged in.");
+    }
+
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship)
     {
         returncode = DEFAULT_RETURNCODE;

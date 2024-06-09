@@ -165,29 +165,7 @@ namespace Mark
                 MarkObject(clientId, targetId);
         }
 
-        // Mark players within the system
-        if (!markedCharactersPerCharacter.contains(characterFileName))
-            return;
-        for (const std::wstring targetCharacterFileName : markedCharactersPerCharacter[characterFileName])
-        {
-            if (cloakedCharacterFileNames.contains(targetCharacterFileName))
-                continue;
-
-            PlayerData* playerData = 0;
-            while (playerData = Players.traverse_active(playerData))
-            {
-                const uint otherClientId = HkGetClientIdFromPD(playerData);
-                std::wstring otherCharacterFileName;
-                if (HkGetCharFileName(ARG_CLIENTID(otherClientId), otherCharacterFileName) != HKE_OK)
-                    continue;
-                if (otherCharacterFileName.compare(targetCharacterFileName) == 0)
-                {
-                    uint targetId;
-                    pub::Player::GetShip(otherClientId, targetId);
-                    MarkObject(clientId, targetId);
-                }
-            }
-        }
+        // Marked players will be refreshed by CreateShip package checks.
     }
 
     void Mark(const uint clientId, const uint targetId)
@@ -438,23 +416,36 @@ namespace Mark
         RefreshMarksForCurrentSystem(clientId);
     }
 
-    void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
-    {
-        returncode = DEFAULT_RETURNCODE;
-
-        uint shipId;
-        pub::Player::GetShip(clientId, shipId);
-        if (shipId)
-            RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(shipId);
-
-        currentlyMarkedObjectsPerClient.erase(clientId);
-    }
-
     void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
 
         currentlyMarkedObjectsPerClient.erase(clientId);
+    }
+
+    bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (clientId && ship.iClientID)
+        {
+            std::wstring currentCharacterFileName;
+            if (HkGetCharFileName(ARG_CLIENTID(clientId), currentCharacterFileName) != HKE_OK ||
+                !markedCharactersPerCharacter.contains(currentCharacterFileName)
+            )
+                return true;
+
+            std::wstring targetCharacterFileName;
+            if (HkGetCharFileName(ARG_CLIENTID(ship.iClientID), targetCharacterFileName) != HKE_OK ||
+                !markedCharactersPerCharacter[currentCharacterFileName].contains(targetCharacterFileName) ||
+                cloakedCharacterFileNames.contains(targetCharacterFileName)
+            )
+                return true;
+
+            MarkObject(clientId, ship.iSpaceID);
+        }
+
+        return true;
     }
 
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state)
@@ -473,20 +464,31 @@ namespace Mark
     {
         returncode = DEFAULT_RETURNCODE;
 
-        if (!killed)
-            return;
         const CShip* ship = (CShip*)ecx[4];
         if (!ship)
             return;
-        UnmarkEverywhere(ship->iID);
+        
+        if (!killed) // Despawned
+        {
+            RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(ship->iID);
 
-        const uint clientId = ship->GetOwnerPlayer();
-        if (!clientId)
-            return;
+            // Despawned NPCs will be removed forever. 
+            const uint clientId = ship->GetOwnerPlayer();
+            if (!clientId)
+                UnmarkEverywhere(ship->iID);
+        }
+        else
+        {
+            UnmarkEverywhere(ship->iID);
 
-        std::wstring characterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
-            return;
-        DisposeCharacterEverywhere(characterFileName);
+            const uint clientId = ship->GetOwnerPlayer();
+            if (clientId)
+            {
+                std::wstring characterFileName;
+                if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+                    return;
+                DisposeCharacterEverywhere(characterFileName);
+            }
+        }
     }
 }

@@ -480,8 +480,8 @@ namespace Mark
     void UserCmd_UnMarkAll(const uint clientId, const std::wstring& wscParam);
     void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId);
     void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
-    void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
+    bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
     void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
 }

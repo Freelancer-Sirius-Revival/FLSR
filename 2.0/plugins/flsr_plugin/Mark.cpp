@@ -426,6 +426,7 @@ namespace Mark
     {
         returncode = DEFAULT_RETURNCODE;
 
+        currentlyMarkedObjectsPerClient.erase(clientId);
         RefreshMarksForCurrentSystem(clientId);
     }
 

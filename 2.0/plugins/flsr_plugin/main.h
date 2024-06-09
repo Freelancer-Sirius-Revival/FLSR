@@ -329,7 +329,6 @@ namespace Hooks {
     void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
-    void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1, float damage, enum DamageEntry::SubObjFate fate);
     void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill);
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID);
     void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui, unsigned int iClientID);
@@ -436,6 +435,7 @@ namespace IFF
     void UserCmd_Neutral(const uint clientId, const std::wstring& arguments);
     void UserCmd_Allied(const uint clientId, const std::wstring& arguments);
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
+    void __stdcall HkCb_AddDmgEntry(DamageList* damageList, unsigned short subObjectId, float hitpoints, DamageEntry::SubObjFate fate);
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);

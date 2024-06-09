@@ -44,28 +44,6 @@ namespace Hooks {
         }
 		    }
 
-    // HkCb_AddDmgEntry
-    void __stdcall HkCb_AddDmgEntry(DamageList *dmg, unsigned short p1, float damage, enum DamageEntry::SubObjFate fate) {
-        returncode = DEFAULT_RETURNCODE;
-
-        //NPCs always do damage
-        if (!dmg->is_inflictor_a_player())
-        {
-            dmg->add_damage_entry(p1, damage, fate);
-        }
-        
-       // ConPrint(std::to_wstring(fate) + L"\n");
-         
-
-
-
-
-
-
-        // Debug
-        // PrintUserCmdText(iDmgTo, L"HIT");
-    }
-
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller) {
         returncode = DEFAULT_RETURNCODE;
 

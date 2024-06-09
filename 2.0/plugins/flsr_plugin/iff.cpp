@@ -7,7 +7,9 @@
 * Cases:
 * - "A" declares "B" as hostile: Shows "A" and "B" both as hostiles.
 * - "A" declares "B" as neutral: Shows "A" and "B" both as neutrals, except "B" declared "A" as hostile. Degrades "B"'s allied status to neutral towards "A". 
-* - "A" declares "B" as allied:  Shows "A" and "B" both as allies,   except "B" declared "A" as hostile. Upgrades "B"'s neutral status to allied towards "A".
+* - "A" declares "B" as allied:  "A" offers "B" friend invite. If "A" and "B" both agree on allied state, upgrades both status to allied.
+* - "A" shoots a member of a group with more than 1 members. Declares everyone hostile towards "A".
+* - Allied players or group members will never turn each other hostile by damaging.
 * 
 */
 
@@ -69,10 +71,15 @@ namespace IFF
         };
     }
 
+    std::wstring GetCharacterName(const uint clientId)
+    {
+        return (wchar_t*)Players.GetActiveCharacterName(clientId);
+    }
+
     void UpdateAttitude(const uint clientId, const uint otherClientId)
     {
-        const auto& attitudes = GetAttitudeTowards({ (wchar_t*)Players.GetActiveCharacterName(clientId), (wchar_t*)Players.GetActiveCharacterName(otherClientId) });
-        Attitude priorityAttitude;
+        const auto& attitudes = GetAttitudeTowards({ GetCharacterName(clientId), GetCharacterName(otherClientId) });
+        Attitude priorityAttitude = Attitude::Neutral;
         if (attitudes.first == attitudes.second)
         {
             priorityAttitude = attitudes.first;
@@ -84,10 +91,6 @@ namespace IFF
         else if (attitudes.first == Attitude::Neutral || attitudes.second == Attitude::Neutral)
         {
             priorityAttitude = Attitude::Neutral;
-        }
-        else
-        {
-            priorityAttitude = Attitude::Allied;
         }
 
         ApplyAttitude({ clientId, otherClientId }, priorityAttitude);
@@ -153,65 +156,85 @@ namespace IFF
             IniDelete(GetPlayerAttitudesFilePath(), sourceCharacterFileName, targetCharacterFileName);
     }
 
-    bool DoesCharacterExist(const std::wstring& characterName)
-    {
-        st6::wstring str((ushort*)characterName.c_str());
-        return Players.FindAccountFromCharacterName(str);
-    }
-
     uint GetClientId(const std::wstring& characterName)
     {
         uint clientId = -1;
         bool idStringType = false;
-        HkGetClientID(idStringType, clientId, characterName);
-        return clientId;
+        if (HkGetClientID(idStringType, clientId, characterName) == HKE_OK)
+            return clientId;
+        return -1;
     }
 
-    void TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring targetCharacterName, const Attitude attitude)
+    std::pair<Attitude, Attitude> TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring targetCharacterName, const Attitude attitude)
     {
-        if (!DoesCharacterExist(targetCharacterName))
-        {
-            PrintUserCmdText(currentClientId, L"Character '" + targetCharacterName + L"' does not exist.");
-            return;
-        }
-
-        const std::wstring currentCharacterName = (wchar_t*)Players.GetActiveCharacterName(currentClientId);
-        if (currentCharacterName == targetCharacterName)
-            return;
-
-        const auto& attitudes = GetAttitudeTowards({ currentCharacterName, targetCharacterName });
-        if (attitudes.first == attitude)
-            return;
-
-        WriteCharacterAttitude(currentCharacterName, targetCharacterName, attitude);
-        if (attitude != Attitude::Hostile)
-        {
-            if (attitudes.second != Attitude::Hostile)
-                WriteCharacterAttitude(targetCharacterName, currentCharacterName, attitude);
-            else
-                PrintUserCmdText(currentClientId, targetCharacterName + L" must end the hostility to allow IFF changes.");
-        }
-        else
-            PrintUserCmdText(currentClientId, L"You are now permanently hostile with " + targetCharacterName);
+        std::pair<Attitude, Attitude> attitudeChange = { attitude, attitude };
 
         const uint targetClientId = GetClientId(targetCharacterName);
-        if (HkIsValidClientID(targetClientId))
-            UpdateAttitude(currentClientId, targetClientId);
+        if (!HkIsValidClientID(targetClientId))
+        {
+            PrintUserCmdText(currentClientId, L"Character '" + targetCharacterName + L"' is not logged in.");
+            return attitudeChange;
+        }
+
+        const std::wstring currentCharacterName = GetCharacterName(currentClientId);
+        if (currentCharacterName == targetCharacterName)
+            return attitudeChange;
+
+        const auto& attitudes = GetAttitudeTowards({ currentCharacterName, targetCharacterName });
+        attitudeChange.first = attitudes.first;
+        if (attitudeChange.first == attitudeChange.second)
+            return attitudeChange;
+
+        WriteCharacterAttitude(currentCharacterName, targetCharacterName, attitude);
+        UpdateAttitude(currentClientId, targetClientId);
+
+        return attitudeChange;
     }
 
     void UserCmd_Hostile(const uint clientId, const std::wstring& arguments)
     {
-        TrySetAttitudeTowardsTarget(clientId, Trim(GetParamToEnd(arguments, ' ', 0)), Attitude::Hostile);
+        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Hostile);
+        if (attitudeChange.first != attitudeChange.second)
+        {
+            PrintUserCmdText(clientId, L"You declared hostility towards " + targetCharacterName);
+            const uint targetClientId = GetClientId(targetCharacterName);
+            PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" declared hostility.");
+        }
     }
 
     void UserCmd_Neutral(const uint clientId, const std::wstring& arguments)
     {
-        TrySetAttitudeTowardsTarget(clientId, Trim(GetParamToEnd(arguments, ' ', 0)), Attitude::Neutral);
+        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Neutral);
+        if (attitudeChange.first != attitudeChange.second)
+        {
+            const uint targetClientId = GetClientId(targetCharacterName);
+            const auto& currentCharacterName = GetCharacterName(clientId);
+            if (attitudeChange.first == Attitude::Hostile)
+            {
+                PrintUserCmdText(clientId, L"You gave up hostility towards " + targetCharacterName);
+                PrintUserCmdText(targetClientId, currentCharacterName + L" terminated hostility.");
+            }
+            else
+            {
+                PrintUserCmdText(clientId, L"You terminated friendship towards " + targetCharacterName);
+                PrintUserCmdText(targetClientId, currentCharacterName + L" terminated friendship.");
+            }
+        }
     }
 
     void UserCmd_Allied(const uint clientId, const std::wstring& arguments)
     {
-        TrySetAttitudeTowardsTarget(clientId, Trim(GetParamToEnd(arguments, ' ', 0)), Attitude::Allied);
+        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Allied);
+        if (attitudeChange.first != attitudeChange.second)
+        {
+            PrintUserCmdText(clientId, L"You offered friendship towards " + targetCharacterName);
+            const uint targetClientId = GetClientId(targetCharacterName);
+            const auto& currentCharacterName = GetCharacterName(clientId);
+            PrintUserCmdText(targetClientId, currentCharacterName + L" offered you friendship. Type '/allied " + currentCharacterName + L"' to accept.");
+        }
     }
 
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship)
@@ -222,6 +245,69 @@ namespace IFF
             UpdateAttitude(clientId, ship.iClientID);
 
         return true;
+    }
+
+    bool AreInSameGroup(const uint clientAId, const uint clientBId)
+    {
+        if (!HkIsValidClientID(clientAId) || !HkIsValidClientID(clientBId))
+            return false;
+
+        std::list<GROUP_MEMBER> members;
+        if (HkGetGroupMembers(ARG_CLIENTID(clientAId), members) == HKE_OK)
+        {
+            for (const auto& member : members)
+            {
+                if (member.iClientID == clientBId)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    void __stdcall HkCb_AddDmgEntry(DamageList* damageList, unsigned short subObjectId, float hitpoints, DamageEntry::SubObjFate fate)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == DamageCause::Collision || !HkIsValidClientID(iDmgTo))
+            return;
+
+        const uint damagerClientId = HkGetClientIDByShip(damageList->get_inflictor_id());
+        if (!damagerClientId)
+            return;
+
+        if (AreInSameGroup(damagerClientId, iDmgTo))
+            return;
+
+        const auto& damageInflictorCharacterName = GetCharacterName(damagerClientId);
+
+        std::list<GROUP_MEMBER> members;
+        if (HkGetGroupMembers(ARG_CLIENTID(iDmgTo), members) != HKE_OK || members.size() < 1)
+        {
+            GROUP_MEMBER member;
+            member.iClientID = iDmgTo;
+            member.wscCharname = GetCharacterName(iDmgTo);
+            members.push_back(member);
+        }
+
+        for (const GROUP_MEMBER& member : members)
+        {
+            const auto& lastAttitude = GetAttitudeTowards({ member.wscCharname, damageInflictorCharacterName });
+
+            // Players which are allied will never get hostile to each other by shooting. Except they are organized in a group. The group integrity has priority and will always cancel any friendships.
+            if (members.size() < 2 && (lastAttitude.first == Attitude::Allied && lastAttitude.second == Attitude::Allied))
+                continue;
+
+            const auto& attitudeChange = TrySetAttitudeTowardsTarget(member.iClientID, damageInflictorCharacterName, Attitude::Hostile);
+            if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
+            {
+                PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" attacks!");
+                if (lastAttitude.first == lastAttitude.second && lastAttitude.second == Attitude::Allied)
+                {
+                    PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" terminated friendship.");
+                    PrintUserCmdText(damagerClientId, member.wscCharname + L" terminated friendship.");
+                }
+            }
+        }
     }
 
     void DeleteCharacterFromIFF(const std::string& characterFileName)

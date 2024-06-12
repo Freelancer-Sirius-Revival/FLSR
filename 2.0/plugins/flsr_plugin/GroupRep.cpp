@@ -106,7 +106,7 @@ namespace GroupReputation
 
         LoadEmpathy();
 
-        const auto contentHandle = LoadContentDll;
+        const HMODULE contentHandle = LoadContentDll();
         if (contentHandle)
             maxReputationThreshold = 1.0f - *(double*)(DWORD(contentHandle) + 0x11B930);
     }

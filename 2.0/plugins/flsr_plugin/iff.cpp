@@ -165,9 +165,34 @@ namespace IFF
         return -1;
     }
 
+    std::wstring GetCharacterNameByTarget(const uint targettingClientId)
+    {
+        uint shipId;
+        pub::Player::GetShip(targettingClientId, shipId);
+        if (!shipId)
+            return L"";
+
+        uint targetId;
+        pub::SpaceObj::GetTarget(shipId, targetId);
+        if (!targetId)
+            return L"";
+
+        const uint targetClientId = HkGetClientIDByShip(targetId);
+        if (targetClientId)
+            return GetCharacterName(targetClientId);
+
+        return L"";
+    }
+
     std::pair<Attitude, Attitude> TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring targetCharacterName, const Attitude attitude)
     {
         std::pair<Attitude, Attitude> attitudeChange = { attitude, attitude };
+
+        if (targetCharacterName.empty())
+        {
+            PrintUserCmdText(currentClientId, L"Select or type a character name to change IFF towards.");
+            return attitudeChange;
+        }
 
         const uint targetClientId = GetClientId(targetCharacterName);
         if (!HkIsValidClientID(targetClientId))
@@ -193,7 +218,9 @@ namespace IFF
 
     void UserCmd_Hostile(const uint clientId, const std::wstring& arguments)
     {
-        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        std::wstring targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        if (targetCharacterName.empty())
+            targetCharacterName = GetCharacterNameByTarget(clientId);
         const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Hostile);
         if (attitudeChange.first != attitudeChange.second)
         {
@@ -205,12 +232,14 @@ namespace IFF
 
     void UserCmd_Neutral(const uint clientId, const std::wstring& arguments)
     {
-        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        std::wstring targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        if (targetCharacterName.empty())
+            targetCharacterName = GetCharacterNameByTarget(clientId);
         const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Neutral);
         if (attitudeChange.first != attitudeChange.second)
         {
             const uint targetClientId = GetClientId(targetCharacterName);
-            const auto& currentCharacterName = GetCharacterName(clientId);
+            const std::wstring& currentCharacterName = GetCharacterName(clientId);
             if (attitudeChange.first == Attitude::Hostile)
             {
                 PrintUserCmdText(clientId, L"You gave up hostility towards " + targetCharacterName);
@@ -226,7 +255,9 @@ namespace IFF
 
     void UserCmd_Allied(const uint clientId, const std::wstring& arguments)
     {
-        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        std::wstring targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        if (targetCharacterName.empty())
+            targetCharacterName = GetCharacterNameByTarget(clientId);
         const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Allied);
         if (attitudeChange.first != attitudeChange.second)
         {
@@ -254,7 +285,16 @@ namespace IFF
 
     void UserCmd_Attitude(const uint clientId, const std::wstring& arguments)
     {
-        const auto& targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        std::wstring targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
+        if (targetCharacterName.empty())
+            targetCharacterName = GetCharacterNameByTarget(clientId);
+
+        if (targetCharacterName.empty())
+        {
+            PrintUserCmdText(clientId, L"Select or type a character name to request IFF about.");
+            return;
+        }
+
         if (HkIsValidClientID(GetClientId(targetCharacterName)))
         {
             const auto& attitude = GetAttitudeTowards({ GetCharacterName(clientId), targetCharacterName });
@@ -327,7 +367,7 @@ namespace IFF
             const auto& attitudeChange = TrySetAttitudeTowardsTarget(member.iClientID, damageInflictorCharacterName, Attitude::Hostile);
             if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
             {
-                PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" attacks!");
+                PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" attacked!");
                 if (lastAttitude.first == lastAttitude.second && lastAttitude.second == Attitude::Allied)
                 {
                     PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" terminated friendship.");

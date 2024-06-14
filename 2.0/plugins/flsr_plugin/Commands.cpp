@@ -815,7 +815,7 @@ namespace Commands {
         {L"/uma", Mark::UserCmd_UnMarkAll},
         {L"/hostile", IFF::UserCmd_Hostile},
         {L"/neutral", IFF::UserCmd_Neutral},
-        {L"/allied", IFF::UserCmd_Allied},
+        {L"/friend", IFF::UserCmd_Allied},
         {L"/iff", IFF::UserCmd_Attitude}
     };
 

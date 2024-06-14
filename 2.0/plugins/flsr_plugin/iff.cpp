@@ -232,8 +232,8 @@ namespace IFF
         {
             PrintUserCmdText(clientId, L"You offered friendship towards " + targetCharacterName);
             const uint targetClientId = GetClientId(targetCharacterName);
-            const auto& currentCharacterName = GetCharacterName(clientId);
-            PrintUserCmdText(targetClientId, currentCharacterName + L" offered you friendship. Type '/allied " + currentCharacterName + L"' to accept.");
+            const std::wstring& currentCharacterName = GetCharacterName(clientId);
+            PrintUserCmdText(targetClientId, currentCharacterName + L" offered you friendship. Type '/friend " + currentCharacterName + L"' to accept.");
         }
     }
 

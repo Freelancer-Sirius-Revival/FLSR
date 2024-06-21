@@ -175,14 +175,15 @@ bool HkIClientImpl::Send_FLPACKET_COMMON_JETTISONCARGO(uint iClientID,
 }
 
 /**************************************************************************************************************
+* Tells ClientId which ShipId requested a trade. Marks ShipId purple and gives a chat message.
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_TRADE(uint iClientID,
-                                                      uint iDunno) {
+bool HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_TRADE_REQUEST(uint iClientID,
+                                                      uint iShipID) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_TRADE(iClientID, iDunno));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_TRADE_REQUEST(iClientID, iShipID));
     return reinterpret_cast<bool>(vRet);
 }
 
@@ -1259,90 +1260,98 @@ void HkIClientImpl::unknown_101(uint iClientID, FLPACKET_UNKNOWN &pDunno) {
 }
 
 /**************************************************************************************************************
+* Opens the trade window for ClientId with ShipId.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_102(uint iClientID, uint iDunno) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_INITIATE_TRADE(uint iClientID, uint iShipID) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_102(iClientID, iDunno));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_INITIATE_TRADE(iClientID, iShipID));
     return;
 }
 
 /**************************************************************************************************************
+* Sets the trade target for ClientId. Is only used by FL to set ShipId to 0 when aborting trade requests from ClientId.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_103(uint iClientID, uint iDunno) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_TRADE_TARGET(uint iClientID, uint iShipID) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_103(iClientID, iDunno));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_TRADE_TARGET(iClientID, iShipID));
     return;
 }
 
 /**************************************************************************************************************
+* Tells ClientID that ShipId has accepted the trade. Accept is usually 1.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_104(uint iClientID, uint iDunno, uint iDunno2) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_ACCEPT_TRADE(uint iClientID, uint iShipID, uint Accept) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_104(iClientID, iDunno, iDunno2));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_ACCEPT_TRADE(iClientID, iShipID, Accept));
     return;
 }
 
 /**************************************************************************************************************
+* Sets the traded money of ShipId for ClientId.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_105(uint iClientID, uint iDunno, uint iDunno2) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_SET_TRADE_MONEY(uint iClientID, uint iShipID, uint iMoney) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_105(iClientID, iDunno, iDunno2));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_SET_TRADE_MONEY(iClientID, iShipID, iMoney));
     return;
 }
 
 /**************************************************************************************************************
+* Adds unknown ID for the traded equipment of ShipID for ClientId.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_106(uint iClientID, uint iDunno, uint iDunno2) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_ADD_TRADE_EQUIP(uint iClientID, uint iShipID, EquipDesc& equipDesc) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_106(iClientID, iDunno, iDunno2));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_ADD_TRADE_EQUIP(iClientID, iShipID, equipDesc));
     return;
 }
 
 /**************************************************************************************************************
+* Deletes unknown ID for the traded equipment of ShipID for ClientId.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_107(uint iClientID, uint iDunno, uint iDunno2) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_DEL_TRADE_EQUIP(uint iClientID, uint iShipID, EquipDesc& equipDesc) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_107(iClientID, iDunno, iDunno2));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_DEL_TRADE_EQUIP(iClientID, iShipID, equipDesc));
     return;
 }
 
 /**************************************************************************************************************
+* Removes the trade request marking for ClientId on target ShipId.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_109(uint iClientID, uint iDunno) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_STOP_TRADE_REQUEST(uint iClientID, uint iShipID) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_109(iClientID, iDunno));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_STOP_TRADE_REQUEST(iClientID, iShipID));
     return;
 }
 
 /**************************************************************************************************************
+* Tells ClientId when OtherClientId disconnects.
 **************************************************************************************************************/
 
-void HkIClientImpl::unknown_112(uint iClientID, uint iDunno) {
+void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_LEFT(uint iClientID, uint iOtherClientID) {
     ISERVER_LOG();
     ISERVER_LOGARG_UI(iClientID);
 
-    CALL_CLIENT_METHOD(unknown_112(iClientID, iDunno));
+    CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_PLAYER_LEFT(iClientID, iOtherClientID));
     return;
 }
 

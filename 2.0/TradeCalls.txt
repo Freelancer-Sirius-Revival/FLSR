@@ -1,0 +1,35 @@
+Server.RequestTrade(CLIENT 1, CLIENT 2) (1 sends to 2)
+Client.Send_FLPACKET_COMMON_PLAYER_TRADE (CLIENT 2, SHIPID 1) -> marks ShipId for Client as "wants to trade" (gives chat message + purple marking)
+
+
+Server.RequestTrade(CLIENT 2, CLIENT 1) (2 replies to 1)
+Server.InitiateTrade(CLIENT 2, CLIENT 1)
+Server.StopTradeRequest(CLIENT 1)
+Client.Send_FLPACKET_COMMON_PLAYER_TRADE_TARGET(CLIENT 1, SHIPID 0) -> client 1 does not offer trade to ShipID anymore for
+Client.Send_FLPACKET_COMMON_PLAYER_STOP_TRADE_REQUEST(CLIENT 2, SHIPID 1) -> client 2 has no more incoming trade offer from ShipId (revokes purple marking)
+Client.Send_FLPACKET_COMMON_PLAYER_INITIATE_TRADE(CLIENT 2, SHIPID 1) -> client 2 opens trade with ShipId
+Client.Send_FLPACKET_COMMON_PLAYER_INITIATE_TRADE(CLIENT 1, SHIPID 2)	-> client 1 opens trade with ShipId
+
+
+Server.TerminateTrade(CLIENT 1, ACCEPT 0)
+Client.Send_FLPACKET_COMMON_PLAYER_TRADE_TARGET(CLIENT 2, SHIPID 0)
+Client.Send_FLPACKET_COMMON_PLAYER_TRADE_TARGET(CLIENT 1, SHIPID 0)
+
+
+Server.SetTradeMoney(CLIENT 1, SHIPID 2) -> 1 sets his money to 10
+Client.Send_FLPACKET_COMMON_PLAYER_SET_TRADE_MONEY(CLIENT 1, SHIPID 1, MONEY)
+Client.Send_FLPACKET_COMMON_PLAYER_SET_TRADE_MONEY(CLIENT 2, SHIPID 1, MONEY)
+
+
+Server.AcceptTrade(CLIENT 1, TRUE)
+Client.Send_FLPACKET_COMMON_PLAYER_ACCEPT_TRADE(CLIENT 2, SHIPID 1, 1 [TRUE])
+
+
+Server.AddTradeEquip(CLIENT 1, EQUIP DESC
+Client.Send_FLPACKET_COMMON_PLAYER_ADD_TRADE_EQUIP(CLIENT 1, SHIPID 1, EQUIP DESC)
+Client.Send_FLPACKET_COMMON_PLAYER_ADD_TRADE_EQUIP(CLIENT 2, SHIPID 1, EQUIP DESC)
+
+
+Server.DelTradeEquip(CLIENT 1, equip)
+Client.Send_FLPACKET_COMMON_PLAYER_DEL_TRADE_EQUIP(CLIENT 2, SHIPID 1, EQUIP ID)
+Client.Send_FLPACKET_COMMON_PLAYER_DEL_TRADE_EQUIP(CLIENT 2, SHIPID 1, EQUIP ID)

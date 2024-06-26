@@ -1273,6 +1273,7 @@ void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_INITIATE_TRADE(uint iClientID, u
 
 /**************************************************************************************************************
 * Sets the trade target for ClientId. Is only used by FL to set ShipId to 0 when aborting trade requests from ClientId.
+* iShipID is the same as TerminateTrade ACCEPT value??
 **************************************************************************************************************/
 
 void HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_TRADE_TARGET(uint iClientID, uint iShipID) {

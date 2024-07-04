@@ -185,7 +185,7 @@ namespace Crafting
 		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
 			missingIngredientArchetypeIdsWithCount.push_back({ ingredientWithCount.first, ingredientWithCount.second * batchCount });
 
-		std::unordered_map<uint, uint> foundIngredientIdByArchetypeId;
+		std::unordered_map<uint, std::vector<std::pair<uint, uint>>> foundIngredientIdsWithCountByArchetypeId;
 
 		for (auto& ingredientWithCount : missingIngredientArchetypeIdsWithCount)
 		{
@@ -193,10 +193,15 @@ namespace Crafting
 			{
 				if (cargo.iArchID == ingredientWithCount.first)
 				{
-					ingredientWithCount.second -= cargo.iCount;
-					foundIngredientIdByArchetypeId[ cargo.iArchID ] = cargo.iID;
+					uint oldRequiredCount = ingredientWithCount.second;
+					ingredientWithCount.second = std::max(ingredientWithCount.second - cargo.iCount, 0);
+					foundIngredientIdsWithCountByArchetypeId[cargo.iArchID].push_back({ cargo.iID, oldRequiredCount - ingredientWithCount.second });
 				}
+				if (ingredientWithCount.second <= 0)
+					break;
 			}
+			if (ingredientWithCount.second <= 0)
+				continue;
 		}
 
 		std::vector<std::wstring> missingPartsTexts;
@@ -252,9 +257,12 @@ namespace Crafting
 		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
 		{
 			const uint archetypeId = ingredientWithCount.first;
-			const int count = ingredientWithCount.second * batchCount;
-			if (!foundIngredientIdByArchetypeId.contains(archetypeId) || HkRemoveCargo(characterNameWS, foundIngredientIdByArchetypeId[archetypeId], count) != HKE_OK)
+			if (!foundIngredientIdsWithCountByArchetypeId.contains(archetypeId))
 				return false;
+
+			for (const auto& ingredientIdWithCount : foundIngredientIdsWithCountByArchetypeId[archetypeId])
+				if (HkRemoveCargo(characterNameWS, ingredientIdWithCount.first, ingredientIdWithCount.second) != HKE_OK)
+					return false;
 		}
 
 		if (recipe.cost)

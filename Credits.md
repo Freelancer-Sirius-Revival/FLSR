@@ -18,9 +18,10 @@
   - [Many misc fixes](https://github.com/FLHDE/freelancer-hd-edition)
   - [Many misc improvements](https://github.com/FLHDE/freelancer-hd-edition)
   - [Text Strings Revision](https://www.moddb.com/games/freelancer/downloads/freelancer-text-strings-revision) *([Mirror](https://github.com/FLHDE/freelancer-text-strings-revision))*
-
-- [BC46](https://github.com/BC46)
   - [FLSharp](https://github.com/BC46/FLSharp)
+  
+- [BC46](https://github.com/BC46), [Laz](https://github.com/Lazrius) & [Jason Hood](https://github.com/adoxa)
+  - [Windowed Mode Mouse Fix](https://github.com/FLHDE/windowed-mode-mouse-fix)
 
 - [Caenen](https://github.com/Caenen)
   - [Gameplay design and balancing](https://github.com/Freelancer-Sirius-Revival/FLSR/)

@@ -218,10 +218,10 @@ File: EXE\Freelancer.exe
 1D0E2C: 0.5f	[ 0.3f ]
 
 # Allows the purchase of equipment that cannot be mounted on the player's ship. - BC46
-08050B: EB	[ 75 ]
+#08050B: EB	[ 75 ]
 
 # Allows the purchase of equipment for which no free hardpoint is available on the player's ship. - BC46
-08053E: E9 8B 01 00 00 90	[ 0F 85 8A 01 00 00 ]
+#08053E: E9 8B 01 00 00 90	[ 0F 85 8A 01 00 00 ]
 
 
 ##########################################

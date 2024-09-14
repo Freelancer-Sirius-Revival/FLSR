@@ -354,6 +354,13 @@ namespace IFF
         if (AreInSameGroup(damagerClientId, iDmgTo))
             return;
 
+        // No-PvP system check
+        uint damagerSystemId;
+        pub::Player::GetSystem(damagerClientId, damagerSystemId);
+        for (const auto& noPvPSystem : map_mapNoPVPSystems)
+            if (noPvPSystem.second == damagerSystemId)
+                return;
+
         // Check if both players are in same system - reducing false positives due to FLHook bugged damage detection implementation
         uint damagedSystemId;
         pub::Player::GetSystem(iDmgTo, damagedSystemId);

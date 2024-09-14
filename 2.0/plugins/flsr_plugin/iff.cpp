@@ -354,6 +354,30 @@ namespace IFF
         if (AreInSameGroup(damagerClientId, iDmgTo))
             return;
 
+        // Check if both players are in same system - reducing false positives due to FLHook bugged damage detection implementation
+        uint damagedSystemId;
+        pub::Player::GetSystem(iDmgTo, damagedSystemId);
+        if (!damagerSystemId || damagerSystemId != damagedSystemId)
+            return;
+
+        // Check if both players are in a range - limiting same bug as above
+        uint damagerShipId;
+        pub::Player::GetShip(damagerClientId, damagerShipId);
+        if (!damagerShipId)
+            return;
+        uint damagedShipId;
+        pub::Player::GetShip(iDmgTo, damagedShipId);
+        if (!damagedShipId)
+            return;
+        Vector damagerShipVector;
+        Matrix damagerShipRotation;
+        pub::SpaceObj::GetLocation(damagerShipId, damagerShipVector, damagerShipRotation);
+        Vector damagedShipVector;
+        Matrix damagedShipRotation;
+        pub::SpaceObj::GetLocation(damagedShipId, damagedShipVector, damagedShipRotation);
+        if (HkDistance3D(damagerShipVector, damagedShipVector) > 20000.0f)
+            return;
+
         const auto& damageInflictorCharacterName = GetCharacterName(damagerClientId);
 
         std::list<GROUP_MEMBER> members;

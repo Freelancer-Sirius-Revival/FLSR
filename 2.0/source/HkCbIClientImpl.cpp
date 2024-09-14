@@ -1188,6 +1188,9 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2) {
         system = Universe::GetNextSystem();
     }
 
+    for (auto& noPvPSystem : map_mapNoPVPSystems)
+        pub::GetSystemID(noPvPSystem.second, noPvPSystem.first.c_str());
+
     lstBases.clear();
     Universe::IBase *base = Universe::GetFirstBase();
     while (base) {

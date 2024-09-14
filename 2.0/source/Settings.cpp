@@ -70,7 +70,7 @@ bool set_bUserCmdHelp;
 bool set_bDefaultLocalChat;
 
 // NoPVP
-std::set<uint> set_setNoPVPSystems;
+std::map<std::string, uint> map_mapNoPVPSystems;
 
 // Chat
 std::set<std::wstring> set_setChatSuppress;
@@ -214,7 +214,7 @@ void LoadSettings() {
         IniGetB(set_scCfgFile, "UserCommands", "DefaultLocalChat", false);
 
     // NoPVP
-    set_setNoPVPSystems.clear();
+    map_mapNoPVPSystems.clear();
     for (uint i = 0;; i++) {
         char szBuf[64];
         sprintf_s(szBuf, "System%u", i);
@@ -223,9 +223,7 @@ void LoadSettings() {
         if (!scSystem.length())
             break;
 
-        uint iSystemID;
-        pub::GetSystemID(iSystemID, scSystem.c_str());
-        set_setNoPVPSystems.insert(iSystemID);
+        map_mapNoPVPSystems.insert({ scSystem, 0 });
     }
 
     // read chat suppress

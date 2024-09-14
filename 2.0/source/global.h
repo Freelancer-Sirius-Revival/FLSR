@@ -134,7 +134,7 @@ extern EXPORT std::string sDebugLog;
 extern EXPORT bool set_bLoadedSettings;
 extern EXPORT std::string set_scCfgFile;
 extern EXPORT uint set_iAntiDockKill;
-extern EXPORT std::set<uint> set_setNoPVPSystems;
+extern EXPORT std::map<std::string, uint> map_mapNoPVPSystems;
 extern EXPORT std::set<std::wstring> set_setChatSuppress;
 extern EXPORT bool set_bSocketActivated;
 extern EXPORT bool set_bDebug;

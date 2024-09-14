@@ -237,8 +237,9 @@ bool AllowPlayerDamage(uint iClientID, uint iClientIDTarget) {
         // no-pvp check
         uint iSystemID;
         pub::Player::GetSystem(iClientID, iSystemID);
-        if (set_setNoPVPSystems.count(iSystemID))
-            return false;
+        for (const auto& noPvPSystem : map_mapNoPVPSystems)
+            if (noPvPSystem.second == iSystemID)
+                return false;
     }
 
     return true;

@@ -805,7 +805,7 @@ extern IMPORT std::string sDebugLog;
 extern IMPORT bool set_bLoadedSettings;
 extern IMPORT std::string set_scCfgFile;
 extern IMPORT uint set_iAntiDockKill;
-extern IMPORT std::set<uint> set_setNoPVPSystems;
+extern IMPORT std::map<std::string, uint> map_mapNoPVPSystems;
 extern IMPORT std::set<std::wstring> set_setChatSuppress;
 extern IMPORT bool set_bSocketActivated;
 extern IMPORT bool set_bDebug;

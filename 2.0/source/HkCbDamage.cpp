@@ -42,12 +42,12 @@ int __stdcall HkCB_MissileTorpHit(char *ECX, char *p1, DamageList *dmg) {
                 return 1;
 
             if (set_bChangeCruiseDisruptorBehaviour) {
-                if (((dmg->get_cause() == DamageCause::CruiseDisrupter) || (dmg->get_cause() == DamageCause::UnkDisrupter)) &&
+                if (((dmg->get_cause() == 6) || (dmg->get_cause() == 0x15)) &&
                     !ClientInfo[iClientID].bCruiseActivated)
                     dmg->set_cause(
-                        DamageCause::DummyDisrupter); // change to sth else, so
-                                                      // client won't recognize it as
-                                                      // a disruptor
+                        (enum DamageCause)0xC0); // change to sth else, so
+                                                 // client won't recognize it as
+                                                 // a disruptor
             }
         }
     }
@@ -90,7 +90,7 @@ void __stdcall HkCb_AddDmgEntry(DamageList *dmgList, unsigned short p1,
         (dmgList, p1, p2, p3));
 
     // check if we've got dmged by a cd with changed behaviour
-    if (dmgList->get_cause() == DamageCause::DummyDisrupter) {
+    if (dmgList->get_cause() == 0xC0) {
         // check if player should be protected (f.e. in a docking cut scene)
         bool bUnk1 = false;
         bool bUnk2 = false;
@@ -102,7 +102,7 @@ void __stdcall HkCb_AddDmgEntry(DamageList *dmgList, unsigned short p1,
             return;
     }
 
-    if (g_gNonGunHitsBase && (dmgList->get_cause() == DamageCause::MissileTorpedo)) {
+    if (g_gNonGunHitsBase && (dmgList->get_cause() == 5)) {
         float fDamage = g_LastHitPts - p2;
         p2 = g_LastHitPts - fDamage * set_fTorpMissileBaseDamageMultiplier;
         if (p2 < 0)

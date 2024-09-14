@@ -344,7 +344,7 @@ namespace IFF
     {
         returncode = DEFAULT_RETURNCODE;
 
-        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == DamageCause::Collision || !HkIsValidClientID(iDmgTo))
+        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == 0x01 || !HkIsValidClientID(iDmgTo))
             return;
 
         const uint damagerClientId = HkGetClientIDByShip(damageList->get_inflictor_id());

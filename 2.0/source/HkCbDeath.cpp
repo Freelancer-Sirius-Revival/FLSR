@@ -150,10 +150,10 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
                 wchar_t wszSystem[64];
                 swprintf_s(wszSystem, L"%u", iSystemID);
 
-                if (dmg.get_cause() != DamageCause::Unknown)
+                if (!dmg.get_cause())
                     dmg = ClientInfo[iClientID].dmgLast;
 
-                DamageCause iCause = dmg.get_cause();
+                uint iCause = dmg.get_cause();
                 uint iClientIDKiller =
                     HkGetClientIDByShip(dmg.get_inflictor_id());
 
@@ -162,16 +162,16 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
                 wscEvent += L" victim=" + wscVictim;
                 if (iClientIDKiller) {
                     std::wstring wscType = L"";
-                    if (iCause == DamageCause::MissileTorpedo)
+                    if (iCause == 0x05)
                         wscType = L"Missile/Torpedo";
-                    else if (iCause == DamageCause::Mine)
+                    else if (iCause == 0x07)
                         wscType = L"Mine";
-                    else if ((iCause == DamageCause::CruiseDisrupter) || (iCause == DamageCause::DummyDisrupter) ||
-                             (iCause == DamageCause::UnkDisrupter))
+                    else if ((iCause == 0x06) || (iCause == 0xC0) ||
+                             (iCause == 0x15))
                         wscType = L"Wasp/Hornet";
-                    else if (iCause == DamageCause::Collision)
+                    else if (iCause == 0x01)
                         wscType = L"Collision";
-                    else if (iCause == DamageCause::Gun)
+                    else if (iCause == 0x02)
                         wscType = L"Gun";
                     else {
                         wscType =
@@ -248,14 +248,14 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
                     }
                 } else if (dmg.get_inflictor_id()) {
                     std::wstring wscType = L"";
-                    if (iCause == DamageCause::MissileTorpedo)
+                    if (iCause == 0x05)
                         wscType = L"Missile/Torpedo";
-                    else if (iCause == DamageCause::Mine)
+                    else if (iCause == 0x07)
                         wscType = L"Mine";
-                    else if ((iCause == DamageCause::CruiseDisrupter) || (iCause == DamageCause::DummyDisrupter) ||
-                             (iCause == DamageCause::UnkDisrupter))
+                    else if ((iCause == 0x06) || (iCause == 0xC0) ||
+                             (iCause == 0x15))
                         wscType = L"Wasp/Hornet";
-                    else if (iCause == DamageCause::Collision)
+                    else if (iCause == 0x01)
                         wscType = L"Collision";
                     else
                         wscType = L"Gun"; // 0x02
@@ -268,7 +268,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
                     if (set_bDieMsg && wscMsg.length())
                         SendDeathMsg(wscMsg, iSystemID, iClientID, 0);
                     ProcessEvent(L"%s", wscEvent.c_str());
-                } else if (iCause == DamageCause::Suicide) {
+                } else if (iCause == 0x08) {
                     wscEvent += L" type=suicide";
                     std::wstring wscMsg = ReplaceStr(set_wscDeathMsgTextSuicide,
                                                      L"%victim", wscVictim);
@@ -276,7 +276,7 @@ void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
                     if (set_bDieMsg && wscMsg.length())
                         SendDeathMsg(wscMsg, iSystemID, iClientID, 0);
                     ProcessEvent(L"%s", wscEvent.c_str());
-                } else if (iCause == DamageCause::Admin) {
+                } else if (iCause == 0x18) {
                     std::wstring wscMsg = ReplaceStr(
                         set_wscDeathMsgTextAdminKill, L"%victim", wscVictim);
 

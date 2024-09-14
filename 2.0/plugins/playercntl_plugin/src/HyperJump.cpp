@@ -1378,7 +1378,7 @@ void HyperJump::PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
 
 void HyperJump::MissileTorpHit(uint iClientID, DamageList *dmg) {
     if (mapSurvey.find(iClientID) != mapSurvey.find(iClientID)) {
-        if (dmg->get_cause() == DamageCause::CruiseDisrupter || dmg->get_cause() == DamageCause::UnkDisrupter) {
+        if (dmg->get_cause() == 6 || dmg->get_cause() == 0x15) {
             mapSurvey[iClientID].curr_charge = 0;
             mapSurvey[iClientID].charging_on = false;
             PrintUserCmdText(iClientID,

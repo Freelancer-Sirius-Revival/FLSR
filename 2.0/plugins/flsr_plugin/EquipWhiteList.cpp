@@ -87,7 +87,7 @@ namespace EquipWhiteList
 		if (Modules::GetModuleState("EquipWhiteListModule") && HkIsValidClientID(clientId))
 		{
 			if (UnmountNotAllowedEquipment(clientId, Players[clientId].equipDescList))
-				PrintUserCmdText(clientId, L"Some equipment has been ummounted due to changed requirements.");
+				PrintUserCmdText(clientId, L"Some equipment has been unmounted due to changed requirements.");
 		}
 	}
 
@@ -99,7 +99,7 @@ namespace EquipWhiteList
 		if (Modules::GetModuleState("CloakModule") && HkIsValidClientID(clientId))
 		{
 			if (UnmountNotAllowedEquipment(clientId, Players[clientId].equipDescList))
-				PrintUserCmdText(clientId, L"Some equipment has been ummounted due to changed requirements.");
+				PrintUserCmdText(clientId, L"Some equipment has been unmounted due to changed requirements.");
 		}
 	}
 

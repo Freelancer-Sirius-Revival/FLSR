@@ -48,7 +48,10 @@ File: EXE\Freelancer.exe
 0B1554: 84	[ 39 ]
 
 # Increases the maximum value for the "TOTAL SOUND ELEMENTS" slider in the audio options menu. - BC46
-0B1375: 100b	[ 32b ]
+0B1375: 127b	[ 32b ]
+
+# Increases the minimum value for the "TOTAL SOUND ELEMENTS" slider in the audio options menu. - BC46
+0B1377: 32b	[ 8b ]
 
 # Gamma ranges from 0.75 to 1.75, not 1.0 to 2.0. - BC46
 0244F7: F8 EB 5D	[ B8 89 5C ]

@@ -135,17 +135,17 @@ namespace LootBoxes
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
 
-		// Check if the recipe exists.
+		// Check if the loot box exists.
 		if (lootBoxName.empty())
 		{
-			PrintUserCmdText(clientId, L"Loot box name must be given to open it!");
+			PrintUserCmdText(clientId, L"Item name must be given to open it!");
 			return false;
 		}
 
 		const std::string lootBoxNameLower = ToLower(lootBoxName);
 		if (!lootBoxes.contains(lootBoxNameLower))
 		{
-			PrintUserCmdText(clientId, L"Loot box '" + stows(lootBoxName) + L"' does not exist!");
+			PrintUserCmdText(clientId, L"'" + stows(lootBoxName) + L"' cannot be opened!");
 			return false;
 		}
 		const LootBox& lootBox = lootBoxes[lootBoxNameLower];

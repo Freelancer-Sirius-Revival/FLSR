@@ -1,3 +1,4 @@
+*.dll
 *.ipch
 *.vs
 *.obj

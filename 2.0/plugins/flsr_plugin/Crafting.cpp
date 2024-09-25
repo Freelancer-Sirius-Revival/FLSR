@@ -132,7 +132,7 @@ namespace Crafting
 			return false;
 		}
 
-		std::string recipeNameLower = ToLower(recipeName);
+		const std::string recipeNameLower = ToLower(recipeName);
 		if (!recipes.contains(recipeNameLower))
 		{
 			PrintUserCmdText(clientId, L"Schematic '" + stows(recipeName) + L"' does not exist!");

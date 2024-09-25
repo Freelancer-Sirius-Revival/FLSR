@@ -58,6 +58,7 @@ namespace Globals {
     const std::string CARRIER_CONFIG_FILE = "\\flhook_plugins\\FLSR-Carrier.cfg";
     const std::string CLOAK_CONFIG_FILE = "\\flhook_plugins\\FLSR-Cloak.cfg";
     const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
+    const std::string LOOTBOXES_CONFIG_FILE = "\\flhook_plugins\\FLSR-LootBoxes.cfg";
     const std::string FLHOOKUSER_FILE = "\\flhookuser.ini";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
     const std::string INSURANCE_STORE = "\\flhook_plugins\\flsr-insurance\\";
@@ -478,6 +479,12 @@ namespace Crafting
 {
     void LoadSettings();
     bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS);
+}
+
+namespace LootBoxes
+{
+    void ReadInitialData();
+    bool UserCmd_Open(const uint clientId, const std::wstring& argumentsWS);
 }
 
 namespace Mark

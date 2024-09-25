@@ -108,6 +108,7 @@
     <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="iff.cpp" />
+    <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
     <ClCompile Include="Modules.cpp" />

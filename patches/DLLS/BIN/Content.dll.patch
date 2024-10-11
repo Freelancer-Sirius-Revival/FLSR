@@ -56,7 +56,7 @@ File: DLLS\BIN\Content.dll
 11CC7C: 0f 0f 1f 2f 4f 6f 5f 3f 2f	[ 0f 0f 2f 3f 9f 6f 4f 2f 1f ]
 
 # Random mission NPCs will use missiles and torpedoes. Effectively changes their attack_preference flags to "GUNS | GUIDED | UNGUIDED | TORPEDO". Use "07" to not use Torpedos instead. - BC46
-# 0F20F0: 0F	[ 01 ]
+0F20F0: 0F	[ 01 ]
 
 
 ##########################################

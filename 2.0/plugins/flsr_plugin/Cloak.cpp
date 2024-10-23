@@ -439,6 +439,8 @@ namespace Cloak
 		if (!clientStats.effectsDefinition)
 			return;
 
+		// Allow cloakCargoId = 0. It will be 0 when a ship's cloak was destroyed but not yet fully removed.
+		clientStats.cloakCargoId = 0;
 		const std::list<CARGO_INFO>& cargoList = GetClientCargoList(clientId);
 		for (const auto& cargo : cargoList)
 		{
@@ -458,9 +460,11 @@ namespace Cloak
 			}
 		}
 
-		if (!clientStats.cloakCargoId || !clientStats.instantCloakCargoId)
+		if (!clientStats.instantCloakCargoId)
 			return;
 
+		// Allow activatorArchetypeId = 0. It will be 0 when a ship's cloak was destroyed but not yet fully removed.
+		clientStats.activatorArchetypeId = 0;
 		for (const uint activatorArchetypeId : cloakActivatorArchetypeIds)
 		{
 			for (const auto& cargo : cargoList)
@@ -476,8 +480,6 @@ namespace Cloak
 			if (clientStats.activatorArchetypeId)
 				break;
 		}
-		if (!clientStats.activatorArchetypeId)
-			return;
 
 		// Find all other power plants and the engine
 		for (const auto& cargo : cargoList)

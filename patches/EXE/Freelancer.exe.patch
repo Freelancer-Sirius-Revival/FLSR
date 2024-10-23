@@ -116,9 +116,6 @@ File: EXE\Freelancer.exe
 # Screen shake when shield is hit. - w0dk4
 11DB89: 0.002f	[ 0.005f ]
 
-# Add faction name to players in contact list. - M0tah
-0D3180: 00	[ E6 ]
-
 # Vertical offset of player name in contact list. - M0tah
 1D7BF0: 0.0d	[ 0.004d ]
 

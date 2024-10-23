@@ -4143,7 +4143,7 @@ public:
 	/* 100 */ float fBadSellPrice;
 	/* 104 */ float fGoodBuyPrice;
 	/* 108 */ uint iJumpDist;
-	/* 112 */ float iDunno2;
+	/* 112 */ float iDunno2; // first bit is a boolean for COMBINABLE flag
 	/* 116 */ float iDunno3;
 	/* 120 */ float iDunno4;
 	/* 124 */ float iDunno5;

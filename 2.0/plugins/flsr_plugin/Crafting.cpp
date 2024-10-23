@@ -120,8 +120,11 @@ namespace Crafting
         return filteredCargoList;
     }
 
-	bool Craft(const uint clientId, const std::string& recipeName, const int batchCount)
+	bool Craft(const uint clientId, const std::string& recipeName, int batchCount)
 	{
+		if (batchCount < 1)
+			batchCount = 1;
+
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
 

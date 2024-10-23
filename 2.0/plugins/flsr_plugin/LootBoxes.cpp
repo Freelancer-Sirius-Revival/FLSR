@@ -20,6 +20,7 @@ namespace LootBoxes
 	};
 
 	static std::unordered_map<std::string, LootBox> lootBoxes;
+	static std::unordered_map<uint, bool> lootArchetypeCombinable;
 
 	static uint successSoundId = 0;
 	static uint failSoundId = 0;
@@ -95,6 +96,9 @@ namespace LootBoxes
 						else if (ini.is_value("loot_item"))
 						{
 							const uint archetypeId = CreateID(ini.get_value_string(0));
+							const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
+							if (goodInfo)
+								lootArchetypeCombinable[archetypeId] = (bool)goodInfo->iDunno2;
 							lootBox.lootArchetypeIds.push_back(archetypeId);
 							lootBox.lootArchetypeNames.push_back(GetEquipmentName(archetypeId));
 							lootBox.highestLootArchetypeVolume = std::max(lootBox.highestLootArchetypeVolume, GetEquipmentVolume(archetypeId));
@@ -130,8 +134,11 @@ namespace LootBoxes
 		return filteredCargoList;
 	}
 
-	bool Open(const uint clientId, const std::string lootBoxName)
+	bool Open(const uint clientId, const std::string lootBoxName, int openCount)
 	{
+		if (openCount < 1)
+			openCount = 1;
+
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
 
@@ -150,41 +157,52 @@ namespace LootBoxes
 		}
 		const LootBox& lootBox = lootBoxes[lootBoxNameLower];
 
-		// Check if the required loot box and the key are in the cargo hold.
+		// Check if the loot box is in the cargo hold.
 		const auto& cargoList = GetUnmountedCargoList(clientId);
 		uint lootBoxItemId = 0;
-		uint keyItemId = 0;
 		for (const auto& cargo : cargoList)
 		{
 			if (cargo.iArchID == lootBox.boxArchetypeId)
 			{
+				// Limit the boxes to open by how many there actually are in the cargo.
+				openCount = std::min(openCount, cargo.iCount);
 				lootBoxItemId = cargo.iID;
-			}
-			else if (cargo.iArchID == lootBox.keyArchetypeId)
-			{
-				keyItemId = cargo.iID;
-			}
-			if (lootBoxItemId && (!lootBox.keyArchetypeId || keyItemId))
 				break;
+			}
 		}
 		if (!lootBoxItemId)
 		{
 			PrintUserCmdText(clientId, L"'" + lootBox.boxArchetypeName + L"' is not in your cargo hold!");
 			return false;
 		}
+
+		// Check if the key is in the cargo hold.
+		uint keyItemId = 0;
+		if (lootBox.keyArchetypeId)
+		{
+			for (const auto& cargo : cargoList)
+			{
+				if (cargo.iArchID == lootBox.keyArchetypeId && cargo.iCount >= openCount)
+				{
+					keyItemId = cargo.iID;
+					break;
+				}
+			}
+		}
 		if (lootBox.keyArchetypeId && !keyItemId)
 		{
-			PrintUserCmdText(clientId, L"'" + lootBox.boxArchetypeName + L"' cannot be opened without '" + lootBox.keyArchetypeName + L"' in your cargo hold!");
+			PrintUserCmdText(clientId, std::to_wstring(openCount) + L" '" + lootBox.boxArchetypeName + L"' cannot be opened without " + std::to_wstring(openCount) + L" '" + lootBox.keyArchetypeName + L"' in your cargo hold!");
 			return false;
 		}
 
 		// Check if there's enough cargo hold to add the looted item.
 		float remainingHoldSize = 0.0f;
 		pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-		const float requiredHoldSize = abs(std::min(0.0f, remainingHoldSize + lootBox.boxArchetypeVolume + lootBox.keyArchetypeVolume - lootBox.highestLootArchetypeVolume));
-		if (requiredHoldSize > 0.0f)
+		const float requiredHoldSize = std::max(0.0f, (-lootBox.boxArchetypeVolume - lootBox.keyArchetypeVolume + lootBox.highestLootArchetypeVolume) * openCount);
+		const float holdSizeDifference = remainingHoldSize - requiredHoldSize;
+		if (holdSizeDifference < 0.0f)
 		{
-			PrintUserCmdText(clientId, L"'" + lootBox.boxArchetypeName + L"' cannot be opened without at least " + std::to_wstring(static_cast<int>(std::ceil(requiredHoldSize))) + L" more units of space in your cargo hold!");
+			PrintUserCmdText(clientId, L"'" + lootBox.boxArchetypeName + L"' cannot be opened without at least " + std::to_wstring(static_cast<int>(std::ceil(abs(holdSizeDifference)))) + L" more units of space in your cargo hold!");
 			return false;
 		}
 
@@ -192,26 +210,53 @@ namespace LootBoxes
 		// Try to remove the key item from the cargo hold if required.
 		if (lootBox.keyArchetypeId)
 		{
-			if (HkRemoveCargo(characterNameWS, keyItemId, 1) != HKE_OK)
+			if (HkRemoveCargo(characterNameWS, keyItemId, openCount) != HKE_OK)
 				return false;
 		}
 
 		// Try to remove the loot box item from the cargo hold.
-		if (HkRemoveCargo(characterNameWS, lootBoxItemId, 1) != HKE_OK)
+		if (HkRemoveCargo(characterNameWS, lootBoxItemId, openCount) != HKE_OK)
 			return false;
 
 		// Finally roll the dice to get the actual looted item.
-		const int lootIndex = lootBox.lootArchetypeIdsDistribution(randomizer);
-		const uint lootedItemArchetypeId = lootBox.lootArchetypeIds[lootIndex];
-		if (Tools::FLSRHkAddCargo(characterNameWS, lootedItemArchetypeId, 1, false) == HKE_OK)
+		// First collect all items to add to cargo. Otherwise too many packages are sent and cause lags!
+		std::map<uint, uint> lootedArchetypeIds;
+		for (int openedCount = 0; openedCount < openCount; openedCount++)
 		{
-			if (successSoundId)
-				pub::Audio::PlaySoundEffect(clientId, successSoundId);
-			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
-			PrintUserCmdText(clientId, L"Looted '" + lootBox.lootArchetypeNames[lootIndex] + L"' from '" + lootBox.boxArchetypeName + L"'.");
-			return true;
+			const int lootIndex = lootBox.lootArchetypeIdsDistribution(randomizer);
+			const uint lootedItemArchetypeId = lootBox.lootArchetypeIds[lootIndex];
+			if (!lootedArchetypeIds.contains(lootedItemArchetypeId))
+				lootedArchetypeIds[lootedItemArchetypeId] = 0;
+			lootedArchetypeIds[lootedItemArchetypeId]++;
+			if (openCount < 5)
+				PrintUserCmdText(clientId, L"Looted '" + lootBox.lootArchetypeNames[lootIndex] + L"' from '" + lootBox.boxArchetypeName + L"'.");
 		}
-		return false;
+		// Now add cargo for the amount of items we need.
+		for (const auto& lootedItemArchetypeIdCount : lootedArchetypeIds)
+		{
+			// Items that cannot be stacked must be sent singular. This causes a lot of package traffic!
+			if (lootArchetypeCombinable[lootedItemArchetypeIdCount.first])
+			{
+				for (int count = 0; count < lootedItemArchetypeIdCount.second; count++)
+					Tools::FLSRHkAddCargo(characterNameWS, lootedItemArchetypeIdCount.first, 1, false);
+			}
+			// Stackable items will be sent as a batch to reduce package traffic.
+			else
+			{
+				Tools::FLSRHkAddCargo(characterNameWS, lootedItemArchetypeIdCount.first, lootedItemArchetypeIdCount.second, false);
+			}
+		}
+
+		if (openCount >= 5)
+			PrintUserCmdText(clientId, L"Looted many items from " + std::to_wstring(openCount) + L" '" + lootBox.boxArchetypeName + L"'.");
+
+		if (successSoundId)
+		{
+			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
+			pub::Audio::PlaySoundEffect(clientId, successSoundId);
+		}
+
+		return true;
 	}
 
 	bool UserCmd_Open(const uint clientId, const std::wstring& argumentsWS)
@@ -220,8 +265,15 @@ namespace LootBoxes
 		if (ToLower(argumentsWS).find(L"/open") == 0)
 		{
 			const std::wstring& arguments = Trim(GetParamToEnd(argumentsWS, ' ', 1));
-			const std::wstring lootBoxName = Trim(arguments);
-			if (!Open(clientId, wstos(lootBoxName)))
+			const size_t lastWhiteSpace = arguments.find_last_of(' ');
+			int count = ToInt(arguments.substr(lastWhiteSpace + 1));
+			std::wstring lootBoxName = arguments;
+			if (count != 0)
+			{
+				lootBoxName = Trim(arguments.substr(0, lastWhiteSpace));
+			}
+			// Limit the opening of crates to 100 to prevent possible lag issues when sending packages.
+			if (!Open(clientId, wstos(lootBoxName), std::min(100, std::max(1, count))))
 			{
 				if (failSoundId)
 					pub::Audio::PlaySoundEffect(clientId, failSoundId);
@@ -230,5 +282,6 @@ namespace LootBoxes
 			return true;
 		}
 		return false;
+
 	}
 }

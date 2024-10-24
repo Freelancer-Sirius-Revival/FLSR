@@ -1,9 +1,13 @@
 File: EXE\common.dll
 
 
-# Disable ArchDB::Get random mission spew warning. - adoxa
+# Disable "ArchDB::Get" random mission spew warning. - adoxa
 0995B6: 90 90	[ FF 10 ]
 0995FC: 90 90	[ FF 12 ]
+
+# Disable "connecting internal type" spew warning for EngClass plugin. - adoxa
+049775: 4E	[ 0D ]
+
 
 ##########################################
 # NPCs

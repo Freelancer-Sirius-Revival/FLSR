@@ -49,7 +49,7 @@ File: DLLS\BIN\Content.dll
 # Distance from 1st mission waypoint that second waypoint (and ships at it) in randommissions are created. - Vital
 11CBCC: 7500f	[ 6000f ]
 
-# Name of Ship Class to spawn in random missions. - Skotty
+# Name of NPC Class to spawn in random missions. - Skotty
 11CBE8: "class_mission"	[ "class_fighter" ]
 
 # Weighted vector used to determine how many ships should occur in random missions. Starts at 0 ships up to 8 ships. (MP) - adoxa

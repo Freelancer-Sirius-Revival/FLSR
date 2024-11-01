@@ -1,0 +1,5 @@
+# Ignore modified DLLs/EXEs but keep original DLLs checked in
+**/*.dll
+**/*.exe
+!**/originals/**/*.dll
+!**/originals/**/*.exe

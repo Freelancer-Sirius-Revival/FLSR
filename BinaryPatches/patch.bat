@@ -11,6 +11,6 @@ bwpatchw.exe -f EXE/rendcomp.dll.patch
 bwpatchw.exe -f EXE/rp8.dll.patch
 bwpatchw.exe -f EXE/server.dll.patch
 
-xcopy .\DLLS\*.dll ..\DLLS /s /y
-xcopy .\EXE\*.dll ..\EXE /s /y
-xcopy .\EXE\*.exe ..\EXE /s /y
+xcopy .\DLLS\*.dll ..\Freelancer\DLLS /s /y
+xcopy .\EXE\*.dll ..\Freelancer\EXE /s /y
+xcopy .\EXE\*.exe ..\Freelancer\EXE /s /y

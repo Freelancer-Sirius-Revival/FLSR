@@ -1,0 +1,14 @@
+*.dll
+*.ipch
+*.vs
+*.obj
+*.vsidx
+*.tlog
+*.obj
+*.pdb
+*.ilk
+*.user
+2.0/bin/*
+2.0/dist/*
+2.0/int/*
+2.0/vcpkg_installed/*

@@ -226,14 +226,6 @@ namespace Tools {
             } else {
                 char szORIG[] = {'\xFF', '\x50', '\x24'};
                 WriteProcMem(pAddress, szORIG, 3);
-
-                //RealCharSwitch
-                //PVP
-                if (Modules::GetModuleState("PVP"))
-                {
-                    //ConPrint(L"CHARSWITCH");
-                    PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::CHARSWITCH);
-                }
             }
 
 
@@ -858,18 +850,6 @@ namespace Tools {
 
         }
 
-    }
-
-    void FLSRIniDelete(const std::string& scFile, const std::string& scApp,const std::string& scKey) {
-        WritePrivateProfileString(scApp.c_str(), scKey.c_str(), NULL,
-            scFile.c_str());
-    }
-
-    std::wstring ToUpper(const std::wstring& str)
-    {
-        std::wstring result = str;
-        std::transform(result.begin(), result.end(), result.begin(), ::toupper);
-        return result;
     }
 
     HK_ERROR FLSRHkAddEquip(const std::wstring& wscCharname, uint iGoodID,

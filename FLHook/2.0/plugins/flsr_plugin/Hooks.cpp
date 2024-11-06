@@ -7,7 +7,6 @@ namespace Hooks {
     void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked) {
         returncode = DEFAULT_RETURNCODE;
 
-        //ConPrint(L"PopUpDialog %u %u\n", iClientID, buttonClicked);
         PopUp::HandleButtonClick(iClientID, buttonClicked);
     }
 
@@ -49,8 +48,6 @@ namespace Hooks {
 
         if (!Tools::isValidPlayer(iClientIDVictim, true))
             return;
-
-        //ConPrint(wscMsg + L"\n");
 
         std::wstring victim, killer;
 		Tools::eDeathTypes DeathType;
@@ -118,90 +115,13 @@ namespace Hooks {
         // Remove whitespaces from killer
         killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());
 
-        // Get the victim's and killer's client IDs
-        //uint victimClientID = HkGetClientIdFromCharname(victim);
-       // uint killerClientID = HkGetClientIdFromCharname(killer);
-
-		// Print the victim's and killer's client IDs for testing
-		//ConPrint(L"Victim Client ID: " + std::to_wstring(victimClientID) + L"\n");
-		//ConPrint(L"Killer Client ID: " + std::to_wstring(killerClientID) + L"\n");
-        
         //PlayerHunt
         if (Modules::GetModuleState("PlayerHunt"))
         {
 			PlayerHunt::CheckDied(iClientIDVictim, iClientIDKiller, DeathType);
-		}
-        
-        //PVP
-        if (Modules::GetModuleState("PVP"))
-        {
-
-            PVP::CheckDied(iClientIDVictim, iClientIDKiller, DeathType);
-
-            //PVE Ranking
-            if (DeathType == Tools::PVE)
-            {
-                PVP::UpdatePVERanking(iClientIDVictim, false);
-            }
-            //PVP Ranking
-            else if (DeathType == Tools::PVP)
-            {
-                PVP::UpdatePVPRanking(iClientIDVictim, false);
-                PVP::UpdatePVPRanking(iClientIDKiller, true);
-
-            }
-
-
-        }
-
-        
+		}        
     }
 
-
-
-    
-    //ShipDestroyed
-    void __stdcall ShipDestroyed(DamageList* _dmg, DWORD* ecx, uint iKill) {
-        returncode = DEFAULT_RETURNCODE;
-
-        if (iKill != 1)
-            return;
-
-        DamageList dmg;
-        try {
-            dmg = *_dmg;
-        }
-        catch (...) {
-            return;
-        }
-
-
-        CShip* cship = (CShip*)ecx[4];
-        uint iClientID = cship->GetOwnerPlayer();
-
-        if (Modules::GetModuleState("PVP"))
-        {
-
-            if (cship->is_player())
-            {
-                //Player is killed
-                //std::wstring wscCharnameClient = (const wchar_t*)Players.GetActiveCharacterName(iClientID);
-                //ConPrint(wscCharnameClient + L" was killed\n");
-            }
-            else
-            {
-                //NPC is killed
-                uint iKillerID = dmg.get_inflictor_owner_player();
-                if (HkIsValidClientID(iKillerID))
-                {
-                    //NPC is killed by Player
-                    //std::wstring wscCharnameKiller = (const wchar_t*)Players.GetActiveCharacterName(iKillerID);
-                    //ConPrint(wscCharnameKiller + L" has Killed a NPC\n");
-                    PVP::UpdatePVERanking(iKillerID, true);
-                }
-            }
-        }
-    }
 
     //BaseEnter_AFTER
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID) {
@@ -224,12 +144,6 @@ namespace Hooks {
         if (Modules::GetModuleState("PlayerHunt"))
         {
 			PlayerHunt::CheckDock(iBaseID, iClientID);
-        }
-
-        //PathSelection
-        if (Modules::GetModuleState("PathSelection"))
-        {
-            PathSelection::Install_Unlawful(iClientID);
         }
     }
 
@@ -254,16 +168,6 @@ namespace Hooks {
             if (Modules::GetModuleState("ACModule"))
             {
                 AntiCheat::SpeedAC::iDunno3(iShip, iDockTarget, iCancel, response);
-            }
-
-            //PathSelection
-            if (Modules::GetModuleState("PathSelection"))
-            {
-				if (!PathSelection::Check_BlockedGate(iShip))
-				{
-					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-				}
-                
             }
         }
 
@@ -367,23 +271,5 @@ namespace Hooks {
         {
             PlayerHunt::CheckDisConnect(iClientID);
         }
-        //PVP
-        if (Modules::GetModuleState("PVP"))
-        {
-            //ConPrint (L"Disconnect: %u\n", iClientID);
-            PVP::CheckDisConnect(iClientID, PVP::DisconnectReason::DISCONNECTED);
-        }
-    }
-    
-    void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-        /*
-        std::wstring wscCharname(si.wszCharname);
-        ConPrint(L"CreateNewCharacter: %s", wscCharname);
-        std::wstring wscFilename;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-        ConPrint(L"NewCharfile: %s", wscFilename);
-        */
-        //SetLastNewChar to Account FlhookIni
     }
 }

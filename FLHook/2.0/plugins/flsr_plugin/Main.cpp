@@ -104,14 +104,6 @@ void LoadSettings() {
         Tools::get_cmpfiles(Globals::DATADIR + std::string("\\SHIPS"));
 		ConPrint(L"Module loaded: CMPUpdate with " + std::to_wstring(Tools::lCMPUpdateExceptions.size()) + L" Exceptions\n");
     }
-    
-    //PathSelection     #############################################################################
-    if (Modules::GetModuleState("PathSelection"))
-    {
-		//Load PathSelection
-        PathSelection::LoadPathSelectionSettings();
-        ConPrint(L"Module loaded: PathSelection with " + std::to_wstring(PathSelection::lBlockedGates.size()) + L" BlockedGates and " + std::to_wstring(PathSelection::lReputations.size()) + L" Reputations\n");
-    }
 
 
     //PlayerHunt     #############################################################################
@@ -121,25 +113,6 @@ void LoadSettings() {
 		PlayerHunt::LoadPlayerHuntSettings();
 		ConPrint(L"Module loaded: PlayerHunt - RewardMultiplicator: " + std::to_wstring(PlayerHunt::set_fRewardMultiplicator) + L", MinTargetSystemDistance: " + std::to_wstring(PlayerHunt::set_iMinTargetSystemDistance) + L", MinCredits: " + std::to_wstring(PlayerHunt::set_iMinCredits) + L"\n");
 	}
-
-    //PVP     #############################################################################
-    if (Modules::GetModuleState("PVP"))
-    {
-        //Load PVP
-        if (Modules::GetModuleState("SQLModule"))
-        {
-            ConPrint(L"Module loading: PVP ...\n");
-
-            PVP::LoadPVP();
-
-            ConPrint(L"Module loaded: PVP \n");
-        }
-        else
-        {
-            ConPrint(L"PVP Module not loaded! Necessary Module not loaded: SQL\n");
-            Modules::SetModuleState ("PVP", false);
-        }
-    }
 
     //SpawnProtection  #############################################################################
     if (Modules::GetModuleState("SpawnProtection"))
@@ -195,38 +168,6 @@ void LoadSettings() {
         {
             ConPrint(L"Module failed to load: DiscordBot\n");
             Modules::SetModuleState("DiscordBot", false);
-        }
-
-    }
-
-    //API
-    if (Modules::GetModuleState("API"))
-    {
-        //Load DiscordBot
-        if (API::LoadSettings())
-        {
-
-            try {
-                HANDLE hAPIThread;
-
-                DWORD id;
-                DWORD dwParam;
-                hAPIThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)API::StartUp, &dwParam, 0, &id);
-
-
-                ConPrint(L"Module loaded: API\n");
-
-            }
-            catch (const char* e) {
-                ConPrint(L"Module failed to load: API\n");
-                Modules::SetModuleState("API", false);
-            }
-
-        }
-        else {
-            //Missing Config
-            Modules::SetModuleState("API", false);
-            ConPrint(L"Module failed to load: API\n");
         }
 
     }
@@ -315,7 +256,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LoadSettings, PLUGIN_LoadSettings, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::UserCmd_Process, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::ExecuteCommandString_Callback,PLUGIN_ExecuteCommandString_Callback, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
@@ -329,7 +269,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::FireWeapon, PLUGIN_HkIServerImpl_FireWeapon, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::CreateNewCharacter_After, PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
 

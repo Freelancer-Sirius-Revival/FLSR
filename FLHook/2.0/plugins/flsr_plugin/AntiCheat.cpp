@@ -26,7 +26,7 @@ namespace AntiCheat {
             
                 //If Detect > 10 in 10 Sekunden
                 if (AC_Info[iClientID].iRateDetectCountTimingSpeed > 20 && !AC_Info[iClientID].bTimingSpeedCheater) {
-                    AntiCheat::Reporting::ReportCheater(iClientID, "TimingSpeed", "RATE: "+std::to_string(dRate));
+                    // AntiCheat::Reporting::ReportCheater(iClientID, "TimingSpeed", "RATE: "+std::to_string(dRate));
                     AC_Info[iClientID].bTimingSpeedCheater = true;
                 }
 
@@ -151,13 +151,13 @@ namespace AntiCheat {
 
                 if (AC_Info[iClientID].iSpeedDetections > 2 && engineState != ES_ENGINE)
                 {
-					AntiCheat::Reporting::ReportCheater(iClientID, "Speed", msg);
+					// AntiCheat::Reporting::ReportCheater(iClientID, "Speed", msg);
                     AC_Info[iClientID].iSpeedDetections = 0;
                     AC_Info[iClientID].bSpeedCheater = true;
                 }
                 else if (AC_Info[iClientID].iSpeedDetections > 3 && engineState == ES_ENGINE)
                 {
-                    AntiCheat::Reporting::ReportCheater(iClientID, "Speed normal-engine", msg);
+                    // AntiCheat::Reporting::ReportCheater(iClientID, "Speed normal-engine", msg);
                     AC_Info[iClientID].iSpeedDetections = 0;
                     AC_Info[iClientID].bSpeedCheater = true;
                 }
@@ -388,7 +388,7 @@ namespace AntiCheat {
                     + "<br> charge_rate=" + std::to_string(AC_Info[iClientID].fChargeRate)
                     + "<br> est_capacity=" + std::to_string(AC_Info[iClientID].fCurEstCapacity);
                 
-                AntiCheat::Reporting::ReportCheater(iClientID, "Power", msg);
+                // AntiCheat::Reporting::ReportCheater(iClientID, "Power", msg);
                 AC_Info[iClientID].bPowerCheater = true;
 
                 AC_Info[iClientID].fCurEstCapacity = 0.0f;
@@ -399,132 +399,13 @@ namespace AntiCheat {
                std::string msg = "capacity=" + std::to_string(AC_Info[iClientID].fMaxCapacity)
                     + "<br> charge_rate=" + std::to_string(AC_Info[iClientID].fChargeRate)
                     + "<br> est_capacity=" + std::to_string(AC_Info[iClientID].fCurEstCapacity);
-              // AntiCheat::Reporting::ReportCheater(iClientID, "Power Over Cap ", msg);
+              // // AntiCheat::Reporting::ReportCheater(iClientID, "Power Over Cap ", msg);
             
 
                  AC_Info[iClientID].fCurEstCapacity = AC_Info[iClientID].fMaxCapacity;
             }
         }
 		
-    }
-	
-    // AC Reporting
-    namespace Reporting {
-	    void ReportCheater(uint iClientID, std::string scType, std::string sData) 
-	    {
-		    std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
-            std::wstring wscType = stows(scType);
-
-            std::wstring wscReport;
-
-		    //Get Time
-            time_t rawtime;
-            struct tm *timeinfo;
-            char cTime[80];
-            time(&rawtime);
-            timeinfo = localtime(&rawtime);
-		    strftime(cTime, sizeof(cTime), "%d-%m-%Y-%H-%M-%S", timeinfo);
-            std::string sTime(cTime);
-            std::wstring wscTime = stows(sTime);
-
-		    //Build Report
-            wscReport = wscCharname + L" - " + wscTime + L" - " + wscType;
-
-            //PrintUserCmdText(iClientID, wscReport);
-            //return;
-
-            //LogCheat
-            std::string reportname = "PATHPATH" + CreateReport(iClientID, wscType, wscTime, stows(sData));
-            wscReport = wscReport + stows(reportname);
-
-            //PrintUserCmdText(iClientID, wscReport);
-            //Report to Discord
-            ShellExecute(NULL, "open", DISCORD_WEBHOOK_CHEATREPORT_FILE, wstos(wscReport).c_str(), NULL, NULL);
-	
-	
-	    }
-
-        std::string CreateReport(uint iClientID, std::wstring wscType,std::wstring wscTime, std::wstring wscDETAILS)
-        {
-            //FLPath
-            char szCurDir[MAX_PATH];
-            GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-
-            CAccount *acc = Players.FindAccountFromClientID(iClientID);
-            std::wstring wscAccDir;
-            HkGetAccountDirName(acc, wscAccDir);
-            std::string scUserFile = scAcctPath + wstos(wscAccDir) + Globals::FLHOOKUSER_FILE;
-            std::string scACFile = CHEATREPORT_STORE;
-            std::wstring wscCharname = (wchar_t *)Players.GetActiveCharacterName(iClientID);
-            std::string Charname = wstos(wscCharname);
-            std::string sTime = wstos(wscTime);
-            std::wstring wscFilename;
-            HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-            std::string scFilename = wstos(wscFilename);
-            scACFile = scACFile + scFilename + "_" + sTime + ".html";
-            std::ifstream RTPL(std::string(szCurDir) + Globals::AC_REPORT_TPL);
-
-            std::string AllCharnames;
-            //Get Charnames on ID
-            for (int i = 0;; i++) {
-                char szBuf[64];
-                sprintf(szBuf, "Char%u", i);
-                std::string aCharname = IniGetS(scUserFile, "Charnames", szBuf, "");
-                Tools::replace_first(aCharname, "-> ", ""); // Charname
-                aCharname = Tools::base64_decode(aCharname);
-                AllCharnames = AllCharnames + "<br>" + aCharname;
-                if (aCharname == "")
-                    break;
-            }
-        
-
-            //TPL
-            std::ostringstream fileContentsStream;
-            fileContentsStream << std::ifstream(std::string(szCurDir) + Globals::AC_REPORT_TPL).rdbuf();
-            std::string RTPL_STR = fileContentsStream.str();
-
-
-            //Prepare Report Template
-            std::string sCHARNAME = wstos(wscCharname); // Charname
-            std::string sCTIMINGSPEED = IniGetS(scUserFile, "CheatDetecion", "CTD", "0");// Confirmed TimingSpeed Detections
-
-            //Replace PlaceHolder->Content
-            Tools::replace_first(RTPL_STR, "{[pos1]}", sCHARNAME); // Charname
-            Tools::replace_first(RTPL_STR, "{[pos2]}", sCTIMINGSPEED); // Confirmed TimingSpeed Detections
-
-            //Prepare Report Body Template
-            std::string sDATE = wstos(wscTime); // Date
-            std::string sTYPE = wstos(wscType); // Confirmed TimingSpeed Detections
-
-
-
-            std::string scDETAILS = wstos(wscDETAILS);
-            //Replace PlaceHolder->Content
-            Tools::replace_first(RTPL_STR, "{[posB1]}", sDATE);       // Date
-            Tools::replace_first(RTPL_STR, "{[posB2]}", sTYPE);          // Type
-            Tools::replace_first(RTPL_STR, "{[posB3]}", scDETAILS);   // Details
-            Tools::replace_first(RTPL_STR, "{[posB4]}", AllCharnames);   // Charnames
-            Tools::replace_first(RTPL_STR, "{[posB5]}", sCTIMINGSPEED); // StatsTDC
-
-            //PrintUserCmdText(iClientID, stows(RTPL_STR));
-
-            FILE *f;
-            fopen_s(&f, scACFile.c_str(), "at");
-            if (!f)
-                return "";
-
-            try {
-                fprintf(f, RTPL_STR.c_str());
-
-                fprintf(f, "\n");
-            } catch (...) {
-            }
-            fclose(f);
-
-
-            return scFilename + "_" + sTime + ".html";
-        }
-
     }
 
     // AC Tools

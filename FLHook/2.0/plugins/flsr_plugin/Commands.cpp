@@ -155,85 +155,6 @@ namespace Commands {
         }
     }
 
-    ///// PVP
-
-
-    void UserCmd_pvpduel(uint iClientID, const std::wstring& wscParam) {
-
-        if (Modules::GetModuleState("PVP"))
-        {
-            PVP::CmdFight(iClientID, wscParam, PVP::PVPTYPE_DUEL);
-        }
-    }
-
-    void UserCmd_pvpffa(uint iClientID, const std::wstring& wscParam) {
-
-        if (Modules::GetModuleState("PVP"))
-        {
-            PVP::CmdFight(iClientID, wscParam, PVP::PVPTYPE_FFA);
-        }
-    }
-
-    void UserCmd_pvpaccept(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("PVP"))
-        {
-            PVP::CmdAcceptPVP(iClientID, wscParam);
-        }
-
-    }
-
-    void UserCmd_pvpclear(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("PVP"))
-        {
-            PVP::CmdClearPVP(iClientID, wscParam);
-        }
-
-    }
-
-    void UserCmd_stats(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("PVP"))
-        {
-            PVP::CmdStats(iClientID, wscParam);
-        }
-
-    }
-
-    void UserCmd_pvpinvite(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("PVP"))
-        {
-            // �berpr�fe ob Spieler im Space ist
-            uint iShip;
-            pub::Player::GetShip(iClientID, iShip);
-            if (!iShip)
-            {
-                PrintUserCmdText(iClientID, L"Please undock!");
-                return;
-            }
-
-            // �berpr�fe auf Target
-            uint iTargetShip;
-            pub::SpaceObj::GetTarget(iShip, iTargetShip);
-            if (!iTargetShip)
-            {
-                PrintUserCmdText(iClientID, L"Please select a target!");
-                return;
-            }
-
-            // �berpr�fe ob Target ein Spieler ist
-            uint iTargetClientID = HkGetClientIDByShip(iTargetShip);
-            if (!iTargetClientID)
-            {
-                PrintUserCmdText(iClientID, L"Please select a player!");
-                return;
-            }
-
-            PVP::InvitePlayerToFFAFight(iClientID, iTargetClientID);
-
-        }
-
-    }
-
-
     void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
 
         if (Modules::GetModuleState("PlayerHunt"))
@@ -790,12 +711,6 @@ namespace Commands {
         {L"/autoinsurance", Insurance::UserCMD_INSURANCE},
         {L"/help", UserCmd_HELP},
         {L"/playerhunt", UserCmd_PLAYERHUNT},
-        {L"/pvpduel", UserCmd_pvpduel},
-        {L"/pvpffa", UserCmd_pvpffa},
-        {L"/pvpaccept", UserCmd_pvpaccept},
-        {L"/pvpclear", UserCmd_pvpclear},
-        {L"/pvpinvite", UserCmd_pvpinvite},
-        {L"/stats", UserCmd_stats},
         {L"/link", UserCMD_LINK},
         {L"/bank", UserCMD_BANK},
         {L"/cloak", Cloak::UserCmd_CLOAK},

@@ -12,9 +12,6 @@
     <Filter Include="SURDUMPER">
       <UniqueIdentifier>{fa96471d-e44d-4fc3-822c-55cadf806a8b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\AC REPORT">
-      <UniqueIdentifier>{5fa6ddab-f230-4632-9d06-c29a9289892f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -62,22 +59,13 @@
     <ClCompile Include="EquipWhiteList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PathSelection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerHunt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PVP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Discord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SpawnProtection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="API.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Mark.cpp">
@@ -110,12 +98,6 @@
     </None>
     <None Include="surdump.zip">
       <Filter>SURDUMPER</Filter>
-    </None>
-    <None Include="report.html">
-      <Filter>Source Files\AC REPORT</Filter>
-    </None>
-    <None Include="ReportTemplate.html">
-      <Filter>Source Files\AC REPORT</Filter>
     </None>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />

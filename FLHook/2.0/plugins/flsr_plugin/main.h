@@ -27,7 +27,6 @@
 #include <numeric>
 #include <unordered_map>
 #include <openssl/sha.h>
-#include <crow.h>
 
 //Plugin Stuff
 extern PLUGIN_RETURNCODE returncode;
@@ -35,10 +34,6 @@ extern PLUGIN_RETURNCODE returncode;
 //Offsets
 #define ADDR_CLIENT_NEWPLAYER 0x8010
 #define ADDR_CRCANTICHEAT 0x6FAF0
-
-//-Static
-#define DISCORD_WEBHOOK_CHEATREPORT_FILE "C:\\Freelancer\\FLSR Public\\EXE\\flhook_plugins\\cheatreport.exe"
-#define CHEATREPORT_STORE "C:\\Caddy\\files\\cheater\\"
 
 // Mutex-Objekt deklarieren
 extern std::mutex m_Mutex;
@@ -53,8 +48,6 @@ namespace Globals {
 
     //FilePaths
     const std::string PLUGIN_CONFIG_FILE = "\\flhook_plugins\\flsr.cfg";
-    const std::string DOCK_CONFIG_FILE = "\\flhook_plugins\\flsr-dock.cfg";
-    const std::string PATHSELECTION_CONFIG_FILE = "\\flhook_plugins\\flsr-pathselection.cfg";
     const std::string CARRIER_CONFIG_FILE = "\\flhook_plugins\\FLSR-Carrier.cfg";
     const std::string CLOAK_CONFIG_FILE = "\\flhook_plugins\\FLSR-Cloak.cfg";
     const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
@@ -64,10 +57,8 @@ namespace Globals {
     const std::string INSURANCE_STORE = "\\flhook_plugins\\flsr-insurance\\";
     const std::string LIBRELANCER_SDK = "\\flhook_plugins\\librelancer-sdk\\";
     const std::string CMP_DUMP_FOLDER = "\\flhook_plugins\\flsr-cmpdumps\\";
-    const std::string MISSION_STORE = "\\flhook_plugins\\missions\\";
     const std::string Equip_WHITELIST_FILE = "\\flhook_plugins\\FLSR-EquipWhiteList.cfg";
     const std::string AC_REPORT_TPL = "\\flhook_plugins\\flsr-cheater\\ReportTemplate.html";
-    const std::string PVP_FIGHTINFO = "\\flhook_plugins\\FightInfo.cfg";
     const std::string DATADIR = "..\\DATA";
 
     //SQL 
@@ -299,8 +290,6 @@ namespace Tools {
     std::vector<std::string> GetShortestPath(std::string start, std::string end);
     int CountShortestPath(std::string start, std::string end);
 
-    void FLSRIniDelete(const std::string& scFile, const std::string& scApp, const std::string& scKey);
-    std::wstring ToUpper(const std::wstring& str);
     HK_ERROR FLSRHkAddEquip(const std::wstring& wscCharname, uint iGoodID,const std::string& scHardpoint, bool bMounted);
     HK_ERROR FLSRHkAddCargo(const std::wstring& wscCharname, uint iGoodID, int iCount, bool bMission);
     float GetAveragePingOfAllPlayers();
@@ -330,7 +319,6 @@ namespace Hooks {
     void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
-    void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill);
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID);
     void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui, unsigned int iClientID);
     int __cdecl Dock_Call(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response);
@@ -341,7 +329,6 @@ namespace Hooks {
     void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn);
     void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID);
     void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state);
-    void __stdcall CreateNewCharacter_After(struct SCreateCharacterInfo const& si, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }
 
@@ -382,11 +369,6 @@ namespace AntiCheat {
         void Init(unsigned int iClientID);
         void Setup(unsigned int iClientID);
         void FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const wpn);
-    }
- 
-    namespace Reporting {
-        void ReportCheater(uint iClientID, std::string scType, std::string sData);
-        std::string CreateReport(uint iClientID, std::wstring wscType,std::wstring wscTime, std::wstring wscDETAILS);
     }
     
     namespace DataGrab {
@@ -526,53 +508,6 @@ namespace SQL {
 
     extern std::string scDbName;
     void InitializeDB();
-    void CheckAndCreateDuelRankingTable();
-    void CheckAndCreateFFARankingTable();
-    void CheckAndCreatePVPRankingTable();
-    void CheckAndCreatePVERankingTable();
-
-}
-
-namespace PathSelection {
-   
-    struct Reputation{
-		std::string scFactionName;
-		float fReputation;
-    };
-    
-    struct BlockedGate {
-       uint iGateID;
-    };
-
-    struct UnlawfulPlayer {
-        bool bisUnlawful;
-        bool bisCharModified;
-    };
-    
-	struct OpenUnlawfulMod {
-		uint iClientID;
-        std::string scCharname;
-        std::wstring scAccountID;
-        std::wstring wscAccDir;
-    };
-
-    extern std::string scStart_Base;
-    extern std::string scSystem;
-    extern uint iCash;
-    
-    extern std::list<PathSelection::OpenUnlawfulMod> lOpenUnlawfulMods;
-    extern std::list<PathSelection::Reputation> lReputations;
-    extern std::list<PathSelection::BlockedGate> lBlockedGates;
-    extern IMPORT UnlawfulPlayer UnlawfulPlayerData[MAX_CLIENT_ID + 1];
-    //extern std::map<std::wstring, UnlawfulPlayer> mUnlawfulPlayer;
-
-
-    void LoadPathSelectionSettings();
-    bool Check_BlockedGate(uint iShip);
-    void Install_Unlawful(uint iClientID);
-    void SetUnlawful(uint iClientID, std::string scCharname, std::string scState);
-    void ModUnlawfulChar500ms();
-
 }
 
 namespace PlayerHunt {
@@ -628,85 +563,8 @@ namespace PlayerHunt {
     void CheckSystemReached(uint iClientID, uint iPlayerSystemID);
     void CheckDock(uint iBaseID, uint iClientID);
     void CheckDisConnect(uint iClientID);
-    bool IsInSameFight(uint iClientID, uint iClientID2);
     void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
     void LoadPlayerHuntSettings();
-}
-
-
-namespace PVP {
-
-
-
-    enum PVPType {
-        PVPTYPE_NONE,
-        PVPTYPE_DUEL,
-        PVPTYPE_FFA,
-        PVPTYPE_RANKED
-
-    };
-
-    enum DisconnectReason {
-        CHARSWITCH,
-        DISCONNECTED
-    };
-
-    struct Member {
-        uint iClientID;
-        std::wstring wscCharname;
-        std::wstring wscCharFilename;
-        uint iKills;
-        bool bIsInFight = false;
-
-    };
-
-    static uint nextFightID = 1;
-
-    struct Fights {
-        uint iFightID;
-        std::list<Member> lMembers;
-        PVPType ePVPType;
-        uint iFights;
-        uint iFightsRemaining;
-
-        Fights() {
-            iFightID = nextFightID;
-            ++nextFightID;
-        }
-    };
-
-    extern std::list<Fights> ServerFightData;
-
-    void LoadPVP();
-    std::wstring GetWStringFromPVPTYPE(PVPType pvpType);
-    uint IsInFight(uint iClientID, bool bSkipFightCheck);
-    uint GetKills(uint iClientID);
-    PVPType GetPVPType(uint iClientID);
-    uint GetFightIDByCharname(const std::wstring& wscCharname);
-    PVPType GetActiveFightPVPType(uint iFightID);
-    std::list<Member> GetPVPMember(uint iClientID);
-    void HandleKill(uint iClientKillerID, PVPType ePVPType);
-    void CmdAcceptPVP(uint iClientID, const std::wstring& wscParam);
-    void CmdFight(uint iClientID, const std::wstring& wscParam, PVP::PVPType ePVPType);
-    void AcceptFight(PVP::Fights& fight, uint iClientID);
-    void CheckDisConnect(uint iClientID, DisconnectReason reason);
-    void CheckDied(uint iClientID, uint iClientKillerID, Tools::eDeathTypes DeathType);
-    void UpdateDuelRanking(uint iClientID, bool bKills);
-    void UpdateFFARanking(uint iClientID, bool bKills);
-    void CalcRanking(const std::string& tableName);
-    void CheckLastRound();
-    void WriteFightInfoToCFG(uint iFightID, const std::string& scCharFilename);
-    bool IsCharInFightInfo(const std::string& scCharFilename);
-    void ClearFightInfo();
-    void RemoveCharFromFightInfo(const std::string& scCharFilename);
-    void CmdClearPVP(uint iClientID, const std::wstring& wscParam);
-    void AddPlayerToFFAFight(uint iFightID, const std::wstring& wscCharname, const std::wstring& wscCharFilename);
-    void InvitePlayerToFFAFight(uint iClientID, uint iTargetClientID);
-    void RemovePlayerFromFight(uint iFightID, const std::wstring& wscCharname);
-    void UpdatePVERanking(uint iClientID, bool bKills);
-    void UpdatePVPRanking(uint iClientID, bool bKills);
-    void CmdStats(uint iClientID, const std::wstring& wscParam);
-
 }
 
 namespace Discord {
@@ -838,15 +696,6 @@ namespace GroupReputation
     void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
     void CleanDestroyedShipRegistry();
 }
-
-namespace API {
-
-    extern ushort;
-
-    bool LoadSettings();
-    void StartUp();
-
-} // namespace API
 
 //namespace SrvCtrlObj {
 namespace SrvCtrlObj {

@@ -48,8 +48,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>flsr</TargetName>
-    <IncludePath>$(SolutionDir)..\FLHookSDK\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\FLHookSDK\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -79,6 +77,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <PostBuildEvent />
     <PostBuildEvent>
       <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
 xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
@@ -91,7 +90,7 @@ xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)sqlite3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)SQLiteCpp.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)zlib1.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)zlibd1.dll" "$(DistDir)"
 
 if "$(FLHOOK_COPY_PATH)" NEQ "" (
 xcopy /y  "$(OutDir)$(TargetName).dll" "$(FLHOOK_COPY_PATH)\flhook_plugins\"

@@ -44,7 +44,7 @@
     <Import Project="..\Plugin Common.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>bountyhunt_plugin</TargetName>
+    <TargetName>bountyhunt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>bountyhunt</TargetName>

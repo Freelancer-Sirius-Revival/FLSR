@@ -426,6 +426,11 @@ namespace IFF
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 }
 
+namespace Storage
+{
+    void UserCmd_CreateAccount(const uint clientId, const std::wstring& arguments);
+}
+
 namespace Cloak
 {
     enum class CloakState

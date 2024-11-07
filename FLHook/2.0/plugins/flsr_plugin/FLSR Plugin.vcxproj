@@ -76,6 +76,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>FLHook.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
@@ -111,6 +112,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
@@ -143,7 +145,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="EquipWhiteList.cpp" />
     <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
-    <ClCompile Include="iff.cpp" />
+    <ClCompile Include="IFF.cpp" />
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
@@ -154,6 +156,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="SendCash.cpp" />
     <ClCompile Include="SpawnProtection.cpp" />
     <ClCompile Include="SQL.cpp" />
+    <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>

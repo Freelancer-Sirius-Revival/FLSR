@@ -44,10 +44,10 @@
     <Import Project="..\Plugin Common.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>FLSR</TargetName>
+    <TargetName>flsr</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>FLSR</TargetName>
+    <TargetName>flsr</TargetName>
     <IncludePath>$(SolutionDir)..\FLHookSDK\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\FLHookSDK\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -79,6 +79,25 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)*.ini" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)*.cfg" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)dpp.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)sqlite3.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)SQLiteCpp.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)zlib1.dll" "$(DistDir)"
+
+if "$(FLHOOK_COPY_PATH)" NEQ "" (
+xcopy /y  "$(OutDir)$(TargetName).dll" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
+xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -94,6 +113,25 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)*.ini" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)*.cfg" "$(DistDir)flhook_plugins\"
+xcopy /y  "$(OutDir)dpp.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)sqlite3.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)SQLiteCpp.dll" "$(DistDir)"
+xcopy /y  "$(OutDir)zlib1.dll" "$(DistDir)"
+
+if "$(FLHOOK_COPY_PATH)" NEQ "" (
+xcopy /y  "$(OutDir)$(TargetName).dll" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
+xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AntiCheat.cpp" />
@@ -129,6 +167,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="configs\FLSR-Carrier.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-Cloak.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-Crafting.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-EquipWhiteList.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-LootBoxes.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\flsr.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
     <None Include="surdump.zip" />

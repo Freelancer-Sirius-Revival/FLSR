@@ -12,6 +12,9 @@
     <Filter Include="SURDUMPER">
       <UniqueIdentifier>{fa96471d-e44d-4fc3-822c-55cadf806a8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="configs">
+      <UniqueIdentifier>{64601be9-2bd9-43da-be3a-b1b38ce82f00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -101,5 +104,25 @@
     </None>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="configs\flsr.cfg">
+      <Filter>configs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-Carrier.cfg">
+      <Filter>configs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-Cloak.cfg">
+      <Filter>configs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-Crafting.cfg">
+      <Filter>configs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-EquipWhiteList.cfg">
+      <Filter>configs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-LootBoxes.cfg">
+      <Filter>configs</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

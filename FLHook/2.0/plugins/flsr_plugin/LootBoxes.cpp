@@ -39,7 +39,11 @@ namespace LootBoxes
 	{
 		const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
 		if (goodInfo)
-			return HkGetWStringFromIDS(goodInfo->iIDSName);
+		{
+			std::wstring name = HkGetWStringFromIDS(goodInfo->iIDSName);
+			std::replace<std::wstring::iterator, wchar_t>(name.begin(), name.end(), 0x2019 /* ’ */, '\'');
+			return name;
+		}
 		return L"";
 	}
 

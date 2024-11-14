@@ -92,16 +92,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="surupdate.au3">
-      <Filter>SURDUMPER</Filter>
-    </None>
-    <None Include="surupdate.exe">
-      <Filter>SURDUMPER</Filter>
-    </None>
-    <None Include="surdump.zip">
-      <Filter>SURDUMPER</Filter>
-    </None>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
   </ItemGroup>

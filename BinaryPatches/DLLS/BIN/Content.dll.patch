@@ -78,6 +78,8 @@ File: DLLS\BIN\Content.dll
 # Reputation needed for unlawful factions to show rumors. - adoxa
 12E358: 0.2f	[ 0.4f ]
 
+# Reputation lost after destroying DESTROYABLE_DEPOT solar. - BC46
+0D00D4: -0.05f	[ -0.1f ]
 
 ##########################################
 # Players

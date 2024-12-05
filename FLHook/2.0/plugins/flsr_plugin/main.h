@@ -426,11 +426,6 @@ namespace IFF
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 }
 
-namespace Storage
-{
-    void UserCmd_CreateAccount(const uint clientId, const std::wstring& arguments);
-}
-
 namespace Cloak
 {
     enum class CloakState
@@ -699,6 +694,12 @@ namespace GroupReputation
     void BaseDestroyed(uint objectId, uint clientId);
     void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
     void CleanDestroyedShipRegistry();
+}
+
+namespace Storage
+{
+    void LoadStorages();
+    bool UserCmd_Storage(const uint clientId, const std::wstring& arguments);
 }
 
 //namespace SrvCtrlObj {

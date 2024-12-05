@@ -732,7 +732,6 @@ namespace Commands {
         {L"/neutral", IFF::UserCmd_Neutral},
         {L"/friend", IFF::UserCmd_Allied},
         {L"/iff", IFF::UserCmd_Attitude},
-        {L"/storage", Storage::UserCmd_CreateAccount}
     };
 
     // User command processing

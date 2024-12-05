@@ -160,6 +160,13 @@ namespace Storage
 		return accountUidByCharacterFileName.contains(GetCharacterFileName(clientId));
 	}
 
+	bool IsPlayerDocked(const uint clientId)
+	{
+		uint baseId;
+		pub::Player::GetBase(clientId, baseId);
+		return baseId;
+	}
+
 	Account& GetAccount(const uint clientId)
 	{
 		const std::string accountUid = accountUidByCharacterFileName[GetCharacterFileName(clientId)];
@@ -256,6 +263,12 @@ namespace Storage
 
 	void DepositMoney(const uint clientId, const int64_t amount)
 	{
+		if (!IsPlayerDocked(clientId))
+		{
+			PrintUserCmdText(clientId, L"You must be docked to be able to deposit money!");
+			return;
+		}
+
 		if (!HasAccount(clientId))
 		{
 			PrintUserCmdText(clientId, L"Cannot deposit money without active storage account!");
@@ -289,6 +302,12 @@ namespace Storage
 
 	void WithdrawMoney(const uint clientId, const int64_t amount)
 	{
+		if (!IsPlayerDocked(clientId))
+		{
+			PrintUserCmdText(clientId, L"You must be docked to be able to withdraw money!");
+			return;
+		}
+
 		if (!HasAccount(clientId))
 		{
 			PrintUserCmdText(clientId, L"Cannot withdraw money without active storage account!");

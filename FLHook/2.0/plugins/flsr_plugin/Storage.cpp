@@ -31,6 +31,14 @@ namespace Storage
 
 	static std::string outputDirectory;
 
+	std::wstring GetEquipmentName(const uint archetypeId)
+	{
+		const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
+		if (goodInfo)
+			return HkGetWStringFromIDS(goodInfo->iIDSName);
+		return L"Not found: " + std::to_wstring(archetypeId);
+	}
+
 	void LoadStorage(const std::wstring& filePath)
 	{
 		INI_Reader ini;
@@ -233,9 +241,33 @@ namespace Storage
 
 	}
 
-	void ListCharacterItems()
+	void ListUnmountedCharacterItems(const uint clientId)
 	{
+		if (!IsPlayerDocked(clientId))
+		{
+			PrintUserCmdText(clientId, L"You must be docked to list your cargo hold!");
+			return;
+		}
 
+		int remainingHoldSize;
+		std::list<CARGO_INFO> cargoList;
+		if (HkEnumCargo(ARG_CLIENTID(clientId), cargoList, remainingHoldSize) != HKE_OK)
+			return;
+		std::unordered_map<std::wstring, uint> itemCountByName;
+		std::set<std::wstring> itemNames;
+		for (const CARGO_INFO& cargo : cargoList)
+		{
+			if (!cargo.bMounted && !cargo.bMission)
+			{
+				const std::wstring name = GetEquipmentName(cargo.iArchID);
+				itemNames.insert(name);
+				itemCountByName[name] = (!itemCountByName.contains(name) ? 0 : itemCountByName[name]) + cargo.iCount;
+			}
+		}
+
+		uint number = 1;
+		for (const std::wstring& name : itemNames)
+			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountByName[name]) + L"\u00D7 " + name);
 	}
 
 	void StoreItem()
@@ -243,7 +275,7 @@ namespace Storage
 
 	}
 
-	void UnstoreItem()
+	void UnstoreItem(const uint clientI, const uint baseId, const uint itemId)
 	{
 
 	}
@@ -413,6 +445,13 @@ namespace Storage
 		if (argumentsLowered.find(L"/money") == 0 || argumentsLowered.find(L"/bank") == 0)
 		{
 			ShowCurrentMoney(clientId);
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return true;
+		}
+
+		if (argumentsLowered.find(L"/inventory") == 0)
+		{
+			ListUnmountedCharacterItems(clientId);
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}

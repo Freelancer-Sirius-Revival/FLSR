@@ -30,6 +30,7 @@ namespace Storage
 	static std::unordered_map<std::string, std::string> accountUidByCharacterFileName;
 
 	static std::string outputDirectory;
+	static int maxCharacterMoney = 999999999;
 
 	std::wstring GetEquipmentName(const uint archetypeId)
 	{
@@ -136,6 +137,10 @@ namespace Storage
 		}
 
 		HkLoadStringDLLs();
+
+		const HMODULE serverHandle = GetModuleHandle("server.dll");
+		if (serverHandle)
+			maxCharacterMoney = *(int*)(DWORD(serverHandle) + 0x06F46E);
 	}
 
 	std::string GetCharacterFileName(const uint clientId)
@@ -333,7 +338,7 @@ namespace Storage
 		}
 
 		int currentCash = 0;
-		if (HkGetCash(ARG_CLIENTID(clientId), currentCash) != HKE_OK || static_cast<int64_t>(currentCash) < amount)
+		if (HkGetCash(ARG_CLIENTID(clientId), currentCash) != HKE_OK || currentCash < amount)
 		{
 			PrintUserCmdText(clientId, L"Cannot deposit more money than you own!");
 			return;
@@ -374,9 +379,9 @@ namespace Storage
 
 		// Limit the money to never exceed 2^32-1
 		int currentCash = INT_MAX;
-		if (HkGetCash(ARG_CLIENTID(clientId), currentCash) != HKE_OK || static_cast<int64_t>(currentCash) + amount > INT_MAX) // Todo: Set by server.dll offset 0x06F46E
+		if (HkGetCash(ARG_CLIENTID(clientId), currentCash) != HKE_OK || currentCash + amount > maxCharacterMoney)
 		{
-			PrintUserCmdText(clientId, L"Your character's money cannot exceed " + PrintMoney(INT_MAX) + L".");
+			PrintUserCmdText(clientId, L"Your character's money cannot exceed " + PrintMoney(maxCharacterMoney) + L".");
 			return;
 		}
 

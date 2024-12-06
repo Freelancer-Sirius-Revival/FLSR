@@ -254,11 +254,10 @@ namespace Storage
 
 	std::wstring PrintMoney(const int64_t amount)
 	{
-		std::wstringstream stream;
-		stream.imbue(std::locale("en_US.UTF-8"));
-		stream << std::showbase << std::put_money(static_cast<long double>(amount) * 100, false);
-		std::wstring result = stream.str();
-		return result.substr(0, result.size() - 3);
+		std::wstring result = std::to_wstring(amount);
+		for (int pos = result.size() - 3; pos > 0; pos = pos - 3)
+			result = result.insert(pos, L",");
+		return L"$" + result;
 	}
 
 	void DepositMoney(const uint clientId, const int64_t amount)

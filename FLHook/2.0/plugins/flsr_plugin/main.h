@@ -698,7 +698,7 @@ namespace GroupReputation
 
 namespace Storage
 {
-    void LoadStorages();
+    void InitializeStorageSystem();
     bool UserCmd_Storage(const uint clientId, const std::wstring& arguments);
 }
 

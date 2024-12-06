@@ -21,7 +21,7 @@ namespace Storage
 		std::string uid;
 		std::wstring ownerAccountId;
 		int64_t money = 0;
-		std::unordered_map<uint, Storage> storages = {};
+		std::unordered_map<uint, Storage> storagesByBaseId = {};
 	};
 
 	static std::unordered_map<std::string, Account> accountByAccountUid;
@@ -65,12 +65,15 @@ namespace Storage
 				}
 				else
 				{
-					//const uint equipmentArchetypeId = CreateID(ini.get_header_ptr());
-					//while (ini.read_value())
-					//{
-						//if (ini.is_value("ship"))
-							//allowedEquipmentArchetypeIdsPerShipArchetypeId[equipmentArchetypeId].push_back(CreateID(ini.get_value_string(0)));
-					//}
+					uint baseId;
+					pub::GetBaseID(baseId, ini.get_header_ptr());
+					if (baseId)
+					{
+						Storage storage;
+						storage.baseId = baseId;
+						storage.itemArchetypeIdsWithCount = {};
+						account.storagesByBaseId[baseId] = storage;
+					}
 				}
 			}
 			ini.close();
@@ -104,7 +107,7 @@ namespace Storage
 	}
 
 	static bool initialized = false;
-	void LoadStorages()
+	void InitializeStorageSystem()
 	{
 		if (initialized)
 			return;
@@ -123,16 +126,18 @@ namespace Storage
 			else if (entry.path().filename() == L"linked_chars.ini")
 				LoadLinkedCharacters(entry.path());
 		}
+
+		HkLoadStringDLLs();
 	}
 
 	std::string GetCharacterFileName(const uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return "";
-		std::wstring characterFileNameWS;
-		if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) != HKE_OK)
+		std::wstring characterFileName;
+		if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
 			return "";
-		return wstos(characterFileNameWS);
+		return wstos(characterFileName);
 	}
 
 	void SwitchToAccount(const uint clientId, const std::string accountUid)
@@ -169,20 +174,16 @@ namespace Storage
 
 	Account& GetAccount(const uint clientId)
 	{
-		const std::string accountUid = accountUidByCharacterFileName[GetCharacterFileName(clientId)];
+		const std::string& accountUid = accountUidByCharacterFileName[GetCharacterFileName(clientId)];
 		return accountByAccountUid[accountUid];
 	}
 
 	void ShowCurrentAccountUid(const uint clientId)
 	{
 		if (HasAccount(clientId))
-		{
 			PrintUserCmdText(clientId, L"Active storage account ID: " + stows(GetAccount(clientId).uid));
-		}
 		else
-		{
 			PrintUserCmdText(clientId, L"No active storage account. Create one by typing: /storage new");
-		}
 	}
 
 	void CreateNewAccount(const uint clientId)
@@ -247,9 +248,28 @@ namespace Storage
 
 	}
 
-	void ListStorages()
+	void ListStorages(const uint clientId)
 	{
+		if (!HasAccount(clientId))
+		{
+			PrintUserCmdText(clientId, L"Without active storage account you cannot list places with stored items!");
+			return;
+		}
 
+		std::wstring result = L"";
+		const Account& account = GetAccount(clientId);
+		for (const auto& storageByBaseId : account.storagesByBaseId)
+		{
+			uint strId;
+			pub::GetBaseStridName(strId, storageByBaseId.first);
+			if (strId)
+				result = result + (result.empty() ? L"" : L", ") + HkGetWStringFromIDS(strId);
+		}
+
+		if (result.empty())
+			PrintUserCmdText(clientId, L"You have no stored items anywhere.");
+		else
+			PrintUserCmdText(clientId, L"Stored items on: " + result);
 	}
 
 	std::wstring PrintMoney(const int64_t amount)
@@ -355,25 +375,6 @@ namespace Storage
 	{
 		returncode = DEFAULT_RETURNCODE;
 		const std::wstring argumentsLowered = ToLower(arguments);
-		if (argumentsLowered.find(L"/storage") == 0)
-		{
-			const std::string& arguments = Trim(wstos(GetParamToEnd(argumentsLowered, ' ', 1)));
-			if (arguments == "new")
-			{
-				CreateNewAccount(clientId);
-			}
-			else if (arguments.length() == 0)
-			{
-				ShowCurrentAccountUid(clientId);
-			}
-			else
-			{
-				SwitchToAccount(clientId, arguments);
-			}
-
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-			return true;
-		}
 
 		if (argumentsLowered.find(L"/deposit") == 0)
 		{
@@ -412,6 +413,33 @@ namespace Storage
 		if (argumentsLowered.find(L"/money") == 0 || argumentsLowered.find(L"/bank") == 0)
 		{
 			ShowCurrentMoney(clientId);
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return true;
+		}
+
+		if (argumentsLowered.find(L"/storages") == 0)
+		{
+			ListStorages(clientId);
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return true;
+		}
+
+		if (argumentsLowered.find(L"/storage") == 0)
+		{
+			const std::string& arguments = Trim(wstos(GetParamToEnd(argumentsLowered, ' ', 1)));
+			if (arguments == "new")
+			{
+				CreateNewAccount(clientId);
+			}
+			else if (arguments.length() == 0)
+			{
+				ShowCurrentAccountUid(clientId);
+			}
+			else
+			{
+				SwitchToAccount(clientId, arguments);
+			}
+
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}

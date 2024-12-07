@@ -185,7 +185,7 @@ namespace Cloak
 	void CollectAllJumpSolarsPerSystem()
 	{
 		CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
-		while (solar = static_cast<CSolar*>(solar->FindNext()))
+		while (solar != NULL)
 		{
 			uint type;
 			pub::SpaceObj::GetType(solar->iID, type);
@@ -203,6 +203,7 @@ namespace Cloak
 				pub::SpaceObj::GetLocation(solar->iID, position, orientation);
 				jumpHolePositionsPerSystem[solar->iSystem].push_back(position);
 			}
+			solar = static_cast<CSolar*>(solar->FindNext());
 		}
 	}
 

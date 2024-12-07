@@ -18,7 +18,7 @@ namespace SpawnProtection
 
     void SetInvincible(const uint shipId)
     {
-        pub::SpaceObj::SetInvincible(shipId, true, true, 0);
+        pub::SpaceObj::SetInvincible(shipId, true, false, 0);
         invincibleEndTimePerShip[shipId] = timeInMS() + invincibleDuration;
     }
 
@@ -72,27 +72,5 @@ namespace SpawnProtection
 
         if (Modules::GetModuleState("SpawnProtection"))
             SetInvincible(shipId);
-    }
-
-    bool AllowPlayerDamage(uint clientId, uint targetClientId)
-    {
-        returncode = DEFAULT_RETURNCODE;
-
-        bool preventNpcDamage;
-        bool preventPlayerDamage;
-        float threshold;
-        uint shipId;
-        pub::Player::GetShip(targetClientId, shipId);
-        if (shipId)
-        {
-            pub::SpaceObj::GetInvincible(shipId, preventNpcDamage, preventPlayerDamage, threshold);
-            if (preventPlayerDamage)
-            {
-                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-                return false;
-            }
-        }
-
-        return true;
     }
 }

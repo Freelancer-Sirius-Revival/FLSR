@@ -686,7 +686,6 @@ namespace SpawnProtection
     void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId);
     void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId);
     void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId);
-    bool AllowPlayerDamage(uint clientId, uint targetClientId);
 }
 
 namespace GroupReputation

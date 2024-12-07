@@ -13,7 +13,7 @@ namespace Storage
 	struct Storage
 	{
 		uint baseId;
-		std::unordered_map<Archetype::AClassType, std::vector<Item>> itemsByType;
+		std::unordered_map<uint, uint> itemArchetypeIdsWithCount = {};
 	};
 
 	struct Account
@@ -25,19 +25,29 @@ namespace Storage
 	};
 
 	static std::unordered_map<std::string, Account> accountByAccountUid;
-	static std::unordered_map<uint, std::string> displayNameByItemArchetypeId;
 	static std::vector<uint> excludedBaseIds;
 	static std::unordered_map<std::string, std::string> accountUidByCharacterFileName;
 
 	static std::string outputDirectory;
 	static int maxCharacterMoney = 999999999;
 
+	static std::unordered_map<std::wstring, uint> baseIdsByLoweredDisplayName;
+
+	std::wstring GetBaseName(const uint baseId)
+	{
+		uint strId;
+		pub::GetBaseStridName(strId, baseId);
+		if (strId)
+			return HkGetWStringFromIDS(strId);
+		return std::to_wstring(baseId);
+	}
+
 	std::wstring GetEquipmentName(const uint archetypeId)
 	{
 		const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
-		if (goodInfo)
+		if (goodInfo && goodInfo->iIDSName > 0)
 			return HkGetWStringFromIDS(goodInfo->iIDSName);
-		return L"Not found: " + std::to_wstring(archetypeId);
+		return std::to_wstring(archetypeId);
 	}
 
 	void LoadStorage(const std::wstring& filePath)
@@ -80,7 +90,10 @@ namespace Storage
 					{
 						Storage storage;
 						storage.baseId = baseId;
-						storage.itemArchetypeIdsWithCount = {};
+						while (ini.read_value())
+						{
+							storage.itemArchetypeIdsWithCount[ini.get_value_int(0)] = ini.get_value_int(1);
+						}
 						account.storagesByBaseId[baseId] = storage;
 					}
 				}
@@ -122,11 +135,13 @@ namespace Storage
 			return;
 		initialized = true;
 
+		// Set up the directory name for all save files of this plugin.
 		outputDirectory = scAcctPath + "\\storages\\";
 
 		if (!std::filesystem::is_directory(outputDirectory))
 			return;
 
+		// Read all storage save files
 		const std::regex filePattern(".{4}-.{4}\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
 		for (const auto& entry : std::filesystem::directory_iterator(outputDirectory))
 		{
@@ -138,9 +153,24 @@ namespace Storage
 
 		HkLoadStringDLLs();
 
+		// Find the actually set up character money limit.
 		const HMODULE serverHandle = GetModuleHandle("server.dll");
 		if (serverHandle)
 			maxCharacterMoney = *(int*)(DWORD(serverHandle) + 0x06F46E);
+
+		// Cache all relevant base display names as lowered strings together with their IDs for the /stored command
+		Universe::IBase* base = Universe::GetFirstBase();
+		while (base)
+		{
+			const std::wstring& baseNickname = ToLower(HkGetBaseNickByID(base->iBaseID));
+			if (!baseNickname.starts_with(L"intro"))
+			{
+				const std::wstring& name = ToLower(GetBaseName(base->iBaseID));
+				if (!name.empty())
+					baseIdsByLoweredDisplayName[name] = base->iBaseID;
+			}
+			base = Universe::GetNextBase();
+		}
 	}
 
 	std::string GetCharacterFileName(const uint clientId)
@@ -241,9 +271,56 @@ namespace Storage
 		SwitchToAccount(clientId, uuidString);
 	}
 
-	void ListStoredItems()
+	void ListStorages(const uint clientId)
 	{
+		if (!HasAccount(clientId))
+		{
+			PrintUserCmdText(clientId, L"Without active storage account you cannot list places with stored items!");
+			return;
+		}
 
+		std::wstring result = L"";
+		const Account& account = GetAccount(clientId);
+		for (const auto& storageByBaseId : account.storagesByBaseId)
+		{
+			if (!storageByBaseId.second.itemArchetypeIdsWithCount.empty())
+				result = result + (result.empty() ? L"" : L", ") + GetBaseName(storageByBaseId.first);
+		}
+
+		if (result.empty())
+			PrintUserCmdText(clientId, L"You have no stored items anywhere.");
+		else
+			PrintUserCmdText(clientId, L"Stored items on: " + result);
+	}
+
+	void ListStoredItems(const uint clientId, const uint baseId)
+	{
+		if (!HasAccount(clientId))
+		{
+			PrintUserCmdText(clientId, L"Without active storage account you cannot list stored items!");
+			return;
+		}
+
+		const Account& account = GetAccount(clientId);
+		if (!account.storagesByBaseId.contains(baseId) || account.storagesByBaseId.at(baseId).itemArchetypeIdsWithCount.empty())
+		{
+			PrintUserCmdText(clientId, L"You have no items stored on " + GetBaseName(baseId) + L".");
+			return;
+		}
+
+		const Storage& storage = account.storagesByBaseId.at(baseId);
+		std::unordered_map<std::wstring, uint> itemCountByName;
+		std::set<std::wstring> itemNames;
+		for (const auto& itemIdWithCount : storage.itemArchetypeIdsWithCount)
+		{
+			const std::wstring name = GetEquipmentName(itemIdWithCount.first);
+			itemNames.insert(name);
+			itemCountByName[name] = itemIdWithCount.second;
+		}
+
+		uint number = 1;
+		for (const std::wstring& name : itemNames)
+			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountByName[name]) + L"\u00D7 " + name);
 	}
 
 	void ListUnmountedCharacterItems(const uint clientId)
@@ -275,38 +352,14 @@ namespace Storage
 			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountByName[name]) + L"\u00D7 " + name);
 	}
 
-	void StoreItem()
+	void StoreItem(const uint clientId, const uint baseId, const uint itemId)
 	{
 
 	}
 
-	void UnstoreItem(const uint clientI, const uint baseId, const uint itemId)
+	void UnstoreItem(const uint clientId, const uint baseId, const uint itemId)
 	{
 
-	}
-
-	void ListStorages(const uint clientId)
-	{
-		if (!HasAccount(clientId))
-		{
-			PrintUserCmdText(clientId, L"Without active storage account you cannot list places with stored items!");
-			return;
-		}
-
-		std::wstring result = L"";
-		const Account& account = GetAccount(clientId);
-		for (const auto& storageByBaseId : account.storagesByBaseId)
-		{
-			uint strId;
-			pub::GetBaseStridName(strId, storageByBaseId.first);
-			if (strId)
-				result = result + (result.empty() ? L"" : L", ") + HkGetWStringFromIDS(strId);
-		}
-
-		if (result.empty())
-			PrintUserCmdText(clientId, L"You have no stored items anywhere.");
-		else
-			PrintUserCmdText(clientId, L"Stored items on: " + result);
 	}
 
 	std::wstring PrintMoney(const int64_t amount)
@@ -377,7 +430,7 @@ namespace Storage
 			return;
 		}
 
-		// Limit the money to never exceed 2^32-1
+		// Limit the money to never exceed whatever is currently set up in server.dll
 		int currentCash = INT_MAX;
 		if (HkGetCash(ARG_CLIENTID(clientId), currentCash) != HKE_OK || currentCash + amount > maxCharacterMoney)
 		{
@@ -464,6 +517,30 @@ namespace Storage
 		if (argumentsLowered.find(L"/storages") == 0)
 		{
 			ListStorages(clientId);
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return true;
+		}
+
+		if (argumentsLowered.find(L"/stored") == 0)
+		{
+			const std::wstring& arguments = Trim(GetParamToEnd(argumentsLowered, ' ', 1));
+			uint baseId = 0;
+			if (!arguments.empty())
+			{
+				const auto& foundBaseId = baseIdsByLoweredDisplayName.find(arguments);
+				if (foundBaseId != baseIdsByLoweredDisplayName.end())
+					baseId = foundBaseId->second;
+			}
+			else
+			{
+				pub::Player::GetBase(clientId, baseId);
+			}
+
+			if (baseId > 0)
+				ListStoredItems(clientId, baseId);
+			else
+				PrintUserCmdText(clientId, L"Specify the base to list stored items from! /stored <base name>");
+
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}

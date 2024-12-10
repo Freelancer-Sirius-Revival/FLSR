@@ -154,7 +154,7 @@ File: EXE\Freelancer.exe
 08D89B: 83 C5 18 EB 50	[ 90 90 90 90 90 ]
 08D997: 00	[ 55 ]
 
-# Group member's NAV position refreshes every second. - BC46
+# Group member's NAV position refreshes every second. - Venemon
 096325: CC 2E	[ 40 3E ]
 096338: CC 2E	[ 40 3E ]
 

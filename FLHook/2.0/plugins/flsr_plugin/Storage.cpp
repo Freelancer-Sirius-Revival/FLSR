@@ -142,7 +142,7 @@ namespace Storage
 			return;
 
 		// Read all storage save files
-		const std::regex filePattern(".{4}-.{4}\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
+		const std::regex filePattern(".{4}-.{4}-.{4}-.{4}\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
 		for (const auto& entry : std::filesystem::directory_iterator(outputDirectory))
 		{
 			if (std::regex_match(wstos(entry.path().filename()), filePattern))
@@ -241,8 +241,8 @@ namespace Storage
 			RPC_CSTR uuidStringOutput;
 			if (UuidToStringA(&uuid, &uuidStringOutput) != RPC_S_OK)
 				return;
-			// Keep the first two 4-digit blocks as actual ID
-			uuidString = std::string((char*)uuidStringOutput).substr(9, 9);
+			// Keep the first four 4-digit blocks as actual ID to have a big enough number of possibilities to prevent brute force attacks
+			uuidString = std::string((char*)uuidStringOutput).substr(9, 19);
 			RpcStringFreeA(&uuidStringOutput);
 		}
 		while (accountByAccountUid.contains(uuidString) && attempts++ < 10);

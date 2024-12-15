@@ -696,6 +696,12 @@ namespace GroupReputation
     void CleanDestroyedShipRegistry();
 }
 
+namespace Storage
+{
+    void InitializeStorageSystem();
+    bool UserCmd_Storage(const uint clientId, const std::wstring& arguments);
+}
+
 //namespace SrvCtrlObj {
 namespace SrvCtrlObj {
 

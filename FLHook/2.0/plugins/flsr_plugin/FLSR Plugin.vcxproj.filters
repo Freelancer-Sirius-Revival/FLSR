@@ -80,10 +80,13 @@
     <ClCompile Include="Crafting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="iff.cpp">
+    <ClCompile Include="IFF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LootBoxes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Storage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

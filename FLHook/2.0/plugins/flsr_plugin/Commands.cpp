@@ -731,7 +731,7 @@ namespace Commands {
         {L"/hostile", IFF::UserCmd_Hostile},
         {L"/neutral", IFF::UserCmd_Neutral},
         {L"/friend", IFF::UserCmd_Allied},
-        {L"/iff", IFF::UserCmd_Attitude}
+        {L"/iff", IFF::UserCmd_Attitude},
     };
 
     // User command processing

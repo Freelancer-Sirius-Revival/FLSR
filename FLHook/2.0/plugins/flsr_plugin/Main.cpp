@@ -301,8 +301,12 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::UserCmd_Craft, PLUGIN_UserCmd_Process, 0));
+
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LootBoxes::UserCmd_Open, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LootBoxes::ReadInitialData, PLUGIN_HkTimerCheckKick, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Storage::InitializeStorageSystem, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Storage::UserCmd_Storage, PLUGIN_UserCmd_Process, 0));
 
     return p_PI;
 }

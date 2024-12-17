@@ -198,7 +198,7 @@ void BaseInvincibility()
         if (solar->get_id() == nameId)
         {
             ConPrint(L"Found ew01_base_wardens01\n");
-            pub::SpaceObj::SetInvincible(solar->iID, true, false, 0);
+            pub::SpaceObj::SetInvincible(solar->iID, true, true, 0);
             ConPrint(L"Set ew01_base_wardens01 invincible for NPCs.\n");
             break;
         }

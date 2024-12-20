@@ -81,6 +81,7 @@ house = 0, cl_07_grp
 house = 0, cl_08_grp
 house = 0, cl_09_grp
 house = 0, fc_fl_grp
+house = -0.8, fc_ww_grp
 
 ;Li01
 visit = 2208796239,1

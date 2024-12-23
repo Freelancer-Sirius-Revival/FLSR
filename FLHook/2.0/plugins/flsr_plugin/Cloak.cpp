@@ -25,6 +25,10 @@
  * [CloakActivators]
  * activator_nickname = 
  * 
+ * [NoCloakAreas]
+ * position = systemNickname, x, y, z, radius, voice_message
+ * object = nickname, radius, voice_message
+ * 
  * 
  * General Functionality:
  * 
@@ -74,8 +78,6 @@ namespace Cloak
 {
 	const uint FIRE_DRY_ID = CreateID("fire_dry");
 	const uint WARNING_NN_ID = pub::GetNicknameId("warning");
-	const uint JUMP_GATE_NN_ID = pub::GetNicknameId("object_jump_gate");
-	const uint JUMP_HOLE_NN_ID = pub::GetNicknameId("object_jump_hole");
 	const uint SHIELD_SLOT_ID = 65521;
 	// The main update loop's interval.
 	const uint TIMER_INTERVAL = 100;
@@ -102,13 +104,6 @@ namespace Cloak
 		std::string cloakingDeviceHardpoint = "";
 	};
 
-	enum class NoCloakZone
-	{
-		None,
-		JumpGate,
-		JumpHole
-	};
-
 	struct ClientCloakStats
 	{
 		uint shipId = 0;
@@ -128,7 +123,8 @@ namespace Cloak
 		mstime uncloakTimeStamp = 0;
 		mstime lastDrySoundTimeStamp = 0;
 		mstime lastNeuralNetSoundTimeStamp = 0;
-		NoCloakZone insideNoCloakZoneOfType = NoCloakZone::None;
+		boolean insideNoCloakArea = false;
+		uint currentNoCloakAreaNNVoiceMessageId = 0;
 		bool dockingManeuverActive = false;
 		ShipEffectDefinition* effectsDefinition = 0;
 	};
@@ -151,20 +147,24 @@ namespace Cloak
 		Destroyed,
 		Power,
 		Docking,
-		JumpGate,
-		JumpHole,
-		Anomaly,
+		NoCloakArea,
 		Disrupted
 	};
 
 	static std::set<uint> cloakActivatorArchetypeIds;
 	static std::vector<ShipEffectDefinition> shipEffects;
 	static std::unordered_map<uint, ClientCloakStats> clientCloakStats;
-
-	static std::unordered_map<uint, std::vector<Vector>> jumpGatePositionsPerSystem;
-	static std::unordered_map<uint, std::vector<Vector>> jumpHolePositionsPerSystem;
-
 	static std::unordered_map<uint, UncloakReason> clientIdsRequestingUncloak;
+
+	struct NoCloakArea
+	{
+		uint objectId = 0;
+		Vector position;
+		float radius;
+		uint NNVoiceMessageId;
+	};
+	static std::unordered_map<uint, std::vector<NoCloakArea>> noCloakAreasPerSystem;
+	static std::vector<NoCloakArea> unprocessedObjectNoCloakAreas;
 
 	bool IsValidCloakableClient(const uint clientId)
 	{
@@ -182,29 +182,47 @@ namespace Cloak
 		return IsValidCloakableClient(clientId) && clientCloakStats[clientId].cloakState == CloakState::Uncloaked;
 	}
 
-	void CollectAllJumpSolarsPerSystem()
+	void CollectNoCloakObjectsPerSystem()
 	{
+		const uint JUMP_GATE_NN_ID = pub::GetNicknameId("object_jump_gate");
+		const uint JUMP_HOLE_NN_ID = pub::GetNicknameId("object_jump_hole");
 		CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
 		while (solar != NULL)
 		{
+			for (NoCloakArea& objectArea : unprocessedObjectNoCloakAreas)
+			{
+				if (objectArea.objectId == solar->iID)
+				{
+					objectArea.position = solar->get_position();
+					noCloakAreasPerSystem[solar->iSystem].push_back(objectArea);
+				}
+			}
+
+			// Jump Gates and Jump Holes are automatically added to the No Cloak Area list.
+			// Jump objects with Parent are ignored. It is assumed those are special objects not meant to be used by players.
 			uint type;
 			pub::SpaceObj::GetType(solar->iID, type);
 			if (type == OBJ_JUMP_GATE && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
-				Vector position;
-				Matrix orientation;
-				pub::SpaceObj::GetLocation(solar->iID, position, orientation);
-				jumpGatePositionsPerSystem[solar->iSystem].push_back(position);
+				NoCloakArea area;
+				area.objectId = solar->iID;
+				area.position = solar->get_position();
+				area.radius = jumpGateDecloakRadius;
+				area.NNVoiceMessageId = JUMP_GATE_NN_ID;
+				noCloakAreasPerSystem[solar->iSystem].push_back(area);
 			}
 			else if (type == OBJ_JUMP_HOLE && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
-				Vector position;
-				Matrix orientation;
-				pub::SpaceObj::GetLocation(solar->iID, position, orientation);
-				jumpHolePositionsPerSystem[solar->iSystem].push_back(position);
+				NoCloakArea area;
+				area.objectId = solar->iID;
+				area.position = solar->get_position();
+				area.radius = jumpHoleDecloakRadius;
+				area.NNVoiceMessageId = JUMP_HOLE_NN_ID;
+				noCloakAreasPerSystem[solar->iSystem].push_back(area);
 			}
 			solar = static_cast<CSolar*>(solar->FindNext());
 		}
+		unprocessedObjectNoCloakAreas.clear();
 	}
 
 	void ClearClientData(const uint clientId)
@@ -268,6 +286,36 @@ namespace Cloak
 							cloakActivatorArchetypeIds.insert(CreateID(ini.get_value_string(0)));
 					}
 				}
+				
+				if (ini.is_header("NoCloakAreas"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("position"))
+						{
+							const uint systemId = CreateID(ini.get_value_string(0));
+							NoCloakArea area;
+							area.position.x = ini.get_value_float(1);
+							area.position.y = ini.get_value_float(2);
+							area.position.z = ini.get_value_float(3);
+							area.radius = ini.get_value_float(4);
+							area.NNVoiceMessageId = CreateID(ini.get_value_string(5));
+							noCloakAreasPerSystem[systemId].push_back(area);
+						}
+
+						if (ini.is_value("object"))
+						{
+							NoCloakArea area;
+							area.objectId = CreateID(ini.get_value_string(0));
+							area.position.x = 0;
+							area.position.y = 0;
+							area.position.z = 0;
+							area.radius = ini.get_value_float(1);
+							area.NNVoiceMessageId = CreateID(ini.get_value_string(2));
+							unprocessedObjectNoCloakAreas.push_back(area);
+						}
+					}
+				}
 			}
 			ini.close();
 		}
@@ -292,7 +340,7 @@ namespace Cloak
 			shipEffect.uncloakDuration = archetype->fCloakoutTime * 1000 + cloakTransitionProlongation;
 		}
 
-		CollectAllJumpSolarsPerSystem();
+		CollectNoCloakObjectsPerSystem();
 	}
 
 	std::list<CARGO_INFO> GetClientCargoList(uint clientId)
@@ -614,19 +662,11 @@ namespace Cloak
 			result = CloakReturnState::DockSequence;
 			PlayDrySound(clientId);
 		}
-		else if (clientCloakStats[clientId].insideNoCloakZoneOfType != NoCloakZone::None)
+		else if (clientCloakStats[clientId].insideNoCloakArea)
 		{
 			result = CloakReturnState::Blocked;
-			switch (clientCloakStats[clientId].insideNoCloakZoneOfType)
-			{
-				case NoCloakZone::JumpGate:
-					PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_GATE_NN_ID });
-					break;
-
-				case NoCloakZone::JumpHole:
-					PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_HOLE_NN_ID });
-					break;
-			}
+			if (clientCloakStats[clientId].currentNoCloakAreaNNVoiceMessageId)
+				PlayNeuralNetVoice(clientId, { WARNING_NN_ID, clientCloakStats[clientId].currentNoCloakAreaNNVoiceMessageId });
 			PlayDrySound(clientId);
 		}
 		else if (timeInMS() - clientCloakStats[clientId].uncloakTimeStamp < clientCloakStats[clientId].effectsDefinition->uncloakDuration)
@@ -670,19 +710,8 @@ namespace Cloak
 			if (clientCloakStats[clientId].initialUncloakCompleted)
 			{
 				StartFuse(clientId, clientCloakStats[clientId].effectsDefinition->uncloakFuseId);
-				switch (reason)
-				{
-					case UncloakReason::JumpGate:
-						PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_GATE_NN_ID });
-						break;
-
-					case UncloakReason::JumpHole:
-						PlayNeuralNetVoice(clientId, { WARNING_NN_ID, JUMP_HOLE_NN_ID });
-						break;
-
-					default:
-						break;
-				}
+				if (reason == UncloakReason::NoCloakArea && clientCloakStats[clientId].currentNoCloakAreaNNVoiceMessageId)
+					PlayNeuralNetVoice(clientId, { WARNING_NN_ID, clientCloakStats[clientId].currentNoCloakAreaNNVoiceMessageId });
 			}
 			clientCloakStats[clientId].uncloakTimeStamp = timeInMS();
 			clientCloakStats[clientId].cloakState = CloakState::Uncloaking;
@@ -725,41 +754,31 @@ namespace Cloak
 		return true;
 	}
 
-	void CheckPlayerInNoCloakZones(const uint clientId, const uint clientSystemId, const uint clientShipId)
+	void CheckPlayerInNoCloakArea(const uint clientId, const uint clientSystemId, const uint clientShipId)
 	{
-		NoCloakZone insideNoCloakZone = NoCloakZone::None;
+		boolean insideNoCloakArea = false;
+		uint noCloakAreaNNVoiceMessageId = 0;
 		UncloakReason uncloakReason;
 		Vector shipPosition;
 		Matrix shipOrientation;
 		pub::SpaceObj::GetLocation(clientShipId, shipPosition, shipOrientation);
-		if (jumpGatePositionsPerSystem.contains(clientSystemId))
+		if (noCloakAreasPerSystem.contains(clientSystemId))
 		{
-			for (const Vector& jumpGatePosition : jumpGatePositionsPerSystem[clientSystemId])
+			for (const NoCloakArea& area : noCloakAreasPerSystem[clientSystemId])
 			{
-				if (HkDistance3D(jumpGatePosition, shipPosition) < jumpGateDecloakRadius)
+				if (HkDistance3D(area.position, shipPosition) <= area.radius)
 				{
-					insideNoCloakZone = NoCloakZone::JumpGate;
-					uncloakReason = UncloakReason::JumpGate;
+					insideNoCloakArea = true;
+					noCloakAreaNNVoiceMessageId = area.NNVoiceMessageId;
+					uncloakReason = UncloakReason::NoCloakArea;
 					break;
 				}
 			}
 		}
-		if (insideNoCloakZone == NoCloakZone::None && jumpHolePositionsPerSystem.contains(clientSystemId))
-		{
-			for (const Vector& jumpHolePosition : jumpHolePositionsPerSystem[clientSystemId])
-			{
-				if (HkDistance3D(jumpHolePosition, shipPosition) < jumpHoleDecloakRadius)
-				{
-					insideNoCloakZone = NoCloakZone::JumpHole;
-					uncloakReason = UncloakReason::JumpHole;
-					break;
-				}
-			}
-		}
-
-		clientCloakStats[clientId].insideNoCloakZoneOfType = insideNoCloakZone;
+		clientCloakStats[clientId].insideNoCloakArea = insideNoCloakArea;
+		clientCloakStats[clientId].currentNoCloakAreaNNVoiceMessageId = noCloakAreaNNVoiceMessageId;
 		const CloakState cloakState = clientCloakStats[clientId].cloakState;
-		if (insideNoCloakZone != NoCloakZone::None && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
+		if (insideNoCloakArea && (cloakState == CloakState::Cloaked || cloakState == CloakState::Cloaking))
 			QueueUncloak(clientId, uncloakReason);
 	}
 
@@ -840,7 +859,7 @@ namespace Cloak
 			SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
 
 			// Uncloak player in no-cloak-zones
-			CheckPlayerInNoCloakZones(clientId, playerData->iSystemID, playerData->iShipID);
+			CheckPlayerInNoCloakArea(clientId, playerData->iSystemID, playerData->iShipID);
 
 			// Cloak state update when effect time has passed
 			// This also sets the initial uncloaked flag.

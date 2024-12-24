@@ -380,8 +380,8 @@ namespace Docking
         while (solar = static_cast<CSolar*>(solar->FindNext()))
         {
             uint type;
-            pub::SpaceObj::GetType(solar->iID, type);
-            if (type == OBJ_JUMP_HOLE)
+            pub::SpaceObj::GetType(solar->id, type);
+            if (type == ObjectType::JumpHole)
                 jumpObjects.push_back(solar);
         }
 
@@ -394,7 +394,7 @@ namespace Docking
                 {
                     if (jumpObject->iSystem == systemPath.second[index - 1] && jumpObject->get_dest_system() == systemPath.second[index])
                     {
-                        foundJumpObjectIds.push_back(jumpObject->iID);
+                        foundJumpObjectIds.push_back(jumpObject->id);
                         break;
                     }
                 }
@@ -837,7 +837,7 @@ namespace Docking
             {
                 uint dockTargetType;
                 pub::SpaceObj::GetType(dockTargetId, dockTargetType);
-                if (dockTargetType == OBJ_JUMP_HOLE || dockTargetType == OBJ_JUMP_GATE)
+                if (dockTargetType == ObjectType::JumpHole || dockTargetType == ObjectType::JumpGate)
                     carrierClientIdInJump.insert(clientId);
                 
                 return 0;

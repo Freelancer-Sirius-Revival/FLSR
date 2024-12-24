@@ -419,7 +419,10 @@ namespace IFF
     void UserCmd_Allied(const uint clientId, const std::wstring& arguments);
     void UserCmd_Attitude(const uint clientId, const std::wstring& arguments);
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
-    void __stdcall HkCb_AddDmgEntry(DamageList* damageList, unsigned short subObjectId, float hitpoints, DamageEntry::SubObjFate fate);
+    void __stdcall ShipEquipDamage(const IObjRW* damagedObject, const CEquip* hitEquip, const float& incomingDamage, const DamageList* damageList);
+    void __stdcall ShipShieldDamage(const IObjRW* damagedObject, const CEShield* hitShield, const float& incomingDamage, const DamageList* damageList);
+    void __stdcall ShipColGrpDamage(const IObjRW* damagedObject, const CArchGroup* hitColGrp, const float& incomingDamage, const DamageList* damageList);
+    void __stdcall ShipHullDamage(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList);
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
@@ -451,7 +454,7 @@ namespace Cloak
     void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
     void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
-    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
+    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
     void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise);
     void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
     void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);
@@ -485,7 +488,8 @@ namespace Mark
     void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
-    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
+    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
+    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
@@ -691,9 +695,8 @@ namespace SpawnProtection
 namespace GroupReputation
 {
     void InitializeWithGameData();
-    void BaseDestroyed(uint objectId, uint clientId);
-    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed);
-    void CleanDestroyedShipRegistry();
+    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
+    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
 }
 
 namespace Storage

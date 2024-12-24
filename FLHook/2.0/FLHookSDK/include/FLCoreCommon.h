@@ -14,41 +14,92 @@
 #define _FLCORECOMMON_H_
 
 #include "FLCoreDefs.h"
-#include <apiquery2.h>
+#include <string>
+#include <list>
+#include <vector>
+#include <map>
+#include "flmap.h"
+
+#define ST6_ALLOCATION_DEFINED
+#include "st6.h"
 
 #pragma comment( lib, "FLCoreCommon.lib" )
 
-// space object types
-#define OBJ_NONE				   0
-#define OBJ_MOON				(1 << 0)
-#define OBJ_PLANET				(1 << 1)
-#define OBJ_SUN					(1 << 2)
-#define OBJ_BLACKHOLE			(1 << 3)
-#define OBJ_SATELLITE			(1 << 4)
-#define OBJ_DOCKING_RING		(1 << 5)
-#define OBJ_JUMP_GATE			(1 << 6)
-#define OBJ_TRADELANE_RING		(1 << 7)
-#define OBJ_STATION				(1 << 8)
-#define OBJ_WAYPOINT			(1 << 9)
-#define OBJ_AIRLOCK_GATE		(1 << 10)
-#define OBJ_JUMP_HOLE			(1 << 11)
-#define OBJ_WEAPONS_PLATFORM	(1 << 12)
-#define OBJ_DESTROYABLE_DEPOT	(1 << 13)
-#define OBJ_NON_TARGETABLE		(1 << 14)
-#define OBJ_MISSION_SATELLITE	(1 << 15)
-#define OBJ_FIGHTER				(1 << 16)
-#define OBJ_FREIGHTER			(1 << 17)
-#define OBJ_GUNBOAT				(1 << 18)
-#define OBJ_CRUISER				(1 << 19)
-#define OBJ_TRANSPORT			(1 << 20)
-#define OBJ_CAPITAL				(1 << 21)
-#define OBJ_MINING				(1 << 22)
-#define OBJ_GUIDED				(1 << 24)
-#define OBJ_BULLET				(1 << 25)
-#define OBJ_MINE				(1 << 26)
-#define OBJ_LOOT				(1 << 28)
-#define OBJ_ASTEROID			(1 << 29)
+enum ObjectType : uint
+{
+	None = 0,
+	Moon = 1 << 0,
+	Planet = 1 << 1,
+	Sun = 1 << 2,
+	BlackHole = 1 << 3,
+	Satellite = 1 << 4,
+	DockingRing = 1 << 5,
+	JumpGate = 1 << 6,
+	TradelaneRing = 1 << 7,
+	Station = 1 << 8,
+	WayPoint = 1 << 9,
+	AirlockGate = 1 << 10,
+	JumpHole = 1 << 11,
+	WeaponPlatform = 1 << 12,
+	DestructibleDepot = 1 << 13,
+	NonTargetable = 1 << 14,
+	MissionSatellite = 1 << 15,
+	Fighter = 1 << 16,
+	Freighter = 1 << 17,
+	Gunboat = 1 << 18,
+	Cruiser = 1 << 19,
+	Transport = 1 << 20,
+	Capital = 1 << 21,
+	Mining = 1 << 22,
+	Guided = 1 << 24,
+	Bullet = 1 << 25,
+	Mine = 1 << 26,
+	Loot = 1 << 28,
+	Asteroid = 1 << 29,
+};
 
+enum EquipmentClass : uint
+{
+	LightEquip = 1 << 0,
+	AttachedFx = 1 << 1, // contrails
+	MineLauncher = 1 << 5,
+	CM = 1 << 6,
+	Gun = 1 << 7,
+	Shield = 1 << 8,
+	ShieldGenerator = 1 << 9,
+	Thruster = 1 << 10,
+	CargoPod = 1 << 11,
+	CloakingDevice = 1 << 12,
+	Cargo = 1 << 16, // commodities, ammo
+	Engine = 1 << 17,
+	Power = 1 << 18,
+	Scanner = 1 << 19,
+	TractorBeam = 1 << 20,
+	RepairDroid = 1 << 21,
+	InternalFX = 1 << 22,
+	TradeLaneEquip = 1 << 23,
+	Armor = 1 << 24,
+	ExternalEquipment = MineLauncher | CM | Gun | ShieldGenerator | Thruster | CargoPod | CloakingDevice,
+	InternalEquipment = Engine | Power | Scanner | TractorBeam | RepairDroid | InternalFX | TradeLaneEquip | Armor,
+};
+
+enum BayState : uint
+{
+	Closed,
+	Closing,
+	Open,
+	Opening
+};
+
+struct Costume
+{
+	uint head = 0;
+	uint body = 0;
+	uint leftHand = 0;
+	uint rightHand = 0;
+	uint accessory[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	int accessories = 0;
+};
 
 struct IMPORT CacheString
 {
@@ -1156,18 +1207,30 @@ public:
 	unsigned char data[OBJECT_DATA_SIZE];
 };
 
-struct IMPORT BaseWatcher
+struct IMPORT Watchable
 {
-	BaseWatcher(void);
-	~BaseWatcher(void);
-	struct BaseWatcher & operator=(struct BaseWatcher const &);
-	void set(struct Watchable const *);
-
-protected:
-	void set_pointer(struct Watchable const *);
+	Watchable();
+	~Watchable();
+	Watchable& operator=(const Watchable&);
+	unsigned int unwatch();
 
 public:
-	unsigned char data[OBJECT_DATA_SIZE];
+	struct BaseWatcher* newestBaseWatcher; // The last basewatcher set to watch this
+};
+
+struct IMPORT BaseWatcher
+{
+	BaseWatcher();
+	~BaseWatcher();
+	BaseWatcher& operator=(const BaseWatcher&);
+	void set(const struct Watchable*);
+
+protected:
+	void set_pointer(const Watchable*);
+
+public:
+	struct Watchable* watchable;
+	BaseWatcher* nextBaseWatcher;
 };
 
 namespace BehaviorTypes
@@ -1219,8 +1282,8 @@ public:
 	SubObjFate fate;
 };
 
-enum DamageCause;
-/*
+enum class DamageCause
+{
 	Unknown = 0x0,
 	Collision = 0x1,
 	Gun = 0x2,
@@ -1228,88 +1291,98 @@ enum DamageCause;
 	CruiseDisrupter = 0x6,
 	Mine = 0x7,
 	Suicide = 0x8,
-	DummyDisrupter = 0xC0, // Defined by Hook's feature to not let disruptors enable engine kill.
+	DummyDisrupter = 0xC0,
 	UnkDisrupter = 0x15,
 	Admin = 0x18
-*/
+};
 
 struct IMPORT DamageList
 {
 
-	DamageList(struct DamageList const &);
+	DamageList(struct DamageList const&);
 	DamageList(void);
 	~DamageList(void);
-	struct DamageList & operator=(struct DamageList const &);
-	static char const *  DmgCauseToString(enum DamageCause);
-	void add_damage_entry(unsigned short,float,enum DamageEntry::SubObjFate);
-	enum DamageCause  get_cause(void)const ;
-	float get_hit_pts_left(unsigned short)const ;
-	unsigned int get_inflictor_id(void)const ;
-	unsigned int get_inflictor_owner_player(void)const ;
-	bool is_destroyed(void)const ;
-	bool is_inflictor_a_player(void)const ;
+	struct DamageList& operator=(struct DamageList const&);
+	static char const* DmgCauseToString(enum DamageCause);
+	void add_damage_entry(unsigned short, float, enum DamageEntry::SubObjFate);
+	enum DamageCause  get_cause(void)const;
+	float get_hit_pts_left(unsigned short)const;
+	unsigned int get_inflictor_id(void)const;
+	unsigned int get_inflictor_owner_player(void)const;
+	bool is_destroyed(void)const;
+	bool is_inflictor_a_player(void)const;
 	void set_cause(enum DamageCause);
 	void set_destroyed(bool);
 	void set_inflictor_id(unsigned int);
 	void set_inflictor_owner_player(unsigned int);
 
 public:
-	uint iDunno1; // 0
 	st6::list<DamageEntry> damageentries; // 4
 	bool bDestroyed; // 12
-	uint iDunno2; // 16
+	DamageCause damageCause; // 16
 	uint iInflictorID; // 20
 	uint iInflictorPlayerID; // 24
+	bool unk;
 };
 
 class IMPORT CArchGroup
 {
 public:
-	CArchGroup(struct Archetype::CollisionGroup const &,struct CEqObj * const);
+	CArchGroup(struct Archetype::CollisionGroup const&, struct CEqObj* const);
 	~CArchGroup(void);
-	struct ID_String const & DebrisTypeName(void)const ;
-	bool DestroysParent(void)const ;
-	float ExplosionGroupImpulse(void)const ;
-	float ExplosionParentImpulse(void)const ;
-	float ExplosionResistance(void)const ;
-	struct ID_String const & ExplosionTypeName(void)const ;
-	class Archetype::FuseIgnitionList const & FuseIgnitions(void)const ;
-	bool GetCenterOfMass(class Vector &)const ;
-	void GetCollisionGroupDesc(struct CollisionGroupDesc &)const ;
-	unsigned int GetCollisionGroupType(void)const ;
-	enum DamageEntry::SubObjFate  GetFate(void)const ;
-	float GetHitPoints(void)const ;
-	unsigned short GetID(void)const ;
-	float GetMaxHitPoints(void)const ;
-	bool GetRadius(float &)const ;
-	float GetRelativeHealth(void)const ;
-	long GetRootIndex(void)const ;
-	bool GetVelocity(class Vector &)const ;
-	class Archetype::DamageObjInfoList const & GroupDamageObjs(void)const ;
-	int InstDepthInGroup(long)const ;
-	bool IsDead(void)const ;
-	bool IsDestroyed(void)const ;
-	bool IsInstInGroup(long)const ;
-	bool IsRootHealthProxy(void)const ;
+	struct ID_String const& DebrisTypeName(void)const;
+	bool DestroysParent(void)const;
+	float ExplosionGroupImpulse(void)const;
+	float ExplosionParentImpulse(void)const;
+	float ExplosionResistance(void)const;
+	struct ID_String const& ExplosionTypeName(void)const;
+	class Archetype::FuseIgnitionList const& FuseIgnitions(void)const;
+	bool GetCenterOfMass(class Vector&)const;
+	void GetCollisionGroupDesc(struct CollisionGroupDesc&)const;
+	unsigned int GetCollisionGroupType(void)const;
+	enum DamageEntry::SubObjFate  GetFate(void)const;
+	float GetHitPoints(void)const;
+	unsigned short GetID(void)const;
+	float GetMaxHitPoints(void)const;
+	bool GetRadius(float&)const;
+	float GetRelativeHealth(void)const;
+	long GetRootIndex(void)const;
+	bool GetVelocity(class Vector&)const;
+	class Archetype::DamageObjInfoList const& GroupDamageObjs(void)const;
+	int InstDepthInGroup(long)const;
+	bool IsDead(void)const;
+	bool IsDestroyed(void)const;
+	bool IsInstInGroup(long)const;
+	bool IsRootHealthProxy(void)const;
 	void Kill(enum DamageEntry::SubObjFate);
-	float LinkedEquipmentDamage(void)const ;
-	unsigned int LinkedEquipmentType(void)const ;
-	struct CacheString const & Name(void)const ;
-	class Archetype::DamageObjInfoList const & ParentDamageObjs(void)const ;
-	struct CObject * RetreiveDestroyedObj(void);
-	bool Separable(void)const ;
+	float LinkedEquipmentDamage(void)const;
+	unsigned int LinkedEquipmentType(void)const;
+	struct CacheString const& Name(void)const;
+	class Archetype::DamageObjInfoList const& ParentDamageObjs(void)const;
+	struct CObject* RetreiveDestroyedObj(void);
+	bool Separable(void)const;
 	void SetHitPoints(float);
 	void SetRelativeHealth(float);
 
 protected:
-	void AttachDamageObjs(struct CObject *,class Archetype::DamageObjInfoList const &)const ;
+	void AttachDamageObjs(struct CObject*, class Archetype::DamageObjInfoList const&)const;
 	void Destroy(void);
 	void FreeDamageObjs(void);
-	void GetBoundingSphere(float &,class Vector &)const ;
+	void GetBoundingSphere(float&, class Vector&)const;
 	void LoadDamageObjs(void);
 
 public:
-	unsigned char data[OBJECT_DATA_SIZE];
+	/* 0  */ CEqObj* owner;
+	/* 1  */ Archetype::CollisionGroup* colGrp;
+	/* 2  */ int rootIndex;
+	/* 3  */ float hitPts;
+	/* 4  */ uint dunno;
+	/* 5  */ uint state;
+	/* 6  */ DamageEntry::SubObjFate fate;
+	/* 7  */ CObject* destroyedObj;
+	/* 8  */ bool boundingSphereInitialized;
+	/* 9  */ float boundingSphereRadius;
+	/* 10 */ Vector boundingSphere;
 };
 
 class IMPORT CArchGroupManager
@@ -1940,17 +2013,17 @@ struct IMPORT CBase
 {
 	virtual ~CBase(void);
 
-	CBase(struct CBase const &);
+	CBase(struct CBase const&);
 	CBase(void);
-	struct CBase & operator=(struct CBase const &);
+	struct CBase& operator=(struct CBase const&);
 	void advise(bool);
-	void cobject(struct CObject *);
-	struct CObject * cobject(void)const ;
-	long get_index(void)const ;
-	void notify_of_destruction(void *);
+	//void cobject(struct CObject *);
+	//struct CObject * cobject(void)const;
+	long get_index(void)const;
+	void notify_of_destruction(void*);
 
 public:
-	unsigned char data[OBJECT_DATA_SIZE];
+	struct CSimple* cobj;
 };
 
 struct IMPORT CObject : public EngineObject
@@ -2055,53 +2128,55 @@ public:
 	struct IMPORT CreateParms
 	{
 		CreateParms(void);
-		struct CreateParms & operator=(struct CreateParms const &);
+		struct CreateParms& operator=(struct CreateParms const&);
 
 	public:
-		unsigned char data[OBJECT_DATA_SIZE];
+		uint id;
+		struct StarSystem* starSystem;
+		uint ownerPlayer;
+		float hitpts;
+		uint dunno[20];
 	};
 
 	virtual ~CSimple(void);
-	virtual void open(struct Archetype::Root *);
-	virtual float get_physical_radius_r(class Vector &)const ;
+	virtual void open(struct Archetype::Root*);
+	virtual float get_physical_radius_r(class Vector&)const;
 	virtual void unmake_physical(void);
-	virtual void beam_object(class Vector const &,class Matrix const &,bool);
-	virtual void init(struct CSimple::CreateParms const &);
+	virtual void beam_object(class Vector const&, class Matrix const&, bool);
+	virtual void init(struct CSimple::CreateParms const&);
 	virtual void cache_physical_props(void);
-	virtual unsigned int get_name(void)const ;
-	virtual bool is_targetable(void)const ;
-	virtual void connect(struct IObjDB *);
-	virtual void disconnect(struct IObjDB *);
+	virtual unsigned int get_name(void)const;
+	virtual bool is_targetable(void)const;
+	virtual void connect(struct IObjDB*);
+	virtual void disconnect(struct IObjDB*);
 	virtual void set_hit_pts(float);
-	virtual void init_physics(class Vector const &,class Vector const &);
+	virtual void init_physics(class Vector const&, class Vector const&);
 
-	CSimple(struct CSimple const &);
+	CSimple(struct CSimple const&);
 	CSimple(enum CObject::Class);
-	unsigned int GetOwnerPlayer(void)const ;
+	unsigned int GetOwnerPlayer(void)const;
 	void SetOwnerPlayer(unsigned int);
-	float get_hit_pts(void)const ;
-	unsigned int const & get_id(void)const ;
-	float get_max_hit_pts(void)const ;
-	struct IObjDB * get_object_database(void)const ;
-	float get_relative_health(void)const ;
-	float get_scanner_interference(void)const ;
-	unsigned int get_type(void)const ;
-	void update_zones(float,unsigned int);
+	float get_hit_pts(void)const;
+	unsigned int const& get_id(void)const;
+	float get_max_hit_pts(void)const;
+	struct IObjDB* get_object_database(void)const;
+	float get_relative_health(void)const;
+	float get_scanner_interference(void)const;
+	unsigned int get_type(void)const;
+	void update_zones(float, unsigned int);
 
-	uint iDunnoCSimple1[0xB];
-	Archetype::Root* archetype; // 0x88
-	uint iDunnoCSimple2[0x5];
-	uint iDunnoTargetable; // 0xA0
-	uint iDunnoScanner; // 0xA4
-	uint iDunnoCSimple3; // 0xA8
-	IObjDB* objDB; // 0xAC
-	uint iID; // 0xB0
-	uint iOwnerPlayer; // 0xB4
-	float fHitPoints; // 0xB8
-	uint iDunnoCSimple4[0x5];
-	Vector vRadiusCenter; // 0xD0
-	float fRadiusCentered; // 0xDC
-	uint iType; // 0xE0
+	uint dunnoCSimple;       // 39
+	uint dunnoTargetable;    // 40
+	Universe::IZone* currentDamageZone;// 41
+	float zoneDmgMultiplier; // 42
+	struct StarSystem* starSystem;  // 43
+	uint id;                 // 44
+	uint ownerPlayer;        // 45
+	float hitPoints;         // 46
+	uint dunnoCSimple4[0x5]; // 47
+	Vector radiusCenter;     // 52
+	float radiusCentered;    // 55
+	ObjectType type;         // 56
 };
 
 struct IMPORT CAsteroid : public CSimple
@@ -2883,104 +2958,117 @@ public:
 	struct IMPORT CreateParms
 	{
 		CreateParms(void);
-		struct CreateParms & operator=(struct CreateParms const &);
+		struct CreateParms& operator=(struct CreateParms const&);
 
 	public:
 		unsigned char data[OBJECT_DATA_SIZE];
 	};
 
 	virtual ~CEqObj(void);
-	virtual int update(float,unsigned int);
+	virtual int update(float, unsigned int);
 	virtual void disable_controllers(void);
 	virtual void enable_controllers(void);
 	virtual void unmake_physical(void);
-	virtual void remake_physical(struct PhySys::CreateParms const &,float);
-	virtual unsigned int get_name(void)const ;
-	virtual bool is_targetable(void)const ;
-	virtual void init(CEqObj::CreateParms const &);
-	virtual void load_equip_and_cargo(struct EquipDescVector const &,bool);
+	virtual void remake_physical(struct PhySys::CreateParms const&, float);
+	virtual unsigned int get_name(void)const;
+	virtual bool is_targetable(void)const;
+	virtual void init(CEqObj::CreateParms const&);
+	virtual void load_equip_and_cargo(struct EquipDescVector const&, bool);
 	virtual void clear_equip_and_cargo(void);
-	virtual void get_equip_desc_list(struct EquipDescVector &)const ;
-	virtual bool add_item(struct EquipDesc const &);
-	virtual enum ObjActivateResult  activate(bool,unsigned int);
-	virtual bool get_activate_state(class st6::vector<bool,class st6::allocator<bool> > &);
-	virtual void disconnect(struct IObjDB *);
-	virtual void disconnect(struct INotify *);
-	virtual void disconnect(struct IObjRW *);
-	virtual void connect(struct IObjDB *);
-	virtual void connect(struct INotify *);
-	virtual void notify(enum INotify::Event,void *);
+	virtual void get_equip_desc_list(struct EquipDescVector&)const;
+	virtual bool add_item(struct EquipDesc const&);
+	virtual enum ObjActivateResult  activate(bool, unsigned int);
+	virtual bool get_activate_state(class std::vector<bool, class std::allocator<bool> >&);
+	virtual void disconnect(struct IObjDB*);
+	virtual void disconnect(struct INotify*);
+	virtual void disconnect(struct IObjRW*);
+	virtual void connect(struct IObjDB*);
+	virtual void connect(struct INotify*);
+	virtual void notify(enum INotify::Event, void*);
 	virtual void flush_animations(void);
-	virtual float get_total_hit_pts(void)const ;
-	virtual float get_total_max_hit_pts(void)const ;
-	virtual float get_total_relative_health(void)const ;
-	virtual bool get_sub_obj_velocity(unsigned short,class Vector &)const ;
-	virtual bool get_sub_obj_center_of_mass(unsigned short,class Vector &)const ;
-	virtual bool get_sub_obj_hit_pts(unsigned short,float &)const ;
-	virtual bool set_sub_obj_hit_pts(unsigned short,float);
-	virtual bool get_sub_obj_max_hit_pts(unsigned short,float &)const ;
-	virtual bool get_sub_obj_relative_health(unsigned short,float &)const ;
-	virtual unsigned short inst_to_subobj_id(long)const ;
-	virtual long sub_obj_id_to_inst(unsigned short)const ;
-	virtual void destroy_sub_objs(struct DamageList const &,bool);
-	virtual int enumerate_sub_objs(void)const ;
-	virtual class CEquip * alloc_equip(unsigned short,struct Archetype::Equipment *,bool);
+	virtual float get_total_hit_pts(void)const;
+	virtual float get_total_max_hit_pts(void)const;
+	virtual float get_total_relative_health(void)const;
+	virtual bool get_sub_obj_velocity(unsigned short, class Vector&)const;
+	virtual bool get_sub_obj_center_of_mass(unsigned short, class Vector&)const;
+	virtual bool get_sub_obj_hit_pts(unsigned short, float&)const;
+	virtual bool set_sub_obj_hit_pts(unsigned short, float);
+	virtual bool get_sub_obj_max_hit_pts(unsigned short, float&)const;
+	virtual bool get_sub_obj_relative_health(unsigned short, float&)const;
+	virtual unsigned short inst_to_subobj_id(long)const;
+	virtual long sub_obj_id_to_inst(unsigned short)const;
+	virtual void destroy_sub_objs(struct DamageList const&, bool);
+	virtual int enumerate_sub_objs(void)const;
+	virtual class CEquip* alloc_equip(unsigned short, struct Archetype::Equipment*, bool);
 	virtual void link_shields(void);
 
 	struct IMPORT DockAnimInfo
 	{
 		DockAnimInfo(void);
-		struct DockAnimInfo & operator=(struct DockAnimInfo const &);
+		struct DockAnimInfo& operator=(struct DockAnimInfo const&);
 
 	public:
 		unsigned char data[OBJECT_DATA_SIZE];
 	};
 
-	CEqObj(struct CEqObj const &);
+	CEqObj(struct CEqObj const&);
 	CEqObj(enum CObject::Class);
-	void attaching_damaged_obj(struct CacheString const &);
-	float attitude_towards(struct CEqObj const *)const ;
-	void attitude_towards_symmetrical(float &,struct CEqObj const *,float &)const ;
+	void attaching_damaged_obj(struct CacheString const&);
+	float attitude_towards(struct CEqObj const*)const;
+	void attitude_towards_symmetrical(float&, struct CEqObj const*, float&)const;
 	void clear_arch_groups(void);
-	class IBehaviorManager * create_behavior_interface(struct IObjRW *,int);
-	struct Archetype::EqObj * eqobjarch(void)const ;
-	unsigned int get_base(void)const ;
-	unsigned int get_base_name(void)const ;
-	class IBehaviorManager * get_behavior_interface(void);
-	float get_cloak_percentage(void)const ;
-	void get_collision_group_description(class st6::list<struct CollisionGroupDesc> &)const ;
-	unsigned int const & get_dock_target(void)const ;
-	bool get_explosion_dmg_bounding_sphere(float &,class Vector &)const ;
-	float get_max_power(void)const ;
-	float get_power(void)const ;
-	float get_power_ratio(void)const ;
-	int get_vibe(void)const ;
-	bool is_base(void)const ;
-	int is_cloaked(void)const ;
-	bool is_control_excluded(unsigned int)const ;
-	bool is_damaged_obj_attached(struct CacheString const &)const ;
-	bool is_dock(void)const ;
-	bool launch_pos(class Vector &,class Matrix &,int)const ;
-	void load_arch_groups(class st6::list<struct CollisionGroupDesc> const &);
+	class IBehaviorManager* create_behavior_interface(struct IObjRW*, int);
+	struct Archetype::EqObj* eqobjarch(void)const;
+	unsigned int get_base(void)const;
+	unsigned int get_base_name(void)const;
+	class IBehaviorManager* get_behavior_interface(void);
+	float get_cloak_percentage(void)const;
+	void get_collision_group_description(class std::list<struct CollisionGroupDesc>&)const;
+	unsigned int const& get_dock_target(void)const;
+	bool get_explosion_dmg_bounding_sphere(float&, class Vector&)const;
+	float get_max_power(void)const;
+	float get_power(void)const;
+	float get_power_ratio(void)const;
+	int get_vibe(void)const;
+	bool is_base(void)const;
+	int is_cloaked(void)const;
+	bool is_control_excluded(unsigned int)const;
+	bool is_damaged_obj_attached(struct CacheString const&)const;
+	bool is_dock(void)const;
+	bool launch_pos(class Vector&, class Matrix&, int)const;
+	void load_arch_groups(class std::list<struct CollisionGroupDesc> const&);
 	void set_control_exclusion(unsigned int);
 	void set_power(float);
-	bool sync_cargo(class EquipDescList const &);
-	bool add_cargo_item(struct EquipDesc const &);
-	bool add_equipped_item(struct EquipDesc const &);
-	void compute_explosion_dmg_bounding_sphere(float &,class Vector &)const ;
+	bool sync_cargo(class EquipDescList const&);
+	bool add_cargo_item(struct EquipDesc const&);
+	bool add_equipped_item(struct EquipDesc const&);
+	void compute_explosion_dmg_bounding_sphere(float&, class Vector&)const;
 	void init_docking_points(unsigned int);
 	void update_docking_animations(float);
 
-#ifdef _USE_DEPRECATED_COBJECT_VARIABLES_
-	/* 0x088 */ Archetype::Ship* ship_arch;
-	/* 0x08c */ UINT dunno3[0x16];
-	/* 0x0e0 */ CEquipManager equip_manager; // 180 bytes
-	/* 0x194 */ float  fPower;
-	/* 0x198 */ float  fMaxPower;
-#endif // _USE_DEPRECATED_COBJECT_VARIABLES_
-
 private:
-	void destroy_equipment(DamageList const &, bool);
+	void destroy_equipment(DamageList const&, bool);
+public:
+	CEquipManager equip_manager;                               // 57
+	uint repVibe;                                              // 65
+	Costume commCostume;                                       // 66
+	uint voiceId;                                              // 79
+	float cloakPercentage;                                     // 80
+	CArchGroupManager archGroupManager;                        // 81
+	bool isUndergoingDeathFuse;											   // 87
+	uint dockTargetId;                                         // 88
+	uint dockTargetId2;				                           // 89
+	INotify* notifyPtr;                                        // 90
+	bool boundingExplosionBool;                                // 91
+	float boundingExplosionFloat;                              // 92
+	Vector boundingExplosionVector;                            // 93
+	st6::vector<CEqObj::DockAnimInfo> dockingAnimationsVector; // 96 could be st6::vector<IAnimation2>
+	uint controlExcludedDunno;                                 // 100
+	IBehaviorManager* behaviorManager;                         // 101
+	float power;                                               // 102
+	float maxPower;                                            // 103
+	uint iDunnoEqObj;                                          // 104 0xffffffff for all solars except those docking on lands you on a base, then it's 6?
+
 };
 
 inline CEquipManager* GetEquipManager(CEqObj* ceq)
@@ -3289,134 +3377,170 @@ public:
 	struct IMPORT CreateParms
 	{
 		CreateParms(void);
-		struct CreateParms & operator=(struct CreateParms const &);
+		struct CreateParms& operator=(struct CreateParms const&);
 
 	public:
 		unsigned char data[OBJECT_DATA_SIZE];
 	};
-	
+
 	static float const  JETTISON_CLEARANCE_TIME;
-	
+
 	virtual ~CShip(void);
 
-	virtual void do_simulation_controller(class IVP_Event_Sim *,class IVP_U_Vector<class IVP_Core> *);
+	virtual void do_simulation_controller(class IVP_Event_Sim*, class IVP_U_Vector<class IVP_Core>*);
 
-	virtual int update(float,unsigned int);
+	virtual int update(float, unsigned int);
 	virtual void disable_controllers(void);
 	virtual void enable_controllers(void);
-	virtual unsigned int get_name(void)const ;
-	virtual void init_physics(class Vector const &,class Vector const &);
+	virtual unsigned int get_name(void)const;
+	virtual void init_physics(class Vector const&, class Vector const&);
 	virtual void flush_animations(void);
-	virtual class CEquip * alloc_equip(unsigned short,struct Archetype::Equipment *,bool);
-	virtual void init(struct CShip::CreateParms const &);
+	virtual class CEquip* alloc_equip(unsigned short, struct Archetype::Equipment*, bool);
+	virtual void init(struct CShip::CreateParms const&);
 
-	CShip(struct CShip const &);
+	CShip(struct CShip const&);
 	CShip(void);
-	struct Archetype::Ship const * shiparch(void)const ;
+	struct Archetype::Ship const* shiparch(void)const;
 	void VerifyTarget(void);
-	enum FORMATION_RTYPE  add_follow_follower(struct IObjRW *);
-	enum FORMATION_RTYPE  add_formation_follower(struct IObjRW *);
-	void airlock_in(class Vector const &,class Matrix const &);
-	bool any_thrusters_on(void)const ;
+	enum FORMATION_RTYPE  add_follow_follower(struct IObjRW*);
+	enum FORMATION_RTYPE  add_formation_follower(struct IObjRW*);
+	void airlock_in(class Vector const&, class Matrix const&);
+	bool any_thrusters_on(void)const;
 	bool check_formation_follower_status(float);
 	float close_bay(void);
-	bool generate_follow_offset(struct IObjInspect const *,class Transform &)const ;
-	int get_ammo_capacity_remaining(unsigned int)const ;
-	int get_ammo_capacity_remaining(struct Archetype::Equipment const *)const ;
-	float get_angular_distance_travelled(float,float,float)const ;
-	float get_angular_distance_travelled(float,float,float,float)const ;
-	class Vector  get_angular_drag(void)const ;
-	float get_angular_speed_XY(float,float)const ;
-	float get_angular_speed_Z(float)const ;
-	class Vector const & get_axis_throttle(void)const ;
-	enum BayState  get_bay_state(void)const ;
-	float get_cargo_hold_remaining(void)const ;
-	float get_distance_travelled(float,float,float,enum IObject::ThrustEquipType)const ;
-	bool get_farthest_active_gun_range(float &)const ;
-	struct IObjRW * get_follow_leader(void);
-	class Vector const & get_follow_offset(void);
+	bool generate_follow_offset(struct IObjInspect const*, class Transform&)const;
+	int get_ammo_capacity_remaining(unsigned int)const;
+	int get_ammo_capacity_remaining(struct Archetype::Equipment const*)const;
+	float get_angular_distance_travelled(float, float, float)const;
+	float get_angular_distance_travelled(float, float, float, float)const;
+	class Vector  get_angular_drag(void)const;
+	float get_angular_speed_XY(float, float)const;
+	float get_angular_speed_Z(float)const;
+	class Vector const& get_axis_throttle(void)const;
+	enum BayState  get_bay_state(void)const;
+	float get_cargo_hold_remaining(void)const;
+	float get_distance_travelled(float, float, float, enum IObject::ThrustEquipType)const;
+	bool get_farthest_active_gun_range(float&)const;
+	struct IObjRW* get_follow_leader(void);
+	class Vector const& get_follow_offset(void);
 	int get_formation_follower_count(void);
-	int get_formation_followers(struct IObjRW * * const,unsigned int);
-	unsigned int get_group_name(void)const ;
-	struct ShipGunStats const & get_gun_stats(void)const ;
-	float get_initial_speed_to_coast_distance(float,bool)const ;
-	float get_linear_drag(void)const ;
-	float get_max_bank_angle(void)const ;
-	float get_max_thrust_power(void)const ;
-	class Vector  get_nudge_vec(void)const ;
-	unsigned short const * get_pilot_name(void)const ;
-	float get_projected_axis_throttle_XY(float)const ;
-	float get_projected_axis_throttle_Z(float)const ;
-	float get_projected_throttle(float,enum IObject::ThrustEquipType)const ;
-	long get_renderable_subtarget(void)const ;
-	int get_repair_kit_capacity_remaining(void)const ;
-	int get_shield_battery_capacity_remaining(void)const ;
-	int get_space_for_cargo_type(struct Archetype::Equipment const *)const ;
-	float get_speed(float,enum IObject::ThrustEquipType)const ;
-	int get_status(char *,int)const ;
-	enum StrafeDir  get_strafe_dir(void)const ;
-	unsigned short get_sub_target(void)const ;
-	struct IObjRW * get_target(void)const ;
+	int get_formation_followers(struct IObjRW** const, unsigned int);
+	unsigned int get_group_name(void)const;
+	struct ShipGunStats const& get_gun_stats(void)const;
+	float get_initial_speed_to_coast_distance(float, bool)const;
+	float get_linear_drag(void)const;
+	float get_max_bank_angle(void)const;
+	float get_max_thrust_power(void)const;
+	class Vector  get_nudge_vec(void)const;
+	unsigned short const* get_pilot_name(void)const;
+	float get_projected_axis_throttle_XY(float)const;
+	float get_projected_axis_throttle_Z(float)const;
+	float get_projected_throttle(float, enum IObject::ThrustEquipType)const;
+	long get_renderable_subtarget(void)const;
+	int get_repair_kit_capacity_remaining(void)const;
+	int get_shield_battery_capacity_remaining(void)const;
+	int get_space_for_cargo_type(struct Archetype::Equipment const*)const;
+	float get_speed(float, enum IObject::ThrustEquipType)const;
+	int get_status(char*, int)const;
+	enum StrafeDir  get_strafe_dir(void)const;
+	unsigned short get_sub_target(void)const;
+	struct IObjRW* get_target(void)const;
 	int get_targeted_enemy_count(void);
-	bool get_tgt_lead_fire_pos(class Vector &)const ;
-	bool get_tgt_lead_fire_pos(struct IObjInspect const *,class Vector &)const ;
-	float get_throttle(void)const ;
-	float get_thrust_power(void)const ;
-	float get_thrust_power_ratio(void)const ;
-	float get_time_to_accelerate(float,float,float,enum IObject::ThrustEquipType)const ;
-	float get_time_to_accelerate_angularly(float,float,float)const ;
-	float get_time_to_accelerate_angularly(float,float,float,float)const ;
+	bool get_tgt_lead_fire_pos(class Vector&)const;
+	bool get_tgt_lead_fire_pos(struct IObjInspect const*, class Vector&)const;
+	float get_throttle(void)const;
+	float get_thrust_power(void)const;
+	float get_thrust_power_ratio(void)const;
+	float get_time_to_accelerate(float, float, float, enum IObject::ThrustEquipType)const;
+	float get_time_to_accelerate_angularly(float, float, float)const;
+	float get_time_to_accelerate_angularly(float, float, float, float)const;
 	unsigned int get_tradelane_entrance_ring(void);
 	unsigned int get_tradelane_exit_ring(void);
 	float get_tradelane_speed(void);
-	int go_tradelane(struct IObjInspect const *,struct IObjInspect const *,struct IObjRW *,bool,float);
-	bool is_cruise_active(void)const ;
-	bool is_enemy(struct IObjInspect *);
-	bool is_jumping(void)const ;
-	bool is_launching(void)const ;
-	bool is_player(void)const ;
-	bool is_using_tradelane(void)const ;
-	void jump_in(struct IObjRW *,class Vector const &,class Matrix const &,float);
-	void launch(struct IObjRW *,struct CEqObj *,int);
-	bool leaving_system_update(unsigned int &);
-	struct IObjRW * next_enemy(void);
-	struct IObjRW * next_target(bool);
-	void notify_set_target(struct CShip *,bool);
+	int go_tradelane(struct IObjInspect const*, struct IObjInspect const*, struct IObjRW*, bool, float);
+	bool is_cruise_active(void)const;
+	bool is_enemy(struct IObjInspect*);
+	bool is_jumping(void)const;
+	bool is_launching(void)const;
+	bool is_player(void)const;
+	bool is_using_tradelane(void)const;
+	void jump_in(struct IObjRW*, class Vector const&, class Matrix const&, float);
+	void launch(struct IObjRW*, struct CEqObj*, int);
+	bool leaving_system_update(unsigned int&);
+	struct IObjRW* next_enemy(void);
+	struct IObjRW* next_target(bool);
+	void notify_set_target(struct CShip*, bool);
 	float open_bay(void);
-	struct IObjRW * previous_enemy(void);
-	enum FORMATION_RTYPE  remove_follow_follower(struct IObjRW *);
-	enum FORMATION_RTYPE  remove_formation_follower(struct IObjRW *);
+	struct IObjRW* previous_enemy(void);
+	enum FORMATION_RTYPE  remove_follow_follower(struct IObjRW*);
+	enum FORMATION_RTYPE  remove_formation_follower(struct IObjRW*);
 	void request_exit_tradelane(void);
 	void set_angular_drag_factor(float);
-	void set_axis_throttle(class Vector const &);
-	void set_follow_leader(struct IObjRW *);
-	void set_follow_offset(class Vector const &);
+	void set_axis_throttle(class Vector const&);
+	void set_follow_leader(struct IObjRW*);
+	void set_follow_offset(class Vector const&);
 	void set_gun_stats_dirty(void);
-	void set_nudge_vec(class Vector const &);
+	void set_nudge_vec(class Vector const&);
 	void set_strafe_dir(enum StrafeDir);
 	void set_sub_target(unsigned short);
-	void set_target(struct IObjRW *);
+	void set_target(struct IObjRW*);
 	void set_throttle(float);
 	void set_thrust_power(float);
 	void set_tradelane_speed(float);
 	void stop_tradelane(void);
 	void use_tradelane(bool);
-	void collect_angular_force_components(unsigned int,float,float &,float &)const ;
-	void collect_force_components(float,enum IObject::ThrustEquipType,float &,float &)const ;
-	float get_distance_travelled(float,float,float,float,float)const ;
-	float get_initial_speed_to_coast_distance(float,float,float)const ;
-	float get_time_to_accelerate(float,float,float,float,float)const ;
+	void collect_angular_force_components(unsigned int, float, float&, float&)const;
+	void collect_force_components(float, enum IObject::ThrustEquipType, float&, float&)const;
+	float get_distance_travelled(float, float, float, float, float)const;
+	float get_initial_speed_to_coast_distance(float, float, float)const;
+	float get_time_to_accelerate(float, float, float, float, float)const;
 	void recalculate_formation_speed(void);
 
-#ifdef _USE_DEPRECATED_COBJECT_VARIABLES_
-	/* 105 */ DWORD vtable;
-	DWORD iDunno5[34];
-	/* 139 */ DWORD iBayAnim;
-	DWORD iDunno6[31];
-	/* 170 */ DWORD iBayState;
-	/* 174 */ DWORD iBayState2;
-#endif // _USE_DEPRECATED_COBJECT_VARIABLES_
-
+	uint dunno5[2];                          // 106
+	uint physicsPtr;                          // 108
+	struct CPlayerGroup* playerGroup;                // 109
+	uint dunno6;                             // 110
+	IObjRW* followLeader2;                    // 111
+	uint dunno16;                             // 112
+	Vector followOffset2;                     // 113
+	st6::vector<IObjRW*> followerVector;      // 116
+	IObjRW* followLeader;                     // 120
+	uint followLeaderID_unk;                 // 121
+	Vector followOffset;                      // 122
+	uint dunno8[3];                          // 125
+	st6::vector<IObjRW*> targetedEnemyVector; // 128
+	uint dunno11[3];                         // 132
+	uint groupId;                             // 135
+	IObjRW* target;                           // 136
+	uint targetId_unk;                       // 137
+	ushort subTargetId;                       // 138
+	uint BayAnim;                            // 139
+	CSteering* cSteering;                     // 140
+	uint dunno13[6];                         // 141
+	Vector axisThrottle;                      // 147
+	CNudgeEngine* nudgeEngine;                // 150
+	uint dunno10[6];                         // 151
+	Vector nudgeVector;                       // 157
+	CStrafeEngine* strafeEngine;              // 160
+	uint dunno12[5];                         // 161
+	StrafeDir strafeDir;                      // 166
+	float throttle;                           // 167
+	float thrustPower;                        // 168
+	float maxThrustPower;                     // 169
+	uint dunno14;                             // 170
+	BayState bayState;                        // 171
+	ActionDB* ActionDB;                       // 172
+	uint dunnoCShip1;                         // 173
+	float tradeLaneSpeed;                     // 174
+	bool inTradeLane;                         // 175
+	bool gunRelatedBool;                      // has active guns?
+	float angularDragFactor;                  // 176
+	bool returnDirtyGunStats;                 // 177
+	uint activeGunCount;                      // 178
+	float averageGunSpeed;                    // 179
+	float maxActiveGunRange;                  // 180
+	uint activeMissileCount;                  // 181
+	float maxActiveMissileRange;              // 182 1-missiles 2-guns?
 };
 
 struct IMPORT CSolar : public CEqObj
@@ -3425,7 +3549,7 @@ public:
 	struct IMPORT CreateParms
 	{
 		CreateParms(void);
-		struct CreateParms & operator=(struct CreateParms const &);
+		struct CreateParms& operator=(struct CreateParms const&);
 
 	public:
 		uint iHash;
@@ -3440,24 +3564,24 @@ public:
 		uint iHash2; // rep group? (otherwise it's the hash)
 		struct structCostume
 		{
-		  UINT head;
-		  UINT body;
-		  UINT lefthand;
-		  UINT righthand;
-		  UINT accessory[8];
-		  int  accessories;
+			uint head;
+			uint body;
+			uint lefthand;
+			uint righthand;
+			uint accessory[8];
+			int  accessories;
 		};
 		structCostume Costume;
 		int iVoiceID;
 		int iDunnoLoadout[4];
-		//class st6::list<struct CollisionGroupDesc> collision;
+		//class std::list<struct CollisionGroupDesc> collision;
 		int iDunno3[3];
 		uint id_string;
 		uint iVisit;
 		uint iParent;
 		uint iDestructible;
 		// 1, 2, 3 = related to loadouts
-		// 4 = class st6::list<struct CollisionGroupDesc> &
+		// 4 = class std::list<struct CollisionGroupDesc> &
 		// 7 = ID_String of solar (same as iHash)
 		// 8 = visit (only last byte used)
 		// 9 = id of parent
@@ -3473,47 +3597,68 @@ public:
 		int iDunnoAnim[3];
 		// 1, 2 = something to do with animations
 	};
-	
-	virtual ~CSolar(void);
-	virtual void __stdcall set_velocity(long,class Vector const &);
-	virtual void __stdcall set_angular_velocity(long,class Vector const &);
-	virtual int update(float,unsigned int);
-	virtual class Vector  get_velocity(void)const ;
-	virtual class Vector get_angular_velocity(void)const ;
-	virtual float get_mass(void)const ;
-	virtual void cache_physical_props(void);
-	virtual void init_physics(class Vector const &,class Vector const &);
-	virtual enum ObjActivateResult  activate(bool,unsigned int);
-	virtual bool get_activate_state(class st6::vector<bool,class st6::allocator<bool> > &);
-	virtual void flush_animations(void);
-	virtual class CEquip * alloc_equip(unsigned short,struct Archetype::Equipment *,bool);
 
-	CSolar(struct CSolar const &);
+	virtual ~CSolar(void);
+	virtual void __stdcall set_velocity(long, class Vector const&);
+	virtual void __stdcall set_angular_velocity(long, class Vector const&);
+	virtual int update(float, unsigned int);
+	virtual class Vector  get_velocity(void)const;
+	virtual class Vector get_angular_velocity(void)const;
+	virtual float get_mass(void)const;
+	virtual void cache_physical_props(void);
+	virtual void init_physics(class Vector const&, class Vector const&);
+	virtual enum ObjActivateResult  activate(bool, unsigned int);
+	virtual bool get_activate_state(class std::vector<bool, class std::allocator<bool> >&);
+	virtual void flush_animations(void);
+	virtual class CEquip* alloc_equip(unsigned short, struct Archetype::Equipment*, bool);
+
+	CSolar(struct CSolar const&);
 	CSolar(enum CObject::Class);
-	struct Archetype::Solar const * solararch(void)const ;
-	struct ID_String const & GetParentNickname(void)const ;
-	unsigned char GetVisitValue(void)const ;
-	static bool  ReadObj(class INI_Reader &,struct Archetype::Solar * &,struct CreateParms &);
+	struct Archetype::Solar const* solararch(void)const;
+	struct ID_String const& GetParentNickname(void)const;
+	unsigned char GetVisitValue(void)const;
+	static bool  ReadObj(class INI_Reader&, struct Archetype::Solar*&, struct CreateParms&);
 	void SetVisitValue(unsigned char);
-	float get_atmosphere_immersion(class Vector const &)const ;
-	float get_atmosphere_range(void)const ;
-	struct ID_String const & get_dest_gate(void)const ;
-	unsigned int get_dest_system(void)const ;
-	struct ID_String const & get_loadout(void)const ;
-	unsigned int get_next_trade_ring(void)const ;
-	unsigned int get_prev_trade_ring(void)const ;
-	unsigned int get_tradelane_space_name(void)const ;
-	void init(struct CSolar::CreateParms const &);
-	bool is_destructible(void)const ;
-	bool is_dynamic(void)const ;
-	bool is_lane_ring(void)const ;
-	bool is_planetary(void)const ;
-	bool is_system_gate(void)const ;
-	bool is_waypoint(void)const ;
-	void configure_system_gate(char const *);
-	void init_continual_anim(char const *);
+	float get_atmosphere_immersion(class Vector const&)const;
+	float get_atmosphere_range(void)const;
+	struct ID_String const& get_dest_gate(void)const;
+	unsigned int get_dest_system(void)const;
+	struct ID_String const& get_loadout(void)const;
+	unsigned int get_next_trade_ring(void)const;
+	unsigned int get_prev_trade_ring(void)const;
+	unsigned int get_tradelane_space_name(void)const;
+	void init(struct CSolar::CreateParms const&);
+	bool is_destructible(void)const;
+	bool is_dynamic(void)const;
+	bool is_lane_ring(void)const;
+	bool is_planetary(void)const;
+	bool is_system_gate(void)const;
+	bool is_waypoint(void)const;
+	void configure_system_gate(char const*);
+	void init_continual_anim(char const*);
 	void update_system_gate(float);
+
+	uint duplicatedSpaceID; // 105
+	bool isDestructible;    // 106
+	bool isDynamic;
+	float atmosphereRange;            // 107
+	uint solarLoadout_possiblyUnused; // 108
+	uint jumpDestSystem;              // 109
+	uint jumpDestObj;                 // 110
+	bool animationBool;               // 111
+	uint animationId;                 // 112
+	uint animationStateEnum;          // 113
+	float animDuration;               // 114
+	CObject::Class CSolarClass;       // 115
+	void* dunnoListPtr;     // 116 Pointer to two-directional list, individual size 0xC, so only 1 value being kept aside from the prev and next pointers
+	uint dunnoListLength;   // 117 length of 116
+	uint prevTradeLaneRing; // 118
+	uint nextTradeLaneRing; // 119
+	uint tradeLaneSpaceName_unused; // 120
+	uint visitValue;                // 121
+	uint parentNickname;            // 122
 };
+
 
 struct IMPORT CharPlaceInfo
 {
@@ -3820,13 +3965,13 @@ struct IMPORT EquipDesc
 	void set_temporary(bool);
 
 public:
-	USHORT iDunno;
-	USHORT sID;
-	UINT iArchID;
+	ushort iDunno;
+	ushort sID;
+	uint iArchID;
 	CacheString szHardPoint;
 	bool bMounted;
 	float fHealth;
-	UINT iCount;
+	uint iCount;
 	bool bMission;
 	uint iOwner;
 };
@@ -4010,22 +4155,22 @@ struct IMPORT FmtStr
 	int unflatten(void *,unsigned int);
 
 public:
-	UINT something;
-	UINT strid;		// resource containing text
-	BYTE tnav_marker;	// counters for each type
-	BYTE tsystem;
-	BYTE tbase;
-	BYTE tstring;
-	BYTE tgood;
-	BYTE tunused;
-	BYTE tint;
-	BYTE trep_instance;
-	BYTE trep_group;
-	BYTE tzone_id;
-	BYTE tspace_obj_id;
-	BYTE tfmt_str;
-	BYTE tinstallation;
-	BYTE tloot;
+	uint something;
+	uint strid;		// resource containing text
+	uchar tnav_marker;	// counters for each type
+	uchar tsystem;
+	uchar tbase;
+	uchar tstring;
+	uchar tgood;
+	uchar tunused;
+	uchar tint;
+	uchar trep_instance;
+	uchar trep_group;
+	uchar tzone_id;
+	uchar tspace_obj_id;
+	uchar tfmt_str;
+	uchar tinstallation;
+	uchar tloot;
 };
 
 class IMPORT Fuse
@@ -4768,7 +4913,7 @@ namespace pub
 			DirectiveFollowOp(void);
 			virtual bool validate(void);
 
-			UINT   iFollowSpaceObj;
+			uint   iFollowSpaceObj;
 			float  fMaxDistance;
 			Vector vOffset;
 			float  fDunno2; // 400
@@ -5121,99 +5266,356 @@ public:
 
 struct IMPORT IObjInspectImpl
 {
-	virtual class Vector const & get_position(void)const ;
-	virtual class Vector  get_velocity(void)const ;
-	virtual class Vector  get_angular_velocity(void)const ;
-	virtual class Matrix const & get_orientation(void)const ;
-	virtual class Transform const & get_transform(void)const ;
-	virtual class Vector  get_center_of_mass(void)const ;
-	virtual int get_sub_obj_center_of_mass(unsigned short,class Vector &)const ;
-	virtual long get_index(void)const ;
-	virtual unsigned int const  get_id(void)const ;
-	virtual int get_good_id(unsigned int &)const ;
-	virtual int get_archetype_extents(class Vector &,class Vector &)const ;
-	virtual int get_physical_radius(float &,class Vector &)const ;
-	virtual float get_mass(void)const ;
-	virtual bool is_targetable(void)const ;
-	virtual bool is_dying(void)const ;
-	virtual int get_status(float &)const ;
-	virtual int get_status(float &,float &)const ;
-	virtual int get_shield_status(float &,bool &)const ; // why in different order ?! msvc i hate you!
-	virtual int get_shield_status(float &,float &,bool &)const ;
-	virtual int get_throttle(float &)const ;
-	virtual int get_axis_throttle(class Vector &)const ;
-	virtual int get_nudge_vec(class Vector &)const ;
-	virtual int get_strafe_dir(enum StrafeDir &)const ;
-	virtual int is_cruise_active(bool &)const ; // why in different order ?! msvc i hate you! both is_cruise_active dont work properly for players(always return false when engine kill was used during cruise) 
-	virtual int is_cruise_active(bool &,bool &)const ;
-	virtual int are_thrusters_active(bool &)const ;
-	virtual int get_attitude_towards(float &,struct IObjInspect const *)const ;
-	virtual int get_attitude_towards_symmetrical(float &,struct IObjInspect const *,float &)const ;
-	virtual int get_reputation(float &,unsigned int const &)const ;
-	virtual int get_target(struct IObjRW * &)const ;
-	virtual int get_subtarget(unsigned short &)const ;
-	virtual int get_subtarget_center_of_mass(class Vector &)const ;
-	virtual int get_rank(unsigned int &)const ;
-	virtual int get_affiliation(unsigned int &)const ;
-	virtual int get_type(unsigned int &)const ;
-	virtual int get_base(unsigned int &)const ;
-	virtual int get_dock_target(unsigned int &)const ;
-	virtual int get_power(float &)const ;
-	virtual int get_zone_props(unsigned long &)const ;
-	virtual float get_scanner_interference(void)const ;
-	virtual int get_hold_left(float &)const ;
-	virtual int enumerate_cargo(struct IObjInspect::CargoEnumerator *)const ;
-	virtual int get_data(void const * &)const ;
-	virtual int get_formation_offset(class Vector &)const ;
-	virtual int get_formation_leader(struct IObjRW * &)const ;
-	virtual int get_follow_offset(class Vector &)const ;
-	virtual int get_follow_leader(struct IObjRW * &)const ;
-	virtual bool is_player(void)const ;
-	virtual int get_hardpoint(char const *,class Vector *,class Matrix *)const ;
-	virtual bool has_dock_hardpoints(void)const ;
-	virtual int get_dock_hardpoints(int,enum TERMINAL_TYPE *,class Transform *,class Transform *,class Transform *,float *)const ;
-	virtual float get_time_to_accelerate(float,float,float,enum IObject::ThrustEquipType)const ;
-	virtual float get_distance_travelled(float,float,float,enum IObject::ThrustEquipType)const ;
-	virtual float get_projected_throttle(float,enum IObject::ThrustEquipType)const ;
-	virtual float get_speed(float,enum IObject::ThrustEquipType)const ;
-	virtual float get_initial_speed_to_coast_distance(float,bool)const ;
-	virtual float get_time_to_accelerate_angularly(float,float,float)const ;
-	virtual float get_time_to_accelerate_angularly(float,float,float,float)const ;
-	virtual float get_angular_distance_travelled(float,float,float)const ;
-	virtual float get_angular_distance_travelled(float,float,float,float)const ;
-	virtual float get_angular_speed_XY(float,float)const ;
-	virtual float get_angular_speed_Z(float)const ;
-	virtual float get_projected_axis_throttle_XY(float)const ;
-	virtual float get_projected_axis_throttle_Z(float)const ;
-	virtual float get_max_bank_angle(void)const ;
-	virtual int get_scanlist(struct ScanList const * &,unsigned int,bool)const ;
-	virtual int get_tgt_lead_fire_pos(unsigned short const &,class Vector &)const ;
-	virtual int is_pointing_at(bool &,unsigned short const &,float)const ;
-	virtual int can_point_at(bool &,unsigned short const &,class Vector const &,float)const ;
-	virtual int find_equipment(unsigned short * const,unsigned int,unsigned int)const ;
-	virtual int get_equipment_status(struct EquipStatus &,unsigned short const &)const ;
-	virtual int get_equipment_val(struct EquipmentVal &,unsigned short const &,enum EquipmentValType,float)const ;
-	virtual int scan_cargo(struct IObjRW *,struct EquipDescVector &)const ;
-	virtual int enumerate_subtargets(struct IObjInspect::SubtargetEnumerator *)const ;
-	virtual int get_lane_direction(class Transform const &,bool *)const ;
-	virtual int get_ring_side(class Transform const &,bool *)const ;
-	virtual int traverse_rings(unsigned int &,bool)const ;
-	virtual int is_using_tradelane(bool *)const ;
-	virtual int get_lane_start(struct IObjInspect const *,struct IObjInspect const * &,class Vector &,class Vector &)const ;
-	virtual bool generate_follow_offset(struct IObjInspect const *,class Transform &)const ;
-	virtual int get_atmosphere_range(float &)const ;
-	virtual int get_toughness(void)const ;
-	virtual int get_behavior_id(void)const ;
-	virtual int get_formation_followers(struct IObjRW * * const,unsigned int)const ;
-	virtual struct CObject const * cobject(void)const ;
+	virtual const Vector& get_position() const;
+	virtual Vector get_velocity() const;
+	virtual Vector get_angular_velocity() const;
+	virtual const Matrix& get_orientation() const;
+	virtual const Transform& get_transform() const;
+	virtual Vector get_center_of_mass() const;
+	virtual int get_sub_obj_center_of_mass(unsigned short, Vector&) const;
+	virtual long get_index() const;
+	virtual const unsigned int get_id() const;
+	virtual int get_good_id(unsigned int&) const;
+	virtual int get_archetype_extents(Vector&, Vector&) const;
+	virtual int get_physical_radius(float&, Vector&) const;
+	virtual float get_mass() const;
+	virtual bool is_targetable() const;
+	virtual bool is_dying() const;
+	virtual int get_status(float&) const;
+	virtual int get_status(float&, float&) const;
+	virtual int get_shield_status(float&, bool&) const; // why in different order ?! msvc i hate you!
+	virtual int get_shield_status(float&, float&, bool&) const;
+	virtual int get_throttle(float&) const;
+	virtual int get_axis_throttle(Vector&) const;
+	virtual int get_nudge_vec(Vector&) const;
+	virtual int get_strafe_dir(StrafeDir&) const;
+	virtual int is_cruise_active(bool&) const; // why in different order ?! msvc i hate you! both is_cruise_active dont work properly for players(always
+	// return false when engine kill was used during cruise)
+	virtual int is_cruise_active(bool&, bool&) const;
+	virtual int are_thrusters_active(bool&) const;
+	virtual int get_attitude_towards(float&, const IObjInspect*) const;
+	virtual int get_attitude_towards_symmetrical(float&, const IObjInspect*, float&) const;
+	virtual int get_reputation(float&, const unsigned int&) const;
+	virtual int get_target(IObjRW*&) const;
+	virtual int get_subtarget(unsigned short&) const;
+	virtual int get_subtarget_center_of_mass(Vector&) const;
+	virtual int get_rank(unsigned int&) const;
+	virtual int get_affiliation(unsigned int&) const;
+	virtual int get_type(unsigned int&) const;
+	virtual int get_base(unsigned int&) const;
+	virtual int get_dock_target(unsigned int&) const;
+	virtual int get_power(float&) const;
+	virtual int get_zone_props(unsigned long&) const;
+	virtual float get_scanner_interference() const;
+	virtual int get_hold_left(float&) const;
+	virtual int enumerate_cargo(IObjInspect::CargoEnumerator*) const;
+	virtual int get_data(const void*&) const;
+	virtual int get_formation_offset(Vector&) const;
+	virtual int get_formation_leader(IObjRW*&) const;
+	virtual int get_follow_offset(Vector&) const;
+	virtual int get_follow_leader(IObjRW*&) const;
+	virtual bool is_player() const;
+	virtual int get_hardpoint(const char*, Vector*, Matrix*) const;
+	virtual bool has_dock_hardpoints() const;
+	virtual int get_dock_hardpoints(int, enum TERMINAL_TYPE*, Transform*, Transform*, Transform*, float*) const;
+	virtual float get_time_to_accelerate(float, float, float, IObject::ThrustEquipType) const;
+	virtual float get_distance_travelled(float, float, float, IObject::ThrustEquipType) const;
+	virtual float get_projected_throttle(float, IObject::ThrustEquipType) const;
+	virtual float get_speed(float, IObject::ThrustEquipType) const;
+	virtual float get_initial_speed_to_coast_distance(float, bool) const;
+	virtual float get_time_to_accelerate_angularly(float, float, float) const;
+	virtual float get_time_to_accelerate_angularly(float, float, float, float) const;
+	virtual float get_angular_distance_travelled(float, float, float) const;
+	virtual float get_angular_distance_travelled(float, float, float, float) const;
+	virtual float get_angular_speed_XY(float, float) const;
+	virtual float get_angular_speed_Z(float) const;
+	virtual float get_projected_axis_throttle_XY(float) const;
+	virtual float get_projected_axis_throttle_Z(float) const;
+	virtual float get_max_bank_angle() const;
+	virtual int get_scanlist(const struct ScanList*&, unsigned int, bool) const;
+	virtual int get_tgt_lead_fire_pos(const unsigned short&, Vector&) const;
+	virtual int is_pointing_at(bool&, const unsigned short&, float) const;
+	virtual int can_point_at(bool&, const unsigned short&, const Vector&, float) const;
+	virtual int find_equipment(unsigned short* const, unsigned int, unsigned int) const;
+	virtual int get_equipment_status(EquipStatus&, const unsigned short&) const;
+	virtual int get_equipment_val(struct EquipmentVal&, const unsigned short&, enum EquipmentValType, float) const;
+	virtual int scan_cargo(IObjRW*, EquipDescVector&) const;
+	virtual int enumerate_subtargets(IObjInspect::SubtargetEnumerator*) const;
+	virtual int get_lane_direction(const Transform&, bool*) const;
+	virtual int get_ring_side(const Transform&, bool*) const;
+	virtual int traverse_rings(unsigned int&, bool) const;
+	virtual int is_using_tradelane(bool*) const;
+	virtual int get_lane_start(const IObjInspect*, const IObjInspect*&, Vector&, Vector&) const;
+	virtual bool generate_follow_offset(const IObjInspect*, Transform&) const;
+	virtual int get_atmosphere_range(float&) const;
+	virtual int get_toughness() const;
+	virtual int get_behavior_id() const;
+	virtual int get_formation_followers(IObjRW** const, unsigned int) const;
+	virtual const CObject* cobject() const;
 
 public:
-	unsigned char data[OBJECT_DATA_SIZE];
+	CObject* cobj;
 };
 
-struct IObjRW // : public IObjInspectImpl
+struct MunitionImpactData
 {
-	IObjInspectImpl *ship;
+	uint attackerId;
+	Archetype::Munition* munitionId;
+	uint subObjId;
+};
+
+struct ExplosionDamageEvent
+{
+	uint projectileId;
+	uint attackerId;
+	DamageCause dmgCause;
+	Vector explosionPosition;
+	Archetype::Explosion* explosionArchetype;
+	uint dunno;
+};
+
+struct IObjRWAbstract
+{
+	virtual const Vector& get_position() const;                                                                     // 0
+	virtual Vector get_velocity() const;                                                                            // 4
+	virtual Vector get_angular_velocity() const;                                                                    // 8
+	virtual const Matrix& get_orientation() const;                                                                  // 12
+	virtual const Transform& get_transform() const;                                                                 // 16
+	virtual Vector get_center_of_mass() const;                                                                      // 20
+	virtual int get_sub_obj_center_of_mass(unsigned short, Vector&) const;                                          // 24
+	virtual long get_index() const;                                                                                 // 28
+	virtual const unsigned int get_id() const;                                                                      // 32
+	virtual int get_good_id(unsigned int&) const;                                                                   // 36
+	virtual int get_archetype_extents(Vector&, Vector&) const;                                                      // 40
+	virtual int get_physical_radius(float&, Vector&) const;                                                         // 44
+	virtual float get_mass() const;                                                                                 // 48
+	virtual bool is_targetable() const;                                                                             // 52
+	virtual bool is_dying() const;                                                                                  // 56
+	virtual int get_status(float&) const;                                                                           // 60
+	virtual int get_status(float&, float&) const;                                                                   // 64
+	virtual int get_shield_status(float&, bool&) const;                                                             // 68
+	virtual int get_shield_status(float&, float&, bool&) const;                                                     // 72
+	virtual int get_throttle(float&) const;                                                                         // 76
+	virtual int get_axis_throttle(Vector&) const;                                                                   // 80
+	virtual int get_nudge_vec(Vector&) const;                                                                       // 84
+	virtual int get_strafe_dir(StrafeDir&) const;                                                                   // 88
+	virtual int is_cruise_active(bool&) const;                                                                      // 92
+	virtual int is_cruise_active(bool&, bool&) const;                                                               // 96
+	virtual int are_thrusters_active(bool&) const;                                                                  // 100
+	virtual int get_attitude_towards(float&, const IObjInspect*) const;                                             // 104
+	virtual int get_attitude_towards_symmetrical(float&, const IObjInspect*, float&) const;                         // 108
+	virtual int get_reputation(float&, const unsigned int&) const;                                                  // 112
+	virtual int get_target(IObjRW*&) const;                                                                         // 116
+	virtual int get_subtarget(unsigned short&) const;                                                               // 120
+	virtual int get_subtarget_center_of_mass(Vector&) const;                                                        // 124
+	virtual int get_rank(unsigned int&) const;                                                                      // 128
+	virtual int get_affiliation(unsigned int&) const;                                                               // 132
+	virtual int get_type(unsigned int&) const;                                                                      // 136
+	virtual int get_base(unsigned int&) const;                                                                      // 140
+	virtual int get_dock_target(unsigned int&) const;                                                               // 144
+	virtual int get_power(float&) const;                                                                            // 148
+	virtual int get_zone_props(unsigned long&) const;                                                               // 152
+	virtual float get_scanner_interference() const;                                                                 // 156
+	virtual int get_hold_left(float&) const;                                                                        // 160
+	virtual int enumerate_cargo(IObjInspect::CargoEnumerator*) const;                                               // 164
+	virtual int get_data(const void*&) const;                                                                       // 168
+	virtual int get_formation_offset(Vector&) const;                                                                // 172
+	virtual int get_formation_leader(IObjRW*&) const;                                                               // 176
+	virtual int get_follow_offset(Vector&) const;                                                                   // 180
+	virtual int get_follow_leader(IObjRW*&) const;                                                                  // 184
+	virtual bool is_player() const;                                                                                 // 188
+	virtual int get_hardpoint(const char*, Vector*, Matrix*) const;                                                 // 192
+	virtual bool has_dock_hardpoints() const;                                                                       // 196
+	virtual int get_dock_hardpoints(int, enum TERMINAL_TYPE*, Transform*, Transform*, Transform*, float*) const;    // 200
+	virtual float get_time_to_accelerate(float, float, float, IObject::ThrustEquipType) const;                      // 204
+	virtual float get_distance_travelled(float, float, float, IObject::ThrustEquipType) const;                      // 208
+	virtual float get_projected_throttle(float, IObject::ThrustEquipType) const;                                    // 212
+	virtual float get_speed(float, IObject::ThrustEquipType) const;                                                 // 216
+	virtual float get_initial_speed_to_coast_distance(float, bool) const;                                           // 220
+	virtual float get_time_to_accelerate_angularly(float, float, float) const;                                      // 224
+	virtual float get_time_to_accelerate_angularly(float, float, float, float) const;                               // 228
+	virtual float get_angular_distance_travelled(float, float, float) const;                                        // 232
+	virtual float get_angular_distance_travelled(float, float, float, float) const;                                 // 236
+	virtual float get_angular_speed_XY(float, float) const;                                                         // 240
+	virtual float get_angular_speed_Z(float) const;                                                                 // 244
+	virtual float get_projected_axis_throttle_XY(float) const;                                                      // 248
+	virtual float get_projected_axis_throttle_Z(float) const;                                                       // 252
+	virtual float get_max_bank_angle() const;                                                                       // 256
+	virtual int get_scanlist(const struct ScanList*&, unsigned int, bool) const;                                    // 260
+	virtual int get_tgt_lead_fire_pos(const unsigned short&, Vector&) const;                                        // 264
+	virtual int is_pointing_at(bool&, const unsigned short&, float) const;                                          // 268
+	virtual int can_point_at(bool&, const unsigned short&, const Vector&, float) const;                             // 272
+	virtual int find_equipment(unsigned short* const, unsigned int, unsigned int) const;                            // 276
+	virtual int get_equipment_status(struct EquipStatus&, const unsigned short&) const;                             // 280
+	virtual int get_equipment_val(struct EquipmentVal&, const unsigned short&, enum EquipmentValType, float) const; // 284
+	virtual int scan_cargo(IObjRW*, EquipDescVector&) const;                                                        // 288
+	virtual int enumerate_subtargets(IObjInspect::SubtargetEnumerator*) const;                                      // 292
+	virtual int get_lane_direction(const Transform&, bool*) const;                                                  // 296
+	virtual int get_ring_side(const Transform&, bool*) const;                                                       // 300
+	virtual int traverse_rings(unsigned int&, bool) const;                                                          // 304
+	virtual int is_using_tradelane(bool*) const;                                                                    // 308
+	virtual int get_lane_start(const IObjInspect*, const IObjInspect*&, Vector&, Vector&) const;                    // 312
+	virtual bool generate_follow_offset(const IObjInspect*, Transform&) const;                                      // 316
+	virtual int get_atmosphere_range(float&) const;                                                                 // 320
+	virtual int get_toughness() const;                                                                              // 324
+	virtual int get_behavior_id() const;                                                                            // 328
+	virtual int get_formation_followers(IObjRW** const, unsigned int) const;                                        // 332
+	virtual const CObject* cobject() const;                                                                         // 336
+	virtual ObjectType get_object_type() const;                                                                     // 340
+
+	virtual bool ShipDestroyed(bool isKill, uint dunno);     // NakedShipDestroyed                                      //344 sub_6CE8080
+	virtual int Disconnect();                                // 348 sub_6CE7C80
+	virtual bool get_dunno_0x40();                           // 352 sub_6CEE6D0
+	virtual int instantiate_cship(Archetype::Root* archPtr); // 356 sub_6D01040
+	virtual bool set_cship(uint shipId);                     // 360 sub_6D010A0
+	virtual void sub_6D01450();                              // 364
+	virtual void sub_6D01A60();                              // 368
+	virtual int sub_6CEE810(void* PhySys_unk);               // physics collsion handling?                                       //372
+	virtual void sub_6CEE980(int dunno);                     // Behavior interface update?                                              //376
+	virtual void sub_6CE9250(void* unk, DamageList*);        // 380
+	virtual void process_munition_impact(MunitionImpactData* unk, DamageList*);        // 384
+	virtual void process_all_explosion_damage(ExplosionDamageEvent*, DamageList*); // calls methods 508-520         //388
+	virtual void applyDamageList(DamageList*);                                     // 392 sub_6D01A10
+	virtual bool get_dunno_0x41();                                                 // 396
+	virtual void sub_6CEEFA0();                                                    // 400
+	virtual void sub_6CEF0F0();                                                    // 404
+	virtual bool is_player_vulnerable();                                           // 408 sub_6CE61A0
+	virtual bool is_invulnerable();                                                // 412 sub_6CE61B0
+	virtual float get_dunno_0x3C();                     // hitpoint % related?                                                           //416 sub_6CE61C0
+	virtual bool process_collision_unk(void*);          // unknown data type, an object containing a IObjRW as 2nd element?? //420 sub_6CEE9F0
+	virtual CArchGroup* sethp_unk(DamageList*, float);  // set relative hp to all eq and colgrps to provided float?  //424 sub_6CEB210
+	virtual int set_relative_health(float newHp);       // 428
+	virtual bool damage_hull(float, DamageList*);       // NakedDamageHit                                                 //432 sub_6CEA3A0
+	virtual void apply_damage_entry(DamageEntry*);      // 436 sub_6CEEF70
+	virtual bool can_deal_damage(DamageList*);          // invokes get_dunno_0x39 and 0x38                                   //440 sub_6CEF0B0
+	virtual void sub_6CE7D00();                         // collision groups, sets off fuses?                                                //444
+	virtual void sub_6CE8C50();                         // damage dealing method, sets off death animation? Fuse.                                 //448
+	virtual void sub_6CE8D40();                         // same as above, but for collision groups                                          //452
+	virtual void sub_6CE8CD0();                         // collision group related                                                          //456
+	virtual void sub_6CE8E90();                         // hardpoint eq related                                                             //460
+	virtual void sub_6CE8E10();                         // hardpoint eq related                                                             //464
+	virtual bool drop_all_cargo(const char* hardpoint, DamageList*); // 468 sub_6CE8F50
+	virtual bool hit_shield_bubble(DamageList*);        // 472
+	virtual void sub_6CE88D0();                         // iterate over all equipped equipment and run an update?                           //476
+	virtual void sub_6CE8930();                         // processes values under 0x74 and 0x78 pointers                                    //480
+	virtual bool light_fuse(uint fuseTriggererId, uint* fuseId, ushort sId, float radius, float fuseLifetime);                                    // 484 sub_6D01A90
+	virtual bool unlight_fuse_unk(uint* fuseId, ushort sid, float lifeTime);                                                               // 488 sub_6CEC7F0
+	virtual bool fuse_expiration_check();                                                                                                 // 492 sub_6CEC8D0
+	virtual void death_explosion();                                                                                                       // 496 sub_6CE8400
+	virtual void sub_6D01C90();                                                                                                           // 500
+	virtual void sub_6CE8760();                                                                                                           // 504
+	virtual void process_explosion_damage_hull(ExplosionDamageEvent* explosion, DamageList* dmgList);                                     // 508 sub_6CE9550
+	virtual const CArchGroup* process_explosion_damage_external_equip_and_col_grps(ExplosionDamageEvent* explosion, DamageList* dmgList); // 512 sub_6CE9690
+	virtual bool process_explosion_damage_shield_bubble(ExplosionDamageEvent* explosion, DamageList* dmgList); // NakedGuidedHit   //516 sub_6CE9A90
+	virtual void process_explosion_damage_energy(ExplosionDamageEvent* explosion, DamageList* dmgList);        // 520 sub_6CE9940
+	virtual void damage_shield(CEShield* shield, Archetype::Munition* munition, DamageList* dmgList);          // 524 sub_6CE94B0
+	virtual bool damage_ext_eq(CEquip* eq, float dmgDealt, DamageList* dmgList);                               // 528 sub_6CEA4A0
+	virtual bool damage_shield_direct(CEShield* shield, float dmg, DamageList* dmgList);                       //532 sub_6CEA740
+	virtual bool damage_col_grp(CArchGroup*, float, DamageList*);                                              // 536 sub_6CEAA80
+	virtual bool damage_energy(float energyDamage, DamageList* dmgList);                       // deal energy damage                      //540 sub_6CEAFC0
+	virtual void col_grp_death(CArchGroup*, DamageEntry::SubObjFate, DamageList*);             // 544 sub_6CEA9F0
+	virtual void cequip_death(CEquip* eq, DamageEntry::SubObjFate fate, DamageList* dmgList);  // 548 sub_6CE9F70
+	virtual void unk_death(void* dunno1, DamageEntry::SubObjFate fate, DamageList* dmgList);   // 552 sub_6CE9C50
+	virtual EquipmentClass deal_colgrp_linked_damage(CArchGroup* colGrp, DamageList* dmgList); // 556 sub_6CEADC0
+	virtual const CArchGroup* sub_6CEAEA0_unk(CArchGroup* colGrp,
+		DamageList* dmgList); // colgrp update method checking for lost equipment? idk. //560 sub_6CEAEA0
+	virtual void AI_react_to_hull_dmg(DamageList*, DamageEntry*);   // 564 sub_6CEB550
+	virtual void AI_react_to_equip_dmg(DamageList*, DamageEntry*);  // 568 sub_6CEB7B0
+	virtual void AI_react_to_energy_dmg(DamageList*, DamageEntry*); // 572 sub_6CEBD40
+	virtual void AI_react_to_colgrp_dmg(DamageList*, DamageEntry*); // 576 sub_6CEBA40
+	virtual void sub_6CEBE80();                                     // 580 sub_6CEBE80
+	virtual bool sub_6CEC260(CAttachedEquip* attachedEq);           // equipment related, always returns true, can't trigger  //584 sub_6CEC260
+	virtual void process_perishable_cargo(float deltaTime);         // 588 sub_6CEC910
+};
+
+struct CShipAbstract
+{
+	virtual int set_throttle(float);                           // 0
+	virtual int set_axis_throttle(const Vector&);              // 4
+	virtual int set_nudge_vec(const Vector&);                  // 8
+	virtual int set_strafe_dir(StrafeDir);                     // 12
+	virtual int basewatcher_setpointer(IObjInspect*);          // 16
+	virtual int basewatcher_removepointer(IObjInspect*);       // 20
+	virtual FORMATION_RTYPE add_formation_follower(IObjRW*);   // 24
+	virtual FORMATION_RTYPE remove_formation_follower(IObjRW*);// 28
+	virtual int get_formation_follower_count();                // 32
+	virtual int set_follow_leader(IObjRW*);                    // 36
+	virtual int set_follow_offset(const Vector&);              // 40
+	virtual FORMATION_RTYPE add_follow_follower(IObjRW*);      // 44
+	virtual FORMATION_RTYPE remove_follow_follower(IObjRW*);   // 48
+	virtual int fire_weapons(ushort startIndex, ushort endIndex, void* unk, void* unk2); // 52
+	virtual int jettison_cargo(ushort sID, ushort amount, uint clientId); // 56
+	virtual int tractor_all(ushort tractorSId, st6::vector<IObjRW*> tractorArray, int clientId); // 60
+	virtual int tractor_single(ushort sId, IObjRW* loot, int clientId); // 64
+	virtual int set_gun_target(ushort gunSId, uint target, ushort targetSId, int flag); // 68
+	virtual int set_target(IObjRW* target, ushort sId, int dunno); // 72
+	virtual int sub_6CE70B0(ushort sId, int dunno, int flag);  // 76 something about strafing/thrusting
+	virtual int toggle_cruise(bool cruiseActive, bool disruptCruise, int dunno2); // 80 engine related, engage cruise?
+	virtual int sub_6D02500();                                 // 84 activates thrusters?
+	virtual int use_item(ushort sId, uint amount, int unused); // 88 sub_6CE7210
+	virtual int request_event(uint eventType, uint requestTarget, uint param1, uint param2, uint dunno); // 92
+	virtual int request_cancel(uint eventType, uint param1, uint param2); // 96
+	virtual int go_tradelane(const IObjInspect* startRing, const IObjInspect* nextRing, IObjRW* jumpingIObj, bool unk1, float unk2); // 100
+	virtual int stop_tradelane();                             // 104 switch from one pair of tradelane to another midflight?
+	virtual int sub_6CEF350();                                 // 108 null
+	virtual int sub_6D02000();                                 // 112 unknown
+	virtual int sub_6D02070(uint spaceObjId);                  // 116 sendmessage 0x26
+	virtual void abstractMethod() = 0;
+
+	Watchable watchable;
+};
+
+// Constructor seems to be e.g. sub_6D02B70
+// Size: 144 bytes
+// Hex numbers behind dunno variables or in a comment indicate hex offset
+struct IObjRW : public IObjRWAbstract, public CShipAbstract, public CBase
+{
+	uchar bDunno_0x14;
+	void* pDunno_0x18; // struct size: 12 bytes
+	int iDunnos_0x1C;  // length of 0x1C
+	double timer;
+	struct StarSystem* starSystem; // has something to do with fuses
+	uchar bDunno_0x2C;
+	void* pDunno_0x30;   // struct size: 20 bytes
+	int iDunno_0x34;     // length of 0x30
+	uchar isInvulnerable; // not entirely sure on those two
+	uchar isPlayerVulnerable;
+	float fDunno_0x3C; // hitpoint related?
+	uchar bDunno_0x40;  // is alive? Used when fetching IObjRW via sub_6D00670
+	uchar bDunno_041;
+	uchar bAlign_0x42; // probably not used
+	uchar bAlign_0x43; // probably not used
+	uchar bDunno_0x44;
+	void* pDunno_0x48; // struct size: 20 bytes
+	int iDunno_0x4C;   // size of 0x48
+	uchar bDunno_0x50;
+	int iDunnos_0x54[3];
+	uchar bDunno_0x60;
+	void* pDunno_0x64; // struct size: 16 bytes
+	int iDunnos_0x68;  // 0x64 size
+	float fdunno_0x6C;
+	uchar bDunno_0x70;
+	void* pDunno_0x74; // struct size: 12 bytes twodirectional list that loops
+	int iDunno_0x78;   // length of 0x74 chain
+	uchar bDunno_0x7C;
+	void* pDunno_0x80; // struct size: 68 bytes list of fuses?
+	int iDunno_0x84;   // 0x80 length
+	uchar bDunno_0x88;  // flagged on ShipDestroyed
+	int iDunno_0x8C;
+	int iDunno_0x90;
+	int iDunno_0x94;
+	bool bDunno_0x98;
+	int iDunno_0x9C;
+	float Dunno_0xA0;
+	int* iDunno_0xA4; // struct size 0x28
+	uint A4Size;
+	int iDunno_0xAC;
+	int iDunno_0xB0;
+	int iDunno_0xB4;
+	bool bDunno_0xB8;
+	float pendingEnvironmentalDamage;
+	float timeSinceLastUpdate;
+	uint equipIdMaker;
 };
 
 class IMPORT ImageNode
@@ -6416,17 +6818,6 @@ public:
 namespace TurnHelper
 {
 	IMPORT  class Vector   get_angular_throttle(class Matrix const &,class Matrix const &,float *);
-};
-
-struct IMPORT Watchable
-{
-	Watchable(void);
-	~Watchable(void);
-	struct Watchable & operator=(struct Watchable const &);
-	unsigned int unwatch(void);
-
-public:
-	unsigned char data[OBJECT_DATA_SIZE];
 };
 
 class IMPORT XMLReader

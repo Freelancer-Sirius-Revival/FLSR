@@ -95,7 +95,9 @@ namespace Mark
         if (!clientId)
             return; 
 
-        for (const uint targetId : currentlyMarkedObjectsPerClient[clientId])
+        // Copy target IDs because UnmarkObject erases them and this breaks the iterator.
+        const std::set<uint> targetIds = std::set(currentlyMarkedObjectsPerClient[clientId]);
+        for (const uint targetId : targetIds)
         {
             if (deletedIds.contains(targetId))
                 UnmarkObject(clientId, targetId);
@@ -129,7 +131,7 @@ namespace Mark
 
     void UnmarkEverywhere(const uint targetId)
     {
-        for (auto& markedObjectsPerClient : currentlyMarkedObjectsPerClient)
+        for (const auto& markedObjectsPerClient : currentlyMarkedObjectsPerClient)
             UnmarkObject(markedObjectsPerClient.first, targetId);
 
         for (auto& markedObjectsPerCharacter : markedObjectsPerCharacter)
@@ -454,21 +456,23 @@ namespace Mark
         currentlyMarkedObjectsPerClient.erase(clientId);
     }
 
-    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed)
+    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
+    {
+        returncode = DEFAULT_RETURNCODE;
+        UnmarkEverywhere(killedObject->cobj->id);
+    }
+
+    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
         returncode = DEFAULT_RETURNCODE;
 
-        const CShip* ship = (CShip*)ecx[4];
-        if (!ship)
-            return;
-        
+        const CSimple* obj = killedObject->cobj;
         if (!killed) // Despawned
         {
-            RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(ship->iID);
-
-            const uint clientId = ship->GetOwnerPlayer();
+            const uint clientId = obj->GetOwnerPlayer();
             if (clientId)
             {
+                RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(obj->id);
                 std::wstring characterFileName;
                 if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) == HKE_OK)
                     cloakedCharacterFileNames.erase(characterFileName);
@@ -476,14 +480,14 @@ namespace Mark
             else
             {
                 // Remove despawned NPCs
-                UnmarkEverywhere(ship->iID);
+                UnmarkEverywhere(obj->id);
             }
         }
         else
         {
-            UnmarkEverywhere(ship->iID);
+            UnmarkEverywhere(obj->id);
 
-            const uint clientId = ship->GetOwnerPlayer();
+            const uint clientId = obj->GetOwnerPlayer();
             if (clientId)
             {
                 std::wstring characterFileName;

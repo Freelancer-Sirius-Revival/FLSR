@@ -384,14 +384,7 @@ for (auto& chat : set_setChatSuppress) {
         ISERVER_LOG();
         ISERVER_LOGARG_UI(iClientID);
 
-        uint iClientIDTarget;
-
         CHECK_FOR_DISCONNECT
-
-            TRY_HOOK{ iClientIDTarget = HkGetClientIDByShip(ci.dwTargetShip); }
-            CATCH_HOOK({})
-
-            iDmgTo = iClientIDTarget;
 
         CALL_PLUGINS_V(
             PLUGIN_HkIServerImpl_SPMunitionCollision, __stdcall,

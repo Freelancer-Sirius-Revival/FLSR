@@ -191,7 +191,7 @@ namespace Cloak
 		{
 			for (NoCloakArea& objectArea : unprocessedObjectNoCloakAreas)
 			{
-				if (objectArea.objectId == solar->iID)
+				if (objectArea.objectId == solar->id)
 				{
 					objectArea.position = solar->get_position();
 					noCloakAreasPerSystem[solar->iSystem].push_back(objectArea);
@@ -201,20 +201,20 @@ namespace Cloak
 			// Jump Gates and Jump Holes are automatically added to the No Cloak Area list.
 			// Jump objects with Parent are ignored. It is assumed those are special objects not meant to be used by players.
 			uint type;
-			pub::SpaceObj::GetType(solar->iID, type);
-			if (type == OBJ_JUMP_GATE && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
+			pub::SpaceObj::GetType(solar->id, type);
+			if (type == ObjectType::JumpGate && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
 				NoCloakArea area;
-				area.objectId = solar->iID;
+				area.objectId = solar->id;
 				area.position = solar->get_position();
 				area.radius = jumpGateDecloakRadius;
 				area.NNVoiceMessageId = JUMP_GATE_NN_ID;
 				noCloakAreasPerSystem[solar->iSystem].push_back(area);
 			}
-			else if (type == OBJ_JUMP_HOLE && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
+			else if (type == ObjectType::JumpHole && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
 				NoCloakArea area;
-				area.objectId = solar->iID;
+				area.objectId = solar->id;
 				area.position = solar->get_position();
 				area.radius = jumpHoleDecloakRadius;
 				area.NNVoiceMessageId = JUMP_HOLE_NN_ID;
@@ -1066,21 +1066,15 @@ namespace Cloak
 			ClearClientData(clientId);
 	}
 
-	void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed)
+	void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		if (Modules::GetModuleState("CloakModule"))
+		if (Modules::GetModuleState("CloakModule") && killed)
 		{
-			if (!killed)
-				return;
-			const CShip* ship = (CShip*)ecx[4];
-			if (!ship)
-				return;
-			const uint clientId = ship->GetOwnerPlayer();
-			if (!clientId)
-				return;
-			ClearClientData(clientId);
+			const uint killedClientId = killedObject->cobj->GetOwnerPlayer();
+			if (HkIsValidClientID(killedClientId))
+				ClearClientData(killedClientId);
 		}
 	}
 

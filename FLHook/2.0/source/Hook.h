@@ -467,6 +467,7 @@ struct CLIENT_INFO {
     uint iShipOld;
     mstime tmSpawnTime;
 
+    DamageCause dmgLastCause;
     DamageList dmgLast;
 
     // money cmd
@@ -827,19 +828,23 @@ EXPORT void PrintLocalUserCmdText(uint iClientID, const std::wstring &wscMsg,
                                   float fDistance);
 
 // HkDeath
-void ShipDestroyedHook();
-void BaseDestroyed(uint iObject, uint iClientIDBy);
+void ShipDestroyedNaked();
+void SolarDestroyedNaked();
+void MineDestroyedNaked();
+void GuidedDestroyedNaked();
+void LootDestroyedNaked();
+void ShipColGrpDestroyedHookNaked();
+void ShipEquipDestroyedHookNaked();
+void SolarColGrpDestroyedHookNaked();
 
 // HkDamage
-void _HookMissileTorpHit();
-void _HkCb_AddDmgEntry();
-void _HkCb_GeneralDmg();
-void _HkCb_GeneralDmg2();
-bool AllowPlayerDamage(uint iClientID, uint iClientIDTarget);
-void _HkCb_NonGunWeaponHitsBase();
-extern FARPROC fpOldNonGunWeaponHitsBase;
-EXPORT extern bool g_gNonGunHitsBase;
-EXPORT extern float g_LastHitPts;
+void ApplyShipDamageListNaked();
+void HookExplosionHitNaked();
+void ShipHullDamageNaked();
+void ShipEquipDamageNaked();
+void ShipShieldDamageNaked();
+void ShipColGrpDamageNaked();
+void SolarHullDamageNaked();
 
 // HkCbCallbacks
 void _SendMessageHook();
@@ -910,9 +915,20 @@ extern EXPORT bool g_bMsg;
 extern EXPORT bool g_bMsgS;
 extern EXPORT bool g_bMsgU;
 
-extern FARPROC fpOldShipDestroyed;
-extern FARPROC fpOldMissileTorpHit;
-extern FARPROC fpOldGeneralDmg, fpOldGeneralDmg2;
+extern FARPROC ApplyShipDamageListOrigFunc;
+extern FARPROC ShipAndSolarColGrpDeathOrigFunc;
+extern FARPROC ShipEquipDeathOrigFunc;
+extern FARPROC ShipDestroyedOrigFunc;
+extern FARPROC SolarDestroyedOrigFunc;
+extern FARPROC LootDestroyedOrigFunc;
+extern FARPROC MineDestroyedOrigFunc;
+extern FARPROC GuidedDestroyedOrigFunc;
+extern FARPROC fpOldExplosionHit;
+extern FARPROC ShipHullDamageOrigFunc;
+extern FARPROC ShipEquipDamageOrigFunc;
+extern FARPROC ShipShieldDamageOrigFunc;
+extern FARPROC ShipColGrpDamageOrigFunc;
+extern FARPROC SolarHullDamageOrigFunc;
 
 extern EXPORT CDPClientProxy **g_cClientProxyArray;
 extern EXPORT void *pClient;

@@ -37,22 +37,24 @@ PATCH_INFO piServerDLL = {
     "server.dll",
     0x6CE0000,
     {
-        {0x6D67274, &ShipDestroyedHook, 4, &fpOldShipDestroyed, false},
-        {0x6D641EC, &_HkCb_AddDmgEntry, 4, 0, false},
-        {0x6D67320, &_HookMissileTorpHit, 4, &fpOldMissileTorpHit, false},
-        {0x6D65448, &_HookMissileTorpHit, 4, 0, false},
-        {0x6D67670, &_HookMissileTorpHit, 4, 0, false},
-        {0x6D653F4, &_HkCb_GeneralDmg, 4, &fpOldGeneralDmg, false},
-        {0x6D672CC, &_HkCb_GeneralDmg, 4, 0, false},
-        {0x6D6761C, &_HkCb_GeneralDmg, 4, 0, false},
-        {0x6D65458, &_HkCb_GeneralDmg2, 4, &fpOldGeneralDmg2, false},
-        {0x6D67330, &_HkCb_GeneralDmg2, 4, 0, false},
-        {0x6D67680, &_HkCb_GeneralDmg2, 4, 0, false},
-        {0x6D67668, &_HkCb_NonGunWeaponHitsBase, 4, &fpOldNonGunWeaponHitsBase,
-         false},
-        {0x6D6420C, &HkIEngine::_LaunchPos, 4, &HkIEngine::fpOldLaunchPos,
-         false},
-        {0x6D648E0, &HkIEngine::FreeReputationVibe, 4, 0, false},
+        //{0x6D672A4,		&ApplyShipDamageListNaked,			4, &ApplyShipDamageListOrigFunc,false},
+        //{0x6D67F4C,		&LootDestroyedNaked,				4, &LootDestroyedOrigFunc,	false},
+        //{0x6D661C4,		&MineDestroyedNaked,				4, &MineDestroyedOrigFunc,		false},
+        //{0x6D66694,		&GuidedDestroyedNaked,				4, &GuidedDestroyedOrigFunc,	false},
+        //{0x6D672D4,		&AllowPlayerDamageNaked,			4, &AllowPlayerDamageOrigFunc,	false},
+        //{0x6D6733C,		&ShipColGrpDestroyedHookNaked,		4, &ShipAndSolarColGrpDeathOrigFunc,		false},
+        {0x6D67340,		&ShipEquipDestroyedHookNaked,		4, &ShipEquipDeathOrigFunc,		false},
+        //{0x6D6768C,		&SolarColGrpDestroyedHookNaked,		4, 0,							false},
+        {0x6D67274,		&ShipDestroyedNaked,				4, &ShipDestroyedOrigFunc,			false},
+        {0x6D675C4,		&SolarDestroyedNaked,				4, &SolarDestroyedOrigFunc,		false},
+        //{0x6D672A0,		&HookExplosionHitNaked,				4, &fpOldExplosionHit,		    false},
+        {0x6D672CC,		&ShipHullDamageNaked,				4, &ShipHullDamageOrigFunc,		false},
+        {0x6D6732C,		&ShipEquipDamageNaked,		        4, &ShipEquipDamageOrigFunc,	false},
+        {0x6D67330,		&ShipShieldDamageNaked,		        4, &ShipShieldDamageOrigFunc,	false},
+        {0x6D67334,		&ShipColGrpDamageNaked,		        4, &ShipColGrpDamageOrigFunc,          false},
+        //{0x6D6761C,		&SolarHullDamageNaked,				4, &SolarHullDamageOrigFunc,    false},
+        {0x6D6420C,		&HkIEngine::_LaunchPos,				4, &HkIEngine::fpOldLaunchPos,	false},
+        {0x6D648E0,		&HkIEngine::FreeReputationVibe,		4, 0,							false},
 
         {0, 0, 0, 0} // terminate
     }};
@@ -175,6 +177,7 @@ void ClearClientInfo(uint iClientID) {
     ClientInfo[iClientID].tmF1Time = 0;
     ClientInfo[iClientID].tmF1TimeDisconnect = 0;
 
+    ClientInfo[iClientID].dmgLastCause = DamageCause::Unknown;
     DamageList dmg;
     ClientInfo[iClientID].dmgLast = dmg;
     ClientInfo[iClientID].dieMsgSize = CS_DEFAULT;

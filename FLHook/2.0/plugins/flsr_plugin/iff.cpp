@@ -340,59 +340,39 @@ namespace IFF
         return false;
     }
 
-    void __stdcall HkCb_AddDmgEntry(DamageList* damageList, unsigned short subObjectId, float hitpoints, DamageEntry::SubObjFate fate)
+    void ShipDamaged(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
     {
-        returncode = DEFAULT_RETURNCODE;
+        if (incomingDamage <= 0.0f)
+            return;
 
-        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == 0x01 || !HkIsValidClientID(iDmgTo))
+        const uint victimClientId = damagedObject->cobj->GetOwnerPlayer();
+        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == DamageCause::Collision || !HkIsValidClientID(victimClientId))
             return;
 
         const uint damagerClientId = HkGetClientIDByShip(damageList->get_inflictor_id());
-        if (!damagerClientId)
+        if (!HkIsValidClientID(damagerClientId))
             return;
 
-        if (AreInSameGroup(damagerClientId, iDmgTo))
+        if (AreInSameGroup(damagerClientId, victimClientId))
             return;
 
         // No-PvP system check
-        uint damagerSystemId;
-        pub::Player::GetSystem(damagerClientId, damagerSystemId);
+        uint victimSystemId;
+        pub::Player::GetSystem(victimClientId, victimSystemId);
         for (const auto& noPvPSystem : map_mapNoPVPSystems)
-            if (noPvPSystem.second == damagerSystemId)
+        {
+            if (noPvPSystem.second == victimSystemId)
                 return;
+        }
 
-        // Check if both players are in same system - reducing false positives due to FLHook bugged damage detection implementation
-        uint damagedSystemId;
-        pub::Player::GetSystem(iDmgTo, damagedSystemId);
-        if (!damagerSystemId || damagerSystemId != damagedSystemId)
-            return;
-
-        // Check if both players are in a range - limiting same bug as above
-        uint damagerShipId;
-        pub::Player::GetShip(damagerClientId, damagerShipId);
-        if (!damagerShipId)
-            return;
-        uint damagedShipId;
-        pub::Player::GetShip(iDmgTo, damagedShipId);
-        if (!damagedShipId)
-            return;
-        Vector damagerShipVector;
-        Matrix damagerShipRotation;
-        pub::SpaceObj::GetLocation(damagerShipId, damagerShipVector, damagerShipRotation);
-        Vector damagedShipVector;
-        Matrix damagedShipRotation;
-        pub::SpaceObj::GetLocation(damagedShipId, damagedShipVector, damagedShipRotation);
-        if (HkDistance3D(damagerShipVector, damagedShipVector) > 20000.0f)
-            return;
-
-        const auto& damageInflictorCharacterName = GetCharacterName(damagerClientId);
+        const std::wstring& damageInflictorCharacterName = GetCharacterName(damagerClientId);
 
         std::list<GROUP_MEMBER> members;
-        if (HkGetGroupMembers(ARG_CLIENTID(iDmgTo), members) != HKE_OK || members.size() < 1)
+        if (HkGetGroupMembers(ARG_CLIENTID(victimClientId), members) != HKE_OK || members.size() < 1)
         {
             GROUP_MEMBER member;
-            member.iClientID = iDmgTo;
-            member.wscCharname = GetCharacterName(iDmgTo);
+            member.iClientID = victimClientId;
+            member.wscCharname = GetCharacterName(victimClientId);
             members.push_back(member);
         }
 
@@ -415,6 +395,34 @@ namespace IFF
                 }
             }
         }
+    }
+
+    void __stdcall ShipEquipDamage(const IObjRW* damagedObject, const CEquip* hitEquip, const float& incomingDamage, const DamageList* damageList)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        ShipDamaged(damagedObject, incomingDamage, damageList);
+    }
+
+    void __stdcall ShipShieldDamage(const IObjRW* damagedObject, const CEShield* hitShield, const float& incomingDamage, const DamageList* damageList)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        ShipDamaged(damagedObject, incomingDamage, damageList);
+    }
+
+    void __stdcall ShipColGrpDamage(const IObjRW* damagedObject, const CArchGroup* hitColGrp, const float& incomingDamage, const DamageList* damageList)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        ShipDamaged(damagedObject, incomingDamage, damageList);
+    }
+
+    void __stdcall ShipHullDamage(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
+    {
+        returncode = DEFAULT_RETURNCODE;
+
+        ShipDamaged(damagedObject, incomingDamage, damageList);
     }
 
     void DeleteCharacterFromIFF(const std::string& characterFileName)

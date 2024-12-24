@@ -531,29 +531,18 @@ void PenalizeDeath(uint iClientID, uint iKillerID) {
     }
 }
 
-// Hook on ShipDestroyed
-void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
+void __stdcall ShipDestroyed(IObjRW* iobj, bool isKill, uint killerId)
+{
     returncode = DEFAULT_RETURNCODE;
 
-    if (iKill == 1) {
-        CShip* cship = (CShip*)ecx[4];
-        uint iClientID = cship->GetOwnerPlayer();
-        
-        uint iKillerID = 0;
-        if (iClientID) {
-            DamageList dmg;
-            if (dmg.get_cause() != 0x0)
-                dmg = ClientInfo[iClientID].dmgLast;
-            uint iClientIDKiller = HkGetClientIDByShip(dmg.get_inflictor_id());
-            if (iClientIDKiller && (iClientID != iClientIDKiller)) {
-                iKillerID = iClientIDKiller;
-                
+    if (!isKill)
+        return;
 
-            }
-
-            // Call function to penalize player and reward killer
-            PenalizeDeath(iClientID, iKillerID);
-        }
+    uint victimClientId = iobj->cobj->GetOwnerPlayer();
+    if (victimClientId)
+    {
+        uint killerClientId = HkGetClientIDByShip(killerId);
+        PenalizeDeath(victimClientId, victimClientId != killerClientId ? killerClientId : 0);
     }
 }
 

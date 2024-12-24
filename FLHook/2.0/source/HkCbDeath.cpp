@@ -3,29 +3,27 @@
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-std::wstring SetSizeToSmall(const std::wstring &wscDataFormat) {
-    uint iFormat = wcstoul(wscDataFormat.c_str() + 2, nullptr, 16);
+std::wstring SetSizeToSmall(const std::wstring& wscDataFormat)
+{
+    uint iFormat = wcstoul(wscDataFormat.c_str() + 2, 0, 16);
     wchar_t wszStyleSmall[32];
-    wcscpy_s(wszStyleSmall, wscDataFormat.c_str());
-    swprintf_s(wszStyleSmall + std::size(wscDataFormat) - 2, 3, L"%02X",
-               0x90 | (iFormat & 7));
-    return std::wstring(wszStyleSmall, std::size(wscDataFormat));
+    wcscpy(wszStyleSmall, wscDataFormat.c_str());
+    swprintf(wszStyleSmall + wcslen(wszStyleSmall) - 2, L"%02X", 0x90 | (iFormat & 7));
+    return wszStyleSmall;
 }
 
 /**************************************************************************************************************
 Send "Death: ..." chat-message
 **************************************************************************************************************/
 
-void SendDeathMsg(const std::wstring &wscMsg, uint iSystemID,
-                  uint iClientIDVictim, uint iClientIDKiller) {
-    CALL_PLUGINS_V(PLUGIN_SendDeathMsg, ,
-                   (const std::wstring &, uint, uint, uint),
-                   (wscMsg, iSystemID, iClientIDVictim, iClientIDKiller));
+void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller, DamageCause deathCause)
+{
 
-    // encode xml std::string(default and small)
+    CALL_PLUGINS_V(PLUGIN_SendDeathMsg, , (const std::wstring&, uint, uint, uint), (wscMsg, iSystemID, iClientIDVictim, iClientIDKiller));
+
+    // encode xml string(default and small)
     // non-sys
-    std::wstring wscXMLMsg =
-        L"<TRA data=\"" + set_wscDeathMsgStyle + L"\" mask=\"-1\"/> <TEXT>";
+    std::wstring wscXMLMsg = L"<TRA data=\"" + set_wscDeathMsgStyle + L"\" mask=\"-1\"/> <TEXT>";
     wscXMLMsg += XMLText(wscMsg);
     wscXMLMsg += L"</TEXT>";
 
@@ -35,64 +33,60 @@ void SendDeathMsg(const std::wstring &wscMsg, uint iSystemID,
         return;
 
     std::wstring wscStyleSmall = SetSizeToSmall(set_wscDeathMsgStyle);
-    std::wstring wscXMLMsgSmall = std::wstring(L"<TRA data=\"") +
-                                  wscStyleSmall + L"\" mask=\"-1\"/> <TEXT>";
+    std::wstring wscXMLMsgSmall = std::wstring(L"<TRA data=\"") + wscStyleSmall + L"\" mask=\"-1\"/> <TEXT>";
     wscXMLMsgSmall += XMLText(wscMsg);
     wscXMLMsgSmall += L"</TEXT>";
     char szBufSmall[0xFFFF];
     uint iRetSmall;
-    if (!HKHKSUCCESS(HkFMsgEncodeXML(wscXMLMsgSmall, szBufSmall,
-                                     sizeof(szBufSmall), iRetSmall)))
+    if (!HKHKSUCCESS(HkFMsgEncodeXML(wscXMLMsgSmall, szBufSmall, sizeof(szBufSmall), iRetSmall)))
         return;
 
     // sys
-    std::wstring wscXMLMsgSys =
-        L"<TRA data=\"" + set_wscDeathMsgStyleSys + L"\" mask=\"-1\"/> <TEXT>";
+    std::wstring wscXMLMsgSys = L"<TRA data=\"" + set_wscDeathMsgStyleSys + L"\" mask=\"-1\"/> <TEXT>";
     wscXMLMsgSys += XMLText(wscMsg);
     wscXMLMsgSys += L"</TEXT>";
     char szBufSys[0xFFFF];
     uint iRetSys;
-    if (!HKHKSUCCESS(
-            HkFMsgEncodeXML(wscXMLMsgSys, szBufSys, sizeof(szBufSys), iRetSys)))
+    if (!HKHKSUCCESS(HkFMsgEncodeXML(wscXMLMsgSys, szBufSys, sizeof(szBufSys), iRetSys)))
         return;
 
     std::wstring wscStyleSmallSys = SetSizeToSmall(set_wscDeathMsgStyleSys);
-    std::wstring wscXMLMsgSmallSys =
-        L"<TRA data=\"" + wscStyleSmallSys + L"\" mask=\"-1\"/> <TEXT>";
+    std::wstring wscXMLMsgSmallSys = L"<TRA data=\"" + wscStyleSmallSys + L"\" mask=\"-1\"/> <TEXT>";
     wscXMLMsgSmallSys += XMLText(wscMsg);
     wscXMLMsgSmallSys += L"</TEXT>";
     char szBufSmallSys[0xFFFF];
     uint iRetSmallSys;
-    if (!HKHKSUCCESS(HkFMsgEncodeXML(wscXMLMsgSmallSys, szBufSmallSys,
-                                     sizeof(szBufSmallSys), iRetSmallSys)))
+    if (!HKHKSUCCESS(HkFMsgEncodeXML(wscXMLMsgSmallSys, szBufSmallSys, sizeof(szBufSmallSys), iRetSmallSys)))
         return;
 
     // send
     // for all players
-    struct PlayerData *pPD = 0;
-    while (pPD = Players.traverse_active(pPD)) {
+    struct PlayerData* pPD = 0;
+    while (pPD = Players.traverse_active(pPD))
+    {
         uint iClientID = HkGetClientIdFromPD(pPD);
         uint iClientSystemID = 0;
         pub::Player::GetSystem(iClientID, iClientSystemID);
 
-        char *szXMLBuf;
+        char* szXMLBuf;
         int iXMLBufRet;
-        char *szXMLBufSys;
+        char* szXMLBufSys;
         int iXMLBufRetSys;
-        if (set_bUserCmdSetDieMsgSize &&
-            (ClientInfo[iClientID].dieMsgSize == CS_SMALL)) {
+        if (set_bUserCmdSetDieMsgSize && (ClientInfo[iClientID].dieMsgSize == CS_SMALL)) {
             szXMLBuf = szBufSmall;
             iXMLBufRet = iRetSmall;
             szXMLBufSys = szBufSmallSys;
             iXMLBufRetSys = iRetSmallSys;
-        } else {
+        }
+        else {
             szXMLBuf = szBuf;
             iXMLBufRet = iRet;
             szXMLBufSys = szBufSys;
             iXMLBufRetSys = iRetSys;
         }
 
-        if (!set_bUserCmdSetDieMsg) { // /set diemsg disabled, thus send to all
+        if (!set_bUserCmdSetDieMsg)
+        { // /set diemsg disabled, thus send to all
             if (iSystemID == iClientSystemID)
                 HkFMsgSendChat(iClientID, szXMLBufSys, iXMLBufRetSys);
             else
@@ -102,12 +96,9 @@ void SendDeathMsg(const std::wstring &wscMsg, uint iSystemID,
 
         if (ClientInfo[iClientID].dieMsg == DIEMSG_NONE)
             continue;
-        else if ((ClientInfo[iClientID].dieMsg == DIEMSG_SYSTEM) &&
-                 (iSystemID == iClientSystemID))
+        else if ((ClientInfo[iClientID].dieMsg == DIEMSG_SYSTEM) && (iSystemID == iClientSystemID))
             HkFMsgSendChat(iClientID, szXMLBufSys, iXMLBufRetSys);
-        else if ((ClientInfo[iClientID].dieMsg == DIEMSG_SELF) &&
-                 ((iClientID == iClientIDVictim) ||
-                  (iClientID == iClientIDKiller)))
+        else if ((ClientInfo[iClientID].dieMsg == DIEMSG_SELF) && ((iClientID == iClientIDVictim) || (iClientID == iClientIDKiller)))
             HkFMsgSendChat(iClientID, szXMLBufSys, iXMLBufRetSys);
         else if (ClientInfo[iClientID].dieMsg == DIEMSG_ALL) {
             if (iSystemID == iClientSystemID)
@@ -118,227 +109,347 @@ void SendDeathMsg(const std::wstring &wscMsg, uint iSystemID,
     }
 }
 
-/**************************************************************************************************************
-Called when ship was destroyed
-**************************************************************************************************************/
+void __stdcall ShipDestroyed(IObjRW* iobj, bool isKill, uint killerId)
+{
+    static uint lastShipId = 0;
 
-void __stdcall ShipDestroyed(DamageList *_dmg, DWORD *ecx, uint iKill) {
-
-    CALL_PLUGINS_V(PLUGIN_ShipDestroyed, __stdcall,
-                   (DamageList * _dmg, DWORD * ecx, uint iKill),
-                   (_dmg, ecx, iKill));
-
-    TRY_HOOK {
-        if (iKill == 1) {
-            CShip *cship = (CShip *)ecx[4];
-            uint iClientID = cship->GetOwnerPlayer();
-
-            if (iClientID) { // a player was killed
-                DamageList dmg;
-                try {
-                    dmg = *_dmg;
-                } catch (...) {
-                    return;
-                }
-
-                std::wstring wscEvent;
-                wscEvent.reserve(256);
-                wscEvent = L"kill";
-
-                uint iSystemID;
-                pub::Player::GetSystem(iClientID, iSystemID);
-                wchar_t wszSystem[64];
-                swprintf_s(wszSystem, L"%u", iSystemID);
-
-                if (!dmg.get_cause())
-                    dmg = ClientInfo[iClientID].dmgLast;
-
-                uint iCause = dmg.get_cause();
-                uint iClientIDKiller =
-                    HkGetClientIDByShip(dmg.get_inflictor_id());
-
-                std::wstring wscVictim =
-                    (wchar_t *)Players.GetActiveCharacterName(iClientID);
-                wscEvent += L" victim=" + wscVictim;
-                if (iClientIDKiller) {
-                    std::wstring wscType = L"";
-                    if (iCause == 0x05)
-                        wscType = L"Missile/Torpedo";
-                    else if (iCause == 0x07)
-                        wscType = L"Mine";
-                    else if ((iCause == 0x06) || (iCause == 0xC0) ||
-                             (iCause == 0x15))
-                        wscType = L"Wasp/Hornet";
-                    else if (iCause == 0x01)
-                        wscType = L"Collision";
-                    else if (iCause == 0x02)
-                        wscType = L"Gun";
-                    else {
-                        wscType =
-                            L"Gun"; // 0x02
-                                    //					AddLog("get_cause()
-                                    // returned %X", iCause);
-                    }
-
-                    std::wstring wscMsg;
-                    if (iClientID == iClientIDKiller) {
-                        wscEvent += L" type=selfkill";
-                        wscMsg = ReplaceStr(set_wscDeathMsgTextSelfKill,
-                                            L"%victim", wscVictim);
-                    } else {
-                        wscEvent += L" type=player";
-                        std::wstring wscKiller =
-                            (wchar_t *)Players.GetActiveCharacterName(
-                                iClientIDKiller);
-                        wscEvent += L" by=" + wscKiller;
-
-                        wscMsg = ReplaceStr(set_wscDeathMsgTextPlayerKill,
-                                            L"%victim", wscVictim);
-                        wscMsg = ReplaceStr(wscMsg, L"%killer", wscKiller);
-                    }
-
-                    wscMsg = ReplaceStr(wscMsg, L"%type", wscType);
-                    if (set_bDieMsg && wscMsg.length())
-                        SendDeathMsg(wscMsg, iSystemID, iClientID,
-                                     iClientIDKiller);
-                    ProcessEvent(L"%s", wscEvent.c_str());
-
-                    // MultiKillMessages
-                    if ((set_MKM_bActivated) &&
-                        (iClientID != iClientIDKiller)) {
-                        std::wstring wscKiller =
-                            (wchar_t *)Players.GetActiveCharacterName(
-                                iClientIDKiller);
-
-                        ClientInfo[iClientIDKiller].iKillsInARow++;
-                        for (auto &msg : set_MKM_lstMessages) {
-                            if (msg.iKillsInARow ==
-                                ClientInfo[iClientIDKiller].iKillsInARow) {
-                                std::wstring wscXMLMsg =
-                                    L"<TRA data=\"" + set_MKM_wscStyle +
-                                    L"\" mask=\"-1\"/> <TEXT>";
-                                wscXMLMsg += XMLText(ReplaceStr(
-                                    msg.wscMessage, L"%player", wscKiller));
-                                wscXMLMsg += L"</TEXT>";
-
-                                char szBuf[0xFFFF];
-                                uint iRet;
-                                if (!HKHKSUCCESS(HkFMsgEncodeXML(
-                                        wscXMLMsg, szBuf, sizeof(szBuf), iRet)))
-                                    break;
-
-                                // for all players in system...
-                                struct PlayerData *pPD = 0;
-                                while (pPD = Players.traverse_active(pPD)) {
-                                    uint iClientID = HkGetClientIdFromPD(pPD);
-                                    uint iClientSystemID = 0;
-                                    pub::Player::GetSystem(iClientID,
-                                                           iClientSystemID);
-                                    if ((iClientID == iClientIDKiller) ||
-                                        ((iSystemID == iClientSystemID) &&
-                                         (((ClientInfo[iClientID].dieMsg ==
-                                            DIEMSG_ALL) ||
-                                           (ClientInfo[iClientID].dieMsg ==
-                                            DIEMSG_SYSTEM)) ||
-                                          !set_bUserCmdSetDieMsg)))
-                                        HkFMsgSendChat(iClientID, szBuf, iRet);
-                                }
-                            }
-                        }
-                    }
-                } else if (dmg.get_inflictor_id()) {
-                    std::wstring wscType = L"";
-                    if (iCause == 0x05)
-                        wscType = L"Missile/Torpedo";
-                    else if (iCause == 0x07)
-                        wscType = L"Mine";
-                    else if ((iCause == 0x06) || (iCause == 0xC0) ||
-                             (iCause == 0x15))
-                        wscType = L"Wasp/Hornet";
-                    else if (iCause == 0x01)
-                        wscType = L"Collision";
-                    else
-                        wscType = L"Gun"; // 0x02
-
-                    wscEvent += L" type=npc";
-                    std::wstring wscMsg = ReplaceStr(set_wscDeathMsgTextNPC,
-                                                     L"%victim", wscVictim);
-                    wscMsg = ReplaceStr(wscMsg, L"%type", wscType);
-
-                    if (set_bDieMsg && wscMsg.length())
-                        SendDeathMsg(wscMsg, iSystemID, iClientID, 0);
-                    ProcessEvent(L"%s", wscEvent.c_str());
-                } else if (iCause == 0x08) {
-                    wscEvent += L" type=suicide";
-                    std::wstring wscMsg = ReplaceStr(set_wscDeathMsgTextSuicide,
-                                                     L"%victim", wscVictim);
-
-                    if (set_bDieMsg && wscMsg.length())
-                        SendDeathMsg(wscMsg, iSystemID, iClientID, 0);
-                    ProcessEvent(L"%s", wscEvent.c_str());
-                } else if (iCause == 0x18) {
-                    std::wstring wscMsg = ReplaceStr(
-                        set_wscDeathMsgTextAdminKill, L"%victim", wscVictim);
-
-                    if (set_bDieMsg && wscMsg.length())
-                        SendDeathMsg(wscMsg, iSystemID, iClientID, 0);
-                } else {
-                    std::wstring wscMsg = L"Death: " + wscVictim + L" has died";
-                    if (set_bDieMsg && wscMsg.length())
-                        SendDeathMsg(wscMsg, iSystemID, iClientID, 0);
-                }
-            }
-
-            ClientInfo[iClientID].iShipOld = ClientInfo[iClientID].iShip;
-            ClientInfo[iClientID].iShip = 0;
-        }
+    if (lastShipId == iobj->get_id())
+    {
+        return;
     }
-    CATCH_HOOK({})
+
+    lastShipId = iobj->get_id();
+
+    uint client = iobj->cobj->ownerPlayer;
+    if (client)
+    {
+        ClientInfo[client].iShipOld = ClientInfo[client].iShip;
+        ClientInfo[client].iShip = 0;
+    }
+
+    TRY_HOOK{
+        CALL_PLUGINS_V(PLUGIN_ShipDestroyed, __stdcall, (IObjRW * iobj, bool isKill, uint killerId), (iobj, isKill, killerId));
+
+        if (isKill && client) { // a player was killed
+
+            std::wstring wscEvent;
+            wscEvent.reserve(256);
+            wscEvent = L"kill";
+
+            uint iSystemID;
+            pub::Player::GetSystem(client, iSystemID);
+            wchar_t wszSystem[64];
+            swprintf(wszSystem, L"%u", iSystemID);
+
+            DamageCause iCause = ClientInfo[client].dmgLastCause;
+            uint iClientIDKiller = HkGetClientIDByShip(killerId);
+
+            std::wstring wscVictim = (wchar_t*)Players.GetActiveCharacterName(client);
+            wscEvent += L" victim=" + wscVictim;
+            if (iClientIDKiller) {
+                std::wstring wscType = L"";
+                if (iCause == DamageCause::MissileTorpedo)
+                    wscType = L"Missile/Torpedo";
+                else if (iCause == DamageCause::Mine)
+                    wscType = L"Mine";
+                else if ((iCause == DamageCause::CruiseDisrupter) || (iCause == DamageCause::UnkDisrupter) || (iCause == DamageCause::DummyDisrupter))
+                    wscType = L"Cruise Disruptor";
+                else if (iCause == DamageCause::Collision)
+                    wscType = L"Collision";
+                else if (iCause == DamageCause::Gun)
+                    wscType = L"Gun";
+                else {
+                    wscType = L"Gun"; //0x02
+                    //				AddLog("get_cause() returned %X", iCause);
+                }
+
+                std::wstring wscMsg;
+                if (client == iClientIDKiller) {
+                    wscEvent += L" type=selfkill";
+                    wscMsg = ReplaceStr(set_wscDeathMsgTextSelfKill, L"%victim", wscVictim);
+                }
+                else {
+                    wscEvent += L" type=player";
+                    std::wstring wscKiller = (wchar_t*)Players.GetActiveCharacterName(iClientIDKiller);
+                    wscEvent += L" by=" + wscKiller;
+
+                    wscMsg = ReplaceStr(set_wscDeathMsgTextPlayerKill, L"%victim", wscVictim);
+                    wscMsg = ReplaceStr(wscMsg, L"%killer", wscKiller);
+                }
+
+                wscMsg = ReplaceStr(wscMsg, L"%type", wscType);
+                if (set_bDieMsg && wscMsg.length())
+                    SendDeathMsg(wscMsg, iSystemID, client, iClientIDKiller, iCause);
+                ProcessEvent(L"%s", wscEvent.c_str());
+
+            }
+            else if (iCause == DamageCause::Admin) {
+                std::wstring wscMsg = ReplaceStr(set_wscDeathMsgTextAdminKill, L"%victim", wscVictim);
+
+                if (set_bDieMsg && wscMsg.length())
+                    SendDeathMsg(wscMsg, iSystemID, client, 0, iCause);
+            }
+            else if (!killerId) {
+                wscEvent += L" type=suicide";
+                std::wstring wscMsg = ReplaceStr(set_wscDeathMsgTextSuicide, L"%victim", wscVictim);
+
+                if (set_bDieMsg && wscMsg.length())
+                    SendDeathMsg(wscMsg, iSystemID, client, 0, iCause);
+                ProcessEvent(L"%s", wscEvent.c_str());
+            }
+            else
+            {
+                std::wstring wscType = L"";
+                if (iCause == DamageCause::MissileTorpedo)
+                    wscType = L"Missile/Torpedo";
+                else if (iCause == DamageCause::Mine)
+                    wscType = L"Mine";
+                else if ((iCause == DamageCause::CruiseDisrupter) || (iCause == DamageCause::DummyDisrupter) || (iCause == DamageCause::UnkDisrupter))
+                    wscType = L"Wasp/Hornet";
+                else if (iCause == DamageCause::Collision)
+                    wscType = L"Collision";
+                else
+                    wscType = L"Gun"; //0x02
+
+                wscEvent += L" type=npc";
+                std::wstring wscMsg = ReplaceStr(set_wscDeathMsgTextNPC, L"%victim", wscVictim);
+                wscMsg = ReplaceStr(wscMsg, L"%type", wscType);
+
+                if (set_bDieMsg && wscMsg.length())
+                    SendDeathMsg(wscMsg, iSystemID, client, 0, iCause);
+                ProcessEvent(L"%s", wscEvent.c_str());
+            }
+        }
+
+    } CATCH_HOOK({})
 }
 
-FARPROC fpOldShipDestroyed;
+FARPROC ShipDestroyedOrigFunc;
 
-__declspec(naked) void ShipDestroyedHook() {
-    __asm {
-        mov eax, [esp+0Ch] ; +4
-        mov edx, [esp+4]
+__declspec(naked) void ShipDestroyedNaked()
+{
+    __asm
+    {
         push ecx
-        push edx
+        push[esp + 0xC]
+        push[esp + 0xC]
         push ecx
-        push eax
         call ShipDestroyed
         pop ecx
-        mov eax, [fpOldShipDestroyed]
+        mov eax, [ShipDestroyedOrigFunc]
         jmp eax
     }
 }
-/**************************************************************************************************************
-Called when base was destroyed
-**************************************************************************************************************/
 
-void BaseDestroyed(uint iObject, uint iClientIDBy) {
+void __stdcall SolarDestroyed(IObjRW* iobj, bool isKill, uint killerId)
+{
+    TRY_HOOK
+    CALL_PLUGINS_V(PLUGIN_SolarDestroyed, __stdcall, (IObjRW * iobj, bool isKill, uint killerId), (iobj, isKill, killerId));
+    CATCH_HOOK({})
+}
 
-    CALL_PLUGINS_V(PLUGIN_BaseDestroyed, , (uint, uint),
-                   (iObject, iClientIDBy));
+FARPROC SolarDestroyedOrigFunc;
 
-    uint iID;
-    pub::SpaceObj::GetDockingTarget(iObject, iID);
-    Universe::IBase *base = Universe::get_base(iID);
-
-    const char* szBaseName = "";
-    if (base) {
-        __asm {
-            pushad
-            mov ecx, [base]
-            mov eax, [base]
-            mov eax, [eax]
-            call [eax+4]
-            mov [szBaseName], eax
-            popad
-        }
+__declspec(naked) void SolarDestroyedNaked()
+{
+    __asm
+    {
+        push ecx
+        push[esp + 0xC]
+        push[esp + 0xC]
+        push ecx
+        call SolarDestroyed
+        pop ecx
+        mov eax, [SolarDestroyedOrigFunc]
+        jmp eax
     }
+}
 
-    ProcessEvent(L"basedestroy basename=%s basehash=%u solarhash=%u by=%s",
-                 stows(szBaseName).c_str(), iObject, iID,
-                 (wchar_t *)Players.GetActiveCharacterName(iClientIDBy));
+inline int MineDestroyedPluginCaller(IObjRW* iobj, bool isKill, uint killerId)
+{
+    CALL_PLUGINS(PLUGIN_MineDestroyed, int, __stdcall, (IObjRW * iobj, bool isKill, uint killerId), (iobj, isKill, killerId));
+    return 0;
+}
+
+bool __stdcall MineDestroyed(IObjRW* iobj, bool isKill, uint killerId)
+{
+    TRY_HOOK
+        int pluginResult = MineDestroyedPluginCaller(iobj, isKill, killerId);
+        switch (pluginResult)
+        {
+        case 0:
+            return true;
+        case 1:
+            if (!isKill)
+            {
+                pub::SpaceObj::Destroy(((CSimple*)iobj->cobj)->id, DestroyType::FUSE);
+                return false;
+            }
+            break;
+        case 2:
+            if (isKill)
+            {
+                pub::SpaceObj::Destroy(((CSimple*)iobj->cobj)->id, DestroyType::VANISH);
+                return false;
+            }
+            break;
+        }
+        return true;
+    CATCH_HOOK(AddLog("MineDestroyed exception"); return true)
+}
+
+FARPROC MineDestroyedOrigFunc;
+
+__declspec(naked) void MineDestroyedNaked()
+{
+    __asm {
+        push ecx
+        push[esp + 0xC]
+        push[esp + 0xC]
+        push ecx
+        call MineDestroyed
+        pop ecx
+        test al, al
+        jz skipLabel
+        mov eax, [MineDestroyedOrigFunc]
+        jmp eax
+        skipLabel :
+        ret 0x8
+    }
+}
+
+inline bool GuidedDestroyedPluginCaller(IObjRW* iobj, bool isKill, uint killerId)
+{
+    static IObjRW* lastIObj = nullptr;
+    if (lastIObj == iobj)
+    {
+        return true;
+    }
+    lastIObj = iobj;
+
+    CALL_PLUGINS(PLUGIN_GuidedDestroyed, bool, __stdcall, (IObjRW * iobj, bool isKill, uint killerId), (iobj, isKill, killerId));
+    return true;
+}
+
+bool __stdcall GuidedDestroyed(IObjRW* iobj, bool isKill, uint killerId)
+{
+    TRY_HOOK
+    if (!GuidedDestroyedPluginCaller(iobj, isKill, killerId))
+    {
+        pub::SpaceObj::Destroy(((CSimple*)iobj->cobj)->id, DestroyType::VANISH);
+        return false;
+    }
+    return true;
+    CATCH_HOOK(AddLog("GuidedDestroyed exception"); return true)
+}
+
+FARPROC GuidedDestroyedOrigFunc;
+
+__declspec(naked) void GuidedDestroyedNaked()
+{
+
+    __asm {
+        push ecx
+        push[esp + 0xC]
+        push[esp + 0xC]
+        push ecx
+        call GuidedDestroyed
+        pop ecx
+        test al, al
+        jz skipLabel
+        mov eax, [GuidedDestroyedOrigFunc]
+        jmp eax
+        skipLabel :
+        ret 0x8
+    }
+}
+
+void __stdcall LootDestroyed(IObjRW* iobj)
+{
+}
+
+FARPROC LootDestroyedOrigFunc;
+
+__declspec(naked) void LootDestroyedNaked()
+{
+    __asm {
+        push ecx
+        push ecx
+        call LootDestroyed
+        pop ecx
+        jmp[LootDestroyedOrigFunc]
+    }
+}
+
+FARPROC ShipAndSolarColGrpDeathOrigFunc;
+
+void __stdcall ShipColGrpDestroyedHook(IObjRW* iobj, CArchGroup* colGrp, DamageEntry::SubObjFate fate, DamageList* dmgList)
+{
+    TRY_HOOK
+    CALL_PLUGINS_V(PLUGIN_ShipColGrpDestroyed, , (IObjRW*, CArchGroup*, DamageEntry::SubObjFate fate, DamageList*), (iobj, colGrp, fate, dmgList));
+    CATCH_HOOK({})
+}
+
+__declspec(naked) void ShipColGrpDestroyedHookNaked()
+{
+    __asm
+    {
+        push ecx
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push ecx
+        call ShipColGrpDestroyedHook
+        pop ecx
+        mov eax, [ShipAndSolarColGrpDeathOrigFunc]
+        jmp eax
+    }
+}
+
+FARPROC ShipEquipDeathOrigFunc;
+
+void __stdcall ShipEquipDestroyedHook(IObjRW* iobj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
+{
+    TRY_HOOK
+    CALL_PLUGINS_V(PLUGIN_ShipEquipDestroyed, , (IObjRW*, CEquip*, DamageEntry::SubObjFate fate, DamageList*), (iobj, equip, fate, dmgList));
+    CATCH_HOOK({})
+}
+
+__declspec(naked) void ShipEquipDestroyedHookNaked()
+{
+    __asm
+    {
+        push ecx
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push ecx
+        call ShipEquipDestroyedHook
+        pop ecx
+        mov eax, [ShipEquipDeathOrigFunc]
+        jmp eax
+    }
+}
+
+void __stdcall SolarColGrpDestroyedHook(IObjRW* iobj, CArchGroup* colGrp, DamageEntry::SubObjFate fate, DamageList* dmgList)
+{
+    TRY_HOOK
+    CALL_PLUGINS_V(PLUGIN_SolarColGrpDestroyed, , (IObjRW*, CArchGroup*, DamageEntry::SubObjFate fate, DamageList*), (iobj, colGrp, fate, dmgList));
+    CATCH_HOOK({})
+}
+
+__declspec(naked) void SolarColGrpDestroyedHookNaked()
+{
+    __asm
+    {
+        push ecx
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push ecx
+        call SolarColGrpDestroyedHook
+        pop ecx
+        mov eax, [ShipAndSolarColGrpDeathOrigFunc]
+        jmp eax
+    }
 }

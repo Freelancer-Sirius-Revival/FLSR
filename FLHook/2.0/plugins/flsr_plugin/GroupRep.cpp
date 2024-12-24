@@ -2,6 +2,8 @@
 
 namespace GroupReputation
 {
+    const float MAX_REPUTATION_TRANSFER_DISTANCE = 10000.0f;
+
     struct RepChangeEffects
     {
         uint groupId = 0;
@@ -10,8 +12,6 @@ namespace GroupReputation
     };
 
     static std::unordered_map<uint, RepChangeEffects> groupReputationChangeEffects;
-
-    static std::unordered_map<uint, mstime> destroyedShipIdsWithTimeStamp;
 
     static float maxReputationThreshold = 0.9f;
 
@@ -111,7 +111,7 @@ namespace GroupReputation
             maxReputationThreshold = 1.0f - *(double*)(DWORD(contentHandle) + 0x11B930);
     }
 
-    void ChangeReputationRelative(int clientReputationId, int groupId, float value)
+    void ChangeReputationRelative(const int clientReputationId, const int groupId, const float value)
     {
         if (value == 0.0f)
             return;
@@ -121,7 +121,7 @@ namespace GroupReputation
         pub::Reputation::SetReputation(clientReputationId, groupId, std::max(-maxReputationThreshold, std::min(currentValue + value, maxReputationThreshold)));
     }
 
-    void ChangeReputationOfGroup(uint clientId, uint otherGroupId)
+    void ChangeReputationOfGroup(const uint clientId, const uint otherGroupId)
     {
         if (!HkIsValidClientID(clientId))
             return;
@@ -168,7 +168,7 @@ namespace GroupReputation
                 Matrix memberShipRotation;
                 pub::SpaceObj::GetLocation(memberShipId, memberShipVector, memberShipRotation);
 
-                if (HkDistance3D(clientShipVector, memberShipVector) > 10000.0f)
+                if (HkDistance3D(clientShipVector, memberShipVector) > MAX_REPUTATION_TRANSFER_DISTANCE)
                     continue;
 
                 int memberReputationId;
@@ -185,77 +185,40 @@ namespace GroupReputation
         }
     }
 
-    void BaseDestroyed(uint objectId, uint clientId)
-    {
-        int baseReputationId;
-        pub::SpaceObj::GetSolarRep(objectId, baseReputationId);
-        if (!baseReputationId)
-            return;
-
-        uint baseGroupId;
-        Reputation::Vibe::GetAffiliation(baseReputationId, baseGroupId, false);
-        if (!baseGroupId)
-            return;
-
-        ChangeReputationOfGroup(clientId, baseGroupId);
-    }
-
-    void __stdcall ShipDestroyed(DamageList* dmg, DWORD* ecx, uint killed)
+    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
         returncode = DEFAULT_RETURNCODE;
 
         if (!killed)
             return;
-        CShip* cship = (CShip*)ecx[4];
-        if (cship->GetOwnerPlayer())
-            return;
-        uint victimShipId = cship->iID;
-        if (!victimShipId)
+
+        const uint killerClientId = HkGetClientIDByShip(killerShipId);
+        if (!killerClientId)
             return;
 
-        if (destroyedShipIdsWithTimeStamp.contains(victimShipId))
-            return;
-
-        destroyedShipIdsWithTimeStamp[victimShipId] = timeInMS();
-
-        //unknown and mutating(??) datatype. Casted to FLPACKET_UNKNOWN for ease of access to individual elements
-        FLPACKET_UNKNOWN* data = reinterpret_cast<FLPACKET_UNKNOWN*>(dmg);
-
-        //First argument is some unknown datatype pointer, not DamageList
-        //In case of ship having died to a death fuse, [2] is equal to 1 and actual killer spaceObjId is in [5]
-        //When death fuse has a duration > 0, both events fire, in case of an instant death fuse, only the fuse death is broadcasted.
-        //As such, we need to handle all 3 scenarios (no fuse, long fuse, instant fuse) by checking for both events and avoiding paying out the bounty twice.
-
-        uint killerShipId;
-        if (data->iDunno[4]) // Represents death's damage cause in case of fuse death
-        {
-            killerShipId = data->iDunno[5]; // in case of fuse death, killerShipId is held here
-        }
-        else
-        {
-            killerShipId = data->iDunno[2]; // in case of fuse death equals an indetermined non-zero value, otherwise it is killerShipId.
-        }
-        uint killerClientId = HkGetClientIDByShip(killerShipId);
-
-        int victimReputationId;
-        pub::SpaceObj::GetRep(victimShipId, victimReputationId);
+        // Solars have their nickname ID directly mapped to their Reputation ID
+        const uint victimReputationId = (killedObject->cobj)->get_id();
         uint victimGroupId;
         Reputation::Vibe::GetAffiliation(victimReputationId, victimGroupId, false);
 
         ChangeReputationOfGroup(killerClientId, victimGroupId);
     }
 
-    void CleanDestroyedShipRegistry()
+    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
-        const mstime now = timeInMS();
-        std::vector<uint> shipIdsToRemove;
-        for (const auto& shipIdTimeStamp : destroyedShipIdsWithTimeStamp)
-        {
-            if (shipIdTimeStamp.second + 30000 < now)
-                shipIdsToRemove.push_back(shipIdTimeStamp.first);
-        }
+        returncode = DEFAULT_RETURNCODE;
 
-        for (const uint shipId : shipIdsToRemove)
-            destroyedShipIdsWithTimeStamp.erase(shipId);
+        if (!killed || killedObject->cobj->GetOwnerPlayer())
+            return;
+
+        const uint killerClientId = HkGetClientIDByShip(killerShipId);
+        if (!killerClientId)
+            return;
+
+        const uint victimReputationId = reinterpret_cast<CShip*>(killedObject->cobj)->repVibe;
+        uint victimGroupId;
+        Reputation::Vibe::GetAffiliation(victimReputationId, victimGroupId, false);
+
+        ChangeReputationOfGroup(killerClientId, victimGroupId);
     }
 }

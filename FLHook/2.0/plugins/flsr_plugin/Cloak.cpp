@@ -191,7 +191,7 @@ namespace Cloak
 		{
 			for (NoCloakArea& objectArea : unprocessedObjectNoCloakAreas)
 			{
-				if (objectArea.objectId == solar->id)
+				if (objectArea.objectId == solar->get_id())
 				{
 					objectArea.position = solar->get_position();
 					noCloakAreasPerSystem[solar->iSystem].push_back(objectArea);
@@ -205,7 +205,7 @@ namespace Cloak
 			if (type == ObjectType::JumpGate && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
 				NoCloakArea area;
-				area.objectId = solar->id;
+				area.objectId = solar->get_id();
 				area.position = solar->get_position();
 				area.radius = jumpGateDecloakRadius;
 				area.NNVoiceMessageId = JUMP_GATE_NN_ID;
@@ -214,7 +214,7 @@ namespace Cloak
 			else if (type == ObjectType::JumpHole && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
 				NoCloakArea area;
-				area.objectId = solar->id;
+				area.objectId = solar->get_id();
 				area.position = solar->get_position();
 				area.radius = jumpHoleDecloakRadius;
 				area.NNVoiceMessageId = JUMP_HOLE_NN_ID;
@@ -1064,6 +1064,24 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 			ClearClientData(clientId);
+	}
+
+	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("CloakModule"))
+		{
+			auto& systemNoCloakAreas = noCloakAreasPerSystem[killedObject->cobj->iSystem];
+			for (auto it = systemNoCloakAreas.begin(); it != systemNoCloakAreas.end(); it++)
+			{
+				if (it->objectId == killedObject->cobj->get_id())
+				{
+					systemNoCloakAreas.erase(it);
+					break;
+				}
+			}
+		}
 	}
 
 	void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)

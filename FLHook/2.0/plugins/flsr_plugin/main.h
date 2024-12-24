@@ -454,6 +454,7 @@ namespace Cloak
     void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
     void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
+    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
     void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
     void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise);
     void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);

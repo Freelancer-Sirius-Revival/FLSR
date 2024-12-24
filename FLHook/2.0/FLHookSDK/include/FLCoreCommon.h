@@ -2908,35 +2908,42 @@ public:
 class IMPORT CEquipManager
 {
 public:
-	CEquipManager(class CEquipManager const &);
+	CEquipManager(class CEquipManager const&);
 	CEquipManager(void);
 	~CEquipManager(void);
-	class CEquipManager & operator=(class CEquipManager const &);
-	bool AddNewEquipment(class CEquip *);
+	class CEquipManager& operator=(class CEquipManager const&);
+	bool AddNewEquipment(class CEquip*);
 	int CleanUp(void);
 	void Clear(void);
-	class CExternalEquip * FindByHardpoint(struct CacheString const &);
-	class CExternalEquip const * FindByHardpoint(struct CacheString const &)const ;
-	class CEquip * FindByID(unsigned short);
-	class CEquip const * FindByID(unsigned short)const ;
-	class CEquip * FindFirst(unsigned int);
-	class CEquip const * FindFirst(unsigned int)const ;
-	bool HasDecayingCargo(void)const ;
-	bool Init(struct CEqObj *);
-	unsigned short InstToSubObjID(long)const ;
-	class CEquip * ReverseTraverse(class CEquipTraverser &);
-	class CEquip const * ReverseTraverse(class CEquipTraverser &)const ;
-	int Size(void)const ;
-	class CEquip * Traverse(class CEquipTraverser &);
-	class CEquip const * Traverse(class CEquipTraverser &)const ;
-	bool VerifyListSync(class EquipDescList const &)const ;
+	class CExternalEquip* FindByHardpoint(struct CacheString const&);
+	class CExternalEquip const* FindByHardpoint(struct CacheString const&)const;
+	class CEquip* FindByID(unsigned short);
+	class CEquip const* FindByID(unsigned short)const;
+	class CEquip* FindFirst(unsigned int);
+	class CEquip const* FindFirst(unsigned int)const;
+	bool HasDecayingCargo(void)const;
+	bool Init(struct CEqObj*);
+	unsigned short InstToSubObjID(long)const;
+	class CEquip* ReverseTraverse(class CEquipTraverser&);
+	class CEquip const* ReverseTraverse(class CEquipTraverser&)const;
+	int Size(void)const;
+	class CEquip* Traverse(class CEquipTraverser&);
+	class CEquip const* Traverse(class CEquipTraverser&)const;
+	bool VerifyListSync(class EquipDescList const&)const;
 
 private:
-	int CleanUp(class st6::list<class CEquip *,class st6::allocator<class CEquip *> > &);
-	static void  Clear(class st6::list<class CEquip *,class st6::allocator<class CEquip *> > &);
+	int CleanUp(class std::list<class CEquip*, class std::allocator<class CEquip*> >&);
+	static void  Clear(class std::list<class CEquip*, class std::allocator<class CEquip*> >&);
 
 public:
-	unsigned char data[180];
+	/* 0 */ CEqObj* parent;
+	/* 1 */ bool bDunno4;
+	/* 2 */ uint unkPtr1;
+	/* 3 */ int size1;
+	/* 4 */ bool bDunno10;
+	/* 5 */ uint unkPtr2;
+	/* 6 */ int size2;
+	/* 7 */ uint decayingCargo;
 };
 
 class IMPORT CEquipTraverser

@@ -411,7 +411,7 @@ FARPROC ShipEquipDeathOrigFunc;
 void __stdcall ShipEquipDestroyedHook(IObjRW* iobj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
 {
     TRY_HOOK
-    CALL_PLUGINS_V(PLUGIN_ShipEquipDestroyed, , (IObjRW*, CEquip*, DamageEntry::SubObjFate fate, DamageList*), (iobj, equip, fate, dmgList));
+    CALL_PLUGINS_V(PLUGIN_ShipEquipDestroyed, __stdcall, (IObjRW*, CEquip*, DamageEntry::SubObjFate fate, DamageList*), (iobj, equip, fate, dmgList));
     CATCH_HOOK({})
 }
 

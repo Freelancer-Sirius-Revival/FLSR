@@ -842,12 +842,6 @@ namespace Cloak
 			if (!IsValidCloakableClient(clientId))
 				continue;
 
-			if (!clientCloakStats[clientId].activatorCargoId || !HasMountedEquipmentByCargoId(clientId, clientCloakStats[clientId].activatorCargoId))
-			{
-				clientCloakStats[clientId].activatorCargoId = 0;
-				QueueUncloak(clientId, UncloakReason::Destroyed);
-			}
-
 			const CloakState& cloakState = clientCloakStats[clientId].cloakState;
 
 			// Synchronize cloak state to all players
@@ -1064,6 +1058,26 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 			ClearClientData(clientId);
+	}
+
+	void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (Modules::GetModuleState("CloakModule"))
+		{
+			const uint clientId = object->cobj->GetOwnerPlayer();
+			if (IsValidCloakableClient(clientId))
+			{
+				EquipDesc equipDescriptor;
+				equip->GetEquipDesc(equipDescriptor);
+				if (clientCloakStats[clientId].activatorCargoId == equipDescriptor.sID)
+				{
+					clientCloakStats[clientId].activatorCargoId = 0;
+					QueueUncloak(clientId, UncloakReason::Destroyed);
+				}
+			}
+		}
 	}
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)

@@ -49,6 +49,11 @@ File: EXE\common.dll
 # Reputation over which will give you affiliation with that faction (faction name appears in space before your name). - Dev
 18D5D4: 1.0f	[ 0.9f ]
 
+
+##########################################
+# World
+##########################################
+
 # Adjust cruise speed according to drag_modifier. - adoxa
 053796: EB	[ 74 ]
 
@@ -56,11 +61,6 @@ File: EXE\common.dll
 03659E: 79	[ 4F ]
 036618: 8B 8E 94 01 00 00 EB 14	[ 90 90 90 90 90 90 90 90 ]
 036634: E3 B8 6A 00 E8 A3 D5 03 00 EB AF	[ 90 90 90 90 90 90 90 90 90 90 90 ]
-
-
-##########################################
-# World
-##########################################
 
 # Make drag_modifier independent of interference/damage. - adoxa
 0DAD24: 41 74	[ 05 7B ]

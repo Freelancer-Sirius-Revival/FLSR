@@ -69,6 +69,9 @@ File: DLLS\BIN\Content.dll
 # Hostile docking reputation. - adoxa
 11BCF4: -0.4f	[ -0.6f ]
 
+# Minimum reputation when NPCs stop getting angry when damaged. Rounded by the game to to the nearest hundreth (e.g. 0.995 becomes 1.0) - BC46
+11BD84: 1.1f	[ 1.0f ]
+
 # Adjustment for maximum reputation (lowest/highest rep +-adjustment). - adoxa
 11B930: 0.0001d	[ 0.1d ]
 

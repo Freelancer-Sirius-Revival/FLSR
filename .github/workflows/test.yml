@@ -24,11 +24,9 @@ jobs:
           with:
               go-version: 1.22.5
 
-        - name: Patch to latest
-          run: |
-            cp autopatch.go ${{ github.workspace }}/freelancer_folder
-            cd ${{ github.workspace }}/freelancer_folder
-            go run autopatch.go
+        - name: Merge latest FLSR files (from Freelancer folder) to clean vanilla (to freelancer_folder)
+          run: go run autopatch.go
+
         - name: Sprinkle with FLSR recipes
           run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder
 

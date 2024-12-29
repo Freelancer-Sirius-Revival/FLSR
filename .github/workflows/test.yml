@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request: {}
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-22.04
+    steps:
+        - name: Check out source repository
+          uses: actions/checkout@v2
+
+        - uses: darklab8/fl-configs/.github/actions/checkout-freelancer@master
+          with:
+            freelancer-mod: "vanilla"
+            freelancer-folder: ${{ github.workspace }}/freelancer_folder
+            ssh-key-base64-vanilla: ${{ secrets.ID_RSA_FILES_FREELANCER_VANILLA }}
+
+        - name: Set up Go
+          uses: actions/setup-go@v3
+          with:
+              go-version: 1.22.5
+
+        - name: Patch to latest
+          run: |
+            cp autopatch.go ${{ github.workspace }}/freelancer_folder
+            cd ${{ github.workspace }}/freelancer_folder
+            go run autopatch.go
+        - name: Sprinkle with FLSR recipes
+          run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder
+
+        - name: Install Darklint
+          run: |
+            curl -L $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/darklab8/darklint/releases/latest | sed "s/releases\/tag/releases\/download/")/darklint-linux-amd64 -o /usr/local/bin/darklint && chmod 777 /usr/local/bin/darklint
+        - name: Run darklint checks
+          run: darklint format --dry
+          env:
+            FREELANCER_FOLDER: ${{ github.workspace }}/freelancer_folder
+            FREELANCER_FOLDER_FAILBACK: ${{ github.workspace }}/Freelancer

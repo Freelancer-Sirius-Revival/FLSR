@@ -34,7 +34,7 @@ jobs:
 
         - name: Install Darklint
           run: |
-            curl -L $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/darklab8/darklint/releases/latest | sed "s/releases\/tag/releases\/download/")/darklint-linux-amd64 -o /usr/local/bin/darklint && chmod 777 /usr/local/bin/darklint
+            curl -L $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/darklab8/fl-darklint/releases/latest | sed "s/releases\/tag/releases\/download/")/darklint-linux-amd64 -o /usr/local/bin/darklint && chmod 777 /usr/local/bin/darklint
         - name: Run darklint checks
           run: darklint format --dry
           env:

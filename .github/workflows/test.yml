@@ -13,28 +13,24 @@ jobs:
         - name: Check out source repository
           uses: actions/checkout@v2
 
-        - uses: darklab8/fl-configs/.github/actions/checkout-freelancer@master
+        - uses: darklab8/infra/.github/actions/checkout-freelancer@master
           with:
             freelancer-mod: "vanilla"
             freelancer-folder: ${{ github.workspace }}/freelancer_folder
             ssh-key-base64-vanilla: ${{ secrets.ID_RSA_FILES_FREELANCER_VANILLA }}
 
         - name: Set up Go
-          uses: actions/setup-go@v3
-          with:
-              go-version: 1.22.5
+          uses: darklab8/infra/.github/actions/install-go@master
         
         - name: Install flsr patcher
           run: go install github.com/darklab8/fl-data-flsr@latest
         - name: Merge latest FLSR files (from Freelancer folder) to clean vanilla (to freelancer_folder)
-          run: fl-data-flsr
-
+          run: fl-data-flsr -wd ${{ github.workspace }}/freelancer_folder
         - name: Sprinkle with FLSR recipes
           run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder
 
-        - name: Install Darklint
-          run: |
-            curl -L $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/darklab8/fl-darklint/releases/latest | sed "s/releases\/tag/releases\/download/")/darklint-linux-amd64 -o /usr/local/bin/darklint && chmod 777 /usr/local/bin/darklint
+        - name: Install darklint
+          uses: darklab8/infra/.github/actions/install-darklint@master
         - name: Run darklint checks
           run: darklint format --dry
           env:

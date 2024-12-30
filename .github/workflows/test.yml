@@ -32,7 +32,7 @@ jobs:
         - name: Install fl-darklint
           uses: darklab8/infra/.github/actions/install-darklint@master
         - name: Run darklint checks
-          run: fl-darklint format --dry
+          run: fl-darklint validate
           env:
             FREELANCER_FOLDER: ${{ github.workspace }}/freelancer_folder
             FREELANCER_FOLDER_FAILBACK: ${{ github.workspace }}/Freelancer

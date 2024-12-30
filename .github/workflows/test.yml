@@ -27,7 +27,7 @@ jobs:
         - name: Install flsr patcher
           run: go install github.com/darklab8/fl-data-flsr@latest
         - name: Merge latest FLSR files (from Freelancer folder) to clean vanilla (to freelancer_folder)
-          run: go run autopatch.go
+          run: fl-data-flsr
 
         - name: Sprinkle with FLSR recipes
           run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder

@@ -29,10 +29,10 @@ jobs:
         - name: Sprinkle with FLSR recipes
           run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder
 
-        - name: Install darklint
+        - name: Install fl-darklint
           uses: darklab8/infra/.github/actions/install-darklint@master
         - name: Run darklint checks
-          run: darklint format --dry
+          run: fl-darklint format --dry
           env:
             FREELANCER_FOLDER: ${{ github.workspace }}/freelancer_folder
             FREELANCER_FOLDER_FAILBACK: ${{ github.workspace }}/Freelancer

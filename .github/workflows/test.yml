@@ -23,7 +23,9 @@ jobs:
           uses: actions/setup-go@v3
           with:
               go-version: 1.22.5
-
+        
+        - name: Install flsr patcher
+          run: go install github.com/darklab8/fl-data-flsr@latest
         - name: Merge latest FLSR files (from Freelancer folder) to clean vanilla (to freelancer_folder)
           run: go run autopatch.go
 

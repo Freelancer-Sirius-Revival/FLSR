@@ -1,0 +1,38 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request: {}
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-22.04
+    steps:
+        - name: Check out source repository
+          uses: actions/checkout@v2
+
+        - uses: darklab8/infra/.github/actions/checkout-freelancer@master
+          with:
+            freelancer-mod: "vanilla"
+            freelancer-folder: ${{ github.workspace }}/freelancer_folder
+            ssh-key-base64-vanilla: ${{ secrets.ID_RSA_FILES_FREELANCER_VANILLA }}
+
+        - name: Set up Go
+          uses: darklab8/infra/.github/actions/install-go@master
+        
+        - name: Install flsr patcher
+          run: go install github.com/darklab8/fl-data-flsr@latest
+        - name: Merge latest FLSR files (from Freelancer folder) to clean vanilla (to freelancer_folder)
+          run: fl-data-flsr -wd ${{ github.workspace }}/freelancer_folder
+        - name: Sprinkle with FLSR recipes
+          run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder
+
+        - name: Install fl-darklint
+          uses: darklab8/infra/.github/actions/install-darklint@master
+        - name: Run darklint checks
+          run: fl-darklint validate
+          env:
+            FREELANCER_FOLDER: ${{ github.workspace }}/freelancer_folder
+            FREELANCER_FOLDER_FAILBACK: ${{ github.workspace }}/Freelancer

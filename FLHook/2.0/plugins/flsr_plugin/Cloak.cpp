@@ -657,7 +657,7 @@ namespace Cloak
 		{
 			result = CloakReturnState::Successful;
 		}
-		else if (clientCloakStats[clientId].dockingManeuverActive || ClientInfo[clientId].bTradelane)
+		else if (bool inTradelane = false; clientCloakStats[clientId].dockingManeuverActive || (clientCloakStats[clientId].shipInspect->is_using_tradelane(&inTradelane) == 0 && inTradelane))
 		{
 			result = CloakReturnState::DockSequence;
 			PlayDrySound(clientId);

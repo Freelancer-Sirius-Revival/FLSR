@@ -220,6 +220,7 @@ File: EXE\Freelancer.exe
 # Load purchased equipment into cargo hold if a suitable hardpoint is unavailable (instead of mounting it internally). - BC46
 7EC69: 00	[ 29 ]
 
+
 ##########################################
 # Rendering
 ##########################################
@@ -247,3 +248,11 @@ File: EXE\Freelancer.exe
 
 # Activate [light] lightsource_cone entries. - adoxa
 131D2B: B0 01 90	[ 0F 94 C0 ]
+
+
+##########################################
+# Reputation
+##########################################
+
+# Faction which is by default added to the list of known factions after opening the Player Status menu. - BC46
+1D4848: 00	[ "l" ]

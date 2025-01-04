@@ -459,7 +459,7 @@ namespace Mark
     void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
         returncode = DEFAULT_RETURNCODE;
-        UnmarkEverywhere(killedObject->cobj->id);
+        UnmarkEverywhere(killedObject->cobj->get_id());
     }
 
     void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
@@ -472,7 +472,7 @@ namespace Mark
             const uint clientId = obj->GetOwnerPlayer();
             if (clientId)
             {
-                RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(obj->id);
+                RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(obj->get_id());
                 std::wstring characterFileName;
                 if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) == HKE_OK)
                     cloakedCharacterFileNames.erase(characterFileName);
@@ -480,12 +480,12 @@ namespace Mark
             else
             {
                 // Remove despawned NPCs
-                UnmarkEverywhere(obj->id);
+                UnmarkEverywhere(obj->get_id());
             }
         }
         else
         {
-            UnmarkEverywhere(obj->id);
+            UnmarkEverywhere(obj->get_id());
 
             const uint clientId = obj->GetOwnerPlayer();
             if (clientId)

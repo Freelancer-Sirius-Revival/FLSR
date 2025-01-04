@@ -56,7 +56,7 @@ namespace SolarInvincibility
             if (solarIds.contains(solar->get_id()))
             {
 				solarIds.erase(solar->get_id());
-                pub::SpaceObj::SetInvincible(solar->id, true, true, 0);
+                pub::SpaceObj::SetInvincible(solar->get_id(), true, true, 0);
             }
             solar = static_cast<CSolar*>(solar->FindNext());
         }

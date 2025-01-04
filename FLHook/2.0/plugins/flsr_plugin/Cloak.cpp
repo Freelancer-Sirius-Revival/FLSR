@@ -200,8 +200,7 @@ namespace Cloak
 
 			// Jump Gates and Jump Holes are automatically added to the No Cloak Area list.
 			// Jump objects with Parent are ignored. It is assumed those are special objects not meant to be used by players.
-			uint type;
-			pub::SpaceObj::GetType(solar->id, type);
+			const uint type = solar->get_type();
 			if (type == ObjectType::JumpGate && jumpGateDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
 				NoCloakArea area;

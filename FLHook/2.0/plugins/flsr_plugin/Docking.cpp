@@ -377,12 +377,11 @@ namespace Docking
 
         std::vector<CSolar*> jumpObjects;
         CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
-        while (solar = static_cast<CSolar*>(solar->FindNext()))
+        while (solar != NULL)
         {
-            uint type;
-            pub::SpaceObj::GetType(solar->id, type);
-            if (type == ObjectType::JumpHole)
+            if (solar->get_type() == ObjectType::JumpHole)
                 jumpObjects.push_back(solar);
+            solar = static_cast<CSolar*>(solar->FindNext());
         }
 
         for (const auto& systemPath : shortestSystemPathToTargets)
@@ -394,7 +393,7 @@ namespace Docking
                 {
                     if (jumpObject->iSystem == systemPath.second[index - 1] && jumpObject->get_dest_system() == systemPath.second[index])
                     {
-                        foundJumpObjectIds.push_back(jumpObject->id);
+                        foundJumpObjectIds.push_back(jumpObject->get_id());
                         break;
                     }
                 }

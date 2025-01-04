@@ -1,121 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="SURDUMPER">
-      <UniqueIdentifier>{fa96471d-e44d-4fc3-822c-55cadf806a8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="configs">
-      <UniqueIdentifier>{64601be9-2bd9-43da-be3a-b1b38ce82f00}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="AntiCheat.cpp" />
+    <ClCompile Include="Chat.cpp" />
+    <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="Commands.cpp" />
+    <ClCompile Include="Crafting.cpp" />
+    <ClCompile Include="Discord.cpp" />
+    <ClCompile Include="Docking.cpp" />
+    <ClCompile Include="EquipWhiteList.cpp" />
+    <ClCompile Include="GroupRep.cpp" />
+    <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="IFF.cpp" />
+    <ClCompile Include="LootBoxes.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mark.cpp" />
+    <ClCompile Include="Modules.cpp" />
+    <ClCompile Include="PlayerHunt.cpp" />
+    <ClCompile Include="PopUp.cpp" />
+    <ClCompile Include="Insurance.cpp" />
+    <ClCompile Include="SendCash.cpp" />
+    <ClCompile Include="SpawnProtection.cpp" />
+    <ClCompile Include="SQL.cpp" />
+    <ClCompile Include="Storage.cpp" />
+    <ClCompile Include="Timers.cpp" />
+    <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="SolarInvincibility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Chat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Docking.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tools.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PopUp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Commands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Timers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Hooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SendCash.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Insurance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AntiCheat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Cloak.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Modules.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SQL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EquipWhiteList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerHunt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Discord.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpawnProtection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mark.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GroupRep.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Crafting.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IFF.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LootBoxes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Storage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="Main.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />
+    <CopyFileToFolders Include="configs\FLSR-Cloak.cfg" />
+    <CopyFileToFolders Include="configs\FLSR-Crafting.cfg" />
+    <CopyFileToFolders Include="configs\FLSR-EquipWhiteList.cfg" />
+    <CopyFileToFolders Include="configs\FLSR-LootBoxes.cfg" />
+    <CopyFileToFolders Include="configs\flsr.cfg" />
+    <CopyFileToFolders Include="configs\FLSR-SolarInvincibility.cfg" />
   </ItemGroup>
+  <ItemGroup>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="configs\flsr.cfg">
-      <Filter>configs</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-Carrier.cfg">
-      <Filter>configs</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-Cloak.cfg">
-      <Filter>configs</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-Crafting.cfg">
-      <Filter>configs</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-EquipWhiteList.cfg">
-      <Filter>configs</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-LootBoxes.cfg">
-      <Filter>configs</Filter>
-    </CopyFileToFolders>
+    <None Include="surdump.zip" />
+    <None Include="surupdate.au3" />
+    <None Include="surupdate.exe" />
   </ItemGroup>
 </Project>

@@ -154,6 +154,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
+    <ClCompile Include="SolarInvincibility.cpp" />
     <ClCompile Include="SpawnProtection.cpp" />
     <ClCompile Include="SQL.cpp" />
     <ClCompile Include="Storage.cpp" />
@@ -185,6 +186,9 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <CopyFileToFolders Include="configs\flsr.cfg">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="configs\FLSR-SolarInvincibility.cfg">
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <None Include="curl\Makefile.am" />

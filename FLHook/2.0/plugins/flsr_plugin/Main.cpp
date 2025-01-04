@@ -41,6 +41,8 @@ void LoadSettings() {
         Docking::LoadSettings();
     }
 
+    SolarInvincibility::LoadSettings();
+
     // POPUP-Module #############################################################################
     if (Modules::GetModuleState("WelcomeMSG"))
     {
@@ -183,29 +185,6 @@ EXPORT PLUGIN_RETURNCODE Get_PluginReturnCode()
     return returncode;
 }
 
-bool processed = false;
-void BaseInvincibility()
-{
-    if (processed)
-        return;
-    processed = true;
-
-    const uint nameId = CreateID("ew01_base_wardens01");
-    ConPrint(L"Searching for ew01_base_wardens01...\n");
-    CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
-    while (solar != NULL)
-    {
-        if (solar->get_id() == nameId)
-        {
-            ConPrint(L"Found ew01_base_wardens01\n");
-            pub::SpaceObj::SetInvincible(solar->id, true, true, 0);
-            ConPrint(L"Set ew01_base_wardens01 invincible for NPCs.\n");
-            break;
-        }
-        solar = static_cast<CSolar*>(solar->FindNext());
-    }
-}
-
 EXPORT PLUGIN_INFO *Get_PluginInfo()
 {
     PLUGIN_INFO *p_PI = new PLUGIN_INFO();
@@ -216,7 +195,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->ePluginReturnCode = &returncode;
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Timers::Update,PLUGIN_HkIServerImpl_Update, 0));
 
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BaseInvincibility, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarInvincibility::Initialize, PLUGIN_HkTimerCheckKick, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::ReadCharacterData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));

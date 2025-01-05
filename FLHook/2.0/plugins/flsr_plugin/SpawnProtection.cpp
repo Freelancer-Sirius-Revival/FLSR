@@ -3,8 +3,8 @@
 namespace SpawnProtection
 {
     const mstime TIMER_INTERVAL = 500;
-    static std::unordered_map<uint, mstime> invincibleEndTimePerShip;
-    static mstime invincibleDuration = 0;
+    static std::unordered_map<uint, mstime> protectionEndTimePerShip;
+    static mstime protectionDuration = 0;
 
     bool LoadSettings()
     {
@@ -12,33 +12,52 @@ namespace SpawnProtection
         GetCurrentDirectory(sizeof(szCurDir), szCurDir);
         std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
-        invincibleDuration = IniGetI(scPluginCfgFile, "SpawnProtection", "ProtectionDuration", 0) * 1000;
+        protectionDuration = IniGetI(scPluginCfgFile, "SpawnProtection", "ProtectionDuration", 0) * 1000;
         return true;
 	}
+
+    static bool IsInNoPvpSystem(const uint shipId)
+    {
+        uint systemId;
+        pub::SpaceObj::GetSystem(shipId, systemId);
+        for (const auto& noPvPSystem : map_mapNoPVPSystems)
+        {
+            if (noPvPSystem.second == systemId)
+                return true;
+        }
+        return false;
+    }
 
     void SetInvincible(const uint shipId)
     {
         pub::SpaceObj::SetInvincible(shipId, true, false, 0);
-        invincibleEndTimePerShip[shipId] = timeInMS() + invincibleDuration;
+        protectionEndTimePerShip[shipId] = timeInMS() + protectionDuration;
     }
 
     void UpdateInvincibleStates()
     {
         if (Modules::GetModuleState("SpawnProtection"))
         {
-            const mstime now = timeInMS();
-            std::vector<uint> shipIdsToDelete;
-            for (const auto& invincibleShipTime : invincibleEndTimePerShip)
+        const mstime now = timeInMS();
+        auto it = protectionEndTimePerShip.begin();
+        while (it != protectionEndTimePerShip.end())
+        {
+            // Protection time ended
+            const mstime protectionStartTime = it->second;
+            if (now > protectionStartTime)
             {
-                if (now > invincibleShipTime.second)
+                const uint shipId = it->first;
+                if (pub::SpaceObj::ExistsAndAlive(shipId) == 0) // 0 -> true
                 {
-                    if (pub::SpaceObj::ExistsAndAlive(invincibleShipTime.first) == 0) // 0 -> true
-                        pub::SpaceObj::SetInvincible(invincibleShipTime.first, false, false, 0);
-                    shipIdsToDelete.push_back(invincibleShipTime.first);
+                    if (IsInNoPvpSystem(shipId))
+                        pub::SpaceObj::SetInvincible2(shipId, false, true, 0);
+                    else
+                        pub::SpaceObj::SetInvincible(shipId, false, false, 0);
                 }
+                it = protectionEndTimePerShip.erase(it);
             }
-            for (const uint shipId : shipIdsToDelete)
-                invincibleEndTimePerShip.erase(shipId);
+            else
+                it++;
         }
     }
 

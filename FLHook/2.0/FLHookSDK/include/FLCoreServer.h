@@ -979,7 +979,7 @@ namespace pub
 		IMPORT  int Relocate(unsigned int const &,unsigned int const &,class Vector const &,class Matrix const &);
 		IMPORT  int RequestSpaceScript(unsigned int const &,class Vector const &,int const &,unsigned int,char const *);
 		IMPORT  int SendComm(unsigned int,unsigned int,unsigned int,struct Costume const *,unsigned int,unsigned int *,int,unsigned int,float,bool);
-		IMPORT  int SetInvincible2(unsigned int,bool,bool,float);
+		IMPORT  int SetInvincible2(unsigned int spaceObjectId,bool preventNpcDamage,bool preventPlayerDamage,float maxHpLossPercentage);
 		IMPORT  int SetInvincible(unsigned int spaceObjectId, bool preventDamage, bool allowPlayerDamage, float maxHpLossPercentage);
 		IMPORT  int SetRelativeHealth(unsigned int const &,float);
 	};

@@ -116,21 +116,7 @@ void LoadSettings() {
 		ConPrint(L"Module loaded: PlayerHunt - RewardMultiplicator: " + std::to_wstring(PlayerHunt::set_fRewardMultiplicator) + L", MinTargetSystemDistance: " + std::to_wstring(PlayerHunt::set_iMinTargetSystemDistance) + L", MinCredits: " + std::to_wstring(PlayerHunt::set_iMinCredits) + L"\n");
 	}
 
-    //SpawnProtection  #############################################################################
-    if (Modules::GetModuleState("SpawnProtection"))
-    {
-        //Load DiscordBot
-        if (SpawnProtection::LoadSettings())
-        {
-            ConPrint(L"Module loaded: SpawnProtection\n");
-        }
-        else {
-            //Missing Config
-            Modules::SetModuleState("SpawnProtection", false);
-            ConPrint(L"Module failed to load: SpawnProtection\n");
-        }
-
-    }
+    SpawnProtection::LoadSettings();
 
     if (Modules::GetModuleState("Crafting"))
     {

@@ -692,8 +692,8 @@ namespace Discord {
 namespace SpawnProtection
 {
     extern const mstime TIMER_INTERVAL;
-    bool LoadSettings();
-    void UpdateInvincibleStates();
+    void LoadSettings();
+    void UpdateSpawnProtectionValidity();
     void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId);
     void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId);
     void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId);

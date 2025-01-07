@@ -235,21 +235,22 @@ namespace IFF
         std::wstring targetCharacterName = Trim(GetParamToEnd(arguments, ' ', 0));
         if (targetCharacterName.empty())
             targetCharacterName = GetCharacterNameByTarget(clientId);
+        const std::wstring& currentCharacterName = GetCharacterName(clientId);
+        const auto& lastAttitude = GetAttitudeTowards({ currentCharacterName, targetCharacterName });
         const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Neutral);
-        if (attitudeChange.first != attitudeChange.second)
+        if (attitudeChange.first == attitudeChange.second)
+            return;
+
+        const uint targetClientId = GetClientId(targetCharacterName);
+        if (attitudeChange.first == Attitude::Hostile)
         {
-            const uint targetClientId = GetClientId(targetCharacterName);
-            const std::wstring& currentCharacterName = GetCharacterName(clientId);
-            if (attitudeChange.first == Attitude::Hostile)
-            {
-                PrintUserCmdText(clientId, L"You gave up hostility towards " + targetCharacterName);
-                PrintUserCmdText(targetClientId, currentCharacterName + L" terminated hostility.");
-            }
-            else
-            {
-                PrintUserCmdText(clientId, L"You terminated friendship towards " + targetCharacterName);
-                PrintUserCmdText(targetClientId, currentCharacterName + L" terminated friendship.");
-            }
+            PrintUserCmdText(clientId, L"You gave up hostility towards " + targetCharacterName);
+            PrintUserCmdText(targetClientId, currentCharacterName + L" terminated hostility.");
+        }
+        else if (lastAttitude.first == lastAttitude.second && lastAttitude.first == Attitude::Allied)
+        {
+            PrintUserCmdText(clientId, L"You terminated friendship towards " + targetCharacterName);
+            PrintUserCmdText(targetClientId, currentCharacterName + L" terminated friendship.");
         }
     }
 

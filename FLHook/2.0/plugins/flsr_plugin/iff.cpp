@@ -366,34 +366,41 @@ namespace IFF
         }
 
         const std::wstring& damageInflictorCharacterName = GetCharacterName(damagerClientId);
+        const std::wstring& victimCharacterName = GetCharacterName(victimClientId);
 
         std::list<GROUP_MEMBER> members;
-        if (HkGetGroupMembers(ARG_CLIENTID(victimClientId), members) != HKE_OK || members.size() < 1)
+        // Players always should be in a group - even if just their own single-person group.
+        if (HkGetGroupMembers(ARG_CLIENTID(victimClientId), members) != HKE_OK)
+            return;
+
+        if (members.size() > 1)
         {
-            GROUP_MEMBER member;
-            member.iClientID = victimClientId;
-            member.wscCharname = GetCharacterName(victimClientId);
-            members.push_back(member);
-        }
-
-        for (const GROUP_MEMBER& member : members)
-        {
-            const auto& lastAttitude = GetAttitudeTowards({ member.wscCharname, damageInflictorCharacterName });
-
-            // Players which are allied will never get hostile to each other by shooting. Except they are organized in a group. The group integrity has priority and will always cancel any friendships.
-            if (members.size() < 2 && (lastAttitude.first == Attitude::Allied && lastAttitude.second == Attitude::Allied))
-                continue;
-
-            const auto& attitudeChange = TrySetAttitudeTowardsTarget(member.iClientID, damageInflictorCharacterName, Attitude::Hostile);
-            if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
+            for (const GROUP_MEMBER& member : members)
             {
-                PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" attacked!");
-                if (lastAttitude.first == lastAttitude.second && lastAttitude.second == Attitude::Allied)
+                const auto& lastAttitude = GetAttitudeTowards({ member.wscCharname, damageInflictorCharacterName });
+                const auto& attitudeChange = TrySetAttitudeTowardsTarget(member.iClientID, damageInflictorCharacterName, Attitude::Hostile);
+                if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
                 {
-                    PrintUserCmdText(member.iClientID, damageInflictorCharacterName + L" terminated friendship.");
-                    PrintUserCmdText(damagerClientId, member.wscCharname + L" terminated friendship.");
+                    std::wstring attackText = damageInflictorCharacterName + L" attacked your group";
+                    if (lastAttitude.first == lastAttitude.second && lastAttitude.second == Attitude::Allied)
+                    {
+                        attackText = attackText + L" and terminated friendship";
+                        PrintUserCmdText(damagerClientId, member.wscCharname + L" terminated friendship, because you attacked their group.");
+                    }
+                    PrintUserCmdText(member.iClientID, attackText + L"!");
                 }
             }
+        }
+        else
+        {
+            const auto& lastAttitude = GetAttitudeTowards({ victimCharacterName, damageInflictorCharacterName });
+            // If they are friends, ignore any shots fired.
+            if (lastAttitude.first == Attitude::Allied && lastAttitude.second == Attitude::Allied)
+                return;
+
+            const auto& attitudeChange = TrySetAttitudeTowardsTarget(victimClientId, damageInflictorCharacterName, Attitude::Hostile);
+            if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
+                PrintUserCmdText(victimClientId, damageInflictorCharacterName + L" attacked!");
         }
     }
 

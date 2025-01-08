@@ -669,7 +669,7 @@ namespace Insurance
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
-        const std::wstring characterFileName = stows(std::string(characterId.szCharFilename).substr(0, 11));
+        const std::wstring characterFileName = stows(std::string(characterId.charFilename).substr(0, 11));
         DeleteInsuranceFileIfExisting(characterFileName);
     }
 

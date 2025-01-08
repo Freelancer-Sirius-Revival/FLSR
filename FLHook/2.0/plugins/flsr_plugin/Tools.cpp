@@ -215,7 +215,7 @@ namespace Tools {
             HkGetCharFileName(CS_wscCharBefore, wscCharFilenameBefore);
 
             wscCharFilenameBefore += L".fl";
-            std::wstring wscCharFilename = stows((std::string)cId.szCharFilename);
+            std::wstring wscCharFilename = stows((std::string)cId.charFilename);
             char *pAddress = ((char *)hModRemoteClient + ADDR_CLIENT_NEWPLAYER);
             if (!wscCharFilenameBefore.compare(wscCharFilename)) {
                 char szNOP[] = {'\x83', '\xC4', '\x08'}; // add esp 08

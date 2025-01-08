@@ -318,8 +318,8 @@ namespace IFF
     {
         returncode = DEFAULT_RETURNCODE;
 
-        if (clientId && ship.iClientID)
-            UpdateAttitude(clientId, ship.iClientID);
+        if (clientId && ship.clientId)
+            UpdateAttitude(clientId, ship.clientId);
 
         return true;
     }
@@ -458,7 +458,7 @@ namespace IFF
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
-        const std::string characterFileName = std::string(characterId.szCharFilename).substr(0, 11);
+        const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
         DeleteCharacterFromIFF(characterFileName);
     }
 

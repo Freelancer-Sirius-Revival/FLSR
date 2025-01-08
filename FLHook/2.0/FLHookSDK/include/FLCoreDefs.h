@@ -29,15 +29,15 @@
 template <int size> struct TString
 {
 	int len;
-	char data[size+1];
-	
-	TString():len(0) { data[0] = 0; }
+	char data[size + 1];
+
+	TString() :len(0) { data[0] = 0; }
 };
 
 class Vector
 {
 public:
-	float x,y,z;
+	float x, y, z;
 };
 
 class Matrix
@@ -49,7 +49,7 @@ public:
 class Quaternion
 {
 public:
-	float w,x,y,z;
+	float w, x, y, z;
 };
 
 using uint = unsigned int;

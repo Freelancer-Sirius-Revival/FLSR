@@ -418,7 +418,7 @@ for (auto& chat : set_setChatSuppress) {
         if (!(ui.vPos.x == ui.vPos.x) || !(ui.vPos.y == ui.vPos.y) ||
             !(ui.vPos.z == ui.vPos.z) || !(ui.vDir.x == ui.vDir.x) ||
             !(ui.vDir.y == ui.vDir.y) || !(ui.vDir.z == ui.vDir.z) ||
-            !(ui.vDir.w == ui.vDir.w) || !(ui.fThrottle == ui.fThrottle)) {
+            !(ui.vDir.w == ui.vDir.w) || !(ui.throttle == ui.throttle)) {
             AddLog("ERROR: NAN found in " __FUNCTION__ " for id=%u", iClientID);
             HkKick(Players[iClientID].Account);
             return;

@@ -429,7 +429,7 @@ namespace Mark
     {
         returncode = DEFAULT_RETURNCODE;
 
-        if (clientId && ship.iClientID)
+        if (clientId && ship.clientId)
         {
             std::wstring currentCharacterFileName;
             if (HkGetCharFileName(ARG_CLIENTID(clientId), currentCharacterFileName) != HKE_OK ||
@@ -438,7 +438,7 @@ namespace Mark
                 return true;
 
             std::wstring targetCharacterFileName;
-            if (HkGetCharFileName(ARG_CLIENTID(ship.iClientID), targetCharacterFileName) != HKE_OK ||
+            if (HkGetCharFileName(ARG_CLIENTID(ship.clientId), targetCharacterFileName) != HKE_OK ||
                 !markedCharactersPerCharacter[currentCharacterFileName].contains(targetCharacterFileName) ||
                 cloakedCharacterFileNames.contains(targetCharacterFileName)
             )
@@ -520,7 +520,7 @@ namespace Mark
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
-        const std::wstring characterFileName = stows(std::string(characterId.szCharFilename).substr(0, 11));
+        const std::wstring characterFileName = stows(std::string(characterId.charFilename).substr(0, 11));
         DisposeCharacterEverywhere(characterFileName);
         ClearCharacteData(characterFileName);
     }

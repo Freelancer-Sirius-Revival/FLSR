@@ -83,8 +83,8 @@ namespace AntiCheat {
 		        float fDrag = cship->shiparch()->fLinearDrag;
             
                 CEquipTraverser tr;
-                for (CEquip *Equip = GetEquipManager(cship)->Traverse(tr); Equip;
-                     Equip = GetEquipManager(cship)->Traverse(tr)) {
+                for (CEquip *Equip = cship->equip_manager.Traverse(tr); Equip;
+                     Equip = cship->equip_manager.Traverse(tr)) {
 
 			        if (CEThruster::cast(Equip))
 			        {
@@ -322,8 +322,8 @@ namespace AntiCheat {
                 // Find the ship power plant and record the capacity and recharge rates
 
                 CEquipTraverser tr;
-                for (CEquip* Equip = GetEquipManager(cship)->Traverse(tr); Equip;
-                    Equip = GetEquipManager(cship)->Traverse(tr)) {
+                for (CEquip* Equip = cship->equip_manager.Traverse(tr); Equip;
+                    Equip = cship->equip_manager.Traverse(tr)) {
                     if (CEPower::cast(Equip))
                     {
                         CEPower* cepower = (CEPower*)Equip;
@@ -362,13 +362,9 @@ namespace AntiCheat {
                 CShip* cship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)obj);
                 
 
-                for (ushort* slot = wpn.sHpIdsBegin; slot != wpn.sHpIdsEnd; slot++)
+                for (ushort slot : wpn.hpIds)
                 {
-       
-     
-
-
-                    CEquip* Equip = GetEquipManager(cship)->FindByID(*slot);
+                    CEquip* Equip = cship->equip_manager.FindByID(slot);
                     if (CEGun::cast(Equip))
                     {
                         CEGun* cgun = (CEGun*)Equip;

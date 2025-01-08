@@ -93,11 +93,11 @@ void __stdcall CharacterSelect(struct CHARACTER_ID const &charid,
     returncode = DEFAULT_RETURNCODE;
 
     std::string path =
-        scAcctPath + GetAccountDir(client) + "\\" + charid.szCharFilename;
+        scAcctPath + GetAccountDir(client) + "\\" + charid.charFilename;
 
     // ConPrint(L"CharacterSelect=%s\n", stows(path).c_str());
 
-    clients[client].charfilename = charid.szCharFilename;
+    clients[client].charfilename = charid.charFilename;
     clients[client].lines.clear();
 
     // Read the flhook section so that we can rewrite after the save so that it
@@ -140,7 +140,7 @@ void LoadSettings() {
             (const wchar_t *)Players.GetActiveCharacterName(client);
         std::string filename = GetCharfilename(charname) + ".fl";
         CHARACTER_ID charid;
-        strcpy_s(charid.szCharFilename, filename.c_str());
+        strcpy_s(charid.charFilename, filename.c_str());
         CharacterSelect(charid, client);
     }
 }

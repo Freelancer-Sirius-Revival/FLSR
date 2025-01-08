@@ -235,7 +235,7 @@ HK_ERROR HkBeam(const std::wstring &wscCharname,
                 GetString(NULL, pBase->iBaseIDS, buf, 1024);
                 if (wcsstr(buf, wscBasename.c_str())) {
                     // Ignore the intro bases.
-                    if (_strnicmp("intro", (char *)pBase->iDunno2, 5) != 0) {
+                    if (_strnicmp("intro", (char *)pBase->cNickname, 5) != 0) {
                         iBaseID = pBase->iBaseID;
                         break;
                     }
@@ -262,7 +262,7 @@ HK_ERROR HkBeam(const std::wstring &wscCharname,
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
         wscCharFileName += L".fl";
         CHARACTER_ID cID;
-        strcpy_s(cID.szCharFilename,
+        strcpy_s(cID.charFilename,
                  wstos(wscCharFileName.substr(0, 14)).c_str());
         Server.CharacterSelect(cID, iClientID);
     }
@@ -1500,11 +1500,11 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
     if ((iClientID == -1) || HkIsInCharSelectMenu(iClientID))
         return HKE_NO_CHAR_SELECTED;
 
-    if (!Players[iClientID].iEnteredBase) {
-        Players[iClientID].iEnteredBase = Players[iClientID].iBaseID;
+    if (!Players[iClientID].enteredBase) {
+        Players[iClientID].enteredBase = Players[iClientID].iBaseID;
         Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true,
                           iClientID);
-        Players[iClientID].iEnteredBase = 0;
+        Players[iClientID].enteredBase = 0;
     } else {
         Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true,
                           iClientID);
@@ -1514,7 +1514,7 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
     // Add to check-list which is being compared to the users equip-list when
     // saving char to fix "Ship or Equipment not sold on base" kick
     EquipDesc ed;
-    ed.sID = Players[iClientID].sLastEquipID;
+    ed.sID = Players[iClientID].lastEquipId;
     ed.iCount = 1;
     ed.iArchID = iGoodID;
     Players[iClientID].lShadowEquipDescList.add_equipment_item(ed, false);

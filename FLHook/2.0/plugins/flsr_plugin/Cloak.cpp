@@ -194,7 +194,7 @@ namespace Cloak
 				if (objectArea.objectId == solar->get_id())
 				{
 					objectArea.position = solar->get_position();
-					noCloakAreasPerSystem[solar->iSystem].push_back(objectArea);
+					noCloakAreasPerSystem[solar->system].push_back(objectArea);
 				}
 			}
 
@@ -208,7 +208,7 @@ namespace Cloak
 				area.position = solar->get_position();
 				area.radius = jumpGateDecloakRadius;
 				area.NNVoiceMessageId = JUMP_GATE_NN_ID;
-				noCloakAreasPerSystem[solar->iSystem].push_back(area);
+				noCloakAreasPerSystem[solar->system].push_back(area);
 			}
 			else if (type == ObjectType::JumpHole && jumpHoleDecloakRadius > 0.0f && solar->GetParentNickname().IsEmpty())
 			{
@@ -217,7 +217,7 @@ namespace Cloak
 				area.position = solar->get_position();
 				area.radius = jumpHoleDecloakRadius;
 				area.NNVoiceMessageId = JUMP_HOLE_NN_ID;
-				noCloakAreasPerSystem[solar->iSystem].push_back(area);
+				noCloakAreasPerSystem[solar->system].push_back(area);
 			}
 			solar = static_cast<CSolar*>(solar->FindNext());
 		}
@@ -574,7 +574,7 @@ namespace Cloak
 		{
 			if (HkGetClientIdFromPD(playerData) == clientId)
 			{
-				std::string currentWeaponGroups(playerData->weaponGroup.value.c_str());
+				std::string currentWeaponGroups(playerData->weaponGroups.c_str());
 				std::vector<std::string> lines;
 
 				size_t delimiterPos;
@@ -806,15 +806,11 @@ namespace Cloak
 		if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].activatorCargoId)
 		{
 			XFireWeaponInfo info;
-			info.iObject = clientCloakStats[clientId].shipId;
-			ushort slot[2] = { (ushort)clientCloakStats[clientId].activatorCargoId, 0 };
-			info.sHpIdsBegin = &slot[0];
-			info.sHpIdsLast = &slot[1];
-			info.sHpIdsEnd = &slot[1];
-			info.iDunno = 0;
-			info.vTarget.x = 1;
-			info.vTarget.y = 0;
-			info.vTarget.z = 0;
+			info.object = clientCloakStats[clientId].shipId;
+			info.hpIds.push_back(static_cast<ushort>(clientCloakStats[clientId].activatorCargoId));
+			info.target.x = 1;
+			info.target.y = 0;
+			info.target.z = 0;
 			Server.FireWeapon(clientId, info);
 			HookClient->Send_FLPACKET_COMMON_FIREWEAPON(clientId, info);
 		}
@@ -1041,7 +1037,7 @@ namespace Cloak
 				CShip* ship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)clientCloakStats[clientId].shipInspect);
 				if (ship)
 				{
-					ship->set_throttle(updateInfo.fThrottle);
+					ship->set_throttle(updateInfo.throttle);
 
 					// Setting Throttle on the ship makes the server think that engine was turned on again.
 					if (clientCloakStats[clientId].engineKillActive)
@@ -1085,7 +1081,7 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			auto& systemNoCloakAreas = noCloakAreasPerSystem[killedObject->cobj->iSystem];
+			auto& systemNoCloakAreas = noCloakAreasPerSystem[killedObject->cobj->system];
 			for (auto it = systemNoCloakAreas.begin(); it != systemNoCloakAreas.end(); it++)
 			{
 				if (it->objectId == killedObject->cobj->get_id())

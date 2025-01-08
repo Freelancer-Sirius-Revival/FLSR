@@ -391,7 +391,7 @@ namespace Docking
             {
                 for (const auto& jumpObject : jumpObjects)
                 {
-                    if (jumpObject->iSystem == systemPath.second[index - 1] && jumpObject->get_dest_system() == systemPath.second[index])
+                    if (jumpObject->system == systemPath.second[index - 1] && jumpObject->get_dest_system() == systemPath.second[index])
                     {
                         foundJumpObjectIds.push_back(jumpObject->get_id());
                         break;
@@ -991,7 +991,7 @@ namespace Docking
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
         returncode = DEFAULT_RETURNCODE;
-        const std::string characterFileName = std::string(characterId.szCharFilename).substr(0, 11);
+        const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
         DeleteCharacterFromRecords(characterFileName);
     }
 

@@ -107,7 +107,7 @@ namespace Cloak
 	struct ClientCloakStats
 	{
 		uint shipId = 0;
-		IObjInspectImpl* shipInspect = 0;
+		IObjRW* shipInspect = 0;
 		uint activatorCargoId = 0;
 		uint activatorArchetypeId = 0;
 		std::string activatorHardpoint = "";
@@ -449,12 +449,12 @@ namespace Cloak
 
 	void StartFuse(const uint clientId, const uint fuseId)
 	{
-		HkLightFuse((IObjRW*)clientCloakStats[clientId].shipInspect, fuseId, 0.0f, 0.0f, 0.0f);
+		HkLightFuse(clientCloakStats[clientId].shipInspect, fuseId, 0.0f, 0.0f, 0.0f);
 	}
 
 	void StopFuse(const uint clientId, const uint fuseId)
 	{
-		HkUnLightFuse((IObjRW*)clientCloakStats[clientId].shipInspect, fuseId);
+		HkUnLightFuse(clientCloakStats[clientId].shipInspect, fuseId);
 	}
 
 	void SendEquipmentActivationState(const uint clientId, const uint cargoId, const bool active)
@@ -1034,7 +1034,7 @@ namespace Cloak
 				// When saving the CShip result via CObject::Find permanently it always crashed the server
 				// when a player with Cloak + Energy-using Engine docked to a base on zero energy.
 				// Instead get it via the InspectionObj in the hope this is more performant than Find on each invokation.
-				CShip* ship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)clientCloakStats[clientId].shipInspect);
+				CShip* ship = (CShip*)(clientCloakStats[clientId].shipInspect->cobj);
 				if (ship)
 				{
 					ship->set_throttle(updateInfo.throttle);

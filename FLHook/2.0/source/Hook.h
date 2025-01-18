@@ -293,8 +293,7 @@ typedef void(__stdcall *_RCSendChatMsg)(uint iId, uint iTo, uint iSize,
 typedef void(__stdcall *_CRCAntiCheat)();
 typedef void(__stdcall *_CreateChar)(const wchar_t *wszName);
 typedef int(__cdecl *_GetFLName)(char *szBuf, const wchar_t *wszStr);
-typedef bool(__cdecl *_GetShipInspect)(uint &iShip, IObjInspectImpl *&inspect,
-                                       uint &iDunno);
+typedef bool(__cdecl* _GetShipInspect)(uint& iShip, IObjRW*& inspect, StarSystem*& starSystem);
 
 EXPORT extern _GetShipInspect GetShipInspect;
 
@@ -656,7 +655,7 @@ EXPORT std::wstring HkGetSystemNickByID(uint iSystemID);
 EXPORT void HkLockAccountAccess(CAccount *acc, bool bKick);
 EXPORT void HkUnlockAccountAccess(CAccount *acc);
 EXPORT void HkGetItemsForSale(uint iBaseID, std::list<uint> &lstItems);
-EXPORT IObjInspectImpl *HkGetInspect(uint iClientID);
+EXPORT IObjRW* HkGetInspect(uint iClientID);
 EXPORT ENGINE_STATE HkGetEngineState(uint iClientID);
 EXPORT EQ_TYPE HkGetEqType(Archetype::Equipment *eq);
 EXPORT float HkDistance3D(Vector v1, Vector v2);

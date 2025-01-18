@@ -73,10 +73,10 @@ namespace AntiCheat {
         void UpdateShipSpeed(uint iClientID)
         {
 
-	        IObjInspectImpl *obj = HkGetInspect(iClientID);
+            IObjRW*obj = HkGetInspect(iClientID);
 	        if (obj)
 	        {
-                CShip *cship = (CShip *)HkGetEqObjFromObjRW((IObjRW *)obj);
+                CShip *cship = (CShip *)(obj->cobj);
 
 		        float fMaxForce = 0.0f;
 		        float fMaxThrusterForce = 0.0f;
@@ -223,7 +223,7 @@ namespace AntiCheat {
                 engineState = AC_Info[iClientID].engineState;
 
             IObjInspectImpl* formation_leader = 0;
-            IObjInspectImpl* obj = HkGetInspect(iClientID);
+            IObjRW* obj = HkGetInspect(iClientID);
             if (obj)
             {
                 obj->get_formation_leader((IObjRW*&)formation_leader);
@@ -314,10 +314,10 @@ namespace AntiCheat {
             AC_Info[iClientID].fChargeRate = 0.0f;
             AC_Info[iClientID].fCurEstCapacity = 0.0f;
 
-            IObjInspectImpl* obj = HkGetInspect(iClientID);
+            IObjRW* obj = HkGetInspect(iClientID);
             if (obj)
             {
-                CShip* cship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)obj);
+                CShip* cship = (CShip*)(obj->cobj);
 
                 // Find the ship power plant and record the capacity and recharge rates
 
@@ -356,10 +356,10 @@ namespace AntiCheat {
             AC_Info[iClientID].tmLastPowerUpdate = msTimeNow;
             AC_Info[iClientID].fCurEstCapacity += fTimeDelta * AC_Info[iClientID].fChargeRate;
 
-            IObjInspectImpl* obj = HkGetInspect(iClientID);
+            IObjRW* obj = HkGetInspect(iClientID);
             if (obj)
             {
-                CShip* cship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)obj);
+                CShip* cship = (CShip*)(obj->cobj);
                 
 
                 for (ushort slot : wpn.hpIds)

@@ -158,9 +158,9 @@ void LoadSettings() {
 
         std::vector<std::string> vDamagedHardPoints;
 
-        IObjInspectImpl* obj = HkGetInspect(iClientID);
+        IObjRW* obj = HkGetInspect(iClientID);
         if (obj) {
-            CShip* cship = (CShip*)HkGetEqObjFromObjRW((IObjRW*)obj);
+            CShip* cship = (CShip*)(obj->cobj);
             if (cship) {
                 std::string sShipfile = cship->shiparch()->szName;
                 std::filesystem::path f(sShipfile);

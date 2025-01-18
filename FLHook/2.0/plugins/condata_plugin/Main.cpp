@@ -376,7 +376,7 @@ EXPORT void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,
     returncode = DEFAULT_RETURNCODE;
 
     // lag detection
-    IObjInspectImpl *ins = HkGetInspect(iClientID);
+    IObjRW *ins = HkGetInspect(iClientID);
     if (!ins)
         return; // ??? 8[
 

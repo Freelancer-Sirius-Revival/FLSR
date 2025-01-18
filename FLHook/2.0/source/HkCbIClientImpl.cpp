@@ -266,14 +266,6 @@ bool HkIClientImpl::Send_FLPACKET_COMMON_SETTARGET(uint iClientID, XSetTarget& s
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
 
-	// When a client selects a solar, do null this selection for all clients.
-	// This prevents desyncs when the targeted solar is spinning. It will cause gunfire to point into wrong directions.
-	if (st.iSpaceID & 0x80000000)
-	{
-		st.iSpaceID = 0;
-		st.iSubObjID = 0;
-	}
-
 	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_SETTARGET(iClientID, st));
 	return reinterpret_cast<bool>(vRet);
 }
@@ -337,8 +329,6 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_CHARACTERINFO(uint iClientID, FLPACKET_
 {
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
-
-	ClientInfo[iClientID].iCharMenuEnterTime = static_cast<uint>(time(0));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_CHARACTERINFO(iClientID, pDunno));
 	return reinterpret_cast<bool>(vRet);
@@ -411,7 +401,6 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_CREATEMINE(uint iClientID, FLPACKET_UNK
 
 /**************************************************************************************************************
 **************************************************************************************************************/
-
 
 bool HkIClientImpl::Send_FLPACKET_SERVER_CREATESHIP(uint iClientID, FLPACKET_CREATESHIP& pShip)
 {
@@ -735,6 +724,9 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE_7(uint iClientID, uint iD
 
 bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE(uint iClientID, FLPACKET_UNKNOWN& pDunno)
 {
+    ISERVER_LOG();
+    ISERVER_LOGARG_UI(iClientID);
+
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_MISCOBJUPDATE(iClientID, pDunno));
 	return reinterpret_cast<bool>(vRet);
 }
@@ -744,6 +736,12 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE(uint iClientID, FLPACKET_
 
 bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE_2(uint iClientID, uint iObject, uint iFaction)
 {
+    ISERVER_LOG();
+    ISERVER_LOGARG_UI(iClientID);
+    // TODO: Missing a flag here?
+    ISERVER_LOGARG_UI(iObject);
+    ISERVER_LOGARG_UI(iFaction);
+
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_MISCOBJUPDATE_2(iClientID, iObject, iFaction));
 	return reinterpret_cast<bool>(vRet);
 }
@@ -753,16 +751,16 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE_2(uint iClientID, uint iO
 
 bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE_3(uint iClientID, uint iTargetID, uint iRank)
 {
-	// TODO SKOTTY: Unused?
-    CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_MISCOBJUPDATE_3,
-         bool, __stdcall, (uint, uint, uint),
-         (iClientID, iTargetID, iRank));
+    ISERVER_LOG();
+    ISERVER_LOGARG_UI(iClientID);
+    ISERVER_LOGARG_UI(iTargetID);
+    ISERVER_LOGARG_UI(iRank);
+
+    CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_MISCOBJUPDATE_3, bool, __stdcall, (uint, uint, uint), (iClientID, iTargetID, iRank));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_MISCOBJUPDATE_3(iClientID, iTargetID, iRank));
 
-    CALL_PLUGINS(
-        PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_MISCOBJUPDATE_3_AFTER, bool, ,
-        (uint, uint, uint), (iClientID, iTargetID, iRank));
+    CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_MISCOBJUPDATE_3_AFTER, bool, , (uint, uint, uint), (iClientID, iTargetID, iRank));
 
 	return reinterpret_cast<bool>(vRet);
 }
@@ -781,7 +779,10 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE_4(uint iClientID, uint iD
 
 bool HkIClientImpl::Send_FLPACKET_SERVER_MISCOBJUPDATE_5(uint iClientID, uint iClientID2, uint iSystemID)
 {
-	// TODO SKOTTY: Still used?
+    ISERVER_LOG();
+    ISERVER_LOGARG_UI(iClientID);
+    ISERVER_LOGARG_UI(iClientID2);
+    ISERVER_LOGARG_UI(iSystemID);
 
     CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_MISCOBJUPDATE_5,
                  bool, __stdcall, (uint, uint, uint),
@@ -1056,6 +1057,8 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_USE_ITEM(uint iClientID, uint iDunno)
 
 bool HkIClientImpl::SendPacket(uint iClientID, void* pData)
 {
+    CALL_PLUGINS(PLUGIN_HkIClientImpl_SendPacket, bool, __stdcall, (uint, void *), (iClientID, pData));
+
 	CALL_CLIENT_METHOD(SendPacket(iClientID, pData));
 	return reinterpret_cast<bool>(vRet);
 }
@@ -1078,7 +1081,9 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2)
 	Universe::ISystem* system = Universe::GetFirstSystem();
 	while (system)
 	{
-		pub::System::LoadSystem(system->id);
+		// Skip fake system entries of adoxa plugin
+		if (!std::string(system->file).empty())
+			pub::System::LoadSystem(system->id);
 		system = Universe::GetNextSystem();
 	}
 

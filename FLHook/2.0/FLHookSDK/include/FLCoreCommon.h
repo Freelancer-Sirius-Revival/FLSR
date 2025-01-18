@@ -25,32 +25,6 @@
 
 #pragma comment( lib, "FLCoreCommon.lib" )
 
-struct IMPORT Watchable
-{
-	Watchable();
-	~Watchable();
-	Watchable& operator=(const Watchable&);
-	unsigned int unwatch();
-
-public:
-	struct BaseWatcher* newestBaseWatcher; // The last basewatcher set to watch this
-};
-
-struct IMPORT BaseWatcher
-{
-	BaseWatcher();
-	~BaseWatcher();
-	BaseWatcher& operator=(const BaseWatcher&);
-	void set(const struct Watchable*);
-
-protected:
-	void set_pointer(const Watchable*);
-
-public:
-	struct Watchable* watchable;
-	BaseWatcher* nextBaseWatcher;
-};
-
 enum ObjectType : uint
 {
 	None = 0,
@@ -123,7 +97,7 @@ struct Costume
 	uint body = 0;
 	uint leftHand = 0;
 	uint rightHand = 0;
-	UINT accessory[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint accessory[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	int accessories = 0;
 };
 
@@ -144,90 +118,6 @@ struct IMPORT ID_String
 public:
 	uint id;
 	unsigned char data[128];
-};
-
-struct IMPORT EquipDesc
-{
-	EquipDesc(struct EquipDesc const&);
-	EquipDesc(void);
-	struct EquipDesc& operator=(struct EquipDesc const&);
-	bool operator==(struct EquipDesc const&)const;
-	bool operator!=(struct EquipDesc const&)const;
-	bool operator<(struct EquipDesc const&)const;
-	bool operator>(struct EquipDesc const&)const;
-
-	static struct CacheString const  CARGO_BAY_HP_NAME;
-	unsigned int get_arch_id(void)const;
-	float get_cargo_space_occupied(void)const;
-	int get_count(void)const;
-	struct CacheString const& get_hardpoint(void)const;
-	unsigned short get_id(void)const;
-	int get_owner(void)const;
-	float get_status(void)const;
-	bool get_temporary(void)const;
-	bool is_equipped(void)const;
-	bool is_internal(void)const;
-	void make_internal(void);
-	void set_arch_id(unsigned int);
-	void set_count(int);
-	void set_equipped(bool);
-	void set_hardpoint(struct CacheString const&);
-	void set_id(unsigned short);
-	void set_owner(int);
-	void set_status(float);
-	void set_temporary(bool);
-
-public:
-	ushort iDunno;
-	ushort sID;
-	uint iArchID;
-	CacheString szHardPoint;
-	bool bMounted;
-	float fHealth;
-	uint iCount;
-	bool bMission;
-	uint iOwner;
-};
-
-class IMPORT EquipDescList
-{
-public:
-	EquipDescList(struct EquipDescVector const&);
-	EquipDescList(class EquipDescList const&);
-	EquipDescList(void);
-	~EquipDescList(void);
-	class EquipDescList& operator=(class EquipDescList const&);
-	int add_equipment_item(struct EquipDesc const&, bool);
-	void append(class EquipDescList const&);
-	struct EquipDesc* find_equipment_item(struct CacheString const&);
-	struct EquipDesc* find_equipment_item(unsigned short);
-	struct EquipDesc const* find_equipment_item(struct CacheString const&)const;
-	struct EquipDesc const* find_equipment_item(unsigned short)const;
-	struct EquipDesc const* find_matching_cargo(unsigned int, int, float)const;
-	float get_cargo_space_occupied(void)const;
-	int remove_equipment_item(unsigned short, int);
-	struct EquipDesc* traverse_equipment_type(unsigned int, struct EquipDesc const*);
-	struct EquipDesc const* traverse_equipment_type(unsigned int, struct EquipDesc const*)const;
-
-public:
-	uint iDunno;
-	std::list<EquipDesc> equip;
-};
-
-struct IMPORT EquipDescVector
-{
-	EquipDescVector(struct EquipDescVector const&);
-	EquipDescVector(class EquipDescList const&);
-	EquipDescVector(void);
-	~EquipDescVector(void);
-	struct EquipDescVector& operator=(struct EquipDescVector const&);
-	int add_equipment_item(struct EquipDesc const&, bool);
-	void append(struct EquipDescVector const&);
-	struct EquipDesc* traverse_equipment_type(unsigned int, struct EquipDesc const*);
-
-public:
-	uint iDunno;
-	std::vector<EquipDesc> equip;
 };
 
 struct IMPORT ActionDB
@@ -300,7 +190,7 @@ namespace PhyArch
 	};
 
 	IMPORT  struct Part const* GetDefaultPart(void);
-	IMPORT  bool  LoadSurfaces(char const*, class std::map<unsigned int, struct PhyArch::Part, struct std::less<unsigned int>, class std::allocator<struct PhyArch::Part>>&);
+	IMPORT  bool  LoadSurfaces(char const*, class st6::map<unsigned int, struct PhyArch::Part, struct st6::less<unsigned int>, class st6::allocator<struct PhyArch::Part>>&);
 };
 
 enum HpAttachmentType
@@ -437,22 +327,22 @@ namespace Archetype
 		bool init_physical_representation(void);
 
 	public:
-		/*  1x4 */ uint vtable;
-		/*  2x4 */ uint iArchID;
-		/*  3x4 */ char* szName;
-		/*  4x4 */ AClassType iArchType;
-		/*  5x4 */ uint iIdsName;
-		/*  6x4 */ uint iIdsInfo;
-		/*  7x4 */ float fHitPoints;
-		/*  8x4 */ float fMass;
-		/*  9x4 */ int iExplosionArchID;
-		/* 10x4 */ float fExplosionResistance;
-		/* 11x4 */ float fRotationInertia[3];
-		/* 14x4 */ bool bHasRotationInertia;
+		uint vtable;
+		uint iArchID;
+		char* szName;
+		AClassType iArchType;
+		uint iIdsName;
+		uint iIdsInfo;
+		float fHitPoints;
+		float fMass;
+		int iExplosionArchID;
+		float fExplosionResistance;
+		float fRotationInertia[3];
+		bool bHasRotationInertia;
 		bool bPhantomPhysics;
 		/* 15 */ uint iDunno1;
 		/* 16 */ uint iDunno2;
-		/* 17 */ LPVOID anim;
+		/* 17 */ void* anim;
 		/* 18 */ uint iArray[5]; // not sure about this.
 	};
 
@@ -491,7 +381,7 @@ namespace Archetype
 		virtual enum AClassType  get_class_type(void)const;
 		struct CollisionGroup const* get_group_by_id(unsigned short)const;
 		struct CollisionGroup const* get_group_by_name(struct CacheString const&)const;
-		bool get_undamaged_collision_group_list(class std::list<struct CollisionGroupDesc>&)const;
+		bool get_undamaged_collision_group_list(class st6::list<struct CollisionGroupDesc>&)const;
 		virtual bool read(class INI_Reader&);
 		virtual void redefine(struct Root const&);
 		bool traverse_groups(struct CollisionGroup const*&)const;
@@ -617,7 +507,7 @@ namespace Archetype
 
 	public:
 		CollisionGroup* next;
-		USHORT	id;
+		ushort	id;
 		CacheString name;
 		uint type;
 		uint hitPts;
@@ -790,7 +680,7 @@ namespace Archetype
 		/* 46 */ bool bUseGunAzimuth;
 		bool bUseGunElevation;
 		bool bAutoTurret;
-		/* 47 */ st6::vector<uint>hpTypes;
+		/* 47 */ st6::vector<uint> hpTypes;
 		bool isRangeCalculated;
 		float range;
 	};
@@ -1102,7 +992,7 @@ namespace Archetype
 		struct Ship& operator=(struct Ship const&);
 		static int const  MAX_EXHAUST_NOZZLES;
 		virtual enum AClassType  get_class_type(void)const;
-		std::vector<struct CacheString> const* get_legal_hps(enum HpAttachmentType)const;
+		st6::vector<struct CacheString> const* get_legal_hps(enum HpAttachmentType)const;
 		virtual bool read(class INI_Reader&);
 		virtual void redefine(struct Root const&);
 
@@ -1292,10 +1182,10 @@ public:
 	~BaseData(void);
 	class BaseData& operator=(class BaseData const&);
 	unsigned int get_base_id(void)const;
-	std::list<class RoomData*> const* get_const_room_data_list(void)const;
-	std::map<unsigned int, struct MarketGoodInfo, struct std::less<unsigned int>, class std::allocator<struct MarketGoodInfo>> const* get_market(void)const;
+	st6::list<class RoomData*> const* get_const_room_data_list(void)const;
+	st6::map<unsigned int, struct MarketGoodInfo, struct st6::less<unsigned int>, class st6::allocator<struct MarketGoodInfo>> const* get_market(void)const;
 	float get_price_variance(void)const;
-	std::list<class RoomData*>* get_room_data_list(void);
+	st6::list<class RoomData*>* get_room_data_list(void);
 	float get_ship_repair_cost(void)const;
 	unsigned int get_start_location(void)const;
 	void read_from_ini(char const*, unsigned int);
@@ -1321,8 +1211,8 @@ public:
 	~BaseDataList(void);
 	class BaseDataList& operator=(class BaseDataList const&);
 	class BaseData* get_base_data(unsigned int)const;
-	std::list<class BaseData*>* get_base_data_list(void);
-	std::list<class BaseData*> const* get_const_base_data_list(void)const;
+	st6::list<class BaseData*>* get_base_data_list(void);
+	st6::list<class BaseData*> const* get_const_base_data_list(void)const;
 	class RoomData* get_room_data(unsigned int)const;
 	class RoomData* get_unloaded_room_data(unsigned int)const;
 	void load(void);
@@ -1341,6 +1231,32 @@ struct IMPORT BaseHint
 
 public:
 	unsigned char data[OBJECT_DATA_SIZE];
+};
+
+struct IMPORT Watchable
+{
+	Watchable();
+	~Watchable();
+	Watchable& operator=(const Watchable&);
+	unsigned int unwatch();
+
+public:
+	struct BaseWatcher* newestBaseWatcher; // The last basewatcher set to watch this
+};
+
+struct IMPORT BaseWatcher
+{
+	BaseWatcher();
+	~BaseWatcher();
+	BaseWatcher& operator=(const BaseWatcher&);
+	void set(const struct Watchable*);
+
+protected:
+	void set_pointer(const Watchable*);
+
+public:
+	struct Watchable* watchable;
+	BaseWatcher* nextBaseWatcher;
 };
 
 namespace BehaviorTypes
@@ -1583,26 +1499,7 @@ namespace Universe
 		uint terrainDynamic2;
 		bool autosaveForbidden;
 	};
-	struct IMPORT ISystem
-	{
-		LPVOID pvtable;
-		LPVOID pvftable;		// CommReferrable
-		size_t msgidprefix_len;	// TString<64>
-		char   msgidprefix_str[64];
 
-		UINT   id;				// ID_String
-		LPCSTR nickname;		// CacheString
-		LPVOID connections[4];	// std::vector
-		BYTE   visit;
-		UINT   strid_name;
-		UINT   ids_info;
-		LPCSTR file;			// CacheString
-		class Vector NavMapPos;
-		LPVOID zones[3];		// std::list
-		ISpatialPartition* spatial;
-		float  NavMapScale;
-		UINT   spacemusic;
-	};
 	struct IMPORT IZone
 	{
 		struct FactionSpawn
@@ -1642,26 +1539,47 @@ namespace Universe
 		uint iDunno6[2];
 	};
 
+	struct IMPORT ISystem
+	{
+		void* pvtable;
+		void* pvftable;		// CommReferrable
+		size_t msgidprefix_len;	// TString<64>
+		char   msgidprefix_str[64];
+
+		uint   id;				// ID_String
+		const char* nickname;		// CacheString
+		st6::vector<ISystem*> connections;
+		uchar   visit;
+		uint   strid_name;
+		uint   ids_info;
+		const char* file;			// CacheString
+		class Vector NavMapPos;
+		st6::list<IZone*> zones;
+		ISpatialPartition* spatial;
+		float  NavMapScale;
+		uint   spacemusic;
+	};
+
 	IMPORT  struct ISystem* GetFirstSystem(void);
 	IMPORT  struct IBase* GetNextBase(void);
 	IMPORT  struct ISystem* GetNextSystem(void);
 	IMPORT  void  Shutdown(void);
 	IMPORT  bool  Startup(char const*);
-	IMPORT  struct IZone const* first_zone(unsigned int);
-	IMPORT struct IBase* __cdecl GetFirstBase(void);
-	IMPORT struct IBase* __cdecl GetNextBase(void);
-	IMPORT unsigned int __cdecl get_base_id(char const*);
+	IMPORT  IZone const* first_zone(unsigned int);
+	IMPORT  struct IBase* __cdecl GetFirstBase(void);
+	IMPORT  struct IBase* __cdecl GetNextBase(void);
+	IMPORT  unsigned int __cdecl get_base_id(char const*);
 	IMPORT  struct IBase* get_base(unsigned int);
 	IMPORT  unsigned int  get_base_id(char const*);
 	IMPORT  void  get_filename(char*, char const*);
 	IMPORT  unsigned int  get_gate_system(unsigned int);
-	IMPORT  struct IZone* get_non_const_zone(unsigned int, unsigned int);
-	IMPORT  struct IZone* get_non_const_zone(unsigned int, char const*);
+	IMPORT  IZone* get_non_const_zone(unsigned int, unsigned int);
+	IMPORT  IZone* get_non_const_zone(unsigned int, char const*);
 	IMPORT  struct ISystem const* get_system(unsigned int);
 	IMPORT  unsigned int  get_system_id(char const*);
-	IMPORT  struct IZone const* get_zone(unsigned int);
-	IMPORT  struct IZone const* get_zone(unsigned int, char const*);
-	IMPORT  struct IZone const* next_zone(struct IZone const*);
+	IMPORT  IZone const* get_zone(unsigned int);
+	IMPORT  IZone const* get_zone(unsigned int, char const*);
+	IMPORT  IZone const* next_zone(IZone const*);
 	IMPORT  unsigned int  num_bases(void);
 	IMPORT  unsigned int  num_systems(void);
 
@@ -1913,7 +1831,7 @@ namespace PhySys
 		void enable_collisions(bool, bool);
 		bool get_actual_collision_state(void)const;
 		bool get_desired_collision_state(void)const;
-		//@@@ int get_intruding_cobjs(bool,struct CheapSet<struct CObject *,struct std::less<struct CObject *> > &);
+		//@@@ int get_intruding_cobjs(bool,struct CheapSet<struct CObject *,struct st6::less<struct CObject *> > &);
 		virtual void mindist_entered_volume(class IVP_Controller_Phantom*, class IVP_Mindist_Base*);
 		virtual void mindist_left_volume(class IVP_Controller_Phantom*, class IVP_Mindist_Base*);
 		virtual void phantom_is_going_to_be_deleted_event(class IVP_Controller_Phantom*);
@@ -2157,48 +2075,6 @@ struct IMPORT CBase
 
 public:
 	struct CSimple* cobj;
-};
-
-
-class IMPORT CEquipManager
-{
-public:
-	CEquipManager(class CEquipManager const&);
-	CEquipManager(void);
-	~CEquipManager(void);
-	class CEquipManager& operator=(class CEquipManager const&);
-	bool AddNewEquipment(class CEquip*);
-	int CleanUp(void);
-	void Clear(void);
-	class CExternalEquip* FindByHardpoint(struct CacheString const&);
-	class CExternalEquip const* FindByHardpoint(struct CacheString const&)const;
-	class CEquip* FindByID(unsigned short);
-	class CEquip const* FindByID(unsigned short)const;
-	class CEquip* FindFirst(unsigned int);
-	class CEquip const* FindFirst(unsigned int)const;
-	bool HasDecayingCargo(void)const;
-	bool Init(struct CEqObj*);
-	unsigned short InstToSubObjID(long)const;
-	class CEquip* ReverseTraverse(class CEquipTraverser&);
-	class CEquip const* ReverseTraverse(class CEquipTraverser&)const;
-	int Size(void)const;
-	class CEquip* Traverse(class CEquipTraverser&);
-	class CEquip const* Traverse(class CEquipTraverser&)const;
-	bool VerifyListSync(class EquipDescList const&)const;
-
-private:
-	int CleanUp(class std::list<class CEquip*, class std::allocator<class CEquip*> >&);
-	static void  Clear(class std::list<class CEquip*, class std::allocator<class CEquip*> >&);
-
-public:
-	/* 0 */ CEqObj* parent;
-	/* 1 */ bool bDunno4;
-	/* 2 */ uint unkPtr1;
-	/* 3 */ int size1;
-	/* 4 */ bool bDunno10;
-	/* 5 */ uint unkPtr2;
-	/* 6 */ int size2;
-	/* 7 */ uint decayingCargo;
 };
 
 struct IMPORT CObject : public EngineObject
@@ -2596,7 +2472,7 @@ public:
 	virtual void Disconnect(void);
 	virtual enum FireResult  Fire(class Vector const&);
 	virtual void ConsumeFireResources(void);
-	virtual void ComputeLaunchInfo(class std::vector<struct ProjLaunchInfo>&, class Vector const&)const;
+	virtual void ComputeLaunchInfo(class st6::vector<struct ProjLaunchInfo>&, class Vector const&)const;
 	virtual float GetPowerDrawPerFire(void)const;
 	virtual int GetAmmoCount(void)const;
 	virtual bool AmmoNeedsMet(void)const;
@@ -2837,7 +2713,7 @@ public:
 	CEEngine(struct CShip*, unsigned short, struct Archetype::Engine const*, bool);
 	bool EngageCruise(bool, bool);
 	struct Archetype::Engine const* EngineArch(void)const;
-	std::vector<struct ExhaustNozzleInfo> const& NozzleInfos(void)const;
+	st6::vector<struct ExhaustNozzleInfo> const& NozzleInfos(void)const;
 	float GetCruiseChargeTime(void)const;
 	float GetCruiseChargeTimeElapsed(void)const;
 	float GetCruiseDrag(void)const;
@@ -3006,9 +2882,7 @@ public:
 	struct Archetype::Scanner const* ScannerArch(void)const;
 	void clear_cache(void);
 	void scan_for_types(unsigned int);
-
 	ScanList scanlist;
-
 };
 
 class IMPORT CEShield : public CAttachedEquip
@@ -3119,7 +2993,7 @@ public:
 	float GetRange(void)const;
 	class Vector  GetSourcePos(void)const;
 	class TractorArm const* GetTractorArm(unsigned int)const;
-	class std::vector<class TractorArm> const& GetTractorArms(void)const;
+	class st6::vector<class TractorArm> const& GetTractorArms(void)const;
 	void RemoveTarget(unsigned int);
 	enum TractorFailureCode  VerifyTarget(struct CLoot const*)const;
 	bool CanSeeTarget(struct CLoot const*)const;
@@ -3138,6 +3012,47 @@ public:
 	struct Archetype::TradeLaneEquip const* TradeLaneArch(void)const;
 
 	Archetype::TradeLaneEquip* archetype;
+};
+
+class IMPORT CEquipManager
+{
+public:
+	CEquipManager(class CEquipManager const&);
+	CEquipManager(void);
+	~CEquipManager(void);
+	class CEquipManager& operator=(class CEquipManager const&);
+	bool AddNewEquipment(class CEquip*);
+	int CleanUp(void);
+	void Clear(void);
+	class CExternalEquip* FindByHardpoint(struct CacheString const&);
+	class CExternalEquip const* FindByHardpoint(struct CacheString const&)const;
+	class CEquip* FindByID(unsigned short);
+	class CEquip const* FindByID(unsigned short)const;
+	class CEquip* FindFirst(unsigned int);
+	class CEquip const* FindFirst(unsigned int)const;
+	bool HasDecayingCargo(void)const;
+	bool Init(struct CEqObj*);
+	unsigned short InstToSubObjID(long)const;
+	class CEquip* ReverseTraverse(class CEquipTraverser&);
+	class CEquip const* ReverseTraverse(class CEquipTraverser&)const;
+	int Size(void)const;
+	class CEquip* Traverse(class CEquipTraverser&);
+	class CEquip const* Traverse(class CEquipTraverser&)const;
+	bool VerifyListSync(class EquipDescList const&)const;
+
+private:
+	int CleanUp(class st6::list<class CEquip*, class st6::allocator<class CEquip*> >&);
+	static void  Clear(class st6::list<class CEquip*, class st6::allocator<class CEquip*> >&);
+
+public:
+	/* 0 */ CEqObj* parent;
+	/* 1 */ bool bDunno4;
+	/* 2 */ uint unkPtr1;
+	/* 3 */ int size1;
+	/* 4 */ bool bDunno10;
+	/* 5 */ uint unkPtr2;
+	/* 6 */ int size2;
+	/* 7 */ uint decayingCargo;
 };
 
 class IMPORT CEquipTraverser
@@ -3179,7 +3094,7 @@ public:
 	virtual void get_equip_desc_list(struct EquipDescVector&)const;
 	virtual bool add_item(struct EquipDesc const&);
 	virtual enum ObjActivateResult  activate(bool, unsigned int);
-	virtual bool get_activate_state(class std::vector<bool, class std::allocator<bool> >&);
+	virtual bool get_activate_state(class st6::vector<bool, class st6::allocator<bool> >&);
 	virtual void disconnect(struct IObjDB*);
 	virtual void disconnect(struct INotify*);
 	virtual void disconnect(struct IObjRW*);
@@ -3224,7 +3139,7 @@ public:
 	unsigned int get_base_name(void)const;
 	class IBehaviorManager* get_behavior_interface(void);
 	float get_cloak_percentage(void)const;
-	void get_collision_group_description(class std::list<struct CollisionGroupDesc>&)const;
+	void get_collision_group_description(class st6::list<struct CollisionGroupDesc>&)const;
 	unsigned int const& get_dock_target(void)const;
 	bool get_explosion_dmg_bounding_sphere(float&, class Vector&)const;
 	float get_max_power(void)const;
@@ -3237,7 +3152,7 @@ public:
 	bool is_damaged_obj_attached(struct CacheString const&)const;
 	bool is_dock(void)const;
 	bool launch_pos(class Vector&, class Matrix&, int)const;
-	void load_arch_groups(class std::list<struct CollisionGroupDesc> const&);
+	void load_arch_groups(class st6::list<struct CollisionGroupDesc> const&);
 	void set_control_exclusion(unsigned int);
 	void set_power(float);
 	bool sync_cargo(class EquipDescList const&);
@@ -3485,6 +3400,88 @@ public:
 	unsigned char data[OBJECT_DATA_SIZE];
 };
 
+struct IMPORT EquipDesc
+{
+	EquipDesc(struct EquipDesc const&);
+	EquipDesc(void);
+	struct EquipDesc& operator=(struct EquipDesc const&);
+	bool operator==(struct EquipDesc const&)const;
+	bool operator!=(struct EquipDesc const&)const;
+	bool operator<(struct EquipDesc const&)const;
+	bool operator>(struct EquipDesc const&)const;
+
+	static struct CacheString const  CARGO_BAY_HP_NAME;
+	unsigned int get_arch_id(void)const;
+	float get_cargo_space_occupied(void)const;
+	int get_count(void)const;
+	struct CacheString const& get_hardpoint(void)const;
+	unsigned short get_id(void)const;
+	int get_owner(void)const;
+	float get_status(void)const;
+	bool get_temporary(void)const;
+	bool is_equipped(void)const;
+	bool is_internal(void)const;
+	void make_internal(void);
+	void set_arch_id(unsigned int);
+	void set_count(int);
+	void set_equipped(bool);
+	void set_hardpoint(struct CacheString const&);
+	void set_id(unsigned short);
+	void set_owner(int);
+	void set_status(float);
+	void set_temporary(bool);
+
+public:
+	ushort iDunno;
+	ushort sID;
+	uint iArchID;
+	CacheString szHardPoint;
+	bool bMounted;
+	float fHealth;
+	uint iCount;
+	bool bMission;
+	uint iOwner;
+};
+
+class IMPORT EquipDescList
+{
+public:
+	EquipDescList(struct EquipDescVector const&);
+	EquipDescList(class EquipDescList const&);
+	EquipDescList(void);
+	~EquipDescList(void);
+	class EquipDescList& operator=(class EquipDescList const&);
+	int add_equipment_item(struct EquipDesc const&, bool);
+	void append(class EquipDescList const&);
+	struct EquipDesc* find_equipment_item(struct CacheString const&);
+	struct EquipDesc* find_equipment_item(unsigned short);
+	struct EquipDesc const* find_equipment_item(struct CacheString const&)const;
+	struct EquipDesc const* find_equipment_item(unsigned short)const;
+	struct EquipDesc const* find_matching_cargo(unsigned int, int, float)const;
+	float get_cargo_space_occupied(void)const;
+	int remove_equipment_item(unsigned short, int);
+	struct EquipDesc* traverse_equipment_type(unsigned int, struct EquipDesc const*);
+	struct EquipDesc const* traverse_equipment_type(unsigned int, struct EquipDesc const*)const;
+
+public:
+	st6::list<EquipDesc> equip;
+};
+
+struct IMPORT EquipDescVector
+{
+	EquipDescVector(struct EquipDescVector const&);
+	EquipDescVector(class EquipDescList const&);
+	EquipDescVector(void);
+	~EquipDescVector(void);
+	struct EquipDescVector& operator=(struct EquipDescVector const&);
+	int add_equipment_item(struct EquipDesc const&, bool);
+	void append(struct EquipDescVector const&);
+	struct EquipDesc* traverse_equipment_type(unsigned int, struct EquipDesc const*);
+
+public:
+	st6::vector<EquipDesc> equip;
+};
+
 class IMPORT CPlayerAccount
 {
 public:
@@ -3494,11 +3491,11 @@ public:
 	class CPlayerAccount& operator=(class CPlayerAccount const&);
 	void GenerateAccount(char const*);
 	static bool  GenerateTextKey(char*);
-	std::basic_string<unsigned short, struct ci_wchar_traits> GetAccountName(void);
+	st6::wstring GetAccountName(void);
 	char const* GetAccountNameChar(void);
-	std::basic_string<unsigned short, struct ci_wchar_traits> GetAccountNameSig(void);
+	st6::wstring GetAccountNameSig(void);
 	char const* GetAccountNameSigChar(void);
-	std::basic_string<unsigned short, struct ci_wchar_traits> GetServerSignature(char const*);
+	st6::wstring GetServerSignature(char const*);
 	static bool  GetTextKey(char*);
 	bool LoadAccount(void);
 	bool LoadAccountFromStrings(char const*, char const*);
@@ -3723,33 +3720,33 @@ public:
 	float get_time_to_accelerate(float, float, float, float, float)const;
 	void recalculate_formation_speed(void);
 
-	DWORD dunno5[2];                          // 106
+	uint dunno5[2];                          // 106
 	uint physicsPtr;                          // 108
 	struct CPlayerGroup* playerGroup;                // 109
-	DWORD dunno6;                             // 110
+	uint dunno6;                             // 110
 	IObjRW* followLeader2;                    // 111
 	uint dunno16;                             // 112
 	Vector followOffset2;                     // 113
 	st6::vector<IObjRW*> followerVector;      // 116
 	IObjRW* followLeader;                     // 120
-	DWORD followLeaderID_unk;                 // 121
+	uint followLeaderID_unk;                 // 121
 	Vector followOffset;                      // 122
-	DWORD dunno8[3];                          // 125
+	uint dunno8[3];                          // 125
 	st6::vector<IObjRW*> targetedEnemyVector; // 128
-	DWORD dunno11[3];                         // 132
+	uint dunno11[3];                         // 132
 	uint groupId;                             // 135
 	IObjRW* target;                           // 136
-	DWORD targetId_unk;                       // 137
+	uint targetId_unk;                       // 137
 	ushort subTargetId;                       // 138
-	DWORD BayAnim;                            // 139
+	uint BayAnim;                            // 139
 	CSteering* cSteering;                     // 140
-	DWORD dunno13[6];                         // 141
+	uint dunno13[6];                         // 141
 	Vector axisThrottle;                      // 147
 	CNudgeEngine* nudgeEngine;                // 150
-	DWORD dunno10[6];                         // 151
+	uint dunno10[6];                         // 151
 	Vector nudgeVector;                       // 157
 	CStrafeEngine* strafeEngine;              // 160
-	DWORD dunno12[5];                         // 161
+	uint dunno12[5];                         // 161
 	StrafeDir strafeDir;                      // 166
 	float throttle;                           // 167
 	float thrustPower;                        // 168
@@ -3791,24 +3788,24 @@ public:
 		uint iHash2; // rep group? (otherwise it's the hash)
 		struct structCostume
 		{
-			UINT head;
-			UINT body;
-			UINT lefthand;
-			UINT righthand;
-			UINT accessory[8];
+			uint head;
+			uint body;
+			uint lefthand;
+			uint righthand;
+			uint accessory[8];
 			int  accessories;
 		};
 		structCostume Costume;
 		int iVoiceID;
 		int iDunnoLoadout[4];
-		//class std::list<struct CollisionGroupDesc> collision;
+		//class st6::list<struct CollisionGroupDesc> collision;
 		int iDunno3[3];
 		uint id_string;
 		uint iVisit;
 		uint iParent;
 		uint iDestructible;
 		// 1, 2, 3 = related to loadouts
-		// 4 = class std::list<struct CollisionGroupDesc> &
+		// 4 = class st6::list<struct CollisionGroupDesc> &
 		// 7 = ID_String of solar (same as iHash)
 		// 8 = visit (only last byte used)
 		// 9 = id of parent
@@ -3835,7 +3832,7 @@ public:
 	virtual void cache_physical_props(void);
 	virtual void init_physics(class Vector const&, class Vector const&);
 	virtual enum ObjActivateResult  activate(bool, unsigned int);
-	virtual bool get_activate_state(class std::vector<bool, class std::allocator<bool> >&);
+	virtual bool get_activate_state(class st6::vector<bool, class st6::allocator<bool> >&);
 	virtual void flush_animations(void);
 	virtual class CEquip* alloc_equip(unsigned short, struct Archetype::Equipment*, bool);
 
@@ -4160,7 +4157,6 @@ namespace EngineEquipConsts
 	IMPORT  float  THROTTLE_STEADY_TIME;
 };
 
-
 namespace ErrorHandler
 {
 	IMPORT  void  activate(char const*, int(*)(char const*, char const*, bool));
@@ -4383,7 +4379,7 @@ public:
 
 protected:
 	typedef TString<260> TString260;
-	static std::list<TString260>  m_FuseINIFiles;
+	static st6::list<TString260>  m_FuseINIFiles;
 
 public:
 	unsigned char data[OBJECT_DATA_SIZE];
@@ -4462,7 +4458,7 @@ public:
 	struct GoodInfo const* find_by_id(unsigned int)const;
 	struct GoodInfo const* find_by_name(char const*)const;
 	struct GoodInfo const* find_by_ship_arch(unsigned int)const;
-	class std::list<struct GoodInfo*, class std::allocator<struct GoodInfo*> > const* get_list(void)const;
+	class st6::list<struct GoodInfo*, class st6::allocator<struct GoodInfo*> > const* get_list(void)const;
 	void load(char const*);
 
 private:
@@ -6155,7 +6151,7 @@ class IMPORT TextNode
 
 public:
 	TextNode(class TextNode const&);
-	TextNode(std::wstring const&, int);
+	TextNode(st6::wstring const&, int);
 	TextNode(unsigned short const*, int);
 	TextNode(void);
 	/*virtual ~TextNode(void);
@@ -6167,10 +6163,10 @@ public:
 	virtual void GetVisualSize(class TextRenderContext const &,struct VisualSize &)const ;
 	virtual bool SplitAtSize(class TextRenderContext const &,int,unsigned int,class RDLNode * &,class RDLNode * &)const ;
 	virtual void Update(float);
-	void append_text(std::wstring const &,int);
+	void append_text(st6::wstring const &,int);
 	void append_text(unsigned short const *,int);
-	std::wstring const & get_text(void)const ;
-	void set_text(std::wstring const &,int);
+	st6::wstring const & get_text(void)const ;
+	void set_text(st6::wstring const &,int);
 	void set_text(unsigned short const *,int);
 
 	virtual operator class TextNode *(void);
@@ -6392,7 +6388,7 @@ namespace Reputation
 	};
 
 	IMPORT  void  FreeFeelings(void);
-	IMPORT  std::map<unsigned int, unsigned int, struct std::less<unsigned int>, class std::allocator<unsigned int>>* GetChangedAffiliationClientMap(void);
+	IMPORT  st6::map<unsigned int, unsigned int, struct st6::less<unsigned int>, class st6::allocator<unsigned int>>* GetChangedAffiliationClientMap(void);
 	IMPORT  bool  IsStoryFaction(unsigned int);
 	IMPORT  void  LoadFeelings(class INI_Reader&);
 	IMPORT  void  Save(struct ISave*);
@@ -6644,7 +6640,7 @@ public:
 	SphereIntruderChecker(void);
 	~SphereIntruderChecker(void);
 	class SphereIntruderChecker& operator=(class SphereIntruderChecker const&);
-	void check_sphere(unsigned int, class Vector const&, float, class std::list<struct CObject*, class std::allocator<struct CObject*> >&);
+	void check_sphere(unsigned int, class Vector const&, float, class st6::list<struct CObject*, class st6::allocator<struct CObject*> >&);
 
 protected:
 	virtual void added(struct CObject*);
@@ -6753,7 +6749,7 @@ public:
 	static void  set_style(unsigned short, class RenderDisplayList const&);
 
 protected:
-	static std::map<unsigned short, class StyleCollection::Style, struct std::less<unsigned short>, class std::allocator<class StyleCollection::Style>>  mStyles;
+	static st6::map<unsigned short, class StyleCollection::Style, struct st6::less<unsigned short>, class st6::allocator<class StyleCollection::Style>>  mStyles;
 
 public:
 	unsigned char data[OBJECT_DATA_SIZE];
@@ -6980,11 +6976,11 @@ struct IMPORT accessory
 	struct accessory& operator=(struct accessory const&);
 	char const* get_accessory_hardpoint(void)const;
 	char const* get_character_hardpoint(void)const;
-	std::list<std::string> const& get_materials(void)const;
+	st6::list<st6::string> const& get_materials(void)const;
 	char const* get_mesh(void)const;
 	char const* get_name(void)const;
 	unsigned long get_name_crc(void)const;
-	void init(char const*, char const*, char const*, char const*, std::list<std::string> const&);
+	void init(char const*, char const*, char const*, char const*, st6::list<st6::string> const&);
 
 public:
 	unsigned char data[OBJECT_DATA_SIZE];
@@ -7000,9 +6996,9 @@ struct IMPORT bodypart
 	char const* get_mesh(void)const;
 	char const* get_name(void)const;
 	unsigned long get_name_crc(void)const;
-	std::list<std::string>* get_petal_anims(void)const;
+	st6::list<st6::string>* get_petal_anims(void)const;
 	class DetailSwitchTable* get_switch_table(void)const;
-	void init(char const*, char const*, int, std::list<std::string>*, class DetailSwitchTable*);
+	void init(char const*, char const*, int, st6::list<st6::string>*, class DetailSwitchTable*);
 
 public:
 	unsigned char data[OBJECT_DATA_SIZE];

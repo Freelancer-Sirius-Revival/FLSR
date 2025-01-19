@@ -503,6 +503,14 @@ namespace SolarInvincibility
     void Initialize();
 }
 
+namespace SolarSpawn
+{
+    void LoadSettings();
+    void Initialize();
+    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
+    bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd);
+}
+
 namespace EquipWhiteList
 {
     void LoadEquipWhiteList();

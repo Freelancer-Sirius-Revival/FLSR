@@ -26,6 +26,7 @@
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="SolarInvincibility.cpp" />
+    <ClCompile Include="SolarSpawn.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -38,6 +39,7 @@
     <CopyFileToFolders Include="configs\FLSR-LootBoxes.cfg" />
     <CopyFileToFolders Include="configs\flsr.cfg" />
     <CopyFileToFolders Include="configs\FLSR-SolarInvincibility.cfg" />
+    <CopyFileToFolders Include="configs\FLSR-Solars.cfg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

@@ -42,6 +42,7 @@ void LoadSettings() {
     }
 
     SolarInvincibility::LoadSettings();
+    SolarSpawn::LoadSettings();
 
     // POPUP-Module #############################################################################
     if (Modules::GetModuleState("WelcomeMSG"))
@@ -182,6 +183,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Timers::Update,PLUGIN_HkIServerImpl_Update, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarInvincibility::Initialize, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::Initialize, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::ReadCharacterData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));

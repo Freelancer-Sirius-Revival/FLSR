@@ -1032,7 +1032,7 @@ namespace Archetype
 		virtual void redefine(struct Root const&);
 
 	public:
-		/* 37 */ bool bDestrutible;
+		/* 37 */ bool bDestructible;
 		/* 38 */ float fSolarRadius;
 		/* 39 */ uint iToughness;
 		/* 40 */ char* szOpenAnim;

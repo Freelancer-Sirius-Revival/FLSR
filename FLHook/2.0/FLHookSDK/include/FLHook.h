@@ -757,6 +757,15 @@ public:
 	std::wstring wscCurCmdString;
 };
 
+class CInGame : public CCmds {
+public:
+	uint iClientID;
+	std::wstring wscAdminName;
+	void DoPrint(const std::wstring& wscText);
+	void ReadRights(const std::string& scIniFile);
+	std::wstring GetAdminName();
+};
+
 
 // namespaces
 namespace HkIServerImpl

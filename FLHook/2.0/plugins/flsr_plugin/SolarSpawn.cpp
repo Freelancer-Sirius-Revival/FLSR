@@ -188,8 +188,6 @@ namespace SolarSpawn
 		solarInfo.vPos = positionOverride == NULL ? info.position : *positionOverride;
 		solarInfo.Costume.head = info.headId;
 		solarInfo.Costume.body = info.bodyId;
-		solarInfo.Costume.lefthand = 0;
-		solarInfo.Costume.righthand = 0;
 		std::copy(info.accessoryIds.begin(), info.accessoryIds.end(), solarInfo.Costume.accessory);
 		solarInfo.Costume.accessories = info.accessoryIds.size();
 		solarInfo.iVoiceID = info.voiceId;
@@ -222,7 +220,6 @@ namespace SolarSpawn
 		pub::AI::SetPersonalityParams personality;
 		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
-		pub::AI::get_personality(info.personalityId, personality.personality);
 		pub::AI::SubmitState(spaceObjId, &personality);
 	}
 
@@ -360,6 +357,7 @@ namespace SolarSpawn
 				}
 			}
 			PrintUserCmdText(clientId, L"ERR solar not found: " + stows(targetNickname));
+			return false;
 		}
 		return false;
 	}

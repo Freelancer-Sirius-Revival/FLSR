@@ -1048,24 +1048,15 @@ namespace pub
 			Vector vPos;
 			Matrix mOrientation;
 			uint iLoadoutID;
-			struct structCostume
-			{
-				UINT head;
-				UINT body;
-				UINT lefthand;
-				UINT righthand;
-				UINT accessory[8];
-				int  accessories;
-			};
-			structCostume Costume;
+			Costume Costume;
 			int iRep;
 			int iVoiceID;
 			uint baseId;
-			uint iUnk9; //Boolean, only last byte is used
+			bool missionBool;
 			int iHitPointsLeft;
 			char cNickName[64]; //Has to be unique
 			uint iUnk11; //0 unused?
-			bool missionMarked;
+			bool missionMarked; // 1 = flagged as mission solar, 0 = normal
 		};
 
 		struct LootInfo {

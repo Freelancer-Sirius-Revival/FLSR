@@ -1008,34 +1008,21 @@ namespace pub
 			uint iSystem;
 			uint iShipArchetype;
 			Vector vPos;
-			Vector vUnk1; // all 0
-			Vector vUnk2; // all 0
+			Vector vAngularVelocity;
+			Vector vLinearVelocity;
 			Matrix mOrientation;
-			uint iUnk1; // 0
+			uint iGroupId; // 0
 			uint iLoadout;
 			OwnerList<pub::SpaceObj::CargoDesc> cargoDesc;
 			uint unk1; // 0
 			uint unk2; // 0
 			float fUnk1;
 			uint unk3; // 0
-			uint iLook1;
-			uint iLook2;
-			uint unk4; // 0
-			uint unk5; // 0
-			uint iComm;
-			float fUnk2;
-			float fUnk3;
-			float fUnk4;
-			float fUnk5;
-			float fUnk6;
-			float fUnk7;
-			float fUnk8;
-			uint iUnk2;
-
-			int iRep; // increases for each NPC spawned, starts at 0 or 1
+			Costume Costume;
+			int iRep;
 			uint iPilotVoice;
-			uint unk6; // 0
-			int iHealth; // -1 = max health
+			uint DockTargetId; // 0
+			int iHitPointsLeft; // -1 = max health
 			uint unk7; // 0
 			uint unk8; // 0
 			uint iLevel;

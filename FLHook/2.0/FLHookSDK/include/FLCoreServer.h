@@ -953,7 +953,7 @@ namespace pub
 		IMPORT  int SetInitialOrnt(unsigned int const&, class Matrix const&);
 		IMPORT  int SetInitialPos(unsigned int const&, class Vector const&);
 		IMPORT  int SetMissionObjectiveState(unsigned int const&, unsigned int const&, int, unsigned int);
-		IMPORT  int SetMissionObjectives(unsigned int const&, unsigned int const&, struct MissionObjective const*, unsigned int, struct FmtStr const&, unsigned char, struct FmtStr const&);
+		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectiveType2, struct FmtStr const& information, uchar objectiveType3, struct FmtStr const& information2);
 		IMPORT  int SetMoneyNeededToNextRank(unsigned int, int);
 		IMPORT  int SetMonkey(unsigned int);
 		IMPORT  int SetMsnID(unsigned int, unsigned int, unsigned int, bool, unsigned int);
@@ -1118,7 +1118,7 @@ namespace pub
 		IMPORT  int LightFuse(unsigned int const&, char const*, float);
 		IMPORT  int Relocate(unsigned int const&, unsigned int const&, class Vector const&, class Matrix const&);
 		IMPORT  int RequestSpaceScript(unsigned int const&, class Vector const&, int const&, unsigned int, char const*);
-		IMPORT  int SendComm(unsigned int, unsigned int, unsigned int, struct Costume const*, unsigned int, unsigned int*, int, unsigned int, float, bool);
+		IMPORT  int SendComm(uint senderObjId, uint receiverObjId, uint voiceID, const Costume* costume, uint info1Id, uint* lineId, int priority, uint info2Id, float delay, bool global);
 		IMPORT  int SetInvincible2(unsigned int spaceObjectId,bool preventNpcDamage,bool preventPlayerDamage,float maxHpLossPercentage);
 		IMPORT  int SetInvincible(unsigned int spaceObjectId, bool preventDamage, bool allowPlayerDamage, float maxHpLossPercentage);
 		IMPORT  int SetRelativeHealth(unsigned int const&, float);

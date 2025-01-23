@@ -10,7 +10,7 @@
 * 
 * [Solar]
 * autospawn = false ;optional
-* nickname = foobar
+* nickname = foobar ;must be unique across all system solars. Can match with object nickname in NoCloakArea to enable de-cloak ability.
 * archetype = largestation1
 * loadout = cv_loadout_solar_largestation01; optional
 * ids_name = 196663
@@ -221,6 +221,9 @@ namespace SolarSpawn
 		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);
+
+		// This must use the general nickname to identify a no-cloak definition for this solar.
+		Cloak::TryRegisterNoCloakSolar(info.nickname, spaceObjId, solarInfo.vPos, solarInfo.iSystemID);
 	}
 
 	static bool DestroySolar(const uint spaceObjId)

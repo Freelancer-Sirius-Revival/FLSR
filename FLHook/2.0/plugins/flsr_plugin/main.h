@@ -443,6 +443,7 @@ namespace Cloak
     void InitializeWithGameData();
     void UpdateCloakClients();
     CloakState GetClientCloakState(uint clientId);
+    bool TryRegisterNoCloakSolar(const std::string nickname, const uint objectId, const Vector& position, const uint systemId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
     void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);

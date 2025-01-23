@@ -154,10 +154,10 @@ namespace SolarSpawn
 							solar.bodyId = CreateID(ini.get_value_string(1));
 							for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
 							{
-								const uint accessoryId = CreateID(ini.get_value_string(index + 2));
-								if (accessoryId == 0)
+								const char* accessoryNickname = ini.get_value_string(index + 2);
+								if (strlen(accessoryNickname) == 0)
 									break;
-								solar.accessoryIds.push_back(accessoryId);
+								solar.accessoryIds.push_back(CreateID(accessoryNickname));
 							}
 						}
 						else if (ini.is_value("voice"))

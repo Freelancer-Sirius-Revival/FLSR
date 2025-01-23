@@ -48,10 +48,10 @@ enum DOCK_HOST_RESPONSE
 
 enum MissionMessageType
 {
-	MissionMessageType_Failure, // mission failure
+	MissionMessageType_Failure, // mission failure, offers Respawn buttons
 	MissionMessageType_Type1, // objective
 	MissionMessageType_Type2, // objective
-	MissionMessageType_Type3, // mission success
+	MissionMessageType_Success, // mission success
 };
 
 struct SSPUseItem
@@ -191,6 +191,21 @@ struct CAccountListNode
 enum ConnectionType
 {
 	JUMPHOLE
+};
+
+struct XRequestBestPathEntry
+{
+	Vector position;
+	uint objId; // Ignored for Server.RequestBestPath
+	uint systemId;
+};
+
+struct XRequestBestPath
+{
+	int repId; // PlayerData.iReputation
+	int waypointCount; // Ignored for Server.RequestBestPath
+	bool noPathFound; // Ignored for Server.RequestBestPath
+	XRequestBestPathEntry entries[64]; // Server.RequestBestPath requires exactly 2, otherwise variable length
 };
 
 class IMPORT CAccount

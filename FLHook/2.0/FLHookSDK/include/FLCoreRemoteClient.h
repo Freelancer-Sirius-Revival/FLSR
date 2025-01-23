@@ -271,7 +271,7 @@ public:
 	virtual void unknown_91(uint iClientID, uint iDunno);
 	virtual bool Send_FLPACKET_COMMON_SET_WEAPON_GROUP(uint iClientID, unsigned char* p2, int p3);
 	virtual bool Send_FLPACKET_COMMON_SET_VISITED_STATE(uint iClientID, unsigned char* p2, int p3);
-	virtual bool Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, unsigned char* p2, int p3);
+	virtual bool Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, XRequestBestPath const& bestPath, int p3);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_PLAYER_STATS(uint iClientID, unsigned char* p2, int p3);
 	virtual void unknown_96(uint iClientID, uint iDunno, uint iDunno2, uint iDunno3);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_GROUP_POSITIONS(uint iClientID, unsigned char* p2, int p3);

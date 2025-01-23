@@ -4584,7 +4584,7 @@ namespace pub
 			virtual bool validate();
 
 			OP_TYPE op_type;
-			int x08;
+			int fireWeapons; // Probably a bool, anything non-zero turns it on
 		};
 
 		struct IMPORT ContentCallback
@@ -4610,9 +4610,6 @@ namespace pub
 			DirectiveCancelOp(class DirectiveCancelOp const&);
 			DirectiveCancelOp(void);
 			virtual bool validate(void);
-
-		public:
-			unsigned char data[OBJECT_DATA_SIZE];
 		};
 
 		class IMPORT DirectiveDelayOp : public pub::AI::BaseOp
@@ -4623,7 +4620,7 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			unsigned char data[OBJECT_DATA_SIZE];
+			float DelayTime;
 		};
 
 		class IMPORT DirectiveDockOp : public pub::AI::BaseOp
@@ -4634,13 +4631,15 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			uint dock_spaceobj;
-			uint zero1;
-			uint zero2;
-			int minusone;
-			uint zero3;
-			float twohundred;
-			float fivehundred;
+			uint DockSpaceObj;
+			uint x10;   // 0
+			ushort x12; // 0
+			ushort x14; // 0xbb, 0x83 ??
+			int x18;    // -1
+			uint x1C;   // 0
+			float x20;  // 200
+			float x24;  // 500
+			uint x28;   // 0
 		};
 
 		class IMPORT DirectiveDrasticEvadeOp : public pub::AI::BaseOp
@@ -4651,6 +4650,7 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
+			uint EvadeSpaceObj;
 			unsigned char data[OBJECT_DATA_SIZE];
 		};
 
@@ -4684,10 +4684,10 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			UINT   leader;       // 0
-			float  max_distance; // 150
-			Vector ofs;          // 0, 0, 0; copy constructor indicates Vector
-			float  unknown;      // 400
+			uint followSpaceObj;
+			float maxDistance;
+			Vector offset;
+			float dunno2; // 400
 		};
 
 		class IMPORT DirectiveFormationOp : public pub::AI::BaseOp
@@ -4709,31 +4709,31 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			int iGotoType; // 1 = Vec, 0 = Ship, 2 = spline, 3 = undefined
-			// The target position if iGotoType is 1.
-			Vector vPos;
-			// If iGotoType is 0 then move to this spaceobj. Do not set a vPos if you
+			int gotoType; // 1 = Vec, 0 = Ship, 2 = spline, 3 = undefined
+			// The target position if GotoType is 1.
+			Vector pos;
+			// If GotoType is 0 then move to this spaceobj. Do not set a pos if you
 			// set this.
-			uint iTargetID;
-			// The 4 points to fly to if iGotoType is 2
-			Vector vSpline[4];
+			uint targetId;
+			// The 4 points to fly to if GotoType is 2
+			Vector spline[4];
 			// This specifies how close the NPC will attempt to get to the position
-			float fRange;
+			float range;
 			// This specifies the thrust in the range from 0-100. Use -1 for maximum.
-			float fThrust;
+			float thrust;
+			// This specifies if the ship should move (*not* always set to true)
+			bool shipMoves;
 			// This specifies if the ship should move (always set to true)
-			bool x58;
-			// This specifies if the ship should move (always set to true)
-			bool x59;
+			bool shipMoves2;
 			// Set the follow to control if the ship will cruise or not. Do not set
 			// both to true.
-			bool goto_cruise;
-			bool goto_no_cruise;
+			bool goToCruise;
+			bool goToNoCruise;
 			int x5C;
 			float x60; // 200
 			float x64; // 500
 			int x68;
-			int x6C;
+			float x6C;
 		};
 
 		class IMPORT DirectiveGuideOp : public pub::AI::BaseOp
@@ -4753,9 +4753,6 @@ namespace pub
 			DirectiveIdleOp(class DirectiveIdleOp const&);
 			DirectiveIdleOp(void);
 			virtual bool validate(void);
-
-		public:
-			unsigned char data[OBJECT_DATA_SIZE];
 		};
 
 		class IMPORT DirectiveInstantTradelaneOp : public pub::AI::BaseOp
@@ -4766,7 +4763,9 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			unsigned char data[OBJECT_DATA_SIZE];
+			uint tradelaneRingFrom;
+			uint tradelaneRingTo;
+			float dunno; // 3750
 		};
 
 		class IMPORT DirectiveLaunchOp : public pub::AI::BaseOp
@@ -4777,7 +4776,9 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			unsigned char data[OBJECT_DATA_SIZE];
+			uint launchFromObject;
+			uint x10; // 2, cannot be -1, defaults to -1
+			uint x14; // 1, cannot be 0, defaults to 0
 		};
 
 		class IMPORT DirectiveRamOp : public pub::AI::BaseOp
@@ -4821,7 +4822,10 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			unsigned char data[OBJECT_DATA_SIZE];
+			uint x0C;  // 10
+			float x10; // 500
+			uint x14;  // 0
+			uint x18;  // 0
 		};
 
 		class IMPORT DirectiveWaitForPlayerManeuverOp : public pub::AI::BaseOp
@@ -5249,8 +5253,8 @@ namespace pub
 			virtual bool validate();
 
 			int state_graph;
-			void* x10; // -1
-			void* x14; // -1
+			ContentCallback* contentCallback;
+			DirectiveCallback* directiveCallback;
 			bool state_id; // true - state_graph_id, false - state_graph
 			Personality personality;
 		};
@@ -5262,7 +5266,13 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			unsigned char data[OBJECT_DATA_SIZE];
+			uint iZoneType;     // 0 = position, 1 = cuboid 2 = spaceobj
+			uint iDunno_0x10;   // 0=?? 1=?? 2=delete user zone
+			Vector vPosition;   // only used for iZoneType 0
+			uint iSpaceObj;     // only used for iZoneType 2
+			Vector vBoxCorner1; // only used for iZoneType 1
+			Vector vBoxCorner2; // only used for iZoneType 1
+			float fRadius;      // not used for iZoneType 1
 		};
 
 	};

@@ -164,9 +164,10 @@ namespace Cloak
 		uint NNVoiceMessageId;
 	};
 	static std::unordered_map<uint, std::vector<NoCloakArea>> noCloakAreasPerSystem;
+	static std::unordered_map<uint, NoCloakArea> noCloakObjectDefinitionsByNicknameId;
 	static std::vector<NoCloakArea> unprocessedObjectNoCloakAreas;
 
-	bool IsValidCloakableClient(const uint clientId)
+	bool static IsValidCloakableClient(const uint clientId)
 	{
 		if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId) && clientCloakStats.contains(clientId))
 		{
@@ -177,12 +178,26 @@ namespace Cloak
 		return false;
 	}
 
-	bool IsFullyUncloaked(const uint clientId)
+	static bool IsFullyUncloaked(const uint clientId)
 	{
 		return IsValidCloakableClient(clientId) && clientCloakStats[clientId].cloakState == CloakState::Uncloaked;
 	}
 
-	void CollectNoCloakObjectsPerSystem()
+	bool TryRegisterNoCloakSolar(const std::string nickname, const uint objectId, const Vector& position, const uint systemId)
+	{
+		const uint nicknameId = CreateID(nickname.c_str());
+		if (noCloakObjectDefinitionsByNicknameId.contains(nicknameId))
+		{
+			NoCloakArea area = noCloakObjectDefinitionsByNicknameId[nicknameId];
+			area.objectId = objectId;
+			area.position = position;			
+			noCloakAreasPerSystem[systemId].push_back(area);
+			return true;
+		}
+		return false;
+	}
+
+	static void CollectNoCloakObjectsPerSystem()
 	{
 		const uint JUMP_GATE_NN_ID = pub::GetNicknameId("object_jump_gate");
 		const uint JUMP_HOLE_NN_ID = pub::GetNicknameId("object_jump_hole");
@@ -224,7 +239,7 @@ namespace Cloak
 		unprocessedObjectNoCloakAreas.clear();
 	}
 
-	void ClearClientData(const uint clientId)
+	static void ClearClientData(const uint clientId)
 	{
 		Mark::RemoveCloakedPlayer(clientId);
 		clientCloakStats.erase(clientId);
@@ -311,6 +326,7 @@ namespace Cloak
 							area.position.z = 0;
 							area.radius = ini.get_value_float(1);
 							area.NNVoiceMessageId = CreateID(ini.get_value_string(2));
+							noCloakObjectDefinitionsByNicknameId[area.objectId] = area;
 							unprocessedObjectNoCloakAreas.push_back(area);
 						}
 					}
@@ -342,7 +358,7 @@ namespace Cloak
 		CollectNoCloakObjectsPerSystem();
 	}
 
-	std::list<CARGO_INFO> GetClientCargoList(uint clientId)
+	static std::list<CARGO_INFO> GetClientCargoList(uint clientId)
 	{
 		std::list<CARGO_INFO> cargoList;
 		if (!HkIsValidClientID(clientId))
@@ -354,7 +370,7 @@ namespace Cloak
 		return cargoList;
 	}
 
-	bool EquipEquipment(const uint clientId, const uint archetypeId, const std::string& hardpoint)
+	static bool EquipEquipment(const uint clientId, const uint archetypeId, const std::string& hardpoint)
 	{
 		if (HkAddEquip(ARG_CLIENTID(clientId), archetypeId, hardpoint) == HKE_OK)
 		{
@@ -377,7 +393,7 @@ namespace Cloak
 		return false;
 	}
 
-	bool EquipCloakingDevices(const uint clientId)
+	static bool EquipCloakingDevices(const uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
@@ -418,7 +434,7 @@ namespace Cloak
 		return false;
 	}
 
-	void RemoveCloakingDevices(const uint clientId)
+	static void RemoveCloakingDevices(const uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
@@ -433,7 +449,7 @@ namespace Cloak
 		}
 	}
 
-	bool HasMountedEquipmentByCargoId(const uint clientId, const uint cargoId)
+	static bool HasMountedEquipmentByCargoId(const uint clientId, const uint cargoId)
 	{
 		if (!HkIsValidClientID(clientId))
 			return false;
@@ -447,17 +463,17 @@ namespace Cloak
 		return false;
 	}
 
-	void StartFuse(const uint clientId, const uint fuseId)
+	static void StartFuse(const uint clientId, const uint fuseId)
 	{
 		HkLightFuse(clientCloakStats[clientId].shipInspect, fuseId, 0.0f, 0.0f, 0.0f);
 	}
 
-	void StopFuse(const uint clientId, const uint fuseId)
+	static void StopFuse(const uint clientId, const uint fuseId)
 	{
 		HkUnLightFuse(clientCloakStats[clientId].shipInspect, fuseId);
 	}
 
-	void SendEquipmentActivationState(const uint clientId, const uint cargoId, const bool active)
+	static void SendEquipmentActivationState(const uint clientId, const uint cargoId, const bool active)
 	{
 		XActivateEquip activateEquipment;
 		activateEquipment.bActivate = active;
@@ -467,7 +483,7 @@ namespace Cloak
 		HookClient->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
 	}
 
-	void InstallCloak(const uint clientId)
+	static void InstallCloak(const uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
@@ -567,7 +583,7 @@ namespace Cloak
 		clientCloakStats.insert({ clientId, clientStats });
 	}
 
-	void SynchronizeWeaponGroupsWithCloakState(const uint clientId)
+	static void SynchronizeWeaponGroupsWithCloakState(const uint clientId)
 	{
 		struct PlayerData* playerData = 0;
 		while (playerData = Players.traverse_active(playerData))
@@ -604,13 +620,13 @@ namespace Cloak
 		}
 	}
 
-	void SynchronizeShieldStateWithCloakState(const uint clientId)
+	static void SynchronizeShieldStateWithCloakState(const uint clientId)
 	{
 		if (clientCloakStats[clientId].shieldPresent)
 			SendEquipmentActivationState(clientId, SHIELD_SLOT_ID, IsFullyUncloaked(clientId));
 	}
 
-	void SynchronizePowerStateWithCloakState(const uint clientId, const float currentShipPower)
+	static void SynchronizePowerStateWithCloakState(const uint clientId, const float currentShipPower)
 	{
 		const CloakState cloakState = clientCloakStats[clientId].cloakState;
 		bool powerPlantsActive = (currentShipPower < LOW_ENERGY_THRESHOLD) || IsFullyUncloaked(clientId); // Make sure we can never drop to zero or negative energy. Or clients will crash.
@@ -618,7 +634,7 @@ namespace Cloak
 			SendEquipmentActivationState(clientId, cargoId, powerPlantsActive);
 	}
 
-	void PlayDrySound(const uint clientId)
+	static void PlayDrySound(const uint clientId)
 	{
 		const mstime now = timeInMS();
 		if (now - clientCloakStats[clientId].lastDrySoundTimeStamp > DRY_SOUND_DEBOUNCE_TIME)
@@ -628,7 +644,7 @@ namespace Cloak
 		}
 	}
 
-	void PlayNeuralNetVoice(const uint clientId, const std::vector<uint> messageIds)
+	static void PlayNeuralNetVoice(const uint clientId, const std::vector<uint> messageIds)
 	{
 		const mstime now = timeInMS();
 		if (now - clientCloakStats[clientId].lastNeuralNetSoundTimeStamp > NEURAL_NET_DEBOUNCE_TIME)
@@ -639,7 +655,7 @@ namespace Cloak
 		}
 	}
 
-	CloakReturnState TryCloak(const uint clientId)
+	static CloakReturnState TryCloak(const uint clientId)
 	{
 		CloakReturnState result = CloakReturnState::None;
 
@@ -691,7 +707,7 @@ namespace Cloak
 		return result;
 	}
 
-	bool TryUncloak(const uint clientId, const UncloakReason reason)
+	static bool TryUncloak(const uint clientId, const UncloakReason reason)
 	{
 		const CloakState cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Uncloaked || cloakState == CloakState::Uncloaking)
@@ -720,7 +736,7 @@ namespace Cloak
 		return false;
 	}
 
-	void QueueUncloak(const uint clientId, const UncloakReason reason)
+	static void QueueUncloak(const uint clientId, const UncloakReason reason)
 	{
 		if (!IsValidCloakableClient(clientId) || !clientCloakStats[clientId].initialUncloakCompleted)
 			return;
@@ -730,13 +746,13 @@ namespace Cloak
 			clientIdsRequestingUncloak[clientId] = reason;
 	}
 
-	void AttemptInitialUncloak(uint clientId)
+	static void AttemptInitialUncloak(uint clientId)
 	{
 		if (IsValidCloakableClient(clientId) && !clientCloakStats[clientId].initialUncloakCompleted && clientCloakStats[clientId].cloakState == CloakState::Cloaked)
 			TryUncloak(clientId, UncloakReason::Initial);
 	}
 
-	bool CheckDockCall(const uint ship, const uint dockTargetId, const uint dockPortIndex, const DOCK_HOST_RESPONSE response)
+	static bool CheckDockCall(const uint ship, const uint dockTargetId, const uint dockPortIndex, const DOCK_HOST_RESPONSE response)
 	{
 		const uint clientId = HkGetClientIDByShip(ship);
 		if (!IsValidCloakableClient(clientId))
@@ -753,7 +769,7 @@ namespace Cloak
 		return true;
 	}
 
-	void CheckPlayerInNoCloakArea(const uint clientId, const uint clientSystemId, const uint clientShipId)
+	static void CheckPlayerInNoCloakArea(const uint clientId, const uint clientSystemId, const uint clientShipId)
 	{
 		boolean insideNoCloakArea = false;
 		uint noCloakAreaNNVoiceMessageId = 0;
@@ -781,7 +797,7 @@ namespace Cloak
 			QueueUncloak(clientId, uncloakReason);
 	}
 
-	void UpdateStateByEffectTimings(const uint clientId, const mstime currentTime)
+	static void UpdateStateByEffectTimings(const uint clientId, const mstime currentTime)
 	{
 		CloakState& cloakState = clientCloakStats[clientId].cloakState;
 		if (cloakState == CloakState::Cloaking)
@@ -801,7 +817,7 @@ namespace Cloak
 		}
 	}
 
-	void FireCloakActivator(const uint clientId)
+	static void FireCloakActivator(const uint clientId)
 	{
 		if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].activatorCargoId)
 		{
@@ -900,7 +916,7 @@ namespace Cloak
 		return CloakState::Uncloaked;
 	}
 
-	bool ToggleClientCloakActivator(const uint clientId, const bool active)
+	static bool ToggleClientCloakActivator(const uint clientId, const bool active)
 	{
 		bool successful = false;
 		if (active)

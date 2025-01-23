@@ -10,7 +10,7 @@
 * 
 * [Solar]
 * autospawn = false ;optional
-* nickname = foobar
+* nickname = foobar ;must be unique across all system solars. Can match with object nickname in NoCloakArea to enable de-cloak ability.
 * archetype = largestation1
 * loadout = cv_loadout_solar_largestation01; optional
 * ids_name = 196663
@@ -188,8 +188,6 @@ namespace SolarSpawn
 		solarInfo.vPos = positionOverride == NULL ? info.position : *positionOverride;
 		solarInfo.Costume.head = info.headId;
 		solarInfo.Costume.body = info.bodyId;
-		solarInfo.Costume.lefthand = 0;
-		solarInfo.Costume.righthand = 0;
 		std::copy(info.accessoryIds.begin(), info.accessoryIds.end(), solarInfo.Costume.accessory);
 		solarInfo.Costume.accessories = info.accessoryIds.size();
 		solarInfo.iVoiceID = info.voiceId;
@@ -222,8 +220,10 @@ namespace SolarSpawn
 		pub::AI::SetPersonalityParams personality;
 		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
-		pub::AI::get_personality(info.personalityId, personality.personality);
 		pub::AI::SubmitState(spaceObjId, &personality);
+
+		// This must use the general nickname to identify a no-cloak definition for this solar.
+		Cloak::TryRegisterNoCloakSolar(info.nickname, spaceObjId, solarInfo.vPos, solarInfo.iSystemID);
 	}
 
 	static bool DestroySolar(const uint spaceObjId)
@@ -360,6 +360,7 @@ namespace SolarSpawn
 				}
 			}
 			PrintUserCmdText(clientId, L"ERR solar not found: " + stows(targetNickname));
+			return false;
 		}
 		return false;
 	}

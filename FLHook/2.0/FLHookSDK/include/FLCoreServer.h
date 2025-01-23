@@ -48,10 +48,10 @@ enum DOCK_HOST_RESPONSE
 
 enum MissionMessageType
 {
-	MissionMessageType_Failure, // mission failure
+	MissionMessageType_Failure, // mission failure, offers Respawn buttons
 	MissionMessageType_Type1, // objective
 	MissionMessageType_Type2, // objective
-	MissionMessageType_Type3, // mission success
+	MissionMessageType_Success, // mission success
 };
 
 struct SSPUseItem
@@ -191,6 +191,21 @@ struct CAccountListNode
 enum ConnectionType
 {
 	JUMPHOLE
+};
+
+struct XRequestBestPathEntry
+{
+	Vector position;
+	uint objId; // Ignored for Server.RequestBestPath
+	uint systemId;
+};
+
+struct XRequestBestPath
+{
+	int repId; // PlayerData.iReputation
+	int waypointCount; // Ignored for Server.RequestBestPath
+	bool noPathFound; // Ignored for Server.RequestBestPath
+	XRequestBestPathEntry entries[64]; // Server.RequestBestPath requires exactly 2, otherwise variable length
 };
 
 class IMPORT CAccount
@@ -953,7 +968,7 @@ namespace pub
 		IMPORT  int SetInitialOrnt(unsigned int const&, class Matrix const&);
 		IMPORT  int SetInitialPos(unsigned int const&, class Vector const&);
 		IMPORT  int SetMissionObjectiveState(unsigned int const&, unsigned int const&, int, unsigned int);
-		IMPORT  int SetMissionObjectives(unsigned int const&, unsigned int const&, struct MissionObjective const*, unsigned int, struct FmtStr const&, unsigned char, struct FmtStr const&);
+		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectiveType2, struct FmtStr const& information, uchar objectiveType3, struct FmtStr const& information2);
 		IMPORT  int SetMoneyNeededToNextRank(unsigned int, int);
 		IMPORT  int SetMonkey(unsigned int);
 		IMPORT  int SetMsnID(unsigned int, unsigned int, unsigned int, bool, unsigned int);
@@ -1008,34 +1023,21 @@ namespace pub
 			uint iSystem;
 			uint iShipArchetype;
 			Vector vPos;
-			Vector vUnk1; // all 0
-			Vector vUnk2; // all 0
+			Vector vAngularVelocity;
+			Vector vLinearVelocity;
 			Matrix mOrientation;
-			uint iUnk1; // 0
+			uint iGroupId; // 0
 			uint iLoadout;
 			OwnerList<pub::SpaceObj::CargoDesc> cargoDesc;
 			uint unk1; // 0
 			uint unk2; // 0
 			float fUnk1;
 			uint unk3; // 0
-			uint iLook1;
-			uint iLook2;
-			uint unk4; // 0
-			uint unk5; // 0
-			uint iComm;
-			float fUnk2;
-			float fUnk3;
-			float fUnk4;
-			float fUnk5;
-			float fUnk6;
-			float fUnk7;
-			float fUnk8;
-			uint iUnk2;
-
-			int iRep; // increases for each NPC spawned, starts at 0 or 1
+			Costume Costume;
+			int iRep;
 			uint iPilotVoice;
-			uint unk6; // 0
-			int iHealth; // -1 = max health
+			uint DockTargetId; // 0
+			int iHitPointsLeft; // -1 = max health
 			uint unk7; // 0
 			uint unk8; // 0
 			uint iLevel;
@@ -1048,24 +1050,15 @@ namespace pub
 			Vector vPos;
 			Matrix mOrientation;
 			uint iLoadoutID;
-			struct structCostume
-			{
-				UINT head;
-				UINT body;
-				UINT lefthand;
-				UINT righthand;
-				UINT accessory[8];
-				int  accessories;
-			};
-			structCostume Costume;
+			Costume Costume;
 			int iRep;
 			int iVoiceID;
 			uint baseId;
-			uint iUnk9; //Boolean, only last byte is used
+			bool missionBool;
 			int iHitPointsLeft;
 			char cNickName[64]; //Has to be unique
 			uint iUnk11; //0 unused?
-			bool missionMarked;
+			bool missionMarked; // 1 = flagged as mission solar, 0 = normal
 		};
 
 		struct LootInfo {
@@ -1140,7 +1133,7 @@ namespace pub
 		IMPORT  int LightFuse(unsigned int const&, char const*, float);
 		IMPORT  int Relocate(unsigned int const&, unsigned int const&, class Vector const&, class Matrix const&);
 		IMPORT  int RequestSpaceScript(unsigned int const&, class Vector const&, int const&, unsigned int, char const*);
-		IMPORT  int SendComm(unsigned int, unsigned int, unsigned int, struct Costume const*, unsigned int, unsigned int*, int, unsigned int, float, bool);
+		IMPORT  int SendComm(uint senderObjId, uint receiverObjId, uint voiceID, const Costume* costume, uint info1Id, uint* lineId, int priority, uint info2Id, float delay, bool global);
 		IMPORT  int SetInvincible2(unsigned int spaceObjectId,bool preventNpcDamage,bool preventPlayerDamage,float maxHpLossPercentage);
 		IMPORT  int SetInvincible(unsigned int spaceObjectId, bool preventDamage, bool allowPlayerDamage, float maxHpLossPercentage);
 		IMPORT  int SetRelativeHealth(unsigned int const&, float);

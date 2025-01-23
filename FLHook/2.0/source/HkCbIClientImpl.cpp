@@ -177,12 +177,12 @@ bool HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_TRADE_REQUEST(uint iClientID, ui
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, unsigned char* p2, int p3)
+bool HkIClientImpl::Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, const XRequestBestPath& data, int size)
 {
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_REQUEST_BEST_PATH(iClientID, p2, p3));
+	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_REQUEST_BEST_PATH(iClientID, data, size));
 	return reinterpret_cast<bool>(vRet);
 }
 

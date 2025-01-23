@@ -1578,21 +1578,21 @@ if (set_bLogConnects)
     /**************************************************************************************************************
     **************************************************************************************************************/
 
-    void __stdcall Hail(unsigned int p1, unsigned int p2, unsigned int p3) {
+    void __stdcall Hail(unsigned int sourceObjId, unsigned int targetObjId, unsigned int p3) {
         ISERVER_LOG();
-        ISERVER_LOGARG_UI(p1);
-        ISERVER_LOGARG_UI(p2);
+        ISERVER_LOGARG_UI(sourceObjId);
+        ISERVER_LOGARG_UI(targetObjId);
         ISERVER_LOGARG_UI(p3);
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_Hail, __stdcall,
             (unsigned int p1, unsigned int p2, unsigned int p3),
-            (p1, p2, p3));
+            (sourceObjId, targetObjId, p3));
 
-        EXECUTE_SERVER_CALL(Server.Hail(p1, p2, p3));
+        EXECUTE_SERVER_CALL(Server.Hail(sourceObjId, targetObjId, p3));
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_Hail_AFTER, __stdcall,
             (unsigned int p1, unsigned int p2, unsigned int p3),
-            (p1, p2, p3));
+            (sourceObjId, targetObjId, p3));
     }
 
     /**************************************************************************************************************
@@ -1933,19 +1933,19 @@ if (set_bLogConnects)
     /**************************************************************************************************************
     **************************************************************************************************************/
 
-    void __stdcall RequestBestPath(unsigned int p1, unsigned char* p2, int p3) {
+    void __stdcall RequestBestPath(unsigned int clientId, unsigned char* data, int size) {
         ISERVER_LOG();
-        ISERVER_LOGARG_UI(p1);
+        ISERVER_LOGARG_UI(clientId);
         //	ISERVER_LOGARG_S(p2);
-        ISERVER_LOGARG_I(p3);
+        ISERVER_LOGARG_I(size);
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_RequestBestPath, __stdcall,
-            (unsigned int p1, unsigned char* p2, int p3), (p1, p2, p3));
+            (unsigned int clientId, unsigned char* p2, int size), (clientId, data, size));
 
-        EXECUTE_SERVER_CALL(Server.RequestBestPath(p1, p2, p3));
+        EXECUTE_SERVER_CALL(Server.RequestBestPath(clientId, data, size));
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_RequestBestPath_AFTER, __stdcall,
-            (unsigned int p1, unsigned char* p2, int p3), (p1, p2, p3));
+            (unsigned int clientId, unsigned char* p2, int size), (clientId, data, size));
     }
 
     /**************************************************************************************************************

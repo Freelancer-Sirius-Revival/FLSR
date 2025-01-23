@@ -72,8 +72,14 @@ namespace SolarSpawn
 			struct PlayerData* pPD = 0;
 			while (pPD = Players.traverse_active(pPD))
 			{
-				if (pPD->iSystemID == solarInfo.iSystemID)
+				if (pPD->iShipID && pPD->iSystemID == solarInfo.iSystemID)
+				{
 					GetClientInterface()->Send_FLPACKET_SERVER_CREATESOLAR(pPD->iOnlineID, (FLPACKET_CREATESOLAR&)packetSolar);
+					// Enforce an update to the client about their attitude to the spawned solar, or it will remain neutral after spawn.
+					float attitudeValue;
+					pub::Reputation::GetAttitude(solarInfo.iRep, pPD->iReputation, attitudeValue);
+					pub::Reputation::SetAttitude(solarInfo.iRep, pPD->iReputation, attitudeValue);
+				}
 			}
 		}
 

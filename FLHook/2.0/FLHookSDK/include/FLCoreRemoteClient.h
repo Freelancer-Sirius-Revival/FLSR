@@ -97,8 +97,8 @@ struct FLPACKET_SETREPUTATION
 struct FLPACKET_LAUNCH
 {
 	uint iShip;
-	uint iBase;
-	uint iState;
+	uint iSolarObjId;
+	uint iDock;
 	float fRotate[4];
 	float fPos[3];
 };
@@ -245,8 +245,12 @@ public:
 	virtual bool Send_FLPACKET_SERVER_USE_ITEM(uint iClientID, uint iDunno);
 	virtual bool Send_FLPACKET_SERVER_SETREPUTATION(uint iClientID, FLPACKET_SETREPUTATION& pDunno);
 	virtual void unknown_68(uint iClientID, FLPACKET_UNKNOWN& pDunno);
-	virtual bool Send_FLPACKET_SERVER_SENDCOMM(uint iClientID, uint, uint, uint, uint, uint,
-		uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint);
+	virtual bool Send_FLPACKET_SERVER_SENDCOMM(uint iClientID, uint senderObjId, uint receiverObjId, uint voice,
+		uint head, uint body, uint leftHand, uint rightHand,
+		uint accessory1, uint accessory2, uint accessory3, uint accessory4,
+		uint accessory5, uint accessory6, uint accessory7, uint accessory8,
+		uint accessories, uint name, uint* lines, uint lineCount,
+		uint iDunno20, float radioSilenceTimeAfter, bool global);
 	virtual void unknown_70(uint iClientID, uint iDunno);
 	virtual bool Send_FLPACKET_SERVER_SET_MISSION_MESSAGE(uint iClientID, FLPACKET_UNKNOWN& pDunno);
 	virtual void unknown_72(uint iClientID, FLPACKET_UNKNOWN& pDunno);
@@ -271,7 +275,7 @@ public:
 	virtual void unknown_91(uint iClientID, uint iDunno);
 	virtual bool Send_FLPACKET_COMMON_SET_WEAPON_GROUP(uint iClientID, unsigned char* p2, int p3);
 	virtual bool Send_FLPACKET_COMMON_SET_VISITED_STATE(uint iClientID, unsigned char* p2, int p3);
-	virtual bool Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, unsigned char* p2, int p3);
+	virtual bool Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, XRequestBestPath const& bestPath, int p3);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_PLAYER_STATS(uint iClientID, unsigned char* p2, int p3);
 	virtual void unknown_96(uint iClientID, uint iDunno, uint iDunno2, uint iDunno3);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_GROUP_POSITIONS(uint iClientID, unsigned char* p2, int p3);

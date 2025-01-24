@@ -1,4 +1,5 @@
 #include "Main.h"
+#include <random>
 
 /**
 * Commands:
@@ -10,7 +11,7 @@
 * 
 * [Solar]
 * autospawn = false ;optional
-* nickname = foobar
+* nickname = foobar ;must be unique across all system solars. Can match with object nickname in NoCloakArea to enable de-cloak ability.
 * archetype = largestation1
 * loadout = cv_loadout_solar_largestation01; optional
 * ids_name = 196663
@@ -26,6 +27,9 @@
 
 namespace SolarSpawn
 {
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
 	// This function is required to make sure the loadout is also sent to the clients.
 	static void SpawnSolar(uint& spaceId, const pub::SpaceObj::SolarInfo& solarInfo)
 	{
@@ -72,8 +76,14 @@ namespace SolarSpawn
 			struct PlayerData* pPD = 0;
 			while (pPD = Players.traverse_active(pPD))
 			{
-				if (pPD->iSystemID == solarInfo.iSystemID)
+				if (pPD->iShipID && pPD->iSystemID == solarInfo.iSystemID)
+				{
 					GetClientInterface()->Send_FLPACKET_SERVER_CREATESOLAR(pPD->iOnlineID, (FLPACKET_CREATESOLAR&)packetSolar);
+					// Enforce an update to the client about their attitude to the spawned solar, or it will remain neutral after spawn.
+					float attitudeValue;
+					pub::Reputation::GetAttitude(solarInfo.iRep, pPD->iReputation, attitudeValue);
+					pub::Reputation::SetAttitude(solarInfo.iRep, pPD->iReputation, attitudeValue);
+				}
 			}
 		}
 
@@ -150,14 +160,21 @@ namespace SolarSpawn
 							solar.affiliation = ini.get_value_string(0);
 						else if (ini.is_value("space_costume"))
 						{
-							solar.headId = CreateID(ini.get_value_string(0));
-							solar.bodyId = CreateID(ini.get_value_string(1));
+							const char* nickname;
+							nickname = ini.get_value_string(0);
+							if (strlen(nickname) > 0)
+								solar.headId = CreateID(nickname);
+
+							nickname = ini.get_value_string(1);
+							if (strlen(nickname) > 0)
+								solar.bodyId = CreateID(nickname);
+
 							for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
 							{
-								const uint accessoryId = CreateID(ini.get_value_string(index + 2));
-								if (accessoryId == 0)
+								const char* accessoryNickname = ini.get_value_string(index + 2);
+								if (strlen(accessoryNickname) == 0)
 									break;
-								solar.accessoryIds.push_back(accessoryId);
+								solar.accessoryIds.push_back(CreateID(accessoryNickname));
 							}
 						}
 						else if (ini.is_value("voice"))
@@ -221,6 +238,9 @@ namespace SolarSpawn
 		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);
+
+		// This must use the general nickname to identify a no-cloak definition for this solar.
+		Cloak::TryRegisterNoCloakSolar(info.nickname, spaceObjId, solarInfo.vPos, solarInfo.iSystemID);
 	}
 
 	static bool DestroySolar(const uint spaceObjId)
@@ -249,6 +269,83 @@ namespace SolarSpawn
 			if (solar.autospawn)
 				CreateSolar(solar);
 		}
+	}
+
+	struct LaunchComm
+	{
+		uint solarObjId;
+		uint dockId;
+	};
+	static std::map<uint, LaunchComm> unprocessedLaunchComms;
+
+	bool __stdcall Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH& pLaunch)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		for (const auto& nicknameObjIdPair : existingSolars)
+		{
+			if (nicknameObjIdPair.second == pLaunch.iSolarObjId)
+			{
+				LaunchComm comm;
+				comm.solarObjId = pLaunch.iSolarObjId;
+				comm.dockId = pLaunch.iDock;
+				unprocessedLaunchComms[iClientID] = comm;
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (!unprocessedLaunchComms.contains(clientId))
+			return;
+
+		uint archetypeId;
+		pub::Player::GetShipID(clientId, archetypeId);
+		const Archetype::Ship* shipArch = Archetype::GetShip(archetypeId);
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (shipArch && GetShipInspect(unprocessedLaunchComms[clientId].solarObjId, inspect, starSystem))
+		{
+			const CSolar* solar = (CSolar*)inspect->cobj;
+			const Archetype::Solar* solarArch = (Archetype::Solar*)solar->archetype;
+			std::string messageIdBase;
+			switch (solarArch->dockInfo[unprocessedLaunchComms[clientId].dockId].dockType)
+			{
+				case Archetype::DockType::Berth:
+					messageIdBase = "gcs_docklaunch_clear_berth_0";
+					break;
+
+				case Archetype::DockType::MoorSmall:
+				case Archetype::DockType::MoorMedium:
+				case Archetype::DockType::MoorLarge:
+					messageIdBase = "gcs_docklaunch_clear_moor_0";
+					break;
+
+				case Archetype::DockType::Ring:
+					messageIdBase = "gcs_docklaunch_clear_ring_0";
+					break;
+
+				default:
+					unprocessedLaunchComms.erase(clientId);
+					return;
+			}
+
+			char msgIdPrefix[64];
+			strncpy_s(msgIdPrefix, sizeof(msgIdPrefix), shipArch->msgidprefix_str, shipArch->msgidprefix_len);
+			static std::uniform_int_distribution<> distr(1, 2);
+			uint lines[] = {
+				CreateID(msgIdPrefix),
+				CreateID((messageIdBase + std::to_string(distr(gen)) + "-").c_str()),
+				CreateID(("gcs_misc_wellwish_0" + std::to_string(distr(gen)) + "-").c_str())
+			};
+			pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines, 3, 19007 /* base comms type*/, 0.5f, false);
+		}
+		unprocessedLaunchComms.erase(clientId);
 	}
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)

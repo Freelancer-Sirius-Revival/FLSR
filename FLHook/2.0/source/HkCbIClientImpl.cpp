@@ -177,12 +177,12 @@ bool HkIClientImpl::Send_FLPACKET_COMMON_PLAYER_TRADE_REQUEST(uint iClientID, ui
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, unsigned char* p2, int p3)
+bool HkIClientImpl::Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, const XRequestBestPath& data, int size)
 {
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_REQUEST_BEST_PATH(iClientID, p2, p3));
+	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_REQUEST_BEST_PATH(iClientID, data, size));
 	return reinterpret_cast<bool>(vRet);
 }
 
@@ -664,6 +664,9 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH&
 	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH, bool, __stdcall, (uint, FLPACKET_LAUNCH&), (iClientID, pLaunch));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_LAUNCH(iClientID, pLaunch));
+
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH_AFTER, bool, __stdcall, (uint, FLPACKET_LAUNCH&), (iClientID, pLaunch));
+
 	return reinterpret_cast<bool>(vRet);
 }
 
@@ -869,18 +872,18 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_SCANNOTIFY(uint iClientID, uint iDunno,
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_SENDCOMM(uint iClientID, uint iDunno, uint iDunno2, uint iDunno3,
-	uint iDunno4, uint iDunno5, uint iDunno6, uint iDunno7,
-	uint iDunno8, uint iDunno9, uint iDunno10, uint iDunno11,
-	uint iDunno12, uint iDunno13, uint iDunno14, uint iDunno15,
-	uint iDunno16, uint iDunno17, uint iDunno18, uint iDunno19,
-	uint iDunno20, uint iDunno21, uint iDunno22)
+bool HkIClientImpl::Send_FLPACKET_SERVER_SENDCOMM(uint iClientID, uint senderObjId, uint receiverObjId, uint voice,
+	uint head, uint body, uint leftHand, uint rightHand,
+	uint accessory1, uint accessory2, uint accessory3, uint accessory4,
+	uint accessory5, uint accessory6, uint accessory7, uint accessory8,
+	uint accessories, uint name, uint* lines, uint lineCount,
+	uint commType, float radioSilenceTimeAfter, bool global)
 {
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_SENDCOMM(iClientID, iDunno, iDunno2, iDunno3, iDunno4, iDunno5, iDunno6, iDunno7, iDunno8, iDunno9, iDunno10
-		, iDunno11, iDunno12, iDunno13, iDunno14, iDunno15, iDunno16, iDunno17, iDunno18, iDunno19, iDunno20, iDunno21, iDunno22));
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_SENDCOMM(iClientID, senderObjId, receiverObjId, voice, head, body, leftHand, rightHand, accessory1, accessory2, accessory3
+		, accessory4, accessory5, accessory6, accessory7, accessory8, accessories, name, lines, lineCount, commType, radioSilenceTimeAfter, global));
 	return reinterpret_cast<bool>(vRet);
 }
 

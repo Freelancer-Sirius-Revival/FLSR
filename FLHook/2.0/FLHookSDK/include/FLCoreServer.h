@@ -48,10 +48,10 @@ enum DOCK_HOST_RESPONSE
 
 enum MissionMessageType
 {
-	MissionMessageType_Failure, // mission failure
+	MissionMessageType_Failure, // mission failure, offers Respawn buttons
 	MissionMessageType_Type1, // objective
 	MissionMessageType_Type2, // objective
-	MissionMessageType_Type3, // mission success
+	MissionMessageType_Success, // mission success
 };
 
 struct SSPUseItem
@@ -191,6 +191,21 @@ struct CAccountListNode
 enum ConnectionType
 {
 	JUMPHOLE
+};
+
+struct XRequestBestPathEntry
+{
+	Vector position;
+	uint objId; // Ignored for Server.RequestBestPath
+	uint systemId;
+};
+
+struct XRequestBestPath
+{
+	int repId; // PlayerData.iReputation
+	int waypointCount; // Ignored for Server.RequestBestPath
+	bool noPathFound; // Ignored for Server.RequestBestPath
+	XRequestBestPathEntry entries[64]; // Server.RequestBestPath requires exactly 2, otherwise variable length
 };
 
 class IMPORT CAccount
@@ -1118,7 +1133,8 @@ namespace pub
 		IMPORT  int LightFuse(unsigned int const&, char const*, float);
 		IMPORT  int Relocate(unsigned int const&, unsigned int const&, class Vector const&, class Matrix const&);
 		IMPORT  int RequestSpaceScript(unsigned int const&, class Vector const&, int const&, unsigned int, char const*);
-		IMPORT  int SendComm(uint senderObjId, uint receiverObjId, uint voiceID, const Costume* costume, uint info1Id, uint* lineId, int priority, uint info2Id, float delay, bool global);
+				// "sender" will always set the name. If "sender" is zero, "name" is used. "commType" is hardcoded values, but 0 works, too.
+		IMPORT  int SendComm(uint senderObjId, uint receiverObjId, uint voice, const Costume* costume, uint name, uint* lines, int lineCount, uint commType, float radioSilenceTimeAfter, bool global);
 		IMPORT  int SetInvincible2(unsigned int spaceObjectId,bool preventNpcDamage,bool preventPlayerDamage,float maxHpLossPercentage);
 		IMPORT  int SetInvincible(unsigned int spaceObjectId, bool preventDamage, bool allowPlayerDamage, float maxHpLossPercentage);
 		IMPORT  int SetRelativeHealth(unsigned int const&, float);

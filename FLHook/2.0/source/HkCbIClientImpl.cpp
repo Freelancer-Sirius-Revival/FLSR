@@ -664,6 +664,9 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH&
 	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH, bool, __stdcall, (uint, FLPACKET_LAUNCH&), (iClientID, pLaunch));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_LAUNCH(iClientID, pLaunch));
+
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH_AFTER, bool, __stdcall, (uint, FLPACKET_LAUNCH&), (iClientID, pLaunch));
+
 	return reinterpret_cast<bool>(vRet);
 }
 

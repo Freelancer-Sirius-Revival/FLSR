@@ -1,4 +1,5 @@
 #include "Main.h"
+#include <random>
 
 /**
 * Commands:
@@ -26,6 +27,9 @@
 
 namespace SolarSpawn
 {
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
 	// This function is required to make sure the loadout is also sent to the clients.
 	static void SpawnSolar(uint& spaceId, const pub::SpaceObj::SolarInfo& solarInfo)
 	{
@@ -265,6 +269,83 @@ namespace SolarSpawn
 			if (solar.autospawn)
 				CreateSolar(solar);
 		}
+	}
+
+	struct LaunchComm
+	{
+		uint solarObjId;
+		uint dockId;
+	};
+	static std::map<uint, LaunchComm> unprocessedLaunchComms;
+
+	bool __stdcall Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH& pLaunch)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		for (const auto& nicknameObjIdPair : existingSolars)
+		{
+			if (nicknameObjIdPair.second == pLaunch.iSolarObjId)
+			{
+				LaunchComm comm;
+				comm.solarObjId = pLaunch.iSolarObjId;
+				comm.dockId = pLaunch.iDock;
+				unprocessedLaunchComms[iClientID] = comm;
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (!unprocessedLaunchComms.contains(clientId))
+			return;
+
+		uint archetypeId;
+		pub::Player::GetShipID(clientId, archetypeId);
+		const Archetype::Ship* shipArch = Archetype::GetShip(archetypeId);
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (shipArch && GetShipInspect(unprocessedLaunchComms[clientId].solarObjId, inspect, starSystem))
+		{
+			const CSolar* solar = (CSolar*)inspect->cobj;
+			const Archetype::Solar* solarArch = (Archetype::Solar*)solar->archetype;
+			std::string messageIdBase;
+			switch (solarArch->dockInfo[unprocessedLaunchComms[clientId].dockId].dockType)
+			{
+				case Archetype::DockType::Berth:
+					messageIdBase = "gcs_docklaunch_clear_berth_0";
+					break;
+
+				case Archetype::DockType::MoorSmall:
+				case Archetype::DockType::MoorMedium:
+				case Archetype::DockType::MoorLarge:
+					messageIdBase = "gcs_docklaunch_clear_moor_0";
+					break;
+
+				case Archetype::DockType::Ring:
+					messageIdBase = "gcs_docklaunch_clear_ring_0";
+					break;
+
+				default:
+					unprocessedLaunchComms.erase(clientId);
+					return;
+			}
+
+			char msgIdPrefix[64];
+			strncpy_s(msgIdPrefix, sizeof(msgIdPrefix), shipArch->msgidprefix_str, shipArch->msgidprefix_len);
+			static std::uniform_int_distribution<> distr(1, 2);
+			uint lines[] = {
+				CreateID(msgIdPrefix),
+				CreateID((messageIdBase + std::to_string(distr(gen)) + "-").c_str()),
+				CreateID(("gcs_misc_wellwish_0" + std::to_string(distr(gen)) + "-").c_str())
+			};
+			pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines, 3, 19007 /* base comms type*/, 0.5f, false);
+		}
+		unprocessedLaunchComms.erase(clientId);
 	}
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)

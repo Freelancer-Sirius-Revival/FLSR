@@ -156,8 +156,15 @@ namespace SolarSpawn
 							solar.affiliation = ini.get_value_string(0);
 						else if (ini.is_value("space_costume"))
 						{
-							solar.headId = CreateID(ini.get_value_string(0));
-							solar.bodyId = CreateID(ini.get_value_string(1));
+							const char* nickname;
+							nickname = ini.get_value_string(0);
+							if (strlen(nickname) > 0)
+								solar.headId = CreateID(nickname);
+
+							nickname = ini.get_value_string(1);
+							if (strlen(nickname) > 0)
+								solar.bodyId = CreateID(nickname);
+
 							for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
 							{
 								const char* accessoryNickname = ini.get_value_string(index + 2);

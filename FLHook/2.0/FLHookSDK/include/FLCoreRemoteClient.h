@@ -97,8 +97,8 @@ struct FLPACKET_SETREPUTATION
 struct FLPACKET_LAUNCH
 {
 	uint iShip;
-	uint iBase;
-	uint iState;
+	uint iSolarObjId;
+	uint iDock;
 	float fRotate[4];
 	float fPos[3];
 };

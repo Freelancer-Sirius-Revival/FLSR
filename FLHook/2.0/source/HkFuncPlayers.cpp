@@ -1186,8 +1186,8 @@ void HkRelocateClient(uint iClientID, Vector vDestination,
 
     FLPACKET_LAUNCH pLaunch;
     pLaunch.iShip = ClientInfo[iClientID].iShip;
-    pLaunch.iBase = 0;
-    pLaunch.iState = 0xFFFFFFFF;
+    pLaunch.iSolarObjId = 0;
+    pLaunch.iDock = 0xFFFFFFFF;
     pLaunch.fRotate[0] = qRotation.w;
     pLaunch.fRotate[1] = qRotation.x;
     pLaunch.fRotate[2] = qRotation.y;

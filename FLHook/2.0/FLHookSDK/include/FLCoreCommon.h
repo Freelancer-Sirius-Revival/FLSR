@@ -371,6 +371,18 @@ namespace Archetype
 		/* 27x4 */ uint bLootable;
 	};
 
+	enum class DockType
+	{
+		Berth = 1,
+		MoorSmall = 3,
+		MoorMedium = 4,
+		MoorLarge = 5,
+		Ring = 6,
+		Pad = 6,
+		Jump = 7,
+		Airlock = 8
+	};
+
 	struct IMPORT EqObj : Root
 	{
 		EqObj(struct EqObj const&);
@@ -385,9 +397,18 @@ namespace Archetype
 		virtual bool read(class INI_Reader&);
 		virtual void redefine(struct Root const&);
 		bool traverse_groups(struct CollisionGroup const*&)const;
+
+		struct DockHardpointInfo
+		{
+			float radius;
+			const char* hardpoint;
+			const char* dockAnimation;
+			DockType dockType;
+		};
+
 	public:
 		/* 23 */ CollisionGroup* collisiongroup;
-		/* 24 */ uint iDunno1;
+		/* 24 */ ushort equipmentIdCounter;
 		/* 25 */ uint iDunno2;
 		/* 26 */ uint iDunno3;
 		/* 27 */ uint iDunno4;
@@ -395,11 +416,9 @@ namespace Archetype
 		/* 29 */ uint iDunno6;
 		/* 30 */ uint fuseList;
 		/* 31 */ uint sizeOfFuseList;
-		/* 32 */ bool b128;
-		bool bDockingCamera;
-		/* 33 */ uint iDunno10;
-		/* 34 */ uint iDunno11;
-		/* 35 */ uint iDunno12;
+		/* 32 */ bool isNomad;
+		bool dockingCamera;
+		/* 33-36 */ st6::vector<DockHardpointInfo> dockInfo;
 	};
 
 	struct IMPORT AttachedEquipment : public Equipment
@@ -996,8 +1015,16 @@ namespace Archetype
 		virtual bool read(class INI_Reader&);
 		virtual void redefine(struct Root const&);
 
+		struct HpType
+		{
+			HpAttachmentType type;
+			st6::vector<CacheString> hp;
+		};
+
 	public:
-		/* 36 */ uint iDunno12[19];
+		/* 37 */ uint iDunno12;
+		/* 38 */ size_t msgidprefix_len;
+		/* 39 */ char   msgidprefix_str[64];
 		/* 55 */ char* szBayDoorAnim;
 		/* 56 */ char* szHpBaySurface;
 		/* 57 */ char* szHpBayExternal;
@@ -1009,13 +1036,13 @@ namespace Archetype
 		/* 63 */ uint	iNumExhaustNozzles;
 		/* 64 */ float	fHoldSize;
 		/* 65 */ float	fLinearDrag;
-		/* 66 */ float	fAngularDrag[3];
-		/* 69 */ float	fSteeringTorque[3];
+		/* 66 */ Vector	fAngularDrag;
+		/* 69 */ Vector	fSteeringTorque;
 		/* 72 */ float	fNudgeForce;
 		/* 73 */ float	fStrafeForce;
 		/* 74 */ float  fStrafePowerUsage;
 		/* 75 */ float  fMaxBankAngle;
-		uint	iDunno6[4]; // something about hptypes
+		st6::vector<HpType> hardpoints;
 		/* 80 */ uint	iMaxNanobots;
 		/* 81 */ uint	iMaxShieldBats;
 	};

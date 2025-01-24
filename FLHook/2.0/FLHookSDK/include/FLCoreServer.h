@@ -1133,7 +1133,8 @@ namespace pub
 		IMPORT  int LightFuse(unsigned int const&, char const*, float);
 		IMPORT  int Relocate(unsigned int const&, unsigned int const&, class Vector const&, class Matrix const&);
 		IMPORT  int RequestSpaceScript(unsigned int const&, class Vector const&, int const&, unsigned int, char const*);
-		IMPORT  int SendComm(uint senderObjId, uint receiverObjId, uint voiceID, const Costume* costume, uint info1Id, uint* lineId, int priority, uint info2Id, float delay, bool global);
+				// "sender" will always set the name. If "sender" is zero, "name" is used. "commType" is hardcoded values, but 0 works, too.
+		IMPORT  int SendComm(uint senderObjId, uint receiverObjId, uint voice, const Costume* costume, uint name, uint* lines, int lineCount, uint commType, float radioSilenceTimeAfter, bool global);
 		IMPORT  int SetInvincible2(unsigned int spaceObjectId,bool preventNpcDamage,bool preventPlayerDamage,float maxHpLossPercentage);
 		IMPORT  int SetInvincible(unsigned int spaceObjectId, bool preventDamage, bool allowPlayerDamage, float maxHpLossPercentage);
 		IMPORT  int SetRelativeHealth(unsigned int const&, float);

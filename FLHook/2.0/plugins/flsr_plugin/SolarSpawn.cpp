@@ -396,7 +396,11 @@ namespace SolarSpawn
 		unprocessedLaunchComms.erase(clientId);
 	}
 
-	static std::unordered_map<uint, std::unordered_set<uint>> dockQueues;
+	struct DockQueue
+	{
+		bool waiting;
+	};
+	static std::unordered_map<uint, std::unordered_map<uint, DockQueue>> dockQueues;
 
 	// Gets called whenever a dock request begins, ends, is cancelled, or the ship is destroyed/despawned. Does not get called when the station gets destroyed.
 	int __cdecl Dock_Call_After(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, DOCK_HOST_RESPONSE response)
@@ -415,8 +419,7 @@ namespace SolarSpawn
 			return 0;
 		}
 
-		if (response == DOCK_HOST_RESPONSE::DOCK_IN_USE)
-			dockQueues[dockTargetId].insert(ship);
+		dockQueues[dockTargetId][ship].waiting = response == DOCK_HOST_RESPONSE::DOCK_IN_USE;
 
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -502,7 +505,7 @@ namespace SolarSpawn
 						break;
 				}
 
-				if (dockQueues[dockTargetId].contains(ship))
+				if (dockQueues[dockTargetId][ship].waiting)
 				{
 					lines = {
 						GetShipMessageId(ship),
@@ -622,6 +625,16 @@ namespace SolarSpawn
 			return;
 		CreateFallbackBaseIfNeeded(killedObject);
 		spawnedSolars.erase(objId);
+
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		for (const auto& entry : dockQueues[objId])
+		{
+			uint shipId = entry.first;
+			// Check for invulnerability to know if the player is in the dock scene without ship controls.
+			if (GetShipInspect(shipId, inspect, starSystem) && inspect->cobj->ownerPlayer > 0 && inspect->is_invulnerable())
+				pub::Player::ForceLand(inspect->cobj->ownerPlayer, static_cast<CEqObj*>(killedObject->cobj)->dockWithBaseId);
+		}
 		dockQueues.erase(objId);
 	}
 

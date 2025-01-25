@@ -8,6 +8,8 @@
 * Spawning on current player location: .spawnhere <nickname>
 * 
 * Template:
+* [General]
+* fallback_base_archetype = nickname ;used to replace the last destoyed solar of a certain base to allow undocking without crashes
 * 
 * [Solar]
 * autospawn = false ;optional
@@ -97,7 +99,7 @@ namespace SolarSpawn
 		bool autospawn = false;
 		uint archetypeId = 0;
 		uint loadoutId = 0;
-		std::string nickname;
+		std::string nickname = "";
 		uint nicknameCounter = 0;
 		uint idsName = 0;
 		uint idsInfocard = 0;
@@ -115,7 +117,14 @@ namespace SolarSpawn
 	};
 
 	static std::vector<SolarArchetype> solarArchetypes;
-	static std::unordered_set<uint> spawnedSolars;
+	static SolarArchetype fallbackBaseArchetype;
+
+	struct SpawnedSolar
+	{
+		uint dockWith = 0;
+		bool fallbackBase = false;
+	};
+	static std::unordered_map<uint, SpawnedSolar> spawnedSolars;
 
 	void LoadSettings()
 	{
@@ -128,6 +137,18 @@ namespace SolarSpawn
 		{
 			while (ini.read_header())
 			{
+				if (ini.is_header("General"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("fallback_base_archetype"))
+						{
+							fallbackBaseArchetype.archetypeId = CreateID(ini.get_value_string(0));
+							fallbackBaseArchetype.nickname = "fallbackBaseExit";
+						}
+					}
+				}
+
 				if (ini.is_header("Solar"))
 				{
 					SolarArchetype solar;
@@ -191,57 +212,6 @@ namespace SolarSpawn
 		}
 	}
 
-	static void CreateSolar(SolarArchetype& info, const uint systemOverride = NULL, const Vector* positionOverride = NULL, const Matrix* orientationOverride = NULL)
-	{
-		pub::SpaceObj::SolarInfo solarInfo;
-		memset(&solarInfo, 0, sizeof(solarInfo));
-		solarInfo.iFlag = 4;
-		solarInfo.iArchID = info.archetypeId;
-		solarInfo.iLoadoutID = info.loadoutId;
-
-		solarInfo.iHitPointsLeft = -1; // Max hit points from archetype are taken when -1
-		solarInfo.iSystemID = systemOverride == NULL ? info.systemId : systemOverride;
-		solarInfo.mOrientation = orientationOverride == NULL ? info.orientation : *orientationOverride;
-		solarInfo.vPos = positionOverride == NULL ? info.position : *positionOverride;
-		solarInfo.Costume.head = info.headId;
-		solarInfo.Costume.body = info.bodyId;
-		std::copy(info.accessoryIds.begin(), info.accessoryIds.end(), solarInfo.Costume.accessory);
-		solarInfo.Costume.accessories = info.accessoryIds.size();
-		solarInfo.iVoiceID = info.voiceId;
-		solarInfo.baseId = info.baseId;
-		std::string nicknameWithCounter;
-		do {
-			nicknameWithCounter = info.nickname + std::to_string(++info.nicknameCounter);
-		} while (spawnedSolars.contains(CreateID(nicknameWithCounter.c_str())));
-		strncpy_s(solarInfo.cNickName, sizeof(solarInfo.cNickName), nicknameWithCounter.c_str(), nicknameWithCounter.size());
-
-		FmtStr infoname(info.idsName, 0);
-		infoname.begin_mad_lib(info.idsName); // scanner name
-		infoname.end_mad_lib();
-
-		FmtStr infocard(info.idsInfocard, 0); // infocard is never displayed for dynamic solars
-		infocard.begin_mad_lib(info.idsInfocard);
-		infocard.end_mad_lib();
-
-		pub::Reputation::Alloc(solarInfo.iRep, infoname, infocard);
-		uint groupId;
-		pub::Reputation::GetReputationGroup(groupId, info.affiliation.c_str());
-		pub::Reputation::SetAffiliation(solarInfo.iRep, groupId);
-
-		uint spaceObjId;
-		SpawnSolar(spaceObjId, solarInfo);
-		spawnedSolars.insert(spaceObjId);
-
-		pub::AI::SetPersonalityParams personality;
-		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
-		personality.state_id = true;
-		pub::AI::SubmitState(spaceObjId, &personality);
-
-		// Expects general nickname to identify the configs
-		Cloak::TryRegisterNoCloakSolar(info.nickname, spaceObjId);
-		SolarInvincibility::TryRegisterInvincibleSolar(info.nickname, spaceObjId);
-	}
-
 	static bool DestroySolar(const uint spaceObjId)
 	{
 		if (spawnedSolars.contains(spaceObjId) && pub::SpaceObj::ExistsAndAlive(spaceObjId) == 0) //0 means alive, -2 dead
@@ -250,6 +220,71 @@ namespace SolarSpawn
 			return true;
 		}
 		return false;
+	}
+
+	static uint CreateSolar(SolarArchetype& archetype, const uint systemOverride = NULL, const Vector* positionOverride = NULL, const Matrix* orientationOverride = NULL)
+	{
+		if (archetype.archetypeId == 0 || archetype.nickname.empty())
+			return 0;
+
+		pub::SpaceObj::SolarInfo solarInfo;
+		memset(&solarInfo, 0, sizeof(solarInfo));
+		solarInfo.iFlag = 4;
+		solarInfo.iArchID = archetype.archetypeId;
+		solarInfo.iLoadoutID = archetype.loadoutId;
+		solarInfo.iHitPointsLeft = -1; // Max hit points from archetype are taken when -1
+		solarInfo.iSystemID = systemOverride == NULL ? archetype.systemId : systemOverride;
+		solarInfo.mOrientation = orientationOverride == NULL ? archetype.orientation : *orientationOverride;
+		solarInfo.vPos = positionOverride == NULL ? archetype.position : *positionOverride;
+		solarInfo.Costume.head = archetype.headId;
+		solarInfo.Costume.body = archetype.bodyId;
+		std::copy(archetype.accessoryIds.begin(), archetype.accessoryIds.end(), solarInfo.Costume.accessory);
+		solarInfo.Costume.accessories = archetype.accessoryIds.size();
+		solarInfo.iVoiceID = archetype.voiceId;
+		solarInfo.baseId = archetype.baseId;
+		std::string nicknameWithCounter;
+		do {
+			nicknameWithCounter = archetype.nickname + std::to_string(++archetype.nicknameCounter);
+		} while (spawnedSolars.contains(CreateID(nicknameWithCounter.c_str())));
+		strncpy_s(solarInfo.cNickName, sizeof(solarInfo.cNickName), nicknameWithCounter.c_str(), nicknameWithCounter.size());
+
+		FmtStr infoname(archetype.idsName, 0);
+		infoname.begin_mad_lib(archetype.idsName); // scanner name
+		infoname.end_mad_lib();
+
+		FmtStr infocard(archetype.idsInfocard, 0); // infocard is never displayed for dynamic solars
+		infocard.begin_mad_lib(archetype.idsInfocard);
+		infocard.end_mad_lib();
+
+		pub::Reputation::Alloc(solarInfo.iRep, infoname, infocard);
+		uint groupId;
+		pub::Reputation::GetReputationGroup(groupId, archetype.affiliation.c_str());
+		pub::Reputation::SetAffiliation(solarInfo.iRep, groupId);
+
+		uint spaceObjId;
+		SpawnSolar(spaceObjId, solarInfo);
+		spawnedSolars[spaceObjId].dockWith = solarInfo.baseId;
+
+		pub::AI::SetPersonalityParams personality;
+		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
+		personality.state_id = true;
+		pub::AI::SubmitState(spaceObjId, &personality);
+
+		// Expects general nickname to identify the configs
+		Cloak::TryRegisterNoCloakSolar(archetype.nickname, spaceObjId);
+		SolarInvincibility::TryRegisterInvincibleSolar(archetype.nickname, spaceObjId);
+
+		// If any fallback solars exists for this base, destroy it.
+		for (const auto& solar : spawnedSolars)
+		{
+			if (solar.second.fallbackBase && solar.second.dockWith == solarInfo.baseId)
+			{
+				DestroySolar(solar.first);
+				break;
+			}
+		}
+
+		return spaceObjId;
 	}
 
 	static bool initialized = false;
@@ -306,6 +341,8 @@ namespace SolarSpawn
 		if (!GetShipInspect(solarObjId, inspect, starSystem))
 			return false;
 		const CEqObj* solar = static_cast<CEqObj*>(inspect->cobj);
+		if (!solar->voiceId)
+			return false;
 		const Archetype::EqObj* solarArchetype = static_cast<Archetype::EqObj*>(solar->archetype);
 		Archetype::DockType dockType;
 		try
@@ -387,6 +424,8 @@ namespace SolarSpawn
 		if (!GetShipInspect(targetId, inspect, starSystem))
 			return 0;
 		const CEqObj* solar = static_cast<CEqObj*>(inspect->cobj);
+		if (!solar->voiceId)
+			return 0;
 		const Archetype::EqObj* solarArchetype = static_cast<Archetype::EqObj*>(solar->archetype);
 		Archetype::DockType dockType;
 		try
@@ -546,15 +585,42 @@ namespace SolarSpawn
 		}
 
 		uint shipId = ship;
-		pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, false);
+		pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, true);
 		return 0;
+	}
+
+	static void CreateFallbackBaseIfNeeded(const IObjRW* killedObject)
+	{
+		const CEqObj* solar = static_cast<CEqObj*>(killedObject->cobj);
+		if (solar->dockWithBaseId == 0)
+			return;
+
+		for (const auto& otherSolar : spawnedSolars)
+		{
+			if (otherSolar.first != solar->id && otherSolar.second.dockWith == solar->dockWithBaseId)
+				return;
+		}
+
+		fallbackBaseArchetype.baseId = solar->dockWithBaseId;
+		fallbackBaseArchetype.systemId = solar->system;
+		fallbackBaseArchetype.position = solar->vPos;
+		fallbackBaseArchetype.orientation = solar->mRot;
+		const uint fallbackObjId = CreateSolar(fallbackBaseArchetype);
+		if (fallbackObjId != 0)
+		{
+			pub::SpaceObj::SetInvincible(fallbackObjId, true, false, 0);
+			spawnedSolars[fallbackObjId].fallbackBase = true;
+		}
 	}
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		const uint objId = killedObject->cobj->get_id();
+		const uint objId = killedObject->cobj->id;
+		if (!spawnedSolars.contains(objId))
+			return;
+		CreateFallbackBaseIfNeeded(killedObject);
 		spawnedSolars.erase(objId);
 		dockQueues.erase(objId);
 	}

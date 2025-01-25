@@ -3199,8 +3199,8 @@ public:
 	float cloakPercentage;                                     // 80
 	CArchGroupManager archGroupManager;                        // 81
 	bool isUndergoingDeathFuse;											   // 87
-	uint dockTargetId;                                         // 88
-	uint dockTargetId2;				                           // 89
+	uint baseId;                                         // 88
+	uint dockWithBaseId;				                           // 89
 	INotify* notifyPtr;                                        // 90
 	bool boundingExplosionBool;                                // 91
 	float boundingExplosionFloat;                              // 92

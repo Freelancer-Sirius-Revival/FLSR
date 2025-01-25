@@ -237,7 +237,9 @@ namespace SolarSpawn
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);
 
-		Cloak::TryRegisterNoCloakSolar(info.nickname, spaceObjId); // Expects general nickname to identify a no-cloak definition
+		// Expects general nickname to identify the configs
+		Cloak::TryRegisterNoCloakSolar(info.nickname, spaceObjId);
+		SolarInvincibility::TryRegisterInvincibleSolar(info.nickname, spaceObjId);
 	}
 
 	static bool DestroySolar(const uint spaceObjId)

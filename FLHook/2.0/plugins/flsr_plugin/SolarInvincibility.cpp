@@ -54,12 +54,14 @@ namespace SolarInvincibility
         while (solarIds.size() > 0 && solar != NULL)
         {
             if (solarIds.contains(solar->get_id()))
-            {
-				solarIds.erase(solar->get_id());
                 pub::SpaceObj::SetInvincible(solar->get_id(), true, true, 0);
-            }
             solar = static_cast<CSolar*>(solar->FindNext());
         }
-		solarIds.clear();
     }
+
+	void TryRegisterInvincibleSolar(const std::string& nickname, const uint spaceObjId)
+	{
+		if (solarIds.contains(CreateID(nickname.c_str())))
+			pub::SpaceObj::SetInvincible(spaceObjId, true, true, 0);
+	}
 }

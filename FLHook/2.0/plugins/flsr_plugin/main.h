@@ -502,6 +502,7 @@ namespace SolarInvincibility
 {
     void LoadSettings();
     void Initialize();
+    void TryRegisterInvincibleSolar(const std::string& nickname, const uint spaceObjId);
 }
 
 namespace SolarSpawn

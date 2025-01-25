@@ -183,15 +183,18 @@ namespace Cloak
 		return IsValidCloakableClient(clientId) && clientCloakStats[clientId].cloakState == CloakState::Uncloaked;
 	}
 
-	bool TryRegisterNoCloakSolar(const std::string nickname, const uint objectId, const Vector& position, const uint systemId)
+	bool TryRegisterNoCloakSolar(const std::string& nickname, uint objectId)
 	{
 		const uint nicknameId = CreateID(nickname.c_str());
-		if (noCloakObjectDefinitionsByNicknameId.contains(nicknameId))
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (noCloakObjectDefinitionsByNicknameId.contains(nicknameId) && GetShipInspect(objectId, inspect, starSystem))
 		{
+			const CSimple* object = inspect->cobj;
 			NoCloakArea area = noCloakObjectDefinitionsByNicknameId[nicknameId];
 			area.objectId = objectId;
-			area.position = position;			
-			noCloakAreasPerSystem[systemId].push_back(area);
+			area.position = object->get_position();
+			noCloakAreasPerSystem[object->system].push_back(area);
 			return true;
 		}
 		return false;

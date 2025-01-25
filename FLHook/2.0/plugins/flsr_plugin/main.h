@@ -443,7 +443,7 @@ namespace Cloak
     void InitializeWithGameData();
     void UpdateCloakClients();
     CloakState GetClientCloakState(uint clientId);
-    bool TryRegisterNoCloakSolar(const std::string nickname, const uint objectId, const Vector& position, const uint systemId);
+    bool TryRegisterNoCloakSolar(const std::string& nickname, uint objectId);
     extern const uint TIMER_INTERVAL;
     void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
     void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
@@ -502,6 +502,7 @@ namespace SolarInvincibility
 {
     void LoadSettings();
     void Initialize();
+    void TryRegisterInvincibleSolar(const std::string& nickname, const uint spaceObjId);
 }
 
 namespace SolarSpawn
@@ -510,6 +511,7 @@ namespace SolarSpawn
     void Initialize();
     bool __stdcall Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH& pLaunch);
     void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
+    int __cdecl Dock_Call_After(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, DOCK_HOST_RESPONSE response);
     void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
     bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd);
 }

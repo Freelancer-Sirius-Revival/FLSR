@@ -131,7 +131,8 @@ int __cdecl Dock_Call(unsigned int const &uShipID, unsigned int const &uSpaceID,
         (unsigned int const &, unsigned int const &, int, DOCK_HOST_RESPONSE),
         (uShipID, uSpaceID, p3, p4));
 
-    TRY_HOOK { return pub::SpaceObj::Dock(uShipID, uSpaceID, p3, p4); }
+    int result = 0;
+    TRY_HOOK { result = pub::SpaceObj::Dock(uShipID, uSpaceID, p3, p4); }
     CATCH_HOOK({})
 
     CALL_PLUGINS(
@@ -139,7 +140,7 @@ int __cdecl Dock_Call(unsigned int const &uShipID, unsigned int const &uSpaceID,
         (unsigned int const &, unsigned int const &, int, DOCK_HOST_RESPONSE),
         (uShipID, uSpaceID, p3, p4));
 
-    return 0;
+    return result;
 }
 
 /**************************************************************************************************************

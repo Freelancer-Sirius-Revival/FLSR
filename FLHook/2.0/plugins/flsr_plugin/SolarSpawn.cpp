@@ -44,7 +44,7 @@ namespace SolarSpawn
 		IObjRW* inspect;
 		if (GetShipInspect(spaceId, inspect, starSystem))
 		{
-			CSolar* solar = (CSolar*)inspect->cobject();
+			CSolar* solar = static_cast<CSolar*>(inspect->cobj);
 
 			// for every player in the same system, send solar creation packet
 			struct SOLAR_STRUCT
@@ -115,7 +115,7 @@ namespace SolarSpawn
 	};
 
 	static std::vector<SolarArchetype> solarArchetypes;
-	static std::unordered_map<std::string, uint> existingSolars;
+	static std::unordered_set<uint> spawnedSolars;
 
 	void LoadSettings()
 	{
@@ -210,19 +210,17 @@ namespace SolarSpawn
 		solarInfo.iVoiceID = info.voiceId;
 		solarInfo.baseId = info.baseId;
 		std::string nicknameWithCounter;
-		do
-		{
+		do {
 			nicknameWithCounter = info.nickname + std::to_string(++info.nicknameCounter);
-		} while (existingSolars.contains(nicknameWithCounter));
+		} while (spawnedSolars.contains(CreateID(nicknameWithCounter.c_str())));
 		strncpy_s(solarInfo.cNickName, sizeof(solarInfo.cNickName), nicknameWithCounter.c_str(), nicknameWithCounter.size());
 
-		// Set the base name
 		FmtStr infoname(info.idsName, 0);
 		infoname.begin_mad_lib(info.idsName); // scanner name
 		infoname.end_mad_lib();
 
-		FmtStr infocard(info.idsInfocard, 0);
-		infocard.begin_mad_lib(info.idsInfocard); // infocard
+		FmtStr infocard(info.idsInfocard, 0); // infocard is never displayed for dynamic solars
+		infocard.begin_mad_lib(info.idsInfocard);
 		infocard.end_mad_lib();
 
 		pub::Reputation::Alloc(solarInfo.iRep, infoname, infocard);
@@ -232,7 +230,7 @@ namespace SolarSpawn
 
 		uint spaceObjId;
 		SpawnSolar(spaceObjId, solarInfo);
-		existingSolars.insert({ nicknameWithCounter, spaceObjId });
+		spawnedSolars.insert(spaceObjId);
 
 		pub::AI::SetPersonalityParams personality;
 		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
@@ -245,14 +243,10 @@ namespace SolarSpawn
 
 	static bool DestroySolar(const uint spaceObjId)
 	{
-		for (const auto& nicknameObjIdPair : existingSolars)
+		if (spawnedSolars.contains(spaceObjId) && pub::SpaceObj::ExistsAndAlive(spaceObjId) == 0) //0 means alive, -2 dead
 		{
-			if (nicknameObjIdPair.second == spaceObjId)
-			{
-				if (pub::SpaceObj::ExistsAndAlive(spaceObjId) == 0) //0 means alive, -2 dead
-					pub::SpaceObj::Destroy(spaceObjId, DestroyType::VANISH);
-				return true;
-			}
+			pub::SpaceObj::Destroy(spaceObjId, DestroyType::VANISH);
+			return true;
 		}
 		return false;
 	}
@@ -282,18 +276,74 @@ namespace SolarSpawn
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		for (const auto& nicknameObjIdPair : existingSolars)
+		if (spawnedSolars.contains(pLaunch.iSolarObjId))
 		{
-			if (nicknameObjIdPair.second == pLaunch.iSolarObjId)
-			{
-				LaunchComm comm;
-				comm.solarObjId = pLaunch.iSolarObjId;
-				comm.dockId = pLaunch.iDock;
-				unprocessedLaunchComms[iClientID] = comm;
-				break;
-			}
+			LaunchComm comm;
+			comm.solarObjId = pLaunch.iSolarObjId;
+			comm.dockId = pLaunch.iDock;
+			unprocessedLaunchComms[iClientID] = comm;
+		}
+		return true;
+	}
+
+	static uint GetShipMessageId(uint shipId)
+	{
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (!GetShipInspect(shipId, inspect, starSystem))
+			return 0;
+		const Archetype::Ship* shipArchetype = static_cast<Archetype::Ship*>(inspect->cobj->archetype);
+		char msgIdPrefix[64];
+		strncpy_s(msgIdPrefix, sizeof(msgIdPrefix), shipArchetype->msgidprefix_str, shipArchetype->msgidprefix_len);
+		return CreateID(msgIdPrefix);
+	}
+
+	static bool SendLaunchWellWishes(uint shipId, uint solarObjId, uint dockId)
+	{
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (!GetShipInspect(solarObjId, inspect, starSystem))
+			return false;
+		const CEqObj* solar = static_cast<CEqObj*>(inspect->cobj);
+		const Archetype::EqObj* solarArchetype = static_cast<Archetype::EqObj*>(solar->archetype);
+		Archetype::DockType dockType;
+		try
+		{
+			dockType = solarArchetype->dockInfo.at(dockId).dockType;
+		}
+		catch(const std::out_of_range& e)
+		{
+			return false;
 		}
 
+		std::string clearMessageIdBase;
+		switch (dockType)
+		{
+			case Archetype::DockType::Berth:
+				clearMessageIdBase = "gcs_docklaunch_clear_berth_0";
+				break;
+
+			case Archetype::DockType::MoorSmall:
+			case Archetype::DockType::MoorMedium:
+			case Archetype::DockType::MoorLarge:
+				clearMessageIdBase = "gcs_docklaunch_clear_moor_0";
+				break;
+
+			case Archetype::DockType::Ring:
+				clearMessageIdBase = "gcs_docklaunch_clear_ring_0";
+				break;
+
+			default:
+				return false;
+		}
+
+		static std::uniform_int_distribution<> distr(1, 2);
+		std::vector<uint> lines = {
+			GetShipMessageId(shipId),
+			CreateID((clearMessageIdBase + std::to_string(distr(gen)) + "-").c_str()),
+			CreateID(("gcs_misc_wellwish_0" + std::to_string(distr(gen)) + "-").c_str())
+		};
+		pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, false);
 		return true;
 	}
 
@@ -304,62 +354,208 @@ namespace SolarSpawn
 		if (!unprocessedLaunchComms.contains(clientId))
 			return;
 
-		uint archetypeId;
-		pub::Player::GetShipID(clientId, archetypeId);
-		const Archetype::Ship* shipArch = Archetype::GetShip(archetypeId);
+		SendLaunchWellWishes(shipId, unprocessedLaunchComms[clientId].solarObjId, unprocessedLaunchComms[clientId].dockId);
+		unprocessedLaunchComms.erase(clientId);
+	}
+
+	static std::unordered_map<uint, std::unordered_set<uint>> dockQueues;
+
+	// Gets called whenever a dock request begins, ends, is cancelled, or the ship is destroyed/despawned. Does not get called when the station gets destroyed.
+	int __cdecl Dock_Call_After(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, DOCK_HOST_RESPONSE response)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		if (!spawnedSolars.contains(dockTargetId))
+		{
+			return 0;
+		}
+
+		// dockPortIndex -1 means docking was cancelled.
+		if (dockPortIndex < 0 || response == DOCK_HOST_RESPONSE::DOCK)
+		{
+			dockQueues[dockTargetId].erase(ship);
+			return 0;
+		}
+
+		if (response == DOCK_HOST_RESPONSE::DOCK_IN_USE)
+			dockQueues[dockTargetId].insert(ship);
+
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		if (shipArch && GetShipInspect(unprocessedLaunchComms[clientId].solarObjId, inspect, starSystem))
+		uint targetId = dockTargetId;
+		if (!GetShipInspect(targetId, inspect, starSystem))
+			return 0;
+		const CEqObj* solar = static_cast<CEqObj*>(inspect->cobj);
+		const Archetype::EqObj* solarArchetype = static_cast<Archetype::EqObj*>(solar->archetype);
+		Archetype::DockType dockType;
+		try
 		{
-			const CSolar* solar = (CSolar*)inspect->cobj;
-			const Archetype::Solar* solarArch = (Archetype::Solar*)solar->archetype;
-			std::string messageIdBase;
-			switch (solarArch->dockInfo[unprocessedLaunchComms[clientId].dockId].dockType)
+			dockType = solarArchetype->dockInfo.at(dockPortIndex).dockType;
+		}
+		catch (const std::out_of_range& e)
+		{
+			return false;
+		}
+		
+		std::vector<uint> lines;
+		switch (response)
+		{
+			case DOCK_HOST_RESPONSE::PROCEED_DOCK:
 			{
-				case Archetype::DockType::Berth:
-					messageIdBase = "gcs_docklaunch_clear_berth_0";
-					break;
+				std::string dockTypeMessageId;
+				switch (dockType)
+				{
+					case Archetype::DockType::Berth:
+						dockTypeMessageId = "gcs_dockrequest_todock";
+						break;
 
-				case Archetype::DockType::MoorSmall:
-				case Archetype::DockType::MoorMedium:
-				case Archetype::DockType::MoorLarge:
-					messageIdBase = "gcs_docklaunch_clear_moor_0";
-					break;
+					case Archetype::DockType::MoorSmall:
+					case Archetype::DockType::MoorMedium:
+					case Archetype::DockType::MoorLarge:
+						dockTypeMessageId = "gcs_dockrequest_tomoor";
+						break;
 
-				case Archetype::DockType::Ring:
-					messageIdBase = "gcs_docklaunch_clear_ring_0";
-					break;
+					case Archetype::DockType::Ring:
+						dockTypeMessageId = "gcs_dockrequest_toland";
+						break;
 
-				default:
-					unprocessedLaunchComms.erase(clientId);
-					return;
+					default:
+						dockTypeMessageId = "";
+						break;
+				}
+
+				std::string dockTargetMessageId;
+				switch (dockType)
+				{
+					case Archetype::DockType::Berth:
+						dockTargetMessageId = "gcs_dockrequest_todock_number";
+						break;
+
+					case Archetype::DockType::MoorSmall:
+					case Archetype::DockType::MoorMedium:
+					case Archetype::DockType::MoorLarge:
+						dockTargetMessageId = "gcs_dockrequest_tomoor_number";
+						break;
+
+					case Archetype::DockType::Ring:
+						dockTargetMessageId = "gcs_dockrequest_toland-";
+						break;
+
+					default:
+						dockTargetMessageId = "";
+						break;
+				}
+
+
+				std::string dockNumberMessageId;
+				switch (dockType)
+				{
+					case Archetype::DockType::Berth:
+					case Archetype::DockType::MoorSmall:
+					case Archetype::DockType::MoorMedium:
+					case Archetype::DockType::MoorLarge:
+						dockNumberMessageId = "gcs_misc_number_" + std::to_string(dockPortIndex + 1) + "-";
+						break;
+
+					default:
+						dockNumberMessageId = "";
+						break;
+				}
+
+				if (dockQueues[dockTargetId].contains(ship))
+				{
+					lines = {
+						GetShipMessageId(ship),
+						CreateID("gcs_dockrequest_nowcleared_01+"),
+						CreateID((!dockTypeMessageId.empty() ? (dockTypeMessageId + "-") : "").c_str()),
+						CreateID("gcs_dockrequest_proceed_01+"),
+						CreateID(dockTargetMessageId.c_str()),
+						CreateID(dockNumberMessageId.c_str())
+					};
+				}
+				else
+				{
+					lines = {
+						CreateID(("gcs_misc_ack_0" + std::to_string(std::uniform_int_distribution(1, 3)(gen)) + "-").c_str()),
+						CreateID("gcs_dockrequest_yourrequest+"),
+						CreateID(dockTypeMessageId.c_str()),
+						CreateID("gcs_dockrequest_granted_01-"),
+						CreateID("gcs_dockrequest_proceed_01+"),
+						CreateID(dockTargetMessageId.c_str()),
+						CreateID(dockNumberMessageId.c_str())
+					};
+				}
+				break;
 			}
 
-			char msgIdPrefix[64];
-			strncpy_s(msgIdPrefix, sizeof(msgIdPrefix), shipArch->msgidprefix_str, shipArch->msgidprefix_len);
-			static std::uniform_int_distribution<> distr(1, 2);
-			uint lines[] = {
-				CreateID(msgIdPrefix),
-				CreateID((messageIdBase + std::to_string(distr(gen)) + "-").c_str()),
-				CreateID(("gcs_misc_wellwish_0" + std::to_string(distr(gen)) + "-").c_str())
-			};
-			pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines, 3, 19007 /* base comms type*/, 0.5f, false);
+
+
+			case DOCK_HOST_RESPONSE::DOCK_IN_USE:
+			{
+				lines = {
+					CreateID(("gcs_misc_ack_0" + std::to_string(std::uniform_int_distribution(1, 3)(gen)) + "-").c_str()),
+					CreateID("gcs_dockrequest_standby_01-"),
+					CreateID("gcs_dockrequest_delayedreason_01-"),
+					CreateID("gcs_dockrequest_willbecleared_01-")
+				};
+				break;
+			}
+
+
+
+			case DOCK_HOST_RESPONSE::DOCK_DENIED:
+			{
+				std::string dockTypeMessageId;
+				switch (dockType)
+				{
+					case Archetype::DockType::Berth:
+						dockTypeMessageId = "gcs_dockrequest_todock";
+						break;
+
+					case Archetype::DockType::MoorSmall:
+					case Archetype::DockType::MoorMedium:
+					case Archetype::DockType::MoorLarge:
+						dockTypeMessageId = "gcs_dockrequest_tomoor";
+						break;
+
+					case Archetype::DockType::Ring:
+						dockTypeMessageId = "gcs_dockrequest_toland";
+						break;
+
+					default:
+						dockTypeMessageId = "";
+					break;
+				}
+
+				lines = {
+					CreateID(("gcs_misc_ack_0" + std::to_string(std::uniform_int_distribution(1, 3)(gen)) + "-").c_str()),
+					CreateID("gcs_dockrequest_yourrequest+"),
+					CreateID(dockTypeMessageId.c_str()),
+					CreateID("gcs_dockrequest_denied_01-"),
+					CreateID("gcs_dockrequest_nofit_01-")
+				};
+				break;
+			}
+
+
+
+			case DOCK_HOST_RESPONSE::ACCESS_DENIED:
+				lines = { CreateID("gcs_dockrequest_denied_01-") };
+				break;
 		}
-		unprocessedLaunchComms.erase(clientId);
+
+		uint shipId = ship;
+		pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, false);
+		return 0;
 	}
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		for (const auto& nicknameObjIdPair : existingSolars)
-		{
-			if (nicknameObjIdPair.second == killedObject->cobj->get_id())
-			{
-				existingSolars.erase(nicknameObjIdPair.first);
-				break;
-			}
-		}
+		const uint objId = killedObject->cobj->get_id();
+		spawnedSolars.erase(objId);
+		dockQueues.erase(objId);
 	}
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)

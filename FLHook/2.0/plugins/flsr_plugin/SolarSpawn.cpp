@@ -607,6 +607,7 @@ namespace SolarSpawn
 		fallbackBaseArchetype.baseId = solar->dockWithBaseId;
 		fallbackBaseArchetype.systemId = solar->system;
 		fallbackBaseArchetype.position = solar->vPos;
+		fallbackBaseArchetype.position.x += 1; // Make sure no two bases are set on the same spot
 		fallbackBaseArchetype.orientation = solar->mRot;
 		const uint fallbackObjId = CreateSolar(fallbackBaseArchetype);
 		if (fallbackObjId != 0)

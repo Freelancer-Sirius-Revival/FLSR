@@ -95,3 +95,18 @@ File: EXE\common.dll
 # Always display the end points of trade lanes on the Nav Map. Effectively adds "visit = 1" to each ring Object. - adoxa
 0D6431: 44 00	[ ED 02 ]
 0D6461: 50 8D 8B D4 00 00 00 6A 40 51 E8 B0 FB FC FF 83 C4 0C 89 83 D0 00 00 00 C6 83 14 01 00 00 01 E9 9D 02 00 00	[ 83 C9 FF 33 C0 8B FE F2 AE F7 D1 49 8B C1 83 F8 40 8D 93 D4 00 00 00 72 05 B8 3F 00 00 00 8B C8 8B FA 8B D1 ]
+
+# Correct inverted ship controls for GUNBOAT typed ships. - Laz
+0x18C8B6: 05	[ 04 ]
+
+# Correct inverted ship controls for CRUISER typed ships. - Laz
+0x18C8BE: 09	[ 08 ]
+
+# Correct inverted ship controls for TRANSPORT typed ships. - Laz
+0x18C8C6: 11	[ 10 ]
+
+# Correct inverted ship controls for CAPITAL typed ships. - Laz
+0x18C8CE: 21	[ 20 ]
+
+# Correct inverted ship controls for MINING typed ships. - Skotty
+0x18C8D6: 41	[ 40 ]

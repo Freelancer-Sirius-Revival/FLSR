@@ -519,13 +519,11 @@ namespace SolarSpawn
 namespace EquipWhiteList
 {
     void LoadEquipWhiteList();
-    void ProcessChangedEquipments();
-    extern const uint TIMER_INTERVAL;
     void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
-    void __stdcall ReqEquipment_AFTER(class EquipDescList const& equipDescriptorList, unsigned int clientId);
-    void __stdcall ReqAddItem_AFTER(unsigned int goodArchetypeId, char const* hardpoint, int count, float status, bool mounted, uint clientId);
-    void __stdcall ReqShipArch_AFTER(unsigned int archetypeId, unsigned int clientId);
+    void __stdcall GFGoodBuy(const SGFGoodBuyInfo& gbi, unsigned int clientId);
+    void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId);
+    void __stdcall ReqAddItem(unsigned int& goodArchetypeId, char* hardpoint, int& count, float& status, bool& mounted, uint clientId);
 }
 
 namespace SQL {

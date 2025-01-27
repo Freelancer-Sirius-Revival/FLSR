@@ -1737,27 +1737,25 @@ if (set_bLogConnects)
     /**************************************************************************************************************
     **************************************************************************************************************/
 
-    void __stdcall ReqAddItem(unsigned int p1, char const* p2, int p3, float p4,
-        bool p5, unsigned int p6) {
+    void __stdcall ReqAddItem(unsigned int goodArchetypeId, char const* hardpoint, int count, float status, bool mounted, unsigned int clientId)
+    {
         ISERVER_LOG();
-        ISERVER_LOGARG_UI(p1);
+        ISERVER_LOGARG_UI(goodArchetypeId);
         //	ISERVER_LOGARG_S(p2);
-        ISERVER_LOGARG_UI(p3);
-        ISERVER_LOGARG_F(p4);
-        ISERVER_LOGARG_UI(p5);
-        ISERVER_LOGARG_UI(p6);
+        ISERVER_LOGARG_UI(count);
+        ISERVER_LOGARG_F(status);
+        ISERVER_LOGARG_UI(mounted);
+        ISERVER_LOGARG_UI(clientId);
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqAddItem, __stdcall,
-            (unsigned int p1, char const* p2, int p3, float p4, bool p5,
-                unsigned int p6),
-            (p1, p2, p3, p4, p5, p6));
+            (unsigned int&, char*, int&, float&, bool&, unsigned int),
+            (goodArchetypeId, (char*)hardpoint, count, status, mounted, clientId));
 
-        EXECUTE_SERVER_CALL(Server.ReqAddItem(p1, p2, p3, p4, p5, p6));
+        EXECUTE_SERVER_CALL(Server.ReqAddItem(goodArchetypeId, hardpoint, count, status, mounted, clientId));
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqAddItem_AFTER, __stdcall,
-            (unsigned int p1, char const* p2, int p3, float p4, bool p5,
-                unsigned int p6),
-            (p1, p2, p3, p4, p5, p6));
+            (unsigned int, char const*, int, float, bool, unsigned int),
+            (goodArchetypeId, hardpoint, count, status, mounted, clientId));
     }
 
     /**************************************************************************************************************

@@ -383,7 +383,7 @@ struct IMPORT IServerImpl
 	virtual void PopUpDialog(unsigned int, unsigned int);
 	virtual void PushToServer(class CDAPacket*);
 	virtual void RTCDone(unsigned int, unsigned int);
-	virtual void ReqAddItem(unsigned int, char const*, int, float, bool, unsigned int);
+	virtual void ReqAddItem(unsigned int goodArchetypeId, char const* hardpoint, int count, float status, bool mounted, unsigned int clientId);
 	virtual void ReqCargo(class EquipDescList const&, unsigned int);
 	virtual void ReqChangeCash(int, unsigned int);
 	virtual void ReqCollisionGroups(class st6::list<struct CollisionGroupDesc, class st6::allocator<struct CollisionGroupDesc> > const&, unsigned int);

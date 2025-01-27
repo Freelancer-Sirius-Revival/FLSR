@@ -1129,7 +1129,7 @@ namespace pub
 		IMPORT  int JettisonEquipment(unsigned int const&, unsigned short const&, int const&);
 		IMPORT  int JumpIn(unsigned int const&, unsigned int const&);
 		IMPORT  int LaneResponse(unsigned int const&, int);
-		IMPORT  int Launch(unsigned int const&, unsigned int const&, int);
+		IMPORT  int Launch(unsigned int const& launcherId, unsigned int const& launchTargetId, int dockId);
 		IMPORT  int LightFuse(unsigned int const&, char const*, float);
 		IMPORT  int Relocate(unsigned int const&, unsigned int const&, class Vector const&, class Matrix const&);
 		IMPORT  int RequestSpaceScript(unsigned int const&, class Vector const&, int const&, unsigned int, char const*);

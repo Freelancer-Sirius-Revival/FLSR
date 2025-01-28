@@ -119,7 +119,6 @@
     <ClCompile Include="..\source\Tools.cpp" />
     <ClCompile Include="..\source\Exceptions.cpp" />
     <ClCompile Include="..\source\ZoneUtilities.cpp" />
-    <ClCompile Include="..\source\CustomHooks.cpp" />
     <ClCompile Include="..\source\Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,7 +181,6 @@
       <Filter>sdk</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ExceptionInfo.h" />
-    <ClInclude Include="..\source\CustomHooks.h" />
     <ClInclude Include="..\FLHookSDK\include\flmap.h">
       <Filter>sdk\Header Files</Filter>
     </ClInclude>

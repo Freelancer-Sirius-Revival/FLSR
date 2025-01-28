@@ -136,6 +136,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AntiCheat.cpp" />
+    <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
     <ClCompile Include="Commands.cpp" />

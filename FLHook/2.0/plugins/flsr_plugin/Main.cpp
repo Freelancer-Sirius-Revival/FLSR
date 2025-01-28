@@ -80,13 +80,8 @@ void LoadSettings() {
         ConPrint(L"Module loaded: AC\n");
     }
 
-	//EquipWhiteList-Module ######################################################################
-    if (Modules::GetModuleState("EquipWhiteListModule"))
-    {
-        EquipWhiteList::LoadEquipWhiteList();
-
-        ConPrint(L"Module loaded: EquipWhiteList\n");
-    }
+    EquipWhiteList::LoadEquipWhiteList();
+    ConPrint(L"Module loaded: EquipWhiteList\n");
 
 	//CLOAK-Module ##############################################################################
     if (Modules::GetModuleState("CloakModule"))
@@ -234,6 +229,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::GFGoodBuy, PLUGIN_HkIServerImpl_GFGoodBuy, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqEquipment, PLUGIN_HkIServerImpl_ReqEquipment, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::ReqAddItem, PLUGIN_HkIServerImpl_ReqAddItem, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BatsBotsShipTransferFix::GFGoodBuy, PLUGIN_HkIServerImpl_GFGoodBuy, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BatsBotsShipTransferFix::ReqEquipment, PLUGIN_HkIServerImpl_ReqEquipment, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::ReqShipArch_After, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));

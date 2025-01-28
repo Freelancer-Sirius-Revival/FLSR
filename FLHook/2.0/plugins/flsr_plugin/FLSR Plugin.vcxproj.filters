@@ -27,6 +27,7 @@
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="SolarInvincibility.cpp" />
     <ClCompile Include="SolarSpawn.cpp" />
+    <ClCompile Include="BatsBotsShipTransferFix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />

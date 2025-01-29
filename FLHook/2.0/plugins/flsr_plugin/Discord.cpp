@@ -1050,9 +1050,8 @@ namespace Discord {
 					if (!HkIsInCharSelectMenu(pPD->iOnlineID)) {
 						int iRank = pPD->iRank;
 						uint iShipArch = pPD->iShipArchetype;
-						uint iClientID = HkGetClientIdFromPD(pPD);
 						//Charname
-						std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+						std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(pPD->iOnlineID);
 						std::string scCharname = wstring_to_utf8(wscCharname);
 						//Ping
 						HKPLAYERINFO pi;
@@ -1096,7 +1095,7 @@ namespace Discord {
 				Archetype::Ship* ship = Archetype::GetShip(std::stoul(ships[i]));
 				std::wstring wscShipName = HkGetWStringFromIDS(ship->iIdsName).c_str();
 
-				shipsLine += wstos(wscShipName);
+				shipsLine += wstring_to_utf8(wscShipName);
 			}
 
 			// Pings zu einer Zeile zusammenfügen

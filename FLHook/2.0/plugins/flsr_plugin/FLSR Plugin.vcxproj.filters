@@ -28,6 +28,7 @@
     <ClCompile Include="SolarInvincibility.cpp" />
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
+    <ClCompile Include="ConnectionLimiter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />

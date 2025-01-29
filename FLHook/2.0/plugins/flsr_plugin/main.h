@@ -730,6 +730,13 @@ namespace Storage
     bool UserCmd_Storage(const uint clientId, const std::wstring& arguments);
 }
 
+namespace ConnectionLimiter
+{
+    extern uint maxParallelConnectionsPerIpAddress;
+    void __stdcall Login_After(struct SLoginInfo const& li, unsigned int clientId);
+    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2);
+}
+
 //namespace SrvCtrlObj {
 namespace SrvCtrlObj {
 

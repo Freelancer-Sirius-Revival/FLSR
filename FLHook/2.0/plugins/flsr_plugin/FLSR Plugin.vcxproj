@@ -135,7 +135,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AntiCheat.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
@@ -152,14 +151,12 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Mark.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
-    <ClCompile Include="PlayerHunt.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
     <ClCompile Include="SolarInvincibility.cpp" />
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="SpawnProtection.cpp" />
-    <ClCompile Include="SQL.cpp" />
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />

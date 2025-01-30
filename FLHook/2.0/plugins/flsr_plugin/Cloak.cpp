@@ -375,25 +375,7 @@ namespace Cloak
 
 	static bool EquipEquipment(const uint clientId, const uint archetypeId, const std::string& hardpoint)
 	{
-		if (HkAddEquip(ARG_CLIENTID(clientId), archetypeId, hardpoint) == HKE_OK)
-		{
-			// Anti Cheat
-			char* szClassPtr;
-			memcpy(&szClassPtr, &Players, 4);
-			szClassPtr += 0x418 * (clientId - 1);
-			ulong lCRC;
-			__asm
-			{
-				pushad
-				mov ecx, [szClassPtr]
-				call[CRCAntiCheat_FLSR]
-				mov[lCRC], eax
-				popad
-			}
-			memcpy(szClassPtr + 0x320, &lCRC, 4);
-			return true;
-		}
-		return false;
+		return HkAddEquip(ARG_CLIENTID(clientId), archetypeId, hardpoint) == HKE_OK;
 	}
 
 	static bool EquipCloakingDevices(const uint clientId)

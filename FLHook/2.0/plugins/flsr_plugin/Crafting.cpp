@@ -272,7 +272,7 @@ namespace Crafting
 			if (HkAddCash(characterNameWS, -recipe.cost * batchCount) != HKE_OK)
 				return false;
 
-		if (Tools::FLSRHkAddCargo(characterNameWS, recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
+		if (HkAddCargo(ARG_CLIENTID(clientId), recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
 		{
 			const uint soundId = recipe.successSoundId ? recipe.successSoundId : defaultSuccessSoundId;
 			if (soundId)

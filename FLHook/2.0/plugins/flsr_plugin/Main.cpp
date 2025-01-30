@@ -17,25 +17,9 @@ void LoadSettings() {
     std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
     ConnectionLimiter::maxParallelConnectionsPerIpAddress = IniGetI(scPluginCfgFile, "ConnectionLimiter", "MaxParallelIpAddressConnections", 2);
-
-    //Load HashMap
-    if (Tools::ReadIniNicknames())
-    {
-        ConPrint(L"\n----------LOADING FLSR-HashMap----------\n");
-        ConPrint(L"Loaded HashMap with %d entries\n", Tools::mNicknameHashMap.size());
-        ConPrint(L"\n");
-    }
-        
+    
     //Load Module-Settings
     Modules::LoadModules();
-
-    //SQL-Module ################################################################################
-    if (Modules::GetModuleState("SQLModule"))
-    {
-        SQL::InitializeDB();
-
-        ConPrint(L"Module loaded: SQL\n");
-    }
 
     if (Modules::GetModuleState("CarrierModule"))
     {
@@ -67,20 +51,6 @@ void LoadSettings() {
         ConPrint(L"Module loaded: Insurance (CostFactor: " + std::to_wstring(Insurance::insuranceEquipmentCostFactor) + L")\n");
     }
 
-    // ANTICHEAT-Module   ########################################################################
-    CRCAntiCheat_FLSR = (_CRCAntiCheat)((char *)hModServer + ADDR_CRCANTICHEAT);
-    if (Modules::GetModuleState("ACModule"))
-    {
-        struct PlayerData* pPD = 0;
-        while (pPD = Players.traverse_active(pPD))
-        {
-            uint iClientID = HkGetClientIdFromPD(pPD);
-            AntiCheat::SpeedAC::Init(iClientID);
-            AntiCheat::TimingAC::Init(iClientID);
-            AntiCheat::PowerAC::Init(iClientID);
-        }
-        ConPrint(L"Module loaded: AC\n");
-    }
 
     EquipWhiteList::LoadEquipWhiteList();
     ConPrint(L"Module loaded: EquipWhiteList\n");
@@ -105,15 +75,6 @@ void LoadSettings() {
 		ConPrint(L"Module loaded: CMPUpdate with " + std::to_wstring(Tools::lCMPUpdateExceptions.size()) + L" Exceptions\n");
     }
 
-
-    //PlayerHunt     #############################################################################
-    if (Modules::GetModuleState("PlayerHunt"))
-    {
-		//Load PlayerHunt
-		PlayerHunt::LoadPlayerHuntSettings();
-		ConPrint(L"Module loaded: PlayerHunt - RewardMultiplicator: " + std::to_wstring(PlayerHunt::set_fRewardMultiplicator) + L", MinTargetSystemDistance: " + std::to_wstring(PlayerHunt::set_iMinTargetSystemDistance) + L", MinCredits: " + std::to_wstring(PlayerHunt::set_iMinCredits) + L"\n");
-	}
-
     SpawnProtection::LoadSettings();
 
     if (Modules::GetModuleState("Crafting"))
@@ -135,10 +96,6 @@ void LoadSettings() {
                 DWORD id;
                 DWORD dwParam;
                 hDiscordBotThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Discord::StartUp, &dwParam, 0, &id);
-                
-                //CleanUp CharManager
-                Discord::CharManager_DeleteInvalidEntries();
-
 
                 ConPrint(L"Module loaded: DiscordBot\n");
 
@@ -260,18 +217,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LoadSettings, PLUGIN_LoadSettings, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::UserCmd_Process, PLUGIN_UserCmd_Process, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::ExecuteCommandString_Callback,PLUGIN_ExecuteCommandString_Callback, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SPObjUpdate,PLUGIN_HkIServerImpl_SPObjUpdate, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SPMunitionCollision, PLUGIN_HkIServerImpl_SPMunitionCollision, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SystemSwitchOutComplete, PLUGIN_HkIServerImpl_SystemSwitchOutComplete, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::ClearClientInfo, PLUGIN_ClearClientInfo, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::FireWeapon, PLUGIN_HkIServerImpl_FireWeapon, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
 

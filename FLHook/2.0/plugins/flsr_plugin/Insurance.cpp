@@ -425,7 +425,7 @@ namespace Insurance
                     consumablesCouldNotBeRestored = consumablesCouldNotBeRestored || actualItemsToAdd != itemsToAdd;
                     itemsToAdd = actualItemsToAdd;
                 }
-                if ((itemsToAdd > 0) && (Tools::FLSRHkAddCargo(characterNameWS, insuredCargo.cargoInfo.iArchID, itemsToAdd, false) == HKE_OK))
+                if ((itemsToAdd > 0) && HkAddCargo(ARG_CLIENTID(clientId), insuredCargo.cargoInfo.iArchID, itemsToAdd, false) == HKE_OK)
                 {
                     totalRestorationPrice += itemsToAdd * insuredCargo.price;
                     somethingWasRestored = true;
@@ -434,25 +434,7 @@ namespace Insurance
             else if (IsArchetypeTypeEquipment(archetypeType) && foundCurrentCargoCount == 0)
             {
                 const std::string hardpoint = insuredCargo.cargoInfo.hardpoint.value;
-                if (HkAddEquip(ARG_CLIENTID(clientId), insuredCargo.cargoInfo.iArchID, hardpoint) == HKE_OK)
-                {
-                    totalRestorationPrice += insuredCargo.price;
-                    somethingWasRestored = true;
-                    // Anti Cheat
-                    char* szClassPtr;
-                    memcpy(&szClassPtr, &Players, 4);
-                    szClassPtr += 0x418 * (clientId - 1);
-                    ulong lCRC;
-                    __asm
-                    {
-                        pushad
-                        mov ecx, [szClassPtr]
-                        call[CRCAntiCheat_FLSR]
-                        mov[lCRC], eax
-                        popad
-                    }
-                    memcpy(szClassPtr + 0x320, &lCRC, 4);
-                }
+                HkAddEquip(ARG_CLIENTID(clientId), insuredCargo.cargoInfo.iArchID, hardpoint);
             }
         }
 

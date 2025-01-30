@@ -1,168 +1,7 @@
 #include "Main.h"
 
-namespace Commands {
-
-        // Discord
-    void UserCMD_BANK(uint iClientID, const std::wstring& wscParam) {
-        if (Modules::GetModuleState("DiscordBot"))
-        {
-            std::wstring wscCharFileName;
-            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-            std::string scCharfile = wstos(wscCharFileName);
-            std::string scDiscordID = Discord::GetDiscordIDForChar(scCharfile);
-            if (scDiscordID == "") // No Link Request
-            {
-                PrintUserCmdText(iClientID, L"Char not linked!");
-                return;
-            }
-            else
-            {
-
-                //Show Balance without Parameter
-                if (wscParam == L"")
-                {
-                    //Get Current Balance
-                    std::string scCredits = Discord::GetCreditsForDiscordAccount(scDiscordID);
-                    PrintUserCmdText(iClientID, L"Current Balance: " + stows(scCredits));
-                    PrintUserCmdText(iClientID, L"Use /bank <amount> to deposit credits");
-                }
-                else
-                {
-                    std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-
-
-                    // Parameter �bergeben - Betrag auf Discord-Account �berweisen
-
-                    // Ist der Char alt genug (Abuse-Prevention - 1h)?
-                    int secs = 0;
-                    HkGetOnlineTime(wscCharname, secs);
-                    if (secs < 600) {
-                        PrintUserCmdText(iClientID, L"ERR insufficient time online");
-                        return;
-                    }
-
-                    int amount = -1;
-
-                    // Betrag aus dem Parameter extrahieren und in einen int umwandeln
-                    try
-                    {
-                        amount = std::stoi(wstos(wscParam));
-                    }
-                    catch (const std::exception&)
-                    {
-                        PrintUserCmdText(iClientID, L"Invalid amount specified.");
-                        return;
-                    }
-
-                    // Betrag validieren (muss positiv sein)
-                    if (amount <= 0)
-                    {
-                        PrintUserCmdText(iClientID, L"Invalid amount specified.");
-                        return;
-                    }
-
-                    // Ist gen�gend Geld auf dem Charakter?
-                    int iCash;
-                    HkGetCash(wscCharname, iCash);
-                    if (iCash < amount)
-                    {
-                        //Nicht gen�geng Geld
-                        PrintUserCmdText(iClientID, L"You don't have enough credits.");
-                        return;
-                    }
-
-
-                    // The last error.
-                    HK_ERROR err;
-
-                    if ((err = HkAddCash(wscCharname, -amount)) != HKE_OK) {
-
-                        PrintUserCmdText(iClientID, L"Error while updateing ingame balance");
-                        return;
-                    }
-
-                    // Betrag auf den Discord-Account �berweisen
-                    if (!Discord::UpdateCreditsForDiscordAccount(scDiscordID, std::to_string(amount), true))
-                    {
-                        PrintUserCmdText(iClientID, L"Error while updating discord balance");
-                        return;
-                    }
-
-                    // Erfolgmeldung anzeigen
-                    PrintUserCmdText(iClientID, L"Successfully deposited " + wscParam + L" credits to your account.");
-                }
-
-
-
-
-            }
-        }
-
-
-    }
-
-    void UserCMD_LINK(uint iClientID, const std::wstring& wscParam) {
-
-        if (Modules::GetModuleState("DiscordBot"))
-        {
-
-            std::wstring wscCharFileName;
-            HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-            std::string scCharfile = wstos(wscCharFileName);
-            std::string sha1PW = Tools::sha1(wstos(wscParam));
-
-
-            //Get 2FA
-            std::string scValid = Discord::GetValidationForChar(scCharfile);
-            if (scValid == "") // No Link Request
-            {
-                PrintUserCmdText(iClientID, L"No link request!");
-                return;
-            }
-            else if (scValid == "TRUE") // Already Linked
-            {
-                PrintUserCmdText(iClientID, L"Char already linked!");
-                return;
-            }
-
-
-            if (scValid == sha1PW)
-            {
-                Discord::UpdateValidationForChar(scCharfile);
-                PrintUserCmdText(iClientID, L"Char Linked!");
-                std::string sscCharname = wstos((wchar_t*)Players.GetActiveCharacterName(iClientID));
-
-                std::string scDiscordID = Discord::GetDiscordIDForChar(scCharfile);
-                std::string scMsg = "Char " + sscCharname + " linked!";
-                dpp::message dm(scMsg);
-                Discord::DMMessage NewMessage;
-                NewMessage.DiscordUserID = scDiscordID;
-                NewMessage.DiscordMessage = dm;
-
-                {
-                    // Mutex sperren
-                    std::lock_guard<std::mutex> lock(m_Mutex);
-                    Discord::lDMMessages.push_back(NewMessage);
-
-                    Discord::CharManager_UpdateCharname(scCharfile, sscCharname);
-                } // Mutex wird hier automatisch freigegeben
-            }
-            else
-            {
-                PrintUserCmdText(iClientID, L"Wrong Pass!");
-            }
-
-        }
-    }
-
-    void UserCmd_PLAYERHUNT(uint iClientID, const std::wstring& wscParam) {
-
-        if (Modules::GetModuleState("PlayerHunt"))
-        {
-            PlayerHunt::Start_PlayerHunt(iClientID, wscParam);
-        }
-    }
-
+namespace Commands
+{
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
 
 
@@ -206,25 +45,6 @@ namespace Commands {
         } // Mutex wird hier automatisch freigegeben
 
 
-    }
-
-    void UserCmd_MODREQUEST(uint iClientID, const std::wstring& wscParam) {
-        std::wstring Chat = wscParam;
-        std::wstring Charname = (wchar_t*)Players.GetActiveCharacterName(iClientID);
-        PrintUserCmdText(iClientID, L"Your request has been sent to the moderators.");
-        //Discord
-        Discord::ChatMessage ChatMsg;
-        ChatMsg.wscCharname = Charname;
-        ChatMsg.wscChatMessage = Chat;
-
-
-        {
-            // Mutex sperren
-            std::lock_guard<std::mutex> lock(m_Mutex);
-
-            // Chat-Nachricht zur Liste hinzuf�gen
-            Discord::lModMessages.push_back(ChatMsg);
-        } // Mutex wird hier automatisch freigegeben
     }
 
     /** Process a give cash command */
@@ -688,31 +508,13 @@ namespace Commands {
         return;
     }
 
-    //ChangeModuleState
-    void AdminCmd_SwitchModuleState(CCmds* cmds, std::wstring wscModulename) {
-
-        // Rechte Check
-        if (!(cmds->rights & RIGHT_SUPERADMIN)) {
-            cmds->Print(L"ERR No permission\n");
-            return;
-        }
-
-        //Switch Module State
-        Modules::SwitchModuleState(wstos(wscModulename));
-        cmds->Print(L"OK\n");
-    }
-
     USERCMD UserCmds[] = {
         {L"/uv", UserCmd_UV},
-        {L"/modrequest", UserCmd_MODREQUEST},
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
         {L"/contributor", UserCMD_Contributor},
         {L"/autoinsurance", Insurance::UserCMD_INSURANCE},
         {L"/help", UserCmd_HELP},
-        {L"/playerhunt", UserCmd_PLAYERHUNT},
-        {L"/link", UserCMD_LINK},
-        {L"/bank", UserCMD_BANK},
         {L"/cloak", Cloak::UserCmd_CLOAK},
         {L"/c", Cloak::UserCmd_CLOAK},
         {L"/uncloak", Cloak::UserCmd_UNCLOAK},
@@ -753,17 +555,6 @@ namespace Commands {
         }
         returncode = DEFAULT_RETURNCODE; // we did not handle the command, so let
         // other plugins or FLHook kick in
-        return false;
-    }
-
-    // Admin command processing
-    bool ExecuteCommandString_Callback(CCmds* cmds, const std::wstring& wscCmd) {
-        returncode = DEFAULT_RETURNCODE;
-        if (IS_CMD("switchModulestate")) {
-            returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-            AdminCmd_SwitchModuleState(cmds, cmds->ArgStr(1));
-            return true;
-        }
         return false;
     }
 }

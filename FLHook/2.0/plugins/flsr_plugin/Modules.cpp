@@ -22,7 +22,7 @@ namespace Modules {
         for (std::list<INISECTIONVALUE>::iterator i = lModulesSettings.begin(); i != lModulesSettings.end(); i++) {
             Modules::Module NewModule;
             NewModule.scModuleName = i->scKey;
-            NewModule.bModulestate = Tools::GetB(i->scValue);
+            NewModule.bModulestate = ToLower(i->scValue) == "true";
             Modules::lModules.push_back(NewModule);
         }
 	}

@@ -6,7 +6,6 @@ namespace Timers {
         { Cloak::UpdateCloakClients, Cloak::TIMER_INTERVAL, 0 },
         { Mark::RotateClearNonExistingTargetIds, Mark::CLEAR_ROTATION_TIMER_INTERVAL, 0 },
         { SpawnProtection::UpdateSpawnProtectionValidity, SpawnProtection::TIMER_INTERVAL, 0 },
-       {Tools::CharSelectMenu, 2000, 0},
     };
 
     int __stdcall Update() {

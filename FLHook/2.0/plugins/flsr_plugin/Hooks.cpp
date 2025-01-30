@@ -27,15 +27,6 @@ namespace Hooks {
         if (!iClientID)
             return;
 
-        //AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::DataGrab::CharnameToFLHOOKUSER_FILE(iClientID);
-            AntiCheat::SpeedAC::Init(iClientID);
-            AntiCheat::TimingAC::Init(iClientID);
-            AntiCheat::PowerAC::Init(iClientID);
-        }
-		
         //Show WelcomePopUp
         if (Modules::GetModuleState("WelcomeMSG"))
         {
@@ -46,7 +37,7 @@ namespace Hooks {
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller) {
         returncode = DEFAULT_RETURNCODE;
 
-        if (!Tools::isValidPlayer(iClientIDVictim, true))
+        if (!HkIsValidClientID(iClientIDVictim))
             return;
 
         std::wstring victim, killer;
@@ -113,13 +104,7 @@ namespace Hooks {
         victim.erase(std::remove_if(victim.begin(), victim.end(), [](unsigned char c) { return std::isspace(c); }), victim.end());
     
         // Remove whitespaces from killer
-        killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());
-
-        //PlayerHunt
-        if (Modules::GetModuleState("PlayerHunt"))
-        {
-			PlayerHunt::CheckDied(iClientIDVictim, iClientIDKiller, DeathType);
-		}        
+        killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());    
     }
 
 
@@ -127,149 +112,21 @@ namespace Hooks {
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID) {
         returncode = DEFAULT_RETURNCODE;
 
-        //Insurance
         if (Modules::GetModuleState("InsuranceModule"))
         {
             Insurance::UseInsurance(iClientID);
         }
 		
-		//AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::SpeedAC::Init(iClientID);
-            AntiCheat::TimingAC::Init(iClientID);
-        }	
-
-        //PlayerHunt
-        if (Modules::GetModuleState("PlayerHunt"))
-        {
-			PlayerHunt::CheckDock(iBaseID, iClientID);
-        }
-    }
-
-	//SPObjUpdate
-    void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-        //AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::TimingAC::CheckTimeStamp(ui, iClientID);
-            AntiCheat::SpeedAC::CheckSpeedCheat(ui, iClientID);
-        }
-    }
-
-	//Dock_Call
-    int __cdecl Dock_Call(unsigned int const& iShip, unsigned int const& iDockTarget, int iCancel, enum DOCK_HOST_RESPONSE response) {
-        returncode = DEFAULT_RETURNCODE;
-		
-        uint iClientID = HkGetClientIDByShip(iShip);
-        if (HkIsValidClientID(iClientID)) {
-            //AC
-            if (Modules::GetModuleState("ACModule"))
-            {
-                AntiCheat::SpeedAC::iDunno3(iShip, iDockTarget, iCancel, response);
-            }
-        }
-
-        return 0;
-    }
-
-    // Called when a gun hits something
-    void __stdcall SPMunitionCollision(struct SSPMunitionCollisionInfo const& ci, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-
-        //AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::SpeedAC::vDunno1(iClientID, 10000);
-        }
-    }
-
-	//JumpInComplete
-    void __stdcall JumpInComplete(unsigned int iSystemID, unsigned int iShipID) {
-        returncode = DEFAULT_RETURNCODE;
-
-        uint iClientID = HkGetClientIDByShip(iShipID);
-        if (!iClientID)
-            return;
-
-        //AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::SpeedAC::Init(iClientID);
-            AntiCheat::SpeedAC::vDunno2(iClientID);
-            AntiCheat::SpeedAC::vDunno1(iClientID, 10000);
-            AntiCheat::TimingAC::Init(iClientID);
-            AntiCheat::PowerAC::Init(iClientID);
-        }
-
-        //PlayerHunt
-        if (Modules::GetModuleState("PlayerHunt"))
-        {
-            PlayerHunt::CheckSystemReached(iClientID, iSystemID);
-        }
-    }
-	
-    void __stdcall SystemSwitchOutComplete(unsigned int iShip, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-        		
-		//AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::SpeedAC::vDunno2(iClientID);
-            AntiCheat::SpeedAC::vDunno1(iClientID, 20000);
-        }
-    }
-
-    /// Clear client info when a client connects.
-    void ClearClientInfo(unsigned int iClientID) {
-		//AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-          AntiCheat::SpeedAC::Init(iClientID);
-          AntiCheat::TimingAC::Init(iClientID);
-          AntiCheat::PowerAC::Init(iClientID);
-
-        }
-    }
-
-    void __stdcall FireWeapon(unsigned int iClientID, struct XFireWeaponInfo const& wpn) {
-        returncode = DEFAULT_RETURNCODE;
-		
-		//AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::PowerAC::FireWeapon(iClientID, wpn);
-        }
     }
 
     void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID) {
         returncode = DEFAULT_RETURNCODE;
-
-        //AC
-        if (Modules::GetModuleState("ACModule"))
-        {
-            AntiCheat::SpeedAC::Init(iClientID);
-            AntiCheat::TimingAC::Init(iClientID);
-            AntiCheat::PowerAC::Init(iClientID);
-        }
 
         //Insurance
         if (Modules::GetModuleState("InsuranceModule") && !Insurance::IsInsurancePresent(iClientID))
         {
             const bool insuranceRequested = Insurance::IsInsuranceRequested(iClientID);
             Insurance::CreateNewInsurance(iClientID, !insuranceRequested);
-        }
-    }
-	
-    void __stdcall DisConnect(unsigned int iClientID, enum EFLConnection state)
-    {
-        returncode = DEFAULT_RETURNCODE;
-
-        //PlayerHunt
-        if (Modules::GetModuleState("PlayerHunt"))
-        {
-            PlayerHunt::CheckDisConnect(iClientID);
         }
     }
 }

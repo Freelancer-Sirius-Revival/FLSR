@@ -242,12 +242,12 @@ namespace LootBoxes
 			if (lootArchetypeCombinable[lootedItemArchetypeIdCount.first])
 			{
 				for (int count = 0; count < lootedItemArchetypeIdCount.second; count++)
-					Tools::FLSRHkAddCargo(characterNameWS, lootedItemArchetypeIdCount.first, 1, false);
+					HkAddCargo(ARG_CLIENTID(clientId), lootedItemArchetypeIdCount.first, 1, false);
 			}
 			// Stackable items will be sent as a batch to reduce package traffic.
 			else
 			{
-				Tools::FLSRHkAddCargo(characterNameWS, lootedItemArchetypeIdCount.first, lootedItemArchetypeIdCount.second, false);
+				HkAddCargo(ARG_CLIENTID(clientId), lootedItemArchetypeIdCount.first, lootedItemArchetypeIdCount.second, false);
 			}
 		}
 

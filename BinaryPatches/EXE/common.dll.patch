@@ -92,8 +92,8 @@ File: EXE\common.dll
 0638AC: EB	[ 7B ]
 
 # Default repair price ratio (ships and collision groups) (both offsets must be changed). - FriendlyFire
-004A28: 0.03125f	[ 0.33f ]
-0057FA: 0.03125f	[ 0.33f ]
+004A28: 0.1f	[ 0.33f ]
+0057FA: 0.1f	[ 0.33f ]
 
 # Always display the end points of trade lanes on the Nav Map. Effectively adds "visit = 1" to each ring Object. - adoxa
 0D6431: 44 00	[ ED 02 ]

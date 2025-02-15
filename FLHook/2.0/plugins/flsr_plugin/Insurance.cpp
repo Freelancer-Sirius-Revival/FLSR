@@ -62,23 +62,84 @@ namespace Insurance
     const std::string ITEM_PRICE_KEY = "fPrice";
     const std::string ITEM_ARCHETYPE_TYPE_KEY = "ClassType";
 
-    bool IsInsuranceFileExisting(const std::string& name)
+    static std::string outputDirectory;
+    static float shipRepairCostFactor = 0.33f;
+    static float equipmentRepairCostFactor = 0.3f;
+
+    static bool initialized = false;
+    void Initialize()
     {
-        struct stat buffer;
-        return (stat(name.c_str(), &buffer) == 0);
+        if (initialized)
+            return;
+        initialized = true;
+
+        const HMODULE commonHandle = GetModuleHandle("common.dll");
+        if (commonHandle)
+            shipRepairCostFactor = *(float*)(DWORD(commonHandle) + 0x004A28);
+
+        const HMODULE freelancerHandle = GetModuleHandle("freelancer.exe");
+        if (freelancerHandle)
+            equipmentRepairCostFactor = *(float*)(DWORD(freelancerHandle) + 0x1D51B4);
+
+        // Set up the directory name for all save files of this plugin.
+        outputDirectory = scAcctPath + "\\insurances\\";
     }
 
-    std::string GetHookUserFilePath(const uint clientId)
+    static std::string GetCharacterFileName(const uint clientId)
     {
-        CAccount* account = Players.FindAccountFromClientID(clientId);
-        std::wstring accountDirectoryWS;
-        if (HkGetAccountDirName(account, accountDirectoryWS) != HKE_OK)
+        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
             return "";
-        return scAcctPath + wstos(accountDirectoryWS) + Globals::FLHOOKUSER_FILE;
+        std::wstring characterFileName;
+        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+            return "";
+        return wstos(characterFileName);
     }
 
-    std::set<InsuranceType> ReadEnabledInsuranceTypes(const uint clientId)
+    static std::string GetInsuranceFilePath(const uint clientId)
     {
+        const std::string charFileName = GetCharacterFileName(clientId);
+        return charFileName.empty() ? "" : outputDirectory + charFileName + ".ini";
+    }
+
+
+    static std::vector<std::string>& split(const std::string& str, char delim)
+    {
+        std::vector<std::string> result;
+        std::stringstream ss(str);
+        std::string item;
+        while (getline(ss, item, delim))
+            result.push_back(item);
+        return result;
+    }
+
+    static std::unordered_set<InsuranceType> ReadEnabledInsuranceTypes(const uint clientId)
+    {
+        INI_Reader ini;
+        if (ini.open(GetInsuranceFilePath(clientId).c_str(), false))
+        {
+            while (ini.read_header())
+            {
+                if (ini.is_header("General"))
+                {
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("insured"))
+                        {
+                            const std::string result = ini.get_value_ptr();
+
+                            while (result.find(','))
+
+                            break;
+                        }
+                    }
+                }
+            }
+            ini.close();
+        }
+        else
+            return;
+
+
         const std::string hookUserFilePath = GetHookUserFilePath(clientId);
 
         std::wstring characterFileNameWS;
@@ -96,7 +157,7 @@ namespace Insurance
         return currentInsuranceTypes;
     }
 
-    bool IsArchetypeTypeEquipment(const Archetype::AClassType archetypeType)
+    static bool IsArchetypeTypeEquipment(const Archetype::AClassType archetypeType)
     {
         return archetypeType == Archetype::SHIELD_GENERATOR ||
                archetypeType == Archetype::THRUSTER ||
@@ -106,7 +167,7 @@ namespace Insurance
                archetypeType == Archetype::COUNTER_MEASURE_DROPPER;
     }
 
-    bool IsArchetypeTypeConsumable(const Archetype::AClassType archetypeType)
+    static bool IsArchetypeTypeConsumable(const Archetype::AClassType archetypeType)
     {
         return archetypeType == Archetype::MINE ||
                archetypeType == Archetype::MUNITION ||
@@ -115,26 +176,13 @@ namespace Insurance
                archetypeType == Archetype::REPAIR_KIT;
     }
 
-    int CalculateInsuranceCost(const std::list<InsuredCargoItem> insuredCargoList)
-    {
-        float totalPrice = 0.0f;
-        for (auto const& cargo : insuredCargoList)
-        {
-            const float price = cargo.goodInfo.fPrice * cargo.cargoInfo.iCount;
-            const Archetype::Equipment* equipment = Archetype::GetEquipment(cargo.cargoInfo.iArchID);
-            const auto archetypeType = equipment->get_class_type();
-            totalPrice += IsArchetypeTypeEquipment(archetypeType) ? price * insuranceEquipmentCostFactor : price;
-        }
-        return std::max(0, static_cast<int>(totalPrice));
-    }
-
-    bool IsEquipmentInsuranceActive(const uint clientId)
+    static bool IsEquipmentInsuranceActive(const uint clientId)
     {
         const auto& insuredTypes = ReadEnabledInsuranceTypes(clientId);
         return insuredTypes.contains(InsuranceType::Equipment);
     }
 
-    bool IsConsumableInsuranceActive(const Archetype::AClassType archetypeType, const uint clientId)
+    static bool IsConsumableInsuranceActive(const Archetype::AClassType archetypeType, const uint clientId)
     {
         const auto& insuredTypes = ReadEnabledInsuranceTypes(clientId);
         return  insuredTypes.contains(InsuranceType::Mines) && archetypeType == Archetype::MINE ||
@@ -144,339 +192,448 @@ namespace Insurance
                 insuredTypes.contains(InsuranceType::Nanobots) && archetypeType == Archetype::REPAIR_KIT;
     }
 
-    std::list<CARGO_INFO> GetCargoList(const uint clientId)
+    struct InsuredEquip
     {
-        int remainingHoldSize;
-        std::list<CARGO_INFO> cargoList;
-        if (HkEnumCargo(ARG_CLIENTID(clientId), cargoList, remainingHoldSize) != HKE_OK)
-            return std::list<CARGO_INFO>();
-        return cargoList;
+        uint archId = 0;
+        uint count = 0;
+        std::string hardpoint = "";
+    };
+
+    static int GetMaxShipHullAndCollGroupsRepairCost(const uint clientId)
+    {
+        const Archetype::Ship* ship = Archetype::GetShip(Players[clientId].iShipArchetype);
+        const float shipMaxHitpoints = ship->fHitPoints;
+        int repairCost = static_cast<int>(shipMaxHitpoints * shipRepairCostFactor);
+
+        Archetype::CollisionGroup* archCollGroup = ship->collisiongroup;
+        while (archCollGroup)
+        {
+            repairCost += static_cast<int>(std::round(archCollGroup->hitPts * shipRepairCostFactor));
+            archCollGroup = archCollGroup->next;
+        }
+        return repairCost;
     }
 
-    std::list<InsuredCargoItem> CollectInsuredCargo(const uint clientId, const bool onlyFreeItems)
+    static std::wstring PrintMoney(const int64_t amount)
     {
-        std::list<InsuredCargoItem> insuredCargoList;
-        const std::list<CARGO_INFO> cargoList = GetCargoList(clientId);
-        for (auto const& cargo : cargoList)
+        std::wstring result = std::to_wstring(amount);
+        for (int pos = result.size() - 3; pos > 0; pos = pos - 3)
+            result = result.insert(pos, L",");
+        return L"$" + result;
+    }
+
+    static void CreateFixedEquipInsurance(const uint clientId)
+    {
+        const auto& filePath = GetInsuranceFilePath(clientId);
+        for (const auto& equip : Players[clientId].equipDescList.equip)
         {
-            if (cargo.bMission)
+            if (!equip.bMission)
                 continue;
 
-            const Archetype::Equipment* equipment = Archetype::GetEquipment(cargo.iArchID);
-            auto archetypeType = equipment->get_class_type();
-            
-            if (cargo.bMounted && IsArchetypeTypeEquipment(archetypeType) && (onlyFreeItems || IsEquipmentInsuranceActive(clientId)))
-            {
-                const GoodInfo* goodInfo = GoodList::find_by_id(cargo.iArchID);
-                if (goodInfo)
-                {
-                    if (onlyFreeItems && (goodInfo->fPrice > 0.0f))
-                        continue;
-                    InsuredCargoItem insuredCargo;
-                    insuredCargo.cargoInfo = cargo;
-                    insuredCargo.goodInfo = *goodInfo;
-                    insuredCargoList.push_back(insuredCargo);
-                }
-            }
-            else if (!onlyFreeItems && IsConsumableInsuranceActive(archetypeType, clientId))
-            {
-                uint nanobotId;
-                pub::GetGoodID(nanobotId, NANOBOT_NICKNAME);
-                uint shieldBatteryId;
-                pub::GetGoodID(shieldBatteryId, SHIELDBATTERY_NICKNAME);
-                uint maxNanobots = std::numeric_limits<uint>::max();
-                uint maxShieldBatteries = std::numeric_limits<uint>::max();
-                const Archetype::Ship* ship = Archetype::GetShip(Players[clientId].iShipArchetype);
-                if (ship)
-                {
-                    maxNanobots = ship->iMaxNanobots;
-                    maxShieldBatteries = ship->iMaxShieldBats;
-                }
+            const Archetype::Equipment* archetype = Archetype::GetEquipment(equip.get_arch_id());
+            const GoodInfo* good = GoodList::find_by_id(equip.get_arch_id());
+            if (!archetype || !good)
+                continue;
 
-                const GoodInfo* goodInfo = GoodList::find_by_id(cargo.iArchID);
-                if (goodInfo)
-                {
-                    InsuredCargoItem insuredCargo;
-                    insuredCargo.cargoInfo = cargo;
-                    insuredCargo.goodInfo = *goodInfo;
-                    if ((goodInfo->iArchID == nanobotId) && (static_cast<uint>(cargo.iCount) > maxNanobots))
-                    {
-                        CARGO_INFO insured_NB = cargo;
-                        insured_NB.iCount = maxNanobots;
-                        insuredCargo.cargoInfo = insured_NB;
-                    }
-                    if ((goodInfo->iArchID == shieldBatteryId) && (static_cast<uint>(cargo.iCount) > maxShieldBatteries))
-                    {
-                        CARGO_INFO insured_SB = cargo;
-                        insured_SB.iCount = maxShieldBatteries;
-                        insuredCargo.cargoInfo = insured_SB;
-                    }
-                    insuredCargoList.push_back(insuredCargo);
-                }
-            }
+            const Archetype::AClassType archetypeType = archetype->get_class_type();
+
+            // Equip with price=0 is fixed equipment and must always be restored
+            if (IsArchetypeTypeEquipment(archetypeType) && good->fPrice == 0.0f)
+                IniWrite(filePath, "Insured", "equipment", std::to_string(equip.get_arch_id()) + ", 1, " + equip.get_hardpoint().value);
         }
-        return insuredCargoList;
     }
 
-    void CreateNewInsurance(const uint clientId, bool onlyFreeItems)
+    static void CreateFullInsurance(const uint clientId)
     {
+        std::vector<InsuredEquip> insuredEquip;
+        int totalCost = GetMaxShipHullAndCollGroupsRepairCost(clientId);
+        for (const auto& equip : Players[clientId].equipDescList.equip)
+        {
+            if (!equip.bMission)
+                continue;
+
+            const Archetype::Equipment* archetype = Archetype::GetEquipment(equip.get_arch_id());
+            const GoodInfo* good = GoodList::find_by_id(equip.get_arch_id());
+            if (!archetype || !good)
+                continue;
+
+            const Archetype::AClassType archetypeType = archetype->get_class_type();
+
+            // Equip with price=0 is fixed equipment and must always be restored
+            if (IsArchetypeTypeEquipment(archetypeType) && (good->fPrice == 0.0f || IsEquipmentInsuranceActive(clientId)))
+            {
+                totalCost += static_cast<int>(std::floor(good->fPrice));
+                InsuredEquip insured;
+                insured.archId = equip.get_arch_id();
+                insured.count = 1;
+                insured.hardpoint = equip.get_hardpoint().value;
+                insuredEquip.push_back(insured);
+            }
+            else if (IsArchetypeTypeConsumable(archetypeType) && IsConsumableInsuranceActive(archetypeType, clientId))
+            {
+                totalCost += static_cast<int>(std::floor(good->fPrice)) * equip.get_count();
+                InsuredEquip insured;
+                insured.archId = equip.get_arch_id();
+                insured.count = equip.get_count();
+                insured.hardpoint = equip.get_hardpoint().value;
+                insuredEquip.push_back(insured);
+            }
+        }
+
         int playerCash = 0;
-        if (!onlyFreeItems)
-        {
-            if (HK_ERROR error = HkGetCash(ARG_CLIENTID(clientId), playerCash); error != HKE_OK)
-            {
-                PrintUserCmdText(clientId, L"ERR Get cash failed err=" + HkErrGetText(error));
-                return;
-            }
-        }
-
-        std::list<InsuredCargoItem> insuredCargoList = CollectInsuredCargo(clientId, onlyFreeItems);
-        if (!onlyFreeItems && (insuredCargoList.size() == 0))
-        {
-            PrintUserCmdText(clientId, L"You own nothing that needs to be insured.");
-            return;
-        }
-
-        int totalPrice = !onlyFreeItems ? CalculateInsuranceCost(insuredCargoList) : 0;
-
-        if (totalPrice > playerCash)
-        {
-            PrintUserCmdText(clientId, L"Insurance failed. You need to own at least $" + ToMoneyStr(totalPrice) + L".");
-            // If the player has not enough money, proceed with only free items which always must be insured.
-            totalPrice = 0;
-            onlyFreeItems = true;
-            insuredCargoList = CollectInsuredCargo(clientId, onlyFreeItems);
-            if (insuredCargoList.size() == 0)
-                return;
-        }
-
-        if (totalPrice > 0)
-        {
-            if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), -totalPrice); error != HKE_OK)
-            {
-                PrintUserCmdText(clientId, L"ERR Remove cash failed err=" + HkErrGetText(error));
-                return;
-            }
-        }
-
-        if (HkAntiCheat(clientId) != HKE_OK)
-        {
-            PrintUserCmdText(clientId, L"ERR Insurance-Booking failed");
-            const std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-            AddLog("NOTICE: Possible cheating when book Insurance %s credits from %s ", wstos(ToMoneyStr(totalPrice)).c_str(), wstos(characterNameWS).c_str());
-            return;
-        }
-
-        char currentDirectory[MAX_PATH];
-        GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-        const std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
-        std::wstring characterFileNameWS;
-        if (HK_ERROR error = HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS); error != HKE_OK)
+        if (HK_ERROR error = HkGetCash(ARG_CLIENTID(clientId), playerCash); error != HKE_OK)
         {
             PrintUserCmdText(clientId, L"ERR Get cash failed err=" + HkErrGetText(error));
             return;
         }
-        const std::string characterFileName = wstos(characterFileNameWS);
-        const std::string insuranceFilePath = insurancesDirectory + characterFileName + INSURANCE_FILE_EXTENSION;
-
-        IniWrite(insuranceFilePath, INSURANCE_INI_SECTION, TOTAL_PRICE_KEY, std::to_string(totalPrice));
-        IniWrite(insuranceFilePath, INSURANCE_INI_SECTION, ITEMS_COUNT_KEY, std::to_string(insuredCargoList.size()));
-
-        std::list<InsuredCargoItem>::iterator insuredCargo = insuredCargoList.begin();
-        int equipmentIndex = 0;
-        for (auto const& insuredCargo : insuredCargoList)
+        if (totalCost > playerCash)
         {
-            const std::string section = EQUIP_PREFIX_INI_SECTION + std::to_string(equipmentIndex++);
-            const GoodInfo gi = insuredCargo.goodInfo;
-            const CARGO_INFO ci = insuredCargo.cargoInfo;
-            IniWrite(insuranceFilePath, section, ITEM_MOUNTED_KEY, std::to_string(ci.bMounted));
-            IniWrite(insuranceFilePath, section, ITEM_HITPOINTS_PERCENTAGE_KEY, std::to_string(ci.fStatus));
-            IniWrite(insuranceFilePath, section, ITEM_HARDPOINT_KEY, ci.hardpoint.value);
-            IniWrite(insuranceFilePath, section, ITEM_ARCHETYPE_ID_KEY, std::to_string(ci.iArchID));
-            IniWrite(insuranceFilePath, section, ITEM_COUNT_KEY, std::to_string(ci.iCount));
-            IniWrite(insuranceFilePath, section, ITEM_ID_KEY, std::to_string(ci.iID));
-            const Archetype::Equipment* equipment = Archetype::GetEquipment(ci.iArchID);
-            const auto archetypeType = equipment->get_class_type();
-            const float price = IsArchetypeTypeConsumable(archetypeType) ? gi.fPrice : gi.fPrice * insuranceEquipmentCostFactor;
-            IniWrite(insuranceFilePath, section, ITEM_PRICE_KEY, std::to_string(price));
-            IniWrite(insuranceFilePath, section, ITEM_ARCHETYPE_TYPE_KEY, std::to_string(static_cast<int>(archetypeType)));
-        }
-
-        if (onlyFreeItems)
-        {
-            PrintUserCmdText(clientId, L"Pre-mounted equipment is insured.");
-        }
-        else
-        {
-            PrintUserCmdText(clientId, L"Your ship is insured with a worth of $" + ToMoneyStr(totalPrice) + L". Unspent insurance deposit will be returned on landing.");
-        }
-    }
-
-    std::string GetInsuranceFilePath(const std::wstring characterFileName)
-    {
-        char currentDirectory[MAX_PATH];
-        GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-        const std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
-        return insurancesDirectory + wstos(characterFileName) + INSURANCE_FILE_EXTENSION;
-    }
-
-    void DeleteInsuranceFileIfExisting(const std::wstring characterFileName)
-    {
-        const std::string insuranceFilePath = GetInsuranceFilePath(characterFileName);
-        if (IsInsuranceFileExisting(insuranceFilePath))
-            DeleteFile(insuranceFilePath.c_str());
-    }
-
-    void UseInsurance(const uint clientId)
-    {
-        char currentDirectory[MAX_PATH];
-        GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-        const std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
-        std::wstring characterFileNameWS;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) != HKE_OK)
+            PrintUserCmdText(clientId, L"Insurance failed. You need at least " + PrintMoney(totalCost) + L".");
             return;
-        const std::string insuranceFilePath = insurancesDirectory + wstos(characterFileNameWS) + INSURANCE_FILE_EXTENSION;
-
-        if (!IsInsuranceFileExisting(insuranceFilePath))
-            return;
-
-        const int insuredEquipmentCount = IniGetI(insuranceFilePath, INSURANCE_INI_SECTION, ITEMS_COUNT_KEY, 0);
-
-        std::list<RestoreCargoItem> insuredCargoList;
-        for (int equipmentIndex = 0; equipmentIndex < insuredEquipmentCount; equipmentIndex++)
-        {
-            const std::string section = EQUIP_PREFIX_INI_SECTION + std::to_string(equipmentIndex);
-
-            CARGO_INFO cargoInfo;
-            cargoInfo.bMission = false;
-            cargoInfo.bMounted = IniGetB(insuranceFilePath, section, ITEM_MOUNTED_KEY, true);
-            cargoInfo.fStatus = IniGetF(insuranceFilePath, section, ITEM_HITPOINTS_PERCENTAGE_KEY, 1.0f);
-            CacheString hardpoint;
-            hardpoint.value = StringAlloc(IniGetS(insuranceFilePath, section, ITEM_HARDPOINT_KEY, "").c_str(), false);
-            cargoInfo.hardpoint = hardpoint;
-            cargoInfo.iArchID = IniGetI(insuranceFilePath, section, ITEM_ARCHETYPE_ID_KEY, 0);
-            cargoInfo.iCount = IniGetI(insuranceFilePath, section, ITEM_COUNT_KEY, 0);
-            cargoInfo.iID = IniGetI(insuranceFilePath, section, ITEM_ID_KEY, 0);
-
-            RestoreCargoItem insuredCargo;
-            insuredCargo.cargoInfo = cargoInfo;
-            insuredCargo.price = IniGetF(insuranceFilePath, section, ITEM_PRICE_KEY, 0);
-            insuredCargoList.push_back(insuredCargo);
         }
 
-        const std::list<CARGO_INFO> currentCargoList = GetCargoList(clientId);
-        std::list<CARGO_INFO> filteredCurrentCargoList;
-        for (auto const& cargo : currentCargoList)
-        {
-            const Archetype::Equipment* equipment = Archetype::GetEquipment(cargo.iArchID);
-            const auto archetypeType = equipment->get_class_type();
+        const auto& filePath = GetInsuranceFilePath(clientId);
+        for (const auto& equip : insuredEquip)
+            IniWrite(filePath, "Insured", "equipment", std::to_string(equip.archId) + ", " + std::to_string(equip.count) + ", " + equip.hardpoint);
 
-            if (cargo.bMounted && IsArchetypeTypeEquipment(archetypeType))
-                filteredCurrentCargoList.push_back(cargo);
-            else if (IsArchetypeTypeConsumable(archetypeType))
-                filteredCurrentCargoList.push_back(cargo);
-        }
+        PrintUserCmdText(clientId, L"Insurance deposited " + PrintMoney(totalCost) + L" until next dock at a base.");
+    }
 
-        const std::wstring characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);
-        bool somethingWasRestored = false;
-        bool consumablesCouldNotBeRestored = false;
-        float totalRestorationPrice = 0.0f;
-        for (auto const& insuredCargo : insuredCargoList)
+    static int RepairShipHull(const uint clientId)
+    {
+        const Archetype::Ship* ship = Archetype::GetShip(Players[clientId].iShipArchetype);
+        const float shipMaxHitpoints = ship->fHitPoints;
+        const int repairCost = static_cast<int>(std::round((1.0f - Players[clientId].fRelativeHealth) * shipMaxHitpoints * shipRepairCostFactor));
+        Server.ReqHullStatus(1.0f, clientId);
+        return repairCost;
+    }
+
+    static int RepairCollisionGroups(const uint clientId)
+    {
+        int repairCost = 0;
+        const Archetype::Ship* ship = Archetype::GetShip(Players[clientId].iShipArchetype);
+        const float shipMaxHitpoints = ship->fHitPoints;
+        st6::list<CollisionGroupDesc, st6::allocator<CollisionGroupDesc> > repairedCollGroups;
+        for (const auto& collGroup : Players[clientId].collisionGroupDesc)
         {
-            const Archetype::Equipment* equipment = Archetype::GetEquipment(insuredCargo.cargoInfo.iArchID);
-            const auto archetypeType = equipment->get_class_type();
-            int foundCurrentCargoCount = 0;
-            if (IsArchetypeTypeEquipment(archetypeType))
+            Archetype::CollisionGroup* archCollGroup = ship->collisiongroup;
+            // Find archetype of current collision group
+            while (archCollGroup)
             {
-                for (auto const& currentCargo : filteredCurrentCargoList)
+                if (collGroup.id == archCollGroup->id)
+                    break;
+                archCollGroup = archCollGroup->next;
+            }
+
+            // Calculate repair cost and repair it
+            if (archCollGroup)
+            {
+                const float collisionGroupMaxHitpoints = archCollGroup->hitPts;
+                repairCost += static_cast<int>(std::round((1.0f - collGroup.health) * collisionGroupMaxHitpoints * shipRepairCostFactor));
+            }
+
+            CollisionGroupDesc repairedGroup;
+            repairedGroup.id = collGroup.id;
+            repairedGroup.health = 1.0f;
+            repairedCollGroups.push_back(repairedGroup);
+        }
+        Server.ReqCollisionGroups(repairedCollGroups, clientId);
+        return repairCost;
+    }
+
+    static int RepairEquipment(const uint clientId)
+    {
+        int repairCost = 0;
+        EquipDescList repairedEquip;
+        for (EquipDesc equip : Players[clientId].equipDescList.equip)
+        {
+            if (equip.bMounted) // Commodities in cargo pods also can count as mounted
+            {
+                const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
+                if (equipment && IsArchetypeTypeEquipment(equipment->get_class_type()))
                 {
-                    if (insuredCargo.cargoInfo.hardpoint.value == currentCargo.hardpoint.value)
+                    const auto& good = GoodList::find_by_id(equip.iArchID);
+                    repairCost += static_cast<int>(std::round((1 - equip.fHealth) * good->fPrice * equipmentRepairCostFactor));
+                    equip.fHealth = 1.0f;
+                }
+            }
+            repairedEquip.equip.push_back(equip);
+        }
+
+        // Repair all present equipment
+        Players[clientId].equipDescList.equip.clear();
+        Players[clientId].equipDescList.append(repairedEquip);
+        // Set shadow list to prevent anti cheat detection
+        Players[clientId].lShadowEquipDescList.equip.clear();
+        Players[clientId].lShadowEquipDescList.append(repairedEquip);
+        Server.ReqEquipment(repairedEquip, clientId);
+        return repairCost;
+    }
+
+    struct RestoreOutput
+    {
+        int cost = 0;
+        bool notEnoughCargoHold = false;
+    };
+
+    static RestoreOutput RestoreInsuredEquipment(const uint clientId)
+    {
+        // Get all insured equipment
+        std::vector<InsuredEquip> insuredEquipment;
+        const std::string insuranceFilePath = GetInsuranceFilePath(clientId);
+        INI_Reader ini;
+        if (ini.open(insuranceFilePath.c_str(), false))
+        {
+            while (ini.read_header())
+            {
+                if (ini.is_header("Insured"))
+                {
+                    while (ini.read_value())
                     {
-                        foundCurrentCargoCount = currentCargo.iCount;
+                        if (ini.is_value("equipment"))
+                        {
+                            InsuredEquip equip;
+                            equip.archId = ini.get_value_int(0);
+                            equip.count = ini.get_value_int(1);
+                            equip.hardpoint = ini.get_value_string(2);
+                            insuredEquipment.push_back(equip);
+                        }
+                    }
+                }
+            }
+            ini.close();
+        }
+        
+        if (insuredEquipment.empty())
+            return;
+
+        const EquipDescList& playerEquipList = Players[clientId].equipDescList;
+        const Archetype::Ship* ship = Archetype::GetShip(Players[clientId].iShipArchetype);
+        float remainingCargoSpace = ship->fHoldSize - Players[clientId].equipDescList.get_cargo_space_occupied();
+        std::vector<InsuredEquip> equipToAdd;
+        bool notEnoughCargoHold = false;
+        float restoreCost = 0.0f;
+        // Process insured equipment
+        for (const auto& insuredEquip : insuredEquipment)
+        {
+            // Mounted Equipment
+            if (!insuredEquip.hardpoint.empty())
+            {
+                // Check if the hardpoint is still in use on the ship
+                bool alreadyPresent = false;
+                for (const auto& presentEquip : playerEquipList.equip)
+                {
+                    alreadyPresent = presentEquip.bMounted && insuredEquip.hardpoint.compare(presentEquip.szHardPoint.value) == 0;
+                    if (alreadyPresent)
+                    {
+                        if (insuredEquip.archId != presentEquip.iArchID)
+                            PrintUserCmdText(clientId, L"Report to Admin: Equip on hardpoint not matching: " + stows(insuredEquip.hardpoint) + L", " + std::to_wstring(insuredEquip.archId) + L" : " + std::to_wstring(presentEquip.iArchID));
                         break;
                     }
                 }
+                if (alreadyPresent)
+                    continue;
+
+                // Create new equipment and add to cost list
+                equipToAdd.push_back(insuredEquip);
+                const GoodInfo* good = GoodList::find_by_id(insuredEquip.archId);
+                if (good)
+                    restoreCost += good->fPrice;
             }
             else
             {
-                for (auto const& currentCargo : filteredCurrentCargoList)
+                st6::list<EquipDesc>::const_iterator presentEquip;
+                for (presentEquip = playerEquipList.equip.begin(); presentEquip != playerEquipList.equip.end(); presentEquip++)
                 {
-                    if (currentCargo.iArchID == insuredCargo.cargoInfo.iArchID)
-                    {
-                        foundCurrentCargoCount = currentCargo.iCount;
+                    if (insuredEquip.archId == presentEquip->iArchID)
                         break;
+                }
+
+                // The consumable exists already
+                if (presentEquip != playerEquipList.equip.end())
+                {
+                    int countDiff = insuredEquip.count - presentEquip->iCount;
+                    if (countDiff <= 0)
+                        continue;
+
+                    const Archetype::Equipment* equipment = Archetype::GetEquipment(insuredEquip.archId);
+                    if (equipment)
+                    {
+                        if (equipment->get_class_type() == Archetype::AClassType::REPAIR_KIT)
+                        {
+                            countDiff = static_cast<int>(std::min(presentEquip->iCount + countDiff, ship->iMaxNanobots - presentEquip->iCount));
+                        }
+                        else if (equipment->get_class_type() == Archetype::AClassType::SHIELD_BATTERY)
+                        {
+                            countDiff = static_cast<int>(std::min(presentEquip->iCount + countDiff, ship->iMaxShieldBats - presentEquip->iCount));
+                        }
+                        if (countDiff <= 0)
+                            continue;
+
+                        const float requiredCargoSpace = equipment->fVolume * countDiff;
+                        if (remainingCargoSpace - requiredCargoSpace < 0.0f)
+                        {
+                            notEnoughCargoHold = true;
+                            countDiff = static_cast<int>(std::floor(remainingCargoSpace / equipment->fVolume));
+                        }
+                        remainingCargoSpace -= equipment->fVolume * countDiff;
+                    }
+                    else
+                        continue;
+
+                    // Fill up and add to cost list
+                    if (countDiff > 0)
+                    {
+                        equipToAdd.push_back(insuredEquip);
+                        equipToAdd.back().count = countDiff;
+                        const GoodInfo* good = GoodList::find_by_id(insuredEquip.archId);
+                        if (good)
+                            restoreCost += good->fPrice * countDiff;
+                    }
+                }
+                else
+                {
+                    int count = insuredEquip.count;
+                    const Archetype::Equipment* equipment = Archetype::GetEquipment(insuredEquip.archId);
+                    if (equipment)
+                    {
+                        if (equipment->get_class_type() == Archetype::AClassType::REPAIR_KIT)
+                        {
+                            count = std::min(count, static_cast<int>(ship->iMaxNanobots));
+                        }
+                        else if (equipment->get_class_type() == Archetype::AClassType::SHIELD_BATTERY)
+                        {
+                            count = std::min(count, static_cast<int>(ship->iMaxShieldBats));
+                        }
+
+                        const float requiredCargoSpace = equipment->fVolume * count;
+                        if (remainingCargoSpace - requiredCargoSpace < 0.0f)
+                        {
+                            notEnoughCargoHold = true;
+                            count = static_cast<int>(std::floor(remainingCargoSpace / equipment->fVolume));
+                        }
+                        remainingCargoSpace -= equipment->fVolume * count;
+                    }
+                    else
+                        continue;
+
+                    // Create new equipment and add to cost list
+                    if (count > 0)
+                    {
+                        equipToAdd.push_back(insuredEquip);
+                        equipToAdd.back().count = count;
+                        const GoodInfo* good = GoodList::find_by_id(insuredEquip.archId);
+                        if (good)
+                            restoreCost += good->fPrice * count;
                     }
                 }
             }
-
-            if (insuredCargo.cargoInfo.iCount <= foundCurrentCargoCount)
-            {
-                continue;
-            }
-
-            if (IsArchetypeTypeConsumable(archetypeType))
-            {
-                uint itemsToAdd = std::max(insuredCargo.cargoInfo.iCount - foundCurrentCargoCount, 0);
-                if (equipment->fVolume > 0.0f)
-                {
-                    float remainingHoldSize;
-                    pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-                    const uint actualItemsToAdd = std::min(itemsToAdd, static_cast<uint>(remainingHoldSize / equipment->fVolume));
-                    consumablesCouldNotBeRestored = consumablesCouldNotBeRestored || actualItemsToAdd != itemsToAdd;
-                    itemsToAdd = actualItemsToAdd;
-                }
-                if ((itemsToAdd > 0) && HkAddCargo(ARG_CLIENTID(clientId), insuredCargo.cargoInfo.iArchID, itemsToAdd, false) == HKE_OK)
-                {
-                    totalRestorationPrice += itemsToAdd * insuredCargo.price;
-                    somethingWasRestored = true;
-                }
-            }
-            else if (IsArchetypeTypeEquipment(archetypeType) && foundCurrentCargoCount == 0)
-            {
-                const std::string hardpoint = insuredCargo.cargoInfo.hardpoint.value;
-                HkAddEquip(ARG_CLIENTID(clientId), insuredCargo.cargoInfo.iArchID, hardpoint);
-            }
         }
 
-        const int insuredTotalPrice = IniGetI(insuranceFilePath, INSURANCE_INI_SECTION, TOTAL_PRICE_KEY, 0);
-        const int moneyBack = std::max(0, insuredTotalPrice - static_cast<int>(totalRestorationPrice));
-        if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), moneyBack); error != HKE_OK)
+        const std::wstring clientWS = ARG_CLIENTID(clientId);
+        // Add all items as cargo or equipment
+        for (const auto& equipToRestore : equipToAdd)
         {
-            PrintUserCmdText(clientId, L"ERR Add cash failed err=" + HkErrGetText(error));
+            if (equipToRestore.hardpoint.empty())
+                HkAddCargo(clientWS, equipToRestore.archId, equipToRestore.count, false);
+            else
+                HkAddEquip(clientWS, equipToRestore.archId, equipToRestore.hardpoint, true);
+        }
+
+        RestoreOutput result;
+        result.cost = static_cast<int>(restoreCost);
+        result.notEnoughCargoHold = notEnoughCargoHold;
+        return result;
+    }
+
+    static void UseInsurance(const uint clientId)
+    {
+        // Get all insured equipment
+        int pawn = 0;
+        bool onlyFixedEquip = false;
+        const std::string insuranceFilePath = GetInsuranceFilePath(clientId);
+        INI_Reader ini;
+        if (ini.open(insuranceFilePath.c_str(), false))
+        {
+            while (ini.read_header())
+            {
+                if (ini.is_header("General"))
+                {
+                    while (ini.read_value())
+                    {
+                        if (ini.is_value("only_fixed_equipment"))
+                            onlyFixedEquip = ini.get_bool(0);
+                        else if (ini.is_value("pawn"))
+                            pawn = ini.get_value_int(0);
+                    }
+                }
+            }
+            ini.close();
+        }
+        else
+            return;
+
+        int shipRepairCost = 0;
+        int equipmentRepairCost = 0;
+        if (!onlyFixedEquip)
+        {
+            shipRepairCost = RepairShipHull(clientId);
+            shipRepairCost += RepairCollisionGroups(clientId);
+            equipmentRepairCost = RepairEquipment(clientId);
+        }
+        const auto& restoreEquipResult = RestoreInsuredEquipment(clientId);
+
+        // Calculate total price and remove from bank account
+        const int totalPrice = shipRepairCost + equipmentRepairCost + restoreEquipResult.cost;
+        const int moneyBack = std::max(0, pawn - totalPrice);
+        if (moneyBack > 0)
+        {
+            if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), moneyBack); error != HKE_OK)
+            {
+                PrintUserCmdText(clientId, L"ERR Add cash failed err=" + HkErrGetText(error));
+            }
         }
 
         std::wstring restorationOutput = L"";
-        if (somethingWasRestored)
-            restorationOutput += L"Your insured items were restored. ";
-        if (consumablesCouldNotBeRestored)
+        if (shipRepairCost > 0 || equipmentRepairCost > 0)
+            restorationOutput = L"Repairs done";
+        if (restoreEquipResult.cost > 0)
+        {
+            if (!restorationOutput.empty())
+                restorationOutput += L" and ";
+            else
+                restorationOutput = L"Your ";
+            restorationOutput += L"insured items were restored";
+        }
+        if (!restorationOutput.empty())
+            restorationOutput += L". ";
+        if (restoreEquipResult.notEnoughCargoHold)
             restorationOutput += L"Some consumables could not be restored due to full cargo hold. ";
         if (moneyBack > 0)
-            restorationOutput += L"Unspent $" + ToMoneyStr(moneyBack) + L" insurance deposit were returned.";
+            restorationOutput += L"Unspent $" + PrintMoney(moneyBack) + L" from insurance returned.";
         if (!restorationOutput.empty())
             PrintUserCmdText(clientId, restorationOutput);
 
-        DeleteInsuranceFileIfExisting(characterFileNameWS);
+        HkSaveChar(clientId);
+        IniWrite(insuranceFilePath, "General", "pawn", "0");
+        IniDelSection(insuranceFilePath, "Insured");
     }
 
-    bool IsInsuranceRequested(const uint clientId)
+    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
     {
-        std::wstring characterFileNameWS;
-        if (HK_ERROR error = HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS); error != HKE_OK)
-            return false;
-        const std::string hookUserFilePath = GetHookUserFilePath(clientId);
-        return IniGetS(hookUserFilePath, INSURANCE_PREFIX_INI_SECTION + wstos(characterFileNameWS), AUTOINSURANCE_INI_SECTION, INSURANCE_OFF_VALUE) == INSURANCE_ON_VALUE;
+        returncode = DEFAULT_RETURNCODE;
+
+        UseInsurance(clientId);
     }
 
-    bool IsInsurancePresent(const uint clientId)
+    void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
     {
-        char currentDirectory[MAX_PATH];
-        GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-        const std::string insurancesDirectory = std::string(currentDirectory) + Globals::INSURANCE_STORE;
-        std::wstring characterFileNameWS;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileNameWS) != HKE_OK)
-            return false;
-        const std::string insuranceFilePath = insurancesDirectory + wstos(characterFileNameWS) + INSURANCE_FILE_EXTENSION;
-        return IsInsuranceFileExisting(insuranceFilePath);
+        returncode = DEFAULT_RETURNCODE;
+
+        if (insuranceType == InsuranceType::None)
+            CreateFixedEquipInsurance(clientId);
+        else
+            CreateFullInsurance(clientId);
     }
 
     InsuranceType GetInsuranceTypeFromString(const std::string& value)

@@ -1514,7 +1514,7 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
     // Add to check-list which is being compared to the users equip-list when
     // saving char to fix "Ship or Equipment not sold on base" kick
     EquipDesc ed;
-    ed.sID = Players[iClientID].lastEquipId;
+    ed.sID = Players[iClientID].lastEquipId++;
     ed.iCount = 1;
     ed.iArchID = iGoodID;
     Players[iClientID].lShadowEquipDescList.add_equipment_item(ed, false);
@@ -1553,13 +1553,14 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
     hardpoint.value = StringAlloc(p, false);
 
     int iOne = 1;
+    int iMission = 0;
     int iMounted = bMounted;
     float fHealth = 1;
     CacheString *pHP = &hardpoint;
     __asm {
         push iOne
+        push iMission
         push iMounted
-        push iOne
         push fHealth
         push iOne
         push pHP

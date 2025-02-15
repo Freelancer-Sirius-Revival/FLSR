@@ -10,6 +10,9 @@ File: EXE\Freelancer.exe
 # Changes the CreateMutex lpName parameter to an empty string, allowing multiple instances of Freelancer to run simultaneously. - M0tah
 1E6DCC: 00	[ "F" ]
 
+# Always assume best machine speed for determining default performance options. - BC46
+0A9326: EB	[ 7F ]
+
 
 ##########################################
 # Interface
@@ -38,7 +41,7 @@ File: EXE\Freelancer.exe
 174707: 00 00	[ 80 3E ]
 
 # Fixes a bug that causes the clickable area height of the main menu buttons to be incorrect on higher resolutions. - BC46
-1745D9: EB 02	[ DF 6C ]
+1745D9: 0F 1F 40 00	[ DF 6C 24 18 ]
 1745E6: D9 05 7C 20	[ D8 0D 54 25 ]
 
 # Interface volume can be controlled independently, thus no longer relying on the sound effects volume. - BC46

@@ -1,5 +1,6 @@
 ﻿// includes
 #include "Main.h"
+#include "Missions.h"
 
 // Mutex-Objekt definieren
 std::mutex m_Mutex;
@@ -83,6 +84,7 @@ void LoadSettings() {
         ConPrint(L"Module loaded: Crafting\n");
     }
 
+    Missions::LoadSettings();
 
     //DiscordBot     #############################################################################
     if (Modules::GetModuleState("DiscordBot"))
@@ -236,6 +238,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ConnectionLimiter::Login_After, PLUGIN_HkIServerImpl_Login_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ConnectionLimiter::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ObjDestroyed, PLUGIN_SolarDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
 
     return p_PI;
 }

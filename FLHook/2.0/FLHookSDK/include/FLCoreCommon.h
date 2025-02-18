@@ -12,6 +12,7 @@
 //////////////////////////////////////////////////////////////////////
 #ifndef _FLCORECOMMON_H_
 #define _FLCORECOMMON_H_
+#undef GetCurrentTime // Prevents possible conflicts with includes where a Windows Macro of the same name gets into the system
 
 #include "FLCoreDefs.h"
 #include <string>

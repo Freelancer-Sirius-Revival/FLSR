@@ -282,14 +282,17 @@ namespace IFF
     {
         switch (attitude)
         {
-        case Attitude::Hostile:
-            return L"hostile";
+            case Attitude::Hostile:
+                return L"hostile";
 
-        case Attitude::Neutral:
-            return L"neutral";
+            case Attitude::Neutral:
+                return L"neutral";
 
-        case Attitude::Allied:
-            return L"friendly";
+            case Attitude::Allied:
+                return L"friendly";
+
+            default:
+                return L"";
         }
     }
 

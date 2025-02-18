@@ -5,7 +5,7 @@ namespace ConnectionLimiter
 	uint maxParallelConnectionsPerIpAddress = 2;
 
 	static std::unordered_map<uint, std::wstring> ipAddressByClientId;
-	static std::unordered_map<std::wstring, int> ipAddressesCounter;
+	static std::unordered_map<std::wstring, ushort> ipAddressesCounter;
 
 	static bool canHaveUnlimitedCharacters(const uint clientId)
 	{
@@ -75,7 +75,7 @@ namespace ConnectionLimiter
 
 		std::wstring ipAddress = ipAddressByClientId[clientId];
 		if (ipAddress != L"")
-			ipAddressesCounter[ipAddress] = std::max(ipAddressesCounter[ipAddress] - 1, 0);
+			ipAddressesCounter[ipAddress] = static_cast<ushort>(std::max(ipAddressesCounter[ipAddress] - 1, 0));
 		ipAddressByClientId.erase(clientId);
 	}
 }

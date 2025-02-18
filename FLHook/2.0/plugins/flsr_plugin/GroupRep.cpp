@@ -54,7 +54,7 @@ namespace GroupReputation
                             repChange.groupId = groupId;
                         }
 
-                        if (ini.is_value("event") && strcmpi(ini.get_value_string(0), "object_destruction") == 0)
+                        if (ini.is_value("event") && std::string(ini.get_value_string(0)) == "object_destruction")
                             repChange.objectDestruction = ini.get_value_float(1);
 
                         if (ini.is_value("empathy_rate"))
@@ -108,7 +108,7 @@ namespace GroupReputation
 
         const HMODULE contentHandle = LoadContentDll();
         if (contentHandle)
-            maxReputationThreshold = 1.0f - *(double*)(DWORD(contentHandle) + 0x11B930);
+            maxReputationThreshold = 1.0f - static_cast<float>(*(double*)(DWORD(contentHandle) + 0x11B930));
     }
 
     void ChangeReputationRelative(const int clientReputationId, const int groupId, const float value)

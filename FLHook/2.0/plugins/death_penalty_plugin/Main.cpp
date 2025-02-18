@@ -423,7 +423,7 @@ void __stdcall PlayerLaunch_AFTER(unsigned int iShip, unsigned int iClientID) {
             // NEKURA - FLSR Adjust Calc | END
 
             // Calculate what the death penalty would be upon death
-            const int finalValue = std::trunc(fValue * fShipFractionOverride(set_fDeathPenalty));
+            const int finalValue = static_cast<int>(fValue * fShipFractionOverride(set_fDeathPenalty));
             if (finalValue < 0)
                 ConPrint(L"Death penalty is negative! " + std::to_wstring(finalValue));
             else

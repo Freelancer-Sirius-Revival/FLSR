@@ -269,7 +269,7 @@ namespace Cloak
 						else if (ini.is_value("jump_hole_decloak_radius"))
 							jumpHoleDecloakRadius = ini.get_value_float(0);
 						else if (ini.is_value("cloak_transition_prolongation"))
-							cloakTransitionProlongation = ini.get_value_float(0) * 1000;
+							cloakTransitionProlongation = static_cast<uint>(ini.get_value_float(0) * 1000.0f);
 						else if (ini.is_value("instant_cloaking_device_nickname"))
 							instantCloakingDeviceArchetypeId = CreateID(ini.get_value_string(0));
 					}
@@ -354,8 +354,8 @@ namespace Cloak
 			if (!equipment)
 				continue;
 			const Archetype::CloakingDevice* archetype = (Archetype::CloakingDevice*)equipment;
-			shipEffect.cloakDuration = archetype->fCloakinTime * 1000 + cloakTransitionProlongation;
-			shipEffect.uncloakDuration = archetype->fCloakoutTime * 1000 + cloakTransitionProlongation;
+			shipEffect.cloakDuration = static_cast<int>(archetype->fCloakinTime * 1000.0f) + cloakTransitionProlongation;
+			shipEffect.uncloakDuration = static_cast<int>(archetype->fCloakoutTime * 1000.0f) + cloakTransitionProlongation;
 		}
 
 		CollectNoCloakObjectsPerSystem();

@@ -241,7 +241,7 @@ namespace LootBoxes
 			// Items that cannot be stacked must be sent singular. This causes a lot of package traffic!
 			if (lootArchetypeCombinable[lootedItemArchetypeIdCount.first])
 			{
-				for (int count = 0; count < lootedItemArchetypeIdCount.second; count++)
+				for (uint count = 0; count < lootedItemArchetypeIdCount.second; count++)
 					HkAddCargo(ARG_CLIENTID(clientId), lootedItemArchetypeIdCount.first, 1, false);
 			}
 			// Stackable items will be sent as a batch to reduce package traffic.

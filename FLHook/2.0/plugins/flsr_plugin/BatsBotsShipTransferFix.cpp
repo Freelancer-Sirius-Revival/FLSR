@@ -78,6 +78,6 @@ namespace BatsBotsShipTransferFix
 				it++;
 		}
 		if (refund > 0.0f)
-			pub::Player::AdjustCash(clientId, std::ceil(refund));
+			pub::Player::AdjustCash(clientId, static_cast<int>(std::ceil(refund)));
 	}
 }

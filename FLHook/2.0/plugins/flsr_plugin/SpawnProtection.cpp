@@ -28,7 +28,7 @@ namespace SpawnProtection
 
     static void ActivateSpawnProtection(const uint shipId)
     {
-        pub::SpaceObj::SetInvincible(shipId, true, false, 0);
+        pub::SpaceObj::SetInvincible2(shipId, true, true, 0);
         protectionEndTimePerShip[shipId] = timeInMS() + protectionDuration;
     }
 
@@ -48,7 +48,7 @@ namespace SpawnProtection
                     if (IsInNoPvpSystem(shipId))
                         pub::SpaceObj::SetInvincible2(shipId, false, true, 0);
                     else
-                        pub::SpaceObj::SetInvincible(shipId, false, false, 0);
+                        pub::SpaceObj::SetInvincible2(shipId, false, false, 0);
                 }
                 it = protectionEndTimePerShip.erase(it);
             }

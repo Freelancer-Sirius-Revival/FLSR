@@ -30,7 +30,7 @@ namespace Missions
 			// Skip any further triggers if the mission has been ended.
 			if (trigger->mission->ended)
 			{
-				ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Skip execution due to ended missio.\n");
+				ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Skip execution due to ended mission.\n");
 				continue;
 			}
 			ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Execute\n");

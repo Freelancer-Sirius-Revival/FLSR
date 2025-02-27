@@ -403,11 +403,21 @@ namespace Missions
 				const auto mission = *it;
 				if (mission->name == targetNickname)
 				{
-					std::shared_ptr<ActChangeStateArchetype> actArch(new ActChangeStateArchetype());
-					actArch->state = MissionState::ABORT;
 					TriggerArchetype triggerArch;
 					triggerArch.name = "Manual Abort";
-					triggerArch.actions.push_back({ TriggerAction::Act_ChangeState, actArch });
+
+					std::shared_ptr<ActChangeStateArchetype> actChangeArchetype(new ActChangeStateArchetype());
+					actChangeArchetype->state = MissionState::ABORT;
+					triggerArch.actions.push_back({ TriggerAction::Act_ChangeState, actChangeArchetype });
+
+					for (const auto& object : mission->objects)
+					{
+						std::shared_ptr<ActDestroyArchetype> actDestroyArchetype(new ActDestroyArchetype());
+						actDestroyArchetype->destroyType = DestroyType::VANISH;
+						actDestroyArchetype->objName = object.name;
+						triggerArch.actions.push_back({ TriggerAction::Act_Destroy, actDestroyArchetype });
+					}
+
 					Trigger* abortionTrigger = new Trigger(mission, triggerArch);
 					abortionTrigger->QueueExecution();
 					returncode = SKIPPLUGINS_NOFUNCTIONCALL;

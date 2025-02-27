@@ -282,7 +282,7 @@ bool __stdcall MineDestroyed(IObjRW* iobj, bool isKill, uint killerId)
         case 1:
             if (!isKill)
             {
-                pub::SpaceObj::Destroy(((CSimple*)iobj->cobj)->id, DestroyType::FUSE);
+                pub::SpaceObj::Destroy(((CSimple*)iobj->cobj)->id, DestroyType::EXPLODE);
                 return false;
             }
             break;

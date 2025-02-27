@@ -73,7 +73,7 @@ struct SSPMunitionCollisionInfo
 enum DestroyType
 {
 	VANISH = 0,
-	FUSE = 1
+	EXPLODE = 1
 };
 
 struct SSPObjCollisionInfo

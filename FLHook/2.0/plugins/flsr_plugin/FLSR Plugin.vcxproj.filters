@@ -26,9 +26,102 @@
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
+    <ClCompile Include="CndDestroyed.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerArch.h">
+      <Filter>Missions\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="Trigger.cpp">
+      <Filter>Missions\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="Mission.cpp">
+      <Filter>Missions\Mission</Filter>
+    </ClCompile>
+    <ClCompile Include="Missions.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="ActLightFuse.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="CndTrue.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="ActChangeState.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="ActSpawnSolar.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="ActDestroy.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="ActActTrigger.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
+    <ClInclude Include="CndDestroyed.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="Missions.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="Action.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Trigger.h">
+      <Filter>Missions\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="Mission.h">
+      <Filter>Missions\Mission</Filter>
+    </ClInclude>
+    <ClInclude Include="MissionArch.h">
+      <Filter>Missions\Mission</Filter>
+    </ClInclude>
+    <ClInclude Include="ActLightFuse.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="CndTrue.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="CndDestroyedArch.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActLightFuseArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActChangeState.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActChangeStateArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActSpawnSolarArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActSpawnSolar.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActDestroyArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActDestroy.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActActTrigger.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="ActActTriggerArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="MsnSolarArch.h">
+      <Filter>Missions\Mission</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />
@@ -46,5 +139,25 @@
     <None Include="surdump.zip" />
     <None Include="surupdate.au3" />
     <None Include="surupdate.exe" />
+    <None Include="configs\FLSR-Missions.ini">
+      <Filter>Missions</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Missions">
+      <UniqueIdentifier>{7bc4a4e5-8a28-4a2f-9032-0ff8ec4bfaba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Conditions">
+      <UniqueIdentifier>{8fe56897-eb60-49c2-930d-ab544a08a5ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Actions">
+      <UniqueIdentifier>{defee9a7-7d37-48cd-88c1-0c95c1fd8b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Trigger">
+      <UniqueIdentifier>{e605c4b1-e203-4ef8-b339-7126588e1eeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Mission">
+      <UniqueIdentifier>{f1e5b1ae-ad0c-48b9-ab29-4a45c5618615}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

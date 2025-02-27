@@ -29,8 +29,8 @@
 
 namespace SolarSpawn
 {
-	static std::random_device rd;
-	static std::mt19937 gen(rd());
+	std::random_device rd;
+	std::mt19937 gen(rd());
 
 	// This function is required to make sure the loadout is also sent to the clients.
 	static void SpawnSolar(uint& spaceId, const pub::SpaceObj::SolarInfo& solarInfo)
@@ -94,37 +94,21 @@ namespace SolarSpawn
 		WriteProcMem(serverHackAddress, &serverUnHack, 1);
 	}
 
-	struct SolarArchetype
-	{
-		bool autospawn = false;
-		uint archetypeId = 0;
-		uint loadoutId = 0;
-		std::string nickname = "";
-		uint nicknameCounter = 0;
-		uint idsName = 0;
-		uint idsInfocard = 0;
-		Vector position;
-		Matrix orientation;
-		uint systemId = 0;
-		uint baseId = 0;
-		std::string affiliation = "";
-		uint personalityId = 0;
-		float hitpointsPercentage = 1.0f;
-		uint voiceId = 0;
-		uint headId = 0;
-		uint bodyId = 0;
-		std::vector<uint> accessoryIds = {};
-	};
-
-	static std::vector<SolarArchetype> solarArchetypes;
-	static SolarArchetype fallbackBaseArchetype;
+	std::vector<SolarArchetype> solarArchetypes;
+	SolarArchetype fallbackBaseArchetype;
 
 	struct SpawnedSolar
 	{
 		uint dockWith = 0;
 		bool fallbackBase = false;
 	};
-	static std::unordered_map<uint, SpawnedSolar> spawnedSolars;
+	std::unordered_map<uint, SpawnedSolar> spawnedSolars;
+
+	void AppendSolarArchetype(const SolarArchetype& archetype)
+	{
+		if (archetype.archetypeId != 0 && !archetype.nickname.empty())
+			solarArchetypes.push_back(archetype);
+	}
 
 	void LoadSettings()
 	{
@@ -212,11 +196,11 @@ namespace SolarSpawn
 		}
 	}
 
-	static bool DestroySolar(const uint spaceObjId)
+	bool DestroySolar(const uint spaceObjId, const DestroyType destroyType = DestroyType::VANISH)
 	{
 		if (spawnedSolars.contains(spaceObjId) && pub::SpaceObj::ExistsAndAlive(spaceObjId) == 0) //0 means alive, -2 dead
 		{
-			pub::SpaceObj::Destroy(spaceObjId, DestroyType::VANISH);
+			pub::SpaceObj::Destroy(spaceObjId, destroyType);
 			return true;
 		}
 		return false;
@@ -287,7 +271,7 @@ namespace SolarSpawn
 		return spaceObjId;
 	}
 
-	static bool initialized = false;
+	bool initialized = false;
 	void Initialize()
 	{
 		if (initialized)
@@ -306,7 +290,7 @@ namespace SolarSpawn
 		uint solarObjId;
 		uint dockId;
 	};
-	static std::map<uint, LaunchComm> unprocessedLaunchComms;
+	std::map<uint, LaunchComm> unprocessedLaunchComms;
 
 	bool __stdcall Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH& pLaunch)
 	{
@@ -375,7 +359,7 @@ namespace SolarSpawn
 				return false;
 		}
 
-		static std::uniform_int_distribution<> distr(1, 2);
+		std::uniform_int_distribution<> distr(1, 2);
 		std::vector<uint> lines = {
 			GetShipMessageId(shipId),
 			CreateID((clearMessageIdBase + std::to_string(distr(gen)) + "-").c_str()),
@@ -400,7 +384,7 @@ namespace SolarSpawn
 	{
 		bool waiting;
 	};
-	static std::unordered_map<uint, std::unordered_map<uint, DockQueue>> dockQueues;
+	std::unordered_map<uint, std::unordered_map<uint, DockQueue>> dockQueues;
 
 	// Gets called whenever a dock request begins, ends, is cancelled, or the ship is destroyed/despawned. Does not get called when the station gets destroyed.
 	int __cdecl Dock_Call_After(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, DOCK_HOST_RESPONSE response)
@@ -617,6 +601,19 @@ namespace SolarSpawn
 		}
 	}
 
+	uint SpawnSolarByName(std::string name)
+	{
+		name = ToLower(name);
+		for (auto& solarArchetype : solarArchetypes)
+		{
+			if (ToLower(solarArchetype.nickname) == name)
+			{
+				return CreateSolar(solarArchetype);
+			}
+		}
+		return 0;
+	}
+
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
 		returncode = DEFAULT_RETURNCODE;
@@ -677,17 +674,13 @@ namespace SolarSpawn
 				return false;
 			}
 
-			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
-			for (auto& solarArchetype : solarArchetypes)
+			if (SpawnSolarByName(wstos(cmds->ArgStr(1))))
 			{
-				if (ToLower(solarArchetype.nickname) == targetNickname)
-				{
-					CreateSolar(solarArchetype);
-					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-					return true;
-				}
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+				return true;
 			}
-			PrintUserCmdText(clientId, L"ERR solar not found: " + stows(targetNickname));
+
+			PrintUserCmdText(clientId, L"ERR solar not found: " + cmds->ArgStr(1));
 			return false;
 		}
 

@@ -89,8 +89,6 @@ xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)sqlite3.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)SQLiteCpp.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)zlibd1.dll" "$(DistDir)"
 
 if "$(FLHOOK_COPY_PATH)" NEQ "" (
@@ -124,8 +122,6 @@ xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)sqlite3.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)SQLiteCpp.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)zlib1.dll" "$(DistDir)"
 
 if "$(FLHOOK_COPY_PATH)" NEQ "" (
@@ -135,9 +131,16 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ActChangeState.cpp" />
+    <ClCompile Include="ActDestroy.cpp" />
+    <ClCompile Include="ActLightFuse.cpp" />
+    <ClCompile Include="ActSpawnSolar.cpp" />
+    <ClCompile Include="ActActTrigger.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="CndDestroyed.cpp" />
+    <ClCompile Include="CndTrue.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
     <ClCompile Include="Discord.cpp" />
@@ -149,6 +152,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
+    <ClCompile Include="Mission.cpp" />
+    <ClCompile Include="Missions.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="PopUp.cpp" />
@@ -160,9 +165,31 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="Trigger.cpp" />
+    <ClCompile Include="TriggerArch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActChangeState.h" />
+    <ClInclude Include="ActChangeStateArch.h" />
+    <ClInclude Include="ActDestroy.h" />
+    <ClInclude Include="ActDestroyArch.h" />
+    <ClInclude Include="Action.h" />
+    <ClInclude Include="ActLightFuse.h" />
+    <ClInclude Include="ActLightFuseArch.h" />
+    <ClInclude Include="ActSpawnSolar.h" />
+    <ClInclude Include="ActSpawnSolarArch.h" />
+    <ClInclude Include="ActActTrigger.h" />
+    <ClInclude Include="ActActTriggerArch.h" />
+    <ClInclude Include="CndDestroyed.h" />
+    <ClInclude Include="CndDestroyedArch.h" />
+    <ClInclude Include="CndTrue.h" />
+    <ClInclude Include="Condition.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="Mission.h" />
+    <ClInclude Include="MissionArch.h" />
+    <ClInclude Include="Missions.h" />
+    <ClInclude Include="MsnSolarArch.h" />
+    <ClInclude Include="Trigger.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">
@@ -194,6 +221,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <CopyFileToFolders Include="configs\FLSR-Solars.cfg">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <None Include="configs\FLSR-Missions.ini" />
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
     <None Include="surdump.zip" />

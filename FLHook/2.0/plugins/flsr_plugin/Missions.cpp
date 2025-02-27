@@ -85,7 +85,10 @@ namespace Missions
 				if (ini.is_header("Mission"))
 				{
 					if (!mission.name.empty())
+					{
 						missionArchetypesByName[mission.name] = mission;
+						mission = {};
+					}
 
 					while (ini.read_value())
 					{

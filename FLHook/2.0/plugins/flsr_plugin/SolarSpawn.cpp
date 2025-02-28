@@ -127,8 +127,12 @@ namespace SolarSpawn
 					{
 						if (ini.is_value("fallback_base_archetype"))
 						{
-							fallbackBaseArchetype.archetypeId = CreateID(ini.get_value_string(0));
 							fallbackBaseArchetype.nickname = "fallbackBaseExit";
+							fallbackBaseArchetype.archetypeId = CreateID(ini.get_value_string(0));
+						}
+						else if (ini.is_value("fallback_base_loadout"))
+						{
+							fallbackBaseArchetype.loadoutId = CreateID(ini.get_value_string(0));
 						}
 					}
 				}
@@ -578,6 +582,9 @@ namespace SolarSpawn
 
 	static void CreateFallbackBaseIfNeeded(const IObjRW* killedObject)
 	{
+		if (!fallbackBaseArchetype.archetypeId)
+			return;
+
 		const CEqObj* solar = static_cast<CEqObj*>(killedObject->cobj);
 		if (solar->dockWithBaseId == 0)
 			return;

@@ -12,9 +12,9 @@ namespace Missions
 
 	struct CndDestroyedArchetype
 	{
-		std::string objNameLabel = "";
+		std::string objNameOrLabel = "";
 		int count = 0;
 		DestroyedCondition condition = DestroyedCondition::ALL;
-		std::string killerNameLabel = "";
+		std::string killerNameOrLabel = "";
 	};
 }

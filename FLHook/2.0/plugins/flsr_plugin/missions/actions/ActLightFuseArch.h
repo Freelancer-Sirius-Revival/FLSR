@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActLightFuseArchetype
 	{
-		std::string objName = "";
+		std::string objNameOrLabel = "";
 		unsigned int fuseId = 0;
 	};
 }

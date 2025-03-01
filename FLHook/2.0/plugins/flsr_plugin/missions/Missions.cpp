@@ -233,7 +233,7 @@ namespace Missions
 						{
 							trigger.condition.first = TriggerCondition::Cnd_Destroyed;
 							std::shared_ptr<CndDestroyedArchetype> archetype(new CndDestroyedArchetype());
-							archetype->objNameLabel = ini.get_value_string(0);
+							archetype->objNameOrLabel = ini.get_value_string(0);
 							archetype->count = ini.get_value_int(1);
 							const std::string val = ToLower(ini.get_value_string(2));
 							if (val == "explode")
@@ -242,7 +242,7 @@ namespace Missions
 								archetype->condition = DestroyedCondition::SILENT;
 							else
 								archetype->condition = DestroyedCondition::ALL;
-							archetype->killerNameLabel = ini.get_value_string(3);
+							archetype->killerNameOrLabel = ini.get_value_string(3);
 							trigger.condition.second = archetype;
 						}
 						else if (ini.is_value("Act_ActTrig"))
@@ -258,7 +258,7 @@ namespace Missions
 						else if (ini.is_value("Act_DeactTrig"))
 						{
 							TriggerArchActionEntry action;
-							action.first = TriggerAction::Act_ActTrig;
+							action.first = TriggerAction::Act_DeactTrig;
 							std::shared_ptr<ActActTriggerArchetype> archetype(new ActActTriggerArchetype());
 							archetype->triggerName = ini.get_value_string(0);
 							archetype->activate = false;
@@ -270,7 +270,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_LightFuse;
 							std::shared_ptr<ActLightFuseArchetype> archetype(new ActLightFuseArchetype());
-							archetype->objName = mission.name + ":" + std::string(ini.get_value_string(0));
+							archetype->objNameOrLabel = mission.name + ":" + std::string(ini.get_value_string(0));
 							archetype->fuseId = CreateID(ini.get_value_string(1));
 							action.second = archetype;
 							trigger.actions.push_back(action);
@@ -303,7 +303,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_Destroy;
 							std::shared_ptr<ActDestroyArchetype> archetype(new ActDestroyArchetype());
-							archetype->objName = mission.name + ":" + std::string(ini.get_value_string(0));
+							archetype->objNameOrLabel = mission.name + ":" + std::string(ini.get_value_string(0));
 							const std::string val = ToLower(ini.get_value_string(1));
 							if (val == "explode")
 								archetype->destroyType = DestroyType::EXPLODE;
@@ -417,7 +417,7 @@ namespace Missions
 					{
 						std::shared_ptr<ActDestroyArchetype> actDestroyArchetype(new ActDestroyArchetype());
 						actDestroyArchetype->destroyType = DestroyType::VANISH;
-						actDestroyArchetype->objName = object.name;
+						actDestroyArchetype->objNameOrLabel = object.name;
 						triggerArch.actions.push_back({ TriggerAction::Act_Destroy, actDestroyArchetype });
 					}
 

@@ -75,6 +75,10 @@ namespace Missions
 					actions.push_back(new ActActTrigger(this, (ActActTriggerArchetype*)actionArchetype.second.get()));
 					break;
 
+				case TriggerAction::Act_DeactTrig:
+					actions.push_back(new ActActTrigger(this, (ActActTriggerArchetype*)actionArchetype.second.get()));
+					break;
+
 				case TriggerAction::Act_Destroy:
 					actions.push_back(new ActDestroy(this, (ActDestroyArchetype*)actionArchetype.second.get()));
 					break;

@@ -7,8 +7,8 @@ namespace Missions
 {
 	struct ActDestroy : Action
 	{
-		std::string objName;
-		DestroyType destroyType;
+		const std::string objNameOrLabel;
+		const DestroyType destroyType;
 
 		ActDestroy(Trigger* parentTrigger, const ActDestroyArchetype* archetype);
 		void Execute();

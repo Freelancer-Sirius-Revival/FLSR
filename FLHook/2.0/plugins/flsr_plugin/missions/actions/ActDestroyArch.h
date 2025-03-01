@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActDestroyArchetype
 	{
-		std::string objName = "";
+		std::string objNameOrLabel = "";
 		DestroyType destroyType = DestroyType::VANISH;
 	};
 }

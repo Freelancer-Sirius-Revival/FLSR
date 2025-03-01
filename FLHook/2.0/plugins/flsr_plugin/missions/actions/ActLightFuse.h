@@ -6,7 +6,7 @@ namespace Missions
 {
 	struct ActLightFuse : Action
 	{
-		const std::string objName;
+		const std::string objNameOrLabel;
 		const unsigned int fuseId;
 
 		ActLightFuse(Trigger* parentTrigger, const ActLightFuseArchetype* archetype);

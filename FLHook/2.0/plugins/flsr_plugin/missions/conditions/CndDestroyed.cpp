@@ -7,10 +7,10 @@ namespace Missions
 	CndDestroyed::CndDestroyed(Trigger* parentTrigger, const CndDestroyedArchetype* archetype) :
 		Condition(parentTrigger, TriggerCondition::Cnd_Destroyed),
 		count(0),
-		objNameLabel(archetype->objNameLabel),
+		objNameOrLabel(archetype->objNameOrLabel),
 		targetCount(archetype->count),
 		condition(archetype->condition),
-		killerNameLabel(archetype->killerNameLabel)
+		killerNameOrLabel(archetype->killerNameOrLabel)
 	{}
 
 	void CndDestroyed::Register()
@@ -45,12 +45,12 @@ namespace Missions
 				break;
 		}
 
-		if (!killerNameLabel.empty())
+		if (!killerNameOrLabel.empty())
 		{
 			bool killerFound = false;
 			for (const auto& object : trigger->mission->objects)
 			{
-				if (object.id == killerId && (object.name == killerNameLabel || object.labels.contains(killerNameLabel)))
+				if (object.id == killerId && (object.name == killerNameOrLabel || object.labels.contains(killerNameOrLabel)))
 				{
 					killerFound = true;
 					break;
@@ -60,14 +60,14 @@ namespace Missions
 				return false;
 		}
 
-		std::wstring outputPretext = stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Cnd_Destroyed " + stows(objNameLabel);
+		std::wstring outputPretext = stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Cnd_Destroyed " + stows(objNameOrLabel);
 
 		if (targetCount < 0)
 		{
 			int foundObjectCount = 0;
 			for (const auto& object : trigger->mission->objects)
 			{
-				const bool nameOrLabelMatch = object.name == objNameLabel || object.labels.contains(objNameLabel);
+				const bool nameOrLabelMatch = object.name == objNameOrLabel || object.labels.contains(objNameOrLabel);
 				if (killedObject->cobj->id == object.id && nameOrLabelMatch)
 				{
 					// Reduce the count of objects by this label because this object was just destroyed.
@@ -89,7 +89,7 @@ namespace Missions
 		{
 			for (const auto& object : trigger->mission->objects)
 			{
-				if (killedObject->cobj->id == object.id && (object.name == objNameLabel || object.labels.contains(objNameLabel)))
+				if (killedObject->cobj->id == object.id && (object.name == objNameOrLabel || object.labels.contains(objNameOrLabel)))
 				{
 					count++;
 					ConPrint(outputPretext + L" " + std::to_wstring(count) + L" of " + std::to_wstring(targetCount) + L"\n");

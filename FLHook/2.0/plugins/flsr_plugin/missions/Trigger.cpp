@@ -1,13 +1,13 @@
 #include "Trigger.h"
-#include "Action.h"
-#include "Condition.h"
-#include "CndTrue.h"
-#include "CndDestroyed.h"
-#include "ActActTrigger.h"
-#include "ActDestroy.h"
-#include "ActChangeState.h"
-#include "ActLightFuse.h"
-#include "ActSpawnSolar.h"
+#include "Actions/Action.h"
+#include "Conditions/Condition.h"
+#include "Conditions/CndTrue.h"
+#include "Conditions/CndDestroyed.h"
+#include "Actions/ActActTrigger.h"
+#include "Actions/ActDestroy.h"
+#include "Actions/ActChangeState.h"
+#include "Actions/ActLightFuse.h"
+#include "Actions/ActSpawnSolar.h"
 #include <FLHook.h>
 #include <queue>
 

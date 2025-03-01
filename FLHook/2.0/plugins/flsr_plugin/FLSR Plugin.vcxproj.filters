@@ -26,101 +26,101 @@
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
-    <ClCompile Include="CndDestroyed.cpp">
+    <ClCompile Include="missions\actions\ActActTrigger.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActChangeState.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActDestroy.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActLightFuse.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnSolar.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndDestroyed.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="TriggerArch.h">
-      <Filter>Missions\Trigger</Filter>
+    <ClCompile Include="missions\conditions\CndTrue.cpp">
+      <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="Trigger.cpp">
-      <Filter>Missions\Trigger</Filter>
-    </ClCompile>
-    <ClCompile Include="Mission.cpp">
-      <Filter>Missions\Mission</Filter>
-    </ClCompile>
-    <ClCompile Include="Missions.cpp">
+    <ClCompile Include="missions\Mission.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
-    <ClCompile Include="ActLightFuse.cpp">
-      <Filter>Missions\Actions</Filter>
+    <ClCompile Include="missions\Missions.cpp">
+      <Filter>Missions</Filter>
     </ClCompile>
-    <ClCompile Include="CndTrue.cpp">
-      <Filter>Missions\Conditions</Filter>
-    </ClCompile>
-    <ClCompile Include="ActChangeState.cpp">
-      <Filter>Missions\Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="ActSpawnSolar.cpp">
-      <Filter>Missions\Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="ActDestroy.cpp">
-      <Filter>Missions\Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="ActActTrigger.cpp">
-      <Filter>Missions\Actions</Filter>
+    <ClCompile Include="missions\Trigger.cpp">
+      <Filter>Missions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
-    <ClInclude Include="CndDestroyed.h">
+    <ClInclude Include="missions\actions\ActActTrigger.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActTriggerArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActChangeState.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActChangeStateArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDestroy.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDestroyArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\Action.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActLightFuse.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActLightFuseArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnSolar.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnSolarArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndDestroyed.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="Condition.h">
+    <ClInclude Include="missions\conditions\CndDestroyedArch.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="Missions.h">
+    <ClInclude Include="missions\conditions\CndTrue.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Mission.h">
       <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="Action.h">
-      <Filter>Missions\Actions</Filter>
+    <ClInclude Include="missions\MissionArch.h">
+      <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="Trigger.h">
-      <Filter>Missions\Trigger</Filter>
+    <ClInclude Include="missions\Missions.h">
+      <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="Mission.h">
-      <Filter>Missions\Mission</Filter>
+    <ClInclude Include="missions\MsnSolarArch.h">
+      <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="MissionArch.h">
-      <Filter>Missions\Mission</Filter>
+    <ClInclude Include="missions\Trigger.h">
+      <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="ActLightFuse.h">
-      <Filter>Missions\Actions</Filter>
+    <ClInclude Include="missions\TriggerArch.h">
+      <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="CndTrue.h">
+    <ClInclude Include="missions\conditions\Condition.h">
       <Filter>Missions\Conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="CndDestroyedArch.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActLightFuseArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActChangeState.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActChangeStateArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActSpawnSolarArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActSpawnSolar.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActDestroyArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActDestroy.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActActTrigger.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="ActActTriggerArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="MsnSolarArch.h">
-      <Filter>Missions\Mission</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,12 +152,6 @@
     </Filter>
     <Filter Include="Missions\Actions">
       <UniqueIdentifier>{defee9a7-7d37-48cd-88c1-0c95c1fd8b97}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Missions\Trigger">
-      <UniqueIdentifier>{e605c4b1-e203-4ef8-b339-7126588e1eeb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Missions\Mission">
-      <UniqueIdentifier>{f1e5b1ae-ad0c-48b9-ab29-4a45c5618615}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

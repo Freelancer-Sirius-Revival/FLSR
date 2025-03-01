@@ -131,16 +131,9 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ActChangeState.cpp" />
-    <ClCompile Include="ActDestroy.cpp" />
-    <ClCompile Include="ActLightFuse.cpp" />
-    <ClCompile Include="ActSpawnSolar.cpp" />
-    <ClCompile Include="ActActTrigger.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
-    <ClCompile Include="CndDestroyed.cpp" />
-    <ClCompile Include="CndTrue.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
     <ClCompile Include="Discord.cpp" />
@@ -152,8 +145,16 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
-    <ClCompile Include="Mission.cpp" />
-    <ClCompile Include="Missions.cpp" />
+    <ClCompile Include="missions\actions\ActActTrigger.cpp" />
+    <ClCompile Include="missions\actions\ActChangeState.cpp" />
+    <ClCompile Include="missions\actions\ActDestroy.cpp" />
+    <ClCompile Include="missions\actions\ActLightFuse.cpp" />
+    <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
+    <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
+    <ClCompile Include="missions\conditions\CndTrue.cpp" />
+    <ClCompile Include="missions\Mission.cpp" />
+    <ClCompile Include="missions\Missions.cpp" />
+    <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="PopUp.cpp" />
@@ -165,31 +166,30 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
-    <ClCompile Include="Trigger.cpp" />
-    <ClCompile Include="TriggerArch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ActChangeState.h" />
-    <ClInclude Include="ActChangeStateArch.h" />
-    <ClInclude Include="ActDestroy.h" />
-    <ClInclude Include="ActDestroyArch.h" />
-    <ClInclude Include="Action.h" />
-    <ClInclude Include="ActLightFuse.h" />
-    <ClInclude Include="ActLightFuseArch.h" />
-    <ClInclude Include="ActSpawnSolar.h" />
-    <ClInclude Include="ActSpawnSolarArch.h" />
-    <ClInclude Include="ActActTrigger.h" />
-    <ClInclude Include="ActActTriggerArch.h" />
-    <ClInclude Include="CndDestroyed.h" />
-    <ClInclude Include="CndDestroyedArch.h" />
-    <ClInclude Include="CndTrue.h" />
-    <ClInclude Include="Condition.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="Mission.h" />
-    <ClInclude Include="MissionArch.h" />
-    <ClInclude Include="Missions.h" />
-    <ClInclude Include="MsnSolarArch.h" />
-    <ClInclude Include="Trigger.h" />
+    <ClInclude Include="missions\actions\ActActTrigger.h" />
+    <ClInclude Include="missions\actions\ActActTriggerArch.h" />
+    <ClInclude Include="missions\actions\ActChangeState.h" />
+    <ClInclude Include="missions\actions\ActChangeStateArch.h" />
+    <ClInclude Include="missions\actions\ActDestroy.h" />
+    <ClInclude Include="missions\actions\ActDestroyArch.h" />
+    <ClInclude Include="missions\actions\Action.h" />
+    <ClInclude Include="missions\actions\ActLightFuse.h" />
+    <ClInclude Include="missions\actions\ActLightFuseArch.h" />
+    <ClInclude Include="missions\actions\ActSpawnSolar.h" />
+    <ClInclude Include="missions\actions\ActSpawnSolarArch.h" />
+    <ClInclude Include="missions\conditions\CndDestroyed.h" />
+    <ClInclude Include="missions\conditions\CndDestroyedArch.h" />
+    <ClInclude Include="missions\conditions\CndTrue.h" />
+    <ClInclude Include="missions\conditions\Condition.h" />
+    <ClInclude Include="missions\Mission.h" />
+    <ClInclude Include="missions\MissionArch.h" />
+    <ClInclude Include="missions\Missions.h" />
+    <ClInclude Include="missions\MsnSolarArch.h" />
+    <ClInclude Include="missions\Trigger.h" />
+    <ClInclude Include="missions\TriggerArch.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">

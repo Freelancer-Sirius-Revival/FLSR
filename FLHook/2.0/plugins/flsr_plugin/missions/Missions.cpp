@@ -2,13 +2,13 @@
 #include "Mission.h"
 #include "MissionArch.h"
 #include "TriggerArch.h"
-#include "CndDestroyed.h"
-#include "CndDestroyedArch.h"
-#include "ActActTrigger.h"
-#include "ActLightFuseArch.h"
-#include "ActChangeStateArch.h"
-#include "ActSpawnSolarArch.h"
-#include "ActDestroyArch.h"
+#include "Conditions/CndDestroyed.h"
+#include "Conditions/CndDestroyedArch.h"
+#include "Actions/ActActTrigger.h"
+#include "Actions/ActLightFuseArch.h"
+#include "Actions/ActChangeStateArch.h"
+#include "Actions/ActSpawnSolarArch.h"
+#include "Actions/ActDestroyArch.h"
 
 namespace Missions
 {

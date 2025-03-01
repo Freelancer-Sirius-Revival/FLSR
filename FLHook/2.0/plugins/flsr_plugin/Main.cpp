@@ -1,6 +1,6 @@
 ﻿// includes
 #include "Main.h"
-#include "Missions.h"
+#include "Missions/Missions.h"
 
 // Mutex-Objekt definieren
 std::mutex m_Mutex;

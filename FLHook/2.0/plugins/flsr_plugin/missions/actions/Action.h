@@ -1,5 +1,5 @@
 #pragma once
-#include "Trigger.h"
+#include "../Trigger.h"
 
 namespace Missions
 {

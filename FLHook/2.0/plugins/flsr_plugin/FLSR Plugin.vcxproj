@@ -146,9 +146,11 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
     <ClCompile Include="missions\actions\ActActTrigger.cpp" />
+    <ClCompile Include="missions\actions\ActAddLabel.cpp" />
     <ClCompile Include="missions\actions\ActChangeState.cpp" />
     <ClCompile Include="missions\actions\ActDestroy.cpp" />
     <ClCompile Include="missions\actions\ActLightFuse.cpp" />
+    <ClCompile Include="missions\actions\ActRemoveLabel.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
@@ -171,6 +173,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Main.h" />
     <ClInclude Include="missions\actions\ActActTrigger.h" />
     <ClInclude Include="missions\actions\ActActTriggerArch.h" />
+    <ClInclude Include="missions\actions\ActAddLabel.h" />
+    <ClInclude Include="missions\actions\ActAddLabelArch.h" />
     <ClInclude Include="missions\actions\ActChangeState.h" />
     <ClInclude Include="missions\actions\ActChangeStateArch.h" />
     <ClInclude Include="missions\actions\ActDestroy.h" />
@@ -178,6 +182,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\Action.h" />
     <ClInclude Include="missions\actions\ActLightFuse.h" />
     <ClInclude Include="missions\actions\ActLightFuseArch.h" />
+    <ClInclude Include="missions\actions\ActRemoveLabel.h" />
+    <ClInclude Include="missions\actions\ActRemoveLabelArch.h" />
     <ClInclude Include="missions\actions\ActSpawnSolar.h" />
     <ClInclude Include="missions\actions\ActSpawnSolarArch.h" />
     <ClInclude Include="missions\conditions\CndDestroyed.h" />

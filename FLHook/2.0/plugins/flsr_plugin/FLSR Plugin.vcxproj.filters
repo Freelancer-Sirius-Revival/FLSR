@@ -56,6 +56,12 @@
     <ClCompile Include="missions\Trigger.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActAddLabel.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActRemoveLabel.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -121,6 +127,18 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\Condition.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAddLabel.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAddLabelArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRemoveLabel.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRemoveLabelArch.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

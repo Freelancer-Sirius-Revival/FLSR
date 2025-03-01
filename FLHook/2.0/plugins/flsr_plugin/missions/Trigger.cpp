@@ -4,6 +4,8 @@
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndDestroyed.h"
 #include "Actions/ActActTrigger.h"
+#include "Actions/ActAddLabel.h"
+#include "Actions/ActRemoveLabel.h"
 #include "Actions/ActDestroy.h"
 #include "Actions/ActChangeState.h"
 #include "Actions/ActLightFuse.h"
@@ -77,6 +79,14 @@ namespace Missions
 
 				case TriggerAction::Act_DeactTrig:
 					actions.push_back(new ActActTrigger(this, (ActActTriggerArchetype*)actionArchetype.second.get()));
+					break;
+
+				case TriggerAction::Act_AddLabel:
+					actions.push_back(new ActAddLabel(this, (ActAddLabelArchetype*)actionArchetype.second.get()));
+					break;
+
+				case TriggerAction::Act_RemoveLabel:
+					actions.push_back(new ActRemoveLabel(this, (ActRemoveLabelArchetype*)actionArchetype.second.get()));
 					break;
 
 				case TriggerAction::Act_Destroy:

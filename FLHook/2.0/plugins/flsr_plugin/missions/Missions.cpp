@@ -5,6 +5,8 @@
 #include "Conditions/CndDestroyed.h"
 #include "Conditions/CndDestroyedArch.h"
 #include "Actions/ActActTrigger.h"
+#include "Actions/ActAddLabel.h"
+#include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuseArch.h"
 #include "Actions/ActChangeStateArch.h"
 #include "Actions/ActSpawnSolarArch.h"
@@ -262,6 +264,26 @@ namespace Missions
 							std::shared_ptr<ActActTriggerArchetype> archetype(new ActActTriggerArchetype());
 							archetype->triggerName = ini.get_value_string(0);
 							archetype->activate = false;
+							action.second = archetype;
+							trigger.actions.push_back(action);
+						}
+						else if (ini.is_value("Act_AddLabel"))
+						{
+							TriggerArchActionEntry action;
+							action.first = TriggerAction::Act_AddLabel;
+							std::shared_ptr<ActAddLabelArchetype> archetype(new ActAddLabelArchetype());
+							archetype->objNameOrLabel = ini.get_value_string(0);
+							archetype->label = ini.get_value_string(1);
+							action.second = archetype;
+							trigger.actions.push_back(action);
+						}
+						else if (ini.is_value("Act_RemoveLabel"))
+						{
+							TriggerArchActionEntry action;
+							action.first = TriggerAction::Act_RemoveLabel;
+							std::shared_ptr<ActRemoveLabelArchetype> archetype(new ActRemoveLabelArchetype());
+							archetype->objNameOrLabel = ini.get_value_string(0);
+							archetype->label = ini.get_value_string(1);
 							action.second = archetype;
 							trigger.actions.push_back(action);
 						}

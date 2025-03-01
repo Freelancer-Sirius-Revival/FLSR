@@ -56,6 +56,7 @@ namespace Missions
 	{
 		Act_ActTrig,
 		Act_AddAmbient,
+		Act_AddLabel,
 		Act_AddRTC,
 		Act_AdjAcct,
 		Act_AdjHealth,
@@ -109,6 +110,7 @@ namespace Missions
 		Act_RelocateShip,
 		Act_RemoveAmbient,
 		Act_RemoveCargo,
+		Act_RemoveLabel,
 		Act_RemoveRTC,
 		Act_RepChangeRequest,
 		Act_RevertCam,

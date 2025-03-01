@@ -4,6 +4,8 @@
 
 **[Discord Server](https://discord.gg/GMtyM57egU)**
 
+**[Credits](Credits.md)**
+
 ## Features:
 ### Gameplay:
 - Fully customisable Ships - Choose from redesigned weapon classes and weapon types, shields, exchangable power plants, modules, engine effects, afterburners and thrusters, and explore to find completely new equipment

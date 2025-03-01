@@ -355,7 +355,9 @@ namespace Missions
 		for (const auto& missionArchetypeWithName: missionArchetypesByName)
 		{
 			if (missionArchetypeWithName.second.active)
-				activeMissions.push_back(new Mission(missionArchetypeWithName.second));
+			{
+				StartMission(missionArchetypeWithName.first);
+			}
 		}
 	}
 
@@ -373,21 +375,8 @@ namespace Missions
 				cnd->trigger->QueueExecution();
 			}
 		}
- 
-		for (const auto& labelAndMission : activeMissions)
-		{
-			for (auto it = labelAndMission->objects.begin(); it != labelAndMission->objects.end();)
-			{
-				if (it->id == killedObject->cobj->id)
-				{
-					it = labelAndMission->objects.erase(it);
-				}
-				else
-				{
-					it++;
-				}
-			}
-		}
+
+		RemoveObjectFromMissions(killedObject->cobj->id);
 	}
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
@@ -404,16 +393,14 @@ namespace Missions
 			}
 
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
-			if (missionArchetypesByName.contains(targetNickname))
+			if (StartMission(targetNickname))
 			{
-				activeMissions.push_back(new Mission(missionArchetypesByName[targetNickname]));
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.");
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}
-			return false;
 		}
-
-		if (IS_CMD("stop_mission"))
+		else if (IS_CMD("stop_mission"))
 		{
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
@@ -423,33 +410,12 @@ namespace Missions
 			}
 
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
-			for (auto it = activeMissions.begin(); it != activeMissions.end(); it++)
+			if (KillMission(targetNickname))
 			{
-				const auto mission = *it;
-				if (mission->name == targetNickname)
-				{
-					TriggerArchetype triggerArch;
-					triggerArch.name = "Manual Abort";
-
-					std::shared_ptr<ActChangeStateArchetype> actChangeArchetype(new ActChangeStateArchetype());
-					actChangeArchetype->state = MissionState::ABORT;
-					triggerArch.actions.push_back({ TriggerAction::Act_ChangeState, actChangeArchetype });
-
-					for (const auto& object : mission->objects)
-					{
-						std::shared_ptr<ActDestroyArchetype> actDestroyArchetype(new ActDestroyArchetype());
-						actDestroyArchetype->destroyType = DestroyType::VANISH;
-						actDestroyArchetype->objNameOrLabel = object.name;
-						triggerArch.actions.push_back({ TriggerAction::Act_Destroy, actDestroyArchetype });
-					}
-
-					Trigger* abortionTrigger = new Trigger(mission, triggerArch);
-					abortionTrigger->QueueExecution();
-					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-					return true;
-				}
+				PrintUserCmdText(clientId, L"Aborted mission " + stows(targetNickname));
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+				return true;
 			}
-			return false;
 		}
 		return false;
 	}

@@ -32,5 +32,7 @@ namespace Missions
 		void RemoveTrigger(const Trigger* trigger);
 	};
 
-	extern std::vector<Mission*> activeMissions;
+	bool StartMission(const std::string& missionName);
+	bool KillMission(const std::string& missionName);
+	void RemoveObjectFromMissions(const uint objId);
 }

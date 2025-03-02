@@ -4,6 +4,7 @@
 #include "Actions/Action.h"
 #include "Conditions/Condition.h"
 #include "Conditions/CndTrue.h"
+#include "Conditions/CndDistVec.h"
 #include "Conditions/CndDestroyed.h"
 #include "Actions/ActEndMission.h"
 #include "Actions/ActActTrigger.h"
@@ -20,11 +21,14 @@ namespace Missions
 	{
 		switch (conditionArchetype.first)
 		{
-		case TriggerCondition::Cnd_Destroyed:
-			return new CndDestroyed(trigger, (CndDestroyedArchetype*)conditionArchetype.second.get());
+			case TriggerCondition::Cnd_Destroyed:
+				return new CndDestroyed(trigger, (CndDestroyedArchetype*)conditionArchetype.second.get());
 
-		default:
-			return new CndTrue(trigger);
+			case TriggerCondition::Cnd_DistVec:
+				return new CndDistVec(trigger, (CndDistVecArchetype*)conditionArchetype.second.get());
+
+			default:
+				return new CndTrue(trigger);
 		}
 	}
 

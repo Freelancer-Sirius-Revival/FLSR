@@ -459,9 +459,9 @@ IMPORT IObjRW* HkGetInspect(uint iClientID);
 IMPORT ENGINE_STATE HkGetEngineState(uint iClientID);
 IMPORT EQ_TYPE HkGetEqType(Archetype::Equipment* eq);
 IMPORT HK_ERROR HkGetClientID(bool& bIdString, uint& iClientID, const std::wstring& wscCharname);
-IMPORT float HkDistance3D(Vector v1, Vector v2);
+IMPORT float HkDistance3D(Vector& v1, Vector& v2);
 IMPORT float HkDistance3DByShip(uint iShip1, uint iShip2);
-IMPORT Quaternion HkMatrixToQuaternion(Matrix m);
+IMPORT Quaternion HkMatrixToQuaternion(Matrix& m);
 template<typename Str>
 IMPORT Str VectorToSectorCoord(uint iSystemID, Vector vPos);
 IMPORT float degrees(float rad);

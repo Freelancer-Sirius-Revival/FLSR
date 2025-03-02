@@ -5,6 +5,7 @@
 #include "TriggerArch.h"
 #include "Conditions/CndDestroyed.h"
 #include "Conditions/CndDestroyedArch.h"
+#include "Conditions/CndDistVec.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
@@ -252,6 +253,23 @@ namespace Missions
 							archetype->killerNameOrLabel = ToLower(ini.get_value_string(3));
 							trigger.condition.second = archetype;
 						}
+						else if (ini.is_value("Cnd_DistVec"))
+						{
+							trigger.condition.first = TriggerCondition::Cnd_DistVec;
+							std::shared_ptr<CndDistVecArchetype> archetype(new CndDistVecArchetype());
+							if (ToLower(ini.get_value_string(0)) == "outside")
+								archetype->type = DistanceCondition::OUTSIDE;
+							else
+								archetype->type = DistanceCondition::INSIDE;
+							const auto bla = std::string(ini.get_value_string(6));
+							archetype->objNameOrLabel = ToLower(ini.get_value_string(1));
+							archetype->position.x = ini.get_value_float(2);
+							archetype->position.y = ini.get_value_float(3);
+							archetype->position.z = ini.get_value_float(4);
+							archetype->distance = ini.get_value_float(5);
+							archetype->systemId = CreateID(ini.get_value_string(6));
+							trigger.condition.second = archetype;
+						}
 						else if (ini.is_value("Act_EndMission"))
 						{
 							trigger.actions.push_back({ TriggerAction::Act_EndMission, NULL });
@@ -386,6 +404,155 @@ namespace Missions
 		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
+	}
+
+	struct FoundObject
+	{
+		uint systemId;
+		Vector position;
+	};
+
+	float elapsedTimeInSec = 0.0f;
+	void __stdcall Elapse_Time_AFTER(float seconds)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		elapsedTimeInSec += seconds;
+		if (elapsedTimeInSec < 0.02f)
+			return;
+		elapsedTimeInSec = 0.0f;
+
+		if (distVecConditions.empty())
+			return;
+
+		std::unordered_map<uint, FoundObject> objPositions;
+		std::unordered_map<uint, FoundObject> clientPositions;
+		std::unordered_map<CndDistVec*, std::vector<uint>> objIdsPerDistVec;
+		std::unordered_map<CndDistVec*, std::vector<uint>> clientIdsPerDistVec;
+
+		for (const auto cnd : distVecConditions)
+		{
+			if (cnd->objNameOrLabel == "stranger")
+			{
+				struct PlayerData* playerData = 0;
+				while (playerData = Players.traverse_active(playerData))
+				{
+					const uint clientId = playerData->iOnlineID;
+					clientIdsPerDistVec[cnd].push_back(clientId);
+					if (clientPositions.contains(clientId))
+						continue;
+
+					uint shipId;
+					pub::Player::GetShip(clientId, shipId);
+					if (shipId)
+					{
+						IObjRW* inspect;
+						StarSystem* starSystem;
+						if (!GetShipInspect(shipId, inspect, starSystem))
+							break;
+						clientPositions[clientId].systemId = inspect->cobj->system;
+						clientPositions[clientId].position = inspect->cobj->vPos;
+					}
+				}
+			}
+			else
+			{
+				for (auto& object : cnd->trigger->mission->objects)
+				{
+					if (object.name == cnd->objNameOrLabel || object.labels.contains(cnd->objNameOrLabel))
+					{
+						if (object.clientId)
+						{
+							clientIdsPerDistVec[cnd].push_back(object.clientId);
+							if (!clientPositions.contains(object.clientId))
+							{
+								uint shipId;
+								pub::Player::GetShip(object.clientId, shipId);
+								if (shipId)
+								{
+									IObjRW* inspect;
+									StarSystem* starSystem;
+									if (!GetShipInspect(shipId, inspect, starSystem))
+										break;
+									clientPositions[object.clientId].systemId = inspect->cobj->system;
+									clientPositions[object.clientId].position = inspect->cobj->vPos;
+								}
+							}
+						}
+						else
+						{
+							objIdsPerDistVec[cnd].push_back(object.id);
+							if (!objPositions.contains(object.id))
+							{
+								IObjRW* inspect;
+								StarSystem* starSystem;
+								if (!GetShipInspect(object.id, inspect, starSystem))
+									break;
+								objPositions[object.id].systemId = inspect->cobj->system;
+								objPositions[object.id].position = inspect->cobj->vPos;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		std::unordered_set<CndDistVec*> originals(distVecConditions);
+		for (const auto cnd : originals)
+		{
+			std::vector<DistVecMatchEntry> entries;
+			if (cnd->objNameOrLabel == "stranger")
+			{
+				std::unordered_set<uint> presentClientIds;
+				for (const auto& object : cnd->trigger->mission->objects)
+					presentClientIds.insert(object.clientId);
+
+				for (const auto clientId : clientIdsPerDistVec[cnd])
+				{
+					if (presentClientIds.contains(clientId))
+						continue;
+
+					const auto foundPosition = clientPositions.find(clientId);
+					if (foundPosition != clientPositions.end() && foundPosition->second.systemId == cnd->systemId)
+					{
+						DistVecMatchEntry entry;
+						entry.objId = 0;
+						entry.clientId = clientId;
+						entry.position = foundPosition->second.position;
+						entries.push_back(entry);
+					}
+				}
+			}
+			else
+			{
+				for (const auto clientId : clientIdsPerDistVec[cnd])
+				{
+					const auto foundPosition = clientPositions.find(clientId);
+					if (foundPosition != clientPositions.end() && foundPosition->second.systemId == cnd->systemId)
+					{
+						DistVecMatchEntry entry;
+						entry.objId = 0;
+						entry.clientId = clientId;
+						entry.position = foundPosition->second.position;
+						entries.push_back(entry);
+					}
+				}
+				for (const auto objId : objIdsPerDistVec[cnd])
+				{
+					const auto foundPosition = objPositions.find(objId);
+					if (foundPosition != objPositions.end() && foundPosition->second.systemId == cnd->systemId)
+					{
+						DistVecMatchEntry entry;
+						entry.objId = objId;
+						entry.clientId = 0;
+						entry.position = foundPosition->second.position;
+						entries.push_back(entry);
+					}
+				}
+			}
+			if (cnd->Matches(entries))
+				cnd->trigger->QueueExecution();
+		}
 	}
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)

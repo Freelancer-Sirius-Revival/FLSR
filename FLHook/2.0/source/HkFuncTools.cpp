@@ -433,7 +433,7 @@ EQ_TYPE HkGetEqType(Archetype::Equipment *eq) {
 }
 
 /** Calculate the distance between the two vectors */
-float HkDistance3D(Vector v1, Vector v2) {
+float HkDistance3D(Vector& v1, Vector& v2) {
     float sq1 = v1.x - v2.x, sq2 = v1.y - v2.y, sq3 = v1.z - v2.z;
     return sqrt(sq1 * sq1 + sq2 * sq2 + sq3 * sq3);
 }
@@ -450,7 +450,7 @@ float HkDistance3DByShip(uint iShip1, uint iShip2) {
     return HkDistance3D(v1, v2);
 }
 
-Quaternion HkMatrixToQuaternion(Matrix m) {
+Quaternion HkMatrixToQuaternion(Matrix& m) {
     Quaternion quaternion;
     quaternion.w =
         sqrt(max(0, 1 + m.data[0][0] + m.data[1][1] + m.data[2][2])) / 2;

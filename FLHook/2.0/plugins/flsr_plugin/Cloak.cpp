@@ -764,7 +764,7 @@ namespace Cloak
 		pub::SpaceObj::GetLocation(clientShipId, shipPosition, shipOrientation);
 		if (noCloakAreasPerSystem.contains(clientSystemId))
 		{
-			for (const NoCloakArea& area : noCloakAreasPerSystem[clientSystemId])
+			for (NoCloakArea& area : noCloakAreasPerSystem[clientSystemId])
 			{
 				if (HkDistance3D(area.position, shipPosition) <= area.radius)
 				{

@@ -154,6 +154,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActRemoveLabel.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
+    <ClCompile Include="missions\conditions\CndDistVec.cpp" />
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
@@ -190,6 +191,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSpawnSolarArch.h" />
     <ClInclude Include="missions\conditions\CndDestroyed.h" />
     <ClInclude Include="missions\conditions\CndDestroyedArch.h" />
+    <ClInclude Include="missions\conditions\CndDistVec.h" />
+    <ClInclude Include="missions\conditions\CndDistVecArch.h" />
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />
     <ClInclude Include="missions\Mission.h" />

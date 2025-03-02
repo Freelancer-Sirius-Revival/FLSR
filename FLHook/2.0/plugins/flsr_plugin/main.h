@@ -198,6 +198,7 @@ namespace Hooks {
     void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
+    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
     void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }

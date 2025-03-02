@@ -1106,6 +1106,31 @@ namespace Cloak
 		}
 	}
 
+	void GuidedInit(CGuided* guided, CGuided::CreateParms& parms)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		uint objId = parms.ownerId;
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (!GetShipInspect(objId, inspect, starSystem))
+			return;
+
+		IObjRW* ownerTarget = nullptr;
+		inspect->get_target(ownerTarget);
+		if (!ownerTarget)
+		{
+			parms.target = nullptr;
+			parms.subObjId = 0;
+		}
+
+		if (parms.target && (parms.target->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK && static_cast<CEqObj*>(parms.target->cobj)->get_cloak_percentage() > 0.9f)
+		{
+			parms.target = nullptr;
+			parms.subObjId = 0;
+		}
+	}
+
 	void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam)
 	{
 		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))

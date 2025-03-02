@@ -863,6 +863,7 @@ void __stdcall Elapse_Time(float p1);
 int __cdecl Dock_Call(unsigned int const &, unsigned int const &, int,
                       enum DOCK_HOST_RESPONSE);
 void _LaunchPos();
+void CGuidedInitNaked();
 void _CShip_init();
 void _CShip_destroy();
 void _HkLoadRepFromCharFile();

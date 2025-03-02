@@ -172,6 +172,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GuidedInit, PLUGIN_HkIEngine_CGuided_init, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ActivateCruise, PLUGIN_HkIServerImpl_ActivateCruise, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::SystemSwitchOutComplete_After, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));

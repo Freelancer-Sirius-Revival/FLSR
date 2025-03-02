@@ -265,6 +265,7 @@ namespace Cloak
     void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList);
     void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
     void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
+    void GuidedInit(CGuided* guided, CGuided::CreateParms& parms);
     void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise);
     void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
     void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);

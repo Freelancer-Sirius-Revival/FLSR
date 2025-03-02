@@ -28,6 +28,7 @@ namespace Missions
 						break;
 					}
 				}
+				// Add player to the mission
 				if (!entryFound)
 				{
 					MissionObject obj;

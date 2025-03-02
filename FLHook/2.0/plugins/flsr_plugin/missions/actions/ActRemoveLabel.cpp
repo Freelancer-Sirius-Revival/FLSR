@@ -54,6 +54,19 @@ namespace Missions
 				}
 			}
 		}
+
+		// Remove players without label from the mission
+		for (auto it = trigger->mission->objects.begin(); it != trigger->mission->objects.end();)
+		{
+			if (it->clientId && it->labels.empty())
+			{
+				it = trigger->mission->objects.erase(it);
+			}
+			else
+			{
+				it++;
+			}
+		}
 		ConPrint(L"\n");
 	}
 }

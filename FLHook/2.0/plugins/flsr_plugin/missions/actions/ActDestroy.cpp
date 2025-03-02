@@ -1,4 +1,4 @@
-#include "../../Main.h"
+#include <FLHook.h>
 #include "ActDestroy.h"
 
 namespace Missions
@@ -12,12 +12,17 @@ namespace Missions
 	void ActDestroy::Execute()
 	{
 		const std::wstring outputPretext = stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Act_Destroy " + stows(objNameOrLabel);
-		for (auto it = trigger->mission->objects.begin(); it != trigger->mission->objects.end(); it++)
+		// Copy list since the destruction of objects will in turn modify it via Destruction Hooks
+		const auto originals = std::vector(trigger->mission->objects);
+		for (const auto& object : originals)
 		{
-			if (it->name == objNameOrLabel || it->labels.contains(objNameOrLabel))
+			if (object.name == objNameOrLabel || object.labels.contains(objNameOrLabel))
 			{
 				ConPrint(outputPretext + L"\n");
-				SolarSpawn::DestroySolar(it->id, destroyType);
+				if (pub::SpaceObj::ExistsAndAlive(object.id) == 0) //0 means alive, -2 dead
+				{
+					pub::SpaceObj::Destroy(object.id, destroyType);
+				}
 			}
 		}
 	}

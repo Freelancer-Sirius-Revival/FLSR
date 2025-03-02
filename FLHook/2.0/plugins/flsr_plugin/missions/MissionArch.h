@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <unordered_map>
 #include "TriggerArch.h"
 #include "MsnSolarArch.h"
 
@@ -17,5 +16,5 @@ namespace Missions
 		std::vector<MsnSolarArchetype> solars;
 	};
 
-	static std::unordered_map<std::string, MissionArchetype> missionArchetypesByName;
+	extern std::vector<MissionArchetype> missionArchetypes;
 }

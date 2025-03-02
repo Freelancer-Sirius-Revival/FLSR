@@ -21,7 +21,6 @@
 #include <map>
 #include "flmap.h"
 
-#define ST6_ALLOCATION_DEFINED
 #include "st6.h"
 
 #pragma comment( lib, "FLCoreCommon.lib" )

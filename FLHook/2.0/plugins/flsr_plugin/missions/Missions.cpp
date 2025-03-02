@@ -1,3 +1,4 @@
+#include "../Main.h"
 #include "Missions.h"
 #include "Mission.h"
 #include "MissionArch.h"
@@ -88,7 +89,7 @@ namespace Missions
 				{
 					if (!mission.name.empty())
 					{
-						missionArchetypesByName[mission.name] = mission;
+						missionArchetypes.push_back(mission);
 						mission = {};
 					}
 
@@ -247,6 +248,10 @@ namespace Missions
 							archetype->killerNameOrLabel = ini.get_value_string(3);
 							trigger.condition.second = archetype;
 						}
+						else if (ini.is_value("Act_EndMission"))
+						{
+							trigger.actions.push_back({ TriggerAction::Act_EndMission, NULL });
+						}
 						else if (ini.is_value("Act_ActTrig"))
 						{
 							TriggerArchActionEntry action;
@@ -341,7 +346,7 @@ namespace Missions
 			ini.close();
 
 			if (!mission.name.empty())
-				missionArchetypesByName[mission.name] = mission;
+				missionArchetypes.push_back(mission);
 		}
 	}
 
@@ -352,11 +357,11 @@ namespace Missions
 			return;
 		initialized = true;
 
-		for (const auto& missionArchetypeWithName: missionArchetypesByName)
+		for (const auto& missionArchetype: missionArchetypes)
 		{
-			if (missionArchetypeWithName.second.active)
+			if (missionArchetype.active)
 			{
-				StartMission(missionArchetypeWithName.first);
+				StartMission(missionArchetype.name);
 			}
 		}
 	}
@@ -412,7 +417,7 @@ namespace Missions
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
 			if (KillMission(targetNickname))
 			{
-				PrintUserCmdText(clientId, L"Aborted mission " + stows(targetNickname));
+				PrintUserCmdText(clientId, L"Ended mission " + stows(targetNickname));
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}

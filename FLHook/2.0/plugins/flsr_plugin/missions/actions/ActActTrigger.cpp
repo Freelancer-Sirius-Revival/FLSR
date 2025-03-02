@@ -1,5 +1,5 @@
-#include "ActActTrigger.h"
 #include <FLHook.h>
+#include "ActActTrigger.h"
 
 namespace Missions
 {

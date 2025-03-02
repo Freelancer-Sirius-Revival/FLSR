@@ -1,4 +1,5 @@
-﻿#ifndef __MAIN_H__
+﻿#pragma once
+#ifndef __MAIN_H__
 #define __MAIN_H__ 1
 
 #define _CRT_SECURE_NO_WARNINGS

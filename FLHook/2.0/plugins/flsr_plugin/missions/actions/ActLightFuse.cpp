@@ -1,5 +1,5 @@
-#include "ActLightFuse.h"
 #include <FLHook.h>
+#include "ActLightFuse.h"
 
 namespace Missions
 {

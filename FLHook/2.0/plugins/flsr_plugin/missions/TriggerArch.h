@@ -70,6 +70,7 @@ namespace Missions
 		Act_DisableFriendlyFire,
 		Act_DisableTradelane,
 		Act_DockRequest,
+		Act_EndMission,
 		Act_EnableEnc,
 		Act_EnableManeuver,
 		Act_EtherComm,

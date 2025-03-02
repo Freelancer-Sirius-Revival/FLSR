@@ -1,7 +1,7 @@
 #pragma once
+#include <FLHook.h>
 #include "Action.h"
 #include "ActDestroyArch.h"
-#include "FLCoreServer.h"
 
 namespace Missions
 {

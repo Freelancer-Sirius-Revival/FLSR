@@ -1,5 +1,5 @@
 #pragma once
-#include "FLCoreServer.h"
+#include <FLHook.h>
 
 namespace Missions
 {

@@ -1,8 +1,11 @@
+#include <queue>
+#include <FLHook.h>
 #include "Trigger.h"
 #include "Actions/Action.h"
 #include "Conditions/Condition.h"
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndDestroyed.h"
+#include "Actions/ActEndMission.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
@@ -10,8 +13,6 @@
 #include "Actions/ActChangeState.h"
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
-#include <FLHook.h>
-#include <queue>
 
 namespace Missions
 {
@@ -53,26 +54,33 @@ namespace Missions
 		executionRunning = false;
 	}
 
-	Trigger::Trigger(Mission* parentMission, const TriggerArchetype& triggerArchetype) :
-		name(triggerArchetype.name),
-		mission(parentMission)
+	static Condition* instantiateCondition(Trigger* trigger, const TriggerArchConditionEntry& conditionArchetype)
 	{
-		condition = NULL;
-		switch (triggerArchetype.condition.first)
+		switch (conditionArchetype.first)
 		{
 			case TriggerCondition::Cnd_Destroyed:
-				condition = new CndDestroyed(this, (CndDestroyedArchetype*)triggerArchetype.condition.second.get());
-				break;
+				return new CndDestroyed(trigger, (CndDestroyedArchetype*)conditionArchetype.second.get());
 
 			default:
-				condition = new CndTrue(this);
-				break;
+				return new CndTrue(trigger);
 		}
+	}
+
+	Trigger::Trigger(Mission* parentMission, const TriggerArchetype& triggerArchetype) :
+		name(triggerArchetype.name),
+		mission(parentMission),
+		repeatable(triggerArchetype.repeatable)
+	{
+		condition = instantiateCondition(this, triggerArchetype.condition);
 
 		for (const auto& actionArchetype : triggerArchetype.actions)
 		{
 			switch (actionArchetype.first)
 			{
+				case TriggerAction::Act_EndMission:
+					actions.push_back(new ActEndMission(this));
+					break;
+
 				case TriggerAction::Act_ActTrig:
 					actions.push_back(new ActActTrigger(this, (ActActTriggerArchetype*)actionArchetype.second.get()));
 					break;

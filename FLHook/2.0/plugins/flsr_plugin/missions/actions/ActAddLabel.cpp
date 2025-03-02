@@ -1,5 +1,5 @@
-#include "ActAddLabel.h"
 #include <FLHook.h>
+#include "ActAddLabel.h"
 
 namespace Missions
 {

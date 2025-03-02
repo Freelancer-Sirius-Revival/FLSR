@@ -1,10 +1,10 @@
 #include "Mission.h"
 #include "Trigger.h"
-#include "Actions/ActChangeStateArch.h"
-#include "Actions/ActDestroyArch.h"
 
 namespace Missions
 {
+	std::vector<MissionArchetype> missionArchetypes;
+
 	std::vector<Mission*> activeMissions;
 
 	Mission::Mission(const MissionArchetype& missionArchetype) :
@@ -32,6 +32,15 @@ namespace Missions
 	{
 		for (Trigger* trigger : triggers)
 			delete trigger;
+
+		for (const auto& object : objects)
+		{
+			if (pub::SpaceObj::ExistsAndAlive(object.id) == 0) //0 means alive, -2 dead
+			{
+				pub::SpaceObj::Destroy(object.id, DestroyType::VANISH);
+			}
+		}
+
 		for (auto it = activeMissions.begin(); it != activeMissions.end(); it++)
 		{
 			const auto mission = *it;
@@ -62,8 +71,16 @@ namespace Missions
 
 	bool StartMission(const std::string& missionName)
 	{
-		const auto foundMission = missionArchetypesByName.find(missionName);
-		if (foundMission == missionArchetypesByName.end())
+		MissionArchetype* foundMissionArchetype = NULL;
+		for (auto& mission : missionArchetypes)
+		{
+			if (mission.name == missionName)
+			{
+				foundMissionArchetype = &mission;
+				break;
+			}
+		}
+		if (!foundMissionArchetype)
 			return false;
 
 		for (const Mission* mission : activeMissions)
@@ -73,7 +90,7 @@ namespace Missions
 				return false;
 			}
 		}
-		activeMissions.push_back(new Mission(foundMission->second));
+		activeMissions.push_back(new Mission(*foundMissionArchetype));
 		return true;
 	}
 
@@ -85,25 +102,14 @@ namespace Missions
 			if (mission->name == missionName)
 			{
 				TriggerArchetype triggerArch;
-				triggerArch.name = "Manual Abort";
-
-				std::shared_ptr<ActChangeStateArchetype> actChangeArchetype(new ActChangeStateArchetype());
-				actChangeArchetype->state = MissionState::ABORT;
-				triggerArch.actions.push_back({ TriggerAction::Act_ChangeState, actChangeArchetype });
-
-				for (const auto& object : mission->objects)
-				{
-					std::shared_ptr<ActDestroyArchetype> actDestroyArchetype(new ActDestroyArchetype());
-					actDestroyArchetype->destroyType = DestroyType::VANISH;
-					actDestroyArchetype->objNameOrLabel = object.name;
-					triggerArch.actions.push_back({ TriggerAction::Act_Destroy, actDestroyArchetype });
-				}
-
+				triggerArch.name = "Admin forced End";
+				triggerArch.actions.push_back({ TriggerAction::Act_EndMission, NULL });
 				Trigger* abortionTrigger = new Trigger(mission, triggerArch);
 				abortionTrigger->QueueExecution();
 				return true;
 			}
 		}
+		return false;
 	}
 
 	void RemoveObjectFromMissions(const uint objId)

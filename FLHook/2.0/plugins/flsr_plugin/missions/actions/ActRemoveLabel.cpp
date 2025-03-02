@@ -1,5 +1,5 @@
-#include "ActRemoveLabel.h"
 #include <FLHook.h>
+#include "ActRemoveLabel.h"
 
 namespace Missions
 {

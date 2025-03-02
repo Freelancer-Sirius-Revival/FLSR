@@ -1,5 +1,5 @@
 #pragma once
-#include "../Main.h"
+#include <FLHook.h>
 
 namespace Missions
 {

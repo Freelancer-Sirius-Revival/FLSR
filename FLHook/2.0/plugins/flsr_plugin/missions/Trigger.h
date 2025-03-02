@@ -11,8 +11,10 @@ namespace Missions
 	{
 		std::string name;
 		Mission* mission;
+		bool repeatable;
 		Condition* condition;
 		std::vector<Action*> actions;
+		bool active;
 
 		Trigger(Mission* parentMission, const TriggerArchetype& triggerArchetype);
 		virtual ~Trigger();

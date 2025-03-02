@@ -10,13 +10,12 @@ namespace Missions
 
 	void ActSpawnSolar::Execute()
 	{
-		const std::wstring outputPretext = stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Act_SpawnSolar " + stows(solarName);
+		ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Act_SpawnSolar " + stows(solarName));
 		for (auto it = trigger->mission->archetype.solars.begin(); it != trigger->mission->archetype.solars.end(); it++)
 		{
 			if (it->name == solarName)
 			{
-				ConPrint(outputPretext + L"\n");
-				const uint objId = SolarSpawn::SpawnSolarByName(solarName);
+				const uint objId = SolarSpawn::SpawnSolarByName(trigger->mission->name + ":" + solarName);
 				if (objId)
 				{
 					MissionObject object;
@@ -25,9 +24,10 @@ namespace Missions
 					object.labels = std::unordered_set(it->labels);
 					trigger->mission->objects.push_back(object);
 				}
+				ConPrint(L"\n");
 				return;
 			}
 		}
-		ConPrint(outputPretext + L" NOT FOUND\n");
+		ConPrint(L" NOT FOUND\n");
 	}
 }

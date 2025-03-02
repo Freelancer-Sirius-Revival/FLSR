@@ -16,6 +16,18 @@
 
 namespace Missions
 {
+	static Condition* instantiateCondition(Trigger* trigger, const TriggerArchConditionEntry& conditionArchetype)
+	{
+		switch (conditionArchetype.first)
+		{
+		case TriggerCondition::Cnd_Destroyed:
+			return new CndDestroyed(trigger, (CndDestroyedArchetype*)conditionArchetype.second.get());
+
+		default:
+			return new CndTrue(trigger);
+		}
+	}
+
 	std::queue<Trigger*> executionQueue;
 	bool executionRunning = false;
 
@@ -43,9 +55,27 @@ namespace Missions
 			if (trigger->mission->ended)
 				endedMissions.insert(trigger->mission);
 
-			// Delete the trigger once executed.
-			trigger->mission->RemoveTrigger(trigger);
-			delete trigger;
+			if (!trigger->repeatable)
+			{
+				// Delete the trigger once executed.
+				trigger->mission->RemoveTrigger(trigger);
+				delete trigger;
+			}
+			else
+			{
+				// Re-instantiate the condition to reset it.
+				for (const auto& triggerArchetype : trigger->mission->archetype.triggers)
+				{
+					if (triggerArchetype.name == trigger->name)
+					{
+						delete trigger->condition;
+						trigger->condition = instantiateCondition(trigger, triggerArchetype.condition);
+						if (trigger->active)
+							trigger->Activate();
+						break;
+					}
+				}
+			}
 		}
 
 		// Clean up all missions which have been ended this run.
@@ -54,22 +84,11 @@ namespace Missions
 		executionRunning = false;
 	}
 
-	static Condition* instantiateCondition(Trigger* trigger, const TriggerArchConditionEntry& conditionArchetype)
-	{
-		switch (conditionArchetype.first)
-		{
-			case TriggerCondition::Cnd_Destroyed:
-				return new CndDestroyed(trigger, (CndDestroyedArchetype*)conditionArchetype.second.get());
-
-			default:
-				return new CndTrue(trigger);
-		}
-	}
-
 	Trigger::Trigger(Mission* parentMission, const TriggerArchetype& triggerArchetype) :
 		name(triggerArchetype.name),
 		mission(parentMission),
-		repeatable(triggerArchetype.repeatable)
+		repeatable(triggerArchetype.repeatable),
+		active(triggerArchetype.active)
 	{
 		condition = instantiateCondition(this, triggerArchetype.condition);
 
@@ -129,6 +148,7 @@ namespace Missions
 
 	void Trigger::Activate()
 	{
+		active = true;
 		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Activate\n");
 		if (condition->type == TriggerCondition::Cnd_True)
 			QueueExecution();
@@ -138,6 +158,7 @@ namespace Missions
 
 	void Trigger::Deactivate()
 	{
+		active = false;
 		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Deactivate\n");
 		condition->Unregister();
 	}
@@ -145,7 +166,7 @@ namespace Missions
 	void Trigger::QueueExecution()
 	{
 		condition->Unregister();
-		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Queue execution\n");
+		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Queue execution, activator: client[" + std::to_wstring(condition->activator.clientId) + L"] obj[" + std::to_wstring(condition->activator.objId) + L"]\n");
 		executionQueue.push(this);
 		ExecuteTriggers();
 	}

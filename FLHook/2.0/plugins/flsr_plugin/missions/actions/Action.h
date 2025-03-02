@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct Action
 	{
-		const Trigger* trigger;
+		Trigger* trigger;
 		const TriggerAction type;
 
 		Action(Trigger* parentTrigger, const TriggerAction actType) :

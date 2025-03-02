@@ -12,6 +12,7 @@ namespace Missions
 		unsigned int id;
 		std::string name;
 		std::unordered_set<std::string> labels;
+		uint clientId = 0;
 	};
 
 	struct Mission

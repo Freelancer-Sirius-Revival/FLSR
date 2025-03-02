@@ -96,9 +96,9 @@ namespace Missions
 					while (ini.read_value())
 					{
 						if (ini.is_value("nickname"))
-							mission.name = ini.get_value_string(0);
+							mission.name = ToLower(ini.get_value_string(0));
 						else if (ini.is_value("InitState"))
-							mission.active = ToLower(std::string(ini.get_value_string(0))) == "active";
+							mission.active = ToLower(ini.get_value_string(0)) == "active";
 						else if (ini.is_value("title"))
 							mission.titleId = ini.get_value_int(0);
 						else if (ini.is_value("offer"))
@@ -124,7 +124,7 @@ namespace Missions
 					{
 						if (ini.is_value("nickname"))
 						{
-							solar.name = mission.name + ":" + std::string(ini.get_value_string(0));
+							solar.name = ToLower(ini.get_value_string(0));
 						}
 						else if (ini.is_value("string_id"))
 						{
@@ -187,7 +187,7 @@ namespace Missions
 						}
 						else if (ini.is_value("label"))
 						{
-							solar.labels.insert(ini.get_value_string(0));
+							solar.labels.insert(ToLower(ini.get_value_string(0)));
 						}
 					}
 
@@ -197,7 +197,7 @@ namespace Missions
 						SolarSpawn::SolarArchetype solarArch;
 						solarArch.archetypeId = solar.archetypeId;
 						solarArch.loadoutId = solar.loadoutId;
-						solarArch.nickname = solar.name;
+						solarArch.nickname = mission.name + ":" + solar.name;
 						solarArch.idsName = solar.idsName;
 						solarArch.position = solar.position;
 						solarArch.orientation = solar.orientation;
@@ -221,11 +221,15 @@ namespace Missions
 					{
 						if (ini.is_value("nickname"))
 						{
-							trigger.name = ini.get_value_string(0);
+							trigger.name = ToLower(ini.get_value_string(0));
 						}
 						else if (ini.is_value("InitState"))
 						{
-							trigger.active = ToLower(std::string(ini.get_value_string(0))) == "active";
+							trigger.active = ToLower(ini.get_value_string(0)) == "active";
+						}
+						else if (ini.is_value("repeatable"))
+						{
+							trigger.repeatable = ini.get_bool(0);
 						}
 						else if (ini.is_value("Cnd_True"))
 						{
@@ -236,7 +240,7 @@ namespace Missions
 						{
 							trigger.condition.first = TriggerCondition::Cnd_Destroyed;
 							std::shared_ptr<CndDestroyedArchetype> archetype(new CndDestroyedArchetype());
-							archetype->objNameOrLabel = ini.get_value_string(0);
+							archetype->objNameOrLabel = ToLower(ini.get_value_string(0));
 							archetype->count = ini.get_value_int(1);
 							const std::string val = ToLower(ini.get_value_string(2));
 							if (val == "explode")
@@ -245,7 +249,7 @@ namespace Missions
 								archetype->condition = DestroyedCondition::SILENT;
 							else
 								archetype->condition = DestroyedCondition::ALL;
-							archetype->killerNameOrLabel = ini.get_value_string(3);
+							archetype->killerNameOrLabel = ToLower(ini.get_value_string(3));
 							trigger.condition.second = archetype;
 						}
 						else if (ini.is_value("Act_EndMission"))
@@ -257,7 +261,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_ActTrig;
 							std::shared_ptr<ActActTriggerArchetype> archetype(new ActActTriggerArchetype());
-							archetype->triggerName = ini.get_value_string(0);
+							archetype->triggerName = ToLower(ini.get_value_string(0));
 							archetype->activate = true;
 							action.second = archetype;
 							trigger.actions.push_back(action);
@@ -267,7 +271,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_DeactTrig;
 							std::shared_ptr<ActActTriggerArchetype> archetype(new ActActTriggerArchetype());
-							archetype->triggerName = ini.get_value_string(0);
+							archetype->triggerName = ToLower(ini.get_value_string(0));
 							archetype->activate = false;
 							action.second = archetype;
 							trigger.actions.push_back(action);
@@ -277,8 +281,8 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_AddLabel;
 							std::shared_ptr<ActAddLabelArchetype> archetype(new ActAddLabelArchetype());
-							archetype->objNameOrLabel = ini.get_value_string(0);
-							archetype->label = ini.get_value_string(1);
+							archetype->objNameOrLabel = ToLower(ini.get_value_string(0));
+							archetype->label = ToLower(ini.get_value_string(1));
 							action.second = archetype;
 							trigger.actions.push_back(action);
 						}
@@ -287,8 +291,8 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_RemoveLabel;
 							std::shared_ptr<ActRemoveLabelArchetype> archetype(new ActRemoveLabelArchetype());
-							archetype->objNameOrLabel = ini.get_value_string(0);
-							archetype->label = ini.get_value_string(1);
+							archetype->objNameOrLabel = ToLower(ini.get_value_string(0));
+							archetype->label = ToLower(ini.get_value_string(1));
 							action.second = archetype;
 							trigger.actions.push_back(action);
 						}
@@ -297,7 +301,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_LightFuse;
 							std::shared_ptr<ActLightFuseArchetype> archetype(new ActLightFuseArchetype());
-							archetype->objNameOrLabel = mission.name + ":" + std::string(ini.get_value_string(0));
+							archetype->objNameOrLabel = ToLower(ini.get_value_string(0));
 							archetype->fuseId = CreateID(ini.get_value_string(1));
 							action.second = archetype;
 							trigger.actions.push_back(action);
@@ -321,7 +325,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_SpawnSolar;
 							std::shared_ptr<ActSpawnSolarArchetype> archetype(new ActSpawnSolarArchetype());
-							archetype->solarName = mission.name + ":" + std::string(ini.get_value_string(0));
+							archetype->solarName = ToLower(ini.get_value_string(0));
 							action.second = archetype;
 							trigger.actions.push_back(action);
 						}
@@ -330,7 +334,7 @@ namespace Missions
 							TriggerArchActionEntry action;
 							action.first = TriggerAction::Act_Destroy;
 							std::shared_ptr<ActDestroyArchetype> archetype(new ActDestroyArchetype());
-							archetype->objNameOrLabel = mission.name + ":" + std::string(ini.get_value_string(0));
+							archetype->objNameOrLabel = ToLower(ini.get_value_string(0));
 							const std::string val = ToLower(ini.get_value_string(1));
 							if (val == "explode")
 								archetype->destroyType = DestroyType::EXPLODE;

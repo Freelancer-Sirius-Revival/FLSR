@@ -82,6 +82,8 @@ namespace Missions
 			if (foundObjectCount <= 0)
 			{
 				ConPrint(outputPretext + L"\n");
+				activator.objId = killerId;
+				activator.clientId = HkGetClientIDByShip(killerId);
 				return true;
 			}
 		}
@@ -100,6 +102,8 @@ namespace Missions
 			if (count >= targetCount)
 			{
 				ConPrint(outputPretext + L"\n");
+				activator.objId = killerId;
+				activator.clientId = HkGetClientIDByShip(killerId);
 				return true;
 			}
 		}

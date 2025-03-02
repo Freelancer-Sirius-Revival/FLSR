@@ -148,7 +148,7 @@ namespace SolarSpawn
 					while (ini.read_value())
 					{
 						if (ini.is_value("nickname"))
-							solar.nickname = ini.get_value_string(0);
+							solar.nickname = ToLower(ini.get_value_string(0));
 						else if (ini.is_value("autospawn"))
 							solar.autospawn = ini.get_value_bool(0);
 						else if (ini.is_value("archetype"))

@@ -9,7 +9,7 @@ namespace Missions
 
 	void ActEndMission::Execute()
 	{
-		ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Act_EndMission\n");
+		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_EndMission\n");
 		trigger->mission->End();
 	}
 }

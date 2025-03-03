@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <FLHook.h>
 
 namespace Missions
@@ -13,9 +12,10 @@ namespace Missions
 	struct CndDistVecArchetype
 	{
 		DistanceCondition type = DistanceCondition::INSIDE;
-		std::string objNameOrLabel = "";
+		unsigned int objNameOrLabel = 0;
 		Vector position;
 		float distance = 0.0f;
 		unsigned int systemId = 0;
 	};
+	typedef std::shared_ptr<CndDistVecArchetype> CndDistVecArchetypePtr;
 }

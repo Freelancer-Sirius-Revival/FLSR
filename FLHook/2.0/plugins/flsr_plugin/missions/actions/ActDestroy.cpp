@@ -4,16 +4,15 @@
 
 namespace Missions
 {
-	ActDestroy::ActDestroy(Trigger* parentTrigger, const ActDestroyArchetype* archetype) :
+	ActDestroy::ActDestroy(Trigger* parentTrigger, const ActDestroyArchetypePtr actionArchetype) :
 		Action(parentTrigger, TriggerAction::Act_Destroy),
-		objNameOrLabel(archetype->objNameOrLabel),
-		destroyType(archetype->destroyType)
+		archetype(actionArchetype)
 	{}
 
 	void ActDestroy::Execute()
 	{
-		ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Act_Destroy " + stows(objNameOrLabel));
-		if (objNameOrLabel == "activator")
+		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_Destroy " + std::to_wstring(archetype->objNameOrLabel));
+		if (archetype->objNameOrLabel == CreateID("activator"))
 		{
 			if (trigger->condition->activator.clientId)
 			{
@@ -21,7 +20,7 @@ namespace Missions
 				pub::Player::GetShip(trigger->condition->activator.clientId, objId);
 				if (objId && pub::SpaceObj::ExistsAndAlive(objId) == 0) //0 means alive, -2 dead
 				{
-					pub::SpaceObj::Destroy(objId, destroyType);
+					pub::SpaceObj::Destroy(objId, archetype->destroyType);
 					ConPrint(L" client[" + std::to_wstring(trigger->condition->activator.clientId) + L"]");
 				}
 			}
@@ -29,11 +28,11 @@ namespace Missions
 			{
 				for (auto& object : trigger->mission->objects)
 				{
-					if (object.id == trigger->condition->activator.objId)
+					if (object.objId == trigger->condition->activator.objId)
 					{
-						if (pub::SpaceObj::ExistsAndAlive(object.id) == 0) //0 means alive, -2 dead
-							pub::SpaceObj::Destroy(object.id, destroyType);
-						ConPrint(L" obj[" + std::to_wstring(object.id) + L"]");
+						if (pub::SpaceObj::ExistsAndAlive(object.objId) == 0) //0 means alive, -2 dead
+							pub::SpaceObj::Destroy(object.objId, archetype->destroyType);
+						ConPrint(L" obj[" + std::to_wstring(object.objId) + L"]");
 						break;
 					}
 				}
@@ -45,14 +44,14 @@ namespace Missions
 			const auto originals = std::vector(trigger->mission->objects);
 			for (const auto& object : originals)
 			{
-				if (object.name == objNameOrLabel || object.labels.contains(objNameOrLabel))
+				if (object.name == archetype->objNameOrLabel || object.labels.contains(archetype->objNameOrLabel))
 				{
-					if (pub::SpaceObj::ExistsAndAlive(object.id) == 0) //0 means alive, -2 dead
-						pub::SpaceObj::Destroy(object.id, destroyType);
+					if (pub::SpaceObj::ExistsAndAlive(object.objId) == 0) //0 means alive, -2 dead
+						pub::SpaceObj::Destroy(object.objId, archetype->destroyType);
 					if (object.clientId)
 						ConPrint(L" client[" + std::to_wstring(object.clientId) + L"]");
 					else
-						ConPrint(L" obj[" + std::to_wstring(object.id) + L"]");
+						ConPrint(L" obj[" + std::to_wstring(object.objId) + L"]");
 				}
 			}
 		}

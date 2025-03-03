@@ -25,6 +25,7 @@ namespace Missions
 		float hitpointsPercentage = 1.0f;
 		uint voiceId = 0;
 		MsnSolarCostume costume;
-		std::unordered_set<std::string> labels;
+		std::unordered_set<uint> labels;
 	};
+	typedef std::shared_ptr<MsnSolarArchetype> MsnSolarArchetypePtr;
 }

@@ -5,7 +5,8 @@ namespace Missions
 {
 	struct ActDestroyArchetype
 	{
-		std::string objNameOrLabel = "";
+		uint objNameOrLabel = 0;
 		DestroyType destroyType = DestroyType::VANISH;
 	};
+	typedef std::shared_ptr<ActDestroyArchetype> ActDestroyArchetypePtr;
 }

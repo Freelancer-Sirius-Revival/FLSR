@@ -6,10 +6,10 @@ namespace Missions
 {
 	struct ActActTrigger : Action
 	{
-		const std::string triggerName;
+		const ActActTriggerArchetypePtr archetype;
 		bool activate;
 
-		ActActTrigger(Trigger* parentTrigger, const ActActTriggerArchetype* archetype);
+		ActActTrigger(Trigger* parentTrigger, const ActActTriggerArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

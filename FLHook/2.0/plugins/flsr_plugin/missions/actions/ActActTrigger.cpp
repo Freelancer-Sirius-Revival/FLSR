@@ -3,18 +3,18 @@
 
 namespace Missions
 {
-	ActActTrigger::ActActTrigger(Trigger* parentTrigger, const ActActTriggerArchetype* archetype) :
+	ActActTrigger::ActActTrigger(Trigger* parentTrigger, const ActActTriggerArchetypePtr actionArchetype) :
 		Action(parentTrigger, TriggerAction::Act_LightFuse),
-		triggerName(archetype->triggerName),
+		archetype(actionArchetype),
 		activate(archetype->activate)
 	{}
 
 	void ActActTrigger::Execute()
 	{
-		ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": " + (activate ? L"Act_ActTrigger" : L"Act_DeactTrigger") + L" " + stows(triggerName));
+		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": " + (activate ? L"Act_ActTrigger" : L"Act_DeactTrigger") + L" " + stows(archetype->triggerName));
 		for (const auto& trigger : trigger->mission->triggers)
 		{
-			if (trigger->name == triggerName)
+			if (trigger->archetype->name == archetype->triggerName)
 			{
 				ConPrint(L"\n");
 				activate ? trigger->Activate() : trigger->Deactivate();

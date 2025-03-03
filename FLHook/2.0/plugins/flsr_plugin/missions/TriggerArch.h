@@ -152,7 +152,8 @@ namespace Missions
 		std::string name = "";
 		bool active = false;
 		bool repeatable = false;
-		TriggerArchConditionEntry condition = { TriggerCondition::Cnd_True, NULL };
+		TriggerArchConditionEntry condition = { TriggerCondition::Cnd_True, nullptr };
 		std::vector<TriggerArchActionEntry> actions;
 	};
+	typedef std::shared_ptr<TriggerArchetype> TriggerArchetypePtr;
 }

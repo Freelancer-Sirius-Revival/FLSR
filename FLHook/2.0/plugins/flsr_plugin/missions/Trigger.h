@@ -9,14 +9,13 @@ namespace Missions
 
 	struct Trigger
 	{
-		std::string name;
+		const TriggerArchetypePtr archetype;
 		Mission* mission;
-		bool repeatable;
 		Condition* condition;
 		std::vector<Action*> actions;
 		bool active;
 
-		Trigger(Mission* parentMission, const TriggerArchetype& triggerArchetype);
+		Trigger(Mission* parentMission, const TriggerArchetypePtr triggerArchetype);
 		virtual ~Trigger();
 		void Activate();
 		void Deactivate();

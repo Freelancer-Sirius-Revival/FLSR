@@ -1,11 +1,11 @@
 #pragma once
-#include <string>
 
 namespace Missions
 {
 	struct ActRemoveLabelArchetype
 	{
-		std::string objNameOrLabel = "";
-		std::string label = "";
+		unsigned int objNameOrLabel = 0;
+		unsigned int label = 0;
 	};
+	typedef std::shared_ptr<ActRemoveLabelArchetype> ActRemoveLabelArchetypePtr;
 }

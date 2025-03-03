@@ -6,10 +6,9 @@ namespace Missions
 {
 	struct ActAddLabel : Action
 	{
-		const std::string objNameOrLabel;
-		const std::string label;
+		const ActAddLabelArchetypePtr archetype;
 
-		ActAddLabel(Trigger* parentTrigger, const ActAddLabelArchetype* archetype);
+		ActAddLabel(Trigger* parentTrigger, const ActAddLabelArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

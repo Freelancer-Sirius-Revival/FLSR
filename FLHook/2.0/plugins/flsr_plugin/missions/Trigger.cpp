@@ -22,10 +22,10 @@ namespace Missions
 		switch (conditionArchetype.first)
 		{
 			case TriggerCondition::Cnd_Destroyed:
-				return new CndDestroyed(trigger, (CndDestroyedArchetype*)conditionArchetype.second.get());
+				return new CndDestroyed(trigger, std::static_pointer_cast<CndDestroyedArchetype>(conditionArchetype.second));
 
 			case TriggerCondition::Cnd_DistVec:
-				return new CndDistVec(trigger, (CndDistVecArchetype*)conditionArchetype.second.get());
+				return new CndDistVec(trigger, std::static_pointer_cast<CndDistVecArchetype>(conditionArchetype.second));
 
 			default:
 				return new CndTrue(trigger);
@@ -49,17 +49,17 @@ namespace Missions
 			// Skip any further triggers if the mission has been ended.
 			if (trigger->mission->ended)
 			{
-				ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Skip execution due to ended mission.\n");
+				ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Skip execution due to ended mission.\n");
 				continue;
 			}
-			ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Execute\n");
+			ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Execute\n");
 			for (Action* action : trigger->actions)
 				action->Execute();
 
 			if (trigger->mission->ended)
 				endedMissions.insert(trigger->mission);
 
-			if (!trigger->repeatable)
+			if (!trigger->archetype->repeatable)
 			{
 				// Delete the trigger once executed.
 				trigger->mission->RemoveTrigger(trigger);
@@ -68,12 +68,12 @@ namespace Missions
 			else
 			{
 				// Re-instantiate the condition to reset it.
-				for (const auto& triggerArchetype : trigger->mission->archetype.triggers)
+				for (const auto& triggerArchetype : trigger->mission->archetype->triggers)
 				{
-					if (triggerArchetype.name == trigger->name)
+					if (triggerArchetype->name == trigger->archetype->name)
 					{
 						delete trigger->condition;
-						trigger->condition = instantiateCondition(trigger, triggerArchetype.condition);
+						trigger->condition = instantiateCondition(trigger, triggerArchetype->condition);
 						if (trigger->active)
 							trigger->Activate();
 						break;
@@ -88,15 +88,14 @@ namespace Missions
 		executionRunning = false;
 	}
 
-	Trigger::Trigger(Mission* parentMission, const TriggerArchetype& triggerArchetype) :
-		name(triggerArchetype.name),
+	Trigger::Trigger(Mission* parentMission, const TriggerArchetypePtr triggerArchetype) :
+		archetype(triggerArchetype),
 		mission(parentMission),
-		repeatable(triggerArchetype.repeatable),
-		active(triggerArchetype.active)
+		active(triggerArchetype->active)
 	{
-		condition = instantiateCondition(this, triggerArchetype.condition);
+		condition = instantiateCondition(this, archetype->condition);
 
-		for (const auto& actionArchetype : triggerArchetype.actions)
+		for (const auto& actionArchetype : archetype->actions)
 		{
 			switch (actionArchetype.first)
 			{
@@ -105,35 +104,35 @@ namespace Missions
 					break;
 
 				case TriggerAction::Act_ActTrig:
-					actions.push_back(new ActActTrigger(this, (ActActTriggerArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActActTrigger(this, std::static_pointer_cast<ActActTriggerArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_DeactTrig:
-					actions.push_back(new ActActTrigger(this, (ActActTriggerArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActActTrigger(this, std::static_pointer_cast<ActActTriggerArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_AddLabel:
-					actions.push_back(new ActAddLabel(this, (ActAddLabelArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActAddLabel(this, std::static_pointer_cast<ActAddLabelArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_RemoveLabel:
-					actions.push_back(new ActRemoveLabel(this, (ActRemoveLabelArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActRemoveLabel(this, std::static_pointer_cast<ActRemoveLabelArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_Destroy:
-					actions.push_back(new ActDestroy(this, (ActDestroyArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActDestroy(this, std::static_pointer_cast<ActDestroyArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_SpawnSolar:
-					actions.push_back(new ActSpawnSolar(this, (ActSpawnSolarArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActSpawnSolar(this, std::static_pointer_cast<ActSpawnSolarArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_ChangeState:
-					actions.push_back(new ActChangeState(this, (ActChangeStateArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActChangeState(this, std::static_pointer_cast<ActChangeStateArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_LightFuse:
-					actions.push_back(new ActLightFuse(this, (ActLightFuseArchetype*)actionArchetype.second.get()));
+					actions.push_back(new ActLightFuse(this, std::static_pointer_cast<ActLightFuseArchetype>(actionArchetype.second)));
 					break;
 
 				default:
@@ -153,7 +152,7 @@ namespace Missions
 	void Trigger::Activate()
 	{
 		active = true;
-		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Activate\n");
+		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Activate\n");
 		if (condition->type == TriggerCondition::Cnd_True)
 			QueueExecution();
 		else
@@ -163,14 +162,14 @@ namespace Missions
 	void Trigger::Deactivate()
 	{
 		active = false;
-		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Deactivate\n");
+		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Deactivate\n");
 		condition->Unregister();
 	}
 
 	void Trigger::QueueExecution()
 	{
 		condition->Unregister();
-		ConPrint(stows(mission->name) + L"->" + stows(name) + L": Queue execution, activator: client[" + std::to_wstring(condition->activator.clientId) + L"] obj[" + std::to_wstring(condition->activator.objId) + L"]\n");
+		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Queue execution, activator: client[" + std::to_wstring(condition->activator.clientId) + L"] obj[" + std::to_wstring(condition->activator.objId) + L"]\n");
 		executionQueue.push(this);
 		ExecuteTriggers();
 	}

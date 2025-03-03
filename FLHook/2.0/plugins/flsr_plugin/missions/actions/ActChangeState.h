@@ -6,10 +6,9 @@ namespace Missions
 {
 	struct ActChangeState : Action
 	{
-		MissionState state;
-		const unsigned int failTextId;
+		const ActChangeStateArchetypePtr archetype;
 
-		ActChangeState(Trigger* parentTrigger, const ActChangeStateArchetype* archetype);
+		ActChangeState(Trigger* parentTrigger, const ActChangeStateArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

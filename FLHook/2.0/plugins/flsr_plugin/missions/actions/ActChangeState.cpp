@@ -1,16 +1,14 @@
-#include <FLHook.h>
 #include "ActChangeState.h"
 
 namespace Missions
 {
-	ActChangeState::ActChangeState(Trigger* parentTrigger, const ActChangeStateArchetype* archetype) :
+	ActChangeState::ActChangeState(Trigger* parentTrigger, const ActChangeStateArchetypePtr actionArchetype) :
 		Action(parentTrigger, TriggerAction::Act_ChangeState),
-		state(archetype->state),
-		failTextId(archetype->failTextId)
+		archetype(actionArchetype)
 	{}
 
 	void ActChangeState::Execute()
 	{
-		ConPrint(stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Act_ChangeState to " + std::to_wstring(state) + L"\n");
+		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_ChangeState to " + std::to_wstring(archetype->state) + L"\n");
 	}
 }

@@ -9,25 +9,21 @@ namespace Missions
 
 	struct MissionObject
 	{
-		unsigned int id;
-		std::string name;
-		std::unordered_set<std::string> labels;
+		uint objId;
+		uint name;
+		std::unordered_set<uint> labels;
 		uint clientId = 0;
 	};
 
 	struct Mission
 	{
-		const MissionArchetype& archetype;
+		const MissionArchetypePtr archetype;
 		bool ended;
-		const std::string name;
-		const int reward;
-		const unsigned int titleId;
-		const unsigned int offerId;
 
 		std::vector<MissionObject> objects;
 		std::vector<Trigger*> triggers;
 
-		Mission(const MissionArchetype& missionArchetype);
+		Mission(const MissionArchetypePtr missionArchetype);
 		virtual ~Mission();
 		void End();
 		void RemoveTrigger(const Trigger* trigger);

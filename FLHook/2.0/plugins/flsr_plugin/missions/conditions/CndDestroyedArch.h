@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 
 namespace Missions
 {
@@ -12,9 +11,10 @@ namespace Missions
 
 	struct CndDestroyedArchetype
 	{
-		std::string objNameOrLabel = "";
+		unsigned int objNameOrLabel = 0;
 		int count = 0;
 		DestroyedCondition condition = DestroyedCondition::ALL;
-		std::string killerNameOrLabel = "";
+		unsigned int killerNameOrLabel = 0;
 	};
+	typedef std::shared_ptr<CndDestroyedArchetype> CndDestroyedArchetypePtr;
 }

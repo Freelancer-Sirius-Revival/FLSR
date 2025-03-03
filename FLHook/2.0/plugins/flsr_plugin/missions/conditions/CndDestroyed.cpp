@@ -4,13 +4,10 @@ namespace Missions
 {
 	std::unordered_set<CndDestroyed*> destroyedConditions;
 
-	CndDestroyed::CndDestroyed(Trigger* parentTrigger, const CndDestroyedArchetype* archetype) :
+	CndDestroyed::CndDestroyed(Trigger* parentTrigger, const CndDestroyedArchetypePtr conditionArchetype) :
 		Condition(parentTrigger, TriggerCondition::Cnd_Destroyed),
-		count(0),
-		objNameOrLabel(archetype->objNameOrLabel),
-		targetCount(archetype->count),
-		condition(archetype->condition),
-		killerNameOrLabel(archetype->killerNameOrLabel)
+		archetype(conditionArchetype),
+		count(0)
 	{}
 
 	void CndDestroyed::Register()
@@ -25,7 +22,7 @@ namespace Missions
 
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
-		switch (condition)
+		switch (archetype->condition)
 		{
 			case DestroyedCondition::SILENT:
 			{
@@ -45,12 +42,12 @@ namespace Missions
 				break;
 		}
 
-		if (!killerNameOrLabel.empty())
+		if (!archetype->killerNameOrLabel)
 		{
 			bool killerFound = false;
 			for (const auto& object : trigger->mission->objects)
 			{
-				if (object.id == killerId && (object.name == killerNameOrLabel || object.labels.contains(killerNameOrLabel)))
+				if (object.objId == killerId && (object.name == archetype->killerNameOrLabel || object.labels.contains(archetype->killerNameOrLabel)))
 				{
 					killerFound = true;
 					break;
@@ -60,15 +57,15 @@ namespace Missions
 				return false;
 		}
 
-		std::wstring outputPretext = stows(trigger->mission->name) + L"->" + stows(trigger->name) + L": Cnd_Destroyed " + stows(objNameOrLabel);
+		std::wstring outputPretext = stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_Destroyed " + std::to_wstring(archetype->objNameOrLabel);
 
-		if (targetCount < 0)
+		if (archetype->count < 0)
 		{
 			int foundObjectCount = 0;
 			for (const auto& object : trigger->mission->objects)
 			{
-				const bool nameOrLabelMatch = object.name == objNameOrLabel || object.labels.contains(objNameOrLabel);
-				if (killedObject->cobj->id == object.id && nameOrLabelMatch)
+				const bool nameOrLabelMatch = object.name == archetype->objNameOrLabel || object.labels.contains(archetype->objNameOrLabel);
+				if (killedObject->cobj->id == object.objId && nameOrLabelMatch)
 				{
 					// Reduce the count of objects by this label because this object was just destroyed.
 					foundObjectCount--;
@@ -91,15 +88,15 @@ namespace Missions
 		{
 			for (const auto& object : trigger->mission->objects)
 			{
-				if (killedObject->cobj->id == object.id && (object.name == objNameOrLabel || object.labels.contains(objNameOrLabel)))
+				if (killedObject->cobj->id == object.objId && (object.name == archetype->objNameOrLabel || object.labels.contains(archetype->objNameOrLabel)))
 				{
 					count++;
-					ConPrint(outputPretext + L" " + std::to_wstring(count) + L" of " + std::to_wstring(targetCount) + L"\n");
+					ConPrint(outputPretext + L" " + std::to_wstring(count) + L" of " + std::to_wstring(archetype->count) + L"\n");
 					break;
 				}
 			}
 
-			if (count >= targetCount)
+			if (count >= archetype->count)
 			{
 				ConPrint(outputPretext + L"\n");
 				activator.objId = killerId;

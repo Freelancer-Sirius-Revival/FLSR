@@ -6,10 +6,9 @@ namespace Missions
 {
 	struct ActLightFuse : Action
 	{
-		const std::string objNameOrLabel;
-		const unsigned int fuseId;
+		const ActLightFuseArchetypePtr archetype;
 
-		ActLightFuse(Trigger* parentTrigger, const ActLightFuseArchetype* archetype);
+		ActLightFuse(Trigger* parentTrigger, const ActLightFuseArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

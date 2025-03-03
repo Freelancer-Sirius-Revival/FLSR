@@ -6,10 +6,9 @@ namespace Missions
 {
 	struct ActRemoveLabel : Action
 	{
-		const std::string objNameOrLabel;
-		const std::string label;
+		const ActRemoveLabelArchetypePtr archetype;
 
-		ActRemoveLabel(Trigger* parentTrigger, const ActRemoveLabelArchetype* archetype);
+		ActRemoveLabel(Trigger* parentTrigger, const ActRemoveLabelArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

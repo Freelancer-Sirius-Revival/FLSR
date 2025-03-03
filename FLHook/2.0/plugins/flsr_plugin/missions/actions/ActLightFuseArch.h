@@ -1,11 +1,11 @@
 #pragma once
-#include <string>
 
 namespace Missions
 {
 	struct ActLightFuseArchetype
 	{
-		std::string objNameOrLabel = "";
+		unsigned int objNameOrLabel = 0;
 		unsigned int fuseId = 0;
 	};
+	typedef std::shared_ptr<ActLightFuseArchetype> ActLightFuseArchetypePtr;
 }

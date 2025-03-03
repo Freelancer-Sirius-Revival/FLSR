@@ -6,9 +6,9 @@ namespace Missions
 {
 	struct ActSpawnSolar : Action
 	{
-		const std::string solarName;
+		const ActSpawnSolarArchetypePtr archetype;
 
-		ActSpawnSolar(Trigger* parentTrigger, const ActSpawnSolarArchetype* archetype);
+		ActSpawnSolar(Trigger* parentTrigger, const ActSpawnSolarArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

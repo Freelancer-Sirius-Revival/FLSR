@@ -13,13 +13,9 @@ namespace Missions
 
 	struct CndDistVec : Condition
 	{
-		DistanceCondition type;
-		std::string objNameOrLabel;
-		Vector position;
-		float distance;
-		unsigned int systemId;
+		CndDistVecArchetypePtr archetype;
 
-		CndDistVec(Trigger* parentTrigger, const CndDistVecArchetype* archetype);
+		CndDistVec(Trigger* parentTrigger, const CndDistVecArchetypePtr conditionArchetype);
 		void Register();
 		void Unregister();
 		bool Matches(std::vector<DistVecMatchEntry>& entries);

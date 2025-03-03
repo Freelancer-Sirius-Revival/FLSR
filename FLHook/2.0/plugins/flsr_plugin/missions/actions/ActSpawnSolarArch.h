@@ -7,4 +7,5 @@ namespace Missions
 	{
 		std::string solarName = "";
 	};
+	typedef std::shared_ptr<ActSpawnSolarArchetype> ActSpawnSolarArchetypePtr;
 }

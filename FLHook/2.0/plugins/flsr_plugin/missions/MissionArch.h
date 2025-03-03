@@ -9,12 +9,10 @@ namespace Missions
 	{
 		std::string name = "";
 		bool active = false;
-		int reward = 0;
-		unsigned int titleId = 1;
-		unsigned int offerId = 1;
-		std::vector<TriggerArchetype> triggers;
-		std::vector<MsnSolarArchetype> solars;
+		std::vector<TriggerArchetypePtr> triggers;
+		std::vector<MsnSolarArchetypePtr> solars;
 	};
+	typedef std::shared_ptr<MissionArchetype> MissionArchetypePtr;
 
-	extern std::vector<MissionArchetype> missionArchetypes;
+	extern std::vector<MissionArchetypePtr> missionArchetypes;
 }

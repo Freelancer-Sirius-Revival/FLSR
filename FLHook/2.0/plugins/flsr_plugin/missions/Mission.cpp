@@ -3,24 +3,20 @@
 
 namespace Missions
 {
-	std::vector<MissionArchetype> missionArchetypes;
+	std::vector<MissionArchetypePtr> missionArchetypes;
 
 	std::vector<Mission*> activeMissions;
 
-	Mission::Mission(const MissionArchetype& missionArchetype) :
+	Mission::Mission(const MissionArchetypePtr missionArchetype) :
 		archetype(missionArchetype),
-		name(missionArchetype.name),
-		reward(missionArchetype.reward),
-		titleId(missionArchetype.titleId),
-		offerId(missionArchetype.offerId),
 		ended(false)
 	{
 		std::vector<Trigger*> initialTriggers;
-		for (const auto& triggerArchetype : missionArchetype.triggers)
+		for (const auto& triggerArchetype : missionArchetype->triggers)
 		{
 			Trigger* trigger = new Trigger(this, triggerArchetype);
 			triggers.push_back(trigger);
-			if (triggerArchetype.active)
+			if (triggerArchetype->active)
 				initialTriggers.push_back(trigger);
 		}
 
@@ -38,7 +34,7 @@ namespace Missions
 		for (const auto& object : objects)
 		{
 			if (!object.clientId)
-				objectIds.push_back(object.id);
+				objectIds.push_back(object.objId);
 		}
 		for (const uint objectId : objectIds)
 		{
@@ -76,12 +72,12 @@ namespace Missions
 
 	bool StartMission(const std::string& missionName)
 	{
-		MissionArchetype* foundMissionArchetype = NULL;
-		for (auto& mission : missionArchetypes)
+		std::shared_ptr<MissionArchetype> foundMissionArchetype = nullptr;
+		for (const auto& mission : missionArchetypes)
 		{
-			if (mission.name == missionName)
+			if (mission->name == missionName)
 			{
-				foundMissionArchetype = &mission;
+				foundMissionArchetype = mission;
 				break;
 			}
 		}
@@ -90,12 +86,12 @@ namespace Missions
 
 		for (const Mission* mission : activeMissions)
 		{
-			if (mission->name == missionName)
+			if (mission->archetype->name == missionName)
 			{
 				return false;
 			}
 		}
-		activeMissions.push_back(new Mission(*foundMissionArchetype));
+		activeMissions.push_back(new Mission(foundMissionArchetype));
 		return true;
 	}
 
@@ -104,11 +100,11 @@ namespace Missions
 		for (auto it = activeMissions.begin(); it != activeMissions.end(); it++)
 		{
 			const auto mission = *it;
-			if (mission->name == missionName)
+			if (mission->archetype->name == missionName)
 			{
-				TriggerArchetype triggerArch;
-				triggerArch.name = "Admin forced End";
-				triggerArch.actions.push_back({ TriggerAction::Act_EndMission, NULL });
+				TriggerArchetypePtr triggerArch(new TriggerArchetype());
+				triggerArch->name = "Admin forced End";
+				triggerArch->actions.push_back({ TriggerAction::Act_EndMission, NULL });
 				Trigger* abortionTrigger = new Trigger(mission, triggerArch);
 				abortionTrigger->QueueExecution();
 				return true;
@@ -123,7 +119,7 @@ namespace Missions
 		{
 			for (auto it = labelAndMission->objects.begin(); it != labelAndMission->objects.end();)
 			{
-				if (it->id == objId)
+				if (it->objId == objId)
 					it = labelAndMission->objects.erase(it);
 				else
 					it++;

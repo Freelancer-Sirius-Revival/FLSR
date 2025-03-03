@@ -7,13 +7,10 @@ namespace Missions
 {
 	struct CndDestroyed : Condition
 	{
-		const std::string objNameOrLabel;
+		const CndDestroyedArchetypePtr archetype;
 		int count;
-		const int targetCount;
-		const DestroyedCondition condition;
-		const std::string killerNameOrLabel;
 
-		CndDestroyed(Trigger* parentTrigger, const CndDestroyedArchetype* archetype);
+		CndDestroyed(Trigger* parentTrigger, const CndDestroyedArchetypePtr conditionArchetype);
 		void Register();
 		void Unregister();
 		bool Matches(const IObjRW* killedObject, const bool killed, const uint killerId);

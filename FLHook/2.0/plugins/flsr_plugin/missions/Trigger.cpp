@@ -169,7 +169,12 @@ namespace Missions
 	void Trigger::QueueExecution()
 	{
 		condition->Unregister();
-		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Queue execution, activator: client[" + std::to_wstring(condition->activator.clientId) + L"] obj[" + std::to_wstring(condition->activator.objId) + L"]\n");
+		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Queue execution, activator: ");
+		if (condition->activator.type == MissionObjectType::Client)
+			ConPrint(L"client[" + std::to_wstring(condition->activator.id) + L"]");
+		else
+			ConPrint(L"obj[" + std::to_wstring(condition->activator.id) + L"]");
+		ConPrint(L"\n");
 		executionQueue.push(this);
 		ExecuteTriggers();
 	}

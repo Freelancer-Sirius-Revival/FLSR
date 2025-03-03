@@ -3,6 +3,8 @@
 
 namespace Missions
 {
+	const uint Activator = CreateID("activator");
+
 	struct Action
 	{
 		Trigger* trigger;

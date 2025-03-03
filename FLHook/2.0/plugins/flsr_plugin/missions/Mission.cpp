@@ -32,13 +32,18 @@ namespace Missions
 	{
 		for (Trigger* trigger : triggers)
 			delete trigger;
-
+		
+		// Copy all ids of non-player-objects. The following process will modify the objects list implicitely.
+		std::vector<uint> objectIds;
 		for (const auto& object : objects)
 		{
-			if (pub::SpaceObj::ExistsAndAlive(object.id) == 0) //0 means alive, -2 dead
-			{
-				pub::SpaceObj::Destroy(object.id, DestroyType::VANISH);
-			}
+			if (!object.clientId)
+				objectIds.push_back(object.id);
+		}
+		for (const uint objectId : objectIds)
+		{
+			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0) //0 means alive, -2 dead
+				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
 
 		for (auto it = activeMissions.begin(); it != activeMissions.end(); it++)

@@ -831,16 +831,18 @@ namespace pub
 
 	namespace Audio
 	{
-		struct Tryptich {
-			uint iDunno;
-			uint iDunno2;
-			uint iDunno3;
-			uint iMusicID;
+		struct MusicParams {
+			uint spaceMusic = 0;
+			uint dangerMusic = 0;
+			uint battleMusic = 0;
+			uint overrideMusic = 0;
+			bool playOnce = false;
+			float crossFadeDurationInS = 0.0f;
 		};
 
 		IMPORT  int CancelMusic(unsigned int);
 		IMPORT  int PlaySoundEffect(unsigned int, unsigned int);
-		IMPORT  int SetMusic(unsigned int, struct Tryptich const&);
+		IMPORT  int SetMusic(unsigned int, struct MusicParams const&);
 	};
 
 	namespace Controller

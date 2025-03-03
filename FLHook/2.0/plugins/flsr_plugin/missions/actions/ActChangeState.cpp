@@ -9,6 +9,6 @@ namespace Missions
 
 	void ActChangeState::Execute()
 	{
-		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_ChangeState to " + std::to_wstring(archetype->state) + L"\n");
+		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_ChangeState to " + (archetype->state == MissionState::Fail ? L"Fail" : L"Success") + L"\n");
 	}
 }

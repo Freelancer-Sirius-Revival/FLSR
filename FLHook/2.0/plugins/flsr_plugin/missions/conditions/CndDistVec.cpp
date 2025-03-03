@@ -19,16 +19,34 @@ namespace Missions
 		distVecConditions.erase(this);
 	}
 
-	bool CndDistVec::Matches(std::vector<DistVecMatchEntry>& entries)
+	static bool isInside(const DistVecMatchEntry& entry, const CndDistVecArchetypePtr& archetype)
 	{
-		for (auto& entry : entries)
+		if (entry.systemId != archetype->systemId)
+			return false;
+		const bool inside = archetype->distance - HkDistance3D(archetype->position, entry.position) > 0.0f;
+		return (archetype->type == DistanceCondition::Inside && inside) || (archetype->type == DistanceCondition::Outside && !inside);
+	}
+
+	bool CndDistVec::Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId)
+	{
+		const std::wstring outputPretext = stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_DistVec " + std::to_wstring(archetype->objNameOrLabel);
+		for (const uint clientId : trigger->mission->clientIds)
 		{
-			const bool inside = archetype->distance - HkDistance3D(archetype->position, entry.position) > 0.0f;
-			if ((archetype->type == DistanceCondition::INSIDE && inside) || (archetype->type == DistanceCondition::OUTSIDE && !inside))
+			if (const auto& entry = clientsByClientId.find(clientId); entry != clientsByClientId.end() && isInside(entry->second, archetype))
 			{
-				activator.clientId = entry.clientId;
-				activator.objId = entry.objId;
-				ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_DistVec " + std::to_wstring(archetype->objNameOrLabel) + L" client[" + std::to_wstring(activator.clientId) + L"] obj[" + std::to_wstring(activator.objId) + L"]\n");
+				activator.type = MissionObjectType::Client;
+				activator.id = entry->first;
+				ConPrint(outputPretext + L" client[" + std::to_wstring(activator.id) + L"]\n");
+				return true;
+			}
+		}
+		for (const uint objId : trigger->mission->objectIds)
+		{
+			if (const auto& entry = objectsByObjId.find(objId); entry != objectsByObjId.end() && isInside(entry->second, archetype))
+			{
+				activator.type = MissionObjectType::Object;
+				activator.id = entry->first;
+				ConPrint(outputPretext + L" client[" + std::to_wstring(activator.id) + L"]\n");
 				return true;
 			}
 		}

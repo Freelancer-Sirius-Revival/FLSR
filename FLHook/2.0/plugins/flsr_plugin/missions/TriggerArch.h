@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	const enum TriggerCondition
+	enum class TriggerCondition
 	{
 		Cnd_WatchVibe,
 		Cnd_WatchTrigger,
@@ -52,7 +52,7 @@ namespace Missions
 		Cnd_BaseEnter
 	};
 
-	const enum TriggerAction
+	enum class TriggerAction
 	{
 		Act_ActTrig,
 		Act_AddAmbient,

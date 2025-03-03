@@ -9,58 +9,55 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
+	static bool Fuse(const uint fuseId, uint objId)
+	{
+		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+			return false;
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (!GetShipInspect(objId, inspect, starSystem))
+			return false;
+		HkLightFuse(inspect, fuseId, 0.0f, 0.0f, 0.0f);
+		return true;
+	}
+
 	void ActLightFuse::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_LightFuse " + std::to_wstring(archetype->fuseId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == CreateID("activator"))
 		{
-			if (trigger->condition->activator.clientId)
+			auto& activator = trigger->condition->activator;
+			if (activator.type == MissionObjectType::Client)
 			{
 				uint objId;
-				pub::Player::GetShip(trigger->condition->activator.clientId, objId);
-				if (objId)
-				{
-					IObjRW* inspect;
-					StarSystem* starSystem;
-					if (GetShipInspect(objId, inspect, starSystem))
-					{
-						HkLightFuse(inspect, archetype->fuseId, 0.0f, 0.0f, 0.0f);
-						ConPrint(L" client[" + std::to_wstring(trigger->condition->activator.clientId) + L"]");
-					}
-				}
+				pub::Player::GetShip(activator.id, objId);
+				if (objId && Fuse(archetype->fuseId, objId))
+					ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 			}
-			else if (trigger->condition->activator.objId)
+			else if (trigger->mission->objectIds.contains(activator.id) && Fuse(archetype->fuseId, activator.id))
 			{
-				for (auto& object : trigger->mission->objects)
-				{
-					if (object.objId == trigger->condition->activator.objId)
-					{
-						IObjRW* inspect;
-						StarSystem* starSystem;
-						if (!GetShipInspect(object.objId, inspect, starSystem))
-							break;
-						HkLightFuse(inspect, archetype->fuseId, 0.0f, 0.0f, 0.0f);
-						ConPrint(L" obj[" + std::to_wstring(object.objId) + L"]");
-						break;
-					}
-				}
+				ConPrint(L" obj[" + std::to_wstring(activator.id) + L"]");
 			}
 		}
 		else
 		{
-			for (auto it = trigger->mission->objects.begin(); it != trigger->mission->objects.end(); it++)
+			// Clients can only be addressed via Label.
+			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->objNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
 			{
-				if (it->name == archetype->objNameOrLabel || it->labels.contains(archetype->objNameOrLabel))
+				if (Fuse(archetype->fuseId, objectByName->second))
+					ConPrint(L" obj[" + std::to_wstring(objectByName->second) + L"]");
+			}
+			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+			{
+				for (const auto& object : objectsByLabel->second)
 				{
-					IObjRW* inspect;
-					StarSystem* starSystem;
-					if (!GetShipInspect(it->objId, inspect, starSystem))
-						continue;
-					HkLightFuse(inspect, archetype->fuseId, 0.0f, 0.0f, 0.0f);
-					if (it->clientId)
-						ConPrint(L" client[" + std::to_wstring(it->clientId) + L"]");
-					else
-						ConPrint(L" obj[" + std::to_wstring(it->objId) + L"]");
+					if (Fuse(archetype->fuseId, object.id))
+					{
+						if (object.type == MissionObjectType::Client)
+							ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
+						else
+							ConPrint(L" obj[" + std::to_wstring(object.id) + L"]");
+					}
 				}
 			}
 		}

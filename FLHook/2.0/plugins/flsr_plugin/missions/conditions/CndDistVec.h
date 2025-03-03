@@ -6,9 +6,8 @@ namespace Missions
 {
 	struct DistVecMatchEntry
 	{
+		uint systemId;
 		Vector position;
-		uint objId;
-		uint clientId;
 	};
 
 	struct CndDistVec : Condition
@@ -18,7 +17,7 @@ namespace Missions
 		CndDistVec(Trigger* parentTrigger, const CndDistVecArchetypePtr conditionArchetype);
 		void Register();
 		void Unregister();
-		bool Matches(std::vector<DistVecMatchEntry>& entries);
+		bool Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId);
 	};
 
 	extern std::unordered_set<CndDistVec*> distVecConditions;

@@ -2,15 +2,15 @@
 
 namespace Missions
 {
-	const enum MissionState
+	enum class MissionState
 	{
-		FAIL,
-		SUCCEED
+		Fail,
+		Succeed
 	};
 
 	struct ActChangeStateArchetype
 	{
-		MissionState state = MissionState::FAIL;
+		MissionState state = MissionState::Fail;
 		unsigned int failTextId = 0;
 	};
 	typedef std::shared_ptr<ActChangeStateArchetype> ActChangeStateArchetypePtr;

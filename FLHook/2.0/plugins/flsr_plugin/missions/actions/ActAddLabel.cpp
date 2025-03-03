@@ -9,61 +9,62 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
+	static void AddLabelIfNotExisting(ActAddLabel& action, const MissionObject& object)
+	{
+		if (object.id == 0)
+			return;
+
+		bool found = false;
+		for (const auto& objectByLabel : action.trigger->mission->objectsByLabel[action.archetype->label])
+		{
+			if (objectByLabel == object)
+			{
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			action.trigger->mission->objectsByLabel[action.archetype->label].push_back(object);
+			if (object.type == MissionObjectType::Client)
+				ConPrint(L" client");
+			else
+				ConPrint(L" obj");
+			ConPrint(L"[" + std::to_wstring(object.id) + L"]");
+		}
+	}
+
 	void ActAddLabel::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_AddLabel " + std::to_wstring(archetype->label) + L" to " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == CreateID("activator"))
 		{
-			if (trigger->condition->activator.clientId)
+			const auto& activator = trigger->condition->activator;
+			if (activator.type == MissionObjectType::Client)
 			{
-				bool entryFound = false;
-				for (auto& object : trigger->mission->objects)
-				{
-					if (object.clientId == trigger->condition->activator.clientId)
-					{
-						object.labels.insert(archetype->label);
-						ConPrint(L" client[" + std::to_wstring(object.clientId) + L"]");
-						entryFound = true;
-						break;
-					}
-				}
-				// Add player to the mission
-				if (!entryFound)
-				{
-					MissionObject obj;
-					obj.objId = trigger->condition->activator.objId;
-					obj.name = CreateID("player");
-					obj.labels.insert(archetype->label);
-					obj.clientId = trigger->condition->activator.clientId;
-					trigger->mission->objects.push_back(obj);
-					ConPrint(L" client[" + std::to_wstring(obj.clientId) + L"]");
-				}
+				// Clients are made known to the mission by giving them a label.
+				trigger->mission->clientIds.insert(activator.id);
+				AddLabelIfNotExisting(*this, activator);
 			}
-			else if (trigger->condition->activator.objId)
+			else if (trigger->mission->objectIds.contains(activator.id))
 			{
-				for (auto& object : trigger->mission->objects)
-				{
-					if (object.objId == trigger->condition->activator.objId)
-					{
-						object.labels.insert(archetype->label);
-						ConPrint(L" obj[" + std::to_wstring(object.objId) + L"]");
-						break;
-					}
-				}
+				AddLabelIfNotExisting(*this, activator);
 			}
 		}
 		else
 		{
-			for (auto& object : trigger->mission->objects)
+			// Clients can only be addressed via Label.
+			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->objNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
 			{
-				if (object.name == archetype->objNameOrLabel || object.labels.contains(archetype->objNameOrLabel))
-				{
-					object.labels.insert(archetype->label);
-					if (object.clientId)
-						ConPrint(L" client[" + std::to_wstring(object.clientId) + L"]");
-					else
-						ConPrint(L" obj[" + std::to_wstring(object.objId) + L"]");
-				}
+				MissionObject object;
+				object.type = MissionObjectType::Object;
+				object.id = objectByName->second;
+				AddLabelIfNotExisting(*this, object);
+			}
+			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+			{
+				for (const auto& object : objectsByLabel->second)
+					AddLabelIfNotExisting(*this, object);
 			}
 		}
 		ConPrint(L"\n");

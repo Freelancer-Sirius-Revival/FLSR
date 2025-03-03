@@ -5,13 +5,13 @@ namespace Missions
 {
 	const enum DistanceCondition
 	{
-		INSIDE,
-		OUTSIDE
+		Inside,
+		Outside
 	};
 
 	struct CndDistVecArchetype
 	{
-		DistanceCondition type = DistanceCondition::INSIDE;
+		DistanceCondition type = DistanceCondition::Inside;
 		unsigned int objNameOrLabel = 0;
 		Vector position;
 		float distance = 0.0f;

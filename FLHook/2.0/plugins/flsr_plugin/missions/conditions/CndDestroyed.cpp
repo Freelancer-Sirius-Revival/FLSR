@@ -22,87 +22,100 @@ namespace Missions
 
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
-		switch (archetype->condition)
+		// If count -1 and the awaited objects do not exist, see this condition as fulfilled. "Stranger" also is fulfilled then because otherwise all players must leave server for fulfill.
+		if (archetype->count < 0 && (archetype->objNameOrLabel == Stranger || (!trigger->mission->objectIdsByName.contains(archetype->objNameOrLabel) && !trigger->mission->objectsByLabel.contains(archetype->objNameOrLabel))))
 		{
-			case DestroyedCondition::SILENT:
-			{
-				if (killed)
-					return false;
-				break;
-			}
+			ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_Destroyed " + std::to_wstring(archetype->objNameOrLabel) + L" none existing\n");
+			return true;
+		}
+		
+		// Check destruction conditions.
+		if ((archetype->condition == DestroyedCondition::SILENT && killed) || (archetype->condition == DestroyedCondition::EXPLODE && !killed))
+			return false;
 
-			case DestroyedCondition::EXPLODE:
-			{
-				if (!killed)
-					return false;
-				break;
-			}
-
-			default:
-				break;
+		// Check if killed object is part of the mission.
+		if (killedObject->is_player())
+		{
+			const bool containsPlayer = trigger->mission->clientIds.contains(killedObject->cobj->ownerPlayer);
+			if ((archetype->objNameOrLabel == Stranger && containsPlayer) || !containsPlayer)
+				return false;
+		}
+		else
+		{
+			if (!trigger->mission->objectIds.contains(killedObject->cobj->id))
+				return false;
 		}
 
-		if (!archetype->killerNameOrLabel)
+		// Make sure the expected killer did the kill.
+		if (archetype->killerNameOrLabel)
 		{
 			bool killerFound = false;
-			for (const auto& object : trigger->mission->objects)
+			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->killerNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
 			{
-				if (object.objId == killerId && (object.name == archetype->killerNameOrLabel || object.labels.contains(archetype->killerNameOrLabel)))
+				killerFound = objectByName->second == killerId;
+			}
+			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->killerNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+			{
+				for (const auto& object : objectsByLabel->second)
 				{
-					killerFound = true;
-					break;
+					if (object.id == killerId)
+					{
+						killerFound = true;
+						break;
+					}
 				}
 			}
 			if (!killerFound)
 				return false;
 		}
 
-		std::wstring outputPretext = stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_Destroyed " + std::to_wstring(archetype->objNameOrLabel);
-
-		if (archetype->count < 0)
+		byte foundObjectType = 0;
+		if (killedObject->is_player() && archetype->objNameOrLabel == Stranger && !trigger->mission->clientIds.contains(killedObject->cobj->ownerPlayer))
 		{
-			int foundObjectCount = 0;
-			for (const auto& object : trigger->mission->objects)
+			foundObjectType = 1;
+		}
+		// Clients can only be addressed via Label.
+		else if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->objNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
+		{
+			if (objectByName->second == killedObject->cobj->id)
 			{
-				const bool nameOrLabelMatch = object.name == archetype->objNameOrLabel || object.labels.contains(archetype->objNameOrLabel);
-				if (killedObject->cobj->id == object.objId && nameOrLabelMatch)
-				{
-					// Reduce the count of objects by this label because this object was just destroyed.
-					foundObjectCount--;
-				}
-				
-				// Count the remaining alive objects by this label.
-				if (nameOrLabelMatch)
-					foundObjectCount++;
-			}
-
-			if (foundObjectCount <= 0)
-			{
-				ConPrint(outputPretext + L"\n");
-				activator.objId = killerId;
-				activator.clientId = HkGetClientIDByShip(killerId);
-				return true;
+				foundObjectType = 2;
 			}
 		}
-		else
+		else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
 		{
-			for (const auto& object : trigger->mission->objects)
+			for (const auto& object : objectsByLabel->second)
 			{
-				if (killedObject->cobj->id == object.objId && (object.name == archetype->objNameOrLabel || object.labels.contains(archetype->objNameOrLabel)))
+				if ((object.type == MissionObjectType::Client && object.id == killedObject->cobj->ownerPlayer) || (object.type == MissionObjectType::Object && object.id == killedObject->cobj->id))
 				{
-					count++;
-					ConPrint(outputPretext + L" " + std::to_wstring(count) + L" of " + std::to_wstring(archetype->count) + L"\n");
+					foundObjectType = 3;
 					break;
 				}
 			}
+		}
 
-			if (count >= archetype->count)
-			{
-				ConPrint(outputPretext + L"\n");
-				activator.objId = killerId;
-				activator.clientId = HkGetClientIDByShip(killerId);
-				return true;
-			}
+		if (foundObjectType == 0)
+			return false;
+
+		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_Destroyed " + std::to_wstring(archetype->objNameOrLabel));
+		bool foundAll = false;
+		if (archetype->count < 0)
+		{
+			foundAll = foundObjectType <= 2 || (foundObjectType == 3 && trigger->mission->objectsByLabel[archetype->objNameOrLabel].size() <= 1);
+			ConPrint(L" all\n");
+		}
+		else
+		{
+			foundAll = ++count >= archetype->count;
+			ConPrint(L" " + std::to_wstring(count) + L" of " + std::to_wstring(archetype->count) + L"\n");
+		}
+
+		if (foundAll)
+		{
+			const uint clientId = HkGetClientIDByShip(killerId);
+			activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
+			activator.id = clientId ? clientId : killerId;
+			return true;
 		}
 
 		return false;

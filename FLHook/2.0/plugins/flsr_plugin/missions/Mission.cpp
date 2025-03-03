@@ -30,15 +30,10 @@ namespace Missions
 			delete trigger;
 		
 		// Copy all ids of non-player-objects. The following process will modify the objects list implicitely.
-		std::vector<uint> objectIds;
-		for (const auto& object : objects)
+		const std::unordered_set<uint> objectIdsCopy(objectIds);
+		for (const uint objectId : objectIdsCopy)
 		{
-			if (!object.clientId)
-				objectIds.push_back(object.objId);
-		}
-		for (const uint objectId : objectIds)
-		{
-			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0) //0 means alive, -2 dead
+			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
 
@@ -67,6 +62,51 @@ namespace Missions
 				triggers.erase(it);
 				return;
 			}
+		}
+	}
+
+	void Mission::RemoveObject(const uint objId)
+	{
+		objectIds.erase(objId);
+		for (auto it = objectIdsByName.begin(); it != objectIdsByName.end();)
+		{
+			if (it->second == objId)
+				it = objectIdsByName.erase(it);
+			else
+				it++;
+		}
+		for (auto labelsIt = objectsByLabel.begin(); labelsIt != objectsByLabel.end();)
+		{
+			for (auto objsIt = labelsIt->second.begin(); objsIt != labelsIt->second.end();)
+			{
+				if (objsIt->type == MissionObjectType::Object && objsIt->id == objId)
+					objsIt = labelsIt->second.erase(objsIt);
+				else
+					objsIt++;
+			}
+			if (labelsIt->second.empty())
+				labelsIt = objectsByLabel.erase(labelsIt);
+			else
+				labelsIt++;
+		}
+	}
+
+	void Mission::RemoveClient(const uint clientId)
+	{
+		clientIds.erase(clientId);
+		for (auto labelsIt = objectsByLabel.begin(); labelsIt != objectsByLabel.end();)
+		{
+			for (auto objsIt = labelsIt->second.begin(); objsIt != labelsIt->second.end();)
+			{
+				if (objsIt->type == MissionObjectType::Client && objsIt->id == clientId)
+					objsIt = labelsIt->second.erase(objsIt);
+				else
+					objsIt++;
+			}
+			if (labelsIt->second.empty())
+				labelsIt = objectsByLabel.erase(labelsIt);
+			else
+				labelsIt++;
 		}
 	}
 
@@ -115,15 +155,7 @@ namespace Missions
 
 	void RemoveObjectFromMissions(const uint objId)
 	{
-		for (const auto& labelAndMission : activeMissions)
-		{
-			for (auto it = labelAndMission->objects.begin(); it != labelAndMission->objects.end();)
-			{
-				if (it->objId == objId)
-					it = labelAndMission->objects.erase(it);
-				else
-					it++;
-			}
-		}
+		for (const auto& mission : activeMissions)
+			mission->RemoveObject(objId);
 	}
 }

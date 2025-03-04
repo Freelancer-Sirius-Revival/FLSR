@@ -150,10 +150,12 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActChangeState.cpp" />
     <ClCompile Include="missions\actions\ActDestroy.cpp" />
     <ClCompile Include="missions\actions\ActEndMission.cpp" />
+    <ClCompile Include="missions\actions\ActEtherComm.cpp" />
     <ClCompile Include="missions\actions\ActLightFuse.cpp" />
     <ClCompile Include="missions\actions\ActPlayMusic.cpp" />
     <ClCompile Include="missions\actions\ActPlaySoundEffect.cpp" />
     <ClCompile Include="missions\actions\ActRemoveLabel.cpp" />
+    <ClCompile Include="missions\actions\ActSendComm.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
     <ClCompile Include="missions\conditions\CndDistVec.cpp" />
@@ -184,6 +186,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActDestroy.h" />
     <ClInclude Include="missions\actions\ActDestroyArch.h" />
     <ClInclude Include="missions\actions\ActEndMission.h" />
+    <ClInclude Include="missions\actions\ActEtherComm.h" />
+    <ClInclude Include="missions\actions\ActEtherCommArch.h" />
     <ClInclude Include="missions\actions\Action.h" />
     <ClInclude Include="missions\actions\ActLightFuse.h" />
     <ClInclude Include="missions\actions\ActLightFuseArch.h" />
@@ -193,6 +197,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActPlaySoundEffectArch.h" />
     <ClInclude Include="missions\actions\ActRemoveLabel.h" />
     <ClInclude Include="missions\actions\ActRemoveLabelArch.h" />
+    <ClInclude Include="missions\actions\ActSendComm.h" />
+    <ClInclude Include="missions\actions\ActSendCommArch.h" />
     <ClInclude Include="missions\actions\ActSpawnSolar.h" />
     <ClInclude Include="missions\actions\ActSpawnSolarArch.h" />
     <ClInclude Include="missions\conditions\CndDestroyed.h" />

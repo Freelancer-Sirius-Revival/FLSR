@@ -74,6 +74,12 @@
     <ClCompile Include="missions\actions\ActPlaySoundEffect.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActEtherComm.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSendComm.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -171,6 +177,18 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActPlaySoundEffectArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActEtherComm.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActEtherCommArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSendComm.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSendCommArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\MissionObject.h">

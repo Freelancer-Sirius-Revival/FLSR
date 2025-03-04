@@ -23,11 +23,11 @@
   - [FLSharp](https://github.com/BC46/FLSharp)
 
 - [Caenen](https://github.com/Caenen)
-  - [Quality Assurance & Testing](https://github.com/Freelancer-Sirius-Revival/FLSR/)
-  - [Polish of existing and new content](https://github.com/Freelancer-Sirius-Revival/FLSR/)
-  - [Writing](https://github.com/Freelancer-Sirius-Revival/FLSR/)
-  - [Level design (systems)](https://github.com/Freelancer-Sirius-Revival/FLSR/)
   - [Gameplay design and balancing](https://github.com/Freelancer-Sirius-Revival/FLSR/)
+  - [Level design (systems)](https://github.com/Freelancer-Sirius-Revival/FLSR/)
+  - [Polish of existing and new content](https://github.com/Freelancer-Sirius-Revival/FLSR/)
+  - [Quality Assurance & Testing](https://github.com/Freelancer-Sirius-Revival/FLSR/)
+  - [Writing](https://github.com/Freelancer-Sirius-Revival/FLSR/)
 
 - [Callum](https://github.com/CallumDev) & [BC46](https://github.com/BC46)
   - [flplusplus](https://github.com/FLHDE/flplusplus)

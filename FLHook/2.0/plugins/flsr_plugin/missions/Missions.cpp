@@ -375,12 +375,13 @@ namespace Missions
 		std::unordered_map<uint, DistVecMatchEntry> objectsByObjId;
 		for (const auto cnd : distVecConditions)
 		{
-			if (cnd->archetype->objNameOrLabel == Stranger || !cnd->trigger->mission->clientIds.empty())
+			const bool strangerRequested = cnd->archetype->objNameOrLabel == Stranger;
+			if (strangerRequested || !cnd->trigger->mission->clientIds.empty())
 			{
 				struct PlayerData* playerData = 0;
 				while (playerData = Players.traverse_active(playerData))
 				{
-					if (clientsByClientId.contains(playerData->iOnlineID) || (cnd->archetype->objNameOrLabel != Stranger && !cnd->trigger->mission->clientIds.contains(playerData->iOnlineID)))
+					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !cnd->trigger->mission->clientIds.contains(playerData->iOnlineID)))
 						continue;
 
 					uint shipId;
@@ -398,18 +399,21 @@ namespace Missions
 					}
 				}
 			}
-			for (uint objId : cnd->trigger->mission->objectIds)
+			if (!strangerRequested)
 			{
-				if (objectsByObjId.contains(objId))
-					continue;
-				IObjRW* inspect;
-				StarSystem* starSystem;
-				if (!GetShipInspect(objId, inspect, starSystem))
-					continue;
-				DistVecMatchEntry entry;
-				entry.systemId = inspect->cobj->system;
-				entry.position = inspect->cobj->vPos;
-				objectsByObjId[objId] = entry;
+				for (uint objId : cnd->trigger->mission->objectIds)
+				{
+					if (objectsByObjId.contains(objId))
+						continue;
+					IObjRW* inspect;
+					StarSystem* starSystem;
+					if (!GetShipInspect(objId, inspect, starSystem))
+						continue;
+					DistVecMatchEntry entry;
+					entry.systemId = inspect->cobj->system;
+					entry.position = inspect->cobj->vPos;
+					objectsByObjId[objId] = entry;
+				}
 			}
 		}
 

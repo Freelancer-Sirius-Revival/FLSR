@@ -24,7 +24,7 @@ namespace Missions
 	void ActLightFuse::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_LightFuse " + std::to_wstring(archetype->fuseId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
-		if (archetype->objNameOrLabel == CreateID("activator"))
+		if (archetype->objNameOrLabel == Activator)
 		{
 			auto& activator = trigger->condition->activator;
 			if (activator.type == MissionObjectType::Client)

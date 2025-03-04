@@ -56,7 +56,7 @@ namespace Missions
 	void ActRemoveLabel::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_RemoveLabel " + std::to_wstring(archetype->label) + L" to " + std::to_wstring(archetype->objNameOrLabel));
-		if (archetype->objNameOrLabel == CreateID("activator"))
+		if (archetype->objNameOrLabel == Activator)
 		{
 			const auto& activator = trigger->condition->activator;
 			if (activator.type == MissionObjectType::Client)

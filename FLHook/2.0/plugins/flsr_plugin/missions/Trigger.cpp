@@ -16,6 +16,8 @@
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActPlaySoundEffect.h"
 #include "Actions/ActPlayMusic.h"
+#include "Actions/ActEtherComm.h"
+#include "Actions/ActSendComm.h"
 
 namespace Missions
 {
@@ -145,6 +147,13 @@ namespace Missions
 					actions.push_back(new ActPlayMusic(this, std::static_pointer_cast<ActPlayMusicArchetype>(actionArchetype.second)));
 					break;
 
+				case TriggerAction::Act_EtherComm:
+					actions.push_back(new ActEtherComm(this, std::static_pointer_cast<ActEtherCommArchetype>(actionArchetype.second)));
+					break;
+
+				case TriggerAction::Act_SendComm:
+					actions.push_back(new ActSendComm(this, std::static_pointer_cast<ActSendCommArchetype>(actionArchetype.second)));
+					break;
 				default:
 					break;
 			}

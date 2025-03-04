@@ -446,12 +446,6 @@ namespace Missions
 		RemoveObjectFromMissions(killedObject->cobj->id);
 	}
 
-	struct FoundObject
-	{
-		uint systemId;
-		Vector position;
-	};
-
 	float elapsedTimeInSec = 0.0f;
 	void __stdcall Elapse_Time_AFTER(float seconds)
 	{
@@ -517,6 +511,29 @@ namespace Missions
 			if (cnd->Matches(clientsByClientId, objectsByObjId))
 				cnd->trigger->QueueExecution();
 		}
+	}
+
+	std::unordered_map<uint, CHARACTER_ID> lastCharacterByClientId;
+
+	void __stdcall CharacterSelect(const CHARACTER_ID& cId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		const auto& foundEntry = lastCharacterByClientId.find(clientId);
+		if (foundEntry == lastCharacterByClientId.end() || !(foundEntry->second == cId))
+			RemoveClientFromMissions(clientId);
+	}
+
+	void __stdcall CharacterSelect_AFTER(const CHARACTER_ID& cId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		lastCharacterByClientId.insert({ clientId, cId });
+	}
+
+	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		lastCharacterByClientId.erase(clientId);
+		RemoveClientFromMissions(clientId);
 	}
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)

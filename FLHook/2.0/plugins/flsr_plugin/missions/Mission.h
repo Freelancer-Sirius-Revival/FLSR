@@ -31,4 +31,5 @@ namespace Missions
 	bool StartMission(const std::string& missionName);
 	bool KillMission(const std::string& missionName);
 	void RemoveObjectFromMissions(const uint objId);
+	void RemoveClientFromMissions(const uint client);
 }

@@ -7,6 +7,18 @@ namespace Missions
 
 	std::vector<Mission*> activeMissions;
 
+	static void ClearMusic(const uint clientId)
+	{
+		pub::Audio::Tryptich music;
+		music.spaceMusic = 0;
+		music.dangerMusic = 0;
+		music.battleMusic = 0;
+		music.overrideMusic = 0;
+		music.playOnce = false;
+		music.crossFadeDurationInS = 4.0f;
+		pub::Audio::SetMusic(clientId, music);
+	}
+
 	Mission::Mission(const MissionArchetypePtr missionArchetype) :
 		archetype(missionArchetype),
 		ended(false)
@@ -29,6 +41,9 @@ namespace Missions
 		for (Trigger* trigger : triggers)
 			delete trigger;
 		
+		for (const uint clientId : clientIds)
+			ClearMusic(clientId);
+
 		// Copy all ids of non-player-objects. The following process will modify the objects list implicitely.
 		const std::unordered_set<uint> objectIdsCopy(objectIds);
 		for (const uint objectId : objectIdsCopy)
@@ -93,7 +108,7 @@ namespace Missions
 
 	void Mission::RemoveClient(const uint clientId)
 	{
-		clientIds.erase(clientId);
+		ClearMusic(clientId);
 		for (auto labelsIt = objectsByLabel.begin(); labelsIt != objectsByLabel.end();)
 		{
 			for (auto objsIt = labelsIt->second.begin(); objsIt != labelsIt->second.end();)
@@ -108,6 +123,7 @@ namespace Missions
 			else
 				labelsIt++;
 		}
+		clientIds.erase(clientId);
 	}
 
 	bool StartMission(const std::string& missionName)
@@ -157,5 +173,11 @@ namespace Missions
 	{
 		for (const auto& mission : activeMissions)
 			mission->RemoveObject(objId);
+	}
+
+	void RemoveClientFromMissions(const uint client)
+	{
+		for (const auto& mission : activeMissions)
+			mission->RemoveClient(client);
 	}
 }

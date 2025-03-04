@@ -68,6 +68,12 @@
     <ClCompile Include="missions\conditions\CndDistVec.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActPlayMusic.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActPlaySoundEffect.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -154,6 +160,18 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\CndDistVecArch.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlayMusic.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlayMusicArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlaySoundEffect.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlaySoundEffectArch.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\MissionObject.h">
       <Filter>Missions</Filter>

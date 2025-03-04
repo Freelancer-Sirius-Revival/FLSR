@@ -831,7 +831,7 @@ namespace pub
 
 	namespace Audio
 	{
-		struct MusicParams {
+		struct Tryptich {
 			uint spaceMusic = 0;
 			uint dangerMusic = 0;
 			uint battleMusic = 0;
@@ -842,7 +842,7 @@ namespace pub
 
 		IMPORT  int CancelMusic(unsigned int);
 		IMPORT  int PlaySoundEffect(unsigned int, unsigned int);
-		IMPORT  int SetMusic(unsigned int, struct MusicParams const&);
+		IMPORT  int SetMusic(unsigned int, struct Tryptich const&);
 	};
 
 	namespace Controller

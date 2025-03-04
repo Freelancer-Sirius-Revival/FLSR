@@ -12,7 +12,7 @@ namespace Missions
 	void ActDestroy::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_Destroy " + std::to_wstring(archetype->objNameOrLabel));
-		if (archetype->objNameOrLabel == CreateID("activator"))
+		if (archetype->objNameOrLabel == Activator)
 		{
 			const auto& activator = trigger->condition->activator;
 			uint objId;

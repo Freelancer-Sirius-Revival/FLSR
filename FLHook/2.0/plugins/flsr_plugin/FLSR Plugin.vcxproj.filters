@@ -155,6 +155,9 @@
     <ClInclude Include="missions\conditions\CndDistVecArch.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\MissionObject.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

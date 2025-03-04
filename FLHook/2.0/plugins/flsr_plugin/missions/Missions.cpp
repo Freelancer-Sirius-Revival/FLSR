@@ -13,6 +13,8 @@
 #include "Actions/ActChangeStateArch.h"
 #include "Actions/ActSpawnSolarArch.h"
 #include "Actions/ActDestroyArch.h"
+#include "Actions/ActPlaySoundEffectArch.h"
+#include "Actions/ActPlayMusicArch.h"
 
 namespace Missions
 {
@@ -309,6 +311,25 @@ namespace Missions
 							archetype->objNameOrLabel = CreateID(ini.get_value_string(0));
 							archetype->destroyType = ToLower(ini.get_value_string(1)) == "explode" ? DestroyType::EXPLODE : DestroyType::VANISH;
 							trigger->actions.push_back({ TriggerAction::Act_Destroy, archetype });
+						}
+						else if (ini.is_value("Act_PlaySoundEffect"))
+						{
+							ActPlaySoundEffectArchetypePtr archetype(new ActPlaySoundEffectArchetype());
+							archetype->objNameOrLabel = CreateID(ini.get_value_string(0));
+							archetype->soundId = CreateID(ini.get_value_string(1));
+							trigger->actions.push_back({ TriggerAction::Act_PlaySoundEffect, archetype });
+						}
+						else if (ini.is_value("Act_PlayMusic"))
+						{
+							ActPlayMusicArchetypePtr archetype(new ActPlayMusicArchetype());
+							archetype->objNameOrLabel = CreateID(ini.get_value_string(0));
+							archetype->music.spaceMusic = std::string(ini.get_value_string(1)) != "none" ? CreateID(ini.get_value_string(1)) : 0;
+							archetype->music.dangerMusic = std::string(ini.get_value_string(2)) != "none" ? CreateID(ini.get_value_string(2)) : 0;
+							archetype->music.battleMusic = std::string(ini.get_value_string(3)) != "none" ? CreateID(ini.get_value_string(3)) : 0;
+							archetype->music.overrideMusic = std::string(ini.get_value_string(4)) != "none" ? CreateID(ini.get_value_string(4)) : 0;
+							archetype->music.crossFadeDurationInS = ini.get_value_float(5);
+							archetype->music.playOnce = ini.get_bool(6);
+							trigger->actions.push_back({ TriggerAction::Act_PlayMusic, archetype });
 						}
 					}
 					missionArchetypes.back()->triggers.push_back(trigger);

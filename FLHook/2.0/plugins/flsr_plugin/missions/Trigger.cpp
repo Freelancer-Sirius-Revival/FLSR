@@ -14,6 +14,8 @@
 #include "Actions/ActChangeState.h"
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
+#include "Actions/ActPlaySoundEffect.h"
+#include "Actions/ActPlayMusic.h"
 
 namespace Missions
 {
@@ -133,6 +135,14 @@ namespace Missions
 
 				case TriggerAction::Act_LightFuse:
 					actions.push_back(new ActLightFuse(this, std::static_pointer_cast<ActLightFuseArchetype>(actionArchetype.second)));
+					break;
+
+				case TriggerAction::Act_PlaySoundEffect:
+					actions.push_back(new ActPlaySoundEffect(this, std::static_pointer_cast<ActPlaySoundEffectArchetype>(actionArchetype.second)));
+					break;
+
+				case TriggerAction::Act_PlayMusic:
+					actions.push_back(new ActPlayMusic(this, std::static_pointer_cast<ActPlayMusicArchetype>(actionArchetype.second)));
 					break;
 
 				default:

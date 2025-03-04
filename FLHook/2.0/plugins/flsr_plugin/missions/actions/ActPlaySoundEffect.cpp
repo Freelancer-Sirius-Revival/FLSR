@@ -9,15 +9,22 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
+	static void PlaySoundEffect(const uint clientId, const uint soundId)
+	{
+		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			return;
+		pub::Audio::PlaySoundEffect(clientId, soundId);
+	}
+
 	void ActPlaySoundEffect::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_PlaySoundEffect " + std::to_wstring(archetype->soundId) + L" for " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			auto& activator = trigger->condition->activator;
+			const auto& activator = trigger->condition->activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
 			{
-				pub::Audio::PlaySoundEffect(activator.id, archetype->soundId);
+				PlaySoundEffect(activator.id, archetype->soundId);
 				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 			}
 		}
@@ -29,7 +36,7 @@ namespace Missions
 				{
 					if (object.type == MissionObjectType::Client)
 					{
-						pub::Audio::PlaySoundEffect(object.id, archetype->soundId);
+						PlaySoundEffect(object.id, archetype->soundId);
 						ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
 					}
 				}

@@ -9,6 +9,13 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
+	static void PlayMusic(const uint clientId, const pub::Audio::Tryptich& music)
+	{
+		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			return;
+		pub::Audio::SetMusic(clientId, music);
+	}
+
 	void ActPlayMusic::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_PlayMusic for " + std::to_wstring(archetype->objNameOrLabel));
@@ -17,7 +24,7 @@ namespace Missions
 			const auto& activator = trigger->condition->activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
 			{
-				pub::Audio::SetMusic(activator.id, archetype->music);
+				PlayMusic(activator.id, archetype->music);
 				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 			}
 		}
@@ -29,7 +36,7 @@ namespace Missions
 				{
 					if (object.type == MissionObjectType::Client)
 					{
-						pub::Audio::SetMusic(object.id, archetype->music);
+						PlayMusic(object.id, archetype->music);
 						ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
 					}
 				}

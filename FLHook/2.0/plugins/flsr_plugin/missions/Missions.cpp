@@ -17,6 +17,7 @@
 #include "Actions/ActPlayMusicArch.h"
 #include "Actions/ActEtherCommArch.h"
 #include "Actions/ActSendCommArch.h"
+#include "Actions/ActSetNNObjArch.h"
 
 namespace Missions
 {
@@ -389,6 +390,19 @@ namespace Missions
 								archetype->delay = ini.get_value_float(pos - 1);
 							archetype->global = ini.get_value_bool(pos);
 							trigger->actions.push_back({ TriggerAction::Act_SendComm, archetype });
+						}
+						else if (ini.is_value("Act_SetNNObj"))
+						{
+							ActSetNNObjArchetypePtr archetype(new ActSetNNObjArchetype());
+							archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+							archetype->message = ini.get_value_int(1);
+							archetype->systemId = CreateIdOrNull(ini.get_value_string(2));
+							archetype->position.x = ini.get_value_float(3);
+							archetype->position.y = ini.get_value_float(4);
+							archetype->position.z = ini.get_value_float(5);
+							archetype->bestRoute = ini.get_bool(6);
+							archetype->targetObjName = CreateIdOrNull(ini.get_value_string(7));
+							trigger->actions.push_back({ TriggerAction::Act_SetNNObj, archetype });
 						}
 					}
 					missionArchetypes.back()->triggers.push_back(trigger);

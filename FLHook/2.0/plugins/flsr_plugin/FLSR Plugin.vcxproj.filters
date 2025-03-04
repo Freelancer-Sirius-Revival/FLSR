@@ -80,6 +80,9 @@
     <ClCompile Include="missions\actions\ActSendComm.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActSetNNObj.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -193,6 +196,12 @@
     </ClInclude>
     <ClInclude Include="missions\MissionObject.h">
       <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetNNObj.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetNNObjArch.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

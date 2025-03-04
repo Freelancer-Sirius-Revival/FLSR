@@ -14,6 +14,9 @@ namespace Missions
 		if (object.id == 0)
 			return;
 
+		if (object.type == MissionObjectType::Client && (!HkIsValidClientID(object.id) || HkIsInCharSelectMenu(object.id)))
+			return;
+
 		bool found = false;
 		for (const auto& objectByLabel : action.trigger->mission->objectsByLabel[action.archetype->label])
 		{

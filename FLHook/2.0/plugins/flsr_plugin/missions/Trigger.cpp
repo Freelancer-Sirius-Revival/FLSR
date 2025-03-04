@@ -18,6 +18,7 @@
 #include "Actions/ActPlayMusic.h"
 #include "Actions/ActEtherComm.h"
 #include "Actions/ActSendComm.h"
+#include "Actions/ActSetNNObj.h"
 
 namespace Missions
 {
@@ -154,6 +155,11 @@ namespace Missions
 				case TriggerAction::Act_SendComm:
 					actions.push_back(new ActSendComm(this, std::static_pointer_cast<ActSendCommArchetype>(actionArchetype.second)));
 					break;
+
+				case TriggerAction::Act_SetNNObj:
+					actions.push_back(new ActSetNNObj(this, std::static_pointer_cast<ActSetNNObjArchetype>(actionArchetype.second)));
+					break;
+
 				default:
 					break;
 			}

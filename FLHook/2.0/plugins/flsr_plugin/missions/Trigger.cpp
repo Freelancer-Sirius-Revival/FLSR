@@ -15,7 +15,6 @@
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActDestroy.h"
-#include "Actions/ActChangeState.h"
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActPlaySoundEffect.h"
@@ -146,10 +145,6 @@ namespace Missions
 
 				case TriggerAction::Act_SpawnSolar:
 					actions.push_back(new ActSpawnSolar(this, std::static_pointer_cast<ActSpawnSolarArchetype>(actionArchetype.second)));
-					break;
-
-				case TriggerAction::Act_ChangeState:
-					actions.push_back(new ActChangeState(this, std::static_pointer_cast<ActChangeStateArchetype>(actionArchetype.second)));
 					break;
 
 				case TriggerAction::Act_LightFuse:

@@ -29,9 +29,6 @@
     <ClCompile Include="missions\actions\ActActTrigger.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\actions\ActChangeState.cpp">
-      <Filter>Missions\Actions</Filter>
-    </ClCompile>
     <ClCompile Include="missions\actions\ActDestroy.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
@@ -102,12 +99,6 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActActTriggerArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActChangeState.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActChangeStateArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActDestroy.h">

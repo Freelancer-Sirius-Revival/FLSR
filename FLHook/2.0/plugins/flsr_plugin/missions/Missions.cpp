@@ -14,7 +14,6 @@
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuseArch.h"
-#include "Actions/ActChangeStateArch.h"
 #include "Actions/ActSpawnSolarArch.h"
 #include "Actions/ActDestroyArch.h"
 #include "Actions/ActPlaySoundEffectArch.h"
@@ -324,13 +323,6 @@ namespace Missions
 							archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 							archetype->fuseId = CreateIdOrNull(ini.get_value_string(1));
 							trigger->actions.push_back({ TriggerAction::Act_LightFuse, archetype });
-						}
-						else if (ini.is_value("Act_ChangeState"))
-						{
-							ActChangeStateArchetypePtr archetype(new ActChangeStateArchetype());
-							archetype->state = ToLower(ini.get_value_string(0)) == "succeed" ? MissionState::Succeed : MissionState::Fail;
-							archetype->failTextId = ini.get_value_int(1);
-							trigger->actions.push_back({ TriggerAction::Act_ChangeState, archetype });
 						}
 						else if (ini.is_value("Act_SpawnSolar"))
 						{

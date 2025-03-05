@@ -6,6 +6,10 @@
 #include "Conditions/CndDestroyed.h"
 #include "Conditions/CndDestroyedArch.h"
 #include "Conditions/CndDistVec.h"
+#include "Conditions/CndSpaceEnter.h"
+#include "Conditions/CndSpaceExit.h"
+#include "Conditions/CndBaseEnter.h"
+#include "Conditions/CndTimer.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
@@ -255,6 +259,33 @@ namespace Missions
 							archetype->systemId = CreateIdOrNull(ini.get_value_string(6));
 							trigger->condition = { TriggerCondition::Cnd_DistVec, archetype };
 						}
+						else if (ini.is_value("Cnd_SpaceEnter"))
+						{
+							CndSpaceEnterArchetypePtr archetype(new CndSpaceEnterArchetype());
+							archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+							archetype->systemId = CreateIdOrNull(ini.get_value_string(1));
+							trigger->condition = { TriggerCondition::Cnd_SpaceEnter, archetype };
+						}
+						else if (ini.is_value("Cnd_SpaceExit"))
+						{
+							CndSpaceExitArchetypePtr archetype(new CndSpaceExitArchetype());
+							archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+							archetype->systemId = CreateIdOrNull(ini.get_value_string(1));
+							trigger->condition = { TriggerCondition::Cnd_SpaceExit, archetype };
+						}
+						else if (ini.is_value("Cnd_BaseEnter"))
+						{
+							CndBaseEnterArchetypePtr archetype(new CndBaseEnterArchetype());
+							archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+							archetype->baseId = CreateIdOrNull(ini.get_value_string(1));
+							trigger->condition = { TriggerCondition::Cnd_BaseEnter, archetype };
+						}
+						else if (ini.is_value("Cnd_Timer"))
+						{
+							CndTimerArchetypePtr archetype(new CndTimerArchetype());
+							archetype->timeInS = ini.get_value_float(0);
+							trigger->condition = { TriggerCondition::Cnd_Timer, archetype };
+						}
 						else if (ini.is_value("Act_EndMission"))
 						{
 							trigger->actions.push_back({ TriggerAction::Act_EndMission, nullptr });
@@ -433,14 +464,19 @@ namespace Missions
 		returncode = DEFAULT_RETURNCODE;
 
 		// Copy the original list because it might be modified implicitely by the following code
-		const std::unordered_set<CndDestroyed*> originals(destroyedConditions);
-		for (const auto cnd : originals)
+		const std::unordered_set<CndDestroyed*> destroyedConditionsCopy(destroyedConditions);
+		for (const auto& cnd : destroyedConditionsCopy)
 		{
-			const auto foundCondition = destroyedConditions.find(cnd);
-			if (foundCondition != destroyedConditions.end() && cnd->Matches(killedObject, killed, killerId))
-			{
+			if (const auto& foundCondition = destroyedConditions.find(cnd); foundCondition != destroyedConditions.end() && cnd->Matches(killedObject, killed, killerId))
 				cnd->trigger->QueueExecution();
-			}
+		}
+
+		// For SpaceExit we do not care whether it happened by despawn (dock/leaving character) or death - both mean the same to NPCs and other Players.
+		const std::unordered_set<CndSpaceExit*> spaceExitConditionsCopy(spaceExitConditions);
+		for (const auto& cnd : spaceExitConditionsCopy)
+		{
+			if (const auto& foundCondition = spaceExitConditions.find(cnd); foundCondition != spaceExitConditions.end() && killedObject->is_player() && cnd->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
+				cnd->trigger->QueueExecution();
 		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
@@ -450,6 +486,13 @@ namespace Missions
 	void __stdcall Elapse_Time_AFTER(float seconds)
 	{
 		returncode = DEFAULT_RETURNCODE;
+
+		const std::unordered_set<CndTimer*> timerConditionsCopy(timerConditions);
+		for (const auto& cnd : timerConditionsCopy)
+		{
+			if (const auto& foundCondition = timerConditions.find(cnd); foundCondition != timerConditions.end() && cnd->Matches(seconds))
+				cnd->trigger->QueueExecution();
+		}
 
 		elapsedTimeInSec += seconds;
 		if (elapsedTimeInSec < 0.02f)
@@ -505,10 +548,10 @@ namespace Missions
 			}
 		}
 
-		const std::unordered_set<CndDistVec*> originals(distVecConditions);
-		for (const auto cnd : originals)
+		const std::unordered_set<CndDistVec*> distVecConditionsCopy(distVecConditions);
+		for (const auto& cnd : distVecConditionsCopy)
 		{
-			if (cnd->Matches(clientsByClientId, objectsByObjId))
+			if (const auto& foundCondition = distVecConditions.find(cnd); foundCondition != distVecConditions.end() && cnd->Matches(clientsByClientId, objectsByObjId))
 				cnd->trigger->QueueExecution();
 		}
 	}
@@ -534,6 +577,32 @@ namespace Missions
 		returncode = DEFAULT_RETURNCODE;
 		lastCharacterByClientId.erase(clientId);
 		RemoveClientFromMissions(clientId);
+	}
+
+	void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		if (spaceEnterConditions.empty())
+			return;
+		uint systemId;
+		pub::Player::GetSystem(clientId, systemId);
+		const std::unordered_set<CndSpaceEnter*> spaceEnterConditionsCopy(spaceEnterConditions);
+		for (const auto& cnd : spaceEnterConditionsCopy)
+		{
+			if (const auto& foundCondition = spaceEnterConditions.find(cnd); foundCondition != spaceEnterConditions.end() && cnd->Matches(clientId, systemId))
+				cnd->trigger->QueueExecution();
+		}
+	}
+
+	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		const std::unordered_set<CndBaseEnter*> baseEnterConditionsCopy(baseEnterConditions);
+		for (const auto& cnd : baseEnterConditionsCopy)
+		{
+			if (const auto& foundCondition = baseEnterConditions.find(cnd); foundCondition != baseEnterConditions.end() && cnd->Matches(clientId, baseId))
+				cnd->trigger->QueueExecution();
+		}
 	}
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)

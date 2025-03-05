@@ -9,6 +9,11 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
+	static void SendComm(uint receiverObjId, const ActEtherCommArchetypePtr archetype)
+	{
+		pub::SpaceObj::SendComm(0, receiverObjId, archetype->senderVoiceId, &archetype->costume, archetype->senderIdsName, archetype->lines.data(), archetype->lines.size(), 0, std::fmaxf(0.0f, archetype->delay), archetype->global);
+	}
+
 	void ActEtherComm::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
@@ -23,7 +28,7 @@ namespace Missions
 
 			if (objId)
 			{
-				pub::SpaceObj::SendComm(0, objId, archetype->senderVoiceId, &archetype->costume, archetype->senderIdsName, archetype->lines.data(), archetype->lines.size(), 0, archetype->delay, archetype->global);
+				SendComm(objId, archetype);
 				if (activator.type == MissionObjectType::Client)
 					ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 				else
@@ -35,7 +40,7 @@ namespace Missions
 			// Clients can only be addressed via Label.
 			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
 			{
-				pub::SpaceObj::SendComm(0, objectByName->second, archetype->senderVoiceId, &archetype->costume, archetype->senderIdsName, archetype->lines.data(), archetype->lines.size(), 0, archetype->delay, archetype->global);
+				SendComm(objectByName->second, archetype);
 				ConPrint(L" obj[" + std::to_wstring(objectByName->second) + L"]");
 			}
 			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
@@ -52,7 +57,7 @@ namespace Missions
 
 					if (objId)
 					{
-						pub::SpaceObj::SendComm(0, objId, archetype->senderVoiceId, &archetype->costume, archetype->senderIdsName, archetype->lines.data(), archetype->lines.size(), 0, archetype->delay, archetype->global);
+						SendComm(objId, archetype);
 						if (object.type == MissionObjectType::Client)
 							ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
 						else

@@ -6,6 +6,10 @@
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndDistVec.h"
 #include "Conditions/CndDestroyed.h"
+#include "Conditions/CndSpaceEnter.h"
+#include "Conditions/CndSpaceExit.h"
+#include "Conditions/CndBaseEnter.h"
+#include "Conditions/CndTimer.h"
 #include "Actions/ActEndMission.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActAddLabel.h"
@@ -31,6 +35,18 @@ namespace Missions
 
 			case TriggerCondition::Cnd_DistVec:
 				return new CndDistVec(trigger, std::static_pointer_cast<CndDistVecArchetype>(conditionArchetype.second));
+
+			case TriggerCondition::Cnd_SpaceEnter:
+				return new CndSpaceEnter(trigger, std::static_pointer_cast<CndSpaceEnterArchetype>(conditionArchetype.second));
+
+			case TriggerCondition::Cnd_SpaceExit:
+				return new CndSpaceExit(trigger, std::static_pointer_cast<CndSpaceExitArchetype>(conditionArchetype.second));
+
+			case TriggerCondition::Cnd_BaseEnter:
+				return new CndBaseEnter(trigger, std::static_pointer_cast<CndBaseEnterArchetype>(conditionArchetype.second));
+
+			case TriggerCondition::Cnd_Timer:
+				return new CndTimer(trigger, std::static_pointer_cast<CndTimerArchetype>(conditionArchetype.second));
 
 			default:
 				return new CndTrue(trigger);
@@ -80,7 +96,7 @@ namespace Missions
 						delete trigger->condition;
 						trigger->condition = instantiateCondition(trigger, triggerArchetype->condition);
 						if (trigger->active)
-							trigger->Activate();
+							trigger->condition->Register();
 						break;
 					}
 				}
@@ -96,7 +112,7 @@ namespace Missions
 	Trigger::Trigger(Mission* parentMission, const TriggerArchetypePtr triggerArchetype) :
 		archetype(triggerArchetype),
 		mission(parentMission),
-		active(triggerArchetype->active)
+		active(false)
 	{
 		condition = instantiateCondition(this, archetype->condition);
 
@@ -176,16 +192,17 @@ namespace Missions
 
 	void Trigger::Activate()
 	{
+		if (active)
+			return;
 		active = true;
 		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Activate\n");
-		if (condition->type == TriggerCondition::Cnd_True)
-			QueueExecution();
-		else
-			condition->Register();
+		condition->Register();
 	}
 
 	void Trigger::Deactivate()
 	{
+		if (!active)
+			return;
 		active = false;
 		ConPrint(stows(mission->archetype->name) + L"->" + stows(archetype->name) + L": Deactivate\n");
 		condition->Unregister();

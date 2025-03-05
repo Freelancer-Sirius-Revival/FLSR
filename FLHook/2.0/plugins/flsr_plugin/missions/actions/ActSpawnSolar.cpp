@@ -11,6 +11,11 @@ namespace Missions
 	void ActSpawnSolar::Execute()
 	{
 		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_SpawnSolar " + stows(archetype->solarName));
+		if (trigger->mission->objectIdsByName.contains(CreateID(archetype->solarName.c_str())))
+		{
+			ConPrint(L" ALREADY EXISTS\n");
+			return;
+		}
 		for (auto it = trigger->mission->archetype->solars.begin(); it != trigger->mission->archetype->solars.end(); it++)
 		{
 			const auto& solar = **it;

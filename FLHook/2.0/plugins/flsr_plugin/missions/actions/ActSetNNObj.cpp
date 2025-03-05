@@ -22,12 +22,11 @@ namespace Missions
 			pub::Player::DisplayMissionMessage(clientId, caption, MissionMessageType::MissionMessageType_Type1, true);
 		}
 
+		XRequestBestPath bestPath;
+		bestPath.noPathFound = false;
+		bestPath.repId = Players[clientId].iReputation;
 		if (action.archetype->systemId)
 		{
-			XRequestBestPath bestPath;
-			bestPath.noPathFound = false;
-			bestPath.repId = Players[clientId].iReputation;
-			bestPath.waypointCount = 1;
 			XRequestBestPathEntry target;
 			target.systemId = action.archetype->systemId;
 			target.position = action.archetype->position;
@@ -37,7 +36,6 @@ namespace Missions
 			else
 				target.objId = action.archetype->targetObjName;
 
-			bestPath.entries[0] = target;
 			if (action.archetype->bestRoute)
 			{
 				uint objId;
@@ -50,19 +48,28 @@ namespace Missions
 				if (!objId || !GetShipInspect(objId, inspect, starSystem))
 					return;
 
-				bestPath.entries[1] = bestPath.entries[0];
 				XRequestBestPathEntry start;
 				start.position = inspect->cobj->vPos;
 				start.systemId = inspect->cobj->system;
 				start.objId = objId;
-				bestPath.entries[0] = start;
+
 				bestPath.waypointCount = 2;
+				bestPath.entries[0] = start;
+				bestPath.entries[1] = target;
 				Server.RequestBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 			}
 			else
 			{
+				bestPath.waypointCount = 1;
+				bestPath.entries[0] = target;
 				pub::Player::ReturnBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 			}
+		}
+		// Clear waypoints
+		else
+		{
+			bestPath.waypointCount = 0;
+			pub::Player::ReturnBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 		}
 	}
 

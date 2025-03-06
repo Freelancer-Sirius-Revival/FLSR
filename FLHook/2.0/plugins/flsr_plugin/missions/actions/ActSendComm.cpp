@@ -4,8 +4,8 @@
 
 namespace Missions
 {
-	ActSendComm::ActSendComm(Trigger* parentTrigger, const ActSendCommArchetypePtr actionArchetype) :
-		Action(parentTrigger, TriggerAction::Act_SendComm),
+	ActSendComm::ActSendComm(const ActionParent& parent, const ActSendCommArchetypePtr actionArchetype) :
+		Action(parent, TriggerAction::Act_SendComm),
 		archetype(actionArchetype)
 	{}
 
@@ -22,14 +22,14 @@ namespace Missions
 
 	void ActSendComm::Execute()
 	{
-		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_SendComm from " + std::to_wstring(archetype->senderObjName) + L" to " + std::to_wstring(archetype->receiverObjNameOrLabel));
-		const auto& senderByName = trigger->mission->objectIdsByName.find(archetype->senderObjName);
-		if (senderByName == trigger->mission->objectIdsByName.end())
+		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_SendComm from " + std::to_wstring(archetype->senderObjName) + L" to " + std::to_wstring(archetype->receiverObjNameOrLabel));
+		const auto& senderByName = missions[parent.missionId].objectIdsByName.find(archetype->senderObjName);
+		if (senderByName == missions[parent.missionId].objectIdsByName.end())
 			return;
 		
 		if (archetype->receiverObjNameOrLabel == Activator)
 		{
-			const auto& activator = trigger->condition->activator;
+			const auto& activator = triggers[parent.triggerId].condition->activator;
 			uint objId;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetShip(activator.id, objId);
@@ -48,12 +48,12 @@ namespace Missions
 		else
 		{
 			// Clients can only be addressed via Label.
-			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
+			if (const auto& objectByName = missions[parent.missionId].objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != missions[parent.missionId].objectIdsByName.end())
 			{
 				SendComm(objectByName->second, senderByName->second, archetype->lines, archetype->delay, archetype->global);
 				ConPrint(L" obj[" + std::to_wstring(objectByName->second) + L"]");
 			}
-			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+			else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
 			{
 				// Copy list since the destruction of objects will in turn modify it via other hooks
 				const std::vector<MissionObject> objectsCopy(objectsByLabel->second);

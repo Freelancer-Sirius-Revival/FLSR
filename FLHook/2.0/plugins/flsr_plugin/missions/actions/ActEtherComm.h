@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActEtherCommArchetypePtr archetype;
 
-		ActEtherComm(Trigger* parentTrigger, const ActEtherCommArchetypePtr actionArchetype);
+		ActEtherComm(const ActionParent& parent, const ActEtherCommArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

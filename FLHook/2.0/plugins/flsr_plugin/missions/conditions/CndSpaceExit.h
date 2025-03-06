@@ -8,7 +8,7 @@ namespace Missions
 	{
 		CndSpaceExitArchetypePtr archetype;
 
-		CndSpaceExit(Trigger* parentTrigger, const CndSpaceExitArchetypePtr conditionArchetype);
+		CndSpaceExit(const ConditionParent& parent, const CndSpaceExitArchetypePtr conditionArchetype);
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint systemId);

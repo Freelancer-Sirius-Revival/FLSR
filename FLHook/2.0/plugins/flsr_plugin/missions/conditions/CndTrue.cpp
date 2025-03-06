@@ -2,12 +2,12 @@
 
 namespace Missions
 {
-	CndTrue::CndTrue(Trigger* parentTrigger) :
-		Condition(parentTrigger, TriggerCondition::Cnd_True)
+	CndTrue::CndTrue(const ConditionParent& parent) :
+		Condition(parent, TriggerCondition::Cnd_True)
 	{}
 
 	void CndTrue::Register()
 	{
-		trigger->QueueExecution();
+		triggers[parent.triggerId].QueueExecution();
 	}
 }

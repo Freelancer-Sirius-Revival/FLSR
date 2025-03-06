@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActPlayMusicArchetypePtr archetype;
 
-		ActPlayMusic(Trigger* parentTrigger, const ActPlayMusicArchetypePtr actionArchetype);
+		ActPlayMusic(const ActionParent& parent, const ActPlayMusicArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

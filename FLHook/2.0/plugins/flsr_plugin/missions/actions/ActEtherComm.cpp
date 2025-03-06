@@ -4,8 +4,8 @@
 
 namespace Missions
 {
-	ActEtherComm::ActEtherComm(Trigger* parentTrigger, const ActEtherCommArchetypePtr actionArchetype) :
-		Action(parentTrigger, TriggerAction::Act_EtherComm),
+	ActEtherComm::ActEtherComm(const ActionParent& parent, const ActEtherCommArchetypePtr actionArchetype) :
+		Action(parent, TriggerAction::Act_EtherComm),
 		archetype(actionArchetype)
 	{}
 
@@ -16,10 +16,10 @@ namespace Missions
 
 	void ActEtherComm::Execute()
 	{
-		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
+		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
 		if (archetype->receiverObjNameOrLabel == Activator)
 		{
-			const auto& activator = trigger->condition->activator;
+			const auto& activator = triggers[parent.triggerId].condition->activator;
 			uint objId;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetShip(activator.id, objId);
@@ -38,12 +38,12 @@ namespace Missions
 		else
 		{
 			// Clients can only be addressed via Label.
-			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
+			if (const auto& objectByName = missions[parent.missionId].objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != missions[parent.missionId].objectIdsByName.end())
 			{
 				SendComm(objectByName->second, archetype);
 				ConPrint(L" obj[" + std::to_wstring(objectByName->second) + L"]");
 			}
-			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+			else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
 			{
 				// Copy list since the destruction of objects will in turn modify it via other hooks
 				const std::vector<MissionObject> objectsCopy(objectsByLabel->second);

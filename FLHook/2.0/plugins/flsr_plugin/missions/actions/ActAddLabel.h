@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActAddLabelArchetypePtr archetype;
 
-		ActAddLabel(Trigger* parentTrigger, const ActAddLabelArchetypePtr actionArchetype);
+		ActAddLabel(const ActionParent& parent, const ActAddLabelArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

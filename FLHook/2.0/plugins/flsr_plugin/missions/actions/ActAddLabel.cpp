@@ -4,8 +4,8 @@
 
 namespace Missions
 {
-	ActAddLabel::ActAddLabel(Trigger* parentTrigger, const ActAddLabelArchetypePtr actionArchetype) :
-		Action(parentTrigger, TriggerAction::Act_AddLabel),
+	ActAddLabel::ActAddLabel(const ActionParent& parent, const ActAddLabelArchetypePtr actionArchetype) :
+		Action(parent, TriggerAction::Act_AddLabel),
 		archetype(actionArchetype)
 	{}
 
@@ -18,7 +18,7 @@ namespace Missions
 			return;
 
 		bool found = false;
-		for (const auto& objectByLabel : action.trigger->mission->objectsByLabel[action.archetype->label])
+		for (const auto& objectByLabel : missions[action.parent.missionId].objectsByLabel[action.archetype->label])
 		{
 			if (objectByLabel == object)
 			{
@@ -28,7 +28,7 @@ namespace Missions
 		}
 		if (!found)
 		{
-			action.trigger->mission->objectsByLabel[action.archetype->label].push_back(object);
+			missions[action.parent.missionId].objectsByLabel[action.archetype->label].push_back(object);
 			if (object.type == MissionObjectType::Client)
 				ConPrint(L" client");
 			else
@@ -39,17 +39,17 @@ namespace Missions
 
 	void ActAddLabel::Execute()
 	{
-		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_AddLabel " + std::to_wstring(archetype->label) + L" to " + std::to_wstring(archetype->objNameOrLabel));
+		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_AddLabel " + std::to_wstring(archetype->label) + L" to " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = trigger->condition->activator;
+			const auto& activator = triggers[parent.triggerId].condition->activator;
 			if (activator.type == MissionObjectType::Client)
 			{
 				// Clients are made known to the mission by giving them a label.
-				trigger->mission->clientIds.insert(activator.id);
+				missions[parent.missionId].clientIds.insert(activator.id);
 				AddLabelIfNotExisting(*this, activator);
 			}
-			else if (trigger->mission->objectIds.contains(activator.id))
+			else if (missions[parent.missionId].objectIds.contains(activator.id))
 			{
 				AddLabelIfNotExisting(*this, activator);
 			}
@@ -57,14 +57,14 @@ namespace Missions
 		else
 		{
 			// Clients can only be addressed via Label.
-			if (const auto& objectByName = trigger->mission->objectIdsByName.find(archetype->objNameOrLabel); objectByName != trigger->mission->objectIdsByName.end())
+			if (const auto& objectByName = missions[parent.missionId].objectIdsByName.find(archetype->objNameOrLabel); objectByName != missions[parent.missionId].objectIdsByName.end())
 			{
 				MissionObject object;
 				object.type = MissionObjectType::Object;
 				object.id = objectByName->second;
 				AddLabelIfNotExisting(*this, object);
 			}
-			else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+			else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
 					AddLabelIfNotExisting(*this, object);

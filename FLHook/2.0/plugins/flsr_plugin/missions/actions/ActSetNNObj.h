@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActSetNNObjArchetypePtr archetype;
 
-		ActSetNNObj(Trigger* parentTrigger, const ActSetNNObjArchetypePtr actionArchetype);
+		ActSetNNObj(const ActionParent& parent, const ActSetNNObjArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

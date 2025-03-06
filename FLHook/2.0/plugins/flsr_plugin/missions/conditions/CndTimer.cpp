@@ -4,8 +4,8 @@ namespace Missions
 {
 	std::unordered_set<CndTimer*> timerConditions;
 
-	CndTimer::CndTimer(Trigger* parentTrigger, const CndTimerArchetypePtr conditionArchetype) :
-		Condition(parentTrigger, TriggerCondition::Cnd_Timer),
+	CndTimer::CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype) :
+		Condition(parent, TriggerCondition::Cnd_Timer),
 		archetype(conditionArchetype),
 		passedTimeInS(0.0f)
 	{}
@@ -25,7 +25,7 @@ namespace Missions
 		passedTimeInS += elapsedTimeInS;
 		if (passedTimeInS >= archetype->timeInS)
 		{
-			ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_Timer " + std::to_wstring(archetype->timeInS) + L"s \n");
+			ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_Timer " + std::to_wstring(archetype->timeInS) + L"s \n");
 			activator.type = MissionObjectType::Client;
 			activator.id = 0;
 			return true;

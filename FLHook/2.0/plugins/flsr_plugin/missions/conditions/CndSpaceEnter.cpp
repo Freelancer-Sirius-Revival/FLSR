@@ -4,8 +4,8 @@ namespace Missions
 {
 	std::unordered_set<CndSpaceEnter*> spaceEnterConditions;
 
-	CndSpaceEnter::CndSpaceEnter(Trigger* parentTrigger, const CndSpaceEnterArchetypePtr conditionArchetype) :
-		Condition(parentTrigger, TriggerCondition::Cnd_SpaceEnter),
+	CndSpaceEnter::CndSpaceEnter(const ConditionParent& parent, const CndSpaceEnterArchetypePtr conditionArchetype) :
+		Condition(parent, TriggerCondition::Cnd_SpaceEnter),
 		archetype(conditionArchetype)
 	{}
 
@@ -21,11 +21,11 @@ namespace Missions
 
 	bool CndSpaceEnter::Matches(const uint clientId, const uint systemId)
 	{
-		const std::wstring outputPretext = stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_SpaceEnter " + std::to_wstring(archetype->objNameOrLabel) + L" into " + std::to_wstring(archetype->systemId);
+		const std::wstring outputPretext = stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_SpaceEnter " + std::to_wstring(archetype->objNameOrLabel) + L" into " + std::to_wstring(archetype->systemId);
 
 		if (archetype->objNameOrLabel == Stranger)
 		{
-			if (!trigger->mission->clientIds.contains(clientId) && (!archetype->systemId || archetype->systemId == systemId))
+			if (!missions[parent.missionId].clientIds.contains(clientId) && (!archetype->systemId || archetype->systemId == systemId))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = clientId;
@@ -33,7 +33,7 @@ namespace Missions
 				return true;
 			}
 		}
-		else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+		else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{

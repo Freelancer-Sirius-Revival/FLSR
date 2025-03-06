@@ -5,16 +5,23 @@ namespace Missions
 {
 	const uint Activator = CreateID("activator");
 
+	struct ActionParent
+	{
+		unsigned int missionId;
+		unsigned int triggerId;
+	};
+
 	struct Action
 	{
-		Trigger* trigger;
+		const ActionParent parent;
 		const TriggerAction type;
 
-		Action(Trigger* parentTrigger, const TriggerAction actType) :
-			trigger(parentTrigger),
-			type(actType)
+		Action(const ActionParent& parent, const TriggerAction type) :
+			parent(parent),
+			type(type)
 		{}
 		virtual ~Action() {}
 		virtual void Execute() = 0;
 	};
+	typedef std::shared_ptr<Action> ActionPtr;
 }

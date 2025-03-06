@@ -5,7 +5,7 @@ namespace Missions
 {
 	std::vector<MissionArchetypePtr> missionArchetypes;
 
-	std::vector<Mission*> activeMissions;
+	std::unordered_map<unsigned int, Mission> missions;
 
 	static void ClearMusic(const uint clientId)
 	{
@@ -19,27 +19,30 @@ namespace Missions
 		pub::Audio::SetMusic(clientId, music);
 	}
 
-	Mission::Mission(const MissionArchetypePtr missionArchetype) :
+	unsigned int lastTriggerId = 0;
+
+	Mission::Mission() :
+		id(0),
+		archetype(nullptr),
+		ended(true)
+	{}
+
+	Mission::Mission(const unsigned int id, const MissionArchetypePtr missionArchetype) :
+		id(id),
 		archetype(missionArchetype),
 		ended(false)
 	{
-		std::vector<Trigger*> initialTriggers;
 		for (const auto& triggerArchetype : missionArchetype->triggers)
 		{
-			Trigger* trigger = new Trigger(this, triggerArchetype);
-			triggers.push_back(trigger);
-			if (triggerArchetype->active)
-				initialTriggers.push_back(trigger);
+			triggerIds.insert(++lastTriggerId);
+			triggers.try_emplace(lastTriggerId, lastTriggerId, id, triggerArchetype);
 		}
-
-		for (const auto& trigger : initialTriggers)
-			trigger->Activate();
 	}
 
 	Mission::~Mission()
 	{
-		for (Trigger* trigger : triggers)
-			delete trigger;
+		for (const auto& id : triggerIds)
+			triggers.erase(id);
 		
 		for (const uint clientId : clientIds)
 			ClearMusic(clientId);
@@ -51,33 +54,11 @@ namespace Missions
 			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
-
-		for (auto it = activeMissions.begin(); it != activeMissions.end(); it++)
-		{
-			const auto mission = *it;
-			if (mission == this)
-			{
-				activeMissions.erase(it);
-				return;
-			}
-		}
 	}
 
 	void Mission::End()
 	{
 		ended = true;
-	}
-
-	void Mission::RemoveTrigger(const Trigger* trigger)
-	{
-		for (auto it = triggers.begin(); it != triggers.end(); it++)
-		{
-			if (*it == trigger)
-			{
-				triggers.erase(it);
-				return;
-			}
-		}
 	}
 
 	void Mission::RemoveObject(const uint objId)
@@ -126,9 +107,11 @@ namespace Missions
 		clientIds.erase(clientId);
 	}
 
+	unsigned int lastMissionId = 0;
+
 	bool StartMission(const std::string& missionName)
 	{
-		std::shared_ptr<MissionArchetype> foundMissionArchetype = nullptr;
+		MissionArchetypePtr foundMissionArchetype = nullptr;
 		for (const auto& mission : missionArchetypes)
 		{
 			if (mission->name == missionName)
@@ -140,44 +123,49 @@ namespace Missions
 		if (!foundMissionArchetype)
 			return false;
 
-		for (const Mission* mission : activeMissions)
+		for (const auto& mission : missions)
 		{
-			if (mission->archetype->name == missionName)
+			if (mission.second.archetype->name == missionName)
 			{
 				return false;
 			}
 		}
-		activeMissions.push_back(new Mission(foundMissionArchetype));
+		missions.try_emplace(++lastMissionId, lastMissionId, foundMissionArchetype);
+		for (const auto& triggerId : missions[lastMissionId].triggerIds)
+		{
+			if (triggers[triggerId].archetype->active)
+				triggers[triggerId].Activate();
+		}
 		return true;
 	}
 
 	bool KillMission(const std::string& missionName)
 	{
-		for (auto it = activeMissions.begin(); it != activeMissions.end(); it++)
+		for (const auto& mission : missions)
 		{
-			const auto mission = *it;
-			if (mission->archetype->name == missionName)
+			if (mission.second.archetype->name == missionName)
 			{
-				TriggerArchetypePtr triggerArch(new TriggerArchetype());
-				triggerArch->name = "Admin forced End";
-				triggerArch->actions.push_back({ TriggerAction::Act_EndMission, NULL });
-				Trigger* abortionTrigger = new Trigger(mission, triggerArch);
-				abortionTrigger->QueueExecution();
+				missions.erase(mission.first);
 				return true;
 			}
 		}
 		return false;
 	}
 
+	void KillMissions()
+	{
+		missions.clear();
+	}
+
 	void RemoveObjectFromMissions(const uint objId)
 	{
-		for (const auto& mission : activeMissions)
-			mission->RemoveObject(objId);
+		for (auto& mission : missions)
+			mission.second.RemoveObject(objId);
 	}
 
 	void RemoveClientFromMissions(const uint client)
 	{
-		for (const auto& mission : activeMissions)
-			mission->RemoveClient(client);
+		for (auto& mission : missions)
+			mission.second.RemoveClient(client);
 	}
 }

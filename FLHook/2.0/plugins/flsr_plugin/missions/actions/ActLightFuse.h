@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActLightFuseArchetypePtr archetype;
 
-		ActLightFuse(Trigger* parentTrigger, const ActLightFuseArchetypePtr actionArchetype);
+		ActLightFuse(const ActionParent& parent, const ActLightFuseArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

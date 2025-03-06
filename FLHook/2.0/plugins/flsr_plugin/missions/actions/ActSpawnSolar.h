@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActSpawnSolarArchetypePtr archetype;
 
-		ActSpawnSolar(Trigger* parentTrigger, const ActSpawnSolarArchetypePtr actionArchetype);
+		ActSpawnSolar(const ActionParent& parent, const ActSpawnSolarArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

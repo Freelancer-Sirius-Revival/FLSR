@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActRemoveLabelArchetypePtr archetype;
 
-		ActRemoveLabel(Trigger* parentTrigger, const ActRemoveLabelArchetypePtr actionArchetype);
+		ActRemoveLabel(const ActionParent& parent, const ActRemoveLabelArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

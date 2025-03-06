@@ -8,7 +8,7 @@ namespace Missions
 	{
 		const ActDestroyArchetypePtr archetype;
 
-		ActDestroy(Trigger* parentTrigger, const ActDestroyArchetypePtr actionArchetype);
+		ActDestroy(const ActionParent& parent, const ActDestroyArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

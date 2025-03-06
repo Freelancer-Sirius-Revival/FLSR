@@ -9,7 +9,7 @@ namespace Missions
 		const ActActTriggerArchetypePtr archetype;
 		bool activate;
 
-		ActActTrigger(Trigger* parentTrigger, const ActActTriggerArchetypePtr actionArchetype);
+		ActActTrigger(const ActionParent& parent, const ActActTriggerArchetypePtr actionArchetype);
 		void Execute();
 	};
 }

@@ -4,8 +4,8 @@ namespace Missions
 {
 	std::unordered_set<CndBaseEnter*> baseEnterConditions;
 
-	CndBaseEnter::CndBaseEnter(Trigger* parentTrigger, const CndBaseEnterArchetypePtr conditionArchetype) :
-		Condition(parentTrigger, TriggerCondition::Cnd_BaseEnter),
+	CndBaseEnter::CndBaseEnter(const ConditionParent& parent, const CndBaseEnterArchetypePtr conditionArchetype) :
+		Condition(parent, TriggerCondition::Cnd_BaseEnter),
 		archetype(conditionArchetype)
 	{}
 
@@ -21,11 +21,11 @@ namespace Missions
 
 	bool CndBaseEnter::Matches(const uint clientId, const uint baseId)
 	{
-		const std::wstring outputPretext = stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Cnd_BaseEnter " + std::to_wstring(archetype->objNameOrLabel) + L" on " + std::to_wstring(archetype->baseId);
+		const std::wstring outputPretext = stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_BaseEnter " + std::to_wstring(archetype->objNameOrLabel) + L" on " + std::to_wstring(archetype->baseId);
 
 		if (archetype->objNameOrLabel == Stranger)
 		{
-			if (!trigger->mission->clientIds.contains(clientId) && (!archetype->baseId || archetype->baseId == baseId))
+			if (!missions[parent.missionId].clientIds.contains(clientId) && (!archetype->baseId || archetype->baseId == baseId))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = clientId;
@@ -33,7 +33,7 @@ namespace Missions
 				return true;
 			}
 		}
-		else if (const auto& objectsByLabel = trigger->mission->objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != trigger->mission->objectsByLabel.end())
+		else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{

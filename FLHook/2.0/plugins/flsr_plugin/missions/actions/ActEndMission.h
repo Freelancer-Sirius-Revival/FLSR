@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActEndMission : Action
 	{
-		ActEndMission(Trigger* parentTrigger);
+		ActEndMission(const ActionParent& parent);
 		void Execute();
 	};
 }

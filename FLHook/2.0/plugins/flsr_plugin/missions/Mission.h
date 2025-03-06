@@ -10,26 +10,28 @@ namespace Missions
 
 	struct Mission
 	{
+		const unsigned int id;
 		const MissionArchetypePtr archetype;
 		bool ended;
 
-		//std::vector<MissionObject> objects;
 		std::unordered_map<uint, uint> objectIdsByName;
 		std::unordered_map<uint, std::vector<MissionObject>> objectsByLabel;
 		std::unordered_set<uint> objectIds;
 		std::unordered_set<uint> clientIds;
-		std::vector<Trigger*> triggers;
+		std::unordered_set<unsigned int> triggerIds;
 
-		Mission(const MissionArchetypePtr missionArchetype);
+		Mission();
+		Mission(const unsigned int id, const MissionArchetypePtr missionArchetype);
 		virtual ~Mission();
 		void End();
-		void RemoveTrigger(const Trigger* trigger);
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
 	};
+	extern std::unordered_map<unsigned int, Mission> missions;
 
 	bool StartMission(const std::string& missionName);
 	bool KillMission(const std::string& missionName);
+	void KillMissions();
 	void RemoveObjectFromMissions(const uint objId);
 	void RemoveClientFromMissions(const uint client);
 }

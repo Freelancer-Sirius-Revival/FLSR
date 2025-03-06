@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct CndTrue : Condition
 	{
-		CndTrue(Trigger* parentTrigger);
+		CndTrue(const ConditionParent& parent);
 		void Register();
 	};
 }

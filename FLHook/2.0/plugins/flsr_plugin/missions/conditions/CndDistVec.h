@@ -14,7 +14,7 @@ namespace Missions
 	{
 		CndDistVecArchetypePtr archetype;
 
-		CndDistVec(Trigger* parentTrigger, const CndDistVecArchetypePtr conditionArchetype);
+		CndDistVec(const ConditionParent& parent, const CndDistVecArchetypePtr conditionArchetype);
 		void Register();
 		void Unregister();
 		bool Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId);

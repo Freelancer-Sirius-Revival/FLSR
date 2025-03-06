@@ -9,7 +9,7 @@ namespace Missions
 		CndTimerArchetypePtr archetype;
 		float passedTimeInS;
 
-		CndTimer(Trigger* parentTrigger, const CndTimerArchetypePtr conditionArchetype);
+		CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype);
 		void Register();
 		void Unregister();
 		bool Matches(const float elapsedTimeInS);

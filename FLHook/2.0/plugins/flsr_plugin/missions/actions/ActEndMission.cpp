@@ -3,13 +3,13 @@
 
 namespace Missions
 {
-	ActEndMission::ActEndMission(Trigger* parentTrigger) :
-		Action(parentTrigger, TriggerAction::Act_EndMission)
+	ActEndMission::ActEndMission(const ActionParent& parent) :
+		Action(parent, TriggerAction::Act_EndMission)
 	{}
 
 	void ActEndMission::Execute()
 	{
-		ConPrint(stows(trigger->mission->archetype->name) + L"->" + stows(trigger->archetype->name) + L": Act_EndMission\n");
-		trigger->mission->End();
+		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_EndMission\n");
+		missions[parent.missionId].End();
 	}
 }

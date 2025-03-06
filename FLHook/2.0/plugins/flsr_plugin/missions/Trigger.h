@@ -9,16 +9,19 @@ namespace Missions
 
 	struct Trigger
 	{
+		const unsigned int id;
+		const unsigned int parentMissionId;
 		const TriggerArchetypePtr archetype;
-		Mission* mission;
-		Condition* condition;
-		std::vector<Action*> actions;
+		std::shared_ptr<Condition> condition;
+		std::vector<std::shared_ptr<Action>> actions;
 		bool active;
 
-		Trigger(Mission* parentMission, const TriggerArchetypePtr triggerArchetype);
+		Trigger();
+		Trigger(const unsigned int id, const unsigned int parentMissionId, const TriggerArchetypePtr triggerArchetype);
 		virtual ~Trigger();
 		void Activate();
 		void Deactivate();
 		void QueueExecution();
 	};
+	extern std::unordered_map<unsigned int, Trigger> triggers;
 }

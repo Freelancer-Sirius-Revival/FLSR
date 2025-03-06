@@ -469,7 +469,7 @@ namespace Missions
 		for (const auto& cnd : destroyedConditionsCopy)
 		{
 			if (const auto& foundCondition = destroyedConditions.find(cnd); foundCondition != destroyedConditions.end() && cnd->Matches(killedObject, killed, killerId))
-				cnd->trigger->QueueExecution();
+				cnd->ExecuteTrigger();
 		}
 
 		// For SpaceExit we do not care whether it happened by despawn (dock/leaving character) or death - both mean the same to NPCs and other Players.
@@ -477,7 +477,7 @@ namespace Missions
 		for (const auto& cnd : spaceExitConditionsCopy)
 		{
 			if (const auto& foundCondition = spaceExitConditions.find(cnd); foundCondition != spaceExitConditions.end() && killedObject->is_player() && cnd->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
-				cnd->trigger->QueueExecution();
+				cnd->ExecuteTrigger();
 		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
@@ -492,7 +492,7 @@ namespace Missions
 		for (const auto& cnd : timerConditionsCopy)
 		{
 			if (const auto& foundCondition = timerConditions.find(cnd); foundCondition != timerConditions.end() && cnd->Matches(seconds))
-				cnd->trigger->QueueExecution();
+				cnd->ExecuteTrigger();
 		}
 
 		elapsedTimeInSec += seconds;
@@ -508,12 +508,12 @@ namespace Missions
 		for (const auto cnd : distVecConditions)
 		{
 			const bool strangerRequested = cnd->archetype->objNameOrLabel == Stranger;
-			if (strangerRequested || !cnd->trigger->mission->clientIds.empty())
+			if (strangerRequested || !missions[cnd->parent.missionId].clientIds.empty())
 			{
 				struct PlayerData* playerData = 0;
 				while (playerData = Players.traverse_active(playerData))
 				{
-					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !cnd->trigger->mission->clientIds.contains(playerData->iOnlineID)))
+					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !missions[cnd->parent.missionId].clientIds.contains(playerData->iOnlineID)))
 						continue;
 
 					uint shipId;
@@ -533,7 +533,7 @@ namespace Missions
 			}
 			if (!strangerRequested)
 			{
-				for (uint objId : cnd->trigger->mission->objectIds)
+				for (uint objId : missions[cnd->parent.missionId].objectIds)
 				{
 					if (objectsByObjId.contains(objId))
 						continue;
@@ -553,7 +553,7 @@ namespace Missions
 		for (const auto& cnd : distVecConditionsCopy)
 		{
 			if (const auto& foundCondition = distVecConditions.find(cnd); foundCondition != distVecConditions.end() && cnd->Matches(clientsByClientId, objectsByObjId))
-				cnd->trigger->QueueExecution();
+				cnd->ExecuteTrigger();
 		}
 	}
 
@@ -591,7 +591,7 @@ namespace Missions
 		for (const auto& cnd : spaceEnterConditionsCopy)
 		{
 			if (const auto& foundCondition = spaceEnterConditions.find(cnd); foundCondition != spaceEnterConditions.end() && cnd->Matches(clientId, systemId))
-				cnd->trigger->QueueExecution();
+				cnd->ExecuteTrigger();
 		}
 	}
 
@@ -602,7 +602,7 @@ namespace Missions
 		for (const auto& cnd : baseEnterConditionsCopy)
 		{
 			if (const auto& foundCondition = baseEnterConditions.find(cnd); foundCondition != baseEnterConditions.end() && cnd->Matches(clientId, baseId))
-				cnd->trigger->QueueExecution();
+				cnd->ExecuteTrigger();
 		}
 	}
 
@@ -643,6 +643,22 @@ namespace Missions
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}
+		}
+		else if (IS_CMD("reload_missions"))
+		{
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			KillMissions();
+			missionArchetypes.clear();
+			LoadSettings();
+			initialized = false;
+			PrintUserCmdText(clientId, L"Ended and reloaded all missions");
+			return true;
 		}
 		return false;
 	}

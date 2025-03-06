@@ -1,0 +1,187 @@
+# Mission Scripting
+
+For each mission you may create one new `.ini` file with any name you wish in `Freelancer\EXE\flhook_plugins\missions\`.
+
+This mission scripting system is mostly a re-implementation of Freelancer’s own mission scripting system. Although there are some differences due to changed requirements and use-cases in multiplayer.
+
+## Console Commands
+
+- `start_mission <mission nickname>` Admin command (requires EVENT permission) to start this mission.
+- `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission.
+
+You may start as many different mission at any time. However, only one instance of the same mission can run at the same time.
+
+The following explains the available sections and their key-values. Key-values are always written as
+- `key`
+    1. `STRING` The first value which is required.
+    1. `[FLOAT]:42` Optional value that defaults to 42 and required floating point numbers.
+    1. `ACTIVE|INACTIVE` This value has two allowed values: Active and Inactive.
+    1. `[ACTIVE|INACTIVE] :INACTIVE` Optional value that allows Active or Inactive as value, and defaults to Inactive if not given.
+- `[another key]` This key is optional.
+
+## `Mission`
+
+The head of any mission. All sections following this one will be assigned to this mission. This also means you can put multiple `Mission` into one file with their respective following contents.
+
+- `nickname` The name of the mission. Used for admin commands and debug output.
+    1. `STRING` The name. Must be unique among all missions on the server.
+- `[initstate]` Whether this mission starts directly at server startup.
+    1. `ACTIVE|INACTIVE :INACTIVE` The initial state.
+
+## `[MsnSolar]`
+
+This is the definition for a single solar for the mission. Multiple `MsnSolar` can be created for individual solars.
+
+- `nickname` The object name of the solar. Used by trigger conditions and actions. Solar-Spawn-Plugin can use these by prefixing the name with `mission-nickname:`, e.g. `my_first_mission:some_station`.
+    1. `STRING` The name. Must be unique in this mission.
+- `[string_id]` The in-game display-name.
+    1. `INTEGER` The resource ID to use.
+- `system` The system to spawn into.
+    1. `STRING` The system nickname.
+- `position` Defines the position in space.
+    1. `FLOAT :0` The x-axis.
+    1. `FLOAT :0` The y-axis.
+    1. `FLOAT :0` The z-axis.
+- `[rotate]` Defines the rotation in space.
+    1. `FLOAT :0` The x-axis.
+    1. `FLOAT :0` The y-axis.
+    1. `FLOAT :0` The z-axis.
+- `archetype` Defines the archetype.
+    1. `STRING` The solar archetype nickname.
+- `[loadout]` Defines the equipment loadout.
+    1. `STRING` The loadout nickname.
+- `[base]` Only required for stations.
+    1. `STRING` The base nickname the docks of this object will be connected with.
+- `[faction]` If left empty, this object is not affiliated with anyone.
+    1. `STRING` The faction nickname used.
+- `[pilot]` The AI for guns.
+    1. `STRING` The pilot nickname used.
+- `[voice]` Required to allow comms sent from this base.
+    1. `STRING` The voice nickname used.
+- `[space_costume]` Required to make a comms window visible to the player on interaction.
+    1. `[STRING]` The head nickname used.
+    1. `[STRING]` The body nickname used.
+    1. `[STRING]` The 1. accessory slot used.
+    1. `[STRING]` The 2. accessory slot used.
+    1. `[STRING]` The 3. accessory slot used.
+    1. `[STRING]` The 4. accessory slot used.
+    1. `[STRING]` The 5. accessory slot used.
+    1. `[STRING]` The 6. accessory slot used.
+    1. `[STRING]` The 7. accessory slot used.
+    1. `[STRING]` The 8. accessory slot used.
+- `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
+    1. `STRING` Name of the group to be linked with.
+
+## `[Trigger]`
+
+Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated. Triggers are usually deactivated by default and should be activated as the mission progresses.
+
+- `nickname` The name of the trigger. Used as reference for following actions and for debug output.
+    1. `STRING` The name. Must be unique within this mission.
+- `[initstate]` Whether this trigger gets activated directly on mission start.
+    1. `Active|Inactive :Inactive` The initial state.
+- `[repeatable]` Allows the trigger’s condition to be fulfilled more than a single time. This effectively allows this trigger to run again and again until deactivated.
+    1. `True|False :False` Whethert this trigger is repeatable or runs just once.
+
+### Conditions
+
+Only one condition must be present. If none is present, `Cnd_True` is used.
+
+The keyword `Stranger` is used to refer explicitely to all players not having a label assigned in this mission. It can be used in combination with action’s `Activator` to assign players to the mission.
+
+- `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be the server.
+- `Cnd_Timer` Waits until the time as passed. `Activator` will be the server.
+    1. `FLOAT` Time in seconds.
+- `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` can be the server when objects get despawned.
+    1. `STRING|Stranger` Object by name or label to await the destruction of.
+    1. `[INTEGER] :0` The specific count of objects that must be destroyed to meet this condition. Any negative value will make this wait until all occurances of the objects are destroyed.
+    1. `[Explode|Silent|All] :All` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Silent`) or whatever reason (`All`).
+    1. `[STRING]` Object by name or label that must be the killer.
+- `Cnd_DistVec` Distance from a vector in space.
+    1. `Inside|Outside :Inside` Whether the objects must be within or outside this distance.
+    1. `STRING|Stranger` Object by name or label to expect within the distance.
+    1. `FLOAT :0` The x-axis position for this volume.
+    1. `FLOAT :0` The y-axis position for this volume.
+    1. `FLOAT :0` The z-axis position for this volume.
+    1. `FLOAT :0` The distance from the given position to check.
+    1. `STRING` The system nickname to place this volume into.
+- `Cnd_SpaceEnter` Only for players. Undocking from bases or spawning into space. Not jumping.
+    1. `STRING|Stranger` Object by name or label to await spawning into space.
+    1. `[STRING] :any` The system nickname the object spawns into.
+- `Cnd_SpaceExit` Only for players. Docking to bases, destruction, leaving the server or changing to another character. Not jumping.
+    1. `STRING|Stranger` Object by name or label to await despawning from space.
+    1. `[STRING] :any` The system nickname the object despawns from.
+- `Cnd_BaseEnter` Only for players. Landing or logging in to bases.
+    1. `STRING|Stranger` Object by name or label to await spawning into space.
+    1. `[STRING] :any` The base nickname the object lands on.
+
+### Actions
+
+There can be as many actions as needed – even the same ones.
+
+The keyword `Activator` is used to refer explicitely to the object/player that fulfilled the trigger condition. Sometimes this can be the server itself (e.g. `Cnd_True`, `Cnd_Timer`). The `Activator` can be used in combination with the condition’s `Stranger` to assign players to the mission or do other things only to non-assigned players.
+
+- `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
+- `Act_ActTrig` Activates a trigger.
+    1. `STRING` Trigger nickname to refer.
+- `Act_DeactTrig` Deactivates a trigger.
+    1. `STRING` Trigger nickname to refer.
+- `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
+    1. `STRING|Activator` Object by name or label to manipulate.
+    1. `STRING` The label to add.
+- `Act_RemoveLabel` Removes a label to the objects. **This is the only explicit way to unassign players from the mission.**
+    1. `STRING|Activator` Object by name or label to manipulate.
+    1. `STRING` The label to remove.
+- `Act_SpawnSolar` Spawns a solar. Only one instance of it can exist at the same time.
+    1. `STRING` The `MsnSolar` nickname to spawn.
+- `Act_Destroy` Destroys an object.
+    1. `STRING|Activator` Object by name or label to destroy.
+    1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
+- `Act_LightFuse` Executes an arbitary fuse.
+    1. `STRING|Activator` Object by name or label to refer.
+    1. `STRING` Fuse nickname to execute on the objects.
+- `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
+    1. `STRING|Activator` Object by name or label to set the message or waypoint.
+    1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
+    1. `[STRING]` The system nickname for the waypoint.
+    1. `[FLOAT] :0` The x-axis position for the waypoint.
+    1. `[FLOAT] :0` The y-axis position for the waypoint.
+    1. `[FLOAT] :0` The z-axis position for the waypoint.
+    1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
+    1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
+- `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
+    1. `STRING|Activator` Object by name or label to play sound effect for.
+    1. `STRING` The sound nickname to play.
+- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
+    1. `STRING|Activator` Object by name or label to set music for.
+    1. `[STRING|None] :None` Overrides the space music.
+    1. `[STRING|None] :None` Overrides the danger music.
+    1. `[STRING|None] :None` Overrides the battle music.
+    1. `[STRING|None] :None` Overrides all music by this track.
+    1. `[FLOAT] :0` The time in seconds it takes to transition music.
+    1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
+- `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window.
+    1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
+    1. `STRING|Activator` Object by name or label to receive this comm.
+    1. `STRING` Object by name to send this comm. Must have a voice defined. Cannot be a player.
+    1. `STRING` Multiple subsequent entries possible. Must be one of the defined voice’s sound messages. 
+    1. `[FLOAT] : 0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
+- `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
+    1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
+    1. `STRING|Activator` Object by name or label to receive this comm.
+    1. `STRING` The voice nickname to use for the sender.
+    1. `STRING` Multiple subsequent entries possible. Must be one of the defined voice’s sound messages. 
+    1. `[FLOAT] : 0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
+    1. `[INTEGER] :0` The sender’s resource ID to display as name below the comms window.
+    1. `[STRING]` The head nickname used for the sender.
+    1. `[STRING]` The body nickname used for the sender.
+    1. `[STRING]` The 1. accessory slot used for the sender.
+    1. `[STRING]` The 2. accessory slot used for the sender.
+    1. `[STRING]` The 3. accessory slot used for the sender.
+    1. `[STRING]` The 4. accessory slot used for the sender..
+    1. `[STRING]` The 5. accessory slot used for the sender.
+    1. `[STRING]` The 6. accessory slot used for the sender.
+    1. `[STRING]` The 7. accessory slot used for the sender.
+    1. `[STRING]` The 8. accessory slot used for the sender.

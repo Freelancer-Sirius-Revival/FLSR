@@ -16,6 +16,7 @@
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuseArch.h"
 #include "Actions/ActSpawnSolarArch.h"
+#include "Actions/ActSpawnShipArch.h"
 #include "Actions/ActDestroyArch.h"
 #include "Actions/ActPlaySoundEffectArch.h"
 #include "Actions/ActPlayMusicArch.h"
@@ -122,6 +123,109 @@ namespace Missions
 
 					if (missionArchetypes.empty())
 						continue;
+
+					if (ini.is_header("Npc"))
+					{
+						NpcArchetypePtr npc(new NpcArchetype());
+						while (ini.read_value())
+						{
+							if (ini.is_value("nickname"))
+							{
+								npc->name = ToLower(ini.get_value_string(0));
+							}
+							else if (ini.is_value("archetype"))
+							{
+								npc->archetypeId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("loadout"))
+							{
+								npc->loadoutId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("state_graph"))
+							{
+								npc->stateGraph = ToLower(ini.get_value_string(0));
+							}
+							else if (ini.is_value("faction"))
+							{
+								npc->faction = ini.get_value_string(0);
+							}
+							else if (ini.is_value("pilot"))
+							{
+								npc->pilotId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("voice"))
+							{
+								npc->voiceId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("space_costume"))
+							{
+								npc->costume.head = CreateIdOrNull(ini.get_value_string(0));
+								npc->costume.body = CreateIdOrNull(ini.get_value_string(1));
+								npc->costume.accessories = 0;
+								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
+								{
+									const char* accessoryNickname = ini.get_value_string(index + 2);
+									if (strlen(accessoryNickname) == 0)
+										break;
+									npc->costume.accessory[index] = CreateID(accessoryNickname);
+									npc->costume.accessories++;
+								}
+							}
+							else if (ini.is_value("level"))
+							{
+								npc->level = ini.get_value_int(0);
+							}
+						}
+						if (npc->archetypeId && !npc->name.empty() && !npc->stateGraph.empty())
+							missionArchetypes.back()->npcs.push_back(npc);
+					}
+
+					if (ini.is_header("MsnNpc"))
+					{
+						MsnNpcArchetypePtr npc(new MsnNpcArchetype());
+						npc->position.x = 0;
+						npc->position.y = 0;
+						npc->position.z = 0;
+						npc->orientation = EulerMatrix(npc->position);
+
+						while (ini.read_value())
+						{
+							if (ini.is_value("nickname"))
+							{
+								npc->name = ToLower(ini.get_value_string(0));
+							}
+							else if (ini.is_value("string_id"))
+							{
+								npc->idsName = ini.get_value_int(0);
+							}
+							else if (ini.is_value("system"))
+							{
+								npc->systemId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("position"))
+							{
+								npc->position = ini.get_vector();
+							}
+							else if (ini.is_value("rotate"))
+							{
+								npc->orientation = EulerMatrix(ini.get_vector());
+							}
+							else if (ini.is_value("npc"))
+							{
+								npc->npcId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("arrival_obj"))
+							{
+								npc->startingObjId = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("label"))
+							{
+								npc->labels.insert(CreateIdOrNull(ini.get_value_string(0)));
+							}
+						}
+						if (npc->npcId && !npc->name.empty() && npc->systemId)
+							missionArchetypes.back()->msnNpcs.push_back(npc);
+					}
 
 					if (ini.is_header("MsnSolar"))
 					{
@@ -338,6 +442,12 @@ namespace Missions
 								archetype->solarName = ToLower(ini.get_value_string(0));
 								trigger->actions.push_back({ TriggerAction::Act_SpawnSolar, archetype });
 							}
+							else if (ini.is_value("Act_SpawnShip"))
+							{
+								ActSpawnShipArchetypePtr archetype(new ActSpawnShipArchetype());
+								archetype->msnNpcName = ToLower(ini.get_value_string(0));
+								trigger->actions.push_back({ TriggerAction::Act_SpawnShip, archetype });
+								}
 							else if (ini.is_value("Act_Destroy"))
 							{
 								ActDestroyArchetypePtr archetype(new ActDestroyArchetype());

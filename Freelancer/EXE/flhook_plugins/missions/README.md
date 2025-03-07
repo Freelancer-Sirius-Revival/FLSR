@@ -72,6 +72,63 @@ This is the definition for a single solar for the mission. Multiple `MsnSolar` c
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
 
+## `[Npc]`
+
+This is the definition for a NPC archetype which again can be used by multiple `MsnNpc`. Multiple entries of this can exist.
+
+- `nickname` The NPC name refered by `MsnNpc`.
+    1. `STRING` The name. Must be unique in this mission.
+- `archetype` Defines the archetype.
+    1. `STRING` The solar archetype nickname.
+- `[loadout]` Defines the equipment loadout.
+    1. `STRING` The loadout nickname.
+- `[state_graph]` Basic behaviour of the ship.
+    1. `STRING` The state graph to use.
+- `[faction]` If left empty, this object is not affiliated with anyone.
+    1. `STRING` The faction nickname used.
+- `[pilot]` The AI for guns.
+    1. `STRING` The pilot nickname used.
+- `[voice]` Required to allow comms sent from this base.
+    1. `STRING` The voice nickname used.
+- `[space_costume]` Required to make a comms window visible to the player on interaction.
+    1. `[STRING]` The head nickname used.
+    1. `[STRING]` The body nickname used.
+    1. `[STRING]` The 1. accessory slot used.
+    1. `[STRING]` The 2. accessory slot used.
+    1. `[STRING]` The 3. accessory slot used.
+    1. `[STRING]` The 4. accessory slot used.
+    1. `[STRING]` The 5. accessory slot used.
+    1. `[STRING]` The 6. accessory slot used.
+    1. `[STRING]` The 7. accessory slot used.
+    1. `[STRING]` The 8. accessory slot used.
+- `[level]` Sets the displayed level.
+    1. `INTEGER` The level to show. Can be from 0 to 255.
+
+## `[MsnNpc]`
+
+This is the definition for a single NPC for the mission. Multiple `MsnSolar` can be created for individual NPCs.
+
+- `nickname` The object name of the NPC. Used by trigger conditions and actions.
+    1. `STRING` The name. Must be unique in this mission.
+- `[string_id]` The in-game display-name. If not given, a random name based on the used faction will be generated.
+    1. `INTEGER` The resource ID to use.
+- `system` The system to spawn into.
+    1. `STRING` The system nickname.
+- `position` Defines the position in space.
+    1. `FLOAT :0` The x-axis.
+    1. `FLOAT :0` The y-axis.
+    1. `FLOAT :0` The z-axis.
+- `[rotate]` Defines the rotation in space.
+    1. `FLOAT :0` The x-axis.
+    1. `FLOAT :0` The y-axis.
+    1. `FLOAT :0` The z-axis.
+- `npc` Defines the NPC archetype.
+    1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
+- `[arrival_obj]` Launches from a base or jump-object.
+    1. `STRING` The solar nickname to undock at spawn from.
+- `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
+    1. `STRING` Name of the group to be linked with.
+
 ## `[Trigger]`
 
 Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated. Triggers are usually deactivated by default and should be activated as the mission progresses.

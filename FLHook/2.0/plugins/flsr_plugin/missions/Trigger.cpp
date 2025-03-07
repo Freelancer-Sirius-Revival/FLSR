@@ -17,6 +17,7 @@
 #include "Actions/ActDestroy.h"
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
+#include "Actions/ActSpawnShip.h"
 #include "Actions/ActPlaySoundEffect.h"
 #include "Actions/ActPlayMusic.h"
 #include "Actions/ActEtherComm.h"
@@ -176,6 +177,10 @@ namespace Missions
 
 				case TriggerAction::Act_SpawnSolar:
 					result = new ActSpawnSolar(actParent, std::static_pointer_cast<ActSpawnSolarArchetype>(actionArchetype.second));
+					break;
+
+				case TriggerAction::Act_SpawnShip:
+					result = new ActSpawnShip(actParent, std::static_pointer_cast<ActSpawnShipArchetype>(actionArchetype.second));
 					break;
 
 				case TriggerAction::Act_LightFuse:

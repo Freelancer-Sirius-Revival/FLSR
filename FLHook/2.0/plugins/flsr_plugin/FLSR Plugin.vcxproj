@@ -156,6 +156,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActRemoveLabel.cpp" />
     <ClCompile Include="missions\actions\ActSendComm.cpp" />
     <ClCompile Include="missions\actions\ActSetNNObj.cpp" />
+    <ClCompile Include="missions\actions\ActSpawnShip.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp" />
     <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
@@ -203,6 +204,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSendCommArch.h" />
     <ClInclude Include="missions\actions\ActSetNNObj.h" />
     <ClInclude Include="missions\actions\ActSetNNObjArch.h" />
+    <ClInclude Include="missions\actions\ActSpawnShip.h" />
+    <ClInclude Include="missions\actions\ActSpawnShipArch.h" />
     <ClInclude Include="missions\actions\ActSpawnSolar.h" />
     <ClInclude Include="missions\actions\ActSpawnSolarArch.h" />
     <ClInclude Include="missions\conditions\CndBaseEnter.h" />
@@ -224,6 +227,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\MissionObject.h" />
     <ClInclude Include="missions\Missions.h" />
     <ClInclude Include="missions\MsnSolarArch.h" />
+    <ClInclude Include="missions\NpcArch.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="missions\TriggerArch.h" />
   </ItemGroup>

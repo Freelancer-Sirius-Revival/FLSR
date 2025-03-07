@@ -63,6 +63,9 @@ namespace Missions
 
 	void Mission::RemoveObject(const uint objId)
 	{
+		if (!objectIds.contains(objId))
+			return;
+
 		objectIds.erase(objId);
 		for (auto it = objectIdsByName.begin(); it != objectIdsByName.end();)
 		{
@@ -154,7 +157,9 @@ namespace Missions
 
 	void KillMissions()
 	{
-		missions.clear();
+		// Do not use clear() function. Destruction of objects at mission deconstruction causes a hook call back on the missions list - which is just being modified.
+		for (auto it = missions.begin(); it != missions.end();)
+			it = missions.erase(it);
 	}
 
 	void RemoveObjectFromMissions(const uint objId)

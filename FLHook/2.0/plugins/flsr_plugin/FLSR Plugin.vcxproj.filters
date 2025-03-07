@@ -92,6 +92,9 @@
     <ClCompile Include="missions\conditions\CndTimer.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnShip.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -229,6 +232,15 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\CndTimerArch.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\NpcArch.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnShip.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnShipArch.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

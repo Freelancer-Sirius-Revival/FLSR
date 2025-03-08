@@ -14,7 +14,7 @@ _CRCAntiCheat CRCAntiCheat_FLSR;
 void LoadSettings() {
     returncode = DEFAULT_RETURNCODE;
 
-    Pilots::ReadPilots();
+    Pilots::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];

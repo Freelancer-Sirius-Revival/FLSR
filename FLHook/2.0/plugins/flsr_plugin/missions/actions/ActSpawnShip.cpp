@@ -1,5 +1,6 @@
 #include <FLHook.h>
 #include "../../Pilots.h"
+#include "../NpcNames.h"
 #include "ActSpawnShip.h"
 
 namespace Missions
@@ -24,20 +25,51 @@ namespace Missions
 		shipInfo.iHitPointsLeft = -1;
 		shipInfo.iLevel = npc.level;
 
-		// Define the string used for the scanner name. Because the
-		// following entry is empty, the pilot_name is used. This
-		// can be overriden to display the ship type instead.
-		FmtStr scanner_name(0, 0);
-		scanner_name.begin_mad_lib(0);
-		scanner_name.end_mad_lib();
+		// Formation name is displayed above the pilot name in wireframe display.
+		// If this is given, the ship IDS Name will be used in scanner list. Keep empty to show Pilot Name in scanner list.
+		FmtStr formationName(0, 0);
+		formationName.begin_mad_lib(0);
+		formationName.end_mad_lib();
 
-		// Define the string used for the pilot name. The example
-		// below shows the use of multiple part names.
-		FmtStr pilot_name(0, 0);
-		pilot_name.begin_mad_lib(16163); // ids of "%s0 %s1"
-		pilot_name.end_mad_lib();
+		// Pilot name to be displayed when clicking on the ship/wireframe display.
+		// Will be also displayed in scanner list if no formation name is given.
+		FmtStr pilotName(0, 0);
+		pilotName.begin_mad_lib(0);
+		pilotName.end_mad_lib();
 
-		pub::Reputation::Alloc(shipInfo.iRep, scanner_name, pilot_name);
+		if (msnNpc.idsName)
+		{
+			pilotName.begin_mad_lib(msnNpc.idsName);
+			pilotName.end_mad_lib();
+		}
+		else
+		{
+			const auto& ship = Archetype::GetShip(npc.archetypeId);
+			bool largeShip = ship->iArchType & (ObjectType::Gunboat | ObjectType::Cruiser | ObjectType::Transport | ObjectType::Capital | ObjectType::Mining);
+
+			if (!npc.faction.empty())
+			{
+				if (largeShip)
+				{
+					const auto& result = NpcNames::GetRandomLargeShipName(CreateID(npc.faction.c_str()));
+					pilotName.begin_mad_lib(16162); // "%s0 %s1 %s2"
+					pilotName.end_mad_lib();
+					pilotName.append_string(ship->iIdsName);
+					pilotName.append_string(result.first);
+					pilotName.append_string(result.second);
+				}
+				else if (npc.voiceId)
+				{
+					pilotName.begin_mad_lib(16163); // "%s0 %s1"
+					pilotName.end_mad_lib();
+					const auto& result = NpcNames::GetRandomName(CreateID(npc.faction.c_str()), npc.voiceId);
+					pilotName.append_string(result.first);
+					pilotName.append_string(result.second);
+				}
+			}
+		}
+
+		pub::Reputation::Alloc(shipInfo.iRep, formationName, pilotName);
 		uint groupId;
 		pub::Reputation::GetReputationGroup(groupId, npc.faction.c_str());
 		pub::Reputation::SetAffiliation(shipInfo.iRep, groupId);

@@ -330,7 +330,7 @@ namespace Archetype
 		uint vtable;
 		uint iArchID;
 		char* szName;
-		AClassType iArchType;
+		ObjectType iArchType;
 		uint iIdsName;
 		uint iIdsInfo;
 		float fHitPoints;

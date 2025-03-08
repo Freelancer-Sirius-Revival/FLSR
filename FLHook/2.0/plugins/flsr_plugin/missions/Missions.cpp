@@ -1,5 +1,6 @@
 #include <regex>
 #include "../Main.h"
+#include "NpcNames.h"
 #include "Missions.h"
 #include "Mission.h"
 #include "MissionArch.h"
@@ -92,6 +93,8 @@ namespace Missions
 
 	void LoadSettings()
 	{
+		NpcNames::ReadFiles();
+
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
 		const std::string missionDirectory = std::string(currentDirectory) + "\\flhook_plugins\\missions\\";
@@ -772,6 +775,7 @@ namespace Missions
 			LoadSettings();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Ended and reloaded all missions");
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 		return false;

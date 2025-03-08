@@ -1037,10 +1037,28 @@ namespace Pilots
 		}
 	}
 
-	void ReadPilots()
+	void ReadFiles()
 	{
+		std::string dataPath = "..\\data";
+		INI_Reader ini;
+		if (ini.open("freelancer.ini", false))
+		{
+			while (ini.read_header())
+			{
+				if (ini.is_header("Freelancer"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("data path"))
+							dataPath = ini.get_value_string(0);
+					}
+				}
+			}
+			ini.close();
+		}
+
 		// Those file paths are hardcoded by Freelancer itself.
-		ReadFile("../DATA/MISSIONS/pilots_population.ini");
-		ReadFile("../DATA/MISSIONS/pilots_story.ini");
+		ReadFile(dataPath + "\\missions\\pilots_population.ini");
+		ReadFile(dataPath + "\\missions\\pilots_story.ini");
 	}
 }

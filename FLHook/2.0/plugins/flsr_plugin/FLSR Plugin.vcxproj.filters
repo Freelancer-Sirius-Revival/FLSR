@@ -96,6 +96,9 @@
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Pilots.cpp" />
+    <ClCompile Include="missions\NpcNames.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -244,6 +247,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="Pilots.h" />
+    <ClInclude Include="missions\NpcNames.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

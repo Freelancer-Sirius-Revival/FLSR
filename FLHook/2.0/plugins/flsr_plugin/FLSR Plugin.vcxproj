@@ -167,6 +167,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
+    <ClCompile Include="missions\NpcNames.cpp" />
     <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
@@ -229,6 +230,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\Missions.h" />
     <ClInclude Include="missions\MsnSolarArch.h" />
     <ClInclude Include="missions\NpcArch.h" />
+    <ClInclude Include="missions\NpcNames.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="missions\TriggerArch.h" />
     <ClInclude Include="Pilots.h" />

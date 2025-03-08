@@ -244,3 +244,6 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING]` The 6. accessory slot used for the sender.
     1. `[STRING]` The 7. accessory slot used for the sender.
     1. `[STRING]` The 8. accessory slot used for the sender.
+- `Act_AdjAcct` Adjusts the cash on the player account. Cash will be automatically clamped to prevent overflows/underflows.
+    1. `STRING|Activator` The players to have their cash being modified.
+    1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.

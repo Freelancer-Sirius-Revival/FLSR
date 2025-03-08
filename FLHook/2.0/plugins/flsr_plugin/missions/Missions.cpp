@@ -24,6 +24,7 @@
 #include "Actions/ActEtherCommArch.h"
 #include "Actions/ActSendCommArch.h"
 #include "Actions/ActSetNNObjArch.h"
+#include "Actions/ActAdjAcctArch.h"
 
 namespace Missions
 {
@@ -551,6 +552,13 @@ namespace Missions
 								archetype->bestRoute = ini.get_bool(6);
 								archetype->targetObjName = CreateIdOrNull(ini.get_value_string(7));
 								trigger->actions.push_back({ TriggerAction::Act_SetNNObj, archetype });
+							}
+							else if (ini.is_value("Act_AdjAcct"))
+							{
+								ActAdjAcctArchetypePtr archetype(new ActAdjAcctArchetype());
+								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								archetype->cash = ini.get_value_int(1);
+								trigger->actions.push_back({ TriggerAction::Act_AdjAcct, archetype });
 							}
 						}
 						missionArchetypes.back()->triggers.push_back(trigger);

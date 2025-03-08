@@ -23,6 +23,7 @@
 #include "Actions/ActEtherComm.h"
 #include "Actions/ActSendComm.h"
 #include "Actions/ActSetNNObj.h"
+#include "Actions/ActAdjAcct.h"
 
 namespace Missions
 {
@@ -205,6 +206,10 @@ namespace Missions
 
 				case TriggerAction::Act_SetNNObj:
 					result = new ActSetNNObj(actParent, std::static_pointer_cast<ActSetNNObjArchetype>(actionArchetype.second));
+					break;
+
+				case TriggerAction::Act_AdjAcct:
+					result = new ActAdjAcct(actParent, std::static_pointer_cast<ActAdjAcctArchetype>(actionArchetype.second));
 					break;
 
 				default:

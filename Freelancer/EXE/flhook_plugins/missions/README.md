@@ -247,3 +247,8 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_AdjAcct` Adjusts the cash on the player account. Cash will be automatically clamped to prevent overflows/underflows.
     1. `STRING|Activator` The players to have their cash being modified.
     1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.
+- `Act_AddCargo` Adds cargo. Only works for players. Will fail if player has not enough cargo space.
+    1. `STRING|Activator` The players to receive the cargo.
+    1. `STRING` The item nickname to use.
+    1. `INTEGER :0` Amount of items to add to cargo.
+    1. `[True|False :False]` Whether this cargo is flagged as mission item.

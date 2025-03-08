@@ -102,6 +102,9 @@
     <ClCompile Include="missions\actions\ActAdjAcct.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActAddCargo.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -257,6 +260,12 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActAdjAcctArch.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAddCargo.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAddCargoArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,6 +25,7 @@
 #include "Actions/ActSendCommArch.h"
 #include "Actions/ActSetNNObjArch.h"
 #include "Actions/ActAdjAcctArch.h"
+#include "Actions/ActAddCargoArch.h"
 
 namespace Missions
 {
@@ -559,6 +560,15 @@ namespace Missions
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->cash = ini.get_value_int(1);
 								trigger->actions.push_back({ TriggerAction::Act_AdjAcct, archetype });
+							}
+							else if (ini.is_value("Act_AddCargo"))
+							{
+								ActAddCargoArchetypePtr archetype(new ActAddCargoArchetype());
+								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								archetype->itemId = CreateIdOrNull(ini.get_value_string(1));
+								archetype->count = std::max(0, ini.get_value_int(2));
+								archetype->missionFlagged = ini.get_value_bool(3);
+								trigger->actions.push_back({ TriggerAction::Act_AddCargo, archetype });
 							}
 						}
 						missionArchetypes.back()->triggers.push_back(trigger);

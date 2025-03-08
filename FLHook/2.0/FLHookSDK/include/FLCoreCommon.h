@@ -3183,8 +3183,10 @@ public:
 	void set_control_exclusion(unsigned int);
 	void set_power(float);
 	bool sync_cargo(class EquipDescList const&);
+	protected:
 	bool add_cargo_item(struct EquipDesc const&);
 	bool add_equipped_item(struct EquipDesc const&);
+	public:
 	void compute_explosion_dmg_bounding_sphere(float&, class Vector&)const;
 	void init_docking_points(unsigned int);
 	void update_docking_animations(float);

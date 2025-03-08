@@ -56,6 +56,7 @@ namespace Missions
 	{
 		Act_ActTrig,
 		Act_AddAmbient,
+		Act_AddCargo,
 		Act_AddLabel,
 		Act_AddRTC,
 		Act_AdjAcct,

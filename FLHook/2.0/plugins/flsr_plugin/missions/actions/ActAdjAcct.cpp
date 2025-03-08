@@ -27,24 +27,21 @@ namespace Missions
 		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_AdjAcct " + std::to_wstring(archetype->cash) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].condition->activator;
 			if (activator.type == MissionObjectType::Client)
 			{
 				AddCash(activator.id, archetype->cash);
 				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 			}
 		}
-		else
+		else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
 		{
-			if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+			for (const auto& object : objectsByLabel->second)
 			{
-				for (const auto& object : objectsByLabel->second)
+				if (object.type == MissionObjectType::Client)
 				{
-					if (object.type == MissionObjectType::Client)
-					{
-						AddCash(object.id, archetype->cash);
-						ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
-					}
+					AddCash(object.id, archetype->cash);
+					ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
 				}
 			}
 		}

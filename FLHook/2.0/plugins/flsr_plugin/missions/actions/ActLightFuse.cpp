@@ -26,7 +26,7 @@ namespace Missions
 		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_LightFuse " + std::to_wstring(archetype->fuseId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].condition->activator;
 			if (activator.type == MissionObjectType::Client)
 			{
 				uint objId;

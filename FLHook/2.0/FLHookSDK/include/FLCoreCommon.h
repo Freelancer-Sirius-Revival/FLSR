@@ -4575,42 +4575,42 @@ namespace pub
 		enum DirectivePriority;
 		struct DirectiveCallback;
 
-		enum OP_TYPE
+		enum OpType
 		{
-			M_NONE = -1,
-			M_NULL = 0,
-			M_BUZZ = 1,
-			M_DUNNO = 2,
-			M_GOTO = 3,
-			M_FOLLOW = 4,
-			M_TRAIL = 5,
-			M_STRAFE = 6,
-			M_FACE = 7,
-			M_RAM = 8,
-			M_TRACTOR = 9,
-			M_EVADE = 10,
-			M_DRASTICEVADE = 11,
-			M_DELAY = 12,
-			M_DOCK = 13,
-			M_LAUNCH = 14,
-			M_TRADELANE = 15,
-			M_INSTANTTRADELANE = 16,
-			M_GUIDE = 17,
-			M_WAITFORSHIP = 18,
-			M_FREEFLIGHT = 19,
-			M_IDLE = 20,
-			M_CANCEL = 21,
+			None = -1,
+			NullOp = 0,
+			Buzz = 1,
+			Dunno = 2,
+			Goto = 3,
+			Follow = 4,
+			Trail = 5,
+			Strafe = 6,
+			Face = 7,
+			Ram = 8,
+			Tractor = 9,
+			Evade = 10,
+			DrasticEvade = 11,
+			Delay = 12,
+			Dock = 13,
+			Launch = 14,
+			Tradelane = 15,
+			InstanceTradeLane = 16,
+			Guide = 17,
+			WaitForShip = 18,
+			FreeFlight = 19,
+			Idle = 20,
+			Cancel = 21,
 		};
 
 		class IMPORT BaseOp
 		{
 		public:
-			BaseOp(OP_TYPE);
+			BaseOp(OpType);
 			BaseOp(const BaseOp&);
 
 			virtual bool validate();
 
-			OP_TYPE op_type;
+			OpType OpType;
 			int fireWeapons; // Probably a bool, anything non-zero turns it on
 		};
 
@@ -4658,7 +4658,7 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			uint DockSpaceObj;
+			uint dockTargetObjId;
 			uint x10;   // 0
 			ushort x12; // 0
 			ushort x14; // 0xbb, 0x83 ??
@@ -4849,9 +4849,9 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			uint x0C;  // 10
-			float x10; // 500
-			uint x14;  // 0
+			uint targetObjId;  // 10
+			float distance; // 500
+			bool x14;  // 0
 			uint x18;  // 0
 		};
 
@@ -5301,7 +5301,6 @@ namespace pub
 			Vector vBoxCorner2; // only used for iZoneType 1
 			float fRadius;      // not used for iZoneType 1
 		};
-
 	};
 
 	namespace StateGraph
@@ -5316,9 +5315,18 @@ namespace pub
 		IMPORT  struct IStateGraph const* get_state_graph_internal(int);
 		IMPORT  void  refresh_state_graph(void);
 	};
-
 };
 
+struct IMPORT IDirectiveInfo
+{
+	bool init; // ? seems to be 1 after first time auto pilot takes over
+	void* vUnknown1;
+	pub::AI::OpType op;
+};
+
+// Size: 460 bytes
+// Constructor e.g. sub_62D2220
+// Hex numbers behind dunno variables or in a comment indicate hex offset
 class IMPORT IBehaviorManager
 {
 public:
@@ -5331,50 +5339,96 @@ public:
 		E
 	};
 
-	bool allow_head_tracking(void);
-	bool cancel_behavior(enum CancelRequestType);
-	bool enable_all_maneuvers(void);
+	enum class CancelRequestType
+	{
+	};
+	enum class EvaluateResult
+	{
+	};
+
+	bool allow_head_tracking();
+	bool cancel_behavior(CancelRequestType);
+	bool enable_all_maneuvers();
 	bool enable_maneuver(int, bool);
-	enum EvaluateResult  external_player_evaluate(int);
-	bool get_camera_level_status(void);
-	float get_closest_trailing_ship(void)const;
-	struct IDirectiveInfo const* get_current_directive(void);
-	struct IObjRW const* get_debugger_target(void)const;
-	bool get_docking_port(struct IObjRW const*&, int&);
-	unsigned int get_parent_id(void);
-	void get_personality(class pub::AI::Personality&);
-	enum pub::AI::ScanResponse  get_scan_response(unsigned int);
-	class Vector const  get_ship_up_direction(void);
-	struct IStateGraph const* get_state_graph(void);
-	class SystemManager* get_sys(void);
-	bool get_user_turning_input_state(void);
+	EvaluateResult external_player_evaluate(int);
+	bool get_camera_level_status();
+	float get_closest_trailing_ship() const;
+	const IDirectiveInfo* get_current_directive();
+	const IObjRW* get_debugger_target() const;
+	bool get_docking_port(const IObjRW*&, int&);
+	unsigned int get_parent_id();
+	void get_personality(pub::AI::Personality&);
+	pub::AI::ScanResponse get_scan_response(unsigned int);
+	const Vector get_ship_up_direction();
+	const IStateGraph* get_state_graph();
+	class SystemManager* get_sys();
+	bool get_user_turning_input_state();
 	bool lock_maneuvers(bool);
-	void refresh_state_graph(void);
-	void reset_current_behavior_direction(void);
-	void set_camera_mode(enum IBehaviorCameraMode);
-	void set_content_callback(struct pub::AI::ContentCallback*);
-	bool set_current_directive(struct IDirectiveInfo const&, class pub::AI::BaseOp const*);
-	void set_directive_callback(struct pub::AI::DirectiveCallback*);
-	enum pub::AI::OP_RTYPE  set_directive_priority(enum pub::AI::DirectivePriority);
-	void set_personality(class pub::AI::Personality const&);
-	void set_ship_up_direction(class Vector const&);
+	void refresh_state_graph();
+	void reset_current_behavior_direction();
+	void set_camera_mode(IBehaviorCameraMode);
+	void set_content_callback(pub::AI::ContentCallback*);
+	bool set_current_directive(const IDirectiveInfo&, const pub::AI::BaseOp*);
+	void set_directive_callback(pub::AI::DirectiveCallback*);
+	pub::AI::OP_RTYPE set_directive_priority(pub::AI::DirectivePriority);
+	void set_personality(const pub::AI::Personality&);
+	void set_ship_up_direction(const Vector&);
 	void set_state_graph(int, bool);
 	void set_turn_sensitivity(float);
 	void set_user_turning_input_state(bool);
-	void submit_camera_up(class Vector const&);
+	void submit_camera_up(const Vector&);
 	void update_current_behavior_afterburner(bool);
 	void update_current_behavior_auto_avoidance(bool);
 	void update_current_behavior_auto_level(bool);
 	void update_current_behavior_brake_reverse(bool);
 	void update_current_behavior_cruise(bool);
-	void update_current_behavior_direction(class Vector const&);
+	void update_current_behavior_direction(const Vector&);
 	void update_current_behavior_engage_engine(bool);
-	void update_current_behavior_slide_strafe_burst(enum StrafeDir);
+	void update_current_behavior_slide_strafe_burst(StrafeDir);
 	void update_current_behavior_throttle(float);
 	void update_level_camera(bool);
 
 public:
-	unsigned char data[OBJECT_DATA_SIZE];
+	int* vft;                        // 0x00
+	IStateGraph* stateGraphInternal; // 0x04
+	void* pDunno_0x08;
+	struct PathfindManager* pathfindManager; // 0x0C
+	int iDunnos_0x10[42];
+	int iEnabledManeuversFlag;     // 0xB8 - 0 = all enabled
+	bool bLockManeuvers;           // 0xBC
+	int iCurrentBehaviourIndex;    // 0xC0 - -1 when no behaviour, otherwise index of behaviourArray
+	IDirectiveInfo* directiveInfo; // 0xC4
+	int iDirectivePriority;        // 0xC8
+	int iDunno_0xCC;
+	float fDunno_0xD0;
+	float fDunno_0xD4;
+	byte bDunno54_0xD8;
+	float fDunno55_0xDC;
+	float fDunno56_0xE0;
+	float fDunno57_0xE4;
+	int iDunnos58_0xE8[2];
+	BaseWatcher baseWatcher; // 0xF0
+	byte bDunno62_0xF8;
+	bool bCameraLevelStatusFlag;                       // 0xF9
+	pub::AI::DirectiveCallback* directiveCallbacks[5]; // 0xFC
+	pub::AI::ContentCallback* contentCallback;         // 0x110
+	int iDunnos_0x114[7];
+	bool bDunno_0x130;
+	Vector shipUpDirection;   // 0x134
+	Vector cameraUpDirection; // 0x140
+	int iDunno_0x14C;
+	bool bUserTurningInputState;    // 0x150
+	IBehaviorCameraMode cameraMode; // 0x154
+	byte bDunno_0x158;
+	void* pDunno_0x15C;
+	int iDunnos_0x160;
+	float fTurnSensitivity; // 0x164
+	byte bDunno_0x168;
+	byte bDunno_0x169;
+	int iDunno_0x16C;
+	byte bDunno_0x170;
+	struct Behavior* behaviourArray[21]; // 0x174 - index 7 seems to be docking
+	byte bDunno_0x1C8;
 };
 
 struct IMPORT ICRSplineSegment

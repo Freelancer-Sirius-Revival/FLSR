@@ -214,6 +214,10 @@ namespace Missions
 							{
 								npc->npcId = CreateIdOrNull(ini.get_value_string(0));
 							}
+							else if (ini.is_value("pilot_job"))
+							{
+								npc->pilotJobId = CreateIdOrNull(ini.get_value_string(0));
+							}
 							else if (ini.is_value("arrival_obj"))
 							{
 								npc->startingObjId = CreateIdOrNull(ini.get_value_string(0));
@@ -312,7 +316,7 @@ namespace Missions
 							solarArch.systemId = solar->systemId;
 							solarArch.baseId = solar->baseId;
 							solarArch.affiliation = solar->faction;
-							solarArch.personalityId = solar->pilotId;
+							solarArch.pilotId = solar->pilotId;
 							solarArch.hitpointsPercentage = solar->hitpointsPercentage;
 							solarArch.voiceId = solar->voiceId;
 							solarArch.headId = solar->costume.headId;

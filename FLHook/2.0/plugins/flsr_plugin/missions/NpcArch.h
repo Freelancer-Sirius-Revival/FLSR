@@ -25,6 +25,7 @@ namespace Missions
 		uint systemId = 0;
 		Vector position;
 		Matrix orientation;
+		uint pilotJobId = 0;
 		uint startingObjId = 0;
 		std::unordered_set<uint> labels;
 	};

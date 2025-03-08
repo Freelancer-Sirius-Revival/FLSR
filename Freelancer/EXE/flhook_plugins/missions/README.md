@@ -86,7 +86,7 @@ This is the definition for a NPC archetype which again can be used by multiple `
     1. `STRING` The state graph to use.
 - `[faction]` If left empty, this object is not affiliated with anyone.
     1. `STRING` The faction nickname used.
-- `[pilot]` The AI for guns.
+- `[pilot]` The AI for the pilot.
     1. `STRING` The pilot nickname used.
 - `[voice]` Required to allow comms sent from this base.
     1. `STRING` The voice nickname used.
@@ -124,6 +124,8 @@ This is the definition for a single NPC for the mission. Multiple `MsnSolar` can
     1. `FLOAT :0` The z-axis.
 - `npc` Defines the NPC archetype.
     1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
+- `[pilot_job]` Override for the job of the pilot.
+    1. `STRING` The job nickname used.
 - `[arrival_obj]` Launches from a base or jump-object.
     1. `STRING` The solar nickname to undock at spawn from.
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.

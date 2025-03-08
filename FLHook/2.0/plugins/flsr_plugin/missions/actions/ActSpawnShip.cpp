@@ -46,7 +46,7 @@ namespace Missions
 		pub::SpaceObj::Create(objId, shipInfo);
 
 		pub::AI::SetPersonalityParams personality;
-		personality.personality = Pilots::GetPilot(npc.pilotId);
+		personality.personality = msnNpc.pilotJobId ? Pilots::GetPilotWithJob(npc.pilotId, msnNpc.pilotJobId) : Pilots::GetPilot(npc.pilotId);
 		personality.state_graph = pub::StateGraph::get_state_graph(npc.stateGraph.c_str(), pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
 		pub::AI::SubmitState(objId, &personality);

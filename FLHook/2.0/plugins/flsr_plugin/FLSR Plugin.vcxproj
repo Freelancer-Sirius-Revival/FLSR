@@ -170,6 +170,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
+    <ClCompile Include="Pilots.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
@@ -230,6 +231,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\NpcArch.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="missions\TriggerArch.h" />
+    <ClInclude Include="Pilots.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">

@@ -95,6 +95,7 @@
     <ClCompile Include="missions\actions\ActSpawnShip.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="Pilots.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -242,6 +243,7 @@
     <ClInclude Include="missions\actions\ActSpawnShipArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="Pilots.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

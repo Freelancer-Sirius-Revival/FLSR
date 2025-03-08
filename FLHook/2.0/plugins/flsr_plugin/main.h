@@ -329,7 +329,7 @@ namespace SolarSpawn
         uint systemId = 0;
         uint baseId = 0;
         std::string affiliation = "";
-        uint personalityId = 0;
+        uint pilotId = 0;
         float hitpointsPercentage = 1.0f;
         uint voiceId = 0;
         uint headId = 0;

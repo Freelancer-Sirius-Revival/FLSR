@@ -1,5 +1,6 @@
 ﻿// includes
 #include "Main.h"
+#include "Pilots.h"
 #include "Missions/Missions.h"
 
 // Mutex-Objekt definieren
@@ -12,6 +13,9 @@ _CRCAntiCheat CRCAntiCheat_FLSR;
 /// Lade Konfig
 void LoadSettings() {
     returncode = DEFAULT_RETURNCODE;
+
+    Pilots::ReadPilots();
+
     // Konfigpfad
     char szCurDir[MAX_PATH];
     GetCurrentDirectory(sizeof(szCurDir), szCurDir);

@@ -1,4 +1,5 @@
 #include "Main.h"
+#include "Pilots.h"
 #include <random>
 
 /**
@@ -189,7 +190,7 @@ namespace SolarSpawn
 						else if (ini.is_value("voice"))
 							solar.voiceId = CreateID(ini.get_value_string(0));
 						else if (ini.is_value("pilot"))
-							solar.personalityId = CreateID(ini.get_value_string(0));
+							solar.pilotId = CreateID(ini.get_value_string(0));
 					}
 
 					if (solar.archetypeId != 0 && !solar.nickname.empty())
@@ -254,6 +255,7 @@ namespace SolarSpawn
 		spawnedSolars[spaceObjId].dockWith = solarInfo.baseId;
 
 		pub::AI::SetPersonalityParams personality;
+		personality.personality = Pilots::GetPilot(archetype.pilotId);
 		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);

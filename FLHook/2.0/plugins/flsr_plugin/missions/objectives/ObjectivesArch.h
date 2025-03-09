@@ -13,7 +13,6 @@ namespace Missions
 
 	struct ObjectivesArchetype
 	{
-		std::string name = "";
 		std::vector<ObjectiveEntry> objectives;
 	};
 	typedef std::shared_ptr<ObjectivesArchetype> ObjectivesArchetypePtr;

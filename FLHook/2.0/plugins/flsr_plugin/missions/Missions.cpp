@@ -26,6 +26,7 @@
 #include "Actions/ActSetNNObjArch.h"
 #include "Actions/ActAdjAcctArch.h"
 #include "Actions/ActAddCargoArch.h"
+#include "Actions/ActGiveObjListArch.h"
 #include "Objectives/ObjGotoArch.h"
 
 namespace Missions
@@ -334,13 +335,12 @@ namespace Missions
 
 					if (ini.is_header("ObjList"))
 					{
+						std::string nickname = "";
 						ObjectivesArchetypePtr objectives(new ObjectivesArchetype());
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-							{
-								objectives->name = ToLower(ini.get_value_string(0));
-							}
+								nickname = ini.get_value_string(0);
 							else if (ini.is_value("GotoShip"))
 							{
 								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
@@ -401,8 +401,8 @@ namespace Missions
 								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
 							}
 						}
-						if (!objectives->name.empty())
-							missionArchetypes.back()->objectives.insert({ CreateID(objectives->name.c_str()), objectives });
+						if (!nickname.empty())
+							missionArchetypes.back()->objectives.insert({ CreateID(nickname.c_str()), objectives });
 					}
 
 					if (ini.is_header("Trigger"))
@@ -644,6 +644,13 @@ namespace Missions
 								archetype->count = std::max(0, ini.get_value_int(2));
 								archetype->missionFlagged = ini.get_value_bool(3);
 								trigger->actions.push_back({ TriggerAction::Act_AddCargo, archetype });
+							}
+							else if (ini.is_value("Act_GiveObjList"))
+							{
+								ActGiveObjListArchetypePtr archetype(new ActGiveObjListArchetype());
+								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								archetype->objectivesId = CreateIdOrNull(ini.get_value_string(1));
+								trigger->actions.push_back({ TriggerAction::Act_GiveObjList, archetype });
 							}
 						}
 						missionArchetypes.back()->triggers.push_back(trigger);

@@ -238,6 +238,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_LightFuse` Executes an arbitary fuse.
     1. `STRING|Activator` Object by name or label to refer.
     1. `STRING` Fuse nickname to execute on the objects.
+- `Act_GiveObjList` Gives NPCs a list of objectives.
+    1. `STRING|Activator` The NPCs to receive the objectives.
+    1. `STRING` The `ObjList` nickname to refer to.
 - `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` Object by name or label to set the message or waypoint.
     1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.

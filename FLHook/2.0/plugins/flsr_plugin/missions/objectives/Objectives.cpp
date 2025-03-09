@@ -52,14 +52,11 @@ namespace Missions
 
 	static void ApplyObjective(uint objId, const uint parentMissionId, const ObjectiveEntry& entry, ConditionPtr& condition)
 	{
-		pub::AI::DirectiveCancelOp cancelOp;
-		pub::AI::SubmitDirective(objId, &cancelOp);
-
 		switch (entry.first)
 		{
 			case ObjectiveType::Goto:
 			{
-				const auto missionEntry = missions.find(parentMissionId);
+				const auto& missionEntry = missions.find(parentMissionId);
 				if (missionEntry == missions.end())
 					return;
 
@@ -141,25 +138,24 @@ namespace Missions
 
 	void Objectives::Progress()
 	{
-		if (currentCondition != nullptr)
-		{
-			currentCondition->Unregister();
-			currentCondition.reset();
-		}
+		Cancel();
 		if (!objectives.empty())
 		{
 			ApplyObjective(objId, parentMissionId, objectives.front(), currentCondition);
 			objectives.pop();
 		}
+		else if (const auto& missionEntry = missions.find(parentMissionId); missionEntry != missions.end())
+			missionEntry->second.objectivesByObjectId.erase(objId);
 	}
 
 	void Objectives::Cancel()
 	{
+		if (currentCondition != nullptr)
+		{
+			currentCondition->Unregister();
+			currentCondition.reset();
+		}
 		pub::AI::DirectiveCancelOp cancelOp;
 		pub::AI::SubmitDirective(objId, &cancelOp);
-
-		pub::AI::DirectiveIdleOp idleOp;
-		idleOp.fireWeapons = true;
-		pub::AI::SubmitDirective(objId, &idleOp);
 	}
 }

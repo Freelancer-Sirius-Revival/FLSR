@@ -25,6 +25,7 @@
 #include "Actions/ActSetNNObj.h"
 #include "Actions/ActAdjAcct.h"
 #include "Actions/ActAddCargo.h"
+#include "Actions/ActGiveObjList.h"
 
 namespace Missions
 {
@@ -211,6 +212,10 @@ namespace Missions
 
 				case TriggerAction::Act_AddCargo:
 					result = new ActAddCargo(actParent, std::static_pointer_cast<ActAddCargoArchetype>(actionArchetype.second));
+					break;
+
+				case TriggerAction::Act_GiveObjList:
+					result = new ActGiveObjList(actParent, std::static_pointer_cast<ActGiveObjListArchetype>(actionArchetype.second));
 					break;
 
 				default:

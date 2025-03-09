@@ -27,6 +27,7 @@ namespace Missions
 		Matrix orientation;
 		uint pilotJobId = 0;
 		uint startingObjId = 0;
+		float hitpoints = -1.0f;
 		std::unordered_set<uint> labels;
 	};
 	typedef std::shared_ptr<MsnNpcArchetype> MsnNpcArchetypePtr;

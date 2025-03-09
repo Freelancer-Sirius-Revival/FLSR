@@ -124,6 +124,8 @@ This is the definition for a single NPC for the mission. Multiple `MsnSolar` can
     1. `FLOAT :0` The z-axis.
 - `npc` Defines the NPC archetype.
     1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
+- `hitpoints` The hitpoints of this NPC.
+    1. `[FLOAT|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.
 - `[pilot_job]` Override for the job of the pilot.
     1. `STRING` The job nickname used.
 - `[arrival_obj]` Launches from a base or jump-object.

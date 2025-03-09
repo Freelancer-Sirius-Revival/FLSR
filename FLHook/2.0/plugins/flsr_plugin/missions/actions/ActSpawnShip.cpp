@@ -23,7 +23,7 @@ namespace Missions
 		shipInfo.iLoadout = npc.loadoutId;
 		shipInfo.Costume = npc.costume;
 		shipInfo.iPilotVoice = npc.voiceId;
-		shipInfo.iHitPointsLeft = -1;
+		shipInfo.iHitPointsLeft = msnNpc.hitpoints;
 		shipInfo.iLevel = npc.level;
 
 		// Formation name is displayed above the pilot name in wireframe display.

@@ -198,41 +198,25 @@ namespace Missions
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-							{
 								npc->name = ToLower(ini.get_value_string(0));
-							}
 							else if (ini.is_value("string_id"))
-							{
 								npc->idsName = ini.get_value_int(0);
-							}
 							else if (ini.is_value("system"))
-							{
 								npc->systemId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("position"))
-							{
 								npc->position = ini.get_vector();
-							}
 							else if (ini.is_value("rotate"))
-							{
 								npc->orientation = EulerMatrix(ini.get_vector());
-							}
 							else if (ini.is_value("npc"))
-							{
 								npc->npcId = CreateIdOrNull(ini.get_value_string(0));
-							}
+							else if (ini.is_value("hitpoints"))
+								npc->hitpoints = ini.get_value_float(0);
 							else if (ini.is_value("pilot_job"))
-							{
 								npc->pilotJobId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("arrival_obj"))
-							{
 								npc->startingObjId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("label"))
-							{
 								npc->labels.insert(CreateIdOrNull(ini.get_value_string(0)));
-							}
 						}
 						if (npc->npcId && !npc->name.empty() && npc->systemId)
 							missionArchetypes.back()->msnNpcs.push_back(npc);

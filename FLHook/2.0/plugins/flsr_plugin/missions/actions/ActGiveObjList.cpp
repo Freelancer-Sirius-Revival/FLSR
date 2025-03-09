@@ -32,7 +32,7 @@ namespace Missions
 		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_GiveObjList " + std::to_wstring(archetype->objectivesId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].activator;
 			if (activator.type == MissionObjectType::Object && missions[parent.missionId].objectIds.contains(activator.id) && SetObjectiveList(parent.missionId, archetype->objectivesId, activator.id))
 				ConPrint(L" obj[" + std::to_wstring(activator.id) + L"]");
 		}

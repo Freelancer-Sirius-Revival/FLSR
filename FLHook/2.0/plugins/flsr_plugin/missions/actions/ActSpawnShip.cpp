@@ -11,15 +11,15 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
-	static uint CreateNPC(const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
+	static uint CreateNPC(const ActSpawnShipArchetype& actionArchetype, const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
 	{
 		pub::SpaceObj::ShipInfo shipInfo;
 		memset(&shipInfo, 0, sizeof(shipInfo));
 		shipInfo.iFlag = 1;
 		shipInfo.iSystem = msnNpc.systemId;
 		shipInfo.iShipArchetype = npc.archetypeId;
-		shipInfo.vPos = msnNpc.position;
-		shipInfo.mOrientation = msnNpc.orientation;
+		shipInfo.vPos = actionArchetype.position.x != std::numeric_limits<float>::infinity() ? actionArchetype.position : msnNpc.position;
+		shipInfo.mOrientation = actionArchetype.orientation.data[0][0] != std::numeric_limits<float>::infinity() ? actionArchetype.orientation : msnNpc.orientation;
 		shipInfo.iLoadout = npc.loadoutId;
 		shipInfo.Costume = npc.costume;
 		shipInfo.iPilotVoice = npc.voiceId;
@@ -116,7 +116,7 @@ namespace Missions
 				{
 					if (CreateID(npc->name.c_str()) == msnNpc->npcId)
 					{
-						const uint objId = CreateNPC(*msnNpc, *npc);
+						const uint objId = CreateNPC(*archetype, *msnNpc, *npc);
 						if (objId)
 						{
 							mission.objectIds.insert(objId);

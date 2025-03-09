@@ -19,7 +19,7 @@ namespace Missions
 		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
 		if (archetype->receiverObjNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].activator;
 			uint objId;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetShip(activator.id, objId);

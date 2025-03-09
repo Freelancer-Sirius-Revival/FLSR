@@ -28,8 +28,8 @@ namespace Missions
 		{
 			if (!missions[parent.missionId].clientIds.contains(clientId) && (!archetype->baseId || archetype->baseId == baseId))
 			{
-				activator.type = MissionObjectType::Client;
-				activator.id = clientId;
+				triggers[parent.triggerId].activator.type = MissionObjectType::Client;
+				triggers[parent.triggerId].activator.id = clientId;
 				ConPrint(outputPretext + L" client[" + std::to_wstring(clientId) + L"]\n");
 				return true;
 			}
@@ -40,7 +40,7 @@ namespace Missions
 			{
 				if (object.type == MissionObjectType::Client && object.id == clientId && (!archetype->baseId || archetype->baseId == baseId))
 				{
-					activator = object;
+					triggers[parent.triggerId].activator = object;
 					ConPrint(outputPretext + L" client[" + std::to_wstring(object.id) + L"]\n");
 					return true;
 				}

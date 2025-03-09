@@ -29,7 +29,7 @@
 
 namespace Missions
 {
-	static ConditionPtr instantiateCondition(const ConditionParent& parent, const TriggerArchConditionEntry& conditionArchetype)
+	static Condition* instantiateCondition(const ConditionParent& parent, const TriggerArchConditionEntry& conditionArchetype)
 	{
 		Condition* result;
 		switch (conditionArchetype.first)
@@ -62,7 +62,7 @@ namespace Missions
 				result = new CndTrue(parent);
 				break;
 		}
-		return ConditionPtr(result);
+		return result;
 	}
 
 	std::queue<unsigned int> executionQueue;
@@ -77,7 +77,7 @@ namespace Missions
 		executionRunning = true;
 		while (!executionQueue.empty())
 		{
-			const Trigger& trigger = triggers[executionQueue.front()];
+			Trigger& trigger = triggers[executionQueue.front()];
 			executionQueue.pop();
 			// Skip any further triggers if the mission has been ended.
 			if (missions[trigger.parentMissionId].ended)
@@ -105,8 +105,7 @@ namespace Missions
 				{
 					if (triggerArchetype->name == trigger.archetype->name)
 					{
-						ConditionParent cndParent(trigger.parentMissionId, trigger.id);
-						(ConditionPtr)trigger.condition = instantiateCondition(cndParent, triggerArchetype->condition);
+						trigger.condition = std::shared_ptr<Condition>(instantiateCondition(ConditionParent(trigger.parentMissionId, trigger.id), triggerArchetype->condition));
 						if (trigger.active)
 							trigger.condition->Register();
 						break;
@@ -136,11 +135,9 @@ namespace Missions
 		id(id),
 		parentMissionId(parentMissionId),
 		archetype(triggerArchetype),
-		active(false)
+		active(false),
+		condition(nullptr)
 	{
-		ConditionParent cndParent(parentMissionId, id);
-		condition = instantiateCondition(cndParent, archetype->condition);
-
 		ActionParent actParent;
 		actParent.missionId = parentMissionId;
 		actParent.triggerId = id;
@@ -228,7 +225,8 @@ namespace Missions
 
 	Trigger::~Trigger()
 	{
-		condition->Unregister();
+		if (condition != nullptr)
+			condition->Unregister();
 	}
 
 	void Trigger::Activate()
@@ -237,6 +235,7 @@ namespace Missions
 			return;
 		active = true;
 		ConPrint(stows(missions[parentMissionId].archetype->name) + L"->" + stows(archetype->name) + L": Activate\n");
+		condition = std::shared_ptr<Condition>(instantiateCondition(ConditionParent(parentMissionId, id), archetype->condition));
 		condition->Register();
 	}
 
@@ -246,17 +245,19 @@ namespace Missions
 			return;
 		active = false;
 		ConPrint(stows(missions[parentMissionId].archetype->name) + L"->" + stows(archetype->name) + L": Deactivate\n");
-		condition->Unregister();
+		if (condition != nullptr)
+			condition->Unregister();
 	}
 
 	void Trigger::QueueExecution()
 	{
-		condition->Unregister();
+		if (condition != nullptr)
+			condition->Unregister();
 		ConPrint(stows(missions[parentMissionId].archetype->name) + L"->" + stows(archetype->name) + L": Queue execution, activator: ");
-		if (condition->activator.type == MissionObjectType::Client)
-			ConPrint(L"client[" + std::to_wstring(condition->activator.id) + L"]");
+		if (activator.type == MissionObjectType::Client)
+			ConPrint(L"client[" + std::to_wstring(activator.id) + L"]");
 		else
-			ConPrint(L"obj[" + std::to_wstring(condition->activator.id) + L"]");
+			ConPrint(L"obj[" + std::to_wstring(activator.id) + L"]");
 		ConPrint(L"\n");
 		executionQueue.push(id);
 		ExecuteTriggers();

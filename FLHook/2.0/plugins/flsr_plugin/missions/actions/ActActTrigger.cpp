@@ -17,7 +17,7 @@ namespace Missions
 			if (triggers[triggerId].archetype->name == archetype->triggerName)
 			{
 				ConPrint(L"\n");
-				activate ? triggers[triggerId].Activate() : triggers[parent.triggerId].Deactivate();
+				activate ? triggers[triggerId].Activate() : triggers[triggerId].Deactivate();
 				return;
 			}
 		}

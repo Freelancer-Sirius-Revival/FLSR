@@ -81,7 +81,7 @@ namespace Missions
 		caption.end_mad_lib();
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
 			{
 				SetObjective(activator.id, *this);

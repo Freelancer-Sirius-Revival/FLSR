@@ -27,7 +27,7 @@ namespace Missions
 		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_AddCargo " + std::to_wstring(archetype->itemId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].activator;
 			if (activator.type == MissionObjectType::Client)
 			{
 				AddCargo(activator.id, *archetype);

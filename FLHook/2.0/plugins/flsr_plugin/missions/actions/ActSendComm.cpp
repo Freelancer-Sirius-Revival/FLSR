@@ -29,7 +29,7 @@ namespace Missions
 		
 		if (archetype->receiverObjNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].condition->activator;
+			const auto& activator = triggers[parent.triggerId].activator;
 			uint objId;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetShip(activator.id, objId);

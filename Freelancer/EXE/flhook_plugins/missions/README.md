@@ -125,7 +125,7 @@ This is the definition for a single NPC for the mission. Multiple `MsnSolar` can
 - `npc` Defines the NPC archetype.
     1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
 - `hitpoints` The hitpoints of this NPC.
-    1. `[FLOAT|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.
+    1. `[INTEGER|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.
 - `[pilot_job]` Override for the job of the pilot.
     1. `STRING` The job nickname used.
 - `[arrival_obj]` Launches from a base or jump-object.
@@ -234,6 +234,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The label to remove.
 - `Act_SpawnSolar` Spawns a solar. Only one instance of it can exist at the same time.
     1. `STRING` The `MsnSolar` nickname to spawn.
+- `Act_SpawnShip` Spawns a ship. Only one instance of it can exist at the same time.
+    1. `STRING` The `MsnNpc` nickname to spawn.
+    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
+    1. `[FLOAT] :0` Override for initial x-axis position.
+    1. `[FLOAT] :0` Override for initial y-axis position.
+    1. `[FLOAT] :0` Override for initial z-axis position.
+    1. `[FLOAT] :0` Override for initial x-axis rotation.
+    1. `[FLOAT] :0` Override for initial y-axis rotation.
+    1. `[FLOAT] :0` Override for initial z-axis rotation.
 - `Act_Destroy` Destroys an object.
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.

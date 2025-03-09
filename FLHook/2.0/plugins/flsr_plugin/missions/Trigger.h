@@ -15,6 +15,7 @@ namespace Missions
 		std::shared_ptr<Condition> condition;
 		std::vector<std::shared_ptr<Action>> actions;
 		bool active;
+		MissionObject activator;
 
 		Trigger();
 		Trigger(const unsigned int id, const unsigned int parentMissionId, const TriggerArchetypePtr triggerArchetype);

@@ -60,9 +60,9 @@ namespace Missions
 		{
 			if (entry.second.systemId == archetype->systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && isInside(entry.second, archetype))
 			{
-				activator.type = MissionObjectType::Client;
-				activator.id = entry.first;
-				ConPrint(outputPretext + L" client[" + std::to_wstring(activator.id) + L"]\n");
+				triggers[parent.triggerId].activator.type = MissionObjectType::Client;
+				triggers[parent.triggerId].activator.id = entry.first;
+				ConPrint(outputPretext + L" client[" + std::to_wstring(triggers[parent.triggerId].activator.id) + L"]\n");
 				return true;
 			}
 		}
@@ -72,9 +72,9 @@ namespace Missions
 			{
 				if (entry.second.systemId == archetype->systemId && validObjIds.contains(entry.first) && isInside(entry.second, archetype))
 				{
-					activator.type = MissionObjectType::Object;
-					activator.id = entry.first;
-					ConPrint(outputPretext + L" obj[" + std::to_wstring(activator.id) + L"]\n");
+					triggers[parent.triggerId].activator.type = MissionObjectType::Object;
+					triggers[parent.triggerId].activator.id = entry.first;
+					ConPrint(outputPretext + L" obj[" + std::to_wstring(triggers[parent.triggerId].activator.id) + L"]\n");
 					return true;
 				}
 			}

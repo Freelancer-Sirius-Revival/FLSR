@@ -210,7 +210,7 @@ namespace Missions
 							else if (ini.is_value("npc"))
 								npc->npcId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("hitpoints"))
-								npc->hitpoints = ini.get_value_float(0);
+								npc->hitpoints = ini.get_value_int(0);
 							else if (ini.is_value("pilot_job"))
 								npc->pilotJobId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("arrival_obj"))
@@ -513,7 +513,22 @@ namespace Missions
 							{
 								ActSpawnShipArchetypePtr archetype(new ActSpawnShipArchetype());
 								archetype->msnNpcName = ToLower(ini.get_value_string(0));
-								archetype->objectivesId = CreateIdOrNull(ini.get_value_string(1));
+								const auto objectivesName = ToLower(ini.get_value_string(1));
+								archetype->objectivesId = objectivesName == "no_ol" ? 0 : CreateID(objectivesName.c_str());
+								if (ini.get_num_parameters() > 2)
+								{
+									archetype->position.x = ini.get_value_float(2);
+									archetype->position.y = ini.get_value_float(3);
+									archetype->position.z = ini.get_value_float(4);
+								}
+								if (ini.get_num_parameters() > 5)
+								{
+									Vector orientation;
+									orientation.x = ini.get_value_float(5);
+									orientation.y = ini.get_value_float(6);
+									orientation.z = ini.get_value_float(7);
+									archetype->orientation = EulerMatrix(orientation);
+								}
 								trigger->actions.push_back({ TriggerAction::Act_SpawnShip, archetype });
 								}
 							else if (ini.is_value("Act_Destroy"))
@@ -665,23 +680,38 @@ namespace Missions
 	{
 		returncode = DEFAULT_RETURNCODE;
 
+		std::vector<CndDestroyed*> fulfilledDestructions;
 		// Copy the original list because it might be modified implicitely by the following code
-		const std::unordered_set<CndDestroyed*> destroyedConditionsCopy(destroyedConditions);
-		for (const auto& cnd : destroyedConditionsCopy)
+		for (const auto& cnd : destroyedConditions)
 		{
-			if (const auto& foundCondition = destroyedConditions.find(cnd); foundCondition != destroyedConditions.end() && cnd->Matches(killedObject, killed, killerId))
-				cnd->ExecuteTrigger();
+			if (cnd->Matches(killedObject, killed, killerId))
+				fulfilledDestructions.push_back(cnd);
 		}
 
+		std::vector<CndSpaceExit*> fulfilledSpaceExits;
 		// For SpaceExit we do not care whether it happened by despawn (dock/leaving character) or death - both mean the same to NPCs and other Players.
-		const std::unordered_set<CndSpaceExit*> spaceExitConditionsCopy(spaceExitConditions);
-		for (const auto& cnd : spaceExitConditionsCopy)
+		if (killedObject->is_player())
 		{
-			if (const auto& foundCondition = spaceExitConditions.find(cnd); foundCondition != spaceExitConditions.end() && killedObject->is_player() && cnd->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
-				cnd->ExecuteTrigger();
+			for (const auto& cnd : spaceExitConditions)
+			{
+				if (cnd->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
+					fulfilledSpaceExits.push_back(cnd);
+			}
 		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
+
+		// Execute those after the objects were unregistered from the mission. Otherwise e.g. respawning would be blocked because they "still exist".
+		for (const auto& cnd : fulfilledDestructions)
+		{
+			if (const auto& foundCondition = destroyedConditions.contains(cnd))
+				cnd->ExecuteTrigger();
+		}
+		for (const auto& cnd : fulfilledSpaceExits)
+		{
+			if (const auto& foundCondition = spaceExitConditions.contains(cnd))
+				cnd->ExecuteTrigger();
+		}
 	}
 
 	float elapsedTimeInSec = 0.0f;

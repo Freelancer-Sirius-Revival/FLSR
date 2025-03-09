@@ -114,8 +114,8 @@ namespace Missions
 		if (foundAll)
 		{
 			const uint clientId = HkGetClientIDByShip(killerId);
-			activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
-			activator.id = clientId ? clientId : killerId;
+			triggers[parent.triggerId].activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
+			triggers[parent.triggerId].activator.id = clientId ? clientId : killerId;
 			return true;
 		}
 

@@ -27,8 +27,8 @@ namespace Missions
 		if (passedTimeInS >= archetype->timeInS)
 		{
 			ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_Timer " + std::to_wstring(archetype->timeInS) + L"s \n");
-			activator.type = MissionObjectType::Client;
-			activator.id = 0;
+			triggers[parent.triggerId].activator.type = MissionObjectType::Client;
+			triggers[parent.triggerId].activator.id = 0;
 			return true;
 		}
 		return false;

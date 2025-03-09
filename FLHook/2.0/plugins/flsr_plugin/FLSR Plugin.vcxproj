@@ -167,9 +167,11 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndSpaceExit.cpp" />
     <ClCompile Include="missions\conditions\CndTimer.cpp" />
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
+    <ClCompile Include="missions\conditions\Condition.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
     <ClCompile Include="missions\NpcNames.cpp" />
+    <ClCompile Include="missions\objectives\Objectives.cpp" />
     <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
@@ -230,6 +232,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndTimerArch.h" />
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />
+    <ClInclude Include="missions\conditions\Conditions.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionArch.h" />
     <ClInclude Include="missions\MissionObject.h" />
@@ -237,6 +240,9 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\MsnSolarArch.h" />
     <ClInclude Include="missions\NpcArch.h" />
     <ClInclude Include="missions\NpcNames.h" />
+    <ClInclude Include="missions\objectives\Objectives.h" />
+    <ClInclude Include="missions\objectives\ObjectivesArch.h" />
+    <ClInclude Include="missions\objectives\ObjGotoArch.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="missions\TriggerArch.h" />
     <ClInclude Include="Pilots.h" />

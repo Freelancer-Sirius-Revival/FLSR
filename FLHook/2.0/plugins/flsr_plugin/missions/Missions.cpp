@@ -26,6 +26,7 @@
 #include "Actions/ActSetNNObjArch.h"
 #include "Actions/ActAdjAcctArch.h"
 #include "Actions/ActAddCargoArch.h"
+#include "Objectives/ObjGotoArch.h"
 
 namespace Missions
 {
@@ -331,6 +332,79 @@ namespace Missions
 						}
 					}
 
+					if (ini.is_header("ObjList"))
+					{
+						ObjectivesArchetypePtr objectives(new ObjectivesArchetype());
+						while (ini.read_value())
+						{
+							if (ini.is_value("nickname"))
+							{
+								objectives->name = ToLower(ini.get_value_string(0));
+							}
+							else if (ini.is_value("GotoShip"))
+							{
+								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								arch->type = pub::AI::GotoOpType::Ship;
+								const auto val = ToLower(ini.get_value_string(0));
+								if (val == "goto_no_cruise")
+									arch->movement = GotoMovement::NoCruise;
+								else
+									arch->movement = GotoMovement::Cruise;
+								arch->targetObjNameOrId = CreateIdOrNull(ini.get_value_string(1));
+								arch->range = ini.get_value_float(2);
+								arch->thrust = ini.get_value_float(3);
+								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(4));
+								arch->startWaitDistance = ini.get_value_float(5);
+								arch->endWaitDistance = ini.get_value_float(6);
+								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
+							}
+							else if (ini.is_value("GotoVec"))
+							{
+								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								arch->type = pub::AI::GotoOpType::Vec;
+								const auto val = ToLower(ini.get_value_string(0));
+								if (val == "goto_no_cruise")
+									arch->movement = GotoMovement::NoCruise;
+								else
+									arch->movement = GotoMovement::Cruise;
+								arch->position.x = ini.get_value_float(1);
+								arch->position.y = ini.get_value_float(2);
+								arch->position.z = ini.get_value_float(3);
+								arch->range = ini.get_value_float(4);
+								arch->thrust = ini.get_value_float(5);
+								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(6));
+								arch->startWaitDistance = ini.get_value_float(7);
+								arch->endWaitDistance = ini.get_value_float(8);
+								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
+							}
+							else if (ini.is_value("GotoSpline"))
+							{
+								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								arch->type = pub::AI::GotoOpType::Spline;
+								const auto val = ToLower(ini.get_value_string(0));
+								if (val == "goto_no_cruise")
+									arch->movement = GotoMovement::NoCruise;
+								else
+									arch->movement = GotoMovement::Cruise;
+								for (byte index = 0; index < 4; index++)
+								{
+									const byte offset = index * 3;
+									arch->spline[index].x = ini.get_value_float(1 + offset);
+									arch->spline[index].y = ini.get_value_float(2 + offset);
+									arch->spline[index].z = ini.get_value_float(3 + offset);
+								}
+								arch->range = ini.get_value_float(13);
+								arch->thrust = ini.get_value_float(14);
+								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(15));
+								arch->startWaitDistance = ini.get_value_float(16);
+								arch->endWaitDistance = ini.get_value_float(17);
+								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
+							}
+						}
+						if (!objectives->name.empty())
+							missionArchetypes.back()->objectives.insert({ CreateID(objectives->name.c_str()), objectives });
+					}
+
 					if (ini.is_header("Trigger"))
 					{
 						TriggerArchetypePtr trigger(new TriggerArchetype());
@@ -455,6 +529,7 @@ namespace Missions
 							{
 								ActSpawnShipArchetypePtr archetype(new ActSpawnShipArchetype());
 								archetype->msnNpcName = ToLower(ini.get_value_string(0));
+								archetype->objectivesId = CreateIdOrNull(ini.get_value_string(1));
 								trigger->actions.push_back({ TriggerAction::Act_SpawnShip, archetype });
 								}
 							else if (ini.is_value("Act_Destroy"))

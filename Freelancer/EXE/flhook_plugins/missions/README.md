@@ -131,6 +131,45 @@ This is the definition for a single NPC for the mission. Multiple `MsnSolar` can
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
 
+## `[ObjList]`
+
+Objectives define a list of directives for NPCs to follow along. They can be assigned to NPCs as often as necessary.
+
+- `nickname` The objective list name. Used by actions.
+    1. `STRING` The name. Must be unique in this mission.
+
+### Objectives
+
+- `GotoVec` Fly toward a specific point in space.
+    1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
+    1. `FLOAT :0` The x-axis position for the target.
+    1. `FLOAT :0` The y-axis position for the target.
+    1. `FLOAT :0` The z-axis position for the target.
+    1. `FLOAT :0` The distance from the given position to stop at.
+    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[STRING]` Object by name to wait for.
+    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+- `GotoSpline` Fly toward a specific point in space along a spline.
+    1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
+    1. `FLOAT :0` The x-axis position of point 1.
+    1. `FLOAT :0` The y-axis position of point 1.
+    1. `FLOAT :0` The z-axis position of point 1.
+    1. `FLOAT :0` The x-axis position of point 2.
+    1. `FLOAT :0` The y-axis position of point 2.
+    1. `FLOAT :0` The z-axis position of point 2.
+    1. `FLOAT :0` The x-axis position of point 3.
+    1. `FLOAT :0` The y-axis position of point 3.
+    1. `FLOAT :0` The z-axis position of point 3.
+    1. `FLOAT :0` The x-axis position of point 4.
+    1. `FLOAT :0` The y-axis position of point 4.
+    1. `FLOAT :0` The z-axis position of point 4.
+    1. `FLOAT :0` The distance from the given position to stop at.
+    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[STRING]` Object by name to wait for.
+    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+
 ## `[Trigger]`
 
 Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated. Triggers are usually deactivated by default and should be activated as the mission progresses.

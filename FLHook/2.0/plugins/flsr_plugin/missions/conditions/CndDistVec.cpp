@@ -1,4 +1,5 @@
 #include "CndDistVec.h"
+#include "../Trigger.h"
 
 namespace Missions
 {
@@ -27,7 +28,11 @@ namespace Missions
 
 	bool CndDistVec::Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId)
 	{
-		const std::wstring outputPretext = stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_DistVec " + std::to_wstring(archetype->objNameOrLabel);
+		std::wstring outputPretext;
+		if (parent.triggerId)
+			outputPretext = stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_DistVec " + std::to_wstring(archetype->objNameOrLabel);
+		else
+			outputPretext = stows(missions[parent.missionId].archetype->name) + L"-> Reached Waypoint: " + std::to_wstring(archetype->objNameOrLabel);
 
 		std::unordered_set<uint> validClientIds;
 		std::unordered_set<uint> validObjIds;

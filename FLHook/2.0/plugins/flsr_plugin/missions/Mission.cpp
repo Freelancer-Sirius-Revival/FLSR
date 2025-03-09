@@ -5,7 +5,7 @@ namespace Missions
 {
 	std::vector<MissionArchetypePtr> missionArchetypes;
 
-	std::unordered_map<unsigned int, Mission> missions;
+	std::unordered_map<uint, Mission> missions;
 
 	static void ClearMusic(const uint clientId)
 	{
@@ -19,7 +19,7 @@ namespace Missions
 		pub::Audio::SetMusic(clientId, music);
 	}
 
-	unsigned int lastTriggerId = 0;
+	uint lastTriggerId = 0;
 
 	Mission::Mission() :
 		id(0),
@@ -27,7 +27,7 @@ namespace Missions
 		ended(true)
 	{}
 
-	Mission::Mission(const unsigned int id, const MissionArchetypePtr missionArchetype) :
+	Mission::Mission(const uint id, const MissionArchetypePtr missionArchetype) :
 		id(id),
 		archetype(missionArchetype),
 		ended(false)
@@ -88,6 +88,7 @@ namespace Missions
 			else
 				labelsIt++;
 		}
+		objectivesByObjectId.erase(objId);
 	}
 
 	void Mission::RemoveClient(const uint clientId)
@@ -110,7 +111,7 @@ namespace Missions
 		clientIds.erase(clientId);
 	}
 
-	unsigned int lastMissionId = 0;
+	uint lastMissionId = 0;
 
 	bool StartMission(const std::string& missionName)
 	{

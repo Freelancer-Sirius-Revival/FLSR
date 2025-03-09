@@ -1,4 +1,5 @@
 #include "CndSpaceEnter.h"
+#include "../Trigger.h"
 
 namespace Missions
 {

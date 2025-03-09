@@ -2,6 +2,7 @@
 #include "../../Pilots.h"
 #include "../NpcNames.h"
 #include "ActSpawnShip.h"
+#include "../Objectives/Objectives.h"
 
 namespace Missions
 {
@@ -95,44 +96,43 @@ namespace Missions
 					pub::SpaceObj::Launch(objId, msnNpc.startingObjId, 0);
 			}
 		}
-
-		pub::AI::DirectiveCancelOp cancel;
-		pub::AI::SubmitDirective(objId, &cancel);
-
-		pub::AI::DirectiveIdleOp idle;
-		idle.fireWeapons = true;
-		pub::AI::SubmitDirective(objId, &idle);
-
 		return objId;
 	}
 
 	void ActSpawnShip::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_SpawnShip " + stows(archetype->msnNpcName));
-		if (missions[parent.missionId].objectIdsByName.contains(CreateID(archetype->msnNpcName.c_str())))
+		auto& mission = missions[parent.missionId];
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_SpawnShip " + stows(archetype->msnNpcName));
+		if (mission.objectIdsByName.contains(CreateID(archetype->msnNpcName.c_str())))
 		{
 			ConPrint(L" ALREADY EXISTS\n");
 			return;
 		}
-		for (const auto& msnNpc : missions[parent.missionId].archetype->msnNpcs)
+		for (const auto& msnNpc : mission.archetype->msnNpcs)
 		{
 			if (msnNpc->name == archetype->msnNpcName)
 			{
-				for (const auto& npc : missions[parent.missionId].archetype->npcs)
+				for (const auto& npc : mission.archetype->npcs)
 				{
 					if (CreateID(npc->name.c_str()) == msnNpc->npcId)
 					{
 						const uint objId = CreateNPC(*msnNpc, *npc);
 						if (objId)
 						{
-							missions[parent.missionId].objectIds.insert(objId);
-							missions[parent.missionId].objectIdsByName[CreateID(msnNpc->name.c_str())] = objId;
+							mission.objectIds.insert(objId);
+							mission.objectIdsByName[CreateID(msnNpc->name.c_str())] = objId;
 							for (const auto& label : msnNpc->labels)
 							{
 								MissionObject object;
 								object.type = MissionObjectType::Object;
 								object.id = objId;
-								missions[parent.missionId].objectsByLabel[label].push_back(object);
+								mission.objectsByLabel[label].push_back(object);
+							}
+							if (const auto& objectivesEntry = mission.archetype->objectives.find(archetype->objectivesId); objectivesEntry != mission.archetype->objectives.end())
+							{
+								const Objectives objectives(parent.missionId, objId, objectivesEntry->second->objectives);
+								mission.objectivesByObjectId.insert({ objId, objectives });
+								mission.objectivesByObjectId[objId].Progress();
 							}
 							ConPrint(L" obj[" + std::to_wstring(objId) + L"]\n");
 							return;

@@ -1,4 +1,5 @@
 #include "CndDestroyed.h"
+#include "../Trigger.h"
 
 namespace Missions
 {

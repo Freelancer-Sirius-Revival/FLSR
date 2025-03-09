@@ -1,4 +1,5 @@
 #include "CndBaseEnter.h"
+#include "../Trigger.h"
 
 namespace Missions
 {

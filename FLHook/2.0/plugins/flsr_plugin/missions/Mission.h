@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include "MissionArch.h"
 #include "MissionObject.h"
+#include "Objectives/Objectives.h"
 
 namespace Missions
 {
@@ -10,7 +11,7 @@ namespace Missions
 
 	struct Mission
 	{
-		const unsigned int id;
+		const uint id;
 		const MissionArchetypePtr archetype;
 		bool ended;
 
@@ -18,16 +19,17 @@ namespace Missions
 		std::unordered_map<uint, std::vector<MissionObject>> objectsByLabel;
 		std::unordered_set<uint> objectIds;
 		std::unordered_set<uint> clientIds;
-		std::unordered_set<unsigned int> triggerIds;
+		std::unordered_set<uint> triggerIds;
+		std::unordered_map<uint, Objectives> objectivesByObjectId;
 
 		Mission();
-		Mission(const unsigned int id, const MissionArchetypePtr missionArchetype);
+		Mission(const uint id, const MissionArchetypePtr missionArchetype);
 		virtual ~Mission();
 		void End();
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
 	};
-	extern std::unordered_map<unsigned int, Mission> missions;
+	extern std::unordered_map<uint, Mission> missions;
 
 	bool StartMission(const std::string& missionName);
 	bool KillMission(const std::string& missionName);

@@ -104,9 +104,7 @@ namespace Missions
 				{
 					if (triggerArchetype->name == trigger.archetype->name)
 					{
-						ConditionParent cndParent;
-						cndParent.missionId = trigger.parentMissionId;
-						cndParent.triggerId = trigger.id;
+						ConditionParent cndParent(trigger.parentMissionId, trigger.id);
 						(ConditionPtr)trigger.condition = instantiateCondition(cndParent, triggerArchetype->condition);
 						if (trigger.active)
 							trigger.condition->Register();
@@ -139,9 +137,7 @@ namespace Missions
 		archetype(triggerArchetype),
 		active(false)
 	{
-		ConditionParent cndParent;
-		cndParent.missionId = parentMissionId;
-		cndParent.triggerId = id;
+		ConditionParent cndParent(parentMissionId, id);
 		condition = instantiateCondition(cndParent, archetype->condition);
 
 		ActionParent actParent;

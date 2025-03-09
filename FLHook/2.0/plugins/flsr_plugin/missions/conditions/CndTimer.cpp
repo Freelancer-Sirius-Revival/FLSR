@@ -1,4 +1,5 @@
 #include "CndTimer.h"
+#include "../Trigger.h"
 
 namespace Missions
 {

@@ -4730,6 +4730,14 @@ namespace pub
 			unsigned char data[OBJECT_DATA_SIZE];
 		};
 
+		enum class GotoOpType
+		{
+			Ship = 0,
+			Vec = 1,
+			Spline = 2,
+			Undefined = 3
+		};
+
 		class IMPORT DirectiveGotoOp : public pub::AI::BaseOp
 		{
 		public:
@@ -4738,7 +4746,7 @@ namespace pub
 			virtual bool validate(void);
 
 		public:
-			int gotoType; // 1 = Vec, 0 = Ship, 2 = spline, 3 = undefined
+			GotoOpType gotoType; // 1 = Vec, 0 = Ship, 2 = spline, 3 = undefined
 			// The target position if GotoType is 1.
 			Vector pos;
 			// If GotoType is 0 then move to this spaceobj. Do not set a pos if you
@@ -4758,9 +4766,9 @@ namespace pub
 			// both to true.
 			bool goToCruise;
 			bool goToNoCruise;
-			int x5C;
-			float x60; // 200
-			float x64; // 500
+			int objIdToWaitFor;
+			float startWaitDistance; // 200
+			float endWaitDistance; // 500
 			int x68;
 			float x6C;
 		};

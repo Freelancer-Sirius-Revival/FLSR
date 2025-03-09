@@ -105,6 +105,12 @@
     <ClCompile Include="missions\actions\ActAddCargo.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\Objectives.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\Condition.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -268,6 +274,18 @@
     <ClInclude Include="missions\actions\ActAddCargoArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoArch.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\Objectives.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjectivesArch.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\Conditions.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />
@@ -298,6 +316,9 @@
     </Filter>
     <Filter Include="Missions\Actions">
       <UniqueIdentifier>{defee9a7-7d37-48cd-88c1-0c95c1fd8b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Objectives">
+      <UniqueIdentifier>{70fb0779-62c5-431f-b907-c667ee804cd0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

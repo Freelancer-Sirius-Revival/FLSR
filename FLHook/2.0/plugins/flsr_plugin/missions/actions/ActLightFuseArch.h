@@ -5,7 +5,7 @@ namespace Missions
 	struct ActLightFuseArchetype
 	{
 		unsigned int objNameOrLabel = 0;
-		unsigned int fuseId = 0;
+		std::string fuseName = "";
 	};
 	typedef std::shared_ptr<ActLightFuseArchetype> ActLightFuseArchetypePtr;
 }

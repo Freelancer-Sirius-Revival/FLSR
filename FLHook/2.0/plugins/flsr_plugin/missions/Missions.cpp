@@ -516,7 +516,7 @@ namespace Missions
 							{
 								ActLightFuseArchetypePtr archetype(new ActLightFuseArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->fuseId = CreateIdOrNull(ini.get_value_string(1));
+								archetype->fuseName = ini.get_value_string(1);
 								trigger->actions.push_back({ TriggerAction::Act_LightFuse, archetype });
 							}
 							else if (ini.is_value("Act_SpawnSolar"))

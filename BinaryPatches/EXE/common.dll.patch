@@ -41,6 +41,9 @@ File: EXE\common.dll
 04B582: 0E	[ 1E ]
 04B63E: 0E	[ 1E ]
 
+# Use cloaking device as internal equipment. - adoxa, Halloween
+139B74: 40 17 2D	[ 90 53 32 ]
+
 
 ##########################################
 # Reputation

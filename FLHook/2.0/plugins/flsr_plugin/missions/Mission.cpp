@@ -135,7 +135,9 @@ namespace Missions
 			}
 		}
 		missions.try_emplace(++lastMissionId, lastMissionId, foundMissionArchetype);
-		for (const auto& triggerId : missions[lastMissionId].triggerIds)
+		// The following activation of triggers can cause a trigger to be instantly resolved and deleted. Make a copy of the list beforehand.
+		const auto triggerIdsCopy = std::unordered_set(missions[lastMissionId].triggerIds);
+		for (const auto& triggerId : triggerIdsCopy)
 		{
 			if (triggers[triggerId].archetype->active)
 				triggers[triggerId].Activate();

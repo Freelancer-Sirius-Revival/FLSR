@@ -25,6 +25,8 @@ namespace Missions
 		shipInfo.iPilotVoice = npc.voiceId;
 		shipInfo.iHitPointsLeft = msnNpc.hitpoints;
 		shipInfo.iLevel = npc.level;
+		shipInfo.cargoDesc = new OwnerList<pub::SpaceObj::CargoDesc>();
+		shipInfo.cargoDesc2 = new OwnerList<pub::SpaceObj::CargoDesc>();
 
 		// Formation name is displayed above the pilot name in wireframe display.
 		// If this is given, the ship IDS Name will be used in scanner list. Keep empty to show Pilot Name in scanner list.
@@ -82,6 +84,8 @@ namespace Missions
 		personality.personality = msnNpc.pilotJobId ? Pilots::GetPilotWithJob(npc.pilotId, msnNpc.pilotJobId) : Pilots::GetPilot(npc.pilotId);
 		personality.state_graph = pub::StateGraph::get_state_graph(npc.stateGraph.c_str(), pub::StateGraph::TYPE_STANDARD);
 		personality.state_id = true;
+		personality.contentCallback = 0;
+		personality.directiveCallback = 0;
 		pub::AI::SubmitState(objId, &personality);
 
 		if (msnNpc.startingObjId)

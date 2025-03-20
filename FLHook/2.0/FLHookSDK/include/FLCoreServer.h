@@ -1030,10 +1030,10 @@ namespace pub
 			Matrix mOrientation;
 			uint iGroupId; // 0
 			uint iLoadout;
-			OwnerList<pub::SpaceObj::CargoDesc> cargoDesc;
+			OwnerList<pub::SpaceObj::CargoDesc>* cargoDesc;
 			uint unk1; // 0
 			uint unk2; // 0
-			float fUnk1;
+			OwnerList<pub::SpaceObj::CargoDesc>* cargoDesc2;
 			uint unk3; // 0
 			Costume Costume;
 			int iRep;

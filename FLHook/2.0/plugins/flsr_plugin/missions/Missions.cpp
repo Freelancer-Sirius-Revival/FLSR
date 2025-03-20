@@ -662,7 +662,7 @@ namespace Missions
 		}
 	}
 
-	static bool initialized = false;
+	bool initialized = false;
 	void Initialize()
 	{
 		if (initialized)
@@ -675,6 +675,66 @@ namespace Missions
 			{
 				StartMission(missionArchetype->name);
 			}
+		}
+	}
+
+	static void DestroyNonLootingEquipment(const IObjRW* killedObject, const uint killerId)
+	{
+		for (const auto& mission : missions)
+		{
+			if (!mission.second.objectIds.contains(killedObject->cobj->id))
+				continue;
+
+			if (!(killedObject->cobj->objectClass & CObject::CEQOBJ_MASK))
+				break;
+
+			const auto eqObj = static_cast<CEqObj*>(killedObject->cobj);
+			EquipDescVector equipList;
+			eqObj->get_equip_desc_list(equipList);
+			// Keep all lootable equip in cargo hold and only destroy the excess.
+			if (HkGetClientIDByShip(killerId) > 0)
+			{
+				std::unordered_map<uint, int> countByLootableArchId;
+				for (const auto& equipEntry : equipList.equip)
+				{
+					const auto& equipArch = Archetype::GetEquipment(equipEntry.iArchID);
+					if (equipArch && equipArch->bLootable)
+						countByLootableArchId[equipEntry.iArchID] += equipEntry.iCount;
+				}
+
+				for (auto& entry : countByLootableArchId)
+					entry.second = LootProps::CalculateDropCount(entry.first, entry.second);
+
+				for (const auto& equipEntry : equipList.equip)
+				{
+					if (equipEntry.bMission) // Always let mission equip drop, no matter what
+						continue;
+
+					// Look if there's a count of loot for this object. If none (is left), destroy the remaining objects.
+					const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID);
+					if (lootCount == countByLootableArchId.end() || lootCount->second < 1)
+					{
+						const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
+						if (equip)
+							equip->Destroy();
+					}
+					else
+					{
+						lootCount->second -= equipEntry.iCount;
+					}
+				}
+			}
+			// Destroy all equipment in case an NPC was the killer.
+			else
+			{
+				for (const auto& equipEntry : equipList.equip)
+				{
+					const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
+					if (equip)
+						equip->Destroy();
+				}
+			}
+			break;
 		}
 	}
 
@@ -703,68 +763,7 @@ namespace Missions
 
 		// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
 		if (killed)
-		{
-			const bool killedByPlayer = HkGetClientIDByShip(killerId);
-			for (const auto& mission : missions)
-			{
-				for (const auto& objectId : mission.second.objectIds)
-				{
-					if (objectId == killedObject->cobj->id)
-					{
-						if ((killedObject->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK)
-						{
-							const auto eqObj = static_cast<CEqObj*>(killedObject->cobj);
-							EquipDescVector equipList;
-							eqObj->get_equip_desc_list(equipList);
-							// Keep all lootable equip in cargo hold and only destroy the excess.
-							if (killedByPlayer)
-							{
-								std::unordered_map<uint, int> countByLootableArchId;
-								for (const auto& equipEntry : equipList.equip)
-								{
-									const auto& equipArch = Archetype::GetEquipment(equipEntry.iArchID);
-									if (equipArch && equipArch->bLootable)
-										countByLootableArchId[equipEntry.iArchID] += equipEntry.iCount;
-								}
-
-								for (auto& entry : countByLootableArchId)
-									entry.second = LootProps::CalculateDropCount(entry.first, entry.second);
-
-								for (const auto& equipEntry : equipList.equip)
-								{
-									if (equipEntry.bMission) // Always let mission equip drop, no matter what
-										continue;
-
-									// Look if there's a count of loot for this object. If none (is left), destroy the remaining objects.
-									const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID);
-									if (lootCount == countByLootableArchId.end() || lootCount->second < 1)
-									{
-										const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
-										if (equip)
-											equip->Destroy();
-									}
-									else
-									{
-										lootCount->second -= equipEntry.iCount;
-									}
-								}
-							}
-							// Destroy all equipment in case an NPC was the killer.
-							else
-							{
-								for (const auto& equipEntry : equipList.equip)
-								{
-									const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
-									if (equip)
-										equip->Destroy();
-								}
-							}
-						}
-						break;
-					}
-				}
-			}
-		}
+			DestroyNonLootingEquipment(killedObject, killerId);
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
 

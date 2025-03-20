@@ -13,7 +13,7 @@ namespace Missions
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		if (GetShipInspect(senderObjId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK)
+		if (GetShipInspect(senderObjId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
 		{
 			const auto& object = static_cast<CEqObj*>(inspect->cobj);
 			pub::SpaceObj::SendComm(object->id, receiverObjId, object->voiceId, &object->commCostume, 0, lines.data(), lines.size(), 0, std::fmaxf(0.0f, delay), global);

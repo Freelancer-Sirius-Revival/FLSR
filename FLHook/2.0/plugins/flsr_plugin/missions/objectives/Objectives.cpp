@@ -62,7 +62,7 @@ namespace Missions
 
 				IObjRW* inspect;
 				StarSystem* starSystem;
-				if (!(GetShipInspect(objId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK))
+				if (!(GetShipInspect(objId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CEQOBJ_MASK)))
 					return;
 
 				const auto& gotoArch = std::static_pointer_cast<ObjGotoArchetype>(entry.second);

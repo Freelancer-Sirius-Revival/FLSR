@@ -1124,7 +1124,7 @@ namespace Cloak
 			parms.subObjId = 0;
 		}
 
-		if (parms.target && (parms.target->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK && static_cast<CEqObj*>(parms.target->cobj)->get_cloak_percentage() > 0.9f)
+		if (parms.target && (parms.target->cobj->objectClass & CObject::CEQOBJ_MASK) && static_cast<CEqObj*>(parms.target->cobj)->get_cloak_percentage() > 0.9f)
 		{
 			parms.target = nullptr;
 			parms.subObjId = 0;

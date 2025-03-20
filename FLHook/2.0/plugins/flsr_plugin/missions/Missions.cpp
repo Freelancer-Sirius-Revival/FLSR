@@ -667,7 +667,7 @@ namespace Missions
 			return;
 		initialized = true;
 
-		for (const auto& missionArchetype: missionArchetypes)
+		for (const auto& missionArchetype : missionArchetypes)
 		{
 			if (missionArchetype->active)
 			{
@@ -696,6 +696,23 @@ namespace Missions
 			{
 				if (cnd->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
 					fulfilledSpaceExits.push_back(cnd);
+			}
+		}
+
+		// Prevent spawned NPCs from dropping all their lootable mounted equipment with 100% chance.
+		for (const auto& mission : missions)
+		{
+			for (const auto& objectId : mission.second.objectIds)
+			{
+				if (objectId == killedObject->cobj->id)
+				{
+					if ((killedObject->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK)
+					{
+						const auto eqObj = static_cast<CEqObj*>(killedObject->cobj);
+						eqObj->clear_equip_and_cargo();
+					}
+					break;
+				}
 			}
 		}
 

@@ -272,7 +272,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING|None] :None` Overrides all music by this track.
     1. `[FLOAT] :0` The time in seconds it takes to transition music.
     1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
-- `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window.
+- `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.
     1. `STRING` Object by name to send this comm. Must have a voice defined. Cannot be a player.

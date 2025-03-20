@@ -114,6 +114,9 @@
     <ClCompile Include="missions\actions\ActGiveObjList.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\LootProps.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -294,6 +297,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActGiveObjListArch.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\LootProps.h">
+      <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 #include <regex>
 #include "../Main.h"
 #include "NpcNames.h"
+#include "LootProps.h"
 #include "Missions.h"
 #include "Mission.h"
 #include "MissionArch.h"
@@ -98,6 +99,7 @@ namespace Missions
 	void LoadSettings()
 	{
 		NpcNames::ReadFiles();
+		LootProps::ReadFiles();
 
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
@@ -699,19 +701,67 @@ namespace Missions
 			}
 		}
 
-		// Prevent spawned NPCs from dropping all their lootable mounted equipment with 100% chance.
-		for (const auto& mission : missions)
+		// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
+		if (killed)
 		{
-			for (const auto& objectId : mission.second.objectIds)
+			const bool killedByPlayer = HkGetClientIDByShip(killerId);
+			for (const auto& mission : missions)
 			{
-				if (objectId == killedObject->cobj->id)
+				for (const auto& objectId : mission.second.objectIds)
 				{
-					if ((killedObject->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK)
+					if (objectId == killedObject->cobj->id)
 					{
-						const auto eqObj = static_cast<CEqObj*>(killedObject->cobj);
-						eqObj->clear_equip_and_cargo();
+						if ((killedObject->cobj->objectClass & CObject::CEQOBJ_MASK) == CObject::CEQOBJ_MASK)
+						{
+							const auto eqObj = static_cast<CEqObj*>(killedObject->cobj);
+							EquipDescVector equipList;
+							eqObj->get_equip_desc_list(equipList);
+							// Keep all lootable equip in cargo hold and only destroy the excess.
+							if (killedByPlayer)
+							{
+								std::unordered_map<uint, int> countByLootableArchId;
+								for (const auto& equipEntry : equipList.equip)
+								{
+									const auto& equipArch = Archetype::GetEquipment(equipEntry.iArchID);
+									if (equipArch && equipArch->bLootable)
+										countByLootableArchId[equipEntry.iArchID] += equipEntry.iCount;
+								}
+
+								for (auto& entry : countByLootableArchId)
+									entry.second = LootProps::CalculateDropCount(entry.first, entry.second);
+
+								for (const auto& equipEntry : equipList.equip)
+								{
+									if (equipEntry.bMission) // Always let mission equip drop, no matter what
+										continue;
+
+									// Look if there's a count of loot for this object. If none (is left), destroy the remaining objects.
+									const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID);
+									if (lootCount == countByLootableArchId.end() || lootCount->second < 1)
+									{
+										const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
+										if (equip)
+											equip->Destroy();
+									}
+									else
+									{
+										lootCount->second -= equipEntry.iCount;
+									}
+								}
+							}
+							// Destroy all equipment in case an NPC was the killer.
+							else
+							{
+								for (const auto& equipEntry : equipList.equip)
+								{
+									const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
+									if (equip)
+										equip->Destroy();
+								}
+							}
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}

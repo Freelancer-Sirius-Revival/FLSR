@@ -688,7 +688,7 @@ namespace Missions
 			if (!(killedObject->cobj->objectClass & CObject::CEQOBJ_MASK))
 				break;
 
-			const auto eqObj = static_cast<CEqObj*>(killedObject->cobj);
+			const auto eqObj = reinterpret_cast<CEqObj*>(killedObject->cobj);
 			EquipDescVector equipList;
 			eqObj->get_equip_desc_list(equipList);
 			// Keep all lootable equip in cargo hold and only destroy the excess.
@@ -705,31 +705,21 @@ namespace Missions
 				for (auto& entry : countByLootableArchId)
 					entry.second = LootProps::CalculateDropCount(entry.first, entry.second);
 
-				std::vector<EquipDesc> limitedEquips;
 				for (const auto& equipEntry : equipList.equip)
 				{
 					if (equipEntry.bMission) // Always let mission equip drop, no matter what
 						continue;
 
-					// Look if there's a count of loot for this object. If none (is left), destroy the remaining objects.
-					const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID);
-					if (lootCount == countByLootableArchId.end() || lootCount->second < 1)
+					const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
+					if (!equip)
+						continue;
+
+					if (const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID); lootCount != countByLootableArchId.end() && lootCount->second > 0)
 					{
-						const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
-						if (equip)
-							equip->Destroy();
-					}
-					else
-					{
-						// If there is more cargo present than should be looted, the existing object must be destroyed.
-						// equipDesc.set_count() shows no effect to change the current quantity.
 						if (equipEntry.iCount > lootCount->second)
 						{
-							limitedEquips.push_back(equipEntry);
-							limitedEquips.back().iCount = lootCount->second;
-							const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
-							if (equip)
-								equip->Destroy();
+							if (equip->CEquipType == EquipmentClass::Cargo)
+								reinterpret_cast<CECargo*>(equip)->SetCount(lootCount->second);
 							lootCount->second = 0;
 						}
 						else
@@ -737,10 +727,11 @@ namespace Missions
 							lootCount->second -= equipEntry.iCount;
 						}
 					}
+					else
+					{
+						equip->Destroy();
+					}
 				}
-				// Re-add the cargo-quantity-limited items ready to be looted.
-				for (const auto& entry : limitedEquips)
-					eqObj->add_item(entry);
 			}
 			// Destroy all equipment in case an NPC was the killer.
 			else

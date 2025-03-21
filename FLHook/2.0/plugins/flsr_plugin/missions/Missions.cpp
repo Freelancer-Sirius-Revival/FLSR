@@ -705,6 +705,7 @@ namespace Missions
 				for (auto& entry : countByLootableArchId)
 					entry.second = LootProps::CalculateDropCount(entry.first, entry.second);
 
+				std::vector<EquipDesc> limitedEquips;
 				for (const auto& equipEntry : equipList.equip)
 				{
 					if (equipEntry.bMission) // Always let mission equip drop, no matter what
@@ -720,9 +721,26 @@ namespace Missions
 					}
 					else
 					{
-						lootCount->second -= equipEntry.iCount;
+						// If there is more cargo present than should be looted, the existing object must be destroyed.
+						// equipDesc.set_count() shows no effect to change the current quantity.
+						if (equipEntry.iCount > lootCount->second)
+						{
+							limitedEquips.push_back(equipEntry);
+							limitedEquips.back().iCount = lootCount->second;
+							const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
+							if (equip)
+								equip->Destroy();
+							lootCount->second = 0;
+						}
+						else
+						{
+							lootCount->second -= equipEntry.iCount;
+						}
 					}
 				}
+				// Re-add the cargo-quantity-limited items ready to be looted.
+				for (const auto& entry : limitedEquips)
+					eqObj->add_item(entry);
 			}
 			// Destroy all equipment in case an NPC was the killer.
 			else

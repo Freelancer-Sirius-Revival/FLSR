@@ -1,6 +1,7 @@
 #include <regex>
 #include "../Main.h"
 #include "NpcNames.h"
+#include "../Empathies.h"
 #include "LootProps.h"
 #include "Missions.h"
 #include "Mission.h"
@@ -680,6 +681,9 @@ namespace Missions
 
 	static void DestroyNonLootingEquipment(const IObjRW* killedObject, const uint killerId)
 	{
+		if (killedObject->is_player())
+			return;
+
 		for (const auto& mission : missions)
 		{
 			if (!mission.second.objectIds.contains(killedObject->cobj->id))
@@ -716,7 +720,7 @@ namespace Missions
 
 					if (const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID); lootCount != countByLootableArchId.end() && lootCount->second > 0)
 					{
-						if (equipEntry.iCount > lootCount->second)
+						if (equipEntry.iCount > static_cast<uint>(lootCount->second))
 						{
 							if (equip->CEquipType == EquipmentClass::Cargo)
 								reinterpret_cast<CECargo*>(equip)->SetCount(lootCount->second);
@@ -747,6 +751,36 @@ namespace Missions
 		}
 	}
 
+	static void ChangeReputationUponDestruction(const IObjRW* killedObject, const uint killerShipId)
+	{
+		if (killedObject->is_player())
+			return;
+
+		const uint killerClientId = HkGetClientIDByShip(killerShipId);
+		if (!killerClientId)
+			return;
+
+		for (const auto& mission : missions)
+		{
+			if (!mission.second.objectIds.contains(killedObject->cobj->id))
+				continue;
+
+			uint victimReputationId;
+			if (killedObject->cobj->objectClass & CObject::CSHIP_OBJECT)
+				victimReputationId = reinterpret_cast<CEqObj*>(killedObject->cobj)->repVibe;
+			else if (killedObject->cobj->objectClass & CObject::CSOLAR_OBJECT)
+				// Solars have their nickname ID directly mapped to their Reputation ID
+				uint victimReputationId = killedObject->cobj->id;
+			else
+				return;
+
+			uint victimGroupId;
+			Reputation::Vibe::GetAffiliation(victimReputationId, victimGroupId, false);
+			Empathies::ChangeReputationsByObjectDestruction(killerClientId, victimGroupId);
+			return;
+		}
+	}
+
 	void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
 		returncode = DEFAULT_RETURNCODE;
@@ -770,9 +804,14 @@ namespace Missions
 			}
 		}
 
-		// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
 		if (killed)
+		{
+			// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
 			DestroyNonLootingEquipment(killedObject, killerId);
+
+			// Manually care for reputation change to the killer. Group-Rep will be handled anyway by the GroupRep module.
+			ChangeReputationUponDestruction(killedObject, killerId);
+		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
 

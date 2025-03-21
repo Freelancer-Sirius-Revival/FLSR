@@ -138,6 +138,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Crafting.cpp" />
     <ClCompile Include="Discord.cpp" />
     <ClCompile Include="Docking.cpp" />
+    <ClCompile Include="Empathies.cpp" />
     <ClCompile Include="EquipWhiteList.cpp" />
     <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
@@ -189,6 +190,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Empathies.h" />
+    <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="missions\actions\ActActTrigger.h" />
     <ClInclude Include="missions\actions\ActActTriggerArch.h" />
@@ -251,6 +254,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="missions\TriggerArch.h" />
     <ClInclude Include="Pilots.h" />
+    <ClInclude Include="Plugin.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">

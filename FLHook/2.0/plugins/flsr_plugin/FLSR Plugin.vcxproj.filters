@@ -117,6 +117,7 @@
     <ClCompile Include="missions\LootProps.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="Empathies.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -301,6 +302,9 @@
     <ClInclude Include="missions\LootProps.h">
       <Filter>Missions</Filter>
     </ClInclude>
+    <ClInclude Include="Empathies.h" />
+    <ClInclude Include="GroupRep.h" />
+    <ClInclude Include="Plugin.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

@@ -1,16 +1,15 @@
-﻿// includes
-#include "Main.h"
+﻿#include "Main.h"
 #include "Pilots.h"
+#include "Empathies.h"
+#include "GroupRep.h"
 #include "Missions/Missions.h"
 
-// Mutex-Objekt definieren
 std::mutex m_Mutex;
 
 PLUGIN_RETURNCODE returncode;
 _CRCAntiCheat CRCAntiCheat_FLSR;
 
 
-/// Lade Konfig
 void LoadSettings() {
     returncode = DEFAULT_RETURNCODE;
 
@@ -230,9 +229,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
 
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Empathies::Initialize, PLUGIN_HkTimerCheckKick, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ObjectDestroyed, PLUGIN_SolarDestroyed, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::UserCmd_Craft, PLUGIN_UserCmd_Process, 0));
 

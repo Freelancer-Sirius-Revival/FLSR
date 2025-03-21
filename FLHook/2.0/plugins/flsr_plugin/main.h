@@ -13,7 +13,7 @@
 
 //FLHOOK Includes
 #include <FLHook.h>
-#include <plugin.h>
+#include "Plugin.h"
 
 //Includes
 #include <list>
@@ -25,9 +25,6 @@
 #include <numeric>
 #include <unordered_map>
 #include <openssl/sha.h>
-
-//Plugin Stuff
-extern PLUGIN_RETURNCODE returncode;
 
 //Offsets
 #define ADDR_CLIENT_NEWPLAYER 0x8010
@@ -437,13 +434,6 @@ namespace SpawnProtection
     void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId);
     void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId);
     void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId);
-}
-
-namespace GroupReputation
-{
-    void InitializeWithGameData();
-    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
 }
 
 namespace Storage

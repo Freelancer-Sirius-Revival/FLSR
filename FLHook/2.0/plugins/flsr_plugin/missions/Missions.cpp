@@ -32,66 +32,7 @@
 #include "Objectives/ObjGotoArch.h"
 
 namespace Missions
-{
-	/*
-	struct NpcDefintion
-	{
-		std::string name = "";
-	};
-
-	struct DialogArchetype
-	{
-		std::string name = "";
-	};
-
-	struct MsnRandEncArchetype
-	{
-		std::string name = "";
-	};
-
-	struct NNObjectiveArchetype
-	{
-		std::string name = "";
-	};
-
-	struct ObjListArchetype
-	{
-		std::string name = "";
-	};
-
-	struct SolarArchetype
-	{
-		std::string name = "";
-	};
-
-	struct ShipArchetype
-	{
-		std::string name = "";
-	};
-
-	struct LootArchetype
-	{
-		std::string name = "";
-		uint archetypeId = 0;
-		uint displayNameId = 1;
-		Vector position;
-		Vector orientation;
-		Vector velocity;
-		uint amount = 1;
-		float relativeHealth = 1.0f;
-		bool canJettison = false;
-	};
-
-	struct FormationArchetype
-	{
-		std::string name = "";
-		Vector position;
-		Vector orientation;
-		std::string formationName = "";
-		std::vector<std::string> shipNames;
-	};
-	*/
-	
+{	
 	static uint CreateIdOrNull(const char* str)
 	{
 		return strlen(str) > 0 ? CreateID(str) : 0;
@@ -403,7 +344,7 @@ namespace Missions
 							}
 							else if (ini.is_value("InitState"))
 							{
-								trigger->active = ToLower(ini.get_value_string(0)) == "active";
+								trigger->initiallyActive = ToLower(ini.get_value_string(0)) == "active";
 							}
 							else if (ini.is_value("repeatable"))
 							{
@@ -411,7 +352,7 @@ namespace Missions
 							}
 							else if (ini.is_value("Cnd_True"))
 							{
-								trigger->condition = { TriggerCondition::Cnd_True, nullptr };
+								trigger->condition = { ConditionType::Cnd_True, nullptr };
 							}
 							else if (ini.is_value("Cnd_Destroyed"))
 							{
@@ -426,7 +367,7 @@ namespace Missions
 								else
 									archetype->condition = DestroyedCondition::ALL;
 								archetype->killerNameOrLabel = std::strlen(ini.get_value_string(6)) ? CreateIdOrNull(ini.get_value_string(3)) : 0;
-								trigger->condition = { TriggerCondition::Cnd_Destroyed, archetype };
+								trigger->condition = { ConditionType::Cnd_Destroyed, archetype };
 							}
 							else if (ini.is_value("Cnd_DistVec"))
 							{
@@ -438,79 +379,79 @@ namespace Missions
 								archetype->position.z = ini.get_value_float(4);
 								archetype->distance = ini.get_value_float(5);
 								archetype->systemId = CreateIdOrNull(ini.get_value_string(6));
-								trigger->condition = { TriggerCondition::Cnd_DistVec, archetype };
+								trigger->condition = { ConditionType::Cnd_DistVec, archetype };
 							}
 							else if (ini.is_value("Cnd_SpaceEnter"))
 							{
 								CndSpaceEnterArchetypePtr archetype(new CndSpaceEnterArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->systemId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->condition = { TriggerCondition::Cnd_SpaceEnter, archetype };
+								trigger->condition = { ConditionType::Cnd_SpaceEnter, archetype };
 							}
 							else if (ini.is_value("Cnd_SpaceExit"))
 							{
 								CndSpaceExitArchetypePtr archetype(new CndSpaceExitArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->systemId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->condition = { TriggerCondition::Cnd_SpaceExit, archetype };
+								trigger->condition = { ConditionType::Cnd_SpaceExit, archetype };
 							}
 							else if (ini.is_value("Cnd_BaseEnter"))
 							{
 								CndBaseEnterArchetypePtr archetype(new CndBaseEnterArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->baseId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->condition = { TriggerCondition::Cnd_BaseEnter, archetype };
+								trigger->condition = { ConditionType::Cnd_BaseEnter, archetype };
 							}
 							else if (ini.is_value("Cnd_Timer"))
 							{
 								CndTimerArchetypePtr archetype(new CndTimerArchetype());
 								archetype->timeInS = ini.get_value_float(0);
-								trigger->condition = { TriggerCondition::Cnd_Timer, archetype };
+								trigger->condition = { ConditionType::Cnd_Timer, archetype };
 							}
 							else if (ini.is_value("Act_EndMission"))
 							{
-								trigger->actions.push_back({ TriggerAction::Act_EndMission, nullptr });
+								trigger->actions.push_back({ ActionType::Act_EndMission, nullptr });
 							}
 							else if (ini.is_value("Act_ActTrig"))
 							{
 								ActActTriggerArchetypePtr archetype(new ActActTriggerArchetype());
 								archetype->triggerName = ToLower(ini.get_value_string(0));
 								archetype->activate = true;
-								trigger->actions.push_back({ TriggerAction::Act_ActTrig, archetype });
+								trigger->actions.push_back({ ActionType::Act_ActTrig, archetype });
 							}
 							else if (ini.is_value("Act_DeactTrig"))
 							{
 								ActActTriggerArchetypePtr archetype(new ActActTriggerArchetype());
 								archetype->triggerName = ToLower(ini.get_value_string(0));
 								archetype->activate = false;
-								trigger->actions.push_back({ TriggerAction::Act_DeactTrig, archetype });
+								trigger->actions.push_back({ ActionType::Act_DeactTrig, archetype });
 							}
 							else if (ini.is_value("Act_AddLabel"))
 							{
 								ActAddLabelArchetypePtr archetype(new ActAddLabelArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->label = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ TriggerAction::Act_AddLabel, archetype });
+								trigger->actions.push_back({ ActionType::Act_AddLabel, archetype });
 							}
 							else if (ini.is_value("Act_RemoveLabel"))
 							{
 								ActRemoveLabelArchetypePtr archetype(new ActRemoveLabelArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->label = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ TriggerAction::Act_RemoveLabel, archetype });
+								trigger->actions.push_back({ ActionType::Act_RemoveLabel, archetype });
 							}
 							else if (ini.is_value("Act_LightFuse"))
 							{
 								ActLightFuseArchetypePtr archetype(new ActLightFuseArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->fuseName = ini.get_value_string(1);
-								trigger->actions.push_back({ TriggerAction::Act_LightFuse, archetype });
+								trigger->actions.push_back({ ActionType::Act_LightFuse, archetype });
 							}
 							else if (ini.is_value("Act_SpawnSolar"))
 							{
 								ActSpawnSolarArchetypePtr archetype(new ActSpawnSolarArchetype());
 								archetype->solarName = ToLower(ini.get_value_string(0));
-								trigger->actions.push_back({ TriggerAction::Act_SpawnSolar, archetype });
+								trigger->actions.push_back({ ActionType::Act_SpawnSolar, archetype });
 							}
 							else if (ini.is_value("Act_SpawnShip"))
 							{
@@ -532,21 +473,21 @@ namespace Missions
 									orientation.z = ini.get_value_float(7);
 									archetype->orientation = EulerMatrix(orientation);
 								}
-								trigger->actions.push_back({ TriggerAction::Act_SpawnShip, archetype });
+								trigger->actions.push_back({ ActionType::Act_SpawnShip, archetype });
 								}
 							else if (ini.is_value("Act_Destroy"))
 							{
 								ActDestroyArchetypePtr archetype(new ActDestroyArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->destroyType = ToLower(ini.get_value_string(1)) == "explode" ? DestroyType::EXPLODE : DestroyType::VANISH;
-								trigger->actions.push_back({ TriggerAction::Act_Destroy, archetype });
+								trigger->actions.push_back({ ActionType::Act_Destroy, archetype });
 							}
 							else if (ini.is_value("Act_PlaySoundEffect"))
 							{
 								ActPlaySoundEffectArchetypePtr archetype(new ActPlaySoundEffectArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->soundId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ TriggerAction::Act_PlaySoundEffect, archetype });
+								trigger->actions.push_back({ ActionType::Act_PlaySoundEffect, archetype });
 							}
 							else if (ini.is_value("Act_PlayMusic"))
 							{
@@ -558,7 +499,7 @@ namespace Missions
 								archetype->music.overrideMusic = std::string(ini.get_value_string(4)) != "none" ? CreateIdOrNull(ini.get_value_string(4)) : 0;
 								archetype->music.crossFadeDurationInS = ini.get_value_float(5);
 								archetype->music.playOnce = ini.get_bool(6);
-								trigger->actions.push_back({ TriggerAction::Act_PlayMusic, archetype });
+								trigger->actions.push_back({ ActionType::Act_PlayMusic, archetype });
 							}
 							else if (ini.is_value("Act_Ethercomm"))
 							{
@@ -593,7 +534,7 @@ namespace Missions
 									archetype->costume.accessory[count++] = CreateIdOrNull(val);
 								}
 								archetype->costume.accessories = count;
-								trigger->actions.push_back({ TriggerAction::Act_EtherComm, archetype });
+								trigger->actions.push_back({ ActionType::Act_EtherComm, archetype });
 							}
 							else if (ini.is_value("Act_SendComm"))
 							{
@@ -616,7 +557,7 @@ namespace Missions
 								if (!ini.is_value_empty(pos++))
 									archetype->delay = ini.get_value_float(pos - 1);
 								archetype->global = ini.get_value_bool(pos);
-								trigger->actions.push_back({ TriggerAction::Act_SendComm, archetype });
+								trigger->actions.push_back({ ActionType::Act_SendComm, archetype });
 							}
 							else if (ini.is_value("Act_SetNNObj"))
 							{
@@ -629,14 +570,14 @@ namespace Missions
 								archetype->position.z = ini.get_value_float(5);
 								archetype->bestRoute = ini.get_bool(6);
 								archetype->targetObjName = CreateIdOrNull(ini.get_value_string(7));
-								trigger->actions.push_back({ TriggerAction::Act_SetNNObj, archetype });
+								trigger->actions.push_back({ ActionType::Act_SetNNObj, archetype });
 							}
 							else if (ini.is_value("Act_AdjAcct"))
 							{
 								ActAdjAcctArchetypePtr archetype(new ActAdjAcctArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->cash = ini.get_value_int(1);
-								trigger->actions.push_back({ TriggerAction::Act_AdjAcct, archetype });
+								trigger->actions.push_back({ ActionType::Act_AdjAcct, archetype });
 							}
 							else if (ini.is_value("Act_AddCargo"))
 							{
@@ -645,14 +586,14 @@ namespace Missions
 								archetype->itemId = CreateIdOrNull(ini.get_value_string(1));
 								archetype->count = std::max(0, ini.get_value_int(2));
 								archetype->missionFlagged = ini.get_value_bool(3);
-								trigger->actions.push_back({ TriggerAction::Act_AddCargo, archetype });
+								trigger->actions.push_back({ ActionType::Act_AddCargo, archetype });
 							}
 							else if (ini.is_value("Act_GiveObjList"))
 							{
 								ActGiveObjListArchetypePtr archetype(new ActGiveObjListArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->objectivesId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ TriggerAction::Act_GiveObjList, archetype });
+								trigger->actions.push_back({ ActionType::Act_GiveObjList, archetype });
 							}
 						}
 						missionArchetypes.back()->triggers.push_back(trigger);
@@ -661,6 +602,32 @@ namespace Missions
 				ini.close();
 			}
 		}
+	}
+
+	uint lastMissionId = 0;
+	static bool StartMission(const std::string& missionName)
+	{
+		MissionArchetypePtr foundMissionArchetype = nullptr;
+		for (const auto& mission : missionArchetypes)
+		{
+			if (mission->name == missionName)
+			{
+				foundMissionArchetype = mission;
+				break;
+			}
+		}
+		if (!foundMissionArchetype)
+			return false;
+
+		for (const auto& mission : missions)
+		{
+			if (mission.second.archetype->name == missionName)
+				return false;
+		}
+		const auto& entry = missions.try_emplace(lastMissionId, lastMissionId, foundMissionArchetype);
+		lastMissionId++;
+		entry.first->second.Start();
+		return true;
 	}
 
 	bool initialized = false;
@@ -673,10 +640,38 @@ namespace Missions
 		for (const auto& missionArchetype : missionArchetypes)
 		{
 			if (missionArchetype->active)
-			{
 				StartMission(missionArchetype->name);
+		}
+	}
+
+	static bool KillMission(const std::string& missionName)
+	{
+		for (const auto& mission : missions)
+		{
+			if (mission.second.archetype->name == missionName)
+			{
+				missions.erase(mission.first);
+				return true;
 			}
 		}
+		return false;
+	}
+
+	static void KillMissions()
+	{
+		missions.clear();
+	}
+
+	static void RemoveObjectFromMissions(const uint objId)
+	{
+		for (const auto& missionId : runningMissionIds)
+			missions.at(missionId).RemoveObject(objId);
+	}
+
+	static void RemoveClientFromMissions(const uint client)
+	{
+		for (const auto& missionId : runningMissionIds)
+			missions.at(missionId).RemoveClient(client);
 	}
 
 	static void DestroyNonLootingEquipment(const IObjRW* killedObject, const uint killerId)
@@ -765,7 +760,7 @@ namespace Missions
 			if (!mission.second.objectIds.contains(killedObject->cobj->id))
 				continue;
 
-			uint victimReputationId;
+			uint victimReputationId = 0;
 			if (killedObject->cobj->objectClass & CObject::CSHIP_OBJECT)
 				victimReputationId = reinterpret_cast<CEqObj*>(killedObject->cobj)->repVibe;
 			else if (killedObject->cobj->objectClass & CObject::CSOLAR_OBJECT)
@@ -853,12 +848,12 @@ namespace Missions
 		for (const auto cnd : distVecConditions)
 		{
 			const bool strangerRequested = cnd->archetype->objNameOrLabel == Stranger;
-			if (strangerRequested || !missions[cnd->parent.missionId].clientIds.empty())
+			if (strangerRequested || !missions.at(cnd->parent.missionId).clientIds.empty())
 			{
 				struct PlayerData* playerData = 0;
 				while (playerData = Players.traverse_active(playerData))
 				{
-					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !missions[cnd->parent.missionId].clientIds.contains(playerData->iOnlineID)))
+					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !missions.at(cnd->parent.missionId).clientIds.contains(playerData->iOnlineID)))
 						continue;
 
 					uint shipId;
@@ -878,7 +873,7 @@ namespace Missions
 			}
 			if (!strangerRequested)
 			{
-				for (uint objId : missions[cnd->parent.missionId].objectIds)
+				for (uint objId : missions.at(cnd->parent.missionId).objectIds)
 				{
 					if (objectsByObjId.contains(objId))
 						continue;
@@ -957,23 +952,26 @@ namespace Missions
 
 		if (IS_CMD("start_mission"))
 		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
-				PrintUserCmdText(clientId, L"ERR No permission");
+				PrintUserCmdText(clientId, L"ERR No permission\n");
 				return false;
 			}
 
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
 			if (StartMission(targetNickname))
-			{
-				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.");
-				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-				return true;
-			}
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.\n");
+			else
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.\n");
+			return true;
 		}
 		else if (IS_CMD("stop_mission"))
 		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
@@ -983,18 +981,35 @@ namespace Missions
 
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
 			if (KillMission(targetNickname))
-			{
-				PrintUserCmdText(clientId, L"Ended mission " + stows(targetNickname));
-				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-				return true;
-			}
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" ended.\n");
+			else
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.\n");
+			return true;
 		}
-		else if (IS_CMD("reload_missions"))
+		else if (IS_CMD("reset_missions"))
 		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
-				PrintUserCmdText(clientId, L"ERR No permission");
+				PrintUserCmdText(clientId, L"ERR No permission\n");
+				return false;
+			}
+
+			KillMissions();
+			initialized = false;
+			PrintUserCmdText(clientId, L"Resetted all missions\n");
+			return true;
+		}
+		else if (IS_CMD("reload_missions"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission\n");
 				return false;
 			}
 
@@ -1002,8 +1017,7 @@ namespace Missions
 			missionArchetypes.clear();
 			LoadSettings();
 			initialized = false;
-			PrintUserCmdText(clientId, L"Ended and reloaded all missions");
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			PrintUserCmdText(clientId, L"Ended and reloaded all missions\n");
 			return true;
 		}
 		return false;

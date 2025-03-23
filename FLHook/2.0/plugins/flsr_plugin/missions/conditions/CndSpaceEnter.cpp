@@ -1,12 +1,12 @@
 #include "CndSpaceEnter.h"
-#include "../Trigger.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	std::unordered_set<CndSpaceEnter*> spaceEnterConditions;
 
 	CndSpaceEnter::CndSpaceEnter(const ConditionParent& parent, const CndSpaceEnterArchetypePtr conditionArchetype) :
-		Condition(parent, TriggerCondition::Cnd_SpaceEnter),
+		Condition(parent, ConditionType::Cnd_SpaceEnter),
 		archetype(conditionArchetype)
 	{}
 
@@ -22,25 +22,27 @@ namespace Missions
 
 	bool CndSpaceEnter::Matches(const uint clientId, const uint systemId)
 	{
-		const std::wstring outputPretext = stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_SpaceEnter " + std::to_wstring(archetype->objNameOrLabel) + L" into " + std::to_wstring(archetype->systemId);
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		const std::wstring outputPretext = stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_SpaceEnter " + std::to_wstring(archetype->objNameOrLabel) + L" into " + std::to_wstring(archetype->systemId);
 
 		if (archetype->objNameOrLabel == Stranger)
 		{
-			if (!missions[parent.missionId].clientIds.contains(clientId) && (!archetype->systemId || archetype->systemId == systemId))
+			if (!mission.clientIds.contains(clientId) && (!archetype->systemId || archetype->systemId == systemId))
 			{
-				triggers[parent.triggerId].activator.type = MissionObjectType::Client;
-				triggers[parent.triggerId].activator.id = clientId;
+				trigger.activator.type = MissionObjectType::Client;
+				trigger.activator.id = clientId;
 				ConPrint(outputPretext + L" client[" + std::to_wstring(clientId) + L"]\n");
 				return true;
 			}
 		}
-		else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
 				if (object.type == MissionObjectType::Client && object.id == clientId && (!archetype->systemId || archetype->systemId == systemId))
 				{
-					triggers[parent.triggerId].activator = object;
+					trigger.activator = object;
 					ConPrint(outputPretext + L" client[" + std::to_wstring(object.id) + L"]\n");
 					return true;
 				}

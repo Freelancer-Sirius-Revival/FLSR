@@ -1,12 +1,12 @@
 #include "CndTimer.h"
-#include "../Trigger.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	std::unordered_set<CndTimer*> timerConditions;
 
 	CndTimer::CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype) :
-		Condition(parent, TriggerCondition::Cnd_Timer),
+		Condition(parent, ConditionType::Cnd_Timer),
 		archetype(conditionArchetype),
 		passedTimeInS(0.0f)
 	{}
@@ -23,12 +23,14 @@ namespace Missions
 
 	bool CndTimer::Matches(const float elapsedTimeInS)
 	{
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
 		passedTimeInS += elapsedTimeInS;
 		if (passedTimeInS >= archetype->timeInS)
 		{
-			ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Cnd_Timer " + std::to_wstring(archetype->timeInS) + L"s \n");
-			triggers[parent.triggerId].activator.type = MissionObjectType::Client;
-			triggers[parent.triggerId].activator.id = 0;
+			ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_Timer " + std::to_wstring(archetype->timeInS) + L"s \n");
+			trigger.activator.type = MissionObjectType::Client;
+			trigger.activator.id = 0;
 			return true;
 		}
 		return false;

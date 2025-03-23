@@ -290,7 +290,7 @@
     <ClInclude Include="missions\objectives\ObjectivesArch.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\Conditions.h">
+    <ClInclude Include="missions\conditions\ConditionTypes.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActGiveObjList.h">
@@ -305,6 +305,9 @@
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Plugin.h" />
+    <ClInclude Include="missions\actions\ActionTypes.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

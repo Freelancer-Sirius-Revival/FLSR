@@ -2,38 +2,37 @@
 #include <vector>
 #include <unordered_set>
 #include "MissionArch.h"
+#include "Trigger.h"
 #include "MissionObject.h"
 #include "Objectives/Objectives.h"
 
 namespace Missions
 {
-	struct Trigger;
-
-	struct Mission
+	class Mission
 	{
+	public:
 		const uint id;
 		const MissionArchetypePtr archetype;
-		bool ended;
-
+		std::unordered_map<uint, Trigger> triggers;
 		std::unordered_map<uint, uint> objectIdsByName;
 		std::unordered_map<uint, std::vector<MissionObject>> objectsByLabel;
 		std::unordered_set<uint> objectIds;
 		std::unordered_set<uint> clientIds;
-		std::unordered_set<uint> triggerIds;
 		std::unordered_map<uint, Objectives> objectivesByObjectId;
+	private:
+		bool ended = false;
+		bool triggerExecutionRunning = false;
+		std::queue<uint> triggerExecutionQueue;
 
-		Mission();
+	public:
 		Mission(const uint id, const MissionArchetypePtr missionArchetype);
 		virtual ~Mission();
+		void Start();
+		void QueueTriggerExecution(const uint triggerId);
 		void End();
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
 	};
 	extern std::unordered_map<uint, Mission> missions;
-
-	bool StartMission(const std::string& missionName);
-	bool KillMission(const std::string& missionName);
-	void KillMissions();
-	void RemoveObjectFromMissions(const uint objId);
-	void RemoveClientFromMissions(const uint client);
+	extern std::unordered_set<uint> runningMissionIds;
 }

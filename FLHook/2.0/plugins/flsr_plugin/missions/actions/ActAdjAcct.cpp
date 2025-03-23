@@ -1,11 +1,11 @@
 #include <FLHook.h>
 #include "ActAdjAcct.h"
-#include "../Conditions/Condition.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	ActAdjAcct::ActAdjAcct(const ActionParent& parent, const ActAdjAcctArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_AdjAcct),
+		Action(parent, ActionType::Act_AdjAcct),
 		archetype(actionArchetype)
 	{}
 
@@ -24,17 +24,19 @@ namespace Missions
 
 	void ActAdjAcct::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_AdjAcct " + std::to_wstring(archetype->cash) + L" on " + std::to_wstring(archetype->objNameOrLabel));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_AdjAcct " + std::to_wstring(archetype->cash) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].activator;
+			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client)
 			{
 				AddCash(activator.id, archetype->cash);
 				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 			}
 		}
-		else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{

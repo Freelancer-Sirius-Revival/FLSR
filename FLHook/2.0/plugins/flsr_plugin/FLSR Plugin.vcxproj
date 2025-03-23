@@ -209,6 +209,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActGiveObjList.h" />
     <ClInclude Include="missions\actions\ActGiveObjListArch.h" />
     <ClInclude Include="missions\actions\Action.h" />
+    <ClInclude Include="missions\actions\ActionTypes.h" />
     <ClInclude Include="missions\actions\ActLightFuse.h" />
     <ClInclude Include="missions\actions\ActLightFuseArch.h" />
     <ClInclude Include="missions\actions\ActPlayMusic.h" />
@@ -239,7 +240,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndTimerArch.h" />
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />
-    <ClInclude Include="missions\conditions\Conditions.h" />
+    <ClInclude Include="missions\conditions\ConditionTypes.h" />
     <ClInclude Include="missions\LootProps.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionArch.h" />

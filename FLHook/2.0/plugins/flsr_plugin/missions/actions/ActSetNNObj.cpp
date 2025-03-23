@@ -1,11 +1,11 @@
 #include <FLHook.h>
 #include "ActSetNNObj.h"
-#include "../Conditions/Condition.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	ActSetNNObj::ActSetNNObj(const ActionParent& parent, const ActSetNNObjArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_SetNNObj),
+		Action(parent, ActionType::Act_SetNNObj),
 		archetype(actionArchetype)
 	{}
 
@@ -30,8 +30,9 @@ namespace Missions
 			XRequestBestPathEntry target;
 			target.systemId = action.archetype->systemId;
 			target.position = action.archetype->position;
-			const auto& object = missions[action.parent.missionId].objectIdsByName.find(action.archetype->targetObjName);
-			if (object != missions[action.parent.missionId].objectIdsByName.end())
+			auto& mission = missions.at(action.parent.missionId);
+			const auto& object = mission.objectIdsByName.find(action.archetype->targetObjName);
+			if (object != mission.objectIdsByName.end())
 				target.objId = object->second;
 			else
 				target.objId = action.archetype->targetObjName;
@@ -75,13 +76,15 @@ namespace Missions
 
 	void ActSetNNObj::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_SetNNObj " + std::to_wstring(archetype->message) + L" for " + std::to_wstring(archetype->objNameOrLabel));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SetNNObj " + std::to_wstring(archetype->message) + L" for " + std::to_wstring(archetype->objNameOrLabel));
 		FmtStr caption(archetype->message, 0);
 		caption.begin_mad_lib(archetype->message);
 		caption.end_mad_lib();
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].activator;
+			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
 			{
 				SetObjective(activator.id, *this);
@@ -90,7 +93,7 @@ namespace Missions
 		}
 		else
 		{
-			if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+			if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
 				{

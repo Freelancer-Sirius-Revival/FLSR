@@ -20,7 +20,7 @@ namespace NpcNames
 	static std::unordered_map<uint, std::pair<uint, uint>> factionLargeShipNames;
 	static std::unordered_map<uint, uint> factionLargeShipDesignations;
 
-	std::pair<uint, uint> GetRandomName(const uint factionId, const uint voiceId)
+	std::pair<unsigned int, unsigned int> GetRandomName(const unsigned int factionId, const unsigned int voiceId)
 	{
 		std::pair<uint, uint> result = { 0, 0 };
 		const auto& genderEntry = voiceGenders.find(voiceId);
@@ -37,7 +37,7 @@ namespace NpcNames
 		return result;
 	}
 
-	std::pair<uint, uint> GetRandomLargeShipName(const uint factionId)
+	std::pair<unsigned int, unsigned int> GetRandomLargeShipName(const unsigned int factionId)
 	{
 		std::pair<uint, uint> result = { 0, 0 };
 

@@ -1,11 +1,11 @@
 #include <FLHook.h>
 #include "ActPlaySoundEffect.h"
-#include "../Conditions/Condition.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	ActPlaySoundEffect::ActPlaySoundEffect(const ActionParent& parent, const ActPlaySoundEffectArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_PlaySoundEffect),
+		Action(parent, ActionType::Act_PlaySoundEffect),
 		archetype(actionArchetype)
 	{}
 
@@ -18,10 +18,12 @@ namespace Missions
 
 	void ActPlaySoundEffect::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_PlaySoundEffect " + std::to_wstring(archetype->soundId) + L" for " + std::to_wstring(archetype->objNameOrLabel));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_PlaySoundEffect " + std::to_wstring(archetype->soundId) + L" for " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].activator;
+			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
 			{
 				PlaySoundEffect(activator.id, archetype->soundId);
@@ -30,7 +32,7 @@ namespace Missions
 		}
 		else
 		{
-			if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+			if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
 				{

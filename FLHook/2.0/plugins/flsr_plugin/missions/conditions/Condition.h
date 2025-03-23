@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <FLHook.h>
-#include "Conditions.h"
+#include "ConditionTypes.h"
 #include "../MissionObject.h"
 
 namespace Missions
@@ -10,17 +10,17 @@ namespace Missions
 
 	struct ConditionParent
 	{
-		unsigned int missionId;
-		unsigned int triggerId;
-		ConditionParent(unsigned int missionId, unsigned int triggerId) : missionId(missionId), triggerId(triggerId) {}
+		const uint missionId;
+		const uint triggerId;
+		ConditionParent(uint missionId, uint triggerId) : missionId(missionId), triggerId(triggerId) {}
 	};
 
 	struct Condition
 	{
 		const ConditionParent parent;
-		const TriggerCondition type;
+		const ConditionType type;
 
-		Condition(const ConditionParent& parent, const TriggerCondition type);
+		Condition(const ConditionParent& parent, const ConditionType type);
 		virtual ~Condition();
 		virtual void Register();
 		virtual void Unregister();

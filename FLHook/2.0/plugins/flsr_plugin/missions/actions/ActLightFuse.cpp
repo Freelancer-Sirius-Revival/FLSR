@@ -1,11 +1,11 @@
 #include <FLHook.h>
 #include "ActLightFuse.h"
-#include "../Conditions/Condition.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	ActLightFuse::ActLightFuse(const ActionParent& parent, const ActLightFuseArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_LightFuse),
+		Action(parent, ActionType::Act_LightFuse),
 		archetype(actionArchetype)
 	{}
 
@@ -19,10 +19,12 @@ namespace Missions
 
 	void ActLightFuse::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_LightFuse " + stows(archetype->fuseName) + L" on " + std::to_wstring(archetype->objNameOrLabel));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_LightFuse " + stows(archetype->fuseName) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].activator;
+			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client)
 			{
 				uint objId;
@@ -30,7 +32,7 @@ namespace Missions
 				if (objId && Fuse(archetype->fuseName, objId))
 					ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
 			}
-			else if (missions[parent.missionId].objectIds.contains(activator.id) && Fuse(archetype->fuseName, activator.id))
+			else if (mission.objectIds.contains(activator.id) && Fuse(archetype->fuseName, activator.id))
 			{
 				ConPrint(L" obj[" + std::to_wstring(activator.id) + L"]");
 			}
@@ -38,12 +40,12 @@ namespace Missions
 		else
 		{
 			// Clients can only be addressed via Label.
-			if (const auto& objectByName = missions[parent.missionId].objectIdsByName.find(archetype->objNameOrLabel); objectByName != missions[parent.missionId].objectIdsByName.end())
+			if (const auto& objectByName = mission.objectIdsByName.find(archetype->objNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
 				if (Fuse(archetype->fuseName, objectByName->second))
 					ConPrint(L" obj[" + std::to_wstring(objectByName->second) + L"]");
 			}
-			else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+			else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
 				{

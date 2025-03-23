@@ -1,13 +1,14 @@
 #include <FLHook.h>
+#include "ActSpawnShip.h"
+#include "../Mission.h"
 #include "../../Pilots.h"
 #include "../NpcNames.h"
-#include "ActSpawnShip.h"
 #include "../Objectives/Objectives.h"
 
 namespace Missions
 {
 	ActSpawnShip::ActSpawnShip(const ActionParent& parent, const ActSpawnShipArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_SpawnShip),
+		Action(parent, ActionType::Act_SpawnShip),
 		archetype(actionArchetype)
 	{}
 
@@ -105,8 +106,9 @@ namespace Missions
 
 	void ActSpawnShip::Execute()
 	{
-		auto& mission = missions[parent.missionId];
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_SpawnShip " + stows(archetype->msnNpcName));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SpawnShip " + stows(archetype->msnNpcName));
 		if (mission.objectIdsByName.contains(CreateID(archetype->msnNpcName.c_str())))
 		{
 			ConPrint(L" ALREADY EXISTS\n");

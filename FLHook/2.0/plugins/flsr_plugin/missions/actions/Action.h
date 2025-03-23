@@ -1,5 +1,6 @@
 #pragma once
-#include "../Trigger.h"
+#include "ActionTypes.h"
+#include <FLHook.h>
 
 namespace Missions
 {
@@ -7,21 +8,21 @@ namespace Missions
 
 	struct ActionParent
 	{
-		unsigned int missionId;
-		unsigned int triggerId;
+		const uint missionId;
+		const uint triggerId;
+		ActionParent(uint missionId, uint triggerId) : missionId(missionId), triggerId(triggerId) {}
 	};
 
 	struct Action
 	{
 		const ActionParent parent;
-		const TriggerAction type;
+		const ActionType type;
 
-		Action(const ActionParent& parent, const TriggerAction type) :
+		Action(const ActionParent& parent, const ActionType type) :
 			parent(parent),
 			type(type)
 		{}
 		virtual ~Action() {}
 		virtual void Execute() = 0;
 	};
-	typedef std::shared_ptr<Action> ActionPtr;
 }

@@ -1,11 +1,11 @@
 #include <FLHook.h>
 #include "ActPlayMusic.h"
-#include "../Conditions/Condition.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	ActPlayMusic::ActPlayMusic(const ActionParent& parent, const ActPlayMusicArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_PlayMusic),
+		Action(parent, ActionType::Act_PlayMusic),
 		archetype(actionArchetype)
 	{}
 
@@ -18,10 +18,12 @@ namespace Missions
 
 	void ActPlayMusic::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_PlayMusic for " + std::to_wstring(archetype->objNameOrLabel));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_PlayMusic for " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].activator;
+			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
 			{
 				PlayMusic(activator.id, archetype->music);
@@ -30,7 +32,7 @@ namespace Missions
 		}
 		else
 		{
-			if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+			if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
 				{

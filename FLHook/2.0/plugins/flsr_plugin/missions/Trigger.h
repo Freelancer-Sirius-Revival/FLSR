@@ -1,28 +1,30 @@
 #pragma once
 #include "TriggerArch.h"
-#include "Mission.h"
+#include "MissionObject.h"
+#include "conditions/Condition.h"
 
 namespace Missions
 {
-	struct Condition;
-	struct Action;
+	enum class TriggerState
+	{
+		Inactive,
+		Active,
+		Finished
+	};
 
 	struct Trigger
 	{
 		const unsigned int id;
-		const unsigned int parentMissionId;
+		const unsigned int missionId;
 		const TriggerArchetypePtr archetype;
-		std::shared_ptr<Condition> condition;
-		std::vector<std::shared_ptr<Action>> actions;
-		bool active;
+		ConditionPtr condition;
+		TriggerState state;
 		MissionObject activator;
 
-		Trigger();
-		Trigger(const unsigned int id, const unsigned int parentMissionId, const TriggerArchetypePtr triggerArchetype);
+		Trigger(const unsigned int id, const unsigned int missionId, const TriggerArchetypePtr triggerArchetype);
 		virtual ~Trigger();
 		void Activate();
 		void Deactivate();
-		void QueueExecution();
+		void Execute();
 	};
-	extern std::unordered_map<unsigned int, Trigger> triggers;
 }

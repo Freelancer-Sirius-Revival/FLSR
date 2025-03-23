@@ -1,10 +1,10 @@
 #pragma once
 #include "Condition.h"
-#include "../Trigger.h"
+#include "../Mission.h"
 
 namespace Missions
 {
-	Condition::Condition(const ConditionParent& parent, const TriggerCondition type) :
+	Condition::Condition(const ConditionParent& parent, const ConditionType type) :
 		parent(parent),
 		type(type)
 	{}
@@ -20,6 +20,6 @@ namespace Missions
 
 	void Condition::ExecuteTrigger()
 	{
-		triggers[parent.triggerId].QueueExecution();
+		missions.at(parent.missionId).QueueTriggerExecution(parent.triggerId);
 	}
 }

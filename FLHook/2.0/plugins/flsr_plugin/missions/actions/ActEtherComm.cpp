@@ -1,11 +1,11 @@
 #include <FLHook.h>
 #include "ActEtherComm.h"
-#include "../Conditions/Condition.h"
+#include "../Mission.h"
 
 namespace Missions
 {
 	ActEtherComm::ActEtherComm(const ActionParent& parent, const ActEtherCommArchetypePtr actionArchetype) :
-		Action(parent, TriggerAction::Act_EtherComm),
+		Action(parent, ActionType::Act_EtherComm),
 		archetype(actionArchetype)
 	{}
 
@@ -16,10 +16,12 @@ namespace Missions
 
 	void ActEtherComm::Execute()
 	{
-		ConPrint(stows(missions[parent.missionId].archetype->name) + L"->" + stows(triggers[parent.triggerId].archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
+		auto& mission = missions.at(parent.missionId);
+		auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
 		if (archetype->receiverObjNameOrLabel == Activator)
 		{
-			const auto& activator = triggers[parent.triggerId].activator;
+			const auto& activator = trigger.activator;
 			uint objId;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetShip(activator.id, objId);
@@ -38,12 +40,12 @@ namespace Missions
 		else
 		{
 			// Clients can only be addressed via Label.
-			if (const auto& objectByName = missions[parent.missionId].objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != missions[parent.missionId].objectIdsByName.end())
+			if (const auto& objectByName = mission.objectIdsByName.find(archetype->receiverObjNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
 				SendComm(objectByName->second, archetype);
 				ConPrint(L" obj[" + std::to_wstring(objectByName->second) + L"]");
 			}
-			else if (const auto& objectsByLabel = missions[parent.missionId].objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != missions[parent.missionId].objectsByLabel.end())
+			else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->receiverObjNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				// Copy list since the destruction of objects will in turn modify it via other hooks
 				const std::vector<MissionObject> objectsCopy(objectsByLabel->second);

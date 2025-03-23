@@ -416,6 +416,8 @@ namespace Missions
 							{
 								ActActTriggerArchetypePtr archetype(new ActActTriggerArchetype());
 								archetype->triggerName = ToLower(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									archetype->probability = ini.get_value_float(1);
 								archetype->activate = true;
 								trigger->actions.push_back({ ActionType::Act_ActTrig, archetype });
 							}
@@ -423,6 +425,8 @@ namespace Missions
 							{
 								ActActTriggerArchetypePtr archetype(new ActActTriggerArchetype());
 								archetype->triggerName = ToLower(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									archetype->probability = ini.get_value_float(1);
 								archetype->activate = false;
 								trigger->actions.push_back({ ActionType::Act_DeactTrig, archetype });
 							}

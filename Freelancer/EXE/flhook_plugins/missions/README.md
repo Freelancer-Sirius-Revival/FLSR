@@ -226,8 +226,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
 - `Act_ActTrig` Activates a trigger.
     1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
 - `Act_DeactTrig` Deactivates a trigger.
     1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to add.

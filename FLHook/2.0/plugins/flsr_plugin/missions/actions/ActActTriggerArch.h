@@ -8,6 +8,7 @@ namespace Missions
 	{
 		std::string triggerName = "";
 		bool activate = false;
+		float probability = 1.0f;
 	};
 	typedef std::shared_ptr<ActActTriggerArchetype> ActActTriggerArchetypePtr;
 }

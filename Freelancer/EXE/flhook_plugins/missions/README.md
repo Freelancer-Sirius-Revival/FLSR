@@ -8,6 +8,8 @@ This mission scripting system is mostly a re-implementation of Freelancer’s ow
 
 - `start_mission <mission nickname>` Admin command (requires EVENT permission) to start this mission.
 - `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission.
+- `reset_missions` Admin command (requires EVENT permission) to stop all missions and start initially active missions.
+- `reload_missions` Admin command (requires EVENT permission) to stop all missions, reload them again from files, and start initially active missions. Do not use too fast or server will crash due to system-blocked INI files.
 
 You may start as many different mission at any time. However, only one instance of the same mission can run at the same time.
 

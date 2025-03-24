@@ -116,6 +116,9 @@
 - [Petroglyph Games](https://petroglyphgames.com/)
   - Weapon sounds from *Universe at War: Earth Assault*
 
+- [Ruppetus](https://github.com/IrateRedKite)
+  - [Planetscapes Fixed for 16:9 Resolutions](https://www.moddb.com/games/freelancer/addons/planetscapes-fixed-for-169-resolutions)
+
 - [Skotty](https://github.com/erikroe)
   - [Client-side Hook programming](https://github.com/Freelancer-Sirius-Revival/FLSR/)
   - [Explosion sequence design](https://github.com/Freelancer-Sirius-Revival/FLSR/)

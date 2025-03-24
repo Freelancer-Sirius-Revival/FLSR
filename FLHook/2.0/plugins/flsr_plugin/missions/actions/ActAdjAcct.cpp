@@ -38,13 +38,16 @@ namespace Missions
 		}
 		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
+			std::vector<uint> clientIds;
 			for (const auto& object : objectsByLabel->second)
 			{
 				if (object.type == MissionObjectType::Client)
-				{
-					AddCash(object.id, archetype->cash);
-					ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
-				}
+					clientIds.push_back(object.id);
+			}
+			for (const auto& id : clientIds)
+			{
+				AddCash(id, archetype->splitBetweenPlayers ? static_cast<int>(std::trunc(archetype->cash / clientIds.size())) : archetype->cash);
+				ConPrint(L" client[" + std::to_wstring(id) + L"]");
 			}
 		}
 		ConPrint(L"\n");

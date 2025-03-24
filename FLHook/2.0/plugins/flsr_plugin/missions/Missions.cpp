@@ -588,6 +588,7 @@ namespace Missions
 								ActAdjAcctArchetypePtr archetype(new ActAdjAcctArchetype());
 								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								archetype->cash = ini.get_value_int(1);
+								archetype->splitBetweenPlayers = ini.get_value_bool(2);
 								trigger->actions.push_back({ ActionType::Act_AdjAcct, archetype });
 							}
 							else if (ini.is_value("Act_AddCargo"))

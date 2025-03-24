@@ -2,7 +2,7 @@
 
 [Freelancer: Sirius Revival](https://fl-sr.eu/) is a multiplayer-optimised complete overhaul of the base game, keeping in line with the original experience and atmosphere of Freelancer
 
-**[Discord Server](https://discord.gg/GMtyM57egU)**
+**[Discord Server](https://discord.gg/tUJGAsPF7q)**
 
 **[Credits](Credits.md)**
 

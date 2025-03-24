@@ -118,6 +118,9 @@
       <Filter>Missions</Filter>
     </ClCompile>
     <ClCompile Include="Empathies.cpp" />
+    <ClCompile Include="missions\actions\ActDebugMsg.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -306,6 +309,12 @@
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Plugin.h" />
     <ClInclude Include="missions\actions\ActionTypes.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDebugMsg.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDebugMsgArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

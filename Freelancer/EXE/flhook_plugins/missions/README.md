@@ -223,6 +223,8 @@ There can be as many actions as needed – even the same ones.
 
 The keyword `Activator` is used to refer explicitely to the object/player that fulfilled the trigger condition. Sometimes this can be the server itself (e.g. `Cnd_True`, `Cnd_Timer`). The `Activator` can be used in combination with the condition’s `Stranger` to assign players to the mission or do other things only to non-assigned players.
 
+- `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
+    1. `STRING` Arbitrary text to print.
 - `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
 - `Act_ActTrig` Activates a trigger.
     1. `STRING` Trigger nickname to refer.

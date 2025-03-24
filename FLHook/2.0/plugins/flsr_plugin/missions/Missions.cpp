@@ -14,9 +14,10 @@
 #include "Conditions/CndSpaceExit.h"
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
-#include "Actions/ActActTrigger.h"
-#include "Actions/ActAddLabel.h"
-#include "Actions/ActRemoveLabel.h"
+#include "Actions/ActDebugMsgArch.h"
+#include "Actions/ActActTriggerArch.h"
+#include "Actions/ActAddLabelArch.h"
+#include "Actions/ActRemoveLabelArch.h"
 #include "Actions/ActLightFuseArch.h"
 #include "Actions/ActSpawnSolarArch.h"
 #include "Actions/ActSpawnShipArch.h"
@@ -407,6 +408,12 @@ namespace Missions
 								CndTimerArchetypePtr archetype(new CndTimerArchetype());
 								archetype->timeInS = ini.get_value_float(0);
 								trigger->condition = { ConditionType::Cnd_Timer, archetype };
+							}
+							else if (ini.is_value("Act_DebugMsg"))
+							{
+								ActDebugMsgArchetypePtr archetype(new ActDebugMsgArchetype());
+								archetype->message = ini.get_value_string(0);
+								trigger->actions.push_back({ ActionType::Act_DebugMsg, archetype });
 							}
 							else if (ini.is_value("Act_EndMission"))
 							{

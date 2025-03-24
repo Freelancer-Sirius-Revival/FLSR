@@ -11,6 +11,7 @@
 #include "Conditions/CndSpaceExit.h"
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
+#include "Actions/ActDebugMsg.h"
 #include "Actions/ActEndMission.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActAddLabel.h"
@@ -120,6 +121,10 @@ namespace Missions
 			Action* result;
 			switch (actionArchetype.first)
 			{
+				case ActionType::Act_DebugMsg:
+					result = new ActDebugMsg(actParent, std::static_pointer_cast<ActDebugMsgArchetype>(actionArchetype.second));
+					break;
+
 				case ActionType::Act_EndMission:
 					result = new ActEndMission(actParent);
 					break;

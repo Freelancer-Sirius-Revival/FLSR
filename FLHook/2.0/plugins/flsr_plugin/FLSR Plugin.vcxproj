@@ -150,6 +150,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActAddCargo.cpp" />
     <ClCompile Include="missions\actions\ActAddLabel.cpp" />
     <ClCompile Include="missions\actions\ActAdjAcct.cpp" />
+    <ClCompile Include="missions\actions\ActDebugMsg.cpp" />
     <ClCompile Include="missions\actions\ActDestroy.cpp" />
     <ClCompile Include="missions\actions\ActEndMission.cpp" />
     <ClCompile Include="missions\actions\ActEtherComm.cpp" />
@@ -201,6 +202,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActAddLabelArch.h" />
     <ClInclude Include="missions\actions\ActAdjAcct.h" />
     <ClInclude Include="missions\actions\ActAdjAcctArch.h" />
+    <ClInclude Include="missions\actions\ActDebugMsg.h" />
+    <ClInclude Include="missions\actions\ActDebugMsgArch.h" />
     <ClInclude Include="missions\actions\ActDestroy.h" />
     <ClInclude Include="missions\actions\ActDestroyArch.h" />
     <ClInclude Include="missions\actions\ActEndMission.h" />

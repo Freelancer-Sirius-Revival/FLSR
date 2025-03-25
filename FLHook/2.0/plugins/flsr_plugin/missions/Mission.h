@@ -30,6 +30,10 @@ namespace Missions
 		void Start();
 		void QueueTriggerExecution(const uint triggerId);
 		void End();
+		void EvaluateCountConditions(const uint label);
+		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);
+		void AddLabelToObject(const MissionObject& object, const uint label);
+		void RemoveLabelFromObject(const MissionObject& object, const uint label);
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
 	};

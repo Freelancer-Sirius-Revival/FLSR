@@ -121,6 +121,9 @@
     <ClCompile Include="missions\actions\ActDebugMsg.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndCount.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -316,6 +319,12 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActDebugMsgArch.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndCountArch.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndCount.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

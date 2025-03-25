@@ -194,6 +194,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be the server.
 - `Cnd_Timer` Waits until the time as passed. `Activator` will be the server.
     1. `FLOAT` Time in seconds.
+- `Cnd_Count` Counts the objects from a label. `Activator` will be the server.
+    1. `STRING` Objects by label to count.
+    1. `INTEGER` The target count.
+    1. `[Less|Equal|Greater] :Equal` The comparator against the target count.
 - `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` can be the server when objects get despawned.
     1. `STRING|Stranger` Object by name or label to await the destruction of.
     1. `[INTEGER] :0` The specific count of objects that must be destroyed to meet this condition. Any negative value will make this wait until all occurances of the objects are destroyed.

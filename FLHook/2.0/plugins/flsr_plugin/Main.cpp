@@ -2,6 +2,8 @@
 #include "Pilots.h"
 #include "Empathies.h"
 #include "GroupRep.h"
+#include "Missions/NpcNames.h"
+#include "Missions/LootProps.h"
 #include "Missions/Missions.h"
 
 std::mutex m_Mutex;
@@ -14,6 +16,8 @@ void LoadSettings() {
     returncode = DEFAULT_RETURNCODE;
 
     Pilots::ReadFiles();
+    NpcNames::ReadFiles();
+    LootProps::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];

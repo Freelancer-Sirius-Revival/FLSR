@@ -9,52 +9,21 @@ namespace Missions
 		archetype(actionArchetype)
 	{}
 
-	static void AddLabelIfNotExisting(ActAddLabel& action, const MissionObject& object)
-	{
-		if (object.id == 0)
-			return;
-
-		if (object.type == MissionObjectType::Client && (!HkIsValidClientID(object.id) || HkIsInCharSelectMenu(object.id)))
-			return;
-
-		auto& mission = missions.at(action.parent.missionId);
-		bool found = false;
-		for (const auto& objectByLabel : mission.objectsByLabel[action.archetype->label])
-		{
-			if (objectByLabel == object)
-			{
-				found = true;
-				break;
-			}
-		}
-		if (!found)
-		{
-			mission.objectsByLabel[action.archetype->label].push_back(object);
-			if (object.type == MissionObjectType::Client)
-				ConPrint(L" client");
-			else
-				ConPrint(L" obj");
-			ConPrint(L"[" + std::to_wstring(object.id) + L"]");
-		}
-	}
-
 	void ActAddLabel::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_AddLabel " + std::to_wstring(archetype->label) + L" to " + std::to_wstring(archetype->objNameOrLabel));
+		const auto& trigger = mission.triggers.at(parent.triggerId);
+		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_AddLabel " + std::to_wstring(archetype->label) + L" to " + std::to_wstring(archetype->objNameOrLabel) + L"\n");
 		if (archetype->objNameOrLabel == Activator)
 		{
 			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client)
 			{
-				// Clients are made known to the mission by giving them a label.
-				mission.clientIds.insert(activator.id);
-				AddLabelIfNotExisting(*this, activator);
+				mission.AddLabelToObject(activator, archetype->label);
 			}
 			else if (mission.objectIds.contains(activator.id))
 			{
-				AddLabelIfNotExisting(*this, activator);
+				mission.AddLabelToObject(activator, archetype->label);
 			}
 		}
 		else
@@ -65,14 +34,13 @@ namespace Missions
 				MissionObject object;
 				object.type = MissionObjectType::Object;
 				object.id = objectByName->second;
-				AddLabelIfNotExisting(*this, object);
+				mission.AddLabelToObject(object, archetype->label);
 			}
 			else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
-					AddLabelIfNotExisting(*this, object);
+					mission.AddLabelToObject(object, archetype->label);
 			}
 		}
-		ConPrint(L"\n");
 	}
 }

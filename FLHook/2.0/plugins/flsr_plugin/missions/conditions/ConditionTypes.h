@@ -4,6 +4,7 @@ namespace Missions
 {
 	enum class ConditionType
 	{
+		Cnd_Count,
 		Cnd_WatchVibe,
 		Cnd_WatchTrigger,
 		Cnd_True,

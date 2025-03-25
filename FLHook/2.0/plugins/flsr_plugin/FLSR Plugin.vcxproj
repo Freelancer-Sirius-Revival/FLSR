@@ -164,6 +164,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActSpawnShip.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp" />
+    <ClCompile Include="missions\conditions\CndCount.cpp" />
     <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
     <ClCompile Include="missions\conditions\CndDistVec.cpp" />
     <ClCompile Include="missions\conditions\CndSpaceEnter.cpp" />
@@ -231,6 +232,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSpawnSolarArch.h" />
     <ClInclude Include="missions\conditions\CndBaseEnter.h" />
     <ClInclude Include="missions\conditions\CndBaseEnterArch.h" />
+    <ClInclude Include="missions\conditions\CndCount.h" />
+    <ClInclude Include="missions\conditions\CndCountArch.h" />
     <ClInclude Include="missions\conditions\CndDestroyed.h" />
     <ClInclude Include="missions\conditions\CndDestroyedArch.h" />
     <ClInclude Include="missions\conditions\CndDistVec.h" />

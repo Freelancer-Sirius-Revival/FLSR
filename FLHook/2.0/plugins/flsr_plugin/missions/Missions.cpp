@@ -1,6 +1,5 @@
 #include <regex>
 #include "../Main.h"
-#include "NpcNames.h"
 #include "../Empathies.h"
 #include "LootProps.h"
 #include "Missions.h"
@@ -8,12 +7,12 @@
 #include "MissionArch.h"
 #include "TriggerArch.h"
 #include "Conditions/CndDestroyed.h"
-#include "Conditions/CndDestroyedArch.h"
 #include "Conditions/CndDistVec.h"
 #include "Conditions/CndSpaceEnter.h"
 #include "Conditions/CndSpaceExit.h"
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
+#include "Conditions/CndCountArch.h"
 #include "Actions/ActDebugMsgArch.h"
 #include "Actions/ActActTriggerArch.h"
 #include "Actions/ActAddLabelArch.h"
@@ -41,8 +40,7 @@ namespace Missions
 
 	void LoadSettings()
 	{
-		NpcNames::ReadFiles();
-		LootProps::ReadFiles();
+		missionArchetypes.clear();
 
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
@@ -408,6 +406,23 @@ namespace Missions
 								CndTimerArchetypePtr archetype(new CndTimerArchetype());
 								archetype->timeInS = ini.get_value_float(0);
 								trigger->condition = { ConditionType::Cnd_Timer, archetype };
+							}
+							else if (ini.is_value("Cnd_Count"))
+							{
+								CndCountArchetypePtr archetype(new CndCountArchetype());
+								archetype->label = CreateIdOrNull(ini.get_value_string(0));
+								archetype->count = ini.get_value_int(1);
+								if(ini.get_num_parameters() > 2)
+								{
+									const auto comparator = ToLower(ini.get_value_string(2));
+									if (comparator == "less")
+										archetype->comparator = CountComparator::Less;
+									else if (comparator == "greater")
+										archetype->comparator = CountComparator::Greater;
+									else
+										archetype->comparator = CountComparator::Equal;
+								}
+								trigger->condition = { ConditionType::Cnd_Count, archetype };
 							}
 							else if (ini.is_value("Act_DebugMsg"))
 							{
@@ -1026,7 +1041,6 @@ namespace Missions
 			}
 
 			KillMissions();
-			missionArchetypes.clear();
 			LoadSettings();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Ended and reloaded all missions\n");

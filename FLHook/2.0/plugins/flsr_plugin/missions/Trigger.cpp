@@ -11,6 +11,7 @@
 #include "Conditions/CndSpaceExit.h"
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
+#include "Conditions/CndCount.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActEndMission.h"
 #include "Actions/ActActTrigger.h"
@@ -58,6 +59,10 @@ namespace Missions
 
 			case ConditionType::Cnd_Timer:
 				result = new CndTimer(parent, std::static_pointer_cast<CndTimerArchetype>(conditionArchetype.second));
+				break;
+
+			case ConditionType::Cnd_Count:
+				result = new CndCount(parent, std::static_pointer_cast<CndCountArchetype>(conditionArchetype.second));
 				break;
 
 			default:

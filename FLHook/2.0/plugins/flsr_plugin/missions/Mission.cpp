@@ -1,4 +1,5 @@
 #include "Mission.h"
+#include "conditions/CndCount.h"
 
 namespace Missions
 {
@@ -47,6 +48,8 @@ namespace Missions
 			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
+
+		countConditionsByMission.erase(id);
 	}
 
 	void Mission::Start()
@@ -97,6 +100,94 @@ namespace Missions
 		runningMissionIds.erase(id);
 	}
 
+	void Mission::EvaluateCountConditions(const uint label)
+	{
+		const auto& countConditions = countConditionsByMission.find(id);
+		if (countConditions == countConditionsByMission.end() || countConditions->second.size() == 0)
+			return;
+
+		const auto& labelEntries = objectsByLabel.find(label);
+		const uint count = labelEntries == objectsByLabel.end() ? 0 : labelEntries->second.size();
+		const auto& countConditionsCopy = std::unordered_set(countConditions->second);
+		for (const auto& cnd : countConditionsCopy)
+		{
+			if (countConditions->second.contains(cnd) && cnd->Matches(label, count))
+				cnd->ExecuteTrigger();
+		}
+	}
+
+	void Mission::AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels)
+	{
+		objectIds.insert(objId);
+		objectIdsByName[name] = objId;
+		for (const auto& label : labels)
+		{
+			MissionObject object;
+			object.type = MissionObjectType::Object;
+			object.id = objId;
+			objectsByLabel[label].push_back(object);
+			EvaluateCountConditions(label);
+		}
+	}
+
+	void Mission::AddLabelToObject(const MissionObject& object, const uint label)
+	{
+		if (object.id == 0)
+			return;
+
+		if (object.type == MissionObjectType::Client)
+		{
+			if (!HkIsValidClientID(object.id) || HkIsInCharSelectMenu(object.id))
+				return;
+			// Clients are made known to the mission by giving them a label.
+			clientIds.insert(object.id);
+		}
+
+		for (const auto& objectByLabel : objectsByLabel[label])
+		{
+			if (objectByLabel == object)
+				return;
+		}
+
+		objectsByLabel[label].push_back(object);
+		EvaluateCountConditions(label);
+	}
+
+	void Mission::RemoveLabelFromObject(const MissionObject& object, const uint label)
+	{
+		if (object.id == 0)
+			return;
+
+		if (const auto& objectByLabel = objectsByLabel.find(label); objectByLabel != objectsByLabel.end())
+		{
+			for (auto it = objectByLabel->second.begin(); it != objectByLabel->second.end();)
+			{
+				if (*it == object)
+					it = objectByLabel->second.erase(it);
+				else
+					it++;
+			}
+			if (objectByLabel->second.empty())
+				objectsByLabel.erase(label);
+		}
+
+		// Once all labels were removed from a client, delete it from the mission.
+		if (object.type == MissionObjectType::Client)
+		{
+			for (const auto& objectByLabel : objectsByLabel)
+			{
+				for (const auto& foundObject : objectByLabel.second)
+				{
+					if (foundObject == object)
+						return;
+				}
+			}
+			clientIds.erase(object.id);
+		}
+
+		EvaluateCountConditions(label);
+	}
+
 	void Mission::RemoveObject(const uint objId)
 	{
 		if (!objectIds.contains(objId))
@@ -109,12 +200,16 @@ namespace Missions
 			else
 				it++;
 		}
+		std::vector<uint> labels;
 		for (auto labelsIt = objectsByLabel.begin(); labelsIt != objectsByLabel.end();)
 		{
 			for (auto objsIt = labelsIt->second.begin(); objsIt != labelsIt->second.end();)
 			{
 				if (objsIt->type == MissionObjectType::Object && objsIt->id == objId)
+				{
+					labels.push_back(labelsIt->first);
 					objsIt = labelsIt->second.erase(objsIt);
+				}
 				else
 					objsIt++;
 			}
@@ -125,6 +220,8 @@ namespace Missions
 		}
 		objectIds.erase(objId);
 		objectivesByObjectId.erase(objId);
+		for (const auto& label : labels)
+			EvaluateCountConditions(label);
 	}
 
 	void Mission::RemoveClient(const uint clientId)
@@ -133,12 +230,16 @@ namespace Missions
 			return;
 
 		ClearMusic(clientId);
+		std::vector<uint> labels;
 		for (auto labelsIt = objectsByLabel.begin(); labelsIt != objectsByLabel.end();)
 		{
 			for (auto objsIt = labelsIt->second.begin(); objsIt != labelsIt->second.end();)
 			{
 				if (objsIt->type == MissionObjectType::Client && objsIt->id == clientId)
+				{
+					labels.push_back(labelsIt->first);
 					objsIt = labelsIt->second.erase(objsIt);
+				}
 				else
 					objsIt++;
 			}
@@ -148,5 +249,7 @@ namespace Missions
 				labelsIt++;
 		}
 		clientIds.erase(clientId);
+		for (const auto& label : labels)
+			EvaluateCountConditions(label);
 	}
 }

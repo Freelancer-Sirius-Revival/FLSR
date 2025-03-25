@@ -29,7 +29,7 @@ namespace Missions
 	void ActGiveObjList::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
+		const auto& trigger = mission.triggers.at(parent.triggerId);
 		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_GiveObjList " + std::to_wstring(archetype->objectivesId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
 		if (archetype->objNameOrLabel == Activator)
 		{

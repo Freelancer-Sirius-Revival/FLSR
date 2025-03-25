@@ -17,7 +17,7 @@ namespace Missions
 	void ActEtherComm::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
+		const auto& trigger = mission.triggers.at(parent.triggerId);
 		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_EtherComm to " + std::to_wstring(archetype->receiverObjNameOrLabel));
 		if (archetype->receiverObjNameOrLabel == Activator)
 		{

@@ -107,7 +107,7 @@ namespace Missions
 	void ActSpawnShip::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
+		const auto& trigger = mission.triggers.at(parent.triggerId);
 		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SpawnShip " + stows(archetype->msnNpcName));
 		if (mission.objectIdsByName.contains(CreateID(archetype->msnNpcName.c_str())))
 		{
@@ -125,15 +125,7 @@ namespace Missions
 						const uint objId = CreateNPC(*archetype, *msnNpc, *npc);
 						if (objId)
 						{
-							mission.objectIds.insert(objId);
-							mission.objectIdsByName[CreateID(msnNpc->name.c_str())] = objId;
-							for (const auto& label : msnNpc->labels)
-							{
-								MissionObject object;
-								object.type = MissionObjectType::Object;
-								object.id = objId;
-								mission.objectsByLabel[label].push_back(object);
-							}
+							mission.AddObject(objId, CreateID(msnNpc->name.c_str()), msnNpc->labels);
 							if (const auto& objectivesEntry = mission.archetype->objectives.find(archetype->objectivesId); objectivesEntry != mission.archetype->objectives.end())
 							{
 								const Objectives objectives(parent.missionId, objId, objectivesEntry->second->objectives);

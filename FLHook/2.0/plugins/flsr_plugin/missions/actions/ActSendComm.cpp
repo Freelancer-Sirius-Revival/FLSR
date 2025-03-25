@@ -23,7 +23,7 @@ namespace Missions
 	void ActSendComm::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
+		const auto& trigger = mission.triggers.at(parent.triggerId);
 		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SendComm from " + std::to_wstring(archetype->senderObjName) + L" to " + std::to_wstring(archetype->receiverObjNameOrLabel));
 		const auto& senderByName = mission.objectIdsByName.find(archetype->senderObjName);
 		if (senderByName == mission.objectIdsByName.end())

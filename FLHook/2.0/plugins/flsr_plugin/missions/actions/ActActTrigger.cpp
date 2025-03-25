@@ -16,7 +16,7 @@ namespace Missions
 	void ActActTrigger::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
+		const auto& trigger = mission.triggers.at(parent.triggerId);
 		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": " + (activate ? L"Act_ActTrigger" : L"Act_DeactTrigger") + L" " + stows(archetype->triggerName));
 		if (archetype->probability < 1.0f && std::uniform_real_distribution<float>(0, 1)(gen) < archetype->probability)
 		{

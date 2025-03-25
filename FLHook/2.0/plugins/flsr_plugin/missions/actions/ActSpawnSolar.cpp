@@ -12,7 +12,7 @@ namespace Missions
 	void ActSpawnSolar::Execute()
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
+		const auto& trigger = mission.triggers.at(parent.triggerId);
 		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SpawnSolar " + stows(archetype->solarName));
 		if (mission.objectIdsByName.contains(CreateID(archetype->solarName.c_str())))
 		{
@@ -27,15 +27,7 @@ namespace Missions
 				const uint objId = SolarSpawn::SpawnSolarByName(mission.archetype->name + ":" + solar.name);
 				if (objId)
 				{
-					mission.objectIds.insert(objId);
-					mission.objectIdsByName[CreateID(solar.name.c_str())] = objId;
-					for (const auto& label : solar.labels)
-					{
-						MissionObject object;
-						object.type = MissionObjectType::Object;
-						object.id = objId;
-						mission.objectsByLabel[label].push_back(object);
-					}
+					mission.AddObject(objId, CreateID(solar.name.c_str()), solar.labels);
 					ConPrint(L" obj[" + std::to_wstring(objId) + L"]");
 				}
 				ConPrint(L"\n");

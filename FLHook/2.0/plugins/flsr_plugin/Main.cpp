@@ -5,6 +5,7 @@
 #include "Missions/NpcNames.h"
 #include "Missions/LootProps.h"
 #include "Missions/Missions.h"
+#include "MissionBoard.h"
 
 std::mutex m_Mutex;
 
@@ -259,5 +260,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
 
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::MissionResponse, PLUGIN_HkIServerImpl_MissionResponse, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST, 0));
+    
     return p_PI;
 }

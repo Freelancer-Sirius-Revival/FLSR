@@ -499,12 +499,14 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_GFCOMPLETECHARLIST(uint iClientID, uint
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint iClientID, uint iDunno)
+bool HkIClientImpl::Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint clientId, uint base)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(iClientID, iDunno));
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST, bool, __stdcall, (uint, uint), (clientId, base));
+
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(clientId, base));
 	return reinterpret_cast<bool>(vRet);
 }
 
@@ -536,12 +538,12 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_GFCOMPLETESCRIPTBEHAVIORLIST(uint iClie
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(uint iClientID, uint iDunno, uint iDunno2)
+bool HkIClientImpl::Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(uint clientId, uint base, uint missionId)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(iClientID, iDunno, iDunno2));
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(clientId, base, missionId));
 	return reinterpret_cast<bool>(vRet);
 }
 
@@ -560,12 +562,12 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_GFDESTROYSCRIPTBEHAVIOR(uint iClientID,
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(uint iClientID, uint iDunno, uint iDunno2)
+bool HkIClientImpl::Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(uint clientId, void* data, uint dataSize)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(iClientID, iDunno, iDunno2));
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, data, dataSize));
 	return reinterpret_cast<bool>(vRet);
 }
 
@@ -576,6 +578,8 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint iClientID,
 {
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
+
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY, bool, __stdcall, (uint, uint), (iClientID, iReason));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(iClientID, iReason));
 	return reinterpret_cast<bool>(vRet);
@@ -608,12 +612,30 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_GFUPDATECHAR(uint iClientID, uint iDunn
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint iClientID, uint iDunno, uint iDunno2)
+/*
+
+struct ClientPackageDataUpdateMissionComputer
+{
+	uint missionId;
+	uint base;
+	uint index;
+	uint unk; // always 2?
+	uint type;
+	FmtStr system; // use FmtStr::flatten(ptr, 0) (returns written bytes) or ::unflatten(ptr, 0) (returns read bytes)
+	FmtStr faction;
+	FmtStr text;
+	uint reward;
+};
+
+*/
+bool HkIClientImpl::Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(iClientID, iDunno, iDunno2));
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER, bool, __stdcall, (uint, void*, uint), (clientId, data, dataSize));
+
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(clientId, data, dataSize));
 	return reinterpret_cast<bool>(vRet);
 }
 

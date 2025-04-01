@@ -124,6 +124,7 @@
     <ClCompile Include="missions\conditions\CndCount.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="MissionBoard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -326,6 +327,7 @@
     <ClInclude Include="missions\conditions\CndCount.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="MissionBoard.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

@@ -15,7 +15,7 @@ namespace Missions
 	static uint CreateNPC(const ActSpawnShipArchetype& actionArchetype, const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
 	{
 		pub::SpaceObj::ShipInfo shipInfo;
-		memset(&shipInfo, 0, sizeof(shipInfo));
+		std::memset(&shipInfo, 0, sizeof(shipInfo));
 		shipInfo.iFlag = 1;
 		shipInfo.iSystem = msnNpc.systemId;
 		shipInfo.iShipArchetype = npc.archetypeId;

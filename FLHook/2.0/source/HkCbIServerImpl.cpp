@@ -1686,23 +1686,23 @@ if (set_bLogConnects)
     /**************************************************************************************************************
     **************************************************************************************************************/
 
-    void __stdcall MissionResponse(unsigned int p1, unsigned long p2, bool p3, unsigned int iClientID) {
+    void __stdcall MissionResponse(unsigned int boardIndex, unsigned long p2, bool p3, unsigned int clientId) {
 
         ISERVER_LOG();
-        ISERVER_LOGARG_UI(p1);
+        ISERVER_LOGARG_UI(boardIndex);
         ISERVER_LOGARG_UI(p2);
         ISERVER_LOGARG_UI(p3);
-        ISERVER_LOGARG_UI(iClientID);
+        ISERVER_LOGARG_UI(clientId);
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_MissionResponse, __stdcall,
             (unsigned int p1, unsigned long p2, bool p3, unsigned int iClientID),
-            (p1, p2, p3, iClientID));
+            (boardIndex, p2, p3, clientId));
 
-        EXECUTE_SERVER_CALL(Server.MissionResponse(p1, p2, p3, iClientID));
+        EXECUTE_SERVER_CALL(Server.MissionResponse(boardIndex, p2, p3, clientId));
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_MissionResponse_AFTER, __stdcall,
             (unsigned int p1, unsigned long p2, bool p3, unsigned int iClientID),
-            (p1, p2, p3, iClientID));
+            (boardIndex, p2, p3, clientId));
 
     }
 

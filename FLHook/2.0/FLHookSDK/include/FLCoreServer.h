@@ -863,6 +863,17 @@ namespace pub
 
 	namespace GF
 	{
+		enum class MissionType
+		{
+			Unknown = 0,
+			KillShips = 1,
+			DestroyInstallation = 2,
+			Assassinate = 3,
+			DestroyContraband = 4,
+			CapturePrisoner = 5,
+			RetrieveLoot = 6
+		};
+
 		IMPORT  unsigned long AmbientScriptCreate(struct AmbientScriptDescription const&);
 		IMPORT  void AmbientScriptDestroy(unsigned long*);
 		IMPORT  unsigned long CharacterBehaviorCreate(struct CharacterBehaviorDescription const&);

@@ -30,6 +30,8 @@ File: EXE\Freelancer.exe
 # Remove automatically generated portion of equipment infocards. - M0tah
 0840B3: 90 E9	[ 0F 84 ]
 
+# Pub::Player::PopUpDialog won't lock controls. - Venemon
+08A53D: 00	[ 01 ]
 
 ##############
 # Main Menu

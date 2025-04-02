@@ -12,11 +12,11 @@ namespace MissionBoard
 		uint type;
 	};
 
-	static void SendMissionOfferToClient(const uint clientId, const MissionOffer& mission, const uint base, const uint index)
+	static void SendMissionOfferToClient(const uint clientId, const uint missionId, const MissionOffer& mission, const uint base, const uint index)
 	{
 		char* buffer = (char*)std::malloc(1024);
 		MissionPacketFirstPart* data = (MissionPacketFirstPart*)buffer;
-		data->missionId = mission.id;
+		data->missionId = missionId;
 		data->base = base;
 		data->index = index;
 		data->unk = 2; //Static value that is always present
@@ -56,11 +56,10 @@ namespace MissionBoard
 		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
 	}
 
-	std::unordered_map<uint, uint> missionOffersMaxIndexByClient;
-
 	std::unordered_map<uint, MissionOffer> customMissions;
 	std::unordered_map<uint, std::unordered_set<uint>> customMissionIdsByBase;
 	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> customMissionIndicesByClient;
+	std::unordered_map<uint, uint> missionOffersMaxIndexByClient;
 
 	static void SendDestroyMissionToAll(const uint missionId)
 	{
@@ -89,11 +88,15 @@ namespace MissionBoard
 		customMissions.erase(missionId);
 	}
 
-	void AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases)
+	uint lastMissionId = std::numeric_limits<uint>::max();
+
+	uint AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases)
 	{
-		customMissions.insert({ mission.id, mission });
+		customMissions.insert({ lastMissionId, mission });
 		for (const uint base : bases)
-			customMissionIdsByBase[base].insert(mission.id);
+			customMissionIdsByBase[base].insert(lastMissionId);
+		// To avoid collisions with existing missions, count the custom mission IDs from high to low.
+		return lastMissionId--;
 	}
 
 	void __stdcall MissionResponse(uint boardIndex, uint p2, bool p3, uint clientId)
@@ -132,12 +135,49 @@ namespace MissionBoard
 		}
 	}
 
-	bool __stdcall Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint clientId, uint reason)
+	static HMODULE LoadContentDll()
 	{
-		returncode = DEFAULT_RETURNCODE;
+		INI_Reader ini;
+		if (ini.open("freelancer.ini", false))
+		{
+			while (ini.read_header())
+			{
+				if (ini.is_header("Initial MP DLLs"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("path"))
+						{
+							const std::string dataPath = ini.get_value_string(0);
+							return GetModuleHandle((dataPath + "\\Content.dll").c_str());
+						}
+					}
+					break;
+				}
+			}
+			ini.close();
+		}
+		return 0;
+	}
+
+	float minRequiredReputationForMissions = -0.2f;
+
+	bool initialized = false;
+	void Initialize()
+	{
+		if (initialized)
+			return;
+		initialized = true;
+		
+		const HMODULE contentHandle = LoadContentDll();
+		if (contentHandle)
+			minRequiredReputationForMissions = *(float*)(DWORD(contentHandle) + 0x1195BC);
+	}
+
+	static void ClearClientData(const uint clientId)
+	{
 		customMissionIndicesByClient.erase(clientId);
 		missionOffersMaxIndexByClient.erase(clientId);
-		return true;
 	}
 
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize)
@@ -156,13 +196,40 @@ namespace MissionBoard
 		const auto& entry = customMissionIdsByBase.find(base);
 		if (entry != customMissionIdsByBase.end())
 		{
+			int clientRep;
+			pub::Player::GetRep(clientId, clientRep);
+
 			for (const auto customMissionId : entry->second)
 			{
-				const uint index = ++missionOffersMaxIndexByClient[clientId];
-				customMissionIndicesByClient[clientId].push_back({ index, customMissionId });
-				SendMissionOfferToClient(clientId, customMissions.at(customMissionId), base, index);
+				const auto& mission = customMissions.at(customMissionId);
+				float feelings;
+				pub::Reputation::GetGroupFeelingsTowards(clientRep, mission.group, feelings);
+				if (feelings > minRequiredReputationForMissions)
+				{
+					const uint index = ++missionOffersMaxIndexByClient[clientId];
+					customMissionIndicesByClient[clientId].push_back({ index, customMissionId });
+					SendMissionOfferToClient(clientId, customMissionId, mission, base, index);
+				}
 			}
 		}
 		return true;
+	}
+
+	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		ClearClientData(clientId);
+	}
+
+	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		ClearClientData(clientId);
+	}
+
+	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		ClearClientData(clientId);
 	}
 }

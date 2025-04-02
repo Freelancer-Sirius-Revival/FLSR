@@ -574,14 +574,12 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(uint clientId
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint iClientID, uint iReason)
+bool HkIClientImpl::Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint clientId, MissionListEmptyReason reason)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY, bool, __stdcall, (uint, uint), (iClientID, iReason));
-
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(iClientID, iReason));
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(clientId, reason));
 	return reinterpret_cast<bool>(vRet);
 }
 

@@ -208,6 +208,14 @@ struct XRequestBestPath
 	XRequestBestPathEntry entries[64]; // Server.RequestBestPath requires exactly 2, otherwise variable length
 };
 
+enum class MissionListEmptyReason
+{
+	NotEmpty = 0,
+	BadReputation = 1,
+	TooLowLevel = 2,
+	TooManyPlayers = 3
+};
+
 class IMPORT CAccount
 {
 public:

@@ -5,7 +5,6 @@ namespace MissionBoard
 {
 	struct MissionOffer
 	{
-		uint id;
 		pub::GF::MissionType type;
 		uint system;
 		uint group;
@@ -13,11 +12,13 @@ namespace MissionBoard
 		uint reward;
 	};
 
-	void AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases);
+	uint AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases);
 
+	void Initialize();
 	void __stdcall MissionResponse(uint missionId, uint p2, bool p3, uint clientId);
-	bool __stdcall Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint clientId, uint reason);
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize);
 	bool __stdcall Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint clientId, uint base);
-	bool __stdcall Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(uint clientId, uint base, uint missionId);
+	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2);
+	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
+	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
 }

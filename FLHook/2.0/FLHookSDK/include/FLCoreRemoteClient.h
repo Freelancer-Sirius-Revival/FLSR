@@ -219,7 +219,7 @@ public:
 	virtual bool Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize);
 	virtual bool Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint clientId, uint baseId);
 	virtual bool Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(uint clientID, void* data, uint dataSize);
-	virtual bool Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint iClientID, uint iReason);
+	virtual bool Send_FLPACKET_SERVER_GFMISSIONVENDORWHYEMPTY(uint clientID, MissionListEmptyReason reason);
 	virtual void unknown_44(uint iClientID, uint iDunno, uint iDunno2);
 	virtual bool Send_FLPACKET_SERVER_GFUPDATENEWSBROADCAST(uint iClientID, uint iDunno, uint iDunno2);
 	virtual bool Send_FLPACKET_SERVER_GFCOMPLETENEWSBROADCASTLIST(uint iClientID, uint iDunno);

@@ -31,9 +31,11 @@ namespace MissionBoard
 		pub::Reputation::GetGroupName(mission.group, groupName);
 		faction.append_string(groupName);
 		pos += faction.flatten(buffer + pos, 0);
-		FmtStr message(327682, 0);
-		message.append_int(mission.reward);
-		message.append_string(mission.text);
+		FmtStr message(327681, 0);
+		FmtStr header(327682, 0);
+		header.append_int(mission.reward);
+		message.append_fmt_str(header);
+		message.append_fmt_str(FmtStr(mission.text, 0));
 		pos += message.flatten(buffer + pos, 0);
 		std::memcpy(buffer + pos, &mission.reward, sizeof(uint));
 		pos += sizeof(uint);

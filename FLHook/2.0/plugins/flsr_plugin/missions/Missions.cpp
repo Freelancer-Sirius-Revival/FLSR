@@ -1101,6 +1101,9 @@ namespace Missions
 				return false;
 			}
 
+			for (const auto& entry : missionNamesByOfferId)
+				MissionBoard::DeleteCustomMission(entry.first);
+
 			KillMissions();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Ended and reloaded all missions\n");

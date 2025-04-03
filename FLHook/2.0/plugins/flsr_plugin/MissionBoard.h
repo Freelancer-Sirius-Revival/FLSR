@@ -13,6 +13,7 @@ namespace MissionBoard
 	};
 
 	uint AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases);
+	void DeleteCustomMission(const uint missionId);
 
 	void Initialize();
 	void __stdcall MissionResponse(uint missionId, uint p2, bool p3, uint clientId);

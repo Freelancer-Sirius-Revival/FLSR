@@ -92,8 +92,6 @@ void LoadSettings() {
         ConPrint(L"Module loaded: Crafting\n");
     }
 
-    Missions::LoadSettings();
-
     //DiscordBot     #############################################################################
     if (Modules::GetModuleState("DiscordBot"))
     {

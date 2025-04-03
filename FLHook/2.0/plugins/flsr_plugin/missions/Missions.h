@@ -3,8 +3,8 @@
 
 namespace Missions
 {
-    void LoadSettings();
     void Initialize();
+    void StartMissionByOfferId(const uint offerId, const uint clientId);
     void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId);
     void __stdcall Elapse_Time_AFTER(float seconds);
     void __stdcall CharacterSelect(const CHARACTER_ID& cId, unsigned int clientId);

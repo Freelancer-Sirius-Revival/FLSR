@@ -1,5 +1,6 @@
 #include "Main.h"
 #include "MissionBoard.h"
+#include "Missions/Missions.h"
 
 namespace MissionBoard
 {
@@ -88,15 +89,23 @@ namespace MissionBoard
 		customMissions.erase(missionId);
 	}
 
-	uint lastMissionId = std::numeric_limits<uint>::max();
+	uint nextMissionId = std::numeric_limits<uint>::max();
 
 	uint AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases)
 	{
-		customMissions.insert({ lastMissionId, mission });
+		customMissions.insert({ nextMissionId, mission });
 		for (const uint base : bases)
-			customMissionIdsByBase[base].insert(lastMissionId);
+			customMissionIdsByBase[base].insert(nextMissionId);
 		// To avoid collisions with existing missions, count the custom mission IDs from high to low.
-		return lastMissionId--;
+		return nextMissionId--;
+	}
+
+	void DeleteCustomMission(const uint missionId)
+	{
+		customMissions.erase(missionId);
+		for (auto& baseEntry : customMissionIdsByBase)
+			baseEntry.second.erase(missionId);
+		SendDestroyMissionToAll(missionId);
 	}
 
 	void __stdcall MissionResponse(uint boardIndex, uint p2, bool p3, uint clientId)
@@ -116,6 +125,7 @@ namespace MissionBoard
 					// Nobody has yet taken upon the mission
 					if (customMissions.contains(indexEntry.second))
 					{
+						Missions::StartMissionByOfferId(indexEntry.second, clientId);
 						SendDestroyMissionToAll(indexEntry.second);
 						RemoveMission(indexEntry.second);
 					}

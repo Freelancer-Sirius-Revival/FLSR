@@ -874,12 +874,12 @@ namespace pub
 		enum class MissionType
 		{
 			Unknown = 0,
-			KillShips = 1,
+			DestroyShips = 1,
 			DestroyInstallation = 2,
 			Assassinate = 3,
 			DestroyContraband = 4,
 			CapturePrisoner = 5,
-			RetrieveLoot = 6
+			RetrieveContraband = 6
 		};
 
 		IMPORT  unsigned long AmbientScriptCreate(struct AmbientScriptDescription const&);

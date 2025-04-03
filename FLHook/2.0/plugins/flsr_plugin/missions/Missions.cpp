@@ -30,9 +30,12 @@
 #include "Actions/ActAddCargoArch.h"
 #include "Actions/ActGiveObjListArch.h"
 #include "Objectives/ObjGotoArch.h"
+#include "../MissionBoard.h"
 
 namespace Missions
 {	
+	std::unordered_map<uint, std::string> missionNamesByOfferId;
+
 	static uint CreateIdOrNull(const char* str)
 	{
 		return strlen(str) > 0 ? CreateID(str) : 0;
@@ -67,7 +70,41 @@ namespace Missions
 								mission->name = ToLower(ini.get_value_string(0));
 							else if (ini.is_value("InitState"))
 								mission->active = ToLower(ini.get_value_string(0)) == "active";
+							else if (ini.is_value("offer_type"))
+							{
+								const auto value = ToLower(ini.get_value_string(0));
+								if (value == "destroyships")
+									mission->offer.type = pub::GF::MissionType::DestroyShips;
+								else if (value == "destroyinstallation")
+									mission->offer.type = pub::GF::MissionType::DestroyInstallation;
+								else if (value == "assassinate")
+									mission->offer.type = pub::GF::MissionType::Assassinate;
+								else if (value == "destroycontraband")
+									mission->offer.type = pub::GF::MissionType::DestroyContraband;
+								else if (value == "captureprisoner")
+									mission->offer.type = pub::GF::MissionType::CapturePrisoner;
+								else if (value == "retrievecontraband")
+									mission->offer.type = pub::GF::MissionType::RetrieveContraband;
+								else
+									mission->offer.type = pub::GF::MissionType::Unknown;
+							}
+							else if (ini.is_value("offer_target_system"))
+								mission->offer.system = CreateIdOrNull(ini.get_value_string(0));
+							else if (ini.is_value("offer_faction"))
+								pub::Reputation::GetReputationGroup(mission->offer.group, ini.get_value_string(0));
+							else if (ini.is_value("offer_string_id"))
+								mission->offer.text = ini.get_value_int(0);
+							else if (ini.is_value("offer_reward"))
+								mission->offer.reward = ini.get_value_int(0);
+							else if (ini.is_value("offer_bases"))
+							{
+								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
+									mission->offer.bases.push_back(CreateIdOrNull(ini.get_value_string(index)));
+							}
 						}
+						// Never automatically start missions which are offered on the mission board.
+						if (mission->offer.type != pub::GF::MissionType::Unknown)
+							mission->active = false;
 						missionArchetypes.push_back(mission);
 					}
 
@@ -629,10 +666,25 @@ namespace Missions
 				ini.close();
 			}
 		}
-	}
 
-	uint lastMissionId = 0;
-	static bool StartMission(const std::string& missionName)
+		for (const auto& missionArch : missionArchetypes)
+		{
+			if (missionArch->offer.type != pub::GF::MissionType::Unknown && !missionArch->offer.bases.empty())
+			{
+				MissionBoard::MissionOffer offer;
+				offer.type = missionArch->offer.type;
+				offer.system = missionArch->offer.system;
+				offer.group = missionArch->offer.group;
+				offer.text = missionArch->offer.text;
+				offer.reward = missionArch->offer.reward;
+				const uint offerId = MissionBoard::AddCustomMission(offer, missionArch->offer.bases);
+				missionNamesByOfferId.insert({ offerId, missionArch->name });
+			}
+		}
+	}
+	
+	uint nextMissionId = 1;
+	static uint CreateMission(const std::string& missionName)
 	{
 		MissionArchetypePtr foundMissionArchetype = nullptr;
 		for (const auto& mission : missionArchetypes)
@@ -644,17 +696,32 @@ namespace Missions
 			}
 		}
 		if (!foundMissionArchetype)
-			return false;
+			return 0;
 
 		for (const auto& mission : missions)
 		{
 			if (mission.second.archetype->name == missionName)
-				return false;
+				return 0;
 		}
-		const auto& entry = missions.try_emplace(lastMissionId, lastMissionId, foundMissionArchetype);
-		lastMissionId++;
-		entry.first->second.Start();
-		return true;
+		const auto& entry = missions.try_emplace(nextMissionId, nextMissionId, foundMissionArchetype);
+		nextMissionId++;
+		return entry.first->second.id;
+	}
+
+	void StartMissionByOfferId(const uint offerId, const uint clientId)
+	{
+		const auto& entry = missionNamesByOfferId.find(offerId);
+		if (entry != missionNamesByOfferId.end())
+		{
+			const uint missionId = CreateMission(entry->second);
+			MissionObject object;
+			object.type = MissionObjectType::Client;
+			object.id = clientId;
+			auto& mission = missions.at(missionId);
+			mission.AddLabelToObject(object, CreateID("player"));
+			mission.Start();
+			missionNamesByOfferId.erase(entry);
+		}
 	}
 
 	bool initialized = false;
@@ -664,10 +731,16 @@ namespace Missions
 			return;
 		initialized = true;
 
+		LoadSettings();
+
 		for (const auto& missionArchetype : missionArchetypes)
 		{
 			if (missionArchetype->active)
-				StartMission(missionArchetype->name);
+			{
+				const uint missionId = CreateMission(missionArchetype->name);
+				if (missionId > 0)
+					missions.at(missionId).Start();
+			}
 		}
 	}
 
@@ -989,8 +1062,12 @@ namespace Missions
 			}
 
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
-			if (StartMission(targetNickname))
+			const uint missionId = CreateMission(targetNickname);
+			if (missionId > 0)
+			{
+				missions.at(missionId).Start();
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.\n");
+			}
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.\n");
 			return true;
@@ -1013,22 +1090,6 @@ namespace Missions
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.\n");
 			return true;
 		}
-		else if (IS_CMD("reset_missions"))
-		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
-			const uint clientId = ((CInGame*)cmds)->iClientID;
-			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
-			{
-				PrintUserCmdText(clientId, L"ERR No permission\n");
-				return false;
-			}
-
-			KillMissions();
-			initialized = false;
-			PrintUserCmdText(clientId, L"Resetted all missions\n");
-			return true;
-		}
 		else if (IS_CMD("reload_missions"))
 		{
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -1041,7 +1102,6 @@ namespace Missions
 			}
 
 			KillMissions();
-			LoadSettings();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Ended and reloaded all missions\n");
 			return true;

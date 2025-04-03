@@ -8,7 +8,6 @@ This mission scripting system is mostly a re-implementation of Freelancer’s ow
 
 - `start_mission <mission nickname>` Admin command (requires EVENT permission) to start this mission.
 - `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission.
-- `reset_missions` Admin command (requires EVENT permission) to stop all missions and start initially active missions.
 - `reload_missions` Admin command (requires EVENT permission) to stop all missions, reload them again from files, and start initially active missions. Do not use too fast or server will crash due to system-blocked INI files.
 
 You may start as many different mission at any time. However, only one instance of the same mission can run at the same time.
@@ -25,10 +24,24 @@ The following explains the available sections and their key-values. Key-values a
 
 The head of any mission. All sections following this one will be assigned to this mission. This also means you can put multiple `Mission` into one file with their respective following contents.
 
+To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player accepting the mission will be automatically added to the label `player` for further reference in the mission.
+
 - `nickname` The name of the mission. Used for admin commands and debug output.
     1. `STRING` The name. Must be unique among all missions on the server.
-- `[initstate]` Whether this mission starts directly at server startup.
+- `[initstate]` Whether this mission starts directly at server startup. Ignored if `offer_type` is given.
     1. `ACTIVE|INACTIVE :INACTIVE` The initial state.
+- `[offer_type]`
+    1. `DestroyShips|DestroyInstallation|DestroyContraband|Assassinate|CapturePrisoner|RetrieveContraband` Defining the icon displayed on the Mission Board.
+- `[offer_target_system]`
+    1. `STRING :0` The system nickname this mission will take the player to.
+- `[offer_faction]`
+    1. `STRING` The faction name offering this mission. If the player has less than the (default) -0.2 reputation with it, this mission will not be displayed.
+- `[offer_string_id]`
+    1. `INTEGER :0` The string id for the detailed Mission Board text box.
+- `[offer_reward]`
+    1. `INTEGER :0` Amount of cash displayed on the Mission Board as reward.
+- `[offer_bases]`
+    1. `STRING` A list of base nicknames this mission will be visible on the Mission Board.
 
 ## `[MsnSolar]`
 

@@ -7,10 +7,21 @@
 
 namespace Missions
 {
+	struct MissionOffer
+	{
+		pub::GF::MissionType type = pub::GF::MissionType::Unknown;
+		uint system = 0;
+		uint group = 0;
+		uint text = 0;
+		uint reward = 0;
+		std::vector<uint> bases;
+	};
+
 	struct MissionArchetype
 	{
 		std::string name = "";
 		bool active = false;
+		MissionOffer offer;
 		std::vector<TriggerArchetypePtr> triggers;
 		std::vector<MsnSolarArchetypePtr> solars;
 		std::vector<NpcArchetypePtr> npcs;

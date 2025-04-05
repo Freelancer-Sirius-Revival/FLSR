@@ -6,6 +6,7 @@
 #include "Missions/LootProps.h"
 #include "Missions/Missions.h"
 #include "MissionBoard.h"
+#include "AutoTurret.h"
 
 std::mutex m_Mutex;
 
@@ -265,6 +266,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&AutoTurret::CGuidedInit, PLUGIN_HkIEngine_CGuided_init, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&AutoTurret::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     
     return p_PI;
 }

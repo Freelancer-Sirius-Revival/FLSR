@@ -125,6 +125,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="MissionBoard.cpp" />
+    <ClCompile Include="AutoTurret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -328,6 +329,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="MissionBoard.h" />
+    <ClInclude Include="AutoTurret.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

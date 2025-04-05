@@ -6,7 +6,6 @@ namespace Missions
 	std::vector<MissionArchetypePtr> missionArchetypes;
 
 	std::unordered_map<uint, Mission> missions;
-	std::unordered_set<uint> runningMissionIds;
 
 	static void ClearMusic(const uint clientId)
 	{
@@ -34,8 +33,6 @@ namespace Missions
 
 	Mission::~Mission()
 	{
-		runningMissionIds.erase(id);
-
 		// Destroy all triggers first. This is to unregister all conditions before destroying any left-overs of this mission.
 		triggers.clear();
 
@@ -54,7 +51,6 @@ namespace Missions
 
 	void Mission::Start()
 	{
-		runningMissionIds.insert(id);
 		std::vector<uint> triggerIds;
 		for (const auto& triggerEntry : triggers)
 		{
@@ -70,9 +66,9 @@ namespace Missions
 		}
 	}
 
-	void Mission::QueueTriggerExecution(const uint triggerId)
+	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
 	{
-		triggerExecutionQueue.push(triggerId);
+		triggerExecutionQueue.push({ triggerId, activator });
 
 		// Directly after try to process all queued triggers.
 		if (triggerExecutionRunning)
@@ -81,9 +77,10 @@ namespace Missions
 
 		while (!triggerExecutionQueue.empty() && !ended)
 		{
-			Trigger& trigger = triggers.at(triggerExecutionQueue.front());
+			const auto& entry = triggerExecutionQueue.front();
+			Trigger& trigger = triggers.at(entry.first);
 			triggerExecutionQueue.pop();
-			trigger.Execute();
+			trigger.Execute(entry.second);
 			if (!trigger.archetype->repeatable)
 				triggers.erase(trigger.id);
 		}
@@ -97,7 +94,6 @@ namespace Missions
 	void Mission::End()
 	{
 		ended = true;
-		runningMissionIds.erase(id);
 	}
 
 	void Mission::EvaluateCountConditions(const uint label)

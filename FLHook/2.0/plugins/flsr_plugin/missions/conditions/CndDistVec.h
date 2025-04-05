@@ -15,6 +15,7 @@ namespace Missions
 		CndDistVecArchetypePtr archetype;
 
 		CndDistVec(const ConditionParent& parent, const CndDistVecArchetypePtr conditionArchetype);
+		~CndDistVec();
 		void Register();
 		void Unregister();
 		bool Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId);

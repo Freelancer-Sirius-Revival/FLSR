@@ -104,19 +104,19 @@ namespace Missions
 
 		for (const auto& msnNpc : mission.archetype->msnNpcs)
 		{
-			if (msnNpc->name == msnNpcName)
+			if (msnNpc.name == msnNpcName)
 			{
 				for (const auto& npc : mission.archetype->npcs)
 				{
-					if (CreateID(npc->name.c_str()) == msnNpc->npcId)
+					if (CreateID(npc.name.c_str()) == msnNpc.npcId)
 					{
-						const uint objId = CreateNPC(*this, *msnNpc, *npc);
+						const uint objId = CreateNPC(*this, msnNpc, npc);
 						if (objId)
 						{
-							mission.AddObject(objId, CreateID(msnNpc->name.c_str()), msnNpc->labels);
+							mission.AddObject(objId, CreateID(msnNpc.name.c_str()), msnNpc.labels);
 							if (const auto& objectivesEntry = mission.archetype->objectives.find(objectivesId); objectivesEntry != mission.archetype->objectives.end())
 							{
-								const Objectives objectives(mission.id, objId, objectivesEntry->second->objectives);
+								const Objectives objectives(mission.id, objId, objectivesEntry->second.objectives);
 								mission.objectivesByObjectId.insert({ objId, objectives });
 								mission.objectivesByObjectId[objId].Progress();
 							}

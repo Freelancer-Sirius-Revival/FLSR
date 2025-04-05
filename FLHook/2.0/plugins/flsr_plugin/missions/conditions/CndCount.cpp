@@ -10,6 +10,11 @@ namespace Missions
 		archetype(conditionArchetype)
 	{}
 
+	CndCount::~CndCount()
+	{
+		Unregister();
+	}
+
 	void CndCount::Register()
 	{
 		countConditionsByMission[parent.missionId].insert(this);
@@ -41,14 +46,6 @@ namespace Missions
 				matches = count > archetype->count;
 				break;
 		}
-
-		if (matches)
-		{
-			const auto& mission = missions.at(parent.missionId);
-			const auto& trigger = mission.triggers.at(parent.triggerId);
-			ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_Count " + std::to_wstring(archetype->label) + L" with " + std::to_wstring(count) + L"\n");
-		}
-
 		return matches;
 	}
 }

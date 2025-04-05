@@ -10,7 +10,7 @@ namespace Missions
 
 		for (auto it = mission.archetype->solars.begin(); it != mission.archetype->solars.end(); it++)
 		{
-			const auto& solar = **it;
+			const auto& solar = *it;
 			if (solar.name == solarName)
 			{
 				const uint objId = SolarSpawn::SpawnSolarByName(mission.archetype->name + ":" + solar.name);

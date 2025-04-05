@@ -11,6 +11,11 @@ namespace Missions
 		passedTimeInS(0.0f)
 	{}
 
+	CndTimer::~CndTimer()
+	{
+		Unregister();
+	}
+
 	void CndTimer::Register()
 	{
 		timerConditions.insert(this);
@@ -24,13 +29,11 @@ namespace Missions
 	bool CndTimer::Matches(const float elapsedTimeInS)
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
 		passedTimeInS += elapsedTimeInS;
 		if (passedTimeInS >= archetype->timeInS)
 		{
-			ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_Timer " + std::to_wstring(archetype->timeInS) + L"s \n");
-			trigger.activator.type = MissionObjectType::Client;
-			trigger.activator.id = 0;
+			activator.type = MissionObjectType::Client;
+			activator.id = 0;
 			return true;
 		}
 		return false;

@@ -10,6 +10,11 @@ namespace Missions
 		archetype(conditionArchetype)
 	{}
 
+	CndDistVec::~CndDistVec()
+	{
+		Unregister();
+	}
+
 	void CndDistVec::Register()
 	{
 		distVecConditions.insert(this);
@@ -29,13 +34,6 @@ namespace Missions
 	bool CndDistVec::Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId)
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
-		std::wstring outputPretext;
-		if (parent.triggerId)
-			outputPretext = stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_DistVec " + std::to_wstring(archetype->objNameOrLabel);
-		else
-			outputPretext = stows(mission.archetype->name) + L"-> Reached Waypoint: " + std::to_wstring(archetype->objNameOrLabel);
-
 		std::unordered_set<uint> validClientIds;
 		std::unordered_set<uint> validObjIds;
 		bool strangerRequested = archetype->objNameOrLabel == Stranger;
@@ -62,9 +60,8 @@ namespace Missions
 		{
 			if (entry.second.systemId == archetype->systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && isInside(entry.second, archetype))
 			{
-				trigger.activator.type = MissionObjectType::Client;
-				trigger.activator.id = entry.first;
-				ConPrint(outputPretext + L" client[" + std::to_wstring(trigger.activator.id) + L"]\n");
+				activator.type = MissionObjectType::Client;
+				activator.id = entry.first;
 				return true;
 			}
 		}
@@ -74,9 +71,8 @@ namespace Missions
 			{
 				if (entry.second.systemId == archetype->systemId && validObjIds.contains(entry.first) && isInside(entry.second, archetype))
 				{
-					trigger.activator.type = MissionObjectType::Object;
-					trigger.activator.id = entry.first;
-					ConPrint(outputPretext + L" obj[" + std::to_wstring(trigger.activator.id) + L"]\n");
+					activator.type = MissionObjectType::Object;
+					activator.id = entry.first;
 					return true;
 				}
 			}

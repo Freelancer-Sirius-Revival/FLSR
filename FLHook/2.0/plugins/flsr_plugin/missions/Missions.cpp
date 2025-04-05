@@ -42,10 +42,8 @@ namespace Missions
 		return strlen(str) > 0 ? CreateID(str) : 0;
 	}
 
-	void LoadSettings()
+	static void LoadSettings()
 	{
-		missionArchetypes.clear();
-
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
 		const std::string missionDirectory = std::string(currentDirectory) + "\\flhook_plugins\\missions\\";
@@ -114,186 +112,186 @@ namespace Missions
 
 					if (ini.is_header("Npc"))
 					{
-						NpcArchetypePtr npc(new NpcArchetype());
+						NpcArchetype npc;
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
 							{
-								npc->name = ToLower(ini.get_value_string(0));
+								npc.name = ToLower(ini.get_value_string(0));
 							}
 							else if (ini.is_value("archetype"))
 							{
-								npc->archetypeId = CreateIdOrNull(ini.get_value_string(0));
+								npc.archetypeId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("loadout"))
 							{
-								npc->loadoutId = CreateIdOrNull(ini.get_value_string(0));
+								npc.loadoutId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("state_graph"))
 							{
-								npc->stateGraph = ToLower(ini.get_value_string(0));
+								npc.stateGraph = ToLower(ini.get_value_string(0));
 							}
 							else if (ini.is_value("faction"))
 							{
-								npc->faction = ini.get_value_string(0);
+								npc.faction = ini.get_value_string(0);
 							}
 							else if (ini.is_value("pilot"))
 							{
-								npc->pilotId = CreateIdOrNull(ini.get_value_string(0));
+								npc.pilotId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("voice"))
 							{
-								npc->voiceId = CreateIdOrNull(ini.get_value_string(0));
+								npc.voiceId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("space_costume"))
 							{
-								npc->costume.head = CreateIdOrNull(ini.get_value_string(0));
-								npc->costume.body = CreateIdOrNull(ini.get_value_string(1));
-								npc->costume.accessories = 0;
+								npc.costume.head = CreateIdOrNull(ini.get_value_string(0));
+								npc.costume.body = CreateIdOrNull(ini.get_value_string(1));
+								npc.costume.accessories = 0;
 								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
 								{
 									const char* accessoryNickname = ini.get_value_string(index + 2);
 									if (strlen(accessoryNickname) == 0)
 										break;
-									npc->costume.accessory[index] = CreateID(accessoryNickname);
-									npc->costume.accessories++;
+									npc.costume.accessory[index] = CreateID(accessoryNickname);
+									npc.costume.accessories++;
 								}
 							}
 							else if (ini.is_value("level"))
 							{
-								npc->level = ini.get_value_int(0);
+								npc.level = ini.get_value_int(0);
 							}
 						}
-						if (npc->archetypeId && !npc->name.empty() && !npc->stateGraph.empty())
+						if (npc.archetypeId && !npc.name.empty() && !npc.stateGraph.empty())
 							missionArchetypes.back()->npcs.push_back(npc);
 					}
 
 					if (ini.is_header("MsnNpc"))
 					{
-						MsnNpcArchetypePtr npc(new MsnNpcArchetype());
-						npc->position.x = 0;
-						npc->position.y = 0;
-						npc->position.z = 0;
-						npc->orientation = EulerMatrix(npc->position);
+						MsnNpcArchetype npc;
+						npc.position.x = 0;
+						npc.position.y = 0;
+						npc.position.z = 0;
+						npc.orientation = EulerMatrix(npc.position);
 
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-								npc->name = ToLower(ini.get_value_string(0));
+								npc.name = ToLower(ini.get_value_string(0));
 							else if (ini.is_value("string_id"))
-								npc->idsName = ini.get_value_int(0);
+								npc.idsName = ini.get_value_int(0);
 							else if (ini.is_value("system"))
-								npc->systemId = CreateIdOrNull(ini.get_value_string(0));
+								npc.systemId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("position"))
-								npc->position = ini.get_vector();
+								npc.position = ini.get_vector();
 							else if (ini.is_value("rotate"))
-								npc->orientation = EulerMatrix(ini.get_vector());
+								npc.orientation = EulerMatrix(ini.get_vector());
 							else if (ini.is_value("npc"))
-								npc->npcId = CreateIdOrNull(ini.get_value_string(0));
+								npc.npcId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("hitpoints"))
-								npc->hitpoints = ini.get_value_int(0);
+								npc.hitpoints = ini.get_value_int(0);
 							else if (ini.is_value("pilot_job"))
-								npc->pilotJobId = CreateIdOrNull(ini.get_value_string(0));
+								npc.pilotJobId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("arrival_obj"))
-								npc->startingObjId = CreateIdOrNull(ini.get_value_string(0));
+								npc.startingObjId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("label"))
-								npc->labels.insert(CreateIdOrNull(ini.get_value_string(0)));
+								npc.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
 						}
-						if (npc->npcId && !npc->name.empty() && npc->systemId)
+						if (npc.npcId && !npc.name.empty() && npc.systemId)
 							missionArchetypes.back()->msnNpcs.push_back(npc);
 					}
 
 					if (ini.is_header("MsnSolar"))
 					{
-						MsnSolarArchetypePtr solar(new MsnSolarArchetype());
-						solar->position.x = 0;
-						solar->position.y = 0;
-						solar->position.z = 0;
-						solar->orientation = EulerMatrix(solar->position);
+						MsnSolarArchetype solar;
+						solar.position.x = 0;
+						solar.position.y = 0;
+						solar.position.z = 0;
+						solar.orientation = EulerMatrix(solar.position);
 
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
 							{
-								solar->name = ToLower(ini.get_value_string(0));
+								solar.name = ToLower(ini.get_value_string(0));
 							}
 							else if (ini.is_value("string_id"))
 							{
-								solar->idsName = ini.get_value_int(0);
+								solar.idsName = ini.get_value_int(0);
 							}
 							else if (ini.is_value("system"))
 							{
-								solar->systemId = CreateIdOrNull(ini.get_value_string(0));
+								solar.systemId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("position"))
 							{
-								solar->position = ini.get_vector();
+								solar.position = ini.get_vector();
 							}
 							else if (ini.is_value("rotate"))
 							{
-								solar->orientation = EulerMatrix(ini.get_vector());
+								solar.orientation = EulerMatrix(ini.get_vector());
 							}
 							else if (ini.is_value("archetype"))
 							{
-								solar->archetypeId = CreateIdOrNull(ini.get_value_string(0));
+								solar.archetypeId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("loadout"))
 							{
-								solar->loadoutId = CreateIdOrNull(ini.get_value_string(0));
+								solar.loadoutId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("base"))
 							{
-								solar->baseId = CreateIdOrNull(ini.get_value_string(0));
+								solar.baseId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("faction"))
 							{
-								solar->faction = ini.get_value_string(0);
+								solar.faction = ini.get_value_string(0);
 							}
 							else if (ini.is_value("pilot"))
 							{
-								solar->pilotId = CreateIdOrNull(ini.get_value_string(0));
+								solar.pilotId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("voice"))
 							{
-								solar->voiceId = CreateIdOrNull(ini.get_value_string(0));
+								solar.voiceId = CreateIdOrNull(ini.get_value_string(0));
 							}
 							else if (ini.is_value("space_costume"))
 							{
-								solar->costume.headId = CreateIdOrNull(ini.get_value_string(0));
-								solar->costume.bodyId = CreateIdOrNull(ini.get_value_string(1));
+								solar.costume.headId = CreateIdOrNull(ini.get_value_string(0));
+								solar.costume.bodyId = CreateIdOrNull(ini.get_value_string(1));
 								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
 								{
 									const char* accessoryNickname = ini.get_value_string(index + 2);
 									if (strlen(accessoryNickname) == 0)
 										break;
-									solar->costume.accessoryIds.push_back(CreateID(accessoryNickname));
+									solar.costume.accessoryIds.push_back(CreateID(accessoryNickname));
 								}
 							}
 							else if (ini.is_value("label"))
 							{
-								solar->labels.insert(CreateIdOrNull(ini.get_value_string(0)));
+								solar.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
 							}
 						}
 
-						if (solar->archetypeId && !solar->name.empty() && solar->systemId)
+						if (solar.archetypeId && !solar.name.empty() && solar.systemId)
 						{
 							missionArchetypes.back()->solars.push_back(solar);
 							SolarSpawn::SolarArchetype solarArch;
-							solarArch.archetypeId = solar->archetypeId;
-							solarArch.loadoutId = solar->loadoutId;
-							solarArch.nickname = missionArchetypes.back()->name + ":" + solar->name;
-							solarArch.idsName = solar->idsName;
-							solarArch.position = solar->position;
-							solarArch.orientation = solar->orientation;
-							solarArch.systemId = solar->systemId;
-							solarArch.baseId = solar->baseId;
-							solarArch.affiliation = solar->faction;
-							solarArch.pilotId = solar->pilotId;
-							solarArch.hitpointsPercentage = solar->hitpointsPercentage;
-							solarArch.voiceId = solar->voiceId;
-							solarArch.headId = solar->costume.headId;
-							solarArch.bodyId = solar->costume.bodyId;
-							solarArch.accessoryIds = std::vector(solar->costume.accessoryIds);
+							solarArch.archetypeId = solar.archetypeId;
+							solarArch.loadoutId = solar.loadoutId;
+							solarArch.nickname = missionArchetypes.back()->name + ":" + solar.name;
+							solarArch.idsName = solar.idsName;
+							solarArch.position = solar.position;
+							solarArch.orientation = solar.orientation;
+							solarArch.systemId = solar.systemId;
+							solarArch.baseId = solar.baseId;
+							solarArch.affiliation = solar.faction;
+							solarArch.pilotId = solar.pilotId;
+							solarArch.hitpointsPercentage = solar.hitpointsPercentage;
+							solarArch.voiceId = solar.voiceId;
+							solarArch.headId = solar.costume.headId;
+							solarArch.bodyId = solar.costume.bodyId;
+							solarArch.accessoryIds = std::vector(solar.costume.accessoryIds);
 							SolarSpawn::AppendSolarArchetype(solarArch);
 						}
 					}
@@ -301,7 +299,7 @@ namespace Missions
 					if (ini.is_header("ObjList"))
 					{
 						std::string nickname = "";
-						ObjectivesArchetypePtr objectives(new ObjectivesArchetype());
+						ObjectivesArchetype objectives;
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
@@ -321,7 +319,7 @@ namespace Missions
 								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(4));
 								arch->startWaitDistance = ini.get_value_float(5);
 								arch->endWaitDistance = ini.get_value_float(6);
-								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
+								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
 							}
 							else if (ini.is_value("GotoVec"))
 							{
@@ -340,7 +338,7 @@ namespace Missions
 								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(6));
 								arch->startWaitDistance = ini.get_value_float(7);
 								arch->endWaitDistance = ini.get_value_float(8);
-								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
+								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
 							}
 							else if (ini.is_value("GotoSpline"))
 							{
@@ -363,7 +361,7 @@ namespace Missions
 								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(15));
 								arch->startWaitDistance = ini.get_value_float(16);
 								arch->endWaitDistance = ini.get_value_float(17);
-								objectives->objectives.push_back({ ObjectiveType::Goto, arch });
+								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
 							}
 						}
 						if (!nickname.empty())
@@ -761,19 +759,27 @@ namespace Missions
 
 	static void KillMissions()
 	{
-		missions.clear();
+		while (missions.begin() != missions.end())
+			missions.erase(missions.begin());
+	}
+
+	void __stdcall Shutdown()
+	{
+		returncode = DEFAULT_RETURNCODE;
+		// Remove all missions to prevent any Destructor calls on FL functionality to cause crashes.
+		KillMissions();
 	}
 
 	static void RemoveObjectFromMissions(const uint objId)
 	{
-		for (const auto& missionId : runningMissionIds)
-			missions.at(missionId).RemoveObject(objId);
+		for (auto& entry : missions)
+			entry.second.RemoveObject(objId);
 	}
 
 	static void RemoveClientFromMissions(const uint client)
 	{
-		for (const auto& missionId : runningMissionIds)
-			missions.at(missionId).RemoveClient(client);
+		for (auto& entry : missions)
+			entry.second.RemoveClient(client);
 	}
 
 	static void DestroyNonLootingEquipment(const IObjRW* killedObject, const uint killerId)
@@ -1107,6 +1113,7 @@ namespace Missions
 				MissionBoard::DeleteCustomMission(entry.first);
 
 			KillMissions();
+			missionArchetypes.clear();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Ended and reloaded all missions\n");
 			return true;

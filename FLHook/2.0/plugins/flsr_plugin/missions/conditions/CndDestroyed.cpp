@@ -11,6 +11,11 @@ namespace Missions
 		count(0)
 	{}
 
+	CndDestroyed::~CndDestroyed()
+	{
+		Unregister();
+	}
+
 	void CndDestroyed::Register()
 	{
 		destroyedConditions.insert(this);
@@ -24,13 +29,9 @@ namespace Missions
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
 		// If count -1 and the awaited objects do not exist, see this condition as fulfilled. "Stranger" also is fulfilled then because otherwise all players must leave server for fulfill.
 		if (archetype->count < 0 && (archetype->objNameOrLabel == Stranger || (!mission.objectIdsByName.contains(archetype->objNameOrLabel) && !mission.objectsByLabel.contains(archetype->objNameOrLabel))))
-		{
-			ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_Destroyed " + std::to_wstring(archetype->objNameOrLabel) + L" none existing\n");
 			return true;
-		}
 		
 		// Check destruction conditions.
 		if ((archetype->condition == DestroyedCondition::SILENT && killed) || (archetype->condition == DestroyedCondition::EXPLODE && !killed))
@@ -100,24 +101,17 @@ namespace Missions
 		if (foundObjectType == 0)
 			return false;
 
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_Destroyed " + std::to_wstring(archetype->objNameOrLabel));
 		bool foundAll = false;
 		if (archetype->count < 0)
-		{
 			foundAll = foundObjectType <= 2 || (foundObjectType == 3 && mission.objectsByLabel[archetype->objNameOrLabel].size() <= 1);
-			ConPrint(L" all\n");
-		}
 		else
-		{
 			foundAll = ++count >= archetype->count;
-			ConPrint(L" " + std::to_wstring(count) + L" of " + std::to_wstring(archetype->count) + L"\n");
-		}
 
 		if (foundAll)
 		{
 			const uint clientId = HkGetClientIDByShip(killerId);
-			trigger.activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
-			trigger.activator.id = clientId ? clientId : killerId;
+			activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
+			activator.id = clientId ? clientId : killerId;
 			return true;
 		}
 

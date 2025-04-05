@@ -9,6 +9,7 @@ namespace Missions
 		CndCountArchetypePtr archetype;
 
 		CndCount(const ConditionParent& parent, const CndCountArchetypePtr conditionArchetype);
+		~CndCount();
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint baseId);

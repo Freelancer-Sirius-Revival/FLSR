@@ -4,6 +4,7 @@
 namespace Missions
 {
     void Initialize();
+    void __stdcall Shutdown();
     void StartMissionByOfferId(const uint offerId, const uint clientId);
     void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId);
     void __stdcall Elapse_Time_AFTER(float seconds);

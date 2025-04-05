@@ -19,6 +19,7 @@ namespace Missions
 	{
 		const ConditionParent parent;
 		const ConditionType type;
+		MissionObject activator;
 
 		Condition(const ConditionParent& parent, const ConditionType type);
 		virtual ~Condition();

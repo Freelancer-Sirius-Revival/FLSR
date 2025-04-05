@@ -20,6 +20,6 @@ namespace Missions
 
 	void Condition::ExecuteTrigger()
 	{
-		missions.at(parent.missionId).QueueTriggerExecution(parent.triggerId);
+		missions.at(parent.missionId).QueueTriggerExecution(parent.triggerId, activator);
 	}
 }

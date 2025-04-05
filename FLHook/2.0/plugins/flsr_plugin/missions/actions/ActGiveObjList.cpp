@@ -9,7 +9,7 @@ namespace Missions
 
 		if (const auto& objectivesEntry = mission.archetype->objectives.find(objectivesId); objectivesEntry != mission.archetype->objectives.end())
 		{
-			const Objectives objectives(mission.id, objId, objectivesEntry->second->objectives);
+			const Objectives objectives(mission.id, objId, objectivesEntry->second.objectives);
 			if (mission.objectivesByObjectId.contains(objId))
 				mission.objectivesByObjectId.erase(objId);
 			mission.objectivesByObjectId.insert({ objId, objectives });

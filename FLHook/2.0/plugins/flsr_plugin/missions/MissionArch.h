@@ -23,10 +23,10 @@ namespace Missions
 		bool active = false;
 		MissionOffer offer;
 		std::vector<TriggerArchetypePtr> triggers;
-		std::vector<MsnSolarArchetypePtr> solars;
-		std::vector<NpcArchetypePtr> npcs;
-		std::vector<MsnNpcArchetypePtr> msnNpcs;
-		std::unordered_map<unsigned int, ObjectivesArchetypePtr> objectives;
+		std::vector<MsnSolarArchetype> solars;
+		std::vector<NpcArchetype> npcs;
+		std::vector<MsnNpcArchetype> msnNpcs;
+		std::unordered_map<uint, ObjectivesArchetype> objectives;
 	};
 	typedef std::shared_ptr<MissionArchetype> MissionArchetypePtr;
 

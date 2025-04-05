@@ -10,6 +10,7 @@ namespace Missions
 		float passedTimeInS;
 
 		CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype);
+		~CndTimer();
 		void Register();
 		void Unregister();
 		bool Matches(const float elapsedTimeInS);

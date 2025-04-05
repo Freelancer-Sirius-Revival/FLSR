@@ -10,6 +10,11 @@ namespace Missions
 		archetype(conditionArchetype)
 	{}
 
+	CndSpaceExit::~CndSpaceExit()
+	{
+		Unregister();
+	}
+
 	void CndSpaceExit::Register()
 	{
 		spaceExitConditions.insert(this);
@@ -23,16 +28,12 @@ namespace Missions
 	bool CndSpaceExit::Matches(const uint clientId, const uint systemId)
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
-		const std::wstring outputPretext = stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_SpaceExit " + std::to_wstring(archetype->objNameOrLabel) + L" from " + std::to_wstring(archetype->systemId);
-
 		if (archetype->objNameOrLabel == Stranger)
 		{
 			if (!mission.clientIds.contains(clientId) && (!archetype->systemId || archetype->systemId == systemId))
 			{
-				trigger.activator.type = MissionObjectType::Client;
-				trigger.activator.id = clientId;
-				ConPrint(outputPretext + L" client[" + std::to_wstring(clientId) + L"]\n");
+				activator.type = MissionObjectType::Client;
+				activator.id = clientId;
 				return true;
 			}
 		}
@@ -42,8 +43,7 @@ namespace Missions
 			{
 				if (object.type == MissionObjectType::Client && object.id == clientId && (!archetype->systemId || archetype->systemId == systemId))
 				{
-					trigger.activator = object;
-					ConPrint(outputPretext + L" client[" + std::to_wstring(object.id) + L"]\n");
+					activator = object;
 					return true;
 				}
 			}

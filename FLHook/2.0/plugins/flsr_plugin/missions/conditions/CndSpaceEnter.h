@@ -9,6 +9,7 @@ namespace Missions
 		CndSpaceEnterArchetypePtr archetype;
 
 		CndSpaceEnter(const ConditionParent& parent, const CndSpaceEnterArchetypePtr conditionArchetype);
+		~CndSpaceEnter();
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint systemId);

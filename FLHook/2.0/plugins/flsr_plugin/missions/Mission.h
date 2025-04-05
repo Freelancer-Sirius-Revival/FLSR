@@ -22,13 +22,13 @@ namespace Missions
 	private:
 		bool ended = false;
 		bool triggerExecutionRunning = false;
-		std::queue<uint> triggerExecutionQueue;
+		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
 
 	public:
 		Mission(const uint id, const MissionArchetypePtr missionArchetype);
 		virtual ~Mission();
 		void Start();
-		void QueueTriggerExecution(const uint triggerId);
+		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
 		void End();
 		void EvaluateCountConditions(const uint label);
 		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);
@@ -38,5 +38,4 @@ namespace Missions
 		void RemoveClient(const uint clientId);
 	};
 	extern std::unordered_map<uint, Mission> missions;
-	extern std::unordered_set<uint> runningMissionIds;
 }

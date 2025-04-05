@@ -11,6 +11,7 @@ namespace Missions
 		int count;
 
 		CndDestroyed(const ConditionParent& parent, const CndDestroyedArchetypePtr conditionArchetype);
+		~CndDestroyed();
 		void Register();
 		void Unregister();
 		bool Matches(const IObjRW* killedObject, const bool killed, const uint killerId);

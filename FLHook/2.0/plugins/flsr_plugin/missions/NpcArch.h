@@ -15,7 +15,6 @@ namespace Missions
 		Costume costume;
 		byte level = 0;
 	};
-	typedef std::shared_ptr<NpcArchetype> NpcArchetypePtr;
 
 	struct MsnNpcArchetype
 	{
@@ -30,5 +29,4 @@ namespace Missions
 		int hitpoints = -1;
 		std::unordered_set<uint> labels;
 	};
-	typedef std::shared_ptr<MsnNpcArchetype> MsnNpcArchetypePtr;
 }

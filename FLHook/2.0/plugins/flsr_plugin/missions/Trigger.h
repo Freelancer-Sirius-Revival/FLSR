@@ -19,12 +19,11 @@ namespace Missions
 		const TriggerArchetypePtr archetype;
 		ConditionPtr condition;
 		TriggerState state;
-		MissionObject activator;
 
 		Trigger(const unsigned int id, const unsigned int missionId, const TriggerArchetypePtr triggerArchetype);
 		virtual ~Trigger();
 		void Activate();
 		void Deactivate();
-		void Execute();
+		void Execute(const MissionObject& activator);
 	};
 }

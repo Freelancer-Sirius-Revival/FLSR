@@ -10,6 +10,11 @@ namespace Missions
 		archetype(conditionArchetype)
 	{}
 
+	CndBaseEnter::~CndBaseEnter()
+	{
+		Unregister();
+	}
+
 	void CndBaseEnter::Register()
 	{
 		baseEnterConditions.insert(this);
@@ -23,16 +28,12 @@ namespace Missions
 	bool CndBaseEnter::Matches(const uint clientId, const uint baseId)
 	{
 		auto& mission = missions.at(parent.missionId);
-		auto& trigger = mission.triggers.at(parent.triggerId);
-		const std::wstring outputPretext = stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Cnd_BaseEnter " + std::to_wstring(archetype->objNameOrLabel) + L" on " + std::to_wstring(archetype->baseId);
-
 		if (archetype->objNameOrLabel == Stranger)
 		{
 			if (!mission.clientIds.contains(clientId) && (!archetype->baseId || archetype->baseId == baseId))
 			{
-				trigger.activator.type = MissionObjectType::Client;
-				trigger.activator.id = clientId;
-				ConPrint(outputPretext + L" client[" + std::to_wstring(clientId) + L"]\n");
+				activator.type = MissionObjectType::Client;
+				activator.id = clientId;
 				return true;
 			}
 		}
@@ -42,8 +43,7 @@ namespace Missions
 			{
 				if (object.type == MissionObjectType::Client && object.id == clientId && (!archetype->baseId || archetype->baseId == baseId))
 				{
-					trigger.activator = object;
-					ConPrint(outputPretext + L" client[" + std::to_wstring(object.id) + L"]\n");
+					activator = object;
 					return true;
 				}
 			}

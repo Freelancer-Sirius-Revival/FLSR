@@ -9,6 +9,7 @@ namespace Missions
 		CndBaseEnterArchetypePtr archetype;
 
 		CndBaseEnter(const ConditionParent& parent, const CndBaseEnterArchetypePtr conditionArchetype);
+		~CndBaseEnter();
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint baseId);

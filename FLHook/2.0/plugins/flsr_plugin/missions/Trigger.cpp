@@ -12,23 +12,6 @@
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCount.h"
-#include "Actions/ActDebugMsg.h"
-#include "Actions/ActEndMission.h"
-#include "Actions/ActActTrigger.h"
-#include "Actions/ActAddLabel.h"
-#include "Actions/ActRemoveLabel.h"
-#include "Actions/ActDestroy.h"
-#include "Actions/ActLightFuse.h"
-#include "Actions/ActSpawnSolar.h"
-#include "Actions/ActSpawnShip.h"
-#include "Actions/ActPlaySoundEffect.h"
-#include "Actions/ActPlayMusic.h"
-#include "Actions/ActEtherComm.h"
-#include "Actions/ActSendComm.h"
-#include "Actions/ActSetNNObj.h"
-#include "Actions/ActAdjAcct.h"
-#include "Actions/ActAddCargo.h"
-#include "Actions/ActGiveObjList.h"
 
 namespace Missions
 {
@@ -91,7 +74,6 @@ namespace Missions
 		if (state != TriggerState::Inactive)
 			return;
 		state = TriggerState::Active;
-		ConPrint(stows(missions.at(missionId).archetype->name) + L"->" + stows(archetype->name) + L": Activate\n");
 		if (condition != nullptr)
 			condition->Unregister();
 		condition = std::shared_ptr<Condition>(instantiateCondition(ConditionParent(missionId, id), archetype->condition));
@@ -103,23 +85,17 @@ namespace Missions
 		if (state != TriggerState::Active)
 			return;
 		state = TriggerState::Inactive;
-		ConPrint(stows(missions.at(missionId).archetype->name) + L"->" + stows(archetype->name) + L": Deactivate\n");
 		if (condition != nullptr)
 			condition->Unregister();
+		condition = nullptr;
 	}
 
-	void Trigger::Execute()
+	void Trigger::Execute(const MissionObject& activator)
 	{
 		auto& mission = missions.at(missionId);
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(archetype->name) + L": Execute through activator ");
-		if (activator.type == MissionObjectType::Client)
-			ConPrint(L"client[" + std::to_wstring(activator.id) + L"]");
-		else
-			ConPrint(L"obj[" + std::to_wstring(activator.id) + L"]");
-		ConPrint(L"\n");
-
 		if (condition != nullptr)
 			condition->Unregister();
+		condition = nullptr;
 		for (const auto& action : archetype->actions)
 			action->Execute(mission, activator);
 

@@ -351,6 +351,7 @@
     <ClCompile Include="missions\actions\ActUnlightFuse.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="AutoTurret.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -717,6 +718,7 @@
     <ClInclude Include="missions\actions\ActUnlightFuse.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="AutoTurret.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

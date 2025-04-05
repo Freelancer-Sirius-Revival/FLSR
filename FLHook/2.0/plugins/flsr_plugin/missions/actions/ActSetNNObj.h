@@ -1,14 +1,18 @@
 #pragma once
 #include "Action.h"
-#include "ActSetNNObjArch.h"
 
 namespace Missions
 {
 	struct ActSetNNObj : Action
 	{
-		const ActSetNNObjArchetypePtr archetype;
+		uint objNameOrLabel = 0;
+		uint message = 0;
+		uint systemId = 0;
+		Vector position;
+		bool bestRoute = false;
+		uint targetObjName = 0;
 
-		ActSetNNObj(const ActionParent& parent, const ActSetNNObjArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActSetNNObj> ActSetNNObjPtr;
 }

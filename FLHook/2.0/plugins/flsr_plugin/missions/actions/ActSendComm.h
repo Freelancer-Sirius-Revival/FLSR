@@ -1,14 +1,18 @@
 #pragma once
 #include "Action.h"
-#include "ActSendCommArch.h"
 
 namespace Missions
 {
 	struct ActSendComm : Action
 	{
-		const ActSendCommArchetypePtr archetype;
+		uint name = 0;
+		uint senderObjName = 0;
+		uint receiverObjNameOrLabel = 0;
+		std::vector<uint> lines;
+		float delay = 0.5f;
+		bool global = false;
 
-		ActSendComm(const ActionParent& parent, const ActSendCommArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActSendComm> ActSendCommPtr;
 }

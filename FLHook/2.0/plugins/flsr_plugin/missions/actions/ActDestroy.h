@@ -1,14 +1,14 @@
 #pragma once
 #include "Action.h"
-#include "ActDestroyArch.h"
 
 namespace Missions
 {
 	struct ActDestroy : Action
 	{
-		const ActDestroyArchetypePtr archetype;
+		uint objNameOrLabel = 0;
+		DestroyType destroyType = DestroyType::VANISH;
 
-		ActDestroy(const ActionParent& parent, const ActDestroyArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActDestroy> ActDestroyPtr;
 }

@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActEndMission : Action
 	{
-		ActEndMission(const ActionParent& parent);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActEndMission> ActEndMissionPtr;
 }

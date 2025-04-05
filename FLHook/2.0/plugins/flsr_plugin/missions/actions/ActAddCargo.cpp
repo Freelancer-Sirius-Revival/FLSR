@@ -1,52 +1,38 @@
-#include <FLHook.h>
 #include "ActAddCargo.h"
-#include "../Mission.h"
 
 namespace Missions
 {
-	ActAddCargo::ActAddCargo(const ActionParent& parent, const ActAddCargoArchetypePtr actionArchetype) :
-		Action(parent, ActionType::Act_LightFuse),
-		archetype(actionArchetype)
-	{}
-
-	static bool AddCargo(const uint clientId, const ActAddCargoArchetype& archetype)
+	static bool AddCargo(const uint clientId, const ActAddCargo& action)
 	{
 		float remainingHold;
 		pub::Player::GetRemainingHoldSize(clientId, remainingHold);
-		const auto& item = Archetype::GetEquipment(archetype.itemId);
-		if (item && (remainingHold >= item->fVolume * archetype.count))
+		const auto& item = Archetype::GetEquipment(action.itemId);
+		if (item && (remainingHold >= item->fVolume * action.count))
 		{
-			pub::Player::AddCargo(clientId, archetype.itemId, archetype.count, 1.0f, archetype.missionFlagged);
+			pub::Player::AddCargo(clientId, action.itemId, action.count, 1.0f, action.missionFlagged);
 			return true;
 		}
 		return false;
 	}
 
-	void ActAddCargo::Execute()
+	void ActAddCargo::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		auto& mission = missions.at(parent.missionId);
-		const auto& trigger = mission.triggers.at(parent.triggerId);
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_AddCargo " + std::to_wstring(archetype->itemId) + L" on " + std::to_wstring(archetype->objNameOrLabel));
-		if (archetype->objNameOrLabel == Activator)
+		if (objNameOrLabel == Activator)
 		{
-			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client)
 			{
-				AddCargo(activator.id, *archetype);
-				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
+				AddCargo(activator.id, *this);
 			}
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
 				if (object.type == MissionObjectType::Client)
 				{
-					AddCargo(object.id, *archetype);
-					ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
+					AddCargo(object.id, *this);
 				}
 			}
 		}
-		ConPrint(L"\n");
 	}
 }

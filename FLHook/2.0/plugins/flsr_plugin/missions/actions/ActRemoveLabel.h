@@ -1,14 +1,14 @@
 #pragma once
 #include "Action.h"
-#include "ActRemoveLabelArch.h"
 
 namespace Missions
 {
 	struct ActRemoveLabel : Action
 	{
-		const ActRemoveLabelArchetypePtr archetype;
+		unsigned int objNameOrLabel = 0;
+		unsigned int label = 0;
 
-		ActRemoveLabel(const ActionParent& parent, const ActRemoveLabelArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActRemoveLabel> ActRemoveLabelPtr;
 }

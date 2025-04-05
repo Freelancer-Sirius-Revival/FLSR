@@ -1,15 +1,15 @@
 #pragma once
 #include "Action.h"
-#include "ActActTriggerArch.h"
 
 namespace Missions
 {
 	struct ActActTrigger : Action
 	{
-		const ActActTriggerArchetypePtr archetype;
-		bool activate;
+		std::string triggerName = "";
+		bool activate = false;
+		float probability = 1.0f;
 
-		ActActTrigger(const ActionParent& parent, const ActActTriggerArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActActTrigger> ActActTriggerPtr;
 }

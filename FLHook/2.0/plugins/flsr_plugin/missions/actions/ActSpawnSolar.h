@@ -1,14 +1,13 @@
 #pragma once
 #include "Action.h"
-#include "ActSpawnSolarArch.h"
 
 namespace Missions
 {
 	struct ActSpawnSolar : Action
 	{
-		const ActSpawnSolarArchetypePtr archetype;
+		std::string solarName = "";
 
-		ActSpawnSolar(const ActionParent& parent, const ActSpawnSolarArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActSpawnSolar> ActSpawnSolarPtr;
 }

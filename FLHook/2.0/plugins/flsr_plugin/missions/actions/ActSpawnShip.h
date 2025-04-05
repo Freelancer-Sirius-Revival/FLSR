@@ -1,14 +1,16 @@
 #pragma once
 #include "Action.h"
-#include "ActSpawnShipArch.h"
 
 namespace Missions
 {
 	struct ActSpawnShip : Action
 	{
-		const ActSpawnShipArchetypePtr archetype;
+		std::string msnNpcName = "";
+		uint objectivesId = 0;
+		Vector position = { std::numeric_limits<float>::infinity(), 0, 0 };
+		Matrix orientation = { { std::numeric_limits<float>::infinity(), 0, 0 } };
 
-		ActSpawnShip(const ActionParent& parent, const ActSpawnShipArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActSpawnShip> ActSpawnShipPtr;
 }

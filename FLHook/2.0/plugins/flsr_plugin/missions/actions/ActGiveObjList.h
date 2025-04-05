@@ -1,14 +1,14 @@
 #pragma once
 #include "Action.h"
-#include "ActGiveObjListArch.h"
 
 namespace Missions
 {
 	struct ActGiveObjList : Action
 	{
-		const ActGiveObjListArchetypePtr archetype;
+		uint objNameOrLabel = 0;
+		uint objectivesId = 0;
 
-		ActGiveObjList(const ActionParent& parent, const ActGiveObjListArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActGiveObjList> ActGiveObjListPtr;
 }

@@ -13,22 +13,23 @@
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCountArch.h"
-#include "Actions/ActDebugMsgArch.h"
-#include "Actions/ActActTriggerArch.h"
-#include "Actions/ActAddLabelArch.h"
-#include "Actions/ActRemoveLabelArch.h"
-#include "Actions/ActLightFuseArch.h"
-#include "Actions/ActSpawnSolarArch.h"
-#include "Actions/ActSpawnShipArch.h"
-#include "Actions/ActDestroyArch.h"
-#include "Actions/ActPlaySoundEffectArch.h"
-#include "Actions/ActPlayMusicArch.h"
-#include "Actions/ActEtherCommArch.h"
-#include "Actions/ActSendCommArch.h"
-#include "Actions/ActSetNNObjArch.h"
-#include "Actions/ActAdjAcctArch.h"
-#include "Actions/ActAddCargoArch.h"
-#include "Actions/ActGiveObjListArch.h"
+#include "Actions/ActDebugMsg.h"
+#include "Actions/ActActTrigger.h"
+#include "Actions/ActAddLabel.h"
+#include "Actions/ActRemoveLabel.h"
+#include "Actions/ActLightFuse.h"
+#include "Actions/ActSpawnSolar.h"
+#include "Actions/ActSpawnShip.h"
+#include "Actions/ActEndMission.h"
+#include "Actions/ActDestroy.h"
+#include "Actions/ActPlaySoundEffect.h"
+#include "Actions/ActPlayMusic.h"
+#include "Actions/ActEtherComm.h"
+#include "Actions/ActSendComm.h"
+#include "Actions/ActSetNNObj.h"
+#include "Actions/ActAdjAcct.h"
+#include "Actions/ActAddCargo.h"
+#include "Actions/ActGiveObjList.h"
 #include "Objectives/ObjGotoArch.h"
 #include "../MissionBoard.h"
 
@@ -463,70 +464,71 @@ namespace Missions
 							}
 							else if (ini.is_value("Act_DebugMsg"))
 							{
-								ActDebugMsgArchetypePtr archetype(new ActDebugMsgArchetype());
-								archetype->message = ini.get_value_string(0);
-								trigger->actions.push_back({ ActionType::Act_DebugMsg, archetype });
+								ActDebugMsgPtr action(new ActDebugMsg());
+								action->message = ini.get_value_string(0);
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_EndMission"))
 							{
-								trigger->actions.push_back({ ActionType::Act_EndMission, nullptr });
+								ActEndMissionPtr action(new ActEndMission());
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_ActTrig"))
 							{
-								ActActTriggerArchetypePtr archetype(new ActActTriggerArchetype());
-								archetype->triggerName = ToLower(ini.get_value_string(0));
+								ActActTriggerPtr action(new ActActTrigger());
+								action->triggerName = ToLower(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
-									archetype->probability = ini.get_value_float(1);
-								archetype->activate = true;
-								trigger->actions.push_back({ ActionType::Act_ActTrig, archetype });
+									action->probability = ini.get_value_float(1);
+								action->activate = true;
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_DeactTrig"))
 							{
-								ActActTriggerArchetypePtr archetype(new ActActTriggerArchetype());
-								archetype->triggerName = ToLower(ini.get_value_string(0));
+								ActActTriggerPtr action(new ActActTrigger());
+								action->triggerName = ToLower(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
-									archetype->probability = ini.get_value_float(1);
-								archetype->activate = false;
-								trigger->actions.push_back({ ActionType::Act_DeactTrig, archetype });
+									action->probability = ini.get_value_float(1);
+								action->activate = false;
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_AddLabel"))
 							{
-								ActAddLabelArchetypePtr archetype(new ActAddLabelArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->label = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ ActionType::Act_AddLabel, archetype });
+								ActAddLabelPtr action(new ActAddLabel());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(1));
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_RemoveLabel"))
 							{
-								ActRemoveLabelArchetypePtr archetype(new ActRemoveLabelArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->label = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ ActionType::Act_RemoveLabel, archetype });
+								ActRemoveLabelPtr action(new ActRemoveLabel());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(1));
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_LightFuse"))
 							{
-								ActLightFuseArchetypePtr archetype(new ActLightFuseArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->fuseName = ini.get_value_string(1);
-								trigger->actions.push_back({ ActionType::Act_LightFuse, archetype });
+								ActLightFusePtr action(new ActLightFuse());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->fuseName = ini.get_value_string(1);
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SpawnSolar"))
 							{
-								ActSpawnSolarArchetypePtr archetype(new ActSpawnSolarArchetype());
-								archetype->solarName = ToLower(ini.get_value_string(0));
-								trigger->actions.push_back({ ActionType::Act_SpawnSolar, archetype });
+								ActSpawnSolarPtr action(new ActSpawnSolar());
+								action->solarName = ToLower(ini.get_value_string(0));
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SpawnShip"))
 							{
-								ActSpawnShipArchetypePtr archetype(new ActSpawnShipArchetype());
-								archetype->msnNpcName = ToLower(ini.get_value_string(0));
+								ActSpawnShipPtr action(new ActSpawnShip());
+								action->msnNpcName = ToLower(ini.get_value_string(0));
 								const auto objectivesName = ToLower(ini.get_value_string(1));
-								archetype->objectivesId = objectivesName == "no_ol" ? 0 : CreateID(objectivesName.c_str());
+								action->objectivesId = objectivesName == "no_ol" ? 0 : CreateID(objectivesName.c_str());
 								if (ini.get_num_parameters() > 2)
 								{
-									archetype->position.x = ini.get_value_float(2);
-									archetype->position.y = ini.get_value_float(3);
-									archetype->position.z = ini.get_value_float(4);
+									action->position.x = ini.get_value_float(2);
+									action->position.y = ini.get_value_float(3);
+									action->position.z = ini.get_value_float(4);
 								}
 								if (ini.get_num_parameters() > 5)
 								{
@@ -534,42 +536,42 @@ namespace Missions
 									orientation.x = ini.get_value_float(5);
 									orientation.y = ini.get_value_float(6);
 									orientation.z = ini.get_value_float(7);
-									archetype->orientation = EulerMatrix(orientation);
+									action->orientation = EulerMatrix(orientation);
 								}
-								trigger->actions.push_back({ ActionType::Act_SpawnShip, archetype });
-								}
+								trigger->actions.push_back(action);
+							}
 							else if (ini.is_value("Act_Destroy"))
 							{
-								ActDestroyArchetypePtr archetype(new ActDestroyArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->destroyType = ToLower(ini.get_value_string(1)) == "explode" ? DestroyType::EXPLODE : DestroyType::VANISH;
-								trigger->actions.push_back({ ActionType::Act_Destroy, archetype });
+								ActDestroyPtr action(new ActDestroy());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->destroyType = ToLower(ini.get_value_string(1)) == "explode" ? DestroyType::EXPLODE : DestroyType::VANISH;
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_PlaySoundEffect"))
 							{
-								ActPlaySoundEffectArchetypePtr archetype(new ActPlaySoundEffectArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->soundId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ ActionType::Act_PlaySoundEffect, archetype });
+								ActPlaySoundEffectPtr action(new ActPlaySoundEffect());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->soundId = CreateIdOrNull(ini.get_value_string(1));
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_PlayMusic"))
 							{
-								ActPlayMusicArchetypePtr archetype(new ActPlayMusicArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->music.spaceMusic = std::string(ini.get_value_string(1)) != "none" ? CreateIdOrNull(ini.get_value_string(1)) : 0;
-								archetype->music.dangerMusic = std::string(ini.get_value_string(2)) != "none" ? CreateIdOrNull(ini.get_value_string(2)) : 0;
-								archetype->music.battleMusic = std::string(ini.get_value_string(3)) != "none" ? CreateIdOrNull(ini.get_value_string(3)) : 0;
-								archetype->music.overrideMusic = std::string(ini.get_value_string(4)) != "none" ? CreateIdOrNull(ini.get_value_string(4)) : 0;
-								archetype->music.crossFadeDurationInS = ini.get_value_float(5);
-								archetype->music.playOnce = ini.get_bool(6);
-								trigger->actions.push_back({ ActionType::Act_PlayMusic, archetype });
+								ActPlayMusicPtr action(new ActPlayMusic());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->music.spaceMusic = std::string(ini.get_value_string(1)) != "none" ? CreateIdOrNull(ini.get_value_string(1)) : 0;
+								action->music.dangerMusic = std::string(ini.get_value_string(2)) != "none" ? CreateIdOrNull(ini.get_value_string(2)) : 0;
+								action->music.battleMusic = std::string(ini.get_value_string(3)) != "none" ? CreateIdOrNull(ini.get_value_string(3)) : 0;
+								action->music.overrideMusic = std::string(ini.get_value_string(4)) != "none" ? CreateIdOrNull(ini.get_value_string(4)) : 0;
+								action->music.crossFadeDurationInS = ini.get_value_float(5);
+								action->music.playOnce = ini.get_bool(6);
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_Ethercomm"))
 							{
-								ActEtherCommArchetypePtr archetype(new ActEtherCommArchetype());
-								archetype->name = CreateIdOrNull(ini.get_value_string(0));
-								archetype->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
-								archetype->senderVoiceId = CreateIdOrNull(ini.get_value_string(2));
+								ActEtherCommPtr action(new ActEtherComm());
+								action->name = CreateIdOrNull(ini.get_value_string(0));
+								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
+								action->senderVoiceId = CreateIdOrNull(ini.get_value_string(2));
 								int pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
@@ -579,32 +581,32 @@ namespace Missions
 									strtol(val, &end, 10);
 									if (end != val)
 										break;
-									archetype->lines.push_back(CreateIdOrNull(val));
+									action->lines.push_back(CreateIdOrNull(val));
 									pos++;
 								}
 								if (!ini.is_value_empty(pos++))
-									archetype->delay = ini.get_value_float(pos - 1);
-								archetype->global = ini.get_value_bool(pos++);
-								archetype->senderIdsName = ini.get_value_int(pos++);
-								archetype->costume.head = CreateIdOrNull(ini.get_value_string(pos++));
-								archetype->costume.body = CreateIdOrNull(ini.get_value_string(pos++));
+									action->delay = ini.get_value_float(pos - 1);
+								action->global = ini.get_value_bool(pos++);
+								action->senderIdsName = ini.get_value_int(pos++);
+								action->costume.head = CreateIdOrNull(ini.get_value_string(pos++));
+								action->costume.body = CreateIdOrNull(ini.get_value_string(pos++));
 								int count = 0;
 								while (count < 8)
 								{
 									const auto val = ini.get_value_string(pos++);
 									if (strlen(val) == 0)
 										break;
-									archetype->costume.accessory[count++] = CreateIdOrNull(val);
+									action->costume.accessory[count++] = CreateIdOrNull(val);
 								}
-								archetype->costume.accessories = count;
-								trigger->actions.push_back({ ActionType::Act_EtherComm, archetype });
+								action->costume.accessories = count;
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SendComm"))
 							{
-								ActSendCommArchetypePtr archetype(new ActSendCommArchetype());
-								archetype->name = CreateIdOrNull(ini.get_value_string(0));
-								archetype->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
-								archetype->senderObjName = CreateIdOrNull(ini.get_value_string(2));
+								ActSendCommPtr action(new ActSendComm());
+								action->name = CreateIdOrNull(ini.get_value_string(0));
+								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
+								action->senderObjName = CreateIdOrNull(ini.get_value_string(2));
 								int pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
@@ -614,50 +616,50 @@ namespace Missions
 									strtol(val, &end, 10);
 									if (end != val)
 										break;
-									archetype->lines.push_back(CreateIdOrNull(val));
+									action->lines.push_back(CreateIdOrNull(val));
 									pos++;
 								}
 								if (!ini.is_value_empty(pos++))
-									archetype->delay = ini.get_value_float(pos - 1);
-								archetype->global = ini.get_value_bool(pos);
-								trigger->actions.push_back({ ActionType::Act_SendComm, archetype });
+									action->delay = ini.get_value_float(pos - 1);
+								action->global = ini.get_value_bool(pos);
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SetNNObj"))
 							{
-								ActSetNNObjArchetypePtr archetype(new ActSetNNObjArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->message = ini.get_value_int(1);
-								archetype->systemId = CreateIdOrNull(ini.get_value_string(2));
-								archetype->position.x = ini.get_value_float(3);
-								archetype->position.y = ini.get_value_float(4);
-								archetype->position.z = ini.get_value_float(5);
-								archetype->bestRoute = ini.get_bool(6);
-								archetype->targetObjName = CreateIdOrNull(ini.get_value_string(7));
-								trigger->actions.push_back({ ActionType::Act_SetNNObj, archetype });
+								ActSetNNObjPtr action(new ActSetNNObj());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->message = ini.get_value_int(1);
+								action->systemId = CreateIdOrNull(ini.get_value_string(2));
+								action->position.x = ini.get_value_float(3);
+								action->position.y = ini.get_value_float(4);
+								action->position.z = ini.get_value_float(5);
+								action->bestRoute = ini.get_bool(6);
+								action->targetObjName = CreateIdOrNull(ini.get_value_string(7));
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_AdjAcct"))
 							{
-								ActAdjAcctArchetypePtr archetype(new ActAdjAcctArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->cash = ini.get_value_int(1);
-								archetype->splitBetweenPlayers = ini.get_value_bool(2);
-								trigger->actions.push_back({ ActionType::Act_AdjAcct, archetype });
+								ActAdjAcctPtr action(new ActAdjAcct());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->cash = ini.get_value_int(1);
+								action->splitBetweenPlayers = ini.get_value_bool(2);
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_AddCargo"))
 							{
-								ActAddCargoArchetypePtr archetype(new ActAddCargoArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->itemId = CreateIdOrNull(ini.get_value_string(1));
-								archetype->count = std::max(0, ini.get_value_int(2));
-								archetype->missionFlagged = ini.get_value_bool(3);
-								trigger->actions.push_back({ ActionType::Act_AddCargo, archetype });
+								ActAddCargoPtr action(new ActAddCargo());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->itemId = CreateIdOrNull(ini.get_value_string(1));
+								action->count = std::max(0, ini.get_value_int(2));
+								action->missionFlagged = ini.get_value_bool(3);
+								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_GiveObjList"))
 							{
-								ActGiveObjListArchetypePtr archetype(new ActGiveObjListArchetype());
-								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								archetype->objectivesId = CreateIdOrNull(ini.get_value_string(1));
-								trigger->actions.push_back({ ActionType::Act_GiveObjList, archetype });
+								ActGiveObjListPtr action(new ActGiveObjList());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->objectivesId = CreateIdOrNull(ini.get_value_string(1));
+								trigger->actions.push_back(action);
 							}
 						}
 						missionArchetypes.back()->triggers.push_back(trigger);

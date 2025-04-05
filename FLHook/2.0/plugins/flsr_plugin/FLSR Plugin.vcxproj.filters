@@ -131,13 +131,7 @@
     <ClInclude Include="missions\actions\ActActTrigger.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActActTriggerArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActDestroy.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActDestroyArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\Action.h">
@@ -146,13 +140,7 @@
     <ClInclude Include="missions\actions\ActLightFuse.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActLightFuseArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActSpawnSolar.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActSpawnSolarArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndDestroyed.h">
@@ -188,13 +176,7 @@
     <ClInclude Include="missions\actions\ActAddLabel.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActAddLabelArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActRemoveLabel.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActRemoveLabelArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActEndMission.h">
@@ -209,34 +191,19 @@
     <ClInclude Include="missions\actions\ActPlayMusic.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActPlayMusicArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActPlaySoundEffect.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActPlaySoundEffectArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActEtherComm.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActEtherCommArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActSendComm.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActSendCommArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\MissionObject.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActSetNNObj.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActSetNNObjArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndSpaceEnter.h">
@@ -269,9 +236,6 @@
     <ClInclude Include="missions\actions\ActSpawnShip.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActSpawnShipArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="Pilots.h" />
     <ClInclude Include="missions\NpcNames.h">
       <Filter>Missions</Filter>
@@ -279,13 +243,7 @@
     <ClInclude Include="missions\actions\ActAdjAcct.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActAdjAcctArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActAddCargo.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActAddCargoArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjGotoArch.h">
@@ -303,22 +261,13 @@
     <ClInclude Include="missions\actions\ActGiveObjList.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActGiveObjListArch.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\LootProps.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Plugin.h" />
-    <ClInclude Include="missions\actions\ActionTypes.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActDebugMsg.h">
-      <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\actions\ActDebugMsgArch.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndCountArch.h">

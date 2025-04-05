@@ -1,14 +1,15 @@
 #pragma once
 #include "Action.h"
-#include "ActAdjAcctArch.h"
 
 namespace Missions
 {
 	struct ActAdjAcct : Action
 	{
-		const ActAdjAcctArchetypePtr archetype;
+		uint objNameOrLabel = 0;
+		uint cash = 0;
+		bool splitBetweenPlayers = false;
 
-		ActAdjAcct(const ActionParent& parent, const ActAdjAcctArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActAdjAcct> ActAdjAcctPtr;
 }

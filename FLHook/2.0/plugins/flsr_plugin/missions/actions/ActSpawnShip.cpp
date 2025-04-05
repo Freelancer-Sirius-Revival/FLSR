@@ -1,26 +1,19 @@
-#include <FLHook.h>
 #include "ActSpawnShip.h"
-#include "../Mission.h"
 #include "../../Pilots.h"
 #include "../NpcNames.h"
 #include "../Objectives/Objectives.h"
 
 namespace Missions
 {
-	ActSpawnShip::ActSpawnShip(const ActionParent& parent, const ActSpawnShipArchetypePtr actionArchetype) :
-		Action(parent, ActionType::Act_SpawnShip),
-		archetype(actionArchetype)
-	{}
-
-	static uint CreateNPC(const ActSpawnShipArchetype& actionArchetype, const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
+	static uint CreateNPC(const ActSpawnShip& action, const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
 	{
 		pub::SpaceObj::ShipInfo shipInfo;
 		std::memset(&shipInfo, 0, sizeof(shipInfo));
 		shipInfo.iFlag = 1;
 		shipInfo.iSystem = msnNpc.systemId;
 		shipInfo.iShipArchetype = npc.archetypeId;
-		shipInfo.vPos = actionArchetype.position.x != std::numeric_limits<float>::infinity() ? actionArchetype.position : msnNpc.position;
-		shipInfo.mOrientation = actionArchetype.orientation.data[0][0] != std::numeric_limits<float>::infinity() ? actionArchetype.orientation : msnNpc.orientation;
+		shipInfo.vPos = action.position.x != std::numeric_limits<float>::infinity() ? action.position : msnNpc.position;
+		shipInfo.mOrientation = action.orientation.data[0][0] != std::numeric_limits<float>::infinity() ? action.orientation : msnNpc.orientation;
 		shipInfo.iLoadout = npc.loadoutId;
 		shipInfo.Costume = npc.costume;
 		shipInfo.iPilotVoice = npc.voiceId;
@@ -104,35 +97,29 @@ namespace Missions
 		return objId;
 	}
 
-	void ActSpawnShip::Execute()
+	void ActSpawnShip::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		auto& mission = missions.at(parent.missionId);
-		const auto& trigger = mission.triggers.at(parent.triggerId);
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SpawnShip " + stows(archetype->msnNpcName));
-		if (mission.objectIdsByName.contains(CreateID(archetype->msnNpcName.c_str())))
-		{
-			ConPrint(L" ALREADY EXISTS\n");
+		if (mission.objectIdsByName.contains(CreateID(msnNpcName.c_str())))
 			return;
-		}
+
 		for (const auto& msnNpc : mission.archetype->msnNpcs)
 		{
-			if (msnNpc->name == archetype->msnNpcName)
+			if (msnNpc->name == msnNpcName)
 			{
 				for (const auto& npc : mission.archetype->npcs)
 				{
 					if (CreateID(npc->name.c_str()) == msnNpc->npcId)
 					{
-						const uint objId = CreateNPC(*archetype, *msnNpc, *npc);
+						const uint objId = CreateNPC(*this, *msnNpc, *npc);
 						if (objId)
 						{
 							mission.AddObject(objId, CreateID(msnNpc->name.c_str()), msnNpc->labels);
-							if (const auto& objectivesEntry = mission.archetype->objectives.find(archetype->objectivesId); objectivesEntry != mission.archetype->objectives.end())
+							if (const auto& objectivesEntry = mission.archetype->objectives.find(objectivesId); objectivesEntry != mission.archetype->objectives.end())
 							{
-								const Objectives objectives(parent.missionId, objId, objectivesEntry->second->objectives);
+								const Objectives objectives(mission.id, objId, objectivesEntry->second->objectives);
 								mission.objectivesByObjectId.insert({ objId, objectives });
 								mission.objectivesByObjectId[objId].Progress();
 							}
-							ConPrint(L" obj[" + std::to_wstring(objId) + L"]\n");
 							return;
 						}
 						break;
@@ -141,6 +128,5 @@ namespace Missions
 				break;
 			}
 		}
-		ConPrint(L" NOT FOUND\n");
 	}
 }

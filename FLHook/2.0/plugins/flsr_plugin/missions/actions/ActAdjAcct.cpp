@@ -1,14 +1,7 @@
-#include <FLHook.h>
 #include "ActAdjAcct.h"
-#include "../Mission.h"
 
 namespace Missions
 {
-	ActAdjAcct::ActAdjAcct(const ActionParent& parent, const ActAdjAcctArchetypePtr actionArchetype) :
-		Action(parent, ActionType::Act_AdjAcct),
-		archetype(actionArchetype)
-	{}
-
 	static void AddCash(const uint clientId, const int cash)
 	{
 		int currentCash = MAXINT32;
@@ -22,21 +15,14 @@ namespace Missions
 			pub::Player::AdjustCash(clientId, cash);
 	}
 
-	void ActAdjAcct::Execute()
+	void ActAdjAcct::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		auto& mission = missions.at(parent.missionId);
-		const auto& trigger = mission.triggers.at(parent.triggerId);
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_AdjAcct " + std::to_wstring(archetype->cash) + L" on " + std::to_wstring(archetype->objNameOrLabel));
-		if (archetype->objNameOrLabel == Activator)
+		if (objNameOrLabel == Activator)
 		{
-			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client)
-			{
-				AddCash(activator.id, archetype->cash);
-				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
-			}
+				AddCash(activator.id, cash);
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			std::vector<uint> clientIds;
 			for (const auto& object : objectsByLabel->second)
@@ -46,10 +32,8 @@ namespace Missions
 			}
 			for (const auto& id : clientIds)
 			{
-				AddCash(id, archetype->splitBetweenPlayers ? static_cast<int>(std::trunc(archetype->cash / clientIds.size())) : archetype->cash);
-				ConPrint(L" client[" + std::to_wstring(id) + L"]");
+				AddCash(id, splitBetweenPlayers ? static_cast<int>(std::trunc(cash / clientIds.size())) : cash);
 			}
 		}
-		ConPrint(L"\n");
 	}
 }

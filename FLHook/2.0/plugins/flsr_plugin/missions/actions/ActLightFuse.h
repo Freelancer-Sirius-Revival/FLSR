@@ -1,14 +1,14 @@
 #pragma once
 #include "Action.h"
-#include "ActLightFuseArch.h"
 
 namespace Missions
 {
 	struct ActLightFuse : Action
 	{
-		const ActLightFuseArchetypePtr archetype;
+		uint objNameOrLabel = 0;
+		std::string fuseName = "";
 
-		ActLightFuse(const ActionParent& parent, const ActLightFuseArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActLightFuse> ActLightFusePtr;
 }

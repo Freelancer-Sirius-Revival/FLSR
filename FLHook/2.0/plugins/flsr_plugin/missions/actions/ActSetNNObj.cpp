@@ -1,23 +1,16 @@
-#include <FLHook.h>
 #include "ActSetNNObj.h"
-#include "../Mission.h"
 
 namespace Missions
 {
-	ActSetNNObj::ActSetNNObj(const ActionParent& parent, const ActSetNNObjArchetypePtr actionArchetype) :
-		Action(parent, ActionType::Act_SetNNObj),
-		archetype(actionArchetype)
-	{}
-
-	static void SetObjective(const uint clientId, const ActSetNNObj& action)
+	static void SetObjective(const Mission& mission, const uint clientId, const ActSetNNObj& action)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
 
-		if (action.archetype->message)
+		if (action.message)
 		{
-			FmtStr caption(action.archetype->message, 0);
-			caption.begin_mad_lib(action.archetype->message);
+			FmtStr caption(action.message, 0);
+			caption.begin_mad_lib(action.message);
 			caption.end_mad_lib();
 			pub::Player::DisplayMissionMessage(clientId, caption, MissionMessageType::MissionMessageType_Type1, true);
 		}
@@ -25,19 +18,18 @@ namespace Missions
 		XRequestBestPath bestPath;
 		bestPath.noPathFound = false;
 		bestPath.repId = Players[clientId].iReputation;
-		if (action.archetype->systemId)
+		if (action.systemId)
 		{
 			XRequestBestPathEntry target;
-			target.systemId = action.archetype->systemId;
-			target.position = action.archetype->position;
-			auto& mission = missions.at(action.parent.missionId);
-			const auto& object = mission.objectIdsByName.find(action.archetype->targetObjName);
+			target.systemId = action.systemId;
+			target.position = action.position;
+			const auto& object = mission.objectIdsByName.find(action.targetObjName);
 			if (object != mission.objectIdsByName.end())
 				target.objId = object->second;
 			else
-				target.objId = action.archetype->targetObjName;
+				target.objId = action.targetObjName;
 
-			if (action.archetype->bestRoute)
+			if (action.bestRoute)
 			{
 				uint objId;
 				pub::Player::GetShip(clientId, objId);
@@ -74,37 +66,23 @@ namespace Missions
 		}
 	}
 
-	void ActSetNNObj::Execute()
+	void ActSetNNObj::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		auto& mission = missions.at(parent.missionId);
-		const auto& trigger = mission.triggers.at(parent.triggerId);
-		ConPrint(stows(mission.archetype->name) + L"->" + stows(trigger.archetype->name) + L": Act_SetNNObj " + std::to_wstring(archetype->message) + L" for " + std::to_wstring(archetype->objNameOrLabel));
-		FmtStr caption(archetype->message, 0);
-		caption.begin_mad_lib(archetype->message);
+		FmtStr caption(message, 0);
+		caption.begin_mad_lib(message);
 		caption.end_mad_lib();
-		if (archetype->objNameOrLabel == Activator)
+		if (objNameOrLabel == Activator)
 		{
-			const auto& activator = trigger.activator;
 			if (activator.type == MissionObjectType::Client && activator.id)
-			{
-				SetObjective(activator.id, *this);
-				ConPrint(L" client[" + std::to_wstring(activator.id) + L"]");
-			}
+				SetObjective(mission, activator.id, *this);
 		}
-		else
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
-			if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+			for (const auto& object : objectsByLabel->second)
 			{
-				for (const auto& object : objectsByLabel->second)
-				{
-					if (object.type == MissionObjectType::Client)
-					{
-						SetObjective(object.id, *this);
-						ConPrint(L" client[" + std::to_wstring(object.id) + L"]");
-					}
-				}
+				if (object.type == MissionObjectType::Client)
+					SetObjective(mission, object.id, *this);
 			}
 		}
-		ConPrint(L"\n");
 	}
 }

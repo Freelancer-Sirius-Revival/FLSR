@@ -1,14 +1,13 @@
 #pragma once
 #include "Action.h"
-#include "ActDebugMsgArch.h"
 
 namespace Missions
 {
 	struct ActDebugMsg : Action
 	{
-		const ActDebugMsgArchetypePtr archetype;
+		std::string message = "";
 
-		ActDebugMsg(const ActionParent& parent, const ActDebugMsgArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActDebugMsg> ActDebugMsgPtr;
 }

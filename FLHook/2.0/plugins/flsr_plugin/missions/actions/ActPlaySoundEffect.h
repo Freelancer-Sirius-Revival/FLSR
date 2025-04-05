@@ -1,14 +1,14 @@
 #pragma once
 #include "Action.h"
-#include "ActPlaySoundEffectArch.h"
 
 namespace Missions
 {
 	struct ActPlaySoundEffect : Action
 	{
-		const ActPlaySoundEffectArchetypePtr archetype;
+		uint objNameOrLabel = 0;
+		uint soundId = 0;
 
-		ActPlaySoundEffect(const ActionParent& parent, const ActPlaySoundEffectArchetypePtr actionArchetype);
-		void Execute();
+		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
+	typedef std::shared_ptr<ActPlaySoundEffect> ActPlaySoundEffectPtr;
 }

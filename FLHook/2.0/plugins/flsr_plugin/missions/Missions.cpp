@@ -28,6 +28,7 @@
 #include "Actions/ActSendComm.h"
 #include "Actions/ActSetNNObj.h"
 #include "Actions/ActAdjAcct.h"
+#include "Actions/ActAdjRep.h"
 #include "Actions/ActAddCargo.h"
 #include "Actions/ActGiveObjList.h"
 #include "Objectives/ObjGotoArch.h"
@@ -643,6 +644,24 @@ namespace Missions
 								action->splitBetweenPlayers = ini.get_value_bool(2);
 								trigger->actions.push_back(action);
 							}
+							else if (ini.is_value("Act_AdjRep"))
+							{
+								ActAdjRepPtr action(new ActAdjRep());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								pub::Reputation::GetReputationGroup(action->groupId, ini.get_value_string(1));
+								const auto& val = ToLower(ini.get_value_string(2));
+								if (val == "objectdestruction")
+									action->reason = Empathies::ReputationChangeReason::ObjectDestruction;
+								else if (val == "missionsuccess")
+										action->reason = Empathies::ReputationChangeReason::MissionSuccess;
+								else if (val == "missionfailure")
+									action->reason = Empathies::ReputationChangeReason::MissionFailure;
+								else if (val == "missionabortion")
+									action->reason = Empathies::ReputationChangeReason::MissionAbortion;
+								else
+									action->change = ini.get_value_float(2);
+								trigger->actions.push_back(action);
+							}
 							else if (ini.is_value("Act_AddCargo"))
 							{
 								ActAddCargoPtr action(new ActAddCargo());
@@ -879,7 +898,7 @@ namespace Missions
 
 			uint victimGroupId;
 			Reputation::Vibe::GetAffiliation(victimReputationId, victimGroupId, false);
-			Empathies::ChangeReputationsByObjectDestruction(killerClientId, victimGroupId);
+			Empathies::ChangeReputationsByReason(killerClientId, victimGroupId, Empathies::ReputationChangeReason::ObjectDestruction);
 			return;
 		}
 	}

@@ -324,6 +324,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` The players to have their cash being modified.
     1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.
     1. `[True|False] :False` Split the cash across all player members of the receiving label equally. No effect if a singular player receives the cash.
+- `Act_AdjRep` Adjusts the reputation of the player toward a specific faction.
+    1. `STRING|Activator` The players to have their reputation being modified.
+    1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
+    1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 - `Act_AddCargo` Adds cargo. Only works for players. Will fail if player has not enough cargo space.
     1. `STRING|Activator` The players to receive the cargo.
     1. `STRING` The item nickname to use.

@@ -53,7 +53,7 @@ namespace GroupReputation
             if (HkDistance3D(clientShipVector, memberShipVector) > MAX_REPUTATION_TRANSFER_DISTANCE)
                 continue;
 
-            Empathies::ChangeReputationsByObjectDestruction(memberClientId, otherGroupId);
+            Empathies::ChangeReputationsByReason(memberClientId, otherGroupId, Empathies::ReputationChangeReason::ObjectDestruction);
         }
     }
 

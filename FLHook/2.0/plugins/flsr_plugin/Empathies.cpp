@@ -7,6 +7,9 @@ namespace Empathies
     {
         uint groupId = 0;
         float objectDestruction = 0;
+        float missionSuccess = 0;
+        float missionFailure = 0;
+        float missionAbortion = 0;
         std::unordered_map<uint, float> empathyRates;
     };
 
@@ -24,22 +27,55 @@ namespace Empathies
 		pub::Reputation::SetReputation(reputationId, groupId, std::max<float>(-maxReputationThreshold, std::min<float>(currentValue + change, maxReputationThreshold)));
 	}
 
-    void ChangeReputationsByObjectDestruction(const unsigned int clientId, const unsigned int groupId)
+    void ChangeReputationsByValue(const unsigned int clientId, const unsigned int groupId, const float change)
+    {
+        const auto& reputationChangeEffectsEntry = groupReputationChangeEffects.find(groupId);
+        if (reputationChangeEffectsEntry == groupReputationChangeEffects.end())
+            return;
+        const auto& reputationChangeEffects = reputationChangeEffectsEntry->second;
+
+        int reputationId;
+        pub::Player::GetRep(clientId, reputationId);
+
+        // Add direct reputation change of the destroyed object.
+        ChangeReputationRelative(reputationId, groupId, change);
+
+        // Add indirect reputation changes of the destroyed object.
+        for (const auto& empathyRate : reputationChangeEffects.empathyRates)
+            ChangeReputationRelative(reputationId, empathyRate.first, change * empathyRate.second);
+    }
+
+    void ChangeReputationsByReason(const unsigned int clientId, const unsigned int groupId, const ReputationChangeReason reason)
 	{
         const auto& reputationChangeEffectsEntry = groupReputationChangeEffects.find(groupId);
         if (reputationChangeEffectsEntry == groupReputationChangeEffects.end())
             return;
 		const auto& reputationChangeEffects = reputationChangeEffectsEntry->second;
 
-		int reputationId;
-		pub::Player::GetRep(clientId, reputationId);
+        float change;
+        switch (reason)
+        {
+            case ReputationChangeReason::ObjectDestruction:
+                change = reputationChangeEffects.objectDestruction;
+                break;
 
-		// Add direct reputation change of the destroyed object.
-		ChangeReputationRelative(reputationId, groupId, reputationChangeEffects.objectDestruction);
+            case ReputationChangeReason::MissionSuccess:
+                change = reputationChangeEffects.missionSuccess;
+                break;
 
-		// Add indirect reputation changes of the destroyed object.
-		for (const auto& empathyRate : reputationChangeEffects.empathyRates)
-			ChangeReputationRelative(reputationId, empathyRate.first, reputationChangeEffects.objectDestruction * empathyRate.second);
+            case ReputationChangeReason::MissionFailure:
+                change = reputationChangeEffects.missionFailure;
+                break;
+
+            case ReputationChangeReason::MissionAbortion:
+                change = reputationChangeEffects.missionAbortion;
+                break;
+
+            default:
+                return;
+        }
+
+        ChangeReputationsByValue(clientId, groupId, change);
 	}
 
 	static HMODULE LoadContentDll()
@@ -106,11 +142,23 @@ namespace Empathies
                             pub::Reputation::GetReputationGroup(groupId, ini.get_value_string(0));
                             repChange.groupId = groupId;
                         }
-
-                        if (ini.is_value("event") && std::string(ini.get_value_string(0)) == "object_destruction")
+                        else if (ini.is_value("event") && std::string(ini.get_value_string(0)) == "object_destruction")
+                        {
                             repChange.objectDestruction = ini.get_value_float(1);
-
-                        if (ini.is_value("empathy_rate"))
+                        }
+                        else if (ini.is_value("event") && std::string(ini.get_value_string(0)) == "random_mission_success")
+                        {
+                            repChange.missionSuccess = ini.get_value_float(1);
+                        }
+                        else if (ini.is_value("event") && std::string(ini.get_value_string(0)) == "random_mission_failure")
+                        {
+                            repChange.missionFailure = ini.get_value_float(1);
+                        }
+                        else if (ini.is_value("event") && std::string(ini.get_value_string(0)) == "random_mission_abortion")
+                        {
+                            repChange.missionAbortion = ini.get_value_float(1);
+                        }
+                        else if (ini.is_value("empathy_rate"))
                         {
                             uint groupId;
                             pub::Reputation::GetReputationGroup(groupId, ini.get_value_string(0));

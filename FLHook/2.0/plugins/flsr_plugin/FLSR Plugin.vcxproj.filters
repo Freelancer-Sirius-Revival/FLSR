@@ -125,6 +125,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="MissionBoard.cpp" />
+    <ClCompile Include="missions\actions\ActAdjRep.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -277,6 +280,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="MissionBoard.h" />
+    <ClInclude Include="missions\actions\ActAdjRep.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="configs\FLSR-Carrier.cfg" />

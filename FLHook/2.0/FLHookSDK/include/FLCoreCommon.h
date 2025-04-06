@@ -4299,6 +4299,13 @@ struct IMPORT FmtStr
 		unsigned char data[OBJECT_DATA_SIZE];
 	};
 
+	struct NavMarker
+	{
+		uint system;
+		uint unk = 1;
+		Vector pos;
+	};
+
 	FmtStr(struct FmtStr const&);
 	FmtStr(unsigned int, struct Val const*);
 	~FmtStr(void);

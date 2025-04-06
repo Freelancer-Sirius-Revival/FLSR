@@ -208,7 +208,7 @@ struct XRequestBestPath
 	XRequestBestPathEntry entries[64]; // Server.RequestBestPath requires exactly 2, otherwise variable length
 };
 
-enum class MissionListEmptyReason
+enum class MissionListEmptyReason : uint
 {
 	NotEmpty = 0,
 	BadReputation = 1,
@@ -871,7 +871,7 @@ namespace pub
 
 	namespace GF
 	{
-		enum class MissionType
+		enum class MissionType : uint
 		{
 			Unknown = 0,
 			DestroyShips = 1,
@@ -943,6 +943,21 @@ namespace pub
 
 	namespace Player
 	{
+		enum class MissionObjectiveType : uint
+		{
+			SimpleEntry          = 0,               // Non-objective entry, without waypoint on map
+			IntermediateWaypoint = (1 << 3) | (1 << 0), // No entry, with intermediate waypoint on map
+			ObjectiveWaypoint    = (1 << 3) | (1 << 1), // Objective entry, with numbered waypoint on map
+			MissionText          = 1 << 4,          // Displays message on screen
+			ActiveLog            = 1 << 5           // Puts message as log entry
+		}; // Bits 3, 7 and 8 are unused.
+
+		struct MissionObjective
+		{
+			MissionObjectiveType type = MissionObjectiveType::IntermediateWaypoint;
+			FmtStr message = FmtStr(0, 0);
+		};
+
 		IMPORT  int AddCargo(unsigned int const&, unsigned int const&, unsigned int, float, bool);
 		IMPORT  int AdjustCash(unsigned int const&, int);
 		IMPORT  int CfgInterfaceNotification(unsigned int, unsigned int, bool, int);
@@ -989,7 +1004,7 @@ namespace pub
 		IMPORT  int SetInitialOrnt(unsigned int const&, class Matrix const&);
 		IMPORT  int SetInitialPos(unsigned int const&, class Vector const&);
 		IMPORT  int SetMissionObjectiveState(unsigned int const&, unsigned int const&, int, unsigned int);
-		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectiveType2, struct FmtStr const& information, uchar objectiveType3, struct FmtStr const& information2);
+		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectivesEntries, struct FmtStr const& missionType, uchar objectiveType3, struct FmtStr const& missionDescription); //arg 2 = 12, arg 6 = 2 ?
 		IMPORT  int SetMoneyNeededToNextRank(unsigned int, int);
 		IMPORT  int SetMonkey(unsigned int);
 		IMPORT  int SetMsnID(unsigned int, unsigned int, unsigned int, bool, unsigned int);

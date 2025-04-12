@@ -1493,47 +1493,17 @@ HK_ERROR HkAntiCheat(uint iClientID) {
     return HKE_OK;
 }
 
-HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
-                    const std::string &scHardpoint) {
+HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint)
+{
+    typedef bool(__stdcall* _AddCargoDocked)(uint iGoodID, CacheString*& hardpoint, int iNumItems, float fHealth, int bMounted, int bMission, uint iOne);
+    static _AddCargoDocked AddCargoDocked = 0;
+    if (!AddCargoDocked)
+        AddCargoDocked = (_AddCargoDocked)((char*)hModServer + 0x6EFC0);
+
     HK_GET_CLIENTID(iClientID, wscCharname);
 
     if ((iClientID == -1) || HkIsInCharSelectMenu(iClientID))
         return HKE_NO_CHAR_SELECTED;
-
-    if (!Players[iClientID].enteredBase) {
-        Players[iClientID].enteredBase = Players[iClientID].iBaseID;
-        Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true,
-                          iClientID);
-        Players[iClientID].enteredBase = 0;
-    } else {
-        Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true,
-                          iClientID);
-
-    }
-
-    // Add to check-list which is being compared to the users equip-list when
-    // saving char to fix "Ship or Equipment not sold on base" kick
-    EquipDesc ed;
-    ed.sID = Players[iClientID].lastEquipId;
-    ed.iCount = 1;
-    ed.iArchID = iGoodID;
-    Players[iClientID].lShadowEquipDescList.add_equipment_item(ed, false);
-
-    return HKE_OK;
-}
-
-HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
-                    const std::string &scHardpoint, bool bMounted) {
-    typedef bool(__stdcall * _AddCargoDocked)(
-        uint iGoodID, CacheString * &hardpoint, int iNumItems, float fHealth,
-        int bMounted, int bMission, uint iOne);
-    static _AddCargoDocked AddCargoDocked = 0;
-    if (!AddCargoDocked)
-        AddCargoDocked = (_AddCargoDocked)((char *)hModServer + 0x6EFC0);
-
-    HK_GET_CLIENTID(iClientID, wscCharname);
-    if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
-        return HKE_PLAYER_NOT_LOGGED_IN;
 
     uint iBase = 0;
     pub::Player::GetBase(iClientID, iBase);
@@ -1544,31 +1514,33 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID,
         Server.LocationExit(iLocation, iClientID);
     if (iBase)
         Server.BaseExit(iBase, iClientID);
+
     if (!HkIsValidClientID(iClientID))
         return HKE_PLAYER_NOT_LOGGED_IN;
 
-    PlayerData *pd = &Players[iClientID];
-    const char *p = scHardpoint.c_str();
     CacheString hardpoint;
-    hardpoint.value = StringAlloc(p, false);
-
+    hardpoint.value = StringAlloc(scHardpoint.c_str(), false);
+    CacheString* pHP = &hardpoint;
+    PlayerData* pd = &Players[iClientID];
     int iOne = 1;
-    int iMounted = bMounted;
+    int iMission = 0;
+    int iMounted = 1;
+    int iNumItems = 1;
     float fHealth = 1;
-    CacheString *pHP = &hardpoint;
     __asm {
         push iOne
+        push iMission
         push iMounted
-        push iOne
         push fHealth
-        push iOne
+        push iNumItems
         push pHP
         push iGoodID
         mov ecx, pd
         call AddCargoDocked
     }
 
-    if (iBase) Server.BaseEnter(iBase, iClientID);
+    if (iBase)
+        Server.BaseEnter(iBase, iClientID);
     if (iLocation)
         Server.LocationEnter(iLocation, iClientID);
 

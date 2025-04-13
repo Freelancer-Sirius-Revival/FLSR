@@ -16,7 +16,7 @@ namespace MissionBoard
 	void DeleteCustomMission(const uint missionId);
 
 	void Initialize();
-	void __stdcall MissionResponse(uint missionId, uint p2, bool p3, uint clientId);
+	void __stdcall MissionResponse(uint missionId, uint origin, bool accepted, uint clientId);
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize);
 	bool __stdcall Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint clientId, uint base);
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2);

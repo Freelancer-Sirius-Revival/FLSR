@@ -973,7 +973,7 @@ namespace pub
 		IMPORT  int GetGroupSize(unsigned int, unsigned int&);
 		IMPORT  int GetLocation(unsigned int const&, unsigned int&);
 		IMPORT  int GetMoneyNeededToNextRank(unsigned int const&, int&);
-		IMPORT  int GetMsnID(unsigned int, unsigned int&);
+		IMPORT  int GetMsnID(unsigned int clientId, unsigned int& missionId);
 		IMPORT  int GetName(unsigned int, st6::wstring&);
 		IMPORT  int GetNumKills(unsigned int const&, int&);
 		IMPORT  int GetNumMissionFailures(unsigned int const&, int&);
@@ -1007,7 +1007,7 @@ namespace pub
 		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectivesEntries, struct FmtStr const& missionType, uchar objectiveType3, struct FmtStr const& missionDescription); //arg 2 = 12, arg 6 = 2 ?
 		IMPORT  int SetMoneyNeededToNextRank(unsigned int, int);
 		IMPORT  int SetMonkey(unsigned int);
-		IMPORT  int SetMsnID(unsigned int, unsigned int, unsigned int, bool, unsigned int);
+		IMPORT  int SetMsnID(unsigned int clientId, unsigned int missionId, unsigned int acceptedByClientId, bool saveGame, unsigned int saveGameName);
 		IMPORT  int SetNumKills(unsigned int const&, int);
 		IMPORT  int SetNumMissionFailures(unsigned int const&, int);
 		IMPORT  int SetNumMissionSuccesses(unsigned int const&, int);

@@ -126,9 +126,12 @@ namespace MissionBoard
 		SendDestroyMissionToAll(missionId);
 	}
 
-	void __stdcall MissionResponse(uint boardIndex, uint p2, bool p3, uint clientId)
+	void __stdcall MissionResponse(uint boardIndex, uint origin, bool accepted, uint clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
+
+		if (!accepted)
+			return;
 
 		uint missionId;
 		pub::Player::GetMsnID(clientId, missionId);

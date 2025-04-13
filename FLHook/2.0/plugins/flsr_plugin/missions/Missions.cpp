@@ -737,10 +737,21 @@ namespace Missions
 			object.type = MissionObjectType::Client;
 			object.id = clientId;
 			auto& mission = missions.at(missionId);
+			mission.offerId = offerId;
 			mission.AddLabelToObject(object, CreateID("player"));
 			mission.Start();
 			missionNamesByOfferId.erase(entry);
 		}
+	}
+
+	bool IsPartOfOfferedJob(const uint clientId)
+	{
+		for (const auto& mission : missions)
+		{
+			if (mission.second.offerId != 0 && mission.second.clientIds.contains(clientId))
+				return true;
+		}
+		return false;
 	}
 
 	bool initialized = false;

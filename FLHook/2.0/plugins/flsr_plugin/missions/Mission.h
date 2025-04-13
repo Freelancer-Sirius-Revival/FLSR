@@ -13,6 +13,7 @@ namespace Missions
 	public:
 		const uint id;
 		const MissionArchetypePtr archetype;
+		uint offerId = 0;
 		std::unordered_map<uint, Trigger> triggers;
 		std::unordered_map<uint, uint> objectIdsByName;
 		std::unordered_map<uint, std::vector<MissionObject>> objectsByLabel;

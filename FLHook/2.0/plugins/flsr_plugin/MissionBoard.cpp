@@ -46,9 +46,11 @@ namespace MissionBoard
 	{
 		uint index;
 		uint base;
-		char unk1 = 1;
-		ushort unk2 = 0;
-		uint unk3 = 0;
+		// acceptanceData:
+		// 1 byte:  bool accepted
+		// 2 bytes: ushort rejectedResourceId;
+		// 4 bytes: unknown
+		char acceptanceData[7];
 	};
 
 	static void SendMissionAcceptance(const uint clientId, const uint boardIndex, const uint base)
@@ -56,6 +58,20 @@ namespace MissionBoard
 		MissionAcceptance data;
 		data.index = boardIndex;
 		data.base = base;
+		std::memset(&data.acceptanceData, 0, sizeof(data.acceptanceData));
+		data.acceptanceData[0] = 1; // TRUE, accepted
+		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
+	}
+
+	static void SendMissionRejection(const uint clientId, const uint boardIndex, const uint base, const ushort rejectionResourceId)
+	{
+		MissionAcceptance data;
+		data.index = boardIndex;
+		data.base = base;
+		std::memset(&data.acceptanceData, 0, sizeof(data.acceptanceData));
+		data.acceptanceData[0] = 0; // FALSE, rejected
+		ushort* rejectedText = (ushort*)& data.acceptanceData[1];
+		*rejectedText = rejectionResourceId;
 		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
 	}
 
@@ -113,6 +129,18 @@ namespace MissionBoard
 	void __stdcall MissionResponse(uint boardIndex, uint p2, bool p3, uint clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
+
+		uint missionId;
+		pub::Player::GetMsnID(clientId, missionId);
+		if (missionId > 0 || Missions::IsPartOfOfferedJob(clientId))
+		{
+			uint base;
+			pub::Player::GetBase(clientId, base);
+			SendMissionRejection(clientId, boardIndex, base, 1840);
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return;
+		}
+
 		const auto& clientEntry = customMissionIndicesByClient.find(clientId);
 		if (clientEntry != customMissionIndicesByClient.end())
 		{
@@ -120,27 +148,23 @@ namespace MissionBoard
 			{
 				if (indexEntry.first == boardIndex)
 				{
+					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 					uint base;
 					pub::Player::GetBase(clientId, base);
-					if (base)
-						SendMissionAcceptance(clientId, indexEntry.first, base);
+					if (!base)
+						return;
 					// Nobody has yet taken upon the mission
 					if (customMissions.contains(indexEntry.second))
 					{
+						SendMissionAcceptance(clientId, boardIndex, base);
 						Missions::StartMissionByOfferId(indexEntry.second, clientId);
-						SendDestroyMissionToAll(indexEntry.second);
-						RemoveMission(indexEntry.second);
+						DeleteCustomMission(indexEntry.second);
 					}
 					// Someone already removed it from the pool
 					else
 					{
-						// Send MISSION REJECTED message
-						FmtStr caption(0, 0);
-						caption.begin_mad_lib(1839);
-						caption.end_mad_lib();
-						pub::Player::DisplayMissionMessage(clientId, caption, MissionMessageType::MissionMessageType_Type1, true);
+						SendMissionRejection(clientId, boardIndex, base, 976);
 					}
-					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 					return;
 				}
 			}
@@ -186,12 +210,6 @@ namespace MissionBoard
 			minRequiredReputationForMissions = *(float*)(DWORD(contentHandle) + 0x1195BC);
 	}
 
-	static void ClearClientData(const uint clientId)
-	{
-		customMissionIndicesByClient.erase(clientId);
-		missionOffersMaxIndexByClient.erase(clientId);
-	}
-
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize)
 	{
 		returncode = DEFAULT_RETURNCODE;
@@ -227,21 +245,27 @@ namespace MissionBoard
 		return true;
 	}
 
+	static void ClearJobBoardClientData(const uint clientId)
+	{
+		customMissionIndicesByClient.erase(clientId);
+		missionOffersMaxIndexByClient.erase(clientId);
+	}
+
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
 	{
 		returncode = DEFAULT_RETURNCODE;
-		ClearClientData(clientId);
+		ClearJobBoardClientData(clientId);
 	}
 
 	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
-		ClearClientData(clientId);
+		ClearJobBoardClientData(clientId);
 	}
 
 	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
-		ClearClientData(clientId);
+		ClearJobBoardClientData(clientId);
 	}
 }

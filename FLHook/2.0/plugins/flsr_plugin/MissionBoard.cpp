@@ -100,13 +100,6 @@ namespace MissionBoard
 		}
 	}
 
-	static void RemoveMission(const uint missionId)
-	{
-		for (auto& baseEntry : customMissionIdsByBase)
-			baseEntry.second.erase(missionId);
-		customMissions.erase(missionId);
-	}
-
 	uint nextMissionId = std::numeric_limits<uint>::max();
 
 	uint AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases)
@@ -171,6 +164,16 @@ namespace MissionBoard
 					return;
 				}
 			}
+		}
+	}
+
+	void __stdcall AbortMission(uint clientId, uint missionId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		if (Missions::IsPartOfOfferedJob(clientId))
+		{
+			Missions::RemoveClientFromCurrentOfferedJob(clientId);
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 		}
 	}
 

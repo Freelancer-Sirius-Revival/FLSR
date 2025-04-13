@@ -86,7 +86,7 @@ namespace Missions
 		}
 		triggerExecutionRunning = false;
 
-		// Delete the mission if it has ended by one of the triggers.
+		// Delete the mission if it was ended by one of the triggers.
 		if (ended)
 			missions.erase(id);
 	}

@@ -754,6 +754,18 @@ namespace Missions
 		return false;
 	}
 
+	void RemoveClientFromCurrentOfferedJob(const uint clientId)
+	{
+		for (auto& mission : missions)
+		{
+			if (mission.second.offerId != 0 && mission.second.clientIds.contains(clientId))
+			{
+				mission.second.RemoveClient(clientId);
+				return;
+			}
+		}
+	}
+
 	bool initialized = false;
 	void Initialize()
 	{
@@ -802,17 +814,31 @@ namespace Missions
 
 	static void RemoveObjectFromMissions(const uint objId)
 	{
-		for (auto& entry : missions)
-			entry.second.RemoveObject(objId);
+		std::vector<uint> ids;
+		for (const auto& entry : missions)
+			ids.push_back(entry.first);
+
+		for (const auto id : ids)
+		{
+			if (const auto& entry = missions.find(id); entry != missions.end())
+				entry->second.RemoveObject(objId);
+		}
 	}
 
 	static void RemoveClientFromMissions(const uint client)
 	{
-		for (auto& entry : missions)
-			entry.second.RemoveClient(client);
+		std::vector<uint> ids;
+		for (const auto& entry : missions)
+			ids.push_back(entry.first);
+
+		for (const auto id : ids)
+		{
+			if (const auto& entry = missions.find(id); entry != missions.end())
+				entry->second.RemoveClient(client);
+		}
 	}
 
-	static void DestroyNonLootingEquipment(const IObjRW* killedObject, const uint killerId)
+	static void DestroyNonLootableEquipment(const IObjRW* killedObject, const uint killerId)
 	{
 		if (killedObject->is_player())
 			return;
@@ -940,7 +966,7 @@ namespace Missions
 		if (killed)
 		{
 			// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
-			DestroyNonLootingEquipment(killedObject, killerId);
+			DestroyNonLootableEquipment(killedObject, killerId);
 
 			// Manually care for reputation change to the killer. Group-Rep will be handled anyway by the GroupRep module.
 			ChangeReputationUponDestruction(killedObject, killerId);

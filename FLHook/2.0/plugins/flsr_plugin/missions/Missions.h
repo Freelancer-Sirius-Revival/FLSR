@@ -5,6 +5,7 @@ namespace Missions
 {
     void StartMissionByOfferId(const uint offerId, const uint clientId);
     bool IsPartOfOfferedJob(const uint clientId);
+    void RemoveClientFromCurrentOfferedJob(const uint clientId);
 
     void Initialize();
     void __stdcall Shutdown();

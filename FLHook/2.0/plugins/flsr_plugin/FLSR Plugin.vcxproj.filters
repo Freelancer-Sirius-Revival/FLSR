@@ -128,6 +128,9 @@
     <ClCompile Include="missions\actions\ActAdjRep.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActChangeState.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -281,6 +284,9 @@
     </ClInclude>
     <ClInclude Include="MissionBoard.h" />
     <ClInclude Include="missions\actions\ActAdjRep.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActChangeState.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

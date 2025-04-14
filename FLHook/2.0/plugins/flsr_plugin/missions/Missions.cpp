@@ -4,7 +4,6 @@
 #include "LootProps.h"
 #include "Missions.h"
 #include "Mission.h"
-#include "MissionArch.h"
 #include "TriggerArch.h"
 #include "Conditions/CndDestroyed.h"
 #include "Conditions/CndDistVec.h"
@@ -15,6 +14,7 @@
 #include "Conditions/CndCountArch.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrigger.h"
+#include "Actions/ActChangeState.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuse.h"
@@ -37,6 +37,23 @@
 namespace Missions
 {	
 	std::unordered_map<uint, std::string> missionNamesByOfferId;
+
+	uint RegisterMissionToJobBoard(const MissionArchetype& missionArchetype)
+	{
+		if (missionArchetype.offer.type != pub::GF::MissionType::Unknown && !missionArchetype.offer.bases.empty())
+		{
+			MissionBoard::MissionOffer offer;
+			offer.type = missionArchetype.offer.type;
+			offer.system = missionArchetype.offer.system;
+			offer.group = missionArchetype.offer.group;
+			offer.text = missionArchetype.offer.text;
+			offer.reward = missionArchetype.offer.reward;
+			const uint offerId = MissionBoard::AddCustomMission(offer, missionArchetype.offer.bases);
+			missionNamesByOfferId.insert({ offerId, missionArchetype.name });
+			return offerId;
+		}
+		return 0;
+	}
 
 	static uint CreateIdOrNull(const char* str)
 	{
@@ -472,6 +489,13 @@ namespace Missions
 								ActEndMissionPtr action(new ActEndMission());
 								trigger->actions.push_back(action);
 							}
+							else if (ini.is_value("Act_ChangeState"))
+							{
+								ActChangeStatePtr action(new ActChangeState());
+								action->state = ToLower(ini.get_value_string(0)) == "succeed" ? ChangeState::Succeed : ChangeState::Fail;
+								action->failureStringId = ini.get_value_int(1);
+								trigger->actions.push_back(action);
+							}
 							else if (ini.is_value("Act_ActTrig"))
 							{
 								ActActTriggerPtr action(new ActActTrigger());
@@ -687,19 +711,7 @@ namespace Missions
 		}
 
 		for (const auto& missionArch : missionArchetypes)
-		{
-			if (missionArch->offer.type != pub::GF::MissionType::Unknown && !missionArch->offer.bases.empty())
-			{
-				MissionBoard::MissionOffer offer;
-				offer.type = missionArch->offer.type;
-				offer.system = missionArch->offer.system;
-				offer.group = missionArch->offer.group;
-				offer.text = missionArch->offer.text;
-				offer.reward = missionArch->offer.reward;
-				const uint offerId = MissionBoard::AddCustomMission(offer, missionArch->offer.bases);
-				missionNamesByOfferId.insert({ offerId, missionArch->name });
-			}
-		}
+			RegisterMissionToJobBoard(*missionArch);
 	}
 	
 	uint nextMissionId = 1;

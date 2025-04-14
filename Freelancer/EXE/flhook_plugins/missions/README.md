@@ -243,6 +243,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
     1. `STRING` Arbitrary text to print.
 - `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
+- `Act_ChangeState` Sets the mission state. This does not end the mission!
+    1. `SUCCEED|FAIL :FAIL` The state to change into. Displays and plays respective text to all players of the mission. On `FAIL` it will re-offer the mission on the job board if applicable.
+    1. `INTEGER :0` Only for `FAIL`: The text ID to display.
 - `Act_ActTrig` Activates a trigger.
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.

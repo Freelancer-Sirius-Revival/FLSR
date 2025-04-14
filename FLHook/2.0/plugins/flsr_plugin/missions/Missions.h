@@ -1,8 +1,10 @@
 #pragma once
 #include <FLHook.h>
+#include "MissionArch.h"
 
 namespace Missions
 {
+    uint RegisterMissionToJobBoard(const MissionArchetype& missionArchetype);
     void StartMissionByOfferId(const uint offerId, const uint clientId);
     bool IsPartOfOfferedJob(const uint clientId);
     void RemoveClientFromCurrentOfferedJob(const uint clientId);

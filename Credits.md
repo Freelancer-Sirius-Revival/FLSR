@@ -19,7 +19,7 @@
   - [Many misc improvements](https://github.com/FLHDE/freelancer-hd-edition)
   - [Text Strings Revision](https://www.moddb.com/games/freelancer/downloads/freelancer-text-strings-revision) *([Mirror](https://github.com/FLHDE/freelancer-text-strings-revision))*
 
-- [BC46](https://github.com/BC46) & [Aingar](https://github.com/Aingar) & [Venemon](https://github.com/Venemon)
+- [BC46](https://github.com/BC46)
   - [FLSharp](https://github.com/BC46/FLSharp)
 
 - [Caenen](https://github.com/Caenen)

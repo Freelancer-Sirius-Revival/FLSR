@@ -207,7 +207,7 @@ namespace Missions
 							else if (ini.is_value("npc"))
 								npc.npcId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("hitpoints"))
-								npc.hitpoints = ini.get_value_int(0);
+								npc.hitpoints = ini.get_value_float(0);
 							else if (ini.is_value("pilot_job"))
 								npc.pilotJobId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("arrival_obj"))
@@ -244,7 +244,7 @@ namespace Missions
 							else if (ini.is_value("loadout"))
 								solar.loadoutId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("hitpoints"))
-								solar.hitpoints = ini.get_value_int(0);
+								solar.hitpoints = ini.get_value_float(0);
 							else if (ini.is_value("base"))
 								solar.baseId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("faction"))

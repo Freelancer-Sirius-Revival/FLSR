@@ -22,7 +22,7 @@ namespace Missions
 		uint baseId = 0;
 		std::string faction = "";
 		uint pilotId = 0;
-		float hitpointsPercentage = 1.0f;
+		int hitpoints = -1;
 		uint voiceId = 0;
 		MsnSolarCostume costume;
 		std::unordered_set<uint> labels;

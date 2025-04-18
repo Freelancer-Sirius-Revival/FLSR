@@ -230,49 +230,29 @@ namespace Missions
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-							{
 								solar.name = ToLower(ini.get_value_string(0));
-							}
 							else if (ini.is_value("string_id"))
-							{
 								solar.idsName = ini.get_value_int(0);
-							}
 							else if (ini.is_value("system"))
-							{
 								solar.systemId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("position"))
-							{
 								solar.position = ini.get_vector();
-							}
 							else if (ini.is_value("rotate"))
-							{
 								solar.orientation = EulerMatrix(ini.get_vector());
-							}
 							else if (ini.is_value("archetype"))
-							{
 								solar.archetypeId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("loadout"))
-							{
 								solar.loadoutId = CreateIdOrNull(ini.get_value_string(0));
-							}
+							else if (ini.is_value("hitpoints"))
+								solar.hitpoints = ini.get_value_int(0);
 							else if (ini.is_value("base"))
-							{
 								solar.baseId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("faction"))
-							{
 								solar.faction = ini.get_value_string(0);
-							}
 							else if (ini.is_value("pilot"))
-							{
 								solar.pilotId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("voice"))
-							{
 								solar.voiceId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("space_costume"))
 							{
 								solar.costume.headId = CreateIdOrNull(ini.get_value_string(0));
@@ -286,9 +266,7 @@ namespace Missions
 								}
 							}
 							else if (ini.is_value("label"))
-							{
 								solar.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
-							}
 						}
 
 						if (solar.archetypeId && !solar.name.empty() && solar.systemId)
@@ -305,7 +283,7 @@ namespace Missions
 							solarArch.baseId = solar.baseId;
 							solarArch.affiliation = solar.faction;
 							solarArch.pilotId = solar.pilotId;
-							solarArch.hitpointsPercentage = solar.hitpointsPercentage;
+							solarArch.hitpoints = solar.hitpoints;
 							solarArch.voiceId = solar.voiceId;
 							solarArch.headId = solar.costume.headId;
 							solarArch.bodyId = solar.costume.bodyId;

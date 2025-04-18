@@ -221,7 +221,7 @@ namespace SolarSpawn
 		solarInfo.iFlag = 4;
 		solarInfo.iArchID = archetype.archetypeId;
 		solarInfo.iLoadoutID = archetype.loadoutId;
-		solarInfo.iHitPointsLeft = -1; // Max hit points from archetype are taken when -1
+		solarInfo.iHitPointsLeft = archetype.hitpoints;
 		solarInfo.iSystemID = systemOverride == NULL ? archetype.systemId : systemOverride;
 		solarInfo.mOrientation = orientationOverride == NULL ? archetype.orientation : *orientationOverride;
 		solarInfo.vPos = positionOverride == NULL ? archetype.position : *positionOverride;

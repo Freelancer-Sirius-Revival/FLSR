@@ -65,6 +65,8 @@ This is the definition for a single solar for the mission. Multiple `MsnSolar` c
     1. `STRING` The solar archetype nickname.
 - `[loadout]` Defines the equipment loadout.
     1. `STRING` The loadout nickname.
+- `[hitpoints]` The absolute hitpoints to spawn this solar with.
+    1. `[INTEGER|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.
 - `[base]` Only required for stations.
     1. `STRING` The base nickname the docks of this object will be connected with.
 - `[faction]` If left empty, this object is not affiliated with anyone.
@@ -139,7 +141,7 @@ This is the definition for a single NPC for the mission. Multiple `MsnSolar` can
     1. `FLOAT :0` The z-axis.
 - `npc` Defines the NPC archetype.
     1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
-- `hitpoints` The hitpoints of this NPC.
+- `[hitpoints]` The absolute hitpoints to spawn this NPC with.
     1. `[INTEGER|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.
 - `[pilot_job]` Override for the job of the pilot.
     1. `STRING` The job nickname used.

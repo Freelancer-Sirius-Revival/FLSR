@@ -23,6 +23,9 @@ File: DLLS\BIN\Content.dll
 # Time given to drop cargo. - adoxa
 118130: 5f	[ 20f ]
 
+# Fixes NPCs saying the first number of their call sign twice when requesting to dock. - BC46
+037068: 03	[ 02 ]
+
 
 ##########################################
 # Random Missions

@@ -510,7 +510,9 @@ namespace Missions
 							{
 								ActLightFusePtr action(new ActLightFuse());
 								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								action->fuseName = ini.get_value_string(1);
+								action->fuse = CreateIdOrNull(ini.get_value_string(1));
+								action->timeOffset = ini.get_value_float(2);
+								action->lifetimeOverride = ini.get_value_float(3);
 								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SpawnSolar"))

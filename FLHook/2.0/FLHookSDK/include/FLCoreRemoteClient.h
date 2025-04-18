@@ -105,13 +105,13 @@ struct FLPACKET_LAUNCH
 
 struct FLPACKET_BURNFUSE
 {
-	uint iShipAttacker;
-	uint iShip;
-	uint iFuseID;
-	uint iDunno1;
-	uint iDunno2;
-	float fDunno;
-	bool bActive;
+	uint triggererObjId;
+	uint objId;
+	uint fuseId;
+	ushort subObjId; // Root = 1, and other Collision Groups
+	float timeOffset; // between 0 and 1
+	float lifetimeOverride; // -1 when no override
+	bool active; // set to False stops the fuse
 };
 
 struct FLPACKET_DESTROYOBJECT

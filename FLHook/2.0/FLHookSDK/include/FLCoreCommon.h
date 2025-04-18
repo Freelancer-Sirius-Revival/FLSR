@@ -5742,7 +5742,7 @@ struct IObjRWAbstract
 	virtual bool hit_shield_bubble(DamageList*);        // 472
 	virtual void sub_6CE88D0();                         // iterate over all equipped equipment and run an update?                           //476
 	virtual void sub_6CE8930();                         // processes values under 0x74 and 0x78 pointers                                    //480
-	virtual bool light_fuse(uint fuseTriggererId, uint* fuseId, ushort sId, float radius, float fuseLifetime);                                    // 484 sub_6D01A90
+	virtual bool light_fuse(uint fuseTriggererId, uint* fuseId, ushort sId, float timeoffset, float lifetimeOverride);                                    // 484 sub_6D01A90
 	virtual bool unlight_fuse_unk(uint* fuseId, ushort sid, float lifeTime);                                                               // 488 sub_6CEC7F0
 	virtual bool fuse_expiration_check();                                                                                                 // 492 sub_6CEC8D0
 	virtual void death_explosion();                                                                                                       // 496 sub_6CE8400

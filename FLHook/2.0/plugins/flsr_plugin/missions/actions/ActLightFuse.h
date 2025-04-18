@@ -6,7 +6,9 @@ namespace Missions
 	struct ActLightFuse : Action
 	{
 		uint objNameOrLabel = 0;
-		std::string fuseName = "";
+		uint fuse = 0;
+		float timeOffset = 0.0f;
+		float lifetimeOverride = -1.0f;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;
 	};

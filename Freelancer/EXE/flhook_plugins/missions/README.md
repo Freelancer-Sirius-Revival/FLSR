@@ -277,6 +277,8 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_LightFuse` Executes an arbitary fuse.
     1. `STRING|Activator` Object by name or label to refer.
     1. `STRING` Fuse nickname to execute on the objects.
+    1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
+    1. `[FLOAT]` Overrides the fuse lifetime by this value.
 - `Act_GiveObjList` Gives NPCs a list of objectives.
     1. `STRING|Activator` The NPCs to receive the objectives.
     1. `STRING` The `ObjList` nickname to refer to.

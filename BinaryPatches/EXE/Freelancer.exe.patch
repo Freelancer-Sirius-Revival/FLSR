@@ -242,6 +242,9 @@ File: EXE\Freelancer.exe
 # Fix bug with low resolution textures on some systems (sets maximum to 8192 instead of 128). - Schmackbolzen
 01AD6F: 00 20	[ 80 00 ]
 
+# Fix bug with low resolution textures of news entries and mission board pictures on some systems. - BC46
+1B48B8: 00	[ 07 ]
+
 # Prevents sudden frame drops from occurring in space. Effectively removes Sleep(1) from the delta time calculation. - BC46
 02D7B8: EB DD	[ 6A 01 ]
 

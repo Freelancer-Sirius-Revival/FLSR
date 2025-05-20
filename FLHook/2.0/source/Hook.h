@@ -773,8 +773,8 @@ EXPORT void HkSaveChar(uint iClientID);
 
 
 EXPORT bool InitLogs();
-EXPORT void AddDebugLog(const std::string& szString, ...);
-EXPORT void AddLog(const std::string& szString, ...);
+EXPORT void AddDebugLog(const std::string szString, ...);
+EXPORT void AddLog(const std::string szString, ...);
 EXPORT void HkHandleCheater(uint iClientID, bool bBan, std::wstring wscReason,
                             ...);
 EXPORT bool HkAddCheaterLog(const std::wstring &wscCharname,

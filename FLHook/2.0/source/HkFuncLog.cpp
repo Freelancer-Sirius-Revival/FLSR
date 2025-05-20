@@ -69,8 +69,6 @@ bool InitLogs()
     return true;
 }
 
-
-
 void AddLog_s(LogType LogType, LogLevel lvl, const std::string& str)
 {
     auto level = static_cast<spdlog::level::level_enum>(lvl);
@@ -143,21 +141,26 @@ void AddLog_s(LogType LogType, LogLevel lvl, const std::string& str)
     }
 }
 
-
-
-
-
-
-void AddDebugLog(const std::string& szString, ...) {
+void AddDebugLog(const std::string szString, ...) {
  
-    AddLog_s(LogType::Normal, LogLevel::Debug, szString);
+    char buffer[1024];
+    va_list args;
+    va_start(args, szString);
+    vsprintf_s(buffer, 1024, szString.c_str(), args);
+    va_end(args);
+    AddLog_s(LogType::Normal, LogLevel::Debug, std::string(buffer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void AddLog(const std::string& szString, ...) {
+void AddLog(const std::string szString, ...) {
 
-    AddLog_s(LogType::Normal, LogLevel::Info, szString);
+    char buffer[1024];
+    va_list args;
+    va_start(args, szString);
+    vsprintf_s(buffer, 1024, szString.c_str(), args);
+    va_end(args);
+    AddLog_s(LogType::Normal, LogLevel::Info, std::string(buffer));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

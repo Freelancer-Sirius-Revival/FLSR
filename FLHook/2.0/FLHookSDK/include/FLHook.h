@@ -538,8 +538,8 @@ IMPORT void HkSaveChar(uint iClientID);
 
 // HkFuncLog
 #define AddBothLog(s, ...) { AddLog(s, __VA_ARGS__); AddDebugLog(s, __VA_ARGS__);  }
-IMPORT void AddDebugLog(const std::string& szString, ...);
-IMPORT void AddLog(const std::string& szString, ...);
+IMPORT void AddDebugLog(const std::string szString, ...);
+IMPORT void AddLog(const std::string szString, ...);
 IMPORT void HkHandleCheater(uint iClientID, bool bBan, std::wstring wscReason, ...);
 IMPORT bool HkAddCheaterLog(const std::wstring& wscCharname, const std::wstring& wscReason);
 IMPORT bool HkAddCheaterLog(const uint& iClientID, const std::wstring& wscReason);

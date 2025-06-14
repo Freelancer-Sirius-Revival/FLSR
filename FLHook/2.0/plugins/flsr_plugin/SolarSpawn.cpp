@@ -579,6 +579,36 @@ namespace SolarSpawn
 
 		uint shipId = ship;
 		pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, true);
+
+		//CEScanner* scanner = (CEScanner*)solar->equip_manager.FindFirst(EquipmentClass::Scanner);
+		//if (scanner)
+		//{
+		//	lines = { CreateID("gcs_dhail_nopermission_01-") };
+		//	ScanList& scanList = scanner->scanlist;
+		//	for (uint index = 0; index < scanList.currSize; index++)
+		//	{
+		//		// Watchables are part of IObjRW, inherited from CShipAbstract
+		//		Watchable* watchable = scanList.objectArray[index].watchable;
+		//		// Move 8 bytes backwards to get from the watchable address to the vfptr of IObjRW
+		//		IObjRW* obj = (IObjRW*)(((char*)watchable) - 8);
+		//		if (obj->cobj->type & (ObjectType::Fighter | ObjectType::Freighter | ObjectType::Gunboat | ObjectType::Cruiser | ObjectType::Transport | ObjectType::Capital | ObjectType::Mining))
+		//		{
+		//			float attitude;
+		//			pub::Reputation::GetAttitude(solar->repVibe, static_cast<CEqObj*>(obj->cobj)->repVibe, attitude);
+		//			if (attitude <= -0.6)
+		//			{
+
+		//			}
+		//			
+		//			if (!obj->cobj->ownerPlayer)
+		//			{
+		//				pub::SpaceObj::SendComm(solar->id, obj->cobj->id, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, true);
+		//			}
+		//		}
+		//	}
+		//}
+
+
 		return 0;
 	}
 

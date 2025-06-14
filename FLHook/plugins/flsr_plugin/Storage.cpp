@@ -16,6 +16,7 @@ namespace Storage
 	{
 		uint baseId;
 		std::unordered_map<uint, uint> itemArchetypeIdsWithCount = {};
+		//std::unordered_map<Archetype::AClassType, std::vector<Item>> itemsByType;
 	};
 
 	struct Account
@@ -29,6 +30,8 @@ namespace Storage
 	std::unordered_map<std::string, Account> accountByAccountUid;
 	std::vector<uint> excludedBaseIds;
 	std::unordered_map<std::string, std::string> accountUidByCharacterFileName;
+	
+	std::unordered_map<uint, std::unordered_map<uint, uint>> itemArchetypeIdByChatIdPerClientId;
 
 	std::string outputDirectory;
 	int maxCharacterMoney = 999999999;
@@ -94,7 +97,11 @@ namespace Storage
 						storage.baseId = baseId;
 						while (ini.read_value())
 						{
-							storage.itemArchetypeIdsWithCount[ini.get_value_int(0)] = ini.get_value_int(1);
+							const std::string line = std::string(ini.get_line_ptr());
+							const std::string key = Trim(line.substr(0, line.find("=")));
+							const uint itemArchetypeId = strtoul(key.c_str(), NULL, 0);
+							if (itemArchetypeId != 0)
+								storage.itemArchetypeIdsWithCount[itemArchetypeId] = ini.get_value_int(0);
 						}
 						account.storagesByBaseId[baseId] = storage;
 					}
@@ -345,7 +352,7 @@ namespace Storage
 		std::list<CARGO_INFO> cargoList;
 		if (HkEnumCargo(ARG_CLIENTID(clientId), cargoList, remainingHoldSize) != HKE_OK)
 			return;
-		std::unordered_map<std::wstring, uint> itemCountByName;
+		std::unordered_map<std::wstring, std::pair<uint, uint>> itemCountAndArchetypeIdByName;
 		std::set<std::wstring> itemNames;
 		for (const CARGO_INFO& cargo : cargoList)
 		{
@@ -353,18 +360,69 @@ namespace Storage
 			{
 				const std::wstring name = GetEquipmentName(cargo.iArchID);
 				itemNames.insert(name);
-				itemCountByName[name] = (!itemCountByName.contains(name) ? 0 : itemCountByName[name]) + cargo.iCount;
+				itemCountAndArchetypeIdByName[name] = {
+					(!itemCountAndArchetypeIdByName.contains(name) ? 0 : itemCountAndArchetypeIdByName[name].first) + cargo.iCount,
+					cargo.iArchID
+				};
 			}
 		}
 
 		uint number = 1;
 		for (const std::wstring& name : itemNames)
-			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountByName[name]) + L"\u00D7 " + name);
+		{
+			itemArchetypeIdByChatIdPerClientId[clientId][number] = itemCountAndArchetypeIdByName[name].second;
+			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountAndArchetypeIdByName[name].first) + L"\u00D7 " + name);
+		}
 	}
 
-	static void StoreItem(const uint clientId, const uint baseId, const uint itemId)
+	static void StoreItem(const uint clientId, const uint baseId, const uint itemArchetypeId, const uint amount)
 	{
+		if (!IsPlayerDocked(clientId))
+		{
+			PrintUserCmdText(clientId, L"You must be docked to store items!");
+			return;
+		}
 
+		if (!HasAccount(clientId))
+		{
+			PrintUserCmdText(clientId, L"Cannot store an item without active storage account!");
+			return;
+		}
+
+		int remainingHoldSize;
+		std::list<CARGO_INFO> cargoList;
+		if (HkEnumCargo(ARG_CLIENTID(clientId), cargoList, remainingHoldSize) != HKE_OK)
+			return;
+		std::unordered_map<uint, uint> itemIdsWithCount;
+		int remainingAmount = amount;
+		for (const auto& foo : cargoList)
+		{
+			if (!foo.bMission && !foo.bMounted && foo.iArchID == itemArchetypeId)
+			{
+				const int amountToRemove = std::min(remainingAmount, foo.iCount);
+				itemIdsWithCount[foo.iID] = amountToRemove;
+				remainingAmount -= amountToRemove;
+				if (remainingAmount <= 0)
+					break;
+			}
+		}
+		if (remainingAmount > 0)
+		{
+			PrintUserCmdText(clientId, L"Cannot store more items from your cargo than you have!");
+			return;
+		}
+
+		for (const auto& itemIdWithCount : itemIdsWithCount)
+			pub::Player::RemoveCargo(clientId, itemIdWithCount.first, itemIdWithCount.second);
+
+		Account& account = GetAccount(clientId);
+		auto& itemArchetypeIdsWithCount = account.storagesByBaseId[baseId].itemArchetypeIdsWithCount;
+		if (!itemArchetypeIdsWithCount.contains(itemArchetypeId))
+			itemArchetypeIdsWithCount[itemArchetypeId] = 0;
+		itemArchetypeIdsWithCount[itemArchetypeId] += amount;
+
+		const std::wstring baseNickname = HkGetBaseNickByID(baseId);
+		IniWrite(outputDirectory + "\\" + account.uid + ".ini", wstos(baseNickname), std::to_string(itemArchetypeId), std::to_string(itemArchetypeIdsWithCount[itemArchetypeId]));
 	}
 
 	static void UnstoreItem(const uint clientId, const uint baseId, const uint itemId)
@@ -568,6 +626,19 @@ namespace Storage
 			return true;
 		}
 
+		if (argumentsLowered.find(L"/store") == 0)
+		{
+			uint baseId;
+			pub::Player::GetBase(clientId, baseId);
+
+			const std::wstring& argument1 = Trim(GetParam(argumentsLowered, ' ', 1));
+			const uint itemNumber = strtoul(wstos(argument1).c_str(), NULL, 0);
+			const std::wstring& argument2 = Trim(GetParam(argumentsLowered, ' ', 2));
+			const uint itemAmount = strtoul(wstos(argument2).c_str(), NULL, 0);
+			if (itemNumber > 0 && itemArchetypeIdByChatIdPerClientId[clientId].contains(itemNumber))
+				StoreItem(clientId, baseId, itemArchetypeIdByChatIdPerClientId[clientId][itemNumber], std::max(static_cast<uint>(1), (itemAmount == ULONG_MAX ? 0 : itemAmount)));
+		}
+
 		if (argumentsLowered.find(L"/storages") == 0)
 		{
 			ListStorages(clientId);
@@ -586,9 +657,7 @@ namespace Storage
 					baseId = foundBaseId->second;
 			}
 			else
-			{
 				pub::Player::GetBase(clientId, baseId);
-			}
 
 			if (baseId > 0)
 				ListStoredItems(clientId, baseId);

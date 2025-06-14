@@ -82,8 +82,6 @@
     <PostBuildEvent>
       <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
 xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)*.ini" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)*.cfg" "$(DistDir)flhook_plugins\"
 xcopy /y  "$(OutDir)dpp.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
@@ -114,9 +112,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)*.ini" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)*.cfg" "$(DistDir)flhook_plugins\"
 xcopy /y  "$(OutDir)dpp.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
 xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
@@ -258,31 +253,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="configs\FLSR-Carrier.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-Cloak.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-Crafting.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-EquipWhiteList.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-LootBoxes.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\flsr.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-SolarInvincibility.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="configs\FLSR-Solars.cfg">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <None Include="configs\FLSR-Missions.ini" />
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
     <None Include="surdump.zip" />

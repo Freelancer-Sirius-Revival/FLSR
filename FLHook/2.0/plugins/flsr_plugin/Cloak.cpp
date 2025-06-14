@@ -448,14 +448,14 @@ namespace Cloak
 		return false;
 	}
 
-	static void StartFuse(const uint clientId, const uint fuseId)
+	static void StartFuse(const uint clientId, uint fuseId)
 	{
-		HkLightFuse(clientCloakStats[clientId].shipInspect, fuseId, 0.0f, 0.0f, 0.0f);
+		clientCloakStats[clientId].shipInspect->light_fuse(0, &fuseId, 0.0f, 0.0f, 0.0f);
 	}
 
-	static void StopFuse(const uint clientId, const uint fuseId)
+	static void StopFuse(const uint clientId, uint fuseId)
 	{
-		HkUnLightFuse(clientCloakStats[clientId].shipInspect, fuseId);
+		clientCloakStats[clientId].shipInspect->unlight_fuse_unk(&fuseId, 0, 0.0f);
 	}
 
 	static void SendEquipmentActivationState(const uint clientId, const uint cargoId, const bool active)
@@ -840,14 +840,6 @@ namespace Cloak
 
 			const CloakState& cloakState = clientCloakStats[clientId].cloakState;
 
-			// Synchronize cloak state to all players
-			SendEquipmentActivationState(clientId, clientCloakStats[clientId].cloakCargoId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
-			// Synchronize fallback instant cloak to all players
-			SendEquipmentActivationState(clientId, clientCloakStats[clientId].instantCloakCargoId, cloakState == CloakState::Cloaked || cloakState == CloakState::Uncloaking);
-
-			// Synchronize activator state to all players
-			SendEquipmentActivationState(clientId, clientCloakStats[clientId].activatorCargoId, cloakState == CloakState::Cloaking || cloakState == CloakState::Cloaked);
-
 			// Uncloak player in no-cloak-zones
 			CheckPlayerInNoCloakArea(clientId, playerData->iSystemID, playerData->iShipID);
 
@@ -866,9 +858,7 @@ namespace Cloak
 
 			// Uncloak when power is empty.
 			if (cloakState == CloakState::Cloaked && power <= LOW_ENERGY_THRESHOLD)
-			{
 				QueueUncloak(clientId, UncloakReason::Power);
-			}
 
 			SynchronizePowerStateWithCloakState(clientId, power);
 
@@ -959,6 +949,7 @@ namespace Cloak
 		{
 			ClearClientData(clientId);
 			InstallCloak(clientId);
+			AttemptInitialUncloak(clientId);
 		}
 	}
 	
@@ -1027,8 +1018,6 @@ namespace Cloak
 
 		if (Modules::GetModuleState("CloakModule"))
 		{
-			AttemptInitialUncloak(clientId);
-
 			// Fix bug of Throttle on server not being correctly set.
 			if (IsValidCloakableClient(clientId))
 			{

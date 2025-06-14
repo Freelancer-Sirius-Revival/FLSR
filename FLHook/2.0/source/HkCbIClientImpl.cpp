@@ -182,6 +182,8 @@ bool HkIClientImpl::Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, const
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
 
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_REQUEST_BEST_PATH, bool, __stdcall, (uint, const XRequestBestPath&, int), (iClientID, data, size));
+
 	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_REQUEST_BEST_PATH(iClientID, data, size));
 	return reinterpret_cast<bool>(vRet);
 }

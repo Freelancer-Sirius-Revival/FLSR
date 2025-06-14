@@ -3,13 +3,22 @@
 
 namespace Missions
 {
+	enum class NNObjectiveType
+	{
+		Ids,
+		Waypoint,
+		Path,
+		Objective
+	};
+
 	struct ActSetNNObj : Action
 	{
 		uint objNameOrLabel = 0;
-		uint message = 0;
+		NNObjectiveType type = NNObjectiveType::Ids;
+		uint titleId = 0;
+		uint descriptionId = 0;
 		uint systemId = 0;
 		Vector position;
-		bool bestRoute = false;
 		uint targetObjName = 0;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;

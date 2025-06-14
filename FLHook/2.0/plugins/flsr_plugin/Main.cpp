@@ -5,6 +5,7 @@
 #include "Missions/NpcNames.h"
 #include "Missions/LootProps.h"
 #include "Missions/Missions.h"
+#include "Missions/BestPath.h"
 #include "MissionBoard.h"
 
 std::mutex m_Mutex;
@@ -19,6 +20,7 @@ void LoadSettings() {
     Pilots::ReadFiles();
     NpcNames::ReadFiles();
     LootProps::ReadFiles();
+    BestPath::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];

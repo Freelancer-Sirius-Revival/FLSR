@@ -61,6 +61,63 @@ namespace MissionBoard
 		std::memset(&data.acceptanceData, 0, sizeof(data.acceptanceData));
 		data.acceptanceData[0] = 1; // TRUE, accepted
 		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
+
+	/*	//FmtStr caption(13068, 0);
+		//caption.append_system(CreateID("li01"));
+		//FmtStr::NavMarker marker;
+		//marker.system = CreateID("li01");
+		//marker.unk = 1101;
+		//marker.pos.x = 14802;
+		//marker.pos.y = 281;
+		//marker.pos.z = -70524;
+		//caption.append_nav_marker(marker);
+		//pub::Player::DisplayMissionMessage(clientId, caption, MissionMessageType::MissionMessageType_Type1, true);
+
+		std::vector<pub::Player::MissionObjective> objs;
+		objs.resize(1);
+		objs[0].type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
+		objs[0].message = FmtStr(13081, 0);
+		//objs[1].unk = 10;
+		//objs[1].message = FmtStr(13066, 0);
+		//objs[2].unk = 9;
+		//objs[2].message = FmtStr(1, 0);
+		//objs[3].unk = 58;
+		//objs[3].message = FmtStr(327739, 0);
+		FmtStr::NavMarker marker1;
+		marker1.system = 2208796239;
+		marker1.unk = 1;
+		marker1.pos.x = 50655;
+		marker1.pos.y = 0;
+		marker1.pos.z = -77595;
+		objs[0].message.append_nav_marker(marker1);
+		objs[0].message.append_system(CreateID("li01"));
+		//FmtStr::NavMarker marker2;
+		//marker1.system = 2208796239;
+		//marker1.unk = 1;
+		//marker1.pos.x = 47207;
+		//marker1.pos.y = 0;
+		//marker1.pos.z = -75413;
+		//objs[1].message.append_nav_marker(marker2);
+		//objs[1].message.append_system(CreateID("li01"));
+		//FmtStr::NavMarker marker3;
+		//marker1.system = 2208796239;
+		//marker1.unk = 1;
+		//marker1.pos.x = 8145;
+		//marker1.pos.y = 0;
+		//marker1.pos.z = -53071;
+		//objs[2].message.append_nav_marker(marker3);
+		//objs[2].message.append_system(CreateID("li01"));
+		//FmtStr::NavMarker marker4;
+		//marker1.system = 2208796239;
+		//marker1.unk = 1101;
+		//marker1.pos.x = 1100;
+		//marker1.pos.y = 0;
+		//marker1.pos.z = -34686;
+		//objs[3].message.append_nav_marker(marker4);
+		//objs[3].message.append_system(CreateID("li01"));
+		FmtStr missionType(13052, 0);
+		FmtStr missionType2(13052, 0);
+		pub::Player::SetMissionObjectives(clientId, 12, objs.data(), objs.size(), missionType, 2, missionType2);*/
 	}
 
 	static void SendMissionRejection(const uint clientId, const uint boardIndex, const uint base, const ushort rejectionResourceId)

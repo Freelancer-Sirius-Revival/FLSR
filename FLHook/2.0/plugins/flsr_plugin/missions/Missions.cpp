@@ -379,7 +379,7 @@ namespace Missions
 							}
 							else if (ini.is_value("repeatable"))
 							{
-								trigger->repeatable = ini.get_bool(0);
+								trigger->repeatable = ini.get_value_bool(0);
 							}
 							else if (ini.is_value("Cnd_True"))
 							{
@@ -566,7 +566,8 @@ namespace Missions
 								action->music.battleMusic = std::string(ini.get_value_string(3)) != "none" ? CreateIdOrNull(ini.get_value_string(3)) : 0;
 								action->music.overrideMusic = std::string(ini.get_value_string(4)) != "none" ? CreateIdOrNull(ini.get_value_string(4)) : 0;
 								action->music.crossFadeDurationInS = ini.get_value_float(5);
-								action->music.playOnce = ini.get_bool(6);
+								if (ini.get_num_parameters() > 6)
+									action->music.playOnce = ini.get_value_bool(6);
 								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_Ethercomm"))
@@ -589,7 +590,8 @@ namespace Missions
 								}
 								if (!ini.is_value_empty(pos++))
 									action->delay = ini.get_value_float(pos - 1);
-								action->global = ini.get_value_bool(pos++);
+								if (ini.get_num_parameters() > pos)
+									action->global = ini.get_value_bool(pos++);
 								action->senderIdsName = ini.get_value_int(pos++);
 								action->costume.head = CreateIdOrNull(ini.get_value_string(pos++));
 								action->costume.body = CreateIdOrNull(ini.get_value_string(pos++));
@@ -624,7 +626,8 @@ namespace Missions
 								}
 								if (!ini.is_value_empty(pos++))
 									action->delay = ini.get_value_float(pos - 1);
-								action->global = ini.get_value_bool(pos);
+								if (ini.get_num_parameters() > pos)
+									action->global = ini.get_value_bool(pos);
 								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SetNNObj"))
@@ -636,7 +639,8 @@ namespace Missions
 								action->position.x = ini.get_value_float(3);
 								action->position.y = ini.get_value_float(4);
 								action->position.z = ini.get_value_float(5);
-								action->bestRoute = ini.get_bool(6);
+								if (ini.get_num_parameters() > 6)
+									action->bestRoute = ini.get_value_bool(6);
 								action->targetObjName = CreateIdOrNull(ini.get_value_string(7));
 								trigger->actions.push_back(action);
 							}
@@ -645,7 +649,8 @@ namespace Missions
 								ActAdjAcctPtr action(new ActAdjAcct());
 								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								action->cash = ini.get_value_int(1);
-								action->splitBetweenPlayers = ini.get_value_bool(2);
+								if (ini.get_num_parameters() > 2)
+									action->splitBetweenPlayers = ini.get_value_bool(2);
 								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_AdjRep"))
@@ -672,7 +677,8 @@ namespace Missions
 								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								action->itemId = CreateIdOrNull(ini.get_value_string(1));
 								action->count = std::max(0, ini.get_value_int(2));
-								action->missionFlagged = ini.get_value_bool(3);
+								if (ini.get_num_parameters() > 3)
+									action->missionFlagged = ini.get_value_bool(3);
 								trigger->actions.push_back(action);
 							}
 							else if (ini.is_value("Act_GiveObjList"))

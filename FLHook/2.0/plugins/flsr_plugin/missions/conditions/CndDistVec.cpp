@@ -25,7 +25,7 @@ namespace Missions
 		distVecConditions.erase(this);
 	}
 
-	static bool isInside(const DistVecMatchEntry& entry, const CndDistVecArchetypePtr& archetype)
+	static bool IsInside(const DistVecMatchEntry& entry, const CndDistVecArchetypePtr& archetype)
 	{
 		const bool inside = archetype->distance - HkDistance3D(archetype->position, entry.position) > 0.0f;
 		return (archetype->type == DistanceCondition::Inside && inside) || (archetype->type == DistanceCondition::Outside && !inside);
@@ -58,7 +58,7 @@ namespace Missions
 		
 		for (const auto& entry : clientsByClientId)
 		{
-			if (entry.second.systemId == archetype->systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && isInside(entry.second, archetype))
+			if (entry.second.systemId == archetype->systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && IsInside(entry.second, archetype))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = entry.first;
@@ -69,7 +69,7 @@ namespace Missions
 		{
 			for (const auto& entry : objectsByObjId)
 			{
-				if (entry.second.systemId == archetype->systemId && validObjIds.contains(entry.first) && isInside(entry.second, archetype))
+				if (entry.second.systemId == archetype->systemId && validObjIds.contains(entry.first) && IsInside(entry.second, archetype))
 				{
 					activator.type = MissionObjectType::Object;
 					activator.id = entry.first;

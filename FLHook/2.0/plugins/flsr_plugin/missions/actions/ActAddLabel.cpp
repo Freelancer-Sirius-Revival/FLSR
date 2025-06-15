@@ -20,10 +20,7 @@ namespace Missions
 			// Clients can only be addressed via Label.
 			if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				MissionObject object;
-				object.type = MissionObjectType::Object;
-				object.id = objectByName->second;
-				mission.AddLabelToObject(object, label);
+				mission.AddLabelToObject(MissionObject(MissionObjectType::Object, objectByName->second), label);
 			}
 			else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{

@@ -741,12 +741,9 @@ namespace Missions
 		if (entry != missionNamesByOfferId.end())
 		{
 			const uint missionId = CreateMission(entry->second);
-			MissionObject object;
-			object.type = MissionObjectType::Client;
-			object.id = clientId;
 			auto& mission = missions.at(missionId);
 			mission.offerId = offerId;
-			mission.AddLabelToObject(object, CreateID("player"));
+			mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), CreateID("player"));
 			mission.Start();
 			missionNamesByOfferId.erase(entry);
 		}

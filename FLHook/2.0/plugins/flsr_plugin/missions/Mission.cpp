@@ -118,10 +118,7 @@ namespace Missions
 		objectIdsByName[name] = objId;
 		for (const auto& label : labels)
 		{
-			MissionObject object;
-			object.type = MissionObjectType::Object;
-			object.id = objId;
-			objectsByLabel[label].push_back(object);
+			objectsByLabel[label].emplace_back(MissionObjectType::Object, objId);
 			EvaluateCountConditions(label);
 		}
 	}

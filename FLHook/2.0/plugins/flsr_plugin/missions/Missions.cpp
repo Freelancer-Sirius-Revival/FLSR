@@ -12,6 +12,7 @@
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCountArch.h"
+#include "Conditions/CndCloaked.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActChangeState.h"
@@ -457,6 +458,13 @@ namespace Missions
 										archetype->comparator = CountComparator::Equal;
 								}
 								trigger->condition = { ConditionType::Cnd_Count, archetype };
+							}
+							else if (ini.is_value("Cnd_Cloaked"))
+							{
+								CndCloakedArchetypePtr archetype(new CndCloakedArchetype());
+								archetype->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								archetype->cloaked = ini.get_value_bool(1);
+								trigger->condition = { ConditionType::Cnd_Cloaked, archetype };
 							}
 							else if (ini.is_value("Act_DebugMsg"))
 							{
@@ -1008,6 +1016,36 @@ namespace Missions
 		if (elapsedTimeInSec < 0.02f)
 			return;
 		elapsedTimeInSec = 0.0f;
+
+		if (!cloakedConditions.empty())
+		{
+			const std::unordered_set<CndCloaked*> cloakedConditionsCopy(cloakedConditions);
+			for (const auto cnd : cloakedConditionsCopy)
+			{
+				bool matchFound = false;
+				struct PlayerData* playerData = 0;
+				while (playerData = Players.traverse_active(playerData))
+				{
+					if (cnd->Matches(MissionObject(MissionObjectType::Client, playerData->iOnlineID)))
+					{
+						cnd->ExecuteTrigger();
+						matchFound = true;
+						break;
+					}
+				}
+				if (!matchFound)
+				{
+					for (uint objId : missions.at(cnd->parent.missionId).objectIds)
+					{
+						if (cnd->Matches(MissionObject(MissionObjectType::Object, objId)))
+						{
+							cnd->ExecuteTrigger();
+							break;
+						}
+					}
+				}
+			}
+		}
 
 		if (distVecConditions.empty())
 			return;

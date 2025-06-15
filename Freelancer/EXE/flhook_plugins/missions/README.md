@@ -236,6 +236,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_BaseEnter` Only for players. Landing or logging in to bases.
     1. `STRING|Stranger` Object by name or label to await spawning into space.
     1. `[STRING] :any` The base nickname the object lands on.
+- `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
+    1. `STRING|Stranger` Object by name or label to watch cloaking state of.
+    1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
 
 ### Actions
 

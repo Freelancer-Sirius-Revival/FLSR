@@ -12,6 +12,7 @@
 #include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCount.h"
+#include "Conditions/CndCloaked.h"
 
 namespace Missions
 {
@@ -46,6 +47,10 @@ namespace Missions
 
 			case ConditionType::Cnd_Count:
 				result = new CndCount(parent, std::static_pointer_cast<CndCountArchetype>(conditionArchetype.second));
+				break;
+
+			case ConditionType::Cnd_Cloaked:
+				result = new CndCloaked(parent, std::static_pointer_cast<CndCloakedArchetype>(conditionArchetype.second));
 				break;
 
 			default:

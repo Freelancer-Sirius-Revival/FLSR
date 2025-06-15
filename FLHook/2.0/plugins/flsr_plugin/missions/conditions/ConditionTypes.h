@@ -7,6 +7,7 @@ namespace Missions
 		Cnd_BaseEnter,
 		Cnd_BaseExit,
 		Cnd_CargoScanned,
+		Cnd_Cloaked,
 		Cnd_CommComplete,
 		Cnd_Count,
 		Cnd_Destroyed,

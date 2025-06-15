@@ -5,6 +5,20 @@
 
 namespace Missions
 {
+	static uint TryCreateNpc(const pub::SpaceObj::ShipInfo& shipInfo)
+	{
+		__try
+		{
+			uint objId;
+			pub::SpaceObj::Create(objId, shipInfo);
+			return objId;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			return 0;
+		}
+	}
+
 	static uint CreateNPC(const ActSpawnShip& action, const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
 	{
 		pub::SpaceObj::ShipInfo shipInfo;
@@ -71,8 +85,12 @@ namespace Missions
 		pub::Reputation::GetReputationGroup(groupId, npc.faction.c_str());
 		pub::Reputation::SetAffiliation(shipInfo.iRep, groupId);
 
-		uint objId;
-		pub::SpaceObj::Create(objId, shipInfo);
+		uint objId = TryCreateNpc(shipInfo);
+		if (objId == 0)
+		{
+			ConPrint(L"Error spawning MSN NPC Ship " + stows(msnNpc.name) + L" in system " + std::to_wstring(msnNpc.systemId) + L" at position " + std::to_wstring(msnNpc.position.x) + L", " + std::to_wstring(msnNpc.position.y) + L", " + std::to_wstring(msnNpc.position.z) + L"\n");
+			return 0;
+		}
 
 		pub::AI::SetPersonalityParams personality;
 		personality.personality = msnNpc.pilotJobId ? Pilots::GetPilotWithJob(npc.pilotId, msnNpc.pilotJobId) : Pilots::GetPilot(npc.pilotId);

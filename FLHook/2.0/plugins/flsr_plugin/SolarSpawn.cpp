@@ -33,6 +33,20 @@ namespace SolarSpawn
 	std::random_device rd;
 	std::mt19937 gen(rd());
 
+	static uint TryCreateSolar(const pub::SpaceObj::SolarInfo& solarInfo)
+	{
+		__try
+		{
+			uint objId;
+			pub::SpaceObj::CreateSolar(objId, solarInfo);
+			return objId;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			return 0;
+		}
+	}
+
 	// This function is required to make sure the loadout is also sent to the clients.
 	static void SpawnSolar(uint& spaceId, const pub::SpaceObj::SolarInfo& solarInfo)
 	{
@@ -41,7 +55,12 @@ namespace SolarSpawn
 		char serverHack[] = { '\xEB' };
 		WriteProcMem(serverHackAddress, &serverHack, 1);
 
-		pub::SpaceObj::CreateSolar(spaceId, solarInfo);
+		spaceId = TryCreateSolar(solarInfo);
+		if (spaceId == 0)
+		{
+			ConPrint(L"Error spawning MSN NPC Ship " + stows(solarInfo.cNickName) + L" in system " + std::to_wstring(solarInfo.iSystemID) + L" at position " + std::to_wstring(solarInfo.vPos.x) + L", " + std::to_wstring(solarInfo.vPos.y) + L", " + std::to_wstring(solarInfo.vPos.z) + L"\n");
+			return;
+		}
 
 		StarSystem* starSystem;
 		IObjRW* inspect;
@@ -252,6 +271,8 @@ namespace SolarSpawn
 
 		uint spaceObjId;
 		SpawnSolar(spaceObjId, solarInfo);
+		if (spaceObjId == 0)
+			return spaceObjId;
 		spawnedSolars[spaceObjId].dockWith = solarInfo.baseId;
 
 		pub::AI::SetPersonalityParams personality;

@@ -131,6 +131,9 @@
     <ClCompile Include="missions\actions\ActChangeState.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActSetVibe.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -287,6 +290,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActChangeState.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetVibe.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

@@ -31,6 +31,7 @@
 #include "Actions/ActAdjRep.h"
 #include "Actions/ActAddCargo.h"
 #include "Actions/ActGiveObjList.h"
+#include "Actions/ActSetVibe.h"
 #include "Objectives/ObjGotoArch.h"
 #include "../MissionBoard.h"
 
@@ -686,6 +687,14 @@ namespace Missions
 								ActGiveObjListPtr action(new ActGiveObjList());
 								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								action->objectivesId = CreateIdOrNull(ini.get_value_string(1));
+								trigger->actions.push_back(action);
+							}
+							else if (ini.is_value("Act_SetVibe"))
+							{
+								ActSetVibePtr action(new ActSetVibe());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->targetObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
+								action->reputation = ini.get_value_float(2);
 								trigger->actions.push_back(action);
 							}
 						}

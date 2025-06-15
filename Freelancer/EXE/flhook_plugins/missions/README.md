@@ -314,7 +314,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to receive this comm.
     1. `STRING` The voice nickname to use for the sender.
     1. `STRING` Multiple subsequent entries possible. Must be one of the defined voice’s sound messages. 
-    1. `[FLOAT] : 0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
     1. `[INTEGER] :0` The sender’s resource ID to display as name below the comms window.
     1. `[STRING]` The head nickname used for the sender.
@@ -340,3 +340,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The item nickname to use.
     1. `INTEGER :0` Amount of items to add to cargo.
     1. `[True|False :False]` Whether this cargo is flagged as mission item.
+- `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
+    1. `STRING|Activator` Object by name or label whose vibe will be set. For players this only works if the target is another player.
+    1. `STRING|Activator` Object by name or label to change the vibe toward. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
+    1. `FLOAT :0` The reputation value between `-1` and `1` to set the vibe on.

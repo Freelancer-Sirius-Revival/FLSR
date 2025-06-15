@@ -18,5 +18,6 @@ namespace Missions
 				return;
 			}
 		}
+		ConPrint(L"Error: Act_ActTrig could not find trigger " + stows(triggerName) + L"\n");
 	}
 }

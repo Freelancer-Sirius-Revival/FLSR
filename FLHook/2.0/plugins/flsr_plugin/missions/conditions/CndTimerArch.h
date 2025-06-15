@@ -5,7 +5,8 @@ namespace Missions
 {
 	struct CndTimerArchetype
 	{
-		float timeInS = 0;
+		float lowerTimeInS = 0.0f;
+		float upperTimeInS = 0.0f;
 	};
 	typedef std::shared_ptr<CndTimerArchetype> CndTimerArchetypePtr;
 }

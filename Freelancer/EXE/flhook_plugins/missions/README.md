@@ -208,7 +208,8 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 
 - `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be the server.
 - `Cnd_Timer` Waits until the time as passed. `Activator` will be the server.
-    1. `FLOAT` Time in seconds.
+    1. `FLOAT` Lower limit of randomized time.
+    1. `[FLOAT] :0` Upper limit of randomized time. When not set or lower than the lower limit, the timer will always use a constant time of lthe lower limit.
 - `Cnd_Count` Counts the objects from a label. `Activator` will be the server.
     1. `STRING` Objects by label to count.
     1. `INTEGER` The target count.

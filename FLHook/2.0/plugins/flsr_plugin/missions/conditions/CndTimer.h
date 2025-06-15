@@ -7,6 +7,7 @@ namespace Missions
 	struct CndTimer : Condition
 	{
 		CndTimerArchetypePtr archetype;
+		float targetTimeInS;
 		float passedTimeInS;
 
 		CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype);

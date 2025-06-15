@@ -437,7 +437,8 @@ namespace Missions
 							else if (ini.is_value("Cnd_Timer"))
 							{
 								CndTimerArchetypePtr archetype(new CndTimerArchetype());
-								archetype->timeInS = ini.get_value_float(0);
+								archetype->lowerTimeInS = ini.get_value_float(0);
+								archetype->upperTimeInS = ini.get_value_float(1);
 								trigger->condition = { ConditionType::Cnd_Timer, archetype };
 							}
 							else if (ini.is_value("Cnd_Count"))

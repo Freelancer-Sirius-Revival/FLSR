@@ -33,8 +33,7 @@ namespace Missions
 		shipInfo.iPilotVoice = npc.voiceId;
 		shipInfo.iHitPointsLeft = msnNpc.hitpoints;
 		shipInfo.iLevel = npc.level;
-		shipInfo.cargoDesc = new OwnerList<pub::SpaceObj::CargoDesc>();
-		shipInfo.cargoDesc2 = new OwnerList<pub::SpaceObj::CargoDesc>();
+		// Do not set the cargo descriptors for ships. These are not yet fully understood and will cause mem-leaks if not handled right. How they must be handled is unclear.
 
 		// Formation name is displayed above the pilot name in wireframe display.
 		// If this is given, the ship IDS Name will be used in scanner list. Keep empty to show Pilot Name in scanner list.

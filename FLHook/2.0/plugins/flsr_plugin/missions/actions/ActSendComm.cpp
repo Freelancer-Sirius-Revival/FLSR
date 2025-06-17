@@ -15,10 +15,20 @@ namespace Missions
 
 	void ActSendComm::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		const auto& senderByName = mission.objectIdsByName.find(senderObjName);
-		if (senderByName == mission.objectIdsByName.end())
+		uint senderObjId = 0;
+		// Try to find any solar in the entire game first.
+		int reputationId;
+		pub::SpaceObj::GetSolarRep(senderObjName, reputationId);
+		// Solar IDs are the exact same as their reputation ID
+		if (reputationId != 0 && senderObjName == reputationId)
+			senderObjId = senderObjName;
+		// Otherwise try to find the sender in the known objects of the mission.
+		else if (const auto& senderByName = mission.objectIdsByName.find(senderObjName); senderByName != mission.objectIdsByName.end())
+			senderObjId = senderByName->second;
+
+		if (senderObjId == 0)
 			return;
-		
+
 		if (receiverObjNameOrLabel == Activator)
 		{
 			uint objId;
@@ -28,14 +38,14 @@ namespace Missions
 				objId = activator.id;
 
 			if (objId)
-				SendComm(objId, senderByName->second, lines, delay, global);
+				SendComm(objId, senderObjId, lines, delay, global);
 		}
 		else
 		{
 			// Clients can only be addressed via Label.
 			if (const auto& objectByName = mission.objectIdsByName.find(receiverObjNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				SendComm(objectByName->second, senderByName->second, lines, delay, global);
+				SendComm(objectByName->second, senderObjId, lines, delay, global);
 			}
 			else if (const auto& objectsByLabel = mission.objectsByLabel.find(receiverObjNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
@@ -50,7 +60,7 @@ namespace Missions
 						objId = object.id;
 
 					if (objId)
-						SendComm(objId, senderByName->second, lines, delay, global);
+						SendComm(objId, senderObjId, lines, delay, global);
 				}
 			}
 		}

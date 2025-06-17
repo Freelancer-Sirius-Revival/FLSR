@@ -4,9 +4,14 @@ namespace Missions
 {
 	static void SetVibe(const int reputationIdA, const uint targetIdOrLabel, const MissionObject& activator, const float reputation, const Mission& mission)
 	{
-		if (targetIdOrLabel == Activator)
+		int reputationIdB;
+		// Try to find any solar in the entire game first.
+		pub::SpaceObj::GetSolarRep(targetIdOrLabel, reputationIdB);
+		// Solar IDs are the exact same as their reputation ID
+		if (reputationIdB != 0 && targetIdOrLabel == reputationIdB)
+			pub::Reputation::SetAttitude(reputationIdA, reputationIdB, reputation);
+		else if (targetIdOrLabel == Activator)
 		{
-			int reputationIdB;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetRep(activator.id, reputationIdB);
 			else
@@ -20,7 +25,6 @@ namespace Missions
 			// Clients can only be addressed via Label.
 			if (const auto& objectByName = mission.objectIdsByName.find(targetIdOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				int reputationIdB;
 				pub::SpaceObj::GetRep(objectByName->second, reputationIdB);
 				if (reputationIdB)
 					pub::Reputation::SetAttitude(reputationIdA, reputationIdB, reputation);
@@ -31,7 +35,6 @@ namespace Missions
 				const std::vector<MissionObject> objectsCopy(objectsByLabel->second);
 				for (const auto& object : objectsCopy)
 				{
-					int reputationIdB;
 					if (object.type == MissionObjectType::Client)
 						pub::Player::GetRep(object.id, reputationIdB);
 					else
@@ -46,9 +49,9 @@ namespace Missions
 
 	void ActSetVibe::Execute(Mission& mission, const MissionObject& activator) const
 	{
+		int reputationId;
 		if (objNameOrLabel == Activator)
 		{
-			int reputationId;
 			if (activator.type == MissionObjectType::Client)
 				pub::Player::GetRep(activator.id, reputationId);
 			else
@@ -59,10 +62,14 @@ namespace Missions
 		}
 		else
 		{
+			// Try to find any solar in the entire game first.
+			pub::SpaceObj::GetSolarRep(objNameOrLabel, reputationId);
+			// Solar IDs are the exact same as their reputation ID
+			if (reputationId != 0 && objNameOrLabel == reputationId)
+				SetVibe(reputationId, targetObjNameOrLabel, activator, reputation, mission);
 			// Clients can only be addressed via Label.
-			if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
+			else if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				int reputationId;
 				pub::SpaceObj::GetRep(objectByName->second, reputationId);
 				if (reputationId)
 					SetVibe(reputationId, targetObjNameOrLabel, activator, reputation, mission);
@@ -73,7 +80,6 @@ namespace Missions
 				const std::vector<MissionObject> objectsCopy(objectsByLabel->second);
 				for (const auto& object : objectsCopy)
 				{
-					int reputationId;
 					if (object.type == MissionObjectType::Client)
 						pub::Player::GetRep(object.id, reputationId);
 					else

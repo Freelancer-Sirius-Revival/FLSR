@@ -1117,7 +1117,7 @@ namespace Missions
 	void __stdcall CharacterSelect_AFTER(const CHARACTER_ID& cId, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
-		lastCharacterByClientId.insert({ clientId, cId });
+		lastCharacterByClientId[clientId] = cId;
 	}
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)

@@ -371,7 +371,7 @@ EXPORT void __stdcall PlayerLaunch(unsigned int iShip, unsigned int iClientID) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EXPORT void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,
+EXPORT void __stdcall SPObjUpdate(SSPObjUpdateInfo &ui,
                                   unsigned int iClientID) {
     returncode = DEFAULT_RETURNCODE;
 
@@ -383,8 +383,10 @@ EXPORT void __stdcall SPObjUpdate(struct SSPObjUpdateInfo const &ui,
     mstime tmNow = timeInMS();
     mstime tmTimestamp = (mstime)(ui.fTimestamp * 1000);
 
-    if (set_iLagDetectionFrame && ConData[iClientID].tmLastObjUpdate &&
-        (HkGetEngineState(iClientID) != ES_TRADELANE) && (ui.cState != 7)) {
+    IObjRW* inspect;
+    StarSystem* starSystem;
+    bool inTradelane = false;
+    if (set_iLagDetectionFrame && ConData[iClientID].tmLastObjUpdate && GetShipInspect(ui.iShip, inspect, starSystem) && inspect->is_using_tradelane(&inTradelane) == 0 && !inTradelane && (ui.cState != 7)) {
         uint iTimeDiff = (uint)(tmNow - ConData[iClientID].tmLastObjUpdate);
         uint iTimestampDiff =
             (uint)(tmTimestamp - ConData[iClientID].tmLastObjTimestamp);

@@ -309,10 +309,6 @@ for (auto& chat : set_setChatSuppress) {
             TRY_HOOK{
                 ClientInfo[iClientID].iShip = iShip;
                 ClientInfo[iClientID].iKillsInARow = 0;
-                ClientInfo[iClientID].bCruiseActivated = false;
-                ClientInfo[iClientID].bThrusterActivated = false;
-                ClientInfo[iClientID].bEngineKilled = false;
-                ClientInfo[iClientID].bTradelane = false;
 
                 // adjust cash, this is necessary when cash was added while use was in
                 // charmenu/had other char selected
@@ -621,18 +617,12 @@ for (auto& chat : set_setChatSuppress) {
 
         CHECK_FOR_DISCONNECT
 
-            CALL_PLUGINS_V(PLUGIN_HkIServerImpl_BaseEnter, __stdcall,
-                (unsigned int iBaseID, unsigned int iClientID),
-                (iBaseID, iClientID));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_BaseEnter, __stdcall,
+            (unsigned int iBaseID, unsigned int iClientID),
+            (iBaseID, iClientID));
 
-        TRY_HOOK{
-            // autobuy
-            if (set_bAutoBuy)
-                HkPlayerAutoBuy(iClientID, iBaseID);
-        }
-        CATCH_HOOK({ AddLog("Exception in " __FUNCTION__ " on autobuy"); })
 
-            EXECUTE_SERVER_CALL(Server.BaseEnter(iBaseID, iClientID));
+        EXECUTE_SERVER_CALL(Server.BaseEnter(iBaseID, iClientID));
 
         TRY_HOOK{
             // adjust cash, this is necessary when cash was added while use was in
@@ -870,32 +860,9 @@ ClientInfo[iClientID].iTradePartner = 0;
 
         CHECK_FOR_DISCONNECT
 
-            TRY_HOOK{
-
-                std::list<CARGO_INFO> lstCargo;
-                int iRem;
-                HkEnumCargo(ARG_CLIENTID(iClientID), lstCargo, iRem);
-
-                for (auto& cargo : lstCargo) {
-                    if (cargo.iID == aq.sID) {
-                        Archetype::Equipment* eq =
-                            Archetype::GetEquipment(cargo.iArchID);
-                        EQ_TYPE eqType = HkGetEqType(eq);
-
-                        if (eqType == ET_ENGINE) {
-                            ClientInfo[iClientID].bEngineKilled = !aq.bActivate;
-                            if (!aq.bActivate)
-                                ClientInfo[iClientID].bCruiseActivated =
-                                    false; // enginekill enabled
-                        }
-                    }
-                }
-        }
-            CATCH_HOOK({})
-
-            CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ActivateEquip, __stdcall,
-                (unsigned int iClientID, struct XActivateEquip const& aq),
-                (iClientID, aq));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ActivateEquip, __stdcall,
+            (unsigned int iClientID, struct XActivateEquip const& aq),
+            (iClientID, aq));
 
         EXECUTE_SERVER_CALL(Server.ActivateEquip(iClientID, aq));
 
@@ -915,12 +882,9 @@ ClientInfo[iClientID].iTradePartner = 0;
 
         CHECK_FOR_DISCONNECT
 
-            TRY_HOOK{ ClientInfo[iClientID].bCruiseActivated = ac.bActivate; }
-            CATCH_HOOK({})
-
-            CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ActivateCruise, __stdcall,
-                (unsigned int iClientID, struct XActivateCruise const& ac),
-                (iClientID, ac));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ActivateCruise, __stdcall,
+            (unsigned int iClientID, struct XActivateCruise const& ac),
+            (iClientID, ac));
 
         EXECUTE_SERVER_CALL(Server.ActivateCruise(iClientID, ac));
 
@@ -940,13 +904,10 @@ ClientInfo[iClientID].iTradePartner = 0;
 
         CHECK_FOR_DISCONNECT
 
-            TRY_HOOK{ ClientInfo[iClientID].bThrusterActivated = at.bActivate; }
-            CATCH_HOOK({})
-
-            CALL_PLUGINS_V(
-                PLUGIN_HkIServerImpl_ActivateThrusters, __stdcall,
-                (unsigned int iClientID, struct XActivateThrusters const& at),
-                (iClientID, at));
+        CALL_PLUGINS_V(
+            PLUGIN_HkIServerImpl_ActivateThrusters, __stdcall,
+            (unsigned int iClientID, struct XActivateThrusters const& at),
+            (iClientID, at));
 
         EXECUTE_SERVER_CALL(Server.ActivateThrusters(iClientID, at));
 
@@ -1273,27 +1234,26 @@ if (set_bLogConnects)
         ISERVER_LOG();
         ISERVER_LOGARG_UI(iClientID);
 
-        TRY_HOOK{ ClientInfo[iClientID].bTradelane = true; }
-            CATCH_HOOK({})
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_GoTradelane, __stdcall,
+            (unsigned int iClientID, struct XGoTradelane const& gtl),
+            (iClientID, gtl));
 
-            CALL_PLUGINS_V(PLUGIN_HkIServerImpl_GoTradelane, __stdcall,
-                (unsigned int iClientID, struct XGoTradelane const& gtl),
-                (iClientID, gtl));
+        TRY_HOOK { 
+            Server.GoTradelane(iClientID, gtl); 
+        }
+        CATCH_HOOK({
+            uint iSystem;
+            pub::Player::GetSystem(iClientID, iSystem);
+            AddLog("ERROR: Exception in HkIServerImpl::GoTradelane charname=%s "
+                    "sys=%08x arch=%08x arch2=%08x",
+                    wstos((const wchar_t*)Players.GetActiveCharacterName(iClientID))
+                        .c_str(),
+                    iSystem, gtl.iTradelaneSpaceObj1, gtl.iTradelaneSpaceObj2);
+            })
 
-        TRY_HOOK{ Server.GoTradelane(iClientID, gtl); }
-            CATCH_HOOK({
-                uint iSystem;
-                pub::Player::GetSystem(iClientID, iSystem);
-                AddLog("ERROR: Exception in HkIServerImpl::GoTradelane charname=%s "
-                       "sys=%08x arch=%08x arch2=%08x",
-                       wstos((const wchar_t*)Players.GetActiveCharacterName(iClientID))
-                           .c_str(),
-                       iSystem, gtl.iTradelaneSpaceObj1, gtl.iTradelaneSpaceObj2);
-                })
-
-            CALL_PLUGINS_V(PLUGIN_HkIServerImpl_GoTradelane_AFTER, __stdcall,
-                (unsigned int iClientID, struct XGoTradelane const& gtl),
-                (iClientID, gtl));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_GoTradelane_AFTER, __stdcall,
+            (unsigned int iClientID, struct XGoTradelane const& gtl),
+            (iClientID, gtl));
     }
 
     /**************************************************************************************************************
@@ -1307,13 +1267,10 @@ if (set_bLogConnects)
         ISERVER_LOGARG_UI(p3);
         ISERVER_LOGARG_UI(p4);
 
-        TRY_HOOK{ ClientInfo[iClientID].bTradelane = false; }
-            CATCH_HOOK({})
-
-            CALL_PLUGINS_V(PLUGIN_HkIServerImpl_StopTradelane, __stdcall,
-                (unsigned int iClientID, unsigned int p2, unsigned int p3,
-                    unsigned int p4),
-                (iClientID, p2, p3, p4));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_StopTradelane, __stdcall,
+            (unsigned int iClientID, unsigned int p2, unsigned int p3,
+                unsigned int p4),
+            (iClientID, p2, p3, p4));
 
         EXECUTE_SERVER_CALL(Server.StopTradelane(iClientID, p2, p3, p4));
 

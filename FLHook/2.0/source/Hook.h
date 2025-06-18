@@ -45,19 +45,6 @@
 #define ADDR_SRV_PLAYERDBMAXPLAYERSPATCH 0x64BC3
 #define ADDR_SRV_PLAYERDBMAXPLAYERS 0xB0264
 #define ADDR_SRV_REPARRAYFREE 0x7F3F0
-#define ADDR_COMMON_VFTABLE_POWER 0x1398F4
-#define ADDR_COMMON_VFTABLE_SCANNER 0x139920
-#define ADDR_COMMON_VFTABLE_LIGHT 0x13994C
-#define ADDR_COMMON_VFTABLE_TRACTOR 0x139978
-#define ADDR_COMMON_VFTABLE_MINE 0x139C64
-#define ADDR_COMMON_VFTABLE_CM 0x139C90
-#define ADDR_COMMON_VFTABLE_GUN 0x139C38
-#define ADDR_COMMON_VFTABLE_SHIELDGEN 0x139BB4
-#define ADDR_COMMON_VFTABLE_THRUSTER 0x139BE0
-#define ADDR_COMMON_VFTABLE_SHIELDBAT 0x1399FC
-#define ADDR_COMMON_VFTABLE_NANOBOT 0x1399D0
-#define ADDR_COMMON_VFTABLE_MUNITION 0x139CE8
-#define ADDR_COMMON_VFTABLE_ENGINE 0x139AAC
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // exception logging
@@ -362,34 +349,6 @@ enum CHATSTYLE {
     CST_UNDERLINE = 3,
 };
 
-enum ENGINE_STATE {
-    ES_CRUISE,
-    ES_THRUSTER,
-    ES_ENGINE,
-    ES_KILLED,
-    ES_TRADELANE
-};
-
-enum EQ_TYPE {
-    ET_GUN,
-    ET_TORPEDO,
-    ET_CD,
-    ET_MISSILE,
-    ET_MINE,
-    ET_CM,
-    ET_SHIELDGEN,
-    ET_THRUSTER,
-    ET_SHIELDBAT,
-    ET_NANOBOT,
-    ET_MUNITION,
-    ET_ENGINE,
-    ET_OTHER,
-    ET_SCANNER,
-    ET_TRACTOR,
-    ET_LIGHT
-};
-
-
 
 enum class LogLevel : int
 {
@@ -477,12 +436,6 @@ struct CLIENT_INFO {
     // anticheat
     uint iTradePartner;
 
-    // change cruise disruptor behaviour
-    bool bCruiseActivated;
-    bool bThrusterActivated;
-    bool bEngineKilled;
-    bool bTradelane;
-
     // idle kicks
     uint iBaseEnterTime;
     uint iCharMenuEnterTime;
@@ -508,14 +461,6 @@ struct CLIENT_INFO {
     CHATSTYLE dieMsgStyle;
     CHATSIZE chatSize;
     CHATSTYLE chatStyle;
-
-    // autobuy
-    bool bAutoBuyMissiles;
-    bool bAutoBuyMines;
-    bool bAutoBuyTorps;
-    bool bAutoBuyCD;
-    bool bAutoBuyCM;
-    bool bAutoBuyReload;
 
     // MultiKillMessages
     uint iKillsInARow;
@@ -658,8 +603,6 @@ EXPORT void HkLockAccountAccess(CAccount *acc, bool bKick);
 EXPORT void HkUnlockAccountAccess(CAccount *acc);
 EXPORT void HkGetItemsForSale(uint iBaseID, std::list<uint> &lstItems);
 EXPORT IObjRW* HkGetInspect(uint iClientID);
-EXPORT ENGINE_STATE HkGetEngineState(uint iClientID);
-EXPORT EQ_TYPE HkGetEqType(Archetype::Equipment *eq);
 EXPORT float HkDistance3D(const Vector& v1, const Vector& v2);
 EXPORT float HkDistance3DByShip(uint iShip1, uint iShip2);
 EXPORT Quaternion HkMatrixToQuaternion(const Matrix& m);
@@ -734,7 +677,6 @@ EXPORT HK_ERROR HkGetReservedSlot(const std::wstring &wscCharname,
                                   bool &bResult);
 EXPORT HK_ERROR HkSetReservedSlot(const std::wstring &wscCharname,
                                   bool bReservedSlot);
-EXPORT void HkPlayerAutoBuy(uint iClientID, uint iBaseID);
 EXPORT HK_ERROR HkResetRep(const std::wstring &wscCharname);
 EXPORT HK_ERROR HkGetGroupMembers(const std::wstring &wscCharname,
                                   std::list<GROUP_MEMBER> &lstMembers);

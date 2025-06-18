@@ -41,7 +41,6 @@ PATCH_INFO piServerDLL = {
         //{0x6D67F4C,		&LootDestroyedNaked,				4, &LootDestroyedOrigFunc,	false},
         //{0x6D661C4,		&MineDestroyedNaked,				4, &MineDestroyedOrigFunc,		false},
         //{0x6D66694,		&GuidedDestroyedNaked,				4, &GuidedDestroyedOrigFunc,	false},
-        //{0x6D672D4,		&AllowPlayerDamageNaked,			4, &AllowPlayerDamageOrigFunc,	false},
         //{0x6D6733C,		&ShipColGrpDestroyedHookNaked,		4, &ShipAndSolarColGrpDeathOrigFunc,		false},
         {0x6D67340,		&ShipEquipDestroyedHookNaked,		4, &ShipEquipDeathOrigFunc,		false},
         //{0x6D6768C,		&SolarColGrpDestroyedHookNaked,		4, 0,							false},
@@ -169,7 +168,6 @@ void ClearClientInfo(uint iClientID) {
     ClientInfo[iClientID].iTradePartner = 0;
     ClientInfo[iClientID].iBaseEnterTime = 0;
     ClientInfo[iClientID].iCharMenuEnterTime = 0;
-    ClientInfo[iClientID].bCruiseActivated = false;
     ClientInfo[iClientID].tmKickTime = 0;
     ClientInfo[iClientID].iLastExitedBaseID = 0;
     ClientInfo[iClientID].bDisconnected = false;
@@ -184,19 +182,9 @@ void ClearClientInfo(uint iClientID) {
     ClientInfo[iClientID].chatSize = CS_DEFAULT;
     ClientInfo[iClientID].chatStyle = CST_DEFAULT;
 
-    ClientInfo[iClientID].bAutoBuyMissiles = false;
-    ClientInfo[iClientID].bAutoBuyMines = false;
-    ClientInfo[iClientID].bAutoBuyTorps = false;
-    ClientInfo[iClientID].bAutoBuyCD = false;
-    ClientInfo[iClientID].bAutoBuyCM = false;
-    ClientInfo[iClientID].bAutoBuyReload = false;
-
     ClientInfo[iClientID].lstIgnore.clear();
     ClientInfo[iClientID].iKillsInARow = 0;
     ClientInfo[iClientID].wscHostname = L"";
-    ClientInfo[iClientID].bEngineKilled = false;
-    ClientInfo[iClientID].bThrusterActivated = false;
-    ClientInfo[iClientID].bTradelane = false;
     ClientInfo[iClientID].iGroupID = 0;
     ClientInfo[iClientID].bSpawnProtected = false;
 
@@ -257,30 +245,6 @@ load settings from flhookhuser.ini (specific to character)
 **************************************************************************************************************/
 
 void LoadUserCharSettings(uint iClientID) {
-    CAccount *acc = Players.FindAccountFromClientID(iClientID);
-    std::wstring wscDir;
-    HkGetAccountDirName(acc, wscDir);
-    std::string scUserFile = scAcctPath + wstos(wscDir) + "\\flhookuser.ini";
-
-    // read autobuy
-    std::wstring wscFilename;
-    HkGetCharFileName((wchar_t *)Players.GetActiveCharacterName(iClientID),
-                      wscFilename);
-    std::string scSection = "autobuy_" + wstos(wscFilename);
-
-    ClientInfo[iClientID].bAutoBuyMissiles =
-        IniGetB(scUserFile, scSection, "missiles", false);
-    ClientInfo[iClientID].bAutoBuyMines =
-        IniGetB(scUserFile, scSection, "mines", false);
-    ClientInfo[iClientID].bAutoBuyTorps =
-        IniGetB(scUserFile, scSection, "torps", false);
-    ClientInfo[iClientID].bAutoBuyCD =
-        IniGetB(scUserFile, scSection, "cd", false);
-    ClientInfo[iClientID].bAutoBuyCM =
-        IniGetB(scUserFile, scSection, "cm", false);
-    ClientInfo[iClientID].bAutoBuyReload =
-        IniGetB(scUserFile, scSection, "reload", false);
-
     CALL_PLUGINS_V(PLUGIN_LoadUserCharSettings, , (uint), (iClientID));
 }
 

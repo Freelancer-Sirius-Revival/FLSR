@@ -213,13 +213,6 @@ setx FLHOOK_SDK_PATH "$(SolutionDir)..\FLHookSDK\\"</Command>
     <ClInclude Include="..\source\global.h" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\misc\FLHook.ini">
-      <FileType>Document</FileType>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\FLHookSDK\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

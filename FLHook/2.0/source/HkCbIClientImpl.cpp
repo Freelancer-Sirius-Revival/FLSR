@@ -1149,15 +1149,6 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2)
 
 bool HkIClientImpl::DispatchMsgs()
 {
-
-	/*	long lRet;
-		char *tmp;
-		WriteProcMem(&tmp, &Client, 4);
-		WriteProcMem(&Client, &OldClient, 4);
-		HookClient->DispatchMsgs();
-		__asm { mov [lRet], eax }
-		WriteProcMem(&Client, &tmp, 4); */
-
 	cdpserver->DispatchMsgs(); // calls IServerImpl functions, which also call HkIClientImpl functions
 	return true;
 }

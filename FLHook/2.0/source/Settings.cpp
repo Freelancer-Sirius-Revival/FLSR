@@ -65,7 +65,6 @@ bool set_bUserCmdSetDieMsgSize;
 bool set_bUserCmdSetChatFont;
 bool set_bUserCmdIgnore;
 uint set_iUserCmdMaxIgnoreList;
-bool set_bAutoBuy;
 bool set_bUserCmdHelp;
 bool set_bDefaultLocalChat;
 
@@ -92,7 +91,6 @@ bool get_bUserCmdSetDieMsgSize(uint iClientID) {
 }
 bool get_bUserCmdSetChatFont(uint iClientID) { return set_bUserCmdSetChatFont; }
 bool get_bUserCmdIgnore(uint iClientID) { return set_bUserCmdIgnore; }
-bool get_bAutoBuy(uint iClientID) { return set_bAutoBuy; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -208,7 +206,6 @@ void LoadSettings() {
         IniGetB(set_scCfgFile, "UserCommands", "Ignore", false);
     set_iUserCmdMaxIgnoreList =
         IniGetI(set_scCfgFile, "UserCommands", "MaxIgnoreListEntries", 30);
-    set_bAutoBuy = IniGetB(set_scCfgFile, "UserCommands", "AutoBuy", false);
     set_bUserCmdHelp = IniGetB(set_scCfgFile, "UserCommands", "Help", false);
     set_bDefaultLocalChat =
         IniGetB(set_scCfgFile, "UserCommands", "DefaultLocalChat", false);
@@ -309,24 +306,6 @@ void LoadSettings() {
                    L"Removes the characters with the associated ignore ID (see "
                    L"/ignorelist) from the ignore list. * deletes all.",
                    L"", get_bUserCmdIgnore);
-    HkAddHelpEntry(
-        L"/autobuy", L"<param> [<on/off>]",
-        L"Auomatically buys the given elements upon docking. See detailed help "
-        L"for more information.",
-        L"<param> can take one of the following values:\tinfo - display "
-        L"current "
-        L"autobuy-settings\n\tmissiles - enable/disable autobuy for "
-        L"missiles\n\ttorps - enable/disable autobuy for torpedos\n\tmines - "
-        L"enable/disable autobuy for mines\n\tcd - enable/disable autobuy for "
-        L"cruise disruptors\n\tcm - enable/disable autobuy for "
-        L"countermeasures\n\treload - enable/disable autobuy for "
-        L"nanobots/shield "
-        L"batteries\n\tall - enable/disable autobuy for all of the "
-        L"above\nExamples:\n\"/autobuy missiles on\" enable autobuy for "
-        L"missiles\n\"/autobuy all off\" completely disable "
-        L"autobuy\n\"/autobuy "
-        L"info\" show autobuy info",
-        get_bAutoBuy);
     HkAddHelpEntry(L"/ids", L"",
                    L"Lists all characters with their respective client IDs.",
                    L"", get_bTrue);

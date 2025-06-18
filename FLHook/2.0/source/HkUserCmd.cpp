@@ -434,100 +434,6 @@ void UserCmd_DelIgnore(uint iClientID, const std::wstring &wscParam) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void UserCmd_AutoBuy(uint iClientID, const std::wstring &wscParam) {
-    if (!set_bAutoBuy) {
-        PRINT_DISABLED();
-        return;
-    }
-
-    std::wstring wscError[] = {
-        L"Error: Invalid parameters",
-        L"Usage: /autobuy <param> [<on/off>]",
-        L"<Param>:",
-        L"   info - display current autobuy-settings",
-        L"   missiles - enable/disable autobuy for missiles",
-        L"   torps - enable/disable autobuy for torpedos",
-        L"   mines - enable/disable autobuy for mines",
-        L"   cd - enable/disable autobuy for cruise disruptors",
-        L"   cm - enable/disable autobuy for countermeasures",
-        L"   reload - enable/disable autobuy for nanobots/shield batteries",
-        L"   all: enable/disable autobuy for all of the above",
-        L"Examples:",
-        L"\"/autobuy missiles on\" enable autobuy for missiles",
-        L"\"/autobuy all off\" completely disable autobuy",
-        L"\"/autobuy info\" show autobuy info",
-    };
-
-    std::wstring wscType = ToLower(GetParam(wscParam, ' ', 0));
-    std::wstring wscSwitch = ToLower(GetParam(wscParam, ' ', 1));
-
-    if (!wscType.compare(L"info")) {
-        PrintUserCmdText(iClientID, L"Missiles: %s",
-                         ClientInfo[iClientID].bAutoBuyMissiles ? L"On"
-                                                                : L"Off");
-        PrintUserCmdText(iClientID, L"Mine: %s",
-                         ClientInfo[iClientID].bAutoBuyMines ? L"On" : L"Off");
-        PrintUserCmdText(iClientID, L"Torpedos: %s",
-                         ClientInfo[iClientID].bAutoBuyTorps ? L"On" : L"Off");
-        PrintUserCmdText(iClientID, L"Cruise Disruptors: %s",
-                         ClientInfo[iClientID].bAutoBuyCD ? L"On" : L"Off");
-        PrintUserCmdText(iClientID, L"Countermeasures: %s",
-                         ClientInfo[iClientID].bAutoBuyCM ? L"On" : L"Off");
-        PrintUserCmdText(iClientID, L"Nanobots/Shield Batteries: %s",
-                         ClientInfo[iClientID].bAutoBuyReload ? L"On" : L"Off");
-        return;
-    }
-
-    if (!wscType.length() || !wscSwitch.length() ||
-        ((wscSwitch.compare(L"on") != 0) && (wscSwitch.compare(L"off") != 0)))
-        PRINT_ERROR();
-
-    GET_USERFILE(scUserFile);
-
-    std::wstring wscFilename;
-    HkGetCharFileName(ARG_CLIENTID(iClientID), wscFilename);
-    std::string scSection = "autobuy_" + wstos(wscFilename);
-
-    bool bEnable = !wscSwitch.compare(L"on") ? true : false;
-    if (!wscType.compare(L"all")) {
-        ClientInfo[iClientID].bAutoBuyMissiles = bEnable;
-        ClientInfo[iClientID].bAutoBuyMines = bEnable;
-        ClientInfo[iClientID].bAutoBuyTorps = bEnable;
-        ClientInfo[iClientID].bAutoBuyCD = bEnable;
-        ClientInfo[iClientID].bAutoBuyCM = bEnable;
-        ClientInfo[iClientID].bAutoBuyReload = bEnable;
-        IniWrite(scUserFile, scSection, "missiles", bEnable ? "yes" : "no");
-        IniWrite(scUserFile, scSection, "mines", bEnable ? "yes" : "no");
-        IniWrite(scUserFile, scSection, "torps", bEnable ? "yes" : "no");
-        IniWrite(scUserFile, scSection, "cd", bEnable ? "yes" : "no");
-        IniWrite(scUserFile, scSection, "cm", bEnable ? "yes" : "no");
-        IniWrite(scUserFile, scSection, "reload", bEnable ? "yes" : "no");
-    } else if (!wscType.compare(L"missiles")) {
-        ClientInfo[iClientID].bAutoBuyMissiles = bEnable;
-        IniWrite(scUserFile, scSection, "missiles", bEnable ? "yes" : "no");
-    } else if (!wscType.compare(L"mines")) {
-        ClientInfo[iClientID].bAutoBuyMines = bEnable;
-        IniWrite(scUserFile, scSection, "mines", bEnable ? "yes" : "no");
-    } else if (!wscType.compare(L"torps")) {
-        ClientInfo[iClientID].bAutoBuyTorps = bEnable;
-        IniWrite(scUserFile, scSection, "torps", bEnable ? "yes" : "no");
-    } else if (!wscType.compare(L"cd")) {
-        ClientInfo[iClientID].bAutoBuyCD = bEnable;
-        IniWrite(scUserFile, scSection, "cd", bEnable ? "yes" : "no");
-    } else if (!wscType.compare(L"cm")) {
-        ClientInfo[iClientID].bAutoBuyCM = bEnable;
-        IniWrite(scUserFile, scSection, "cm", bEnable ? "yes" : "no");
-    } else if (!wscType.compare(L"reload")) {
-        ClientInfo[iClientID].bAutoBuyReload = bEnable;
-        IniWrite(scUserFile, scSection, "reload", bEnable ? "yes" : "no");
-    } else
-        PRINT_ERROR();
-
-    PRINT_OK();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void UserCmd_IDs(uint iClientID, const std::wstring &wscParam) {
     wchar_t wszLine[128] = L"";
     for (auto &player : HkGetPlayers()) {
@@ -681,7 +587,6 @@ USERCMD UserCmds[] = {
     {L"/delignore", UserCmd_DelIgnore},
     {L"/ignore", UserCmd_Ignore},
     {L"/ignoreid", UserCmd_IgnoreID},
-    {L"/autobuy", UserCmd_AutoBuy},
     {L"/ids", UserCmd_IDs},
     {L"/id", UserCmd_ID},
     {L"/i$", UserCmd_InviteID},

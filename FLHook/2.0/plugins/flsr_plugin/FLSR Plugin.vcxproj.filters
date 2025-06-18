@@ -137,6 +137,7 @@
     <ClCompile Include="missions\conditions\CndCloaked.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="MissionAbortFix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -304,6 +305,7 @@
     <ClInclude Include="missions\conditions\CndCloakedArch.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="MissionAbortFix.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

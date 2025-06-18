@@ -6,6 +6,7 @@
 #include "Missions/LootProps.h"
 #include "Missions/Missions.h"
 #include "MissionBoard.h"
+#include "MissionAbortFix.h"
 
 std::mutex m_Mutex;
 
@@ -268,6 +269,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));*/
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::CharacterSelect_AFTER, PLUGIN_HkIServerImpl_CharacterSelect_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     
     return p_PI;
 }

@@ -5,7 +5,7 @@
 #include "Missions/NpcNames.h"
 #include "Missions/LootProps.h"
 #include "Missions/Missions.h"
-#include "MissionBoard.h"
+#include "Missions/MissionBoard.h"
 #include "MissionAbortFix.h"
 
 std::mutex m_Mutex;

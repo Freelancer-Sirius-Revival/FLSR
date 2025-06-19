@@ -141,7 +141,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
-    <ClCompile Include="MissionBoard.cpp" />
     <ClCompile Include="MissionAbortFix.cpp" />
     <ClCompile Include="missions\actions\ActActTrigger.cpp" />
     <ClCompile Include="missions\actions\ActAddCargo.cpp" />
@@ -175,6 +174,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\Condition.cpp" />
     <ClCompile Include="missions\LootProps.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
+    <ClCompile Include="missions\MissionBoard.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
     <ClCompile Include="missions\NpcNames.cpp" />
     <ClCompile Include="missions\objectives\Objectives.cpp" />
@@ -196,7 +196,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="MissionBoard.h" />
     <ClInclude Include="MissionAbortFix.h" />
     <ClInclude Include="missions\actions\ActActTrigger.h" />
     <ClInclude Include="missions\actions\ActAddCargo.h" />
@@ -241,6 +240,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\LootProps.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionArch.h" />
+    <ClInclude Include="missions\MissionBoard.h" />
     <ClInclude Include="missions\MissionObject.h" />
     <ClInclude Include="missions\Missions.h" />
     <ClInclude Include="missions\MsnSolarArch.h" />

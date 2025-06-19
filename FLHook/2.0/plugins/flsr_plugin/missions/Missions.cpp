@@ -34,7 +34,7 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Objectives/ObjGotoArch.h"
-#include "../MissionBoard.h"
+#include "MissionBoard.h"
 
 namespace Missions
 {	

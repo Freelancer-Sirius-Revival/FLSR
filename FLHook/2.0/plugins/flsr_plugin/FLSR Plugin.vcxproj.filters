@@ -124,7 +124,6 @@
     <ClCompile Include="missions\conditions\CndCount.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="MissionBoard.cpp" />
     <ClCompile Include="missions\actions\ActAdjRep.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
@@ -138,6 +137,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="MissionAbortFix.cpp" />
+    <ClCompile Include="missions\MissionBoard.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -289,7 +291,6 @@
     <ClInclude Include="missions\conditions\CndCount.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="MissionBoard.h" />
     <ClInclude Include="missions\actions\ActAdjRep.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
@@ -306,6 +307,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="MissionAbortFix.h" />
+    <ClInclude Include="missions\MissionBoard.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

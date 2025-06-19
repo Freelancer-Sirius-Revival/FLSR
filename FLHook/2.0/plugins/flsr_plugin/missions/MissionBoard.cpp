@@ -1,6 +1,6 @@
-#include "Main.h"
+#include "../Main.h"
 #include "MissionBoard.h"
-#include "Missions/Missions.h"
+#include "Missions.h"
 
 namespace MissionBoard
 {

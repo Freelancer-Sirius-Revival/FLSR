@@ -153,6 +153,8 @@ namespace MissionBoard
 					if (customMissions.contains(indexEntry.second))
 					{
 						SendMissionAcceptance(clientId, boardIndex, base);
+						// SetMsnID makes sure: 1. the player cannot be invited to groups ("Is in a Mission") and 2. it sets the same MsnId to group-joining players.
+						pub::Player::SetMsnID(clientId, indexEntry.second, clientId, false, 0);
 						Missions::StartMissionByOfferId(indexEntry.second, clientId);
 						DeleteCustomMission(indexEntry.second);
 					}

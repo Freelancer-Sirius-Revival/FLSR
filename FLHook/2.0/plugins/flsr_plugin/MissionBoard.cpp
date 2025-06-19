@@ -125,15 +125,21 @@ namespace MissionBoard
 		if (!accepted)
 			return;
 
-		uint missionId;
-		pub::Player::GetMsnID(clientId, missionId);
-		if (missionId > 0 || Missions::IsPartOfOfferedJob(clientId))
+		st6::vector<uint> groupMembers;
+		pub::Player::GetGroupMembers(clientId, groupMembers);
+		// Usually this check is enough on one player of a group. But just make sure it really does not overlook anything.
+		for (const auto memberId : groupMembers)
 		{
-			uint base;
-			pub::Player::GetBase(clientId, base);
-			SendMissionOfferRejection(clientId, boardIndex, base, 1840);
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-			return;
+			uint missionId;
+			pub::Player::GetMsnID(clientId, missionId);
+			if (missionId > 0 || Missions::IsPartOfOfferedJob(clientId))
+			{
+				uint base;
+				pub::Player::GetBase(clientId, base);
+				SendMissionOfferRejection(clientId, boardIndex, base, 1840);
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+				return;
+			}
 		}
 
 		const auto& clientEntry = missionOfferIndicesByClient.find(clientId);
@@ -152,9 +158,14 @@ namespace MissionBoard
 					if (missionOffers.contains(indexEntry.second))
 					{
 						SendMissionOfferAcceptance(clientId, boardIndex, base);
-						// SetMsnID makes sure: 1. the player cannot be invited to groups ("Is in a Mission") and 2. it sets the same MsnId to group-joining players.
-						pub::Player::SetMsnID(clientId, indexEntry.second, clientId, false, 0);
-						Missions::StartMissionByOfferId(indexEntry.second, clientId);
+						std::vector<uint> groupMemberIds;
+						for (const auto memberId : groupMembers)
+						{
+							// SetMsnID makes sure: 1. the player cannot be invited to groups ("Is in a Mission") and 2. it sets the same MsnId to late group-joining players.
+							pub::Player::SetMsnID(memberId, indexEntry.second, clientId, false, 0);
+							groupMemberIds.push_back(memberId);
+						}
+						Missions::StartMissionByOfferId(indexEntry.second, groupMemberIds);
 						DeleteMissionOffer(indexEntry.second);
 					}
 					// Someone already removed it from the pool

@@ -743,7 +743,7 @@ namespace Missions
 		return entry.first->second.id;
 	}
 
-	void StartMissionByOfferId(const uint offerId, const uint clientId)
+	void StartMissionByOfferId(const uint offerId, const std::vector<uint>& clientIds)
 	{
 		const auto& entry = missionNamesByOfferId.find(offerId);
 		if (entry != missionNamesByOfferId.end())
@@ -751,7 +751,9 @@ namespace Missions
 			const uint missionId = CreateMission(entry->second);
 			auto& mission = missions.at(missionId);
 			mission.offerId = offerId;
-			mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), CreateID("player"));
+			const uint labelId = CreateID("players");
+			for (const auto clientId : clientIds)
+				mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), labelId);
 			mission.Start();
 			missionNamesByOfferId.erase(entry);
 		}

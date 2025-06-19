@@ -50,7 +50,7 @@ namespace Missions
 			offer.group = missionArchetype.offer.group;
 			offer.text = missionArchetype.offer.text;
 			offer.reward = missionArchetype.offer.reward;
-			const uint offerId = MissionBoard::AddCustomMission(offer, missionArchetype.offer.bases);
+			const uint offerId = MissionBoard::AddMissionOffer(offer, missionArchetype.offer.bases);
 			missionNamesByOfferId.insert({ offerId, missionArchetype.name });
 			return offerId;
 		}
@@ -1209,7 +1209,7 @@ namespace Missions
 			}
 
 			for (const auto& entry : missionNamesByOfferId)
-				MissionBoard::DeleteCustomMission(entry.first);
+				MissionBoard::DeleteMissionOffer(entry.first);
 
 			KillMissions();
 			missionArchetypes.clear();

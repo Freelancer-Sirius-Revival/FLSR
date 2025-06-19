@@ -53,7 +53,7 @@ namespace MissionBoard
 		char acceptanceData[7];
 	};
 
-	static void SendMissionAcceptance(const uint clientId, const uint boardIndex, const uint base)
+	static void SendMissionOfferAcceptance(const uint clientId, const uint boardIndex, const uint base)
 	{
 		MissionAcceptance data;
 		data.index = boardIndex;
@@ -63,7 +63,7 @@ namespace MissionBoard
 		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
 	}
 
-	static void SendMissionRejection(const uint clientId, const uint boardIndex, const uint base, const ushort rejectionResourceId)
+	static void SendMissionOfferRejection(const uint clientId, const uint boardIndex, const uint base, const ushort rejectionResourceId)
 	{
 		MissionAcceptance data;
 		data.index = boardIndex;
@@ -75,14 +75,13 @@ namespace MissionBoard
 		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
 	}
 
-	std::unordered_map<uint, MissionOffer> customMissions;
-	std::unordered_map<uint, std::unordered_set<uint>> customMissionIdsByBase;
-	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> customMissionIndicesByClient;
-	std::unordered_map<uint, uint> missionOffersMaxIndexByClient;
+	std::unordered_map<uint, MissionOffer> missionOffers;
+	std::unordered_map<uint, std::unordered_set<uint>> missionIdsByBase;
+	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> missionOfferIndicesByClient;
 
-	static void SendDestroyMissionToAll(const uint missionId)
+	static void SendDestroyMissionOfferToAll(const uint missionId)
 	{
-		for (auto& clientEntry : customMissionIndicesByClient)
+		for (const auto& clientEntry : missionOfferIndicesByClient)
 		{
 			for (auto indexEntry = clientEntry.second.begin(); indexEntry != clientEntry.second.end(); indexEntry++)
 			{
@@ -93,7 +92,7 @@ namespace MissionBoard
 					pub::Player::GetBase(clientId, base);
 					if (base)
 						GetClientInterface()->Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(clientId, base, missionId);
-					// Do not clear customMissionIndicesByClient here. Other clients may still have the mission visible if they have the mission board open at the same time.
+					// Do not clear missionOfferIndicesByClient here. Other clients may still have the mission visible if they have the mission board open at the same time.
 					break;
 				}
 			}
@@ -102,21 +101,21 @@ namespace MissionBoard
 
 	uint nextMissionId = std::numeric_limits<uint>::max();
 
-	uint AddCustomMission(const MissionOffer& mission, const std::vector<uint>& bases)
+	uint AddMissionOffer(const MissionOffer& mission, const std::vector<uint>& bases)
 	{
-		customMissions.insert({ nextMissionId, mission });
+		missionOffers.insert({ nextMissionId, mission });
 		for (const uint base : bases)
-			customMissionIdsByBase[base].insert(nextMissionId);
+			missionIdsByBase[base].insert(nextMissionId);
 		// To avoid collisions with existing missions, count the custom mission IDs from high to low.
 		return nextMissionId--;
 	}
 
-	void DeleteCustomMission(const uint missionId)
+	void DeleteMissionOffer(const uint missionId)
 	{
-		customMissions.erase(missionId);
-		for (auto& baseEntry : customMissionIdsByBase)
+		missionOffers.erase(missionId);
+		for (auto& baseEntry : missionIdsByBase)
 			baseEntry.second.erase(missionId);
-		SendDestroyMissionToAll(missionId);
+		SendDestroyMissionOfferToAll(missionId);
 	}
 
 	void __stdcall MissionResponse(uint boardIndex, uint origin, bool accepted, uint clientId)
@@ -132,13 +131,13 @@ namespace MissionBoard
 		{
 			uint base;
 			pub::Player::GetBase(clientId, base);
-			SendMissionRejection(clientId, boardIndex, base, 1840);
+			SendMissionOfferRejection(clientId, boardIndex, base, 1840);
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return;
 		}
 
-		const auto& clientEntry = customMissionIndicesByClient.find(clientId);
-		if (clientEntry != customMissionIndicesByClient.end())
+		const auto& clientEntry = missionOfferIndicesByClient.find(clientId);
+		if (clientEntry != missionOfferIndicesByClient.end())
 		{
 			for (const auto& indexEntry : clientEntry->second)
 			{
@@ -150,18 +149,18 @@ namespace MissionBoard
 					if (!base)
 						return;
 					// Nobody has yet taken upon the mission
-					if (customMissions.contains(indexEntry.second))
+					if (missionOffers.contains(indexEntry.second))
 					{
-						SendMissionAcceptance(clientId, boardIndex, base);
+						SendMissionOfferAcceptance(clientId, boardIndex, base);
 						// SetMsnID makes sure: 1. the player cannot be invited to groups ("Is in a Mission") and 2. it sets the same MsnId to group-joining players.
 						pub::Player::SetMsnID(clientId, indexEntry.second, clientId, false, 0);
 						Missions::StartMissionByOfferId(indexEntry.second, clientId);
-						DeleteCustomMission(indexEntry.second);
+						DeleteMissionOffer(indexEntry.second);
 					}
 					// Someone already removed it from the pool
 					else
 					{
-						SendMissionRejection(clientId, boardIndex, base, 976);
+						SendMissionOfferRejection(clientId, boardIndex, base, 976);
 					}
 					return;
 				}
@@ -218,11 +217,13 @@ namespace MissionBoard
 			minRequiredReputationForMissions = *(float*)(DWORD(contentHandle) + 0x1195BC);
 	}
 
+	std::unordered_map<uint, uint> missionBoardOffersMaxIndexByClient;
+
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize)
 	{
 		returncode = DEFAULT_RETURNCODE;
 		const uint index = *((uint*)data + 2);
-		missionOffersMaxIndexByClient[clientId] = std::max<uint>(missionOffersMaxIndexByClient[clientId], index);
+		missionBoardOffersMaxIndexByClient[clientId] = std::max<uint>(missionBoardOffersMaxIndexByClient[clientId], index);
 		return true;
 	}
 
@@ -231,22 +232,22 @@ namespace MissionBoard
 		returncode = DEFAULT_RETURNCODE;
 
 		// Before the Complete Packet it sent, add the custom missions to the list.
-		const auto& entry = customMissionIdsByBase.find(base);
-		if (entry != customMissionIdsByBase.end())
+		const auto& entry = missionIdsByBase.find(base);
+		if (entry != missionIdsByBase.end())
 		{
 			int clientRep;
 			pub::Player::GetRep(clientId, clientRep);
 
-			for (const auto customMissionId : entry->second)
+			for (const auto missionOfferId : entry->second)
 			{
-				const auto& mission = customMissions.at(customMissionId);
+				const auto& offer = missionOffers.at(missionOfferId);
 				float feelings;
-				pub::Reputation::GetGroupFeelingsTowards(clientRep, mission.group, feelings);
+				pub::Reputation::GetGroupFeelingsTowards(clientRep, offer.group, feelings);
 				if (feelings > minRequiredReputationForMissions)
 				{
-					const uint index = ++missionOffersMaxIndexByClient[clientId];
-					customMissionIndicesByClient[clientId].push_back({ index, customMissionId });
-					SendMissionOfferToClient(clientId, customMissionId, mission, base, index);
+					const uint index = ++missionBoardOffersMaxIndexByClient[clientId];
+					missionOfferIndicesByClient[clientId].push_back({ index, missionOfferId });
+					SendMissionOfferToClient(clientId, missionOfferId, offer, base, index);
 				}
 			}
 		}
@@ -255,8 +256,8 @@ namespace MissionBoard
 
 	static void ClearJobBoardClientData(const uint clientId)
 	{
-		customMissionIndicesByClient.erase(clientId);
-		missionOffersMaxIndexByClient.erase(clientId);
+		missionOfferIndicesByClient.erase(clientId);
+		missionBoardOffersMaxIndexByClient.erase(clientId);
 	}
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)

@@ -35,6 +35,7 @@
 #include "Actions/ActSetVibe.h"
 #include "Objectives/ObjGotoArch.h"
 #include "MissionBoard.h"
+#include "ClientObjectives.h"
 
 namespace Missions
 {	
@@ -842,6 +843,7 @@ namespace Missions
 
 	static void RemoveClientFromMissions(const uint client)
 	{
+		ClientObjectives::DeleteClientObjectives(client, 0);
 		std::vector<uint> ids;
 		for (const auto& entry : missions)
 			ids.push_back(entry.first);
@@ -1132,6 +1134,9 @@ namespace Missions
 	void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
+
+		ClientObjectives::SendClientObjectives(clientId);
+
 		if (spaceEnterConditions.empty())
 			return;
 		uint systemId;
@@ -1147,6 +1152,9 @@ namespace Missions
 	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 	{
 		returncode = DEFAULT_RETURNCODE;
+
+		ClientObjectives::SendClientObjectives(clientId);
+
 		const std::unordered_set<CndBaseEnter*> baseEnterConditionsCopy(baseEnterConditions);
 		for (const auto& cnd : baseEnterConditionsCopy)
 		{

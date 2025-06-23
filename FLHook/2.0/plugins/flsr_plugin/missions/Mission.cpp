@@ -1,5 +1,6 @@
 #include "Mission.h"
 #include "conditions/CndCount.h"
+#include "ClientObjectives.h"
 
 namespace Missions
 {
@@ -221,6 +222,8 @@ namespace Missions
 	{
 		if (!clientIds.contains(clientId))
 			return;
+
+		ClientObjectives::DeleteClientObjectives(clientId, id);
 
 		ClearMusic(clientId);
 		std::vector<uint> labels;

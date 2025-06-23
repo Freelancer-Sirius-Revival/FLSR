@@ -205,7 +205,7 @@ struct XRequestBestPath
 	int repId; // PlayerData.iReputation
 	int waypointCount; // Ignored for Server.RequestBestPath
 	bool noPathFound; // Ignored for Server.RequestBestPath
-	XRequestBestPathEntry entries[64]; // Server.RequestBestPath requires exactly 2, otherwise variable length
+	XRequestBestPathEntry entries[2]; // Server.RequestBestPath requires exactly 2, otherwise variable length
 };
 
 enum class MissionListEmptyReason : uint
@@ -296,7 +296,7 @@ struct StarSystemMock
 
 namespace SysDB
 {
-	IMPORT  st6::map<uint, StarSystem, st6::less<uint>, st6::allocator<StarSystem>> SysMap;
+	IMPORT st6::map<uint, StarSystem, st6::less<uint>, st6::allocator<StarSystem>> SysMap;
 };
 
 class IMPORT CPlayerGroup

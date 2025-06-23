@@ -1,7 +1,9 @@
 #include "ActSetNNObj.h"
+#include "../ClientObjectives.h"
 
 namespace Missions
 {
+	/*
 	static void SetObjective(const Mission& mission, const uint clientId, const ActSetNNObj& action)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
@@ -34,7 +36,7 @@ namespace Missions
 				uint objId;
 				pub::Player::GetShip(clientId, objId);
 				if (!objId)
-					pub::Player::GetBase(clientId, objId);
+					pub::Player::GetBase(clientId, objId); //NOT the base location!
 
 				IObjRW* inspect;
 				StarSystem* starSystem;
@@ -65,23 +67,34 @@ namespace Missions
 			pub::Player::ReturnBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 		}
 	}
+	*/
 
 	void ActSetNNObj::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		FmtStr caption(message, 0);
-		caption.begin_mad_lib(message);
-		caption.end_mad_lib();
+		ClientObjectives::Objective objective;
+		objective.missionId = mission.id;
+		objective.objId = targetObjName;
+		objective.systemId = systemId;
+		objective.position = position;
+		objective.message = message;
+
 		if (objNameOrLabel == Activator)
 		{
 			if (activator.type == MissionObjectType::Client && activator.id)
-				SetObjective(mission, activator.id, *this);
+			{
+				ClientObjectives::SetClientObjective(activator.id, objective);
+				ClientObjectives::SendClientObjectives(activator.id);
+			}
 		}
 		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
 				if (object.type == MissionObjectType::Client)
-					SetObjective(mission, object.id, *this);
+				{
+					ClientObjectives::SetClientObjective(object.id, objective);
+					ClientObjectives::SendClientObjectives(object.id);
+				}
 			}
 		}
 	}

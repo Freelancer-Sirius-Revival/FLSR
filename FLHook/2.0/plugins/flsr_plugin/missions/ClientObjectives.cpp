@@ -7,7 +7,6 @@ namespace Missions
 	{
 		std::unordered_map<uint, Objective> objectiveByClientId;
 		std::unordered_map<uint, std::vector<pub::Player::MissionObjective>> objectivesByClientId;
-		uint bestPathToInterceptForObjectivesByClientId;
 
 		void DeleteClientObjectives(const uint clientId, const uint missionId)
 		{
@@ -18,8 +17,6 @@ namespace Missions
 			}
 			objectiveByClientId.erase(clientId);
 			objectivesByClientId.erase(clientId);
-			if (bestPathToInterceptForObjectivesByClientId == clientId)
-				bestPathToInterceptForObjectivesByClientId = 0;
 		}
 
 		bool DoesClientHaveObjective(const uint clientId)
@@ -41,64 +38,72 @@ namespace Missions
 
 			if (objectiveEntry->second.systemId)
 			{
-				// Define start location
-				XRequestBestPathEntry start;
-				uint playerObjectId = 0;
-				uint baseId;
-				pub::Player::GetBase(clientId, baseId);
-				if (baseId)
-				{
-					for (const auto& base : lstBases)
-					{
-						if (base.iBaseID == baseId && base.iObjectID)
-						{
-							playerObjectId = base.iObjectID;
-							break;
-						}
-					}
-				}
-				else
-				{
-					pub::Player::GetShip(clientId, playerObjectId);
-				}
-
-				if (!playerObjectId)
-					return;
-
-				IObjRW* inspect;
-				StarSystem* starSystem;
-				if (GetShipInspect(playerObjectId, inspect, starSystem))
-				{
-					start.systemId = inspect->cobj->system;
-					start.position = inspect->cobj->vPos;
-					start.objId = inspect->cobj->id;
-				}
-
-				// Define target location
-				XRequestBestPathEntry target;
+				// Define destination location
+				XRequestBestPathEntry destination;
 				uint playerSystemId;
 				pub::Player::GetSystem(clientId, playerSystemId);
-				if (playerSystemId != objectiveEntry->second.systemId)
+				const bool playerNotInDestinationSystem = playerSystemId != objectiveEntry->second.systemId;
+				if (playerNotInDestinationSystem)
 				{
-					target = BestPath::GetJumpObjectToNextSystem(clientId, objectiveEntry->second.systemId);
+					destination = BestPath::GetJumpObjectToNextSystem(clientId, objectiveEntry->second.systemId);
 				}
 				else
 				{
-					target.systemId = objectiveEntry->second.systemId;
-					target.position = objectiveEntry->second.position;
-					target.objId = objectiveEntry->second.objId;
+					destination.systemId = objectiveEntry->second.systemId;
+					destination.position = objectiveEntry->second.position;
+					destination.objId = objectiveEntry->second.objId;
 				}
 
 				// Tell the server to compute the best path
 				XRequestBestPath bestPath;
 				bestPath.noPathFound = false;
 				bestPath.repId = 0;
-				bestPath.waypointCount = 2;
-				bestPath.entries[0] = start;
-				bestPath.entries[1] = target;
+				if (playerNotInDestinationSystem || objectiveEntry->second.bestPath)
+				{
+					// Define start location
+					XRequestBestPathEntry start;
+					uint playerObjectId = 0;
+					uint baseId;
+					pub::Player::GetBase(clientId, baseId);
+					if (baseId)
+					{
+						for (const auto& base : lstBases)
+						{
+							if (base.iBaseID == baseId && base.iObjectID)
+							{
+								playerObjectId = base.iObjectID;
+								break;
+							}
+						}
+					}
+					else
+					{
+						pub::Player::GetShip(clientId, playerObjectId);
+					}
 
-				// Set a flag to intercept the actual client package because we use it for getting the resolved path.
-				bestPathToInterceptForObjectivesByClientId = clientId;
+					if (!playerObjectId)
+						return;
+
+					IObjRW* inspect;
+					StarSystem* starSystem;
+					if (GetShipInspect(playerObjectId, inspect, starSystem))
+					{
+						start.systemId = inspect->cobj->system;
+						start.position = inspect->cobj->vPos;
+						start.objId = inspect->cobj->id;
+					}
+
+					bestPath.waypointCount = 2;
+					bestPath.entries[0] = start;
+					bestPath.entries[1] = destination;
+				}
+				else
+				{
+					bestPath.waypointCount = 1;
+					bestPath.entries[0] = destination;
+				}
+
+				// Players cannot have player-waypoints while being in a mission. So we can assume this always takes priority.
 				Server.RequestBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 			}
 			else
@@ -107,139 +112,163 @@ namespace Missions
 			}
 		}
 
+		static bool AreObjectivesEqual(const std::vector<pub::Player::MissionObjective>& objectivesA, const std::vector<pub::Player::MissionObjective>& objectivesB)
+		{
+			if (objectivesA.size() != objectivesB.size())
+				return false;
+
+			for (size_t index = 0, length = objectivesB.size(); index < length; index++)
+			{
+				if (objectivesA[index].type != objectivesB[index].type)
+					return false;
+
+				const size_t bufferSize = 1024;
+				char flatFmtStrA[bufferSize];
+				const size_t sizeA = objectivesA[index].message.flatten(flatFmtStrA, bufferSize);
+				char flatFmtStrB[bufferSize];
+				const size_t sizeB = objectivesB[index].message.flatten(flatFmtStrB, bufferSize);
+				if (sizeA != sizeB || std::memcmp(flatFmtStrA, flatFmtStrB, sizeA) != 0)
+					return false;
+			}
+
+			return true;
+		}
+
+		static bool AppendLaunchToSpaceObjectiveIfNecessary(const uint clientId, std::vector<pub::Player::MissionObjective>& objectives)
+		{
+			uint baseId;
+			pub::Player::GetBase(clientId, baseId);
+			if (!baseId)
+				return false;
+
+			for (const auto& base : lstBases)
+			{
+				if (base.iBaseID == baseId && base.iObjectID)
+				{
+					pub::Player::MissionObjective objective;
+					objective.type = pub::Player::MissionObjectiveType::MissionText;
+					objective.message = FmtStr(13081, 0);
+					objective.message.append_base(baseId);
+					FmtStr::NavMarker marker;
+					uint objId = base.iObjectID;
+					IObjRW* inspect;
+					StarSystem* starSystem;
+					if (GetShipInspect(objId, inspect, starSystem))
+					{
+						marker.pos = inspect->cobj->vPos;
+						marker.system = base.iSystemID;
+					}
+					else
+					{
+						marker.pos = Vector(0, 0, 0);
+						uint systemId;
+						pub::Player::GetSystem(clientId, systemId);
+						marker.system = systemId;
+					}
+					objective.message.append_nav_marker(marker);
+					objectives.push_back(objective);
+					return true;
+				}
+			}
+			return false;
+		}
+
 		bool __stdcall Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint clientId, const XRequestBestPath& data, int size)
 		{
-			if (bestPathToInterceptForObjectivesByClientId != clientId)
+			// Players can have player-waypoints only when NOT in a mission. So we can safely assume this works as intended.
+			if (!objectiveByClientId.contains(clientId))
 			{
 				returncode = DEFAULT_RETURNCODE;
 				return true;
 			}
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-			bestPathToInterceptForObjectivesByClientId = 0;
 
-			// Early exit if no "best path" was generated or the client has somehow "left" by now.
+			// Early exit if no "best path" was generated or the character has somehow left by now.
 			if (data.waypointCount == 0 || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId)) 
 				return false;
 
-			std::vector<pub::Player::MissionObjective> objs;
-			objs.resize(data.waypointCount);
-
-			int objectivesOffset = 0;
-			IObjRW* inspect;
-			StarSystem* starSystem;
-
-			// If the player is docked, add first objective LAUNCH.
-			uint baseId;
-			pub::Player::GetBase(clientId, baseId);
-			if (baseId > 0)
-			{
-				for (const auto& base : lstBases)
-				{
-					if (base.iBaseID == baseId && base.iObjectID)
-					{
-						objs.resize(data.waypointCount + 1);
-						objs[0].type = pub::Player::MissionObjectiveType::MissionText;
-						objs[0].message = FmtStr(13081, 0);
-						objs[0].message.append_base(baseId);
-						FmtStr::NavMarker marker;
-						uint objId = base.iObjectID;
-						if (GetShipInspect(objId, inspect, starSystem))
-						{
-							marker.pos = inspect->cobj->vPos;
-							marker.system = base.iSystemID;
-						}
-						else
-						{
-							marker.pos = Vector(0, 0, 0);
-							uint systemId;
-							pub::Player::GetSystem(clientId, systemId);
-							marker.system = systemId;
-						}
-						objs[0].message.append_nav_marker(marker);
-						objectivesOffset++;
-						break;
-					}
-				}
-			}
+			std::vector<pub::Player::MissionObjective> objectives;
+			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for potential MAIN objective
+			const int objectiveIndexOffset = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives) ? 1 : 0;
+			objectives.resize(data.waypointCount + objectiveIndexOffset);
 
 			// The first "best path" waypoint is being treated as objective to reach the actual destination.
+			auto& nextObjective = objectives[objectiveIndexOffset];
 			if (data.entries[0].objId > 0)
 			{
-				objs[objectivesOffset].type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
 				IObjRW* inspect;
 				StarSystem* system;
 				uint objId = data.entries[0].objId;
 				if (GetShipInspect(objId, inspect, system))
 				{
+					nextObjective.type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
 					if (inspect->cobj->type & ObjectType::TradelaneRing)
 					{
 						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && (inspect->cobj->type & ObjectType::JumpGate))
 						{
-							objs[objectivesOffset].message = FmtStr(13071, 0);
-							objs[objectivesOffset].message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
+							nextObjective.message = FmtStr(13071, 0);
+							nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
 						}
 						else
 						{
-							objs[objectivesOffset].message = FmtStr(13060, 0);
+							nextObjective.message = FmtStr(13060, 0);
 						}
 					}
 					else if (inspect->cobj->type & ObjectType::JumpGate)
 					{
-						objs[objectivesOffset].message = FmtStr(13080, 0);
-						objs[objectivesOffset].message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
+						nextObjective.message = FmtStr(13080, 0);
+						nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
 					}
 				}
 			}
 
-			// The final waypoint is the actual destination. Mark is as objective.
-			objs[objs.size() - 1].type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
+			const auto& playerObjective = objectiveByClientId[clientId];
+			const auto& lastWaypoint = data.entries[data.waypointCount - 1];
+			const bool lastObjectiveIsMainObjective = lastWaypoint.systemId == playerObjective.systemId && 
+													  lastWaypoint.position.x == playerObjective.position.x &&
+													  lastWaypoint.position.y == playerObjective.position.y &&
+													  lastWaypoint.position.z == playerObjective.position.z;
+
+			const pub::Player::MissionObjectiveType lastObjectiveType = (pub::Player::MissionObjectiveType)((uint)pub::Player::MissionObjectiveType::ObjectiveWaypoint | (uint)pub::Player::MissionObjectiveType::MissionText | (uint)pub::Player::MissionObjectiveType::ActiveLog);
+
+			if (lastObjectiveIsMainObjective)
+			{
+				auto& lastObjective = objectives[objectives.size() - 1];
+				lastObjective.type = lastObjectiveType;
+				lastObjective.message = FmtStr(playerObjective.message, 0);
+			}
 
 			// Translate all "best path" waypoints to nav map markers the objectives.
-			for (int waypointIndex = 0, objectiveIndex = objectivesOffset; waypointIndex < data.waypointCount; waypointIndex++, objectiveIndex++)
+			for (int waypointIndex = 0, objectiveIndex = objectiveIndexOffset; waypointIndex < data.waypointCount; waypointIndex++, objectiveIndex++)
 			{
 				FmtStr::NavMarker marker;
 				marker.pos = data.entries[waypointIndex].position;
 				marker.system = data.entries->systemId;
-				objs[objectiveIndex].message.append_nav_marker(marker);
+				objectives[objectiveIndex].message.append_nav_marker(marker);
+			}
+
+			if (!lastObjectiveIsMainObjective)
+			{
+				pub::Player::MissionObjective finalObjective;
+				finalObjective.type = lastObjectiveType;
+				finalObjective.message = FmtStr(playerObjective.message, 0);
+				FmtStr::NavMarker marker;
+				marker.pos = playerObjective.position;
+				marker.system = playerObjective.systemId;
+				finalObjective.message.append_nav_marker(marker);
+				objectives.push_back(finalObjective);
 			}
 
 			// Check whether the client needs a packet with new objectives. This must be done to ensure constant re-generation of best path will not flood the network.
-			bool clientNeedsUpdate = false;
-			if (!objectivesByClientId.contains(clientId) || objectivesByClientId[clientId].size() != objs.size())
+			if (!AreObjectivesEqual(objectivesByClientId[clientId], objectives))
 			{
-				clientNeedsUpdate = true;
-			}
-			else
-			{
-				for (int index = 0, length = objs.size(); index < length; index++)
-				{
-					if (objectivesByClientId[clientId][index].type != objs[index].type)
-					{
-						clientNeedsUpdate = true;
-						break;
-					}
+				// Save the current objectives for later comparison.
+				objectivesByClientId[clientId] = objectives;
 
-					char flatFmtStrA[4096];
-					const size_t sizeA = objectivesByClientId[clientId][index].message.flatten(flatFmtStrA, 4096);
-					char flatFmtStrB[4096];
-					const size_t sizeB = objs[index].message.flatten(flatFmtStrB, 4096);
-					if (sizeA != sizeB || std::memcmp(flatFmtStrA, flatFmtStrB, sizeA) != 0)
-					{
-						clientNeedsUpdate = true;
-						break;
-					}
-				}
-			}
-
-			// Save the current objectives for later comparison.
-			objectivesByClientId[clientId] = objs;
-
-			if (clientNeedsUpdate)
-			{
 				FmtStr missionTitle(13052, 0);
 				FmtStr missionDescription(13052, 0);
-				pub::Player::SetMissionObjectives(clientId, 12, objs.data(), objs.size(), missionTitle, 2, missionDescription);
+				pub::Player::SetMissionObjectives(clientId, 12, objectives.data(), objectives.size(), missionTitle, 2, missionDescription);
 			}
 
 			return true;

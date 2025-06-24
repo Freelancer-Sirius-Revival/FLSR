@@ -8,11 +8,12 @@ namespace Missions
 	{
 		struct Objective
 		{
-			uint missionId;
+			uint missionId = 0;
 			Vector position;
-			uint systemId;
-			uint message;
-			uint objId;
+			uint systemId = 0;
+			uint message = 0;
+			uint objId = 0;
+			bool bestPath = false;
 		};
 
 		void DeleteClientObjectives(const uint clientId, const uint missionId);

@@ -11,6 +11,7 @@ namespace Missions
 		objective.systemId = systemId;
 		objective.position = position;
 		objective.message = message;
+		objective.bestPath = bestRoute;
 
 		if (objNameOrLabel == Activator)
 		{

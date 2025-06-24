@@ -24,11 +24,11 @@ namespace Missions
 		id(id),
 		archetype(missionArchetype)
 	{
-		uint lastTriggerId = 0;
+		uint nextTriggerId = 1;
 		for (const auto& triggerArchetype : missionArchetype->triggers)
 		{
-			triggers.try_emplace(lastTriggerId, lastTriggerId, id, triggerArchetype);
-			lastTriggerId++;
+			triggers.try_emplace(nextTriggerId, nextTriggerId, id, triggerArchetype);
+			nextTriggerId++;
 		}
 	}
 

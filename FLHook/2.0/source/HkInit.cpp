@@ -43,7 +43,7 @@ PATCH_INFO piServerDLL = {
         //{0x6D66694,		&GuidedDestroyedNaked,				4, &GuidedDestroyedOrigFunc,	false},
         //{0x6D6733C,		&ShipColGrpDestroyedHookNaked,		4, &ShipAndSolarColGrpDeathOrigFunc,		false},
         {0x6D67340,		&ShipEquipDestroyedHookNaked,		4, &ShipEquipDeathOrigFunc,		false},
-        //{0x6D6768C,		&SolarColGrpDestroyedHookNaked,		4, 0,							false},
+        //{0x6D6768C,		&SolarColGrpDestroyedHookNaked,		4, 0,							false}, // Same original function as ShipColGrpDeath
         {0x6D67274,		&ShipDestroyedNaked,				4, &ShipDestroyedOrigFunc,			false},
         {0x6D675C4,		&SolarDestroyedNaked,				4, &SolarDestroyedOrigFunc,		false},
         //{0x6D672A0,		&HookExplosionHitNaked,				4, &fpOldExplosionHit,		    false},

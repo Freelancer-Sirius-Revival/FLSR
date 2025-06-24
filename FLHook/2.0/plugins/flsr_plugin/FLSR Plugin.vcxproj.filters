@@ -146,6 +146,9 @@
     <ClCompile Include="missions\ClientObjectives.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActNNPath.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -321,6 +324,9 @@
     </ClInclude>
     <ClInclude Include="missions\ClientObjectives.h">
       <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActNNPath.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

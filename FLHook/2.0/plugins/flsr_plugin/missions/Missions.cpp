@@ -1189,7 +1189,7 @@ namespace Missions
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
-				PrintUserCmdText(clientId, L"ERR No permission\n");
+				PrintUserCmdText(clientId, L"ERR No permission");
 				return false;
 			}
 
@@ -1198,10 +1198,10 @@ namespace Missions
 			if (missionId > 0)
 			{
 				missions.at(missionId).Start();
-				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.\n");
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.");
 			}
 			else
-				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.\n");
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.");
 			return true;
 		}
 		else if (IS_CMD("stop_mission"))
@@ -1217,9 +1217,9 @@ namespace Missions
 
 			const std::string targetNickname = wstos(ToLower(cmds->ArgStr(1)));
 			if (KillMission(targetNickname))
-				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" ended.\n");
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" ended.");
 			else
-				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.\n");
+				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.");
 			return true;
 		}
 		else if (IS_CMD("reload_missions"))
@@ -1229,7 +1229,7 @@ namespace Missions
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
-				PrintUserCmdText(clientId, L"ERR No permission\n");
+				PrintUserCmdText(clientId, L"ERR No permission");
 				return false;
 			}
 
@@ -1239,7 +1239,9 @@ namespace Missions
 			KillMissions();
 			missionArchetypes.clear();
 			initialized = false;
-			PrintUserCmdText(clientId, L"Ended and reloaded all missions\n");
+			PrintUserCmdText(clientId, L"Stopped and reloaded all missions.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;
 		}
 		return false;

@@ -1,5 +1,6 @@
 #include "ClientObjectives.h"
 #include "BestPath.h"
+#include "Mission.h"
 
 namespace Missions
 {
@@ -188,6 +189,10 @@ namespace Missions
 			if (data.waypointCount == 0 || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId)) 
 				return false;
 
+			const auto& missionEntry = missions.find(objectiveByClientId[clientId].missionId);
+			if (missionEntry == missions.end())
+				return false;
+
 			std::vector<pub::Player::MissionObjective> objectives;
 			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for potential MAIN objective
 			const int objectiveIndexOffset = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives) ? 1 : 0;
@@ -266,8 +271,8 @@ namespace Missions
 				// Save the current objectives for later comparison.
 				objectivesByClientId[clientId] = objectives;
 
-				FmtStr missionTitle(13052, 0);
-				FmtStr missionDescription(13052, 0);
+				FmtStr missionTitle(missionEntry->second.archetype->offer.title, 0);
+				FmtStr missionDescription(missionEntry->second.archetype->offer.description, 0);
 				pub::Player::SetMissionObjectives(clientId, 12, objectives.data(), objectives.size(), missionTitle, 2, missionDescription);
 			}
 

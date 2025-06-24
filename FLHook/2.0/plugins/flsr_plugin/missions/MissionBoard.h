@@ -8,7 +8,7 @@ namespace MissionBoard
 		pub::GF::MissionType type;
 		uint system;
 		uint group;
-		uint text;
+		uint description;
 		uint reward;
 	};
 

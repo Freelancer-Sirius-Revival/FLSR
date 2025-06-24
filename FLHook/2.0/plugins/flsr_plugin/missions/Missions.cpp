@@ -50,7 +50,7 @@ namespace Missions
 			offer.type = missionArchetype.offer.type;
 			offer.system = missionArchetype.offer.system;
 			offer.group = missionArchetype.offer.group;
-			offer.text = missionArchetype.offer.text;
+			offer.description = missionArchetype.offer.description;
 			offer.reward = missionArchetype.offer.reward;
 			const uint offerId = MissionBoard::AddMissionOffer(offer, missionArchetype.offer.bases);
 			missionNamesByOfferId.insert({ offerId, missionArchetype.name });
@@ -113,8 +113,10 @@ namespace Missions
 								mission->offer.system = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("offer_faction"))
 								pub::Reputation::GetReputationGroup(mission->offer.group, ini.get_value_string(0));
-							else if (ini.is_value("offer_string_id"))
-								mission->offer.text = ini.get_value_int(0);
+							else if (ini.is_value("offer_title_id"))
+								mission->offer.title = ini.get_value_int(0);
+							else if (ini.is_value("offer_description_id"))
+								mission->offer.description = ini.get_value_int(0);
 							else if (ini.is_value("offer_reward"))
 								mission->offer.reward = ini.get_value_int(0);
 							else if (ini.is_value("offer_bases"))
@@ -858,7 +860,6 @@ namespace Missions
 
 	static void RemoveClientFromMissions(const uint client)
 	{
-		ClientObjectives::DeleteClientObjectives(client, 0);
 		std::vector<uint> ids;
 		for (const auto& entry : missions)
 			ids.push_back(entry.first);

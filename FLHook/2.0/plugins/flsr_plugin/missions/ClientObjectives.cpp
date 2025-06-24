@@ -22,6 +22,11 @@ namespace Missions
 				bestPathToInterceptForObjectivesByClientId = 0;
 		}
 
+		bool DoesClientHaveObjective(const uint clientId)
+		{
+			return objectiveByClientId.contains(clientId);
+		}
+
 		void SetClientObjective(const uint clientId, const Objective objective)
 		{
 			DeleteClientObjectives(clientId, 0);

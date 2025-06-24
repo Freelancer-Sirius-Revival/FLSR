@@ -1,10 +1,11 @@
 #include "ActNNPath.h"
+#include "../ClientObjectives.h"
 
 namespace Missions
 {
 	static void SetObjective(const Mission& mission, const uint clientId, const ActNNPath& action)
 	{
-		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+		if (ClientObjectives::DoesClientHaveObjective(clientId) || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
 
 		if (action.message)
@@ -20,14 +21,14 @@ namespace Missions
 		bestPath.repId = Players[clientId].iReputation;
 		if (action.systemId)
 		{
-			XRequestBestPathEntry target;
-			target.systemId = action.systemId;
-			target.position = action.position;
+			XRequestBestPathEntry destination;
+			destination.systemId = action.systemId;
+			destination.position = action.position;
 			const auto& object = mission.objectIdsByName.find(action.targetObjName);
 			if (object != mission.objectIdsByName.end())
-				target.objId = object->second;
+				destination.objId = object->second;
 			else
-				target.objId = action.targetObjName;
+				destination.objId = action.targetObjName;
 
 			if (action.bestRoute)
 			{
@@ -62,13 +63,13 @@ namespace Missions
 
 				bestPath.waypointCount = 2;
 				bestPath.entries[0] = start;
-				bestPath.entries[1] = target;
+				bestPath.entries[1] = destination;
 				Server.RequestBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 			}
 			else
 			{
 				bestPath.waypointCount = 1;
-				bestPath.entries[0] = target;
+				bestPath.entries[0] = destination;
 				pub::Player::ReturnBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 			}
 		}

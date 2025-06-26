@@ -799,21 +799,32 @@ extern FARPROC fpOldDiscPacketSent;
 
 // HkIEngine
 namespace HkIEngine {
-int __cdecl FreeReputationVibe(int const &p1);
-void __cdecl Update_Time(double);
-void __stdcall Elapse_Time(float p1);
-int __cdecl Dock_Call(unsigned int const &, unsigned int const &, int,
-                      enum DOCK_HOST_RESPONSE);
-void _LaunchPos();
-void CGuidedInitNaked();
-void _CShip_init();
-void _CShip_destroy();
-void _HkLoadRepFromCharFile();
+    int __cdecl FreeReputationVibe(int const &p1);
+    void __cdecl Update_Time(double);
+    void __stdcall Elapse_Time(float p1);
+    int __cdecl Dock_Call(unsigned int const &, unsigned int const &, int,
+                          enum DOCK_HOST_RESPONSE);
+    void _LaunchPos();
+    void CGuidedInitNaked();
+    void _CShip_init();
+    void _CShip_destroy();
+    void _HkLoadRepFromCharFile();
 
-extern FARPROC fpOldLaunchPos;
-extern FARPROC fpOldInitCShip;
-extern FARPROC fpOldDestroyCShip;
-extern FARPROC fpOldLoadRepCharFile;
+    extern FARPROC fpOldLaunchPos;
+    extern FARPROC fpOldInitCShip;
+    extern FARPROC fpOldDestroyCShip;
+    extern FARPROC fpOldLoadRepCharFile;
+    extern std::unordered_set<uint> playerShips;
+
+    IObjRW* __stdcall FindInStarList(StarSystemMock* starSystem, uint searchedId);
+    void _HkLoadRepFromCharFile();
+    void FindInStarListNaked();
+    void GameObjectDestructorNaked();
+    void CAsteroidInitNaked();
+    void CGuidedInitNaked();
+    void CObjDestrOrgNaked();
+    CObject* __cdecl CObjectFindDetour(const uint& spaceObjId, CObject::Class objClass);
+    CObject* __cdecl CObjAllocDetour(CObject::Class objClass);
 } // namespace HkIEngine
 
 // HkTimers

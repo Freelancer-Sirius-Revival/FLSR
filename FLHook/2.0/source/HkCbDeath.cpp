@@ -123,6 +123,7 @@ void __stdcall ShipDestroyed(IObjRW* iobj, bool isKill, uint killerId)
     uint client = iobj->cobj->ownerPlayer;
     if (client)
     {
+        HkIEngine::playerShips.erase(iobj->cobj->id);
         ClientInfo[client].iShipOld = ClientInfo[client].iShip;
         ClientInfo[client].iShip = 0;
     }

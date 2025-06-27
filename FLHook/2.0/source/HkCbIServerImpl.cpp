@@ -328,6 +328,7 @@ for (auto& chat : set_setChatSuppress) {
                 (unsigned int iShip, unsigned int iClientID),
                 (iShip, iClientID));
 
+        HkIEngine::playerShips.insert(iShip);
         EXECUTE_SERVER_CALL(Server.PlayerLaunch(iShip, iClientID));
 
         TRY_HOOK{
@@ -617,10 +618,15 @@ for (auto& chat : set_setChatSuppress) {
 
         CHECK_FOR_DISCONNECT
 
+        uint playerShipId;
+        pub::Player::GetShip(iClientID, playerShipId);
+
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_BaseEnter, __stdcall,
             (unsigned int iBaseID, unsigned int iClientID),
             (iBaseID, iClientID));
 
+        if (playerShipId)
+            HkIEngine::playerShips.erase(playerShipId);
 
         EXECUTE_SERVER_CALL(Server.BaseEnter(iBaseID, iClientID));
 

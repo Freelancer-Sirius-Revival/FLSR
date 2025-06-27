@@ -814,6 +814,7 @@ namespace HkIEngine {
     extern FARPROC fpOldInitCShip;
     extern FARPROC fpOldDestroyCShip;
     extern FARPROC fpOldLoadRepCharFile;
+    extern std::unordered_set<uint> playerShips;
 
     IObjRW* __stdcall FindInStarList(StarSystemMock* starSystem, uint searchedId);
     void _HkLoadRepFromCharFile();

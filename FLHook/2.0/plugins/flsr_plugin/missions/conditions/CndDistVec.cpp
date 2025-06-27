@@ -1,5 +1,6 @@
 #include "CndDistVec.h"
 #include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
@@ -25,58 +26,91 @@ namespace Missions
 		distVecConditions.erase(this);
 	}
 
-	static bool IsInside(const DistVecMatchEntry& entry, const CndDistVecArchetypePtr& archetype)
+	static bool IsDistanceMatching(const CSimple* cobj, const CndDistVecArchetypePtr& archetype)
 	{
-		const bool inside = archetype->distance - HkDistance3D(archetype->position, entry.position) > 0.0f;
+		const bool inside = archetype->distance - HkDistance3D(archetype->position, cobj->vPos) > 0.0f;
 		return (archetype->type == DistanceCondition::Inside && inside) || (archetype->type == DistanceCondition::Outside && !inside);
 	}
 
-	bool CndDistVec::Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId)
+	bool CndDistVec::Matches()
 	{
-		auto& mission = missions.at(parent.missionId);
-		std::unordered_set<uint> validClientIds;
-		std::unordered_set<uint> validObjIds;
-		bool strangerRequested = archetype->objNameOrLabel == Stranger;
-		if (strangerRequested)
+		const auto& mission = missions.at(parent.missionId);
+		if (archetype->objNameOrLabel == Stranger)
 		{
-			validClientIds = mission.clientIds;
-		}
-		else if (const auto& objectByName = mission.objectIdsByName.find(archetype->objNameOrLabel); objectByName != mission.objectIdsByName.end())
-		{
-			validObjIds.insert(objectByName->second);
-		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
-		{
-			for (const auto& object : objectsByLabel->second)
+			PlayerData* playerData = 0;
+			while (playerData = Players.traverse_active(playerData))
 			{
-				if (object.type == MissionObjectType::Client)
-					validClientIds.insert(object.id);
-				else
-					validObjIds.insert(object.id);
+				if (!mission.clientIds.contains(playerData->iOnlineID) && playerData->iShipID && playerData->iSystemID == archetype->systemId)
+				{
+					IObjRW* inspect;
+					StarSystem* starSystem;
+					if (GetShipInspect(playerData->iShipID, inspect, starSystem) && IsDistanceMatching(inspect->cobj, archetype))
+					{
+						activator = MissionObject(MissionObjectType::Client, playerData->iOnlineID);
+						return true;
+					}
+				}
 			}
 		}
-		
-		for (const auto& entry : clientsByClientId)
+		else if (const auto& objectId = mission.objectIdsByName.find(archetype->objNameOrLabel); objectId != mission.objectIdsByName.end())
 		{
-			if (entry.second.systemId == archetype->systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && IsInside(entry.second, archetype))
+			uint objId = objectId->second;
+			IObjRW* inspect;
+			StarSystem* starSystem;
+			if (GetShipInspect(objId, inspect, starSystem) && !(inspect->cobj->objectClass & CObject::CSOLAR_OBJECT) && IsDistanceMatching(inspect->cobj, archetype))
 			{
-				activator.type = MissionObjectType::Client;
-				activator.id = entry.first;
+				activator = MissionObject(MissionObjectType::Object, objId);
 				return true;
 			}
 		}
-		if (!strangerRequested)
+		else
 		{
-			for (const auto& entry : objectsByObjId)
+			const auto& objectsByLabelEntry = mission.objectsByLabel.find(archetype->objNameOrLabel);
+			if (objectsByLabelEntry == mission.objectsByLabel.end())
+				return false;
+
+			for (const auto& objectEntry : objectsByLabelEntry->second)
 			{
-				if (entry.second.systemId == archetype->systemId && validObjIds.contains(entry.first) && IsInside(entry.second, archetype))
+				uint objId;
+				IObjRW* inspect;
+				StarSystem* starSystem;
+				if (objectEntry.type == MissionObjectType::Client)
 				{
-					activator.type = MissionObjectType::Object;
-					activator.id = entry.first;
-					return true;
+					pub::Player::GetShip(objectEntry.id, objId);
+					if (objId && GetShipInspect(objId, inspect, starSystem) && IsDistanceMatching(inspect->cobj, archetype))
+					{
+						activator = objectEntry;
+						return true;
+					}
+				}
+				else
+				{
+					objId = objectEntry.id;
+					if (GetShipInspect(objId, inspect, starSystem) && !(inspect->cobj->objectClass & CObject::CSOLAR_OBJECT) && IsDistanceMatching(inspect->cobj, archetype))
+					{
+						activator = objectEntry;
+						return true;
+					}
 				}
 			}
 		}
 		return false;
+	}
+	
+	float elapsedTimeSinceLastUpdate = 0.0f;
+	void Cnd_DistVec_Elapse_Time_AFTER(const float seconds)
+	{
+		elapsedTimeSinceLastUpdate += seconds;
+		if (elapsedTimeSinceLastUpdate < 0.02f)
+			return;
+		elapsedTimeSinceLastUpdate = 0.0f;
+
+		// Trigger execution can delete conditions on the fly. Make a copy with checks to avoid any issues.
+		const std::unordered_set<CndDistVec*> distVecConditionsCopy(distVecConditions);
+		for (const auto& condition : distVecConditionsCopy)
+		{
+			if (distVecConditions.contains(condition) && condition->Matches())
+				condition->ExecuteTrigger();
+		}
 	}
 }

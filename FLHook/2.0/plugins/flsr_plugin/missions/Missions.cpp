@@ -1005,6 +1005,8 @@ namespace Missions
 	float elapsedTimeInSec = 0.0f;
 	void __stdcall Elapse_Time_AFTER(float seconds)
 	{
+		Cnd_DistVec_Elapse_Time_AFTER(seconds);
+
 		returncode = DEFAULT_RETURNCODE;
 
 		const std::unordered_set<CndTimer*> timerConditionsCopy(timerConditions);
@@ -1047,62 +1049,6 @@ namespace Missions
 					}
 				}
 			}
-		}
-
-		if (distVecConditions.empty())
-			return;
-		
-		std::unordered_map<uint, DistVecMatchEntry> clientsByClientId;
-		std::unordered_map<uint, DistVecMatchEntry> objectsByObjId;
-		for (const auto cnd : distVecConditions)
-		{
-			const bool strangerRequested = cnd->archetype->objNameOrLabel == Stranger;
-			if (strangerRequested || !missions.at(cnd->parent.missionId).clientIds.empty())
-			{
-				struct PlayerData* playerData = 0;
-				while (playerData = Players.traverse_active(playerData))
-				{
-					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !missions.at(cnd->parent.missionId).clientIds.contains(playerData->iOnlineID)))
-						continue;
-
-					uint shipId;
-					pub::Player::GetShip(playerData->iOnlineID, shipId);
-					if (shipId)
-					{
-						IObjRW* inspect;
-						StarSystem* starSystem;
-						if (!GetShipInspect(shipId, inspect, starSystem))
-							continue;
-						DistVecMatchEntry entry;
-						entry.systemId = inspect->cobj->system;
-						entry.position = inspect->cobj->vPos;
-						clientsByClientId[playerData->iOnlineID] = entry;
-					}
-				}
-			}
-			if (!strangerRequested)
-			{
-				for (uint objId : missions.at(cnd->parent.missionId).objectIds)
-				{
-					if (objectsByObjId.contains(objId))
-						continue;
-					IObjRW* inspect;
-					StarSystem* starSystem;
-					if (!GetShipInspect(objId, inspect, starSystem))
-						continue;
-					DistVecMatchEntry entry;
-					entry.systemId = inspect->cobj->system;
-					entry.position = inspect->cobj->vPos;
-					objectsByObjId[objId] = entry;
-				}
-			}
-		}
-
-		const std::unordered_set<CndDistVec*> distVecConditionsCopy(distVecConditions);
-		for (const auto& cnd : distVecConditionsCopy)
-		{
-			if (const auto& foundCondition = distVecConditions.find(cnd); foundCondition != distVecConditions.end() && cnd->Matches(clientsByClientId, objectsByObjId))
-				cnd->ExecuteTrigger();
 		}
 	}
 

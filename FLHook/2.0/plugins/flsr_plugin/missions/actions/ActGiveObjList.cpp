@@ -7,13 +7,12 @@ namespace Missions
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;
 
-		if (const auto& objectivesEntry = mission.archetype->objectives.find(objectivesId); objectivesEntry != mission.archetype->objectives.end())
+		if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
 		{
-			const Objectives objectives(mission.id, objId, objectivesEntry->second.objectives);
 			if (mission.objectivesByObjectId.contains(objId))
 				mission.objectivesByObjectId.erase(objId);
-			mission.objectivesByObjectId.insert({ objId, objectives });
-			mission.objectivesByObjectId[objId].Progress();
+			mission.objectivesByObjectId.try_emplace(objId, mission.id, objId, objectivesEntry->second.objectives);
+			mission.objectivesByObjectId.at(objId).Progress();
 			return;
 		}
 		return;

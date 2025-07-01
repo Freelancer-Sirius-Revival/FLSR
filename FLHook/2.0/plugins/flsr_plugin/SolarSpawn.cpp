@@ -58,7 +58,7 @@ namespace SolarSpawn
 		spaceId = TryCreateSolar(solarInfo);
 		if (spaceId == 0)
 		{
-			ConPrint(L"Error spawning MSN NPC Ship " + stows(solarInfo.cNickName) + L" in system " + std::to_wstring(solarInfo.iSystemID) + L" at position " + std::to_wstring(solarInfo.vPos.x) + L", " + std::to_wstring(solarInfo.vPos.y) + L", " + std::to_wstring(solarInfo.vPos.z) + L"\n");
+			ConPrint(L"Error spawning Solar '" + stows(solarInfo.cNickName) + L"' in system " + std::to_wstring(solarInfo.iSystemID) + L" at position " + std::to_wstring(solarInfo.vPos.x) + L", " + std::to_wstring(solarInfo.vPos.y) + L", " + std::to_wstring(solarInfo.vPos.z) + L"\n");
 			return;
 		}
 

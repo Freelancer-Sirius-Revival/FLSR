@@ -4,9 +4,8 @@
 
 namespace Missions
 {
-	Condition::Condition(const ConditionParent& parent, const ConditionType type) :
+	Condition::Condition(const ConditionParent& parent) :
 		parent(parent),
-		type(type),
 		activator(MissionObject(MissionObjectType::Client, 0))
 	{}
 

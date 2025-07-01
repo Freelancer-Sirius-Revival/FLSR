@@ -1,16 +1,33 @@
 #pragma once
 #include <FLHook.h>
 #include "Condition.h"
-#include "CndDestroyedArch.h"
 
 namespace Missions
 {
-	struct CndDestroyed : Condition
+	class CndDestroyed : public Condition
 	{
-		const CndDestroyedArchetypePtr archetype;
-		int count;
+	public:
+		enum class DestroyCondition
+		{
+			ALL,
+			SILENT,
+			EXPLODE
+		};
 
-		CndDestroyed(const ConditionParent& parent, const CndDestroyedArchetypePtr conditionArchetype);
+	private:
+		const uint objNameOrLabel;
+		const DestroyCondition condition;
+		const uint killerNameOrLabel;
+		const int targetCount;
+
+		int currentCount;
+
+	public:
+		CndDestroyed(const ConditionParent& parent,
+						const uint objNameOrLabel,
+						const DestroyCondition condition,
+						const uint killerNameOrLabel,
+						const int targetCount);
 		~CndDestroyed();
 		void Register();
 		void Unregister();

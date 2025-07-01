@@ -6,10 +6,16 @@
 
 namespace Missions
 {
-	struct CndDistVecGoto : CndDistVec
+	class CndDistVecGoto : public CndDistVec
 	{
-		CndDistVecGoto(const uint parentMissionId, const CndDistVecArchetypePtr conditionArchetype) :
-			CndDistVec(ConditionParent(parentMissionId, 0), conditionArchetype)
+	public:
+		CndDistVecGoto(const ConditionParent& parent,
+						const uint objNameOrLabel,
+						const DistanceCondition condition,
+						const Vector& position,
+						const float distance,
+						const uint systemId) :
+			CndDistVec(parent, objNameOrLabel, condition, position, distance, systemId)
 		{}
 
 		void ExecuteTrigger()
@@ -18,7 +24,7 @@ namespace Missions
 			if (missionEntry == missions.end())
 				return;
 
-			const auto& objectEntry = missionEntry->second.objectIdsByName.find(archetype->objNameOrLabel);
+			const auto& objectEntry = missionEntry->second.objectIdsByName.find(objNameOrLabel);
 			if (objectEntry == missionEntry->second.objectIdsByName.end())
 				return;
 
@@ -29,12 +35,6 @@ namespace Missions
 			objective->second.Progress();
 		}
 	};
-
-	Objectives::Objectives() :
-		parentMissionId(0),
-		objId(0),
-		currentCondition(nullptr)
-	{}
 
 	Objectives::Objectives(const unsigned int parentMissionId, const unsigned int objId, const std::vector<ObjectiveEntry>& objectives) :
 		parentMissionId(parentMissionId),
@@ -69,16 +69,24 @@ namespace Missions
 
 				if (gotoArch->type == pub::AI::GotoOpType::Vec || gotoArch->type == pub::AI::GotoOpType::Spline)
 				{
-					CndDistVecArchetypePtr cndDistVecArch(new CndDistVecArchetype());
+					uint objNameOrLabel = 0;
 					for (const auto& entry : missionEntry->second.objectIdsByName)
 					{
 						if (entry.second == objId)
-							cndDistVecArch->objNameOrLabel = entry.first;
+						{
+							objNameOrLabel = entry.first;
+							break;
+						}
 					}
-					cndDistVecArch->position = gotoArch->type == pub::AI::GotoOpType::Vec ? gotoArch->position : gotoArch->spline[3];
-					cndDistVecArch->distance = gotoArch->range + std::clamp(10.0f, gotoArch->range * 0.1f, 100.0f); // Add tolerance area to make sure NPCs will really trigger this.
-					cndDistVecArch->systemId = inspect->cobj->system;
-					condition = std::shared_ptr<CndDistVecGoto>(new CndDistVecGoto(parentMissionId, cndDistVecArch));
+					if (!objNameOrLabel)
+						return;
+
+					condition = ConditionPtr(new CndDistVecGoto(ConditionParent(parentMissionId, 0),
+						objNameOrLabel, CndDistVec::DistanceCondition::Inside,
+						gotoArch->type == pub::AI::GotoOpType::Vec ? gotoArch->position : gotoArch->spline[3],
+						gotoArch->range + std::clamp(10.0f, gotoArch->range * 0.1f, 100.0f), // Add tolerance area to make sure NPCs will really trigger this.
+						inspect->cobj->system
+					));
 					condition->Register();
 				}
 

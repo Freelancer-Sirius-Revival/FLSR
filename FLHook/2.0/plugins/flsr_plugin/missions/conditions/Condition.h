@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <FLHook.h>
-#include "ConditionTypes.h"
 #include "../MissionObject.h"
 
 namespace Missions
@@ -15,13 +14,13 @@ namespace Missions
 		ConditionParent(uint missionId, uint triggerId) : missionId(missionId), triggerId(triggerId) {}
 	};
 
-	struct Condition
+	class Condition
 	{
+	public:
 		const ConditionParent parent;
-		const ConditionType type;
 		MissionObject activator;
 
-		Condition(const ConditionParent& parent, const ConditionType type);
+		Condition(const ConditionParent& parent);
 		virtual ~Condition();
 		virtual void Register();
 		virtual void Unregister();

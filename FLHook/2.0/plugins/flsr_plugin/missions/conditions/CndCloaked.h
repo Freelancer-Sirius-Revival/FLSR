@@ -1,14 +1,16 @@
 #pragma once
 #include "Condition.h"
-#include "CndCloakedArch.h"
 
 namespace Missions
 {
-	struct CndCloaked : Condition
+	class CndCloaked : public Condition
 	{
-		CndCloakedArchetypePtr archetype;
+	private:
+		const uint objNameOrLabel;
+		const bool cloaked;
 
-		CndCloaked(const ConditionParent& parent, const CndCloakedArchetypePtr conditionArchetype);
+	public:
+		CndCloaked(const ConditionParent& parent, const uint objNameOrLabel, const bool cloaked);
 		~CndCloaked();
 		void Register();
 		void Unregister();

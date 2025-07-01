@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActActTrigger : Action
 	{
-		std::string triggerName = "";
+		uint nameId = 0;
 		bool activate = false;
 		float probability = 1.0f;
 

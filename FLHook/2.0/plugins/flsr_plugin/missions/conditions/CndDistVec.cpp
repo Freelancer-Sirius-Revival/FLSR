@@ -5,9 +5,18 @@ namespace Missions
 {
 	std::unordered_set<CndDistVec*> distVecConditions;
 
-	CndDistVec::CndDistVec(const ConditionParent& parent, const CndDistVecArchetypePtr conditionArchetype) :
-		Condition(parent, ConditionType::Cnd_DistVec),
-		archetype(conditionArchetype)
+	CndDistVec::CndDistVec(const ConditionParent& parent,
+							const uint objNameOrLabel,
+							const DistanceCondition condition,
+							const Vector& position,
+							const float distance,
+							const uint systemId) :
+							Condition(parent),
+		objNameOrLabel(objNameOrLabel),
+		condition(condition),
+		position(position),
+		distance(distance),
+		systemId(systemId)
 	{}
 
 	CndDistVec::~CndDistVec()
@@ -25,27 +34,27 @@ namespace Missions
 		distVecConditions.erase(this);
 	}
 
-	static bool IsInside(const DistVecMatchEntry& entry, const CndDistVecArchetypePtr& archetype)
+	static bool IsInside(const DistVecMatchEntry& entry, const CndDistVec& condition)
 	{
-		const bool inside = archetype->distance - HkDistance3D(archetype->position, entry.position) > 0.0f;
-		return (archetype->type == DistanceCondition::Inside && inside) || (archetype->type == DistanceCondition::Outside && !inside);
+		const bool inside = condition.distance - HkDistance3D(condition.position, entry.position) > 0.0f;
+		return (condition.condition == CndDistVec::DistanceCondition::Inside && inside) || (condition.condition == CndDistVec::DistanceCondition::Outside && !inside);
 	}
 
 	bool CndDistVec::Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId)
 	{
-		auto& mission = missions.at(parent.missionId);
+		const auto& mission = missions.at(parent.missionId);
 		std::unordered_set<uint> validClientIds;
 		std::unordered_set<uint> validObjIds;
-		bool strangerRequested = archetype->objNameOrLabel == Stranger;
+		bool strangerRequested = objNameOrLabel == Stranger;
 		if (strangerRequested)
 		{
 			validClientIds = mission.clientIds;
 		}
-		else if (const auto& objectByName = mission.objectIdsByName.find(archetype->objNameOrLabel); objectByName != mission.objectIdsByName.end())
+		else if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 		{
 			validObjIds.insert(objectByName->second);
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
@@ -58,7 +67,7 @@ namespace Missions
 		
 		for (const auto& entry : clientsByClientId)
 		{
-			if (entry.second.systemId == archetype->systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && IsInside(entry.second, archetype))
+			if (entry.second.systemId == systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && IsInside(entry.second, *this))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = entry.first;
@@ -69,7 +78,7 @@ namespace Missions
 		{
 			for (const auto& entry : objectsByObjId)
 			{
-				if (entry.second.systemId == archetype->systemId && validObjIds.contains(entry.first) && IsInside(entry.second, archetype))
+				if (entry.second.systemId == systemId && validObjIds.contains(entry.first) && IsInside(entry.second, *this))
 				{
 					activator.type = MissionObjectType::Object;
 					activator.id = entry.first;

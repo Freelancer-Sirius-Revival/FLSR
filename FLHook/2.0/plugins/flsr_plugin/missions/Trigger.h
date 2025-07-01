@@ -1,27 +1,55 @@
 #pragma once
-#include "TriggerArch.h"
+#include <memory>
+#include <FLHook.h>
 #include "MissionObject.h"
-#include "conditions/Condition.h"
 
 namespace Missions
 {
-	enum class TriggerState
-	{
-		Inactive,
-		Active,
-		Finished
-	};
+	struct Condition;
+	typedef std::shared_ptr<Condition> ConditionPtr;
 
-	struct Trigger
+	struct Action;
+	typedef std::shared_ptr<Action> ActionPtr;
+
+	class Trigger
 	{
-		const unsigned int id;
-		const unsigned int missionId;
-		const TriggerArchetypePtr archetype;
-		ConditionPtr condition;
+	public:
+		enum class TriggerRepeatable
+		{
+			Off,
+			Auto,
+			Manual
+		};
+
+		const std::string name;
+		const uint nameId;
+		const uint id;
+		const uint missionId;
+		const bool initiallyActive;
+		const TriggerRepeatable repeatable;
+
+	private:
+		enum class TriggerState
+		{
+			AwaitingInitialActivation,
+			Inactive,
+			Active,
+			Finished
+		};
 		TriggerState state;
 
-		Trigger(const unsigned int id, const unsigned int missionId, const TriggerArchetypePtr triggerArchetype);
+	public:
+		ConditionPtr condition;
+		std::vector<ActionPtr> actions;
+
+		Trigger(const std::string name,
+				const uint id,
+				const uint missionId,
+				const bool initiallyActive,
+				const TriggerRepeatable repeatable);
 		virtual ~Trigger();
+		bool IsAwaitingInitialActivation() const;
+		void Reset();
 		void Activate();
 		void Deactivate();
 		void Execute(const MissionObject& activator);

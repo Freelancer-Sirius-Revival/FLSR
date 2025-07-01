@@ -19,7 +19,7 @@ namespace Missions
 		}
 	}
 
-	static uint CreateNPC(const ActSpawnShip& action, const MsnNpcArchetype& msnNpc, const NpcArchetype& npc)
+	static uint CreateNPC(const ActSpawnShip& action, const MsnNpc& msnNpc, const Npc& npc)
 	{
 		pub::SpaceObj::ShipInfo shipInfo;
 		std::memset(&shipInfo, 0, sizeof(shipInfo));
@@ -87,7 +87,7 @@ namespace Missions
 		uint objId = TryCreateNpc(shipInfo);
 		if (objId == 0)
 		{
-			ConPrint(L"Error spawning MSN NPC Ship " + stows(msnNpc.name) + L" in system " + std::to_wstring(msnNpc.systemId) + L" at position " + std::to_wstring(msnNpc.position.x) + L", " + std::to_wstring(msnNpc.position.y) + L", " + std::to_wstring(msnNpc.position.z) + L"\n");
+			ConPrint(L"Error spawning MSN NPC Ship '" + stows(msnNpc.name) + L"' in system " + std::to_wstring(msnNpc.systemId) + L" at position " + std::to_wstring(msnNpc.position.x) + L", " + std::to_wstring(msnNpc.position.y) + L", " + std::to_wstring(msnNpc.position.z) + L"\n");
 			return 0;
 		}
 
@@ -119,11 +119,11 @@ namespace Missions
 		if (mission.objectIdsByName.contains(CreateID(msnNpcName.c_str())))
 			return;
 
-		for (const auto& msnNpc : mission.archetype->msnNpcs)
+		for (const auto& msnNpc : mission.msnNpcs)
 		{
 			if (msnNpc.name == msnNpcName)
 			{
-				for (const auto& npc : mission.archetype->npcs)
+				for (const auto& npc : mission.npcs)
 				{
 					if (CreateID(npc.name.c_str()) == msnNpc.npcId)
 					{
@@ -131,11 +131,10 @@ namespace Missions
 						if (objId)
 						{
 							mission.AddObject(objId, CreateID(msnNpc.name.c_str()), msnNpc.labels);
-							if (const auto& objectivesEntry = mission.archetype->objectives.find(objectivesId); objectivesEntry != mission.archetype->objectives.end())
+							if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
 							{
-								const Objectives objectives(mission.id, objId, objectivesEntry->second.objectives);
-								mission.objectivesByObjectId.insert({ objId, objectives });
-								mission.objectivesByObjectId[objId].Progress();
+								mission.objectivesByObjectId.try_emplace(objId, mission.id, objId, objectivesEntry->second.objectives);
+								mission.objectivesByObjectId.at(objId).Progress();
 							}
 							return;
 						}

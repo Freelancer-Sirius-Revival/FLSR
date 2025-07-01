@@ -1,6 +1,7 @@
 #pragma once
-#include "../Mission.h"
+#include <memory>
 #include <FLHook.h>
+#include "../Mission.h"
 
 namespace Missions
 {
@@ -12,4 +13,5 @@ namespace Missions
 		virtual ~Action() {}
 		virtual void Execute(Mission& mission, const MissionObject& activator) const = 0;
 	};
+	typedef std::shared_ptr<Action> ActionPtr;
 }

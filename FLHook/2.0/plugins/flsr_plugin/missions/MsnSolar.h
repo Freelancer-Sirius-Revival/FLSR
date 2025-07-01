@@ -10,7 +10,7 @@ namespace Missions
 		std::vector<uint> accessoryIds;
 	};
 
-	struct MsnSolarArchetype
+	struct MsnSolar
 	{
 		std::string name = "";
 		uint archetypeId = 0;
@@ -27,5 +27,4 @@ namespace Missions
 		MsnSolarCostume costume;
 		std::unordered_set<uint> labels;
 	};
-	typedef std::shared_ptr<MsnSolarArchetype> MsnSolarArchetypePtr;
 }

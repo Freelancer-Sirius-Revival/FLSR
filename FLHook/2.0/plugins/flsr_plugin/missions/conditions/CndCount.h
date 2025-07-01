@@ -1,14 +1,25 @@
 #pragma once
 #include "Condition.h"
-#include "CndCountArch.h"
 
 namespace Missions
 {
-	struct CndCount : Condition
+	class CndCount : public Condition
 	{
-		CndCountArchetypePtr archetype;
+	public:
+		enum class CountComparator
+		{
+			Less,
+			Equal,
+			Greater
+		};
 
-		CndCount(const ConditionParent& parent, const CndCountArchetypePtr conditionArchetype);
+	private:
+		const uint label;
+		const uint targetCount;
+		const CountComparator comparator;
+
+	public:
+		CndCount(const ConditionParent& parent, const uint label, const uint targetCount, const CountComparator comparator);
 		~CndCount();
 		void Register();
 		void Unregister();

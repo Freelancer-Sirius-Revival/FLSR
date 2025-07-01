@@ -3,8 +3,6 @@
 
 namespace Missions
 {
-	std::vector<MissionArchetypePtr> missionArchetypes;
-
 	std::unordered_map<uint, Mission> missions;
 
 	static void ClearMusic(const uint clientId)
@@ -19,22 +17,66 @@ namespace Missions
 		pub::Audio::SetMusic(clientId, music);
 	}
 
-	Mission::Mission(const uint id, const MissionArchetypePtr missionArchetype) :
+	Mission::Mission(const std::string name, const uint id, const bool initiallyActive) :
+		name(name),
 		id(id),
-		archetype(missionArchetype)
-	{
-		uint lastTriggerId = 0;
-		for (const auto& triggerArchetype : missionArchetype->triggers)
-		{
-			triggers.try_emplace(lastTriggerId, lastTriggerId, id, triggerArchetype);
-			lastTriggerId++;
-		}
-	}
+		initiallyActive(initiallyActive),
+		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
+		offerId(0),
+		triggerExecutionRunning(false)
+	{}
 
 	Mission::~Mission()
 	{
 		// Destroy all triggers first. This is to unregister all conditions before destroying any left-overs of this mission.
 		triggers.clear();
+		End();
+	}
+
+	void Mission::Reset()
+	{
+		End();
+		state = initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive;
+	}
+
+	bool Mission::Start()
+	{
+		if (state != MissionState::Inactive && state != MissionState::AwaitingInitialActivation)
+			return false;
+
+		state = MissionState::Active;
+
+		for (auto& trigger : triggers)
+		{
+			trigger.Reset();
+			if (trigger.IsAwaitingInitialActivation())
+				trigger.Activate();
+		}
+		return true;
+	}
+
+	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
+	{
+		triggerExecutionQueue.push({ triggerId, activator });
+
+		// Directly after try to process all queued triggers.
+		if (triggerExecutionRunning)
+			return;
+		triggerExecutionRunning = true;
+
+		while (!triggerExecutionQueue.empty() && state != MissionState::Finished)
+		{
+			const auto& entry = triggerExecutionQueue.front();
+			Trigger& trigger = triggers.at(entry.first);
+			triggerExecutionQueue.pop();
+			trigger.Execute(entry.second);
+		}
+		triggerExecutionRunning = false;
+	}
+
+	void Mission::End()
+	{
+		state = MissionState::Finished;
 
 		for (const uint clientId : clientIds)
 			ClearMusic(clientId);
@@ -47,53 +89,6 @@ namespace Missions
 		}
 
 		countConditionsByMission.erase(id);
-	}
-
-	void Mission::Start()
-	{
-		std::vector<uint> triggerIds;
-		for (const auto& triggerEntry : triggers)
-		{
-			if (triggerEntry.second.archetype->initiallyActive)
-				triggerIds.push_back(triggerEntry.first);
-		}
-
-		for (const auto& triggerId : triggerIds)
-		{
-			const auto& triggerEntry = triggers.find(triggerId);
-			if (triggerEntry != triggers.end())
-				triggerEntry->second.Activate();
-		}
-	}
-
-	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
-	{
-		triggerExecutionQueue.push({ triggerId, activator });
-
-		// Directly after try to process all queued triggers.
-		if (triggerExecutionRunning)
-			return;
-		triggerExecutionRunning = true;
-
-		while (!triggerExecutionQueue.empty() && !ended)
-		{
-			const auto& entry = triggerExecutionQueue.front();
-			Trigger& trigger = triggers.at(entry.first);
-			triggerExecutionQueue.pop();
-			trigger.Execute(entry.second);
-			if (!trigger.archetype->repeatable)
-				triggers.erase(trigger.id);
-		}
-		triggerExecutionRunning = false;
-
-		// Delete the mission if it was ended by one of the triggers.
-		if (ended)
-			missions.erase(id);
-	}
-
-	void Mission::End()
-	{
-		ended = true;
 	}
 
 	void Mission::EvaluateCountConditions(const uint label)

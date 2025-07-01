@@ -10,14 +10,14 @@ namespace Missions
 	{
 		if (probability < 1.0f && std::uniform_real_distribution<float>(0, 1)(gen) < probability)
 			return;
-		for (auto& triggerEntry : mission.triggers)
+		for (auto& trigger : mission.triggers)
 		{
-			if (triggerEntry.second.archetype->name == triggerName)
+			if (trigger.nameId == nameId)
 			{
-				activate ? triggerEntry.second.Activate() : triggerEntry.second.Deactivate();
+				activate ? trigger.Activate() : trigger.Deactivate();
 				return;
 			}
 		}
-		ConPrint(L"Error: Act_ActTrig could not find trigger " + stows(triggerName) + L"\n");
+		ConPrint(L"Error: Act_ActTrig could not find trigger " + std::to_wstring(nameId) + L"\n");
 	}
 }

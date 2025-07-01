@@ -5,11 +5,11 @@ namespace Missions
 {
 	std::unordered_set<CndCloaked*> cloakedConditions;
 
-	CndCloaked::CndCloaked(const ConditionParent& parent, const CndCloakedArchetypePtr conditionArchetype) :
-		Condition(parent, ConditionType::Cnd_BaseEnter),
-		archetype(conditionArchetype)
-	{
-	}
+	CndCloaked::CndCloaked(const ConditionParent& parent, const uint objNameOrLabel, const bool cloaked) :
+		Condition(parent),
+		objNameOrLabel(objNameOrLabel),
+		cloaked(cloaked)
+	{}
 
 	CndCloaked::~CndCloaked()
 	{
@@ -37,12 +37,12 @@ namespace Missions
 
 	bool CndCloaked::Matches(const MissionObject object)
 	{
-		auto& mission = missions.at(parent.missionId);
-		if (object.type == MissionObjectType::Client && archetype->objNameOrLabel == Stranger && !mission.clientIds.contains(object.id))
+		const auto& mission = missions.at(parent.missionId);
+		if (object.type == MissionObjectType::Client && objNameOrLabel == Stranger && !mission.clientIds.contains(object.id))
 		{
 			uint shipId;
 			pub::Player::GetShip(object.id, shipId);
-			if (shipId && IsCloaked(shipId) == archetype->cloaked)
+			if (shipId && IsCloaked(shipId) == cloaked)
 			{
 				activator = object;
 				return true;
@@ -58,9 +58,9 @@ namespace Missions
 
 		if (object.type == MissionObjectType::Object)
 		{
-			if (const auto& objectByName = mission.objectIdsByName.find(archetype->objNameOrLabel); objectByName != mission.objectIdsByName.end())
+			if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				if (objectByName->second == object.id && IsCloaked(object.id) == archetype->cloaked)
+				if (objectByName->second == object.id && IsCloaked(object.id) == cloaked)
 				{
 					activator = object;
 					return true;
@@ -68,7 +68,7 @@ namespace Missions
 				return false;
 			}
 		}
-		if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& labelObject : objectsByLabel->second)
 			{
@@ -78,7 +78,7 @@ namespace Missions
 					{
 						uint shipId;
 						pub::Player::GetShip(object.id, shipId);
-						if (shipId && IsCloaked(shipId) == archetype->cloaked)
+						if (shipId && IsCloaked(shipId) == cloaked)
 						{
 							activator = object;
 							return true;
@@ -87,7 +87,7 @@ namespace Missions
 					}
 					else
 					{
-						if (IsCloaked(object.id) == archetype->cloaked)
+						if (IsCloaked(object.id) == cloaked)
 						{
 							activator = object;
 							return true;

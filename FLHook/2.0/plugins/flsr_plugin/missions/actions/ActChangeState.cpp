@@ -25,7 +25,7 @@ namespace Missions
 		}
 		else
 		{
-			RegisterMissionToJobBoard(*mission.archetype);
+			RegisterMissionToJobBoard(mission);
 			const FmtStr failText(failureStringId, 0);
 			music.crossFadeDurationInS = 1.0f;
 			music.overrideMusic = failureMusicId;

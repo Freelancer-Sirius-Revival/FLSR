@@ -5,10 +5,17 @@ namespace Missions
 {
 	std::unordered_set<CndDestroyed*> destroyedConditions;
 
-	CndDestroyed::CndDestroyed(const ConditionParent& parent, const CndDestroyedArchetypePtr conditionArchetype) :
-		Condition(parent, ConditionType::Cnd_Destroyed),
-		archetype(conditionArchetype),
-		count(0)
+	CndDestroyed::CndDestroyed(const ConditionParent& parent,
+								const uint objNameOrLabel,
+								const DestroyCondition condition,
+								const uint killerNameOrLabel,
+								const int targetCount) :
+		Condition(parent),
+		objNameOrLabel(objNameOrLabel),
+		condition(condition),
+		killerNameOrLabel(killerNameOrLabel),
+		targetCount(targetCount),
+		currentCount(0)
 	{}
 
 	CndDestroyed::~CndDestroyed()
@@ -18,6 +25,7 @@ namespace Missions
 
 	void CndDestroyed::Register()
 	{
+		currentCount = 0;
 		destroyedConditions.insert(this);
 	}
 
@@ -28,20 +36,20 @@ namespace Missions
 
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
-		auto& mission = missions.at(parent.missionId);
+		const auto& mission = missions.at(parent.missionId);
 		// If count -1 and the awaited objects do not exist, see this condition as fulfilled. "Stranger" also is fulfilled then because otherwise all players must leave server for fulfill.
-		if (archetype->count < 0 && (archetype->objNameOrLabel == Stranger || (!mission.objectIdsByName.contains(archetype->objNameOrLabel) && !mission.objectsByLabel.contains(archetype->objNameOrLabel))))
+		if (targetCount < 0 && (objNameOrLabel == Stranger || (!mission.objectIdsByName.contains(objNameOrLabel) && !mission.objectsByLabel.contains(objNameOrLabel))))
 			return true;
 		
 		// Check destruction conditions.
-		if ((archetype->condition == DestroyedCondition::SILENT && killed) || (archetype->condition == DestroyedCondition::EXPLODE && !killed))
+		if ((condition == DestroyCondition::SILENT && killed) || (condition == DestroyCondition::EXPLODE && !killed))
 			return false;
 
 		// Check if killed object is part of the mission.
 		if (killedObject->is_player())
 		{
 			const bool containsPlayer = mission.clientIds.contains(killedObject->cobj->ownerPlayer);
-			if ((archetype->objNameOrLabel == Stranger && containsPlayer) || !containsPlayer)
+			if ((objNameOrLabel == Stranger && containsPlayer) || !containsPlayer)
 				return false;
 		}
 		else
@@ -51,14 +59,14 @@ namespace Missions
 		}
 
 		// Make sure the expected killer did the kill.
-		if (archetype->killerNameOrLabel)
+		if (killerNameOrLabel)
 		{
 			bool killerFound = false;
-			if (const auto& objectByName = mission.objectIdsByName.find(archetype->killerNameOrLabel); objectByName != mission.objectIdsByName.end())
+			if (const auto& objectByName = mission.objectIdsByName.find(killerNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
 				killerFound = objectByName->second == killerId;
 			}
-			else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->killerNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+			else if (const auto& objectsByLabel = mission.objectsByLabel.find(killerNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
 				for (const auto& object : objectsByLabel->second)
 				{
@@ -74,19 +82,19 @@ namespace Missions
 		}
 
 		byte foundObjectType = 0;
-		if (killedObject->is_player() && archetype->objNameOrLabel == Stranger && !mission.clientIds.contains(killedObject->cobj->ownerPlayer))
+		if (killedObject->is_player() && objNameOrLabel == Stranger && !mission.clientIds.contains(killedObject->cobj->ownerPlayer))
 		{
 			foundObjectType = 1;
 		}
 		// Clients can only be addressed via Label.
-		else if (const auto& objectByName = mission.objectIdsByName.find(archetype->objNameOrLabel); objectByName != mission.objectIdsByName.end())
+		else if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 		{
 			if (objectByName->second == killedObject->cobj->id)
 			{
 				foundObjectType = 2;
 			}
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(archetype->objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
@@ -102,10 +110,10 @@ namespace Missions
 			return false;
 
 		bool foundAll = false;
-		if (archetype->count < 0)
-			foundAll = foundObjectType <= 2 || (foundObjectType == 3 && mission.objectsByLabel[archetype->objNameOrLabel].size() <= 1);
+		if (targetCount < 0)
+			foundAll = foundObjectType <= 2 || (foundObjectType == 3 && mission.objectsByLabel.at(objNameOrLabel).size() <= 1);
 		else
-			foundAll = ++count >= archetype->count;
+			foundAll = ++currentCount >= targetCount;
 
 		if (foundAll)
 		{

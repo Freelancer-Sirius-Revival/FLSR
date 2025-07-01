@@ -161,28 +161,19 @@
     <ClInclude Include="missions\conditions\CndDestroyed.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndDestroyedArch.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\conditions\CndTrue.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\Mission.h">
       <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\MissionArch.h">
-      <Filter>Missions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\Missions.h">
       <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\MsnSolarArch.h">
+    <ClInclude Include="missions\MsnSolar.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\Trigger.h">
-      <Filter>Missions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\TriggerArch.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\Condition.h">
@@ -198,9 +189,6 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndDistVec.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\conditions\CndDistVecArch.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActPlayMusic.h">
@@ -224,28 +212,16 @@
     <ClInclude Include="missions\conditions\CndSpaceEnter.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSpaceEnterArch.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\conditions\CndSpaceExit.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\conditions\CndSpaceExitArch.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndBaseEnter.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndBaseEnterArch.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\conditions\CndTimer.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndTimerArch.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\NpcArch.h">
+    <ClInclude Include="missions\Npc.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActSpawnShip.h">
@@ -270,9 +246,6 @@
     <ClInclude Include="missions\objectives\ObjectivesArch.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\ConditionTypes.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActGiveObjList.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
@@ -284,9 +257,6 @@
     <ClInclude Include="Plugin.h" />
     <ClInclude Include="missions\actions\ActDebugMsg.h">
       <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\conditions\CndCountArch.h">
-      <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndCount.h">
       <Filter>Missions\Conditions</Filter>
@@ -303,11 +273,11 @@
     <ClInclude Include="missions\conditions\CndCloaked.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndCloakedArch.h">
-      <Filter>Missions\Conditions</Filter>
-    </ClInclude>
     <ClInclude Include="MissionAbortFix.h" />
     <ClInclude Include="missions\MissionBoard.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MissionOffer.h">
       <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>

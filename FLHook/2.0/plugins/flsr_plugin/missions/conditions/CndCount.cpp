@@ -5,9 +5,11 @@ namespace Missions
 {
 	std::unordered_map<uint, std::unordered_set<CndCount*>> countConditionsByMission;
 
-	CndCount::CndCount(const ConditionParent& parent, const CndCountArchetypePtr conditionArchetype) :
-		Condition(parent, ConditionType::Cnd_Count),
-		archetype(conditionArchetype)
+	CndCount::CndCount(const ConditionParent& parent, const uint label, const uint targetCount, const CountComparator comparator) :
+		Condition(parent),
+		label(label),
+		targetCount(targetCount),
+		comparator(comparator)
 	{}
 
 	CndCount::~CndCount()
@@ -18,7 +20,7 @@ namespace Missions
 	void CndCount::Register()
 	{
 		countConditionsByMission[parent.missionId].insert(this);
-		missions.at(parent.missionId).EvaluateCountConditions(archetype->label);
+		missions.at(parent.missionId).EvaluateCountConditions(label);
 	}
 
 	void CndCount::Unregister()
@@ -26,26 +28,24 @@ namespace Missions
 		countConditionsByMission[parent.missionId].erase(this);
 	}
 
-	bool CndCount::Matches(const uint label, const uint count)
+	bool CndCount::Matches(const uint currentLabel, const uint currentCount)
 	{
-		if (label != archetype->label)
+		if (currentLabel != label)
 			return false;
 
-		bool matches = false;
-		switch (archetype->comparator)
+		switch (comparator)
 		{
 			case CountComparator::Less:
-				matches = count < archetype->count;
-				break;
+				return currentCount < targetCount;
 
 			case CountComparator::Equal:
-				matches = count == archetype->count;
-				break;
+				return currentCount == targetCount;
 
 			case CountComparator::Greater:
-				matches = count > archetype->count;
-				break;
+				return currentCount > targetCount;
+
+			default:
+				return false;
 		}
-		return matches;
 	}
 }

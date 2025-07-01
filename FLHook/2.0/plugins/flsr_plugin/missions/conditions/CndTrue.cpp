@@ -3,7 +3,7 @@
 namespace Missions
 {
 	CndTrue::CndTrue(const ConditionParent& parent) :
-		Condition(parent, ConditionType::Cnd_True)
+		Condition(parent)
 	{}
 
 	void CndTrue::Register()

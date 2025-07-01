@@ -1,16 +1,19 @@
 #pragma once
 #include "Condition.h"
-#include "CndTimerArch.h"
 
 namespace Missions
 {
-	struct CndTimer : Condition
+	class CndTimer : public Condition
 	{
-		CndTimerArchetypePtr archetype;
+	private:
+		const float lowerTimeInS;
+		const float upperTimeInS;
+
 		float targetTimeInS;
 		float passedTimeInS;
 
-		CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype);
+	public:
+		CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS);
 		~CndTimer();
 		void Register();
 		void Unregister();

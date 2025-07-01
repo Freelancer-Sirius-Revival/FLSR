@@ -1,87 +1,47 @@
-#include <queue>
 #include <FLHook.h>
 #include "Trigger.h"
-#include "Mission.h"
-#include "Actions/Action.h"
-#include "Conditions/Condition.h"
+#include "actions/Action.h"
+#include "conditions/Condition.h"
 #include "Conditions/CndTrue.h"
-#include "Conditions/CndDistVec.h"
-#include "Conditions/CndDestroyed.h"
-#include "Conditions/CndSpaceEnter.h"
-#include "Conditions/CndSpaceExit.h"
-#include "Conditions/CndBaseEnter.h"
-#include "Conditions/CndTimer.h"
-#include "Conditions/CndCount.h"
-#include "Conditions/CndCloaked.h"
 
 namespace Missions
 {
-	static Condition* instantiateCondition(const ConditionParent& parent, const TriggerArchConditionEntry& conditionArchetype)
-	{
-		Condition* result;
-		switch (conditionArchetype.first)
-		{
-			case ConditionType::Cnd_Destroyed:
-				result = new CndDestroyed(parent, std::static_pointer_cast<CndDestroyedArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_DistVec:
-				result = new CndDistVec(parent, std::static_pointer_cast<CndDistVecArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_SpaceEnter:
-				result = new CndSpaceEnter(parent, std::static_pointer_cast<CndSpaceEnterArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_SpaceExit:
-				result = new CndSpaceExit(parent, std::static_pointer_cast<CndSpaceExitArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_BaseEnter:
-				result = new CndBaseEnter(parent, std::static_pointer_cast<CndBaseEnterArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_Timer:
-				result = new CndTimer(parent, std::static_pointer_cast<CndTimerArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_Count:
-				result = new CndCount(parent, std::static_pointer_cast<CndCountArchetype>(conditionArchetype.second));
-				break;
-
-			case ConditionType::Cnd_Cloaked:
-				result = new CndCloaked(parent, std::static_pointer_cast<CndCloakedArchetype>(conditionArchetype.second));
-				break;
-
-			default:
-				result = new CndTrue(parent);
-				break;
-		}
-		return result;
-	}
-
-	Trigger::Trigger(const unsigned int id, const unsigned int parentMissionId, const TriggerArchetypePtr triggerArchetype) :
+	Trigger::Trigger(const std::string name,
+					const uint id,
+					const uint missionId,
+					const bool initiallyActive,
+					const TriggerRepeatable repeatable) :
+		name(name),
 		id(id),
-		missionId(parentMissionId),
-		archetype(triggerArchetype),
-		state(TriggerState::Inactive),
-		condition(nullptr)
+		nameId(CreateID(name.c_str())),
+		missionId(missionId),
+		initiallyActive(initiallyActive),
+		state(initiallyActive ? TriggerState::AwaitingInitialActivation : TriggerState::Inactive),
+		repeatable(repeatable),
+		condition(ConditionPtr(new CndTrue({ missionId, id })))
 	{}
 
 	Trigger::~Trigger()
 	{
-		if (condition != nullptr)
-			condition->Unregister();
+		condition->Unregister();
+	}
+
+	bool Trigger::IsAwaitingInitialActivation() const
+	{
+		return state == TriggerState::AwaitingInitialActivation;
+	}
+
+	void Trigger::Reset()
+	{
+		condition->Unregister();
+		state = initiallyActive ? TriggerState::AwaitingInitialActivation : TriggerState::Inactive;
 	}
 
 	void Trigger::Activate()
 	{
-		if (state != TriggerState::Inactive)
+		if (state != TriggerState::Inactive && state != TriggerState::AwaitingInitialActivation)
 			return;
 		state = TriggerState::Active;
-		if (condition != nullptr)
-			condition->Unregister();
-		condition = std::shared_ptr<Condition>(instantiateCondition(ConditionParent(missionId, id), archetype->condition));
 		condition->Register();
 	}
 
@@ -90,28 +50,24 @@ namespace Missions
 		if (state != TriggerState::Active)
 			return;
 		state = TriggerState::Inactive;
-		if (condition != nullptr)
-			condition->Unregister();
-		condition = nullptr;
+		condition->Unregister();
 	}
 
 	void Trigger::Execute(const MissionObject& activator)
 	{
+		condition->Unregister();
 		auto& mission = missions.at(missionId);
-		if (condition != nullptr)
-			condition->Unregister();
-		condition = nullptr;
-		for (const auto& action : archetype->actions)
+		for (const auto& action : actions)
 			action->Execute(mission, activator);
 
-		if (archetype->repeatable)
+		if (repeatable != TriggerRepeatable::Off)
 		{
-			// In case the trigger wasn't deactivated by itself.
+			// In case the trigger wasn't already deactivated by itself.
 			if (state == TriggerState::Active)
 			{
-				// Temporarily set inactive to allow re-activation.
 				state = TriggerState::Inactive;
-				Activate();
+				if (repeatable == TriggerRepeatable::Auto)
+					Activate();
 			}
 		}
 		else

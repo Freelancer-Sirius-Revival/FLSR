@@ -3,7 +3,7 @@
 
 namespace Missions
 {
-	struct NpcArchetype
+	struct Npc
 	{
 		std::string name = "";
 		uint archetypeId = 0;
@@ -16,7 +16,7 @@ namespace Missions
 		byte level = 0;
 	};
 
-	struct MsnNpcArchetype
+	struct MsnNpc
 	{
 		std::string name = "";
 		uint npcId = 0;

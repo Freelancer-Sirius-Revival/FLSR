@@ -13,11 +13,11 @@ namespace MissionBoard
 		uint type;
 	};
 
-	static void SendMissionOfferToClient(const uint clientId, const uint missionId, const MissionOffer& mission, const uint base, const uint index)
+	static void SendMissionOfferToClient(const uint clientId, const uint offerId, const MissionOffer& mission, const uint base, const uint index)
 	{
 		char* buffer = (char*)std::malloc(1024);
 		MissionPacketFirstPart* data = (MissionPacketFirstPart*)buffer;
-		data->missionId = missionId;
+		data->missionId = offerId;
 		data->base = base;
 		data->index = index;
 		data->unk = 2; //Static value that is always present
@@ -75,47 +75,47 @@ namespace MissionBoard
 		GetClientInterface()->Send_FLPACKET_SERVER_GFMISSIONVENDORACCEPTANCE(clientId, &data, sizeof(MissionAcceptance));
 	}
 
-	std::unordered_map<uint, MissionOffer> missionOffers;
-	std::unordered_map<uint, std::unordered_set<uint>> missionIdsByBase;
-	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> missionOfferIndicesByClient;
+	std::unordered_map<uint, MissionOffer> offersByOfferId;
+	std::unordered_map<uint, std::unordered_set<uint>> offerIdsByBase;
+	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> offerIndicesByClient;
 
-	static void SendDestroyMissionOfferToAll(const uint missionId)
+	static void SendDestroyMissionOfferToAll(const uint offerId)
 	{
-		for (const auto& clientEntry : missionOfferIndicesByClient)
+		for (const auto& clientEntry : offerIndicesByClient)
 		{
 			for (auto indexEntry = clientEntry.second.begin(); indexEntry != clientEntry.second.end(); indexEntry++)
 			{
-				if (indexEntry->second == missionId)
+				if (indexEntry->second == offerId)
 				{
 					const uint clientId = clientEntry.first;
 					uint base;
 					pub::Player::GetBase(clientId, base);
 					if (base)
-						GetClientInterface()->Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(clientId, base, missionId);
-					// Do not clear missionOfferIndicesByClient here. Other clients may still have the mission visible if they have the mission board open at the same time.
+						GetClientInterface()->Send_FLPACKET_SERVER_GFDESTROYMISSIONCOMPUTER(clientId, base, offerId);
+					// Do not clear offerIndicesByClient here. Other clients may still have the offer visible if they have the job board open at the same time.
 					break;
 				}
 			}
 		}
 	}
 
-	uint nextMissionId = std::numeric_limits<uint>::max();
+	uint offerId = std::numeric_limits<uint>::max();
 
 	uint AddMissionOffer(const MissionOffer& mission, const std::vector<uint>& bases)
 	{
-		missionOffers.insert({ nextMissionId, mission });
+		offersByOfferId.insert({ offerId, mission });
 		for (const uint base : bases)
-			missionIdsByBase[base].insert(nextMissionId);
-		// To avoid collisions with existing missions, count the custom mission IDs from high to low.
-		return nextMissionId--;
+			offerIdsByBase[base].insert(offerId);
+		// To avoid collisions with Freelancer's own mission offers. Count the custom mission offer IDs from high to low.
+		return offerId--;
 	}
 
-	void DeleteMissionOffer(const uint missionId)
+	void DeleteMissionOffer(const uint offerId)
 	{
-		missionOffers.erase(missionId);
-		for (auto& baseEntry : missionIdsByBase)
-			baseEntry.second.erase(missionId);
-		SendDestroyMissionOfferToAll(missionId);
+		offersByOfferId.erase(offerId);
+		for (auto& baseEntry : offerIdsByBase)
+			baseEntry.second.erase(offerId);
+		SendDestroyMissionOfferToAll(offerId);
 	}
 
 	void __stdcall MissionResponse(uint boardIndex, uint origin, bool accepted, uint clientId)
@@ -142,8 +142,8 @@ namespace MissionBoard
 			}
 		}
 
-		const auto& clientEntry = missionOfferIndicesByClient.find(clientId);
-		if (clientEntry != missionOfferIndicesByClient.end())
+		const auto& clientEntry = offerIndicesByClient.find(clientId);
+		if (clientEntry != offerIndicesByClient.end())
 		{
 			for (const auto& indexEntry : clientEntry->second)
 			{
@@ -154,8 +154,8 @@ namespace MissionBoard
 					pub::Player::GetBase(clientId, base);
 					if (!base)
 						return;
-					// Nobody has yet taken upon the mission
-					if (missionOffers.contains(indexEntry.second))
+					// Nobody has yet taken upon the offer
+					if (offersByOfferId.contains(indexEntry.second))
 					{
 						SendMissionOfferAcceptance(clientId, boardIndex, base);
 						std::vector<uint> groupMemberIds;
@@ -243,22 +243,22 @@ namespace MissionBoard
 		returncode = DEFAULT_RETURNCODE;
 
 		// Before the Complete Packet it sent, add the custom missions to the list.
-		const auto& entry = missionIdsByBase.find(base);
-		if (entry != missionIdsByBase.end())
+		const auto& entry = offerIdsByBase.find(base);
+		if (entry != offerIdsByBase.end())
 		{
 			int clientRep;
 			pub::Player::GetRep(clientId, clientRep);
 
-			for (const auto missionOfferId : entry->second)
+			for (const auto offerId : entry->second)
 			{
-				const auto& offer = missionOffers.at(missionOfferId);
+				const auto& offer = offersByOfferId.at(offerId);
 				float feelings;
 				pub::Reputation::GetGroupFeelingsTowards(clientRep, offer.group, feelings);
 				if (feelings > minRequiredReputationForMissions)
 				{
 					const uint index = ++missionBoardOffersMaxIndexByClient[clientId];
-					missionOfferIndicesByClient[clientId].push_back({ index, missionOfferId });
-					SendMissionOfferToClient(clientId, missionOfferId, offer, base, index);
+					offerIndicesByClient[clientId].push_back({ index, offerId });
+					SendMissionOfferToClient(clientId, offerId, offer, base, index);
 				}
 			}
 		}
@@ -267,7 +267,7 @@ namespace MissionBoard
 
 	static void ClearJobBoardClientData(const uint clientId)
 	{
-		missionOfferIndicesByClient.erase(clientId);
+		offerIndicesByClient.erase(clientId);
 		missionBoardOffersMaxIndexByClient.erase(clientId);
 	}
 

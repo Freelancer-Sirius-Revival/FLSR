@@ -9,9 +9,10 @@ namespace Missions
 
 	std::unordered_set<CndTimer*> timerConditions;
 
-	CndTimer::CndTimer(const ConditionParent& parent, const CndTimerArchetypePtr conditionArchetype) :
-		Condition(parent, ConditionType::Cnd_Timer),
-		archetype(conditionArchetype),
+	CndTimer::CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS) :
+		Condition(parent),
+		lowerTimeInS(lowerTimeInS),
+		upperTimeInS(upperTimeInS),
 		targetTimeInS(0.0f),
 		passedTimeInS(0.0f)
 	{}
@@ -23,10 +24,11 @@ namespace Missions
 
 	void CndTimer::Register()
 	{
-		if (archetype->lowerTimeInS >= archetype->upperTimeInS)
-			targetTimeInS = archetype->lowerTimeInS;
+		passedTimeInS = 0;
+		if (lowerTimeInS >= upperTimeInS)
+			targetTimeInS = lowerTimeInS;
 		else
-			targetTimeInS = std::uniform_real_distribution<float>(archetype->lowerTimeInS, archetype->upperTimeInS)(gen);
+			targetTimeInS = std::uniform_real_distribution<float>(lowerTimeInS, upperTimeInS)(gen);
 
 		timerConditions.insert(this);
 	}
@@ -38,7 +40,7 @@ namespace Missions
 
 	bool CndTimer::Matches(const float elapsedTimeInS)
 	{
-		auto& mission = missions.at(parent.missionId);
+		const auto& mission = missions.at(parent.missionId);
 		passedTimeInS += elapsedTimeInS;
 		if (passedTimeInS >= targetTimeInS)
 		{

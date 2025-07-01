@@ -3,8 +3,9 @@
 
 namespace Missions
 {
-	struct CndTrue : Condition
+	class CndTrue : public Condition
 	{
+	public:
 		CndTrue(const ConditionParent& parent);
 		void Register();
 	};

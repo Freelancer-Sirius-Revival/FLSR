@@ -13,7 +13,6 @@ namespace Missions
 		const unsigned int objId;
 		ConditionPtr currentCondition;
 
-		Objectives();
 		Objectives(const unsigned int parentMissionId, const unsigned int objId, const std::vector<ObjectiveEntry>& objectives);
 		virtual ~Objectives();
 		void Progress();

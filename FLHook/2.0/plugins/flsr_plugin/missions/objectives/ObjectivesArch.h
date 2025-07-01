@@ -15,5 +15,4 @@ namespace Missions
 	{
 		std::vector<ObjectiveEntry> objectives;
 	};
-	typedef std::shared_ptr<ObjectivesArchetype> ObjectivesArchetypePtr;
 }

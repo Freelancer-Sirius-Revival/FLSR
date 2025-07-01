@@ -24,7 +24,7 @@ The following explains the available sections and their key-values. Key-values a
 
 The head of any mission. All sections following this one will be assigned to this mission. This also means you can put multiple `Mission` into one file with their respective following contents.
 
-To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player accepting the mission will be automatically added to the label `player` for further reference in the mission.
+To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player and group members accepting the mission will be automatically added to the label `players` for further reference in the mission.
 
 - `nickname` The name of the mission. Used for admin commands and debug output.
     1. `STRING` The name. Must be unique among all missions on the server.
@@ -197,8 +197,8 @@ Triggers are the core logical elements of a mission. Multiple `Trigger` can be c
     1. `STRING` The name. Must be unique within this mission.
 - `[initstate]` Whether this trigger gets activated directly on mission start.
     1. `Active|Inactive :Inactive` The initial state.
-- `[repeatable]` Allows the trigger’s condition to be fulfilled more than a single time. This effectively allows this trigger to run again and again until deactivated.
-    1. `True|False :False` Whethert this trigger is repeatable or runs just once.
+- `[repeatable]` Allows the trigger to be executed more than once.
+    1. `Off|Auto|Manual :Off` `Auto` instantly re-activates the trigger upon finished execution until being deactivated via `Act_DeactTrig`. `Manual` deactivates the trigger after finished execution until being re-activated via `Act_ActTrig`.
 
 ### Conditions
 

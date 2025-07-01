@@ -1,14 +1,16 @@
 #pragma once
 #include "Condition.h"
-#include "CndSpaceEnterArch.h"
 
 namespace Missions
 {
-	struct CndSpaceEnter : Condition
+	struct CndSpaceEnter : public Condition
 	{
-		CndSpaceEnterArchetypePtr archetype;
+	private:
+		const uint objNameOrLabel;
+		const uint systemId;
 
-		CndSpaceEnter(const ConditionParent& parent, const CndSpaceEnterArchetypePtr conditionArchetype);
+	public:
+		CndSpaceEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId);
 		~CndSpaceEnter();
 		void Register();
 		void Unregister();

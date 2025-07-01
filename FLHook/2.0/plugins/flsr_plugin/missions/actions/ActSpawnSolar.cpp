@@ -8,12 +8,12 @@ namespace Missions
 		if (mission.objectIdsByName.contains(CreateID(solarName.c_str())))
 			return;
 
-		for (auto it = mission.archetype->solars.begin(); it != mission.archetype->solars.end(); it++)
+		for (auto it = mission.solars.begin(); it != mission.solars.end(); it++)
 		{
 			const auto& solar = *it;
 			if (solar.name == solarName)
 			{
-				const uint objId = SolarSpawn::SpawnSolarByName(mission.archetype->name + ":" + solar.name);
+				const uint objId = SolarSpawn::SpawnSolarByName(mission.name + ":" + solar.name);
 				if (objId)
 					mission.AddObject(objId, CreateID(solar.name.c_str()), solar.labels);
 				return;

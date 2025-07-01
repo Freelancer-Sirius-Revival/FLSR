@@ -1,6 +1,5 @@
 #pragma once
 #include "Condition.h"
-#include "CndDistVecArch.h"
 
 namespace Missions
 {
@@ -10,11 +9,29 @@ namespace Missions
 		Vector position;
 	};
 
-	struct CndDistVec : Condition
+	class CndDistVec : public Condition
 	{
-		CndDistVecArchetypePtr archetype;
+	public:
+		enum class DistanceCondition
+		{
+			Inside,
+			Outside
+		};
 
-		CndDistVec(const ConditionParent& parent, const CndDistVecArchetypePtr conditionArchetype);
+	//private:
+		const uint objNameOrLabel;
+		const DistanceCondition condition;
+		const Vector position;
+		const float distance;
+		const uint systemId;
+
+	public:
+		CndDistVec(const ConditionParent& parent,
+					const uint objNameOrLabel,
+					const DistanceCondition condition,
+					const Vector& position,
+					const float distance,
+					const uint systemId);
 		~CndDistVec();
 		void Register();
 		void Unregister();

@@ -4,12 +4,6 @@
 
 namespace Missions
 {
-	struct DistVecMatchEntry
-	{
-		uint systemId;
-		Vector position;
-	};
-
 	struct CndDistVec : Condition
 	{
 		CndDistVecArchetypePtr archetype;
@@ -18,8 +12,8 @@ namespace Missions
 		~CndDistVec();
 		void Register();
 		void Unregister();
-		bool Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId);
+		bool Matches();
 	};
 
-	extern std::unordered_set<CndDistVec*> distVecConditions;
+	void Cnd_DistVec_Elapse_Time_AFTER(const float seconds);
 }

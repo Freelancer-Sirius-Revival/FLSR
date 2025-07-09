@@ -140,6 +140,9 @@
     <ClCompile Include="missions\MissionBoard.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActRandomPopSphere.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -279,6 +282,9 @@
     </ClInclude>
     <ClInclude Include="missions\MissionOffer.h">
       <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRandomPopSphere.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

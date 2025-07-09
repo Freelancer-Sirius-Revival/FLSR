@@ -1,5 +1,6 @@
 #include "Mission.h"
 #include "conditions/CndCount.h"
+#include "actions/ActRandomPopSphere.h"
 
 namespace Missions
 {
@@ -77,6 +78,8 @@ namespace Missions
 	void Mission::End()
 	{
 		state = MissionState::Finished;
+
+		ClearRandomPopSpheres(id);
 
 		for (const uint clientId : clientIds)
 			ClearMusic(clientId);

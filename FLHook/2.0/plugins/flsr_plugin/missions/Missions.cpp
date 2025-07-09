@@ -32,6 +32,7 @@
 #include "Actions/ActAddCargo.h"
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
+#include "Actions/ActRandomPopSphere.h"
 #include "Objectives/ObjGotoArch.h"
 #include "MissionBoard.h"
 
@@ -762,6 +763,18 @@ namespace Missions
 								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								action->targetObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->reputation = ini.get_value_float(2);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_RandomPopSphere"))
+							{
+								ActRandomPopSpherePtr action(new ActRandomPopSphere());
+								action->systemId = CreateIdOrNull(ini.get_value_string(0));
+								action->position.x = ini.get_value_float(1);
+								action->position.y = ini.get_value_float(2);
+								action->position.z = ini.get_value_float(3);
+								action->distance = ini.get_value_float(4);
+								if (ini.get_num_parameters() > 5)
+									action->spawningAllowed = ini.get_value_bool(5);
 								actions.push_back(action);
 							}
 						}

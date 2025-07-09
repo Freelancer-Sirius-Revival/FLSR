@@ -3,7 +3,6 @@
 #include "Empathies.h"
 #include "GroupRep.h"
 #include "Missions/NpcNames.h"
-#include "Missions/LootProps.h"
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
 #include "Missions/conditions/CndBaseEnter.h"
@@ -27,7 +26,6 @@ void LoadSettings() {
 
     Pilots::ReadFiles();
     NpcNames::ReadFiles();
-    LootProps::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];

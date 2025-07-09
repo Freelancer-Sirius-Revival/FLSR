@@ -143,9 +143,6 @@
     <ClCompile Include="missions\conditions\IniReader.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\LootProps.cpp">
-      <Filter>Missions</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -288,9 +285,6 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\IniReader.h">
       <Filter>Missions\Conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\LootProps.h">
-      <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

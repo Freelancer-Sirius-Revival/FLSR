@@ -1,7 +1,6 @@
 #include <regex>
 #include "../Main.h"
 #include "../Empathies.h"
-#include "LootProps.h"
 #include "Missions.h"
 #include "Conditions/CndTrue.h"
 #include "Conditions/IniReader.h"
@@ -766,120 +765,9 @@ namespace Missions
 		}
 	}
 
-	static void DestroyNonLootableEquipment(const IObjRW* killedObject, const uint killerId)
-	{
-		if (killedObject->is_player())
-			return;
-
-		for (const auto& mission : missions)
-		{
-			if (!mission.second.objectIds.contains(killedObject->cobj->id))
-				continue;
-
-			if (!(killedObject->cobj->objectClass & CObject::CEQOBJ_MASK))
-				break;
-
-			const auto eqObj = reinterpret_cast<CEqObj*>(killedObject->cobj);
-			EquipDescVector equipList;
-			eqObj->get_equip_desc_list(equipList);
-			// Keep all lootable equip in cargo hold and only destroy the excess.
-			if (HkGetClientIDByShip(killerId) > 0)
-			{
-				std::unordered_map<uint, int> countByLootableArchId;
-				for (const auto& equipEntry : equipList.equip)
-				{
-					const auto& equipArch = Archetype::GetEquipment(equipEntry.iArchID);
-					if (equipArch && equipArch->bLootable)
-						countByLootableArchId[equipEntry.iArchID] += equipEntry.iCount;
-				}
-
-				for (auto& entry : countByLootableArchId)
-					entry.second = LootProps::CalculateDropCount(entry.first, entry.second);
-
-				for (const auto& equipEntry : equipList.equip)
-				{
-					if (equipEntry.bMission) // Always let mission equip drop, no matter what
-						continue;
-
-					const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
-					if (!equip)
-						continue;
-
-					if (const auto& lootCount = countByLootableArchId.find(equipEntry.iArchID); lootCount != countByLootableArchId.end() && lootCount->second > 0)
-					{
-						if (equipEntry.iCount > static_cast<uint>(lootCount->second))
-						{
-							if (equip->CEquipType == EquipmentClass::Cargo)
-								reinterpret_cast<CECargo*>(equip)->SetCount(lootCount->second);
-							lootCount->second = 0;
-						}
-						else
-						{
-							lootCount->second -= equipEntry.iCount;
-						}
-					}
-					else
-					{
-						equip->Destroy();
-					}
-				}
-			}
-			// Destroy all equipment in case an NPC was the killer.
-			else
-			{
-				for (const auto& equipEntry : equipList.equip)
-				{
-					const auto& equip = eqObj->equip_manager.FindByID(equipEntry.sID);
-					if (equip)
-						equip->Destroy();
-				}
-			}
-			break;
-		}
-	}
-
-	static void ChangeReputationUponDestruction(const IObjRW* killedObject, const uint killerShipId)
-	{
-		if (killedObject->is_player())
-			return;
-
-		const uint killerClientId = HkGetClientIDByShip(killerShipId);
-		if (!killerClientId)
-			return;
-
-		for (const auto& mission : missions)
-		{
-			if (!mission.second.objectIds.contains(killedObject->cobj->id))
-				continue;
-
-			uint victimReputationId = 0;
-			if (killedObject->cobj->objectClass & CObject::CSHIP_OBJECT)
-				victimReputationId = reinterpret_cast<CEqObj*>(killedObject->cobj)->repVibe;
-			else if (killedObject->cobj->objectClass & CObject::CSOLAR_OBJECT)
-				// Solars have their nickname ID directly mapped to their Reputation ID
-				uint victimReputationId = killedObject->cobj->id;
-			else
-				return;
-
-			uint victimGroupId;
-			Reputation::Vibe::GetAffiliation(victimReputationId, victimGroupId, false);
-			Empathies::ChangeReputationsByReason(killerClientId, victimGroupId, Empathies::ReputationChangeReason::ObjectDestruction);
-			return;
-		}
-	}
-
 	void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
 		returncode = DEFAULT_RETURNCODE;
-
-		if (killed)
-		{
-			// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
-			DestroyNonLootableEquipment(killedObject, killerId);
-
-			// Manually care for reputation change to the killer. Group-Rep will be handled anyway by the GroupRep module.
-			ChangeReputationUponDestruction(killedObject, killerId);
-		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
 	}

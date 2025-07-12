@@ -82,8 +82,10 @@ namespace Missions
 			ClearMusic(clientId);
 
 		// Destroy all spawned objects of this mission.
-		for (const uint objectId : objectIds)
+		for (auto it = objectIds.begin(); it != objectIds.end();)
 		{
+			const auto objectId = *it;
+			it = objectIds.erase(it);
 			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}

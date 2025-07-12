@@ -349,47 +349,47 @@ namespace IFF
         if (incomingDamage <= 0.0f)
             return;
 
-        const uint victimClientId = damagedObject->cobj->GetOwnerPlayer();
-        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == DamageCause::Collision || !HkIsValidClientID(victimClientId))
+        const uint damagedClientId = damagedObject->cobj->GetOwnerPlayer();
+        if (!damageList->is_inflictor_a_player() || damageList->get_cause() == DamageCause::Collision || !HkIsValidClientID(damagedClientId))
             return;
 
-        const uint damagerClientId = HkGetClientIDByShip(damageList->get_inflictor_id());
-        if (!HkIsValidClientID(damagerClientId))
+        const uint inflictorClientId = damageList->get_inflictor_owner_player();
+        if (!HkIsValidClientID(inflictorClientId))
             return;
 
-        if (AreInSameGroup(damagerClientId, victimClientId))
+        if (AreInSameGroup(inflictorClientId, damagedClientId))
             return;
 
         // No-PvP system check
-        uint victimSystemId;
-        pub::Player::GetSystem(victimClientId, victimSystemId);
+        uint damagedSystemId;
+        pub::Player::GetSystem(damagedClientId, damagedSystemId);
         for (const auto& noPvPSystem : map_mapNoPVPSystems)
         {
-            if (noPvPSystem.second == victimSystemId)
+            if (noPvPSystem.second == damagedSystemId)
                 return;
         }
 
-        const std::wstring& damageInflictorCharacterName = GetCharacterName(damagerClientId);
-        const std::wstring& victimCharacterName = GetCharacterName(victimClientId);
+        const std::wstring& inflictorCharacterName = GetCharacterName(inflictorClientId);
+        const std::wstring& damagedCharacterName = GetCharacterName(damagedClientId);
 
         std::list<GROUP_MEMBER> members;
         // Players always should be in a group - even if just their own single-person group.
-        if (HkGetGroupMembers(ARG_CLIENTID(victimClientId), members) != HKE_OK)
+        if (HkGetGroupMembers(ARG_CLIENTID(damagedClientId), members) != HKE_OK)
             return;
 
         if (members.size() > 1)
         {
             for (const GROUP_MEMBER& member : members)
             {
-                const auto& lastAttitude = GetAttitudeTowards({ member.wscCharname, damageInflictorCharacterName });
-                const auto& attitudeChange = TrySetAttitudeTowardsTarget(member.iClientID, damageInflictorCharacterName, Attitude::Hostile);
+                const auto& lastAttitude = GetAttitudeTowards({ member.wscCharname, inflictorCharacterName });
+                const auto& attitudeChange = TrySetAttitudeTowardsTarget(member.iClientID, inflictorCharacterName, Attitude::Hostile);
                 if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
                 {
-                    std::wstring attackText = damageInflictorCharacterName + L" attacked your group";
+                    std::wstring attackText = inflictorCharacterName + L" attacked your group";
                     if (lastAttitude.first == lastAttitude.second && lastAttitude.second == Attitude::Allied)
                     {
                         attackText = attackText + L" and terminated friendship";
-                        PrintUserCmdText(damagerClientId, member.wscCharname + L" terminated friendship, because you attacked their group.");
+                        PrintUserCmdText(inflictorClientId, member.wscCharname + L" terminated friendship, because you attacked their group.");
                     }
                     PrintUserCmdText(member.iClientID, attackText + L"!");
                 }
@@ -397,14 +397,14 @@ namespace IFF
         }
         else
         {
-            const auto& lastAttitude = GetAttitudeTowards({ victimCharacterName, damageInflictorCharacterName });
+            const auto& lastAttitude = GetAttitudeTowards({ damagedCharacterName, inflictorCharacterName });
             // If they are friends, ignore any shots fired.
             if (lastAttitude.first == Attitude::Allied && lastAttitude.second == Attitude::Allied)
                 return;
 
-            const auto& attitudeChange = TrySetAttitudeTowardsTarget(victimClientId, damageInflictorCharacterName, Attitude::Hostile);
+            const auto& attitudeChange = TrySetAttitudeTowardsTarget(damagedClientId, inflictorCharacterName, Attitude::Hostile);
             if (attitudeChange.first != attitudeChange.second && lastAttitude.second != Attitude::Hostile)
-                PrintUserCmdText(victimClientId, damageInflictorCharacterName + L" attacked!");
+                PrintUserCmdText(damagedClientId, inflictorCharacterName + L" attacked!");
         }
     }
 

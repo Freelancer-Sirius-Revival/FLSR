@@ -11,6 +11,7 @@
 #include "Missions/conditions/CndProjHitCount.h"
 #include "Missions/conditions/CndSpaceEnter.h"
 #include "Missions/conditions/CndSpaceExit.h"
+#include "Missions/conditions/CndTimer.h"
 #include "MissionAbortFix.h"
 
 std::mutex m_Mutex;
@@ -272,6 +273,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipShieldDamage, PLUGIN_ShipShieldDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSpaceEnter::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSpaceExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndTimer::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::MissionResponse, PLUGIN_HkIServerImpl_MissionResponse, 0));

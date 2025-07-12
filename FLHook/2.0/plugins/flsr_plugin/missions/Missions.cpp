@@ -445,17 +445,6 @@ namespace Missions
 								if (objNameOrLabel && systemId && distance > 0)
 									condition = ConditionPtr(new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId));
 							}
-							else if (ini.is_value("Cnd_Timer"))
-							{
-								float lowerTimeInS = 0.0f;
-								float upperTimeInS = 0.0f;
-
-								lowerTimeInS = ini.get_value_float(0);
-								upperTimeInS = ini.get_value_float(1);
-
-								if (lowerTimeInS >= 0.0f && upperTimeInS >= 0.0f)
-									condition = ConditionPtr(new CndTimer(conditionParent, lowerTimeInS, upperTimeInS));
-							}
 							else if (ini.is_value("Cnd_Count"))
 							{
 								uint label = 0;
@@ -985,13 +974,6 @@ namespace Missions
 	void __stdcall Elapse_Time_AFTER(float seconds)
 	{
 		returncode = DEFAULT_RETURNCODE;
-
-		const std::unordered_set<CndTimer*> timerConditionsCopy(timerConditions);
-		for (const auto& cnd : timerConditionsCopy)
-		{
-			if (const auto& foundCondition = timerConditions.find(cnd); foundCondition != timerConditions.end() && cnd->Matches(seconds))
-				cnd->ExecuteTrigger();
-		}
 
 		elapsedTimeInSec += seconds;
 		if (elapsedTimeInSec < 0.02f)

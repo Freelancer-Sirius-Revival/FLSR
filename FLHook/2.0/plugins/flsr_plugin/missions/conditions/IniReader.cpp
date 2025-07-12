@@ -4,6 +4,7 @@
 #include "CndProjHitCount.h"
 #include "CndSpaceEnter.h"
 #include "CndSpaceExit.h"
+#include "CndTimer.h"
 
 namespace Missions
 {
@@ -204,6 +205,34 @@ namespace Missions
 		return new CndSpaceExit(conditionParent, label, systemId);
 	}
 
+	static CndTimer* ReadCndTimer(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		float lowerTimeInS = 0.0f;
+		float upperTimeInS = 0.0f;
+
+		uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ini.get_value_float(argNum);
+			if (value >= 0.0f)
+				lowerTimeInS = value;
+			else
+				PrintErrorToConsole(L"Cnd_Timer", conditionParent, argNum, L"Lower boundary must be equal or greater than 0. Defaulting to 0.");
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ini.get_value_float(argNum);
+			if (value >= 0.0f)
+				upperTimeInS = value;
+			else
+				PrintErrorToConsole(L"Cnd_Timer", conditionParent, argNum, L"Upper boundary must be equal or greater than 0. Defaulting to 0.");
+		}
+
+		return new CndTimer(conditionParent, lowerTimeInS, upperTimeInS);
+	}
+
 	Condition* TryReadConditionFromIni(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		if (ini.is_value("Cnd_BaseEnter"))
@@ -220,6 +249,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_SpaceExit"))
 			return ReadCndSpaceExit(conditionParent, ini);
+
+		if (ini.is_value("Cnd_Timer"))
+			return ReadCndTimer(conditionParent, ini);
 
 		return nullptr;
 	}

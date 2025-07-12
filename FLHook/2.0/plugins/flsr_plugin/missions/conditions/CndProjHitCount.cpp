@@ -28,13 +28,13 @@ namespace Missions
 
 	void CndProjHitCount::Register()
 	{
+		currentHitCount = 0;
 		registeredConditions.insert(this);
 	}
 
 	void CndProjHitCount::Unregister()
 	{
 		registeredConditions.erase(this);
-		currentHitCount = 0;
 	}
 
 	bool CndProjHitCount::Matches(const IObjRW* damagedObject, const DamageList* damageList, const DamagedSurface damagedSurface)

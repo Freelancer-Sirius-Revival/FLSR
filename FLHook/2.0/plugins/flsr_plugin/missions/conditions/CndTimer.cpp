@@ -1,13 +1,14 @@
 #include "CndTimer.h"
-#include "../Mission.h"
 #include <random>
+#include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
 
-	std::unordered_set<CndTimer*> timerConditions;
+	std::unordered_set<CndTimer*> registeredConditions;
 
 	CndTimer::CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS) :
 		Condition(parent),
@@ -30,12 +31,12 @@ namespace Missions
 		else
 			targetTimeInS = std::uniform_real_distribution<float>(lowerTimeInS, upperTimeInS)(gen);
 
-		timerConditions.insert(this);
+		registeredConditions.insert(this);
 	}
 
 	void CndTimer::Unregister()
 	{
-		timerConditions.erase(this);
+		registeredConditions.erase(this);
 	}
 
 	bool CndTimer::Matches(const float elapsedTimeInS)
@@ -49,5 +50,23 @@ namespace Missions
 			return true;
 		}
 		return false;
+	}
+
+	namespace Hooks
+	{
+		namespace CndTimer
+		{
+			void __stdcall Elapse_Time_AFTER(float seconds)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				const std::unordered_set<Missions::CndTimer*> currentConditions(registeredConditions);
+				for (const auto& condition : currentConditions)
+				{
+					if (registeredConditions.contains(condition) && condition->Matches(seconds))
+						condition->ExecuteTrigger();
+				}
+			}
+		}
 	}
 }

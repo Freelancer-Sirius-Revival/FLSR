@@ -20,5 +20,11 @@ namespace Missions
 		bool Matches(const float elapsedTimeInS);
 	};
 
-	extern std::unordered_set<CndTimer*> timerConditions;
+	namespace Hooks
+	{
+		namespace CndTimer
+		{
+			void __stdcall Elapse_Time_AFTER(float seconds);
+		}
+	}
 }

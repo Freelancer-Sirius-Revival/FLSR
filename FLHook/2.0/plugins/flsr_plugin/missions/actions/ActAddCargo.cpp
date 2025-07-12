@@ -17,14 +17,14 @@ namespace Missions
 
 	void ActAddCargo::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		if (objNameOrLabel == Activator)
+		if (label == Activator)
 		{
 			if (activator.type == MissionObjectType::Client)
 			{
 				AddCargo(activator.id, *this);
 			}
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{

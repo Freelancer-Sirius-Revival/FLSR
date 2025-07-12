@@ -6,7 +6,7 @@ namespace Missions
 	struct CndSpaceEnter : public Condition
 	{
 	private:
-		const uint objNameOrLabel;
+		const uint label;
 		const uint systemId;
 
 	public:

@@ -228,14 +228,14 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `FLOAT :0` The distance from the given position to check.
     1. `STRING` The system nickname to place this volume into.
 - `Cnd_SpaceEnter` Only for players. Undocking from bases or spawning into space. Not jumping.
-    1. `STRING|Stranger` Object by name or label to await spawning into space.
-    1. `[STRING] :any` The system nickname the object spawns into.
-- `Cnd_SpaceExit` Only for players. Docking to bases, destruction, leaving the server or changing to another character. Not jumping.
-    1. `STRING|Stranger` Object by name or label to await despawning from space.
-    1. `[STRING] :any` The system nickname the object despawns from.
+    1. `STRING|Stranger` The players  to await spawning into space.
+    1. `[STRING] :any` The system nickname the player spawns into.
+- `Cnd_SpaceExit` Only for players. Docking to bases, destruction, leaving the server, or changing to another character. Not jumping.
+    1. `STRING|Stranger` The players to await despawning from space.
+    1. `[STRING] :any` The system nickname the player despawns from.
 - `Cnd_BaseEnter` Only for players. Landing or logging in to bases.
-    1. `STRING|Stranger` Object by name or label to await spawning into space.
-    1. `[STRING] :any` The base nickname the object lands on.
+    1. `STRING|Stranger` The players to await fully landing on a base.
+    1. `[STRING] :any` The base nickname the player lands on.
 - `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
@@ -293,7 +293,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` The NPCs to receive the objectives.
     1. `STRING` The `ObjList` nickname to refer to.
 - `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
-    1. `STRING|Activator` Object by name or label to set the message or waypoint.
+    1. `STRING|Activator` The players to set the message or waypoint.
     1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
     1. `[STRING]` The system nickname for the waypoint.
     1. `[FLOAT] :0` The x-axis position for the waypoint.
@@ -302,10 +302,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
-    1. `STRING|Activator` Object by name or label to play sound effect for.
+    1. `STRING|Activator` The players to play the sound effect for.
     1. `STRING` The sound nickname to play.
 - `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
-    1. `STRING|Activator` Object by name or label to set music for.
+    1. `STRING|Activator` The players to set music for.
     1. `[STRING|None] :None` Overrides the space music.
     1. `[STRING|None] :None` Overrides the danger music.
     1. `[STRING|None] :None` Overrides the battle music.
@@ -337,15 +337,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING]` The 6. accessory slot used for the sender.
     1. `[STRING]` The 7. accessory slot used for the sender.
     1. `[STRING]` The 8. accessory slot used for the sender.
-- `Act_AdjAcct` Adjusts the cash on the player account. Cash will be automatically clamped to prevent overflows/underflows.
+- `Act_AdjAcct` Only for players. Adjusts the cash on the account. Cash will be automatically clamped to prevent overflows/underflows.
     1. `STRING|Activator` The players to have their cash being modified.
     1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.
     1. `[True|False] :False` Split the cash across all player members of the receiving label equally. No effect if a singular player receives the cash.
-- `Act_AdjRep` Adjusts the reputation of the player toward a specific faction.
+- `Act_AdjRep` Only for players. Adjusts the reputation of the player toward a specific faction.
     1. `STRING|Activator` The players to have their reputation being modified.
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
-- `Act_AddCargo` Adds cargo. Only works for players. Will fail if player has not enough cargo space.
+- `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
     1. `STRING|Activator` The players to receive the cargo.
     1. `STRING` The item nickname to use.
     1. `INTEGER :0` Amount of items to add to cargo.

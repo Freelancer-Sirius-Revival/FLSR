@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActAddCargo : Action
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		uint itemId = 0;
 		uint count = 0;
 		bool missionFlagged = false;

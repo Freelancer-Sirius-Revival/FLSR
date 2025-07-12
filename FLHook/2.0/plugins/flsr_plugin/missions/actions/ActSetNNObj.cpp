@@ -71,12 +71,12 @@ namespace Missions
 		FmtStr caption(message, 0);
 		caption.begin_mad_lib(message);
 		caption.end_mad_lib();
-		if (objNameOrLabel == Activator)
+		if (label == Activator)
 		{
 			if (activator.type == MissionObjectType::Client && activator.id)
 				SetObjective(mission, activator.id, *this);
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{

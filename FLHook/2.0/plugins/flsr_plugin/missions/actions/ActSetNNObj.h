@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActSetNNObj : Action
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		uint message = 0;
 		uint systemId = 0;
 		Vector position;

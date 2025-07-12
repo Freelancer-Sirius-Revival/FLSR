@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActPlaySoundEffect : Action
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		uint soundId = 0;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;

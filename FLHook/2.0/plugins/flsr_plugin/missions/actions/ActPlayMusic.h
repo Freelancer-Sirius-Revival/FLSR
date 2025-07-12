@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActPlayMusic : Action
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		pub::Audio::Tryptich music;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;

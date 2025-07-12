@@ -17,12 +17,12 @@ namespace Missions
 
 	void ActAdjAcct::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		if (objNameOrLabel == Activator)
+		if (label == Activator)
 		{
 			if (activator.type == MissionObjectType::Client)
 				AddCash(activator.id, cash);
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
 		{
 			std::vector<uint> clientIds;
 			for (const auto& object : objectsByLabel->second)

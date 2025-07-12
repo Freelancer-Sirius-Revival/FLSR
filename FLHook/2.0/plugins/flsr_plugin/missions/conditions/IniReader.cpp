@@ -18,7 +18,7 @@ namespace Missions
 
 	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		uint baseId = 0;
 
 		uint argNum = 0;
@@ -26,7 +26,7 @@ namespace Missions
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				objNameOrLabel = value;
+				label = value;
 			else
 			{
 				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target label. Aborting!");
@@ -44,7 +44,7 @@ namespace Missions
 				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target base. Defaulting to any base.");
 		}
 
-		return new CndBaseEnter(conditionParent, objNameOrLabel, baseId);
+		return new CndBaseEnter(conditionParent, label, baseId);
 	}
 
 	static CndCloaked* ReadCndCloaked(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -143,7 +143,7 @@ namespace Missions
 
 	static CndSpaceEnter* ReadCndSpaceEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		uint systemId = 0;
 
 		uint argNum = 0;
@@ -151,7 +151,7 @@ namespace Missions
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				objNameOrLabel = value;
+				label = value;
 			else
 			{
 				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target label. Aborting!");

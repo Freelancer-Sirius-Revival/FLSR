@@ -586,14 +586,14 @@ namespace Missions
 							else if (ini.is_value("Act_PlaySoundEffect"))
 							{
 								ActPlaySoundEffectPtr action(new ActPlaySoundEffect());
-								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->soundId = CreateIdOrNull(ini.get_value_string(1));
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_PlayMusic"))
 							{
 								ActPlayMusicPtr action(new ActPlayMusic());
-								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->music.spaceMusic = std::string(ini.get_value_string(1)) != "none" ? CreateIdOrNull(ini.get_value_string(1)) : 0;
 								action->music.dangerMusic = std::string(ini.get_value_string(2)) != "none" ? CreateIdOrNull(ini.get_value_string(2)) : 0;
 								action->music.battleMusic = std::string(ini.get_value_string(3)) != "none" ? CreateIdOrNull(ini.get_value_string(3)) : 0;
@@ -666,7 +666,7 @@ namespace Missions
 							else if (ini.is_value("Act_SetNNObj"))
 							{
 								ActSetNNObjPtr action(new ActSetNNObj());
-								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->message = ini.get_value_int(1);
 								action->systemId = CreateIdOrNull(ini.get_value_string(2));
 								action->position.x = ini.get_value_float(3);
@@ -680,7 +680,7 @@ namespace Missions
 							else if (ini.is_value("Act_AdjAcct"))
 							{
 								ActAdjAcctPtr action(new ActAdjAcct());
-								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->cash = ini.get_value_int(1);
 								if (ini.get_num_parameters() > 2)
 									action->splitBetweenPlayers = ini.get_value_bool(2);
@@ -707,7 +707,7 @@ namespace Missions
 							else if (ini.is_value("Act_AddCargo"))
 							{
 								ActAddCargoPtr action(new ActAddCargo());
-								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->itemId = CreateIdOrNull(ini.get_value_string(1));
 								action->count = std::max(0, ini.get_value_int(2));
 								if (ini.get_num_parameters() > 3)

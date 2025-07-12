@@ -6,7 +6,7 @@ namespace Missions
 	class CndBaseEnter : public Condition
 	{
 	private:
-		const uint objNameOrLabel;
+		const uint label;
 		const uint baseId;
 
 	public:

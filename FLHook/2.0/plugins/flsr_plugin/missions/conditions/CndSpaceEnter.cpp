@@ -8,7 +8,7 @@ namespace Missions
 
 	CndSpaceEnter::CndSpaceEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
 		Condition(parent),
-		objNameOrLabel(objNameOrLabel),
+		label(objNameOrLabel),
 		systemId(systemId)
 	{}
 
@@ -30,7 +30,7 @@ namespace Missions
 	bool CndSpaceEnter::Matches(const uint clientId, const uint currentSystemId)
 	{
 		const auto& mission = missions.at(parent.missionId);
-		if (objNameOrLabel == Stranger)
+		if (label == Stranger)
 		{
 			if (!mission.clientIds.contains(clientId) && (!systemId || systemId == currentSystemId))
 			{
@@ -39,7 +39,7 @@ namespace Missions
 				return true;
 			}
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
 		{
 			for (const auto& object : objectsByLabel->second)
 			{

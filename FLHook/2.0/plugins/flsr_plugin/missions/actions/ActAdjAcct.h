@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActAdjAcct : Action
 	{
-		uint objNameOrLabel = 0;
+		uint label = 0;
 		uint cash = 0;
 		bool splitBetweenPlayers = false;
 

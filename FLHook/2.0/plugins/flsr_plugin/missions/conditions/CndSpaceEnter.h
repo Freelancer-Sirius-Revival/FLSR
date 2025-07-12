@@ -17,5 +17,11 @@ namespace Missions
 		bool Matches(const uint clientId, const uint systemId);
 	};
 
-	extern std::unordered_set<CndSpaceEnter*> spaceEnterConditions;
+	namespace Hooks
+	{
+		namespace CndSpaceEnter
+		{
+			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId);
+		}
+	}
 }

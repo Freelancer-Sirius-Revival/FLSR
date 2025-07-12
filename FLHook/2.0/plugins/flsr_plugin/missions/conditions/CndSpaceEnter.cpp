@@ -1,9 +1,10 @@
 #include "CndSpaceEnter.h"
 #include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndSpaceEnter*> spaceEnterConditions;
+	std::unordered_set<CndSpaceEnter*> registeredConditions;
 
 	CndSpaceEnter::CndSpaceEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
 		Condition(parent),
@@ -18,12 +19,12 @@ namespace Missions
 
 	void CndSpaceEnter::Register()
 	{
-		spaceEnterConditions.insert(this);
+		registeredConditions.insert(this);
 	}
 
 	void CndSpaceEnter::Unregister()
 	{
-		spaceEnterConditions.erase(this);
+		registeredConditions.erase(this);
 	}
 
 	bool CndSpaceEnter::Matches(const uint clientId, const uint currentSystemId)
@@ -50,5 +51,28 @@ namespace Missions
 			}
 		}
 		return false;
+	}
+
+	namespace Hooks
+	{
+		namespace CndSpaceEnter
+		{
+			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				if (registeredConditions.empty())
+					return;
+				uint systemId;
+				pub::Player::GetSystem(clientId, systemId);
+
+				const std::unordered_set<Missions::CndSpaceEnter*> currentConditions(registeredConditions);
+				for (const auto& condition : currentConditions)
+				{
+					if (registeredConditions.contains(condition) && condition->Matches(clientId, systemId))
+						condition->ExecuteTrigger();
+				}
+			}
+		}
 	}
 }

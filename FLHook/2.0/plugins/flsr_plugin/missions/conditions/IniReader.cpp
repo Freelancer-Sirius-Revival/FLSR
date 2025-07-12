@@ -2,6 +2,7 @@
 #include "CndBaseEnter.h"
 #include "CndCloaked.h"
 #include "CndProjHitCount.h"
+#include "CndSpaceEnter.h"
 
 namespace Missions
 {
@@ -140,6 +141,37 @@ namespace Missions
 		return new CndProjHitCount(conditionParent, damagedObjNameOrLabel, targetSurface, damageType, targetHitCount, inflictorObjNameOrLabel);
 	}
 
+	static CndSpaceEnter* ReadCndSpaceEnter(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		uint systemId = 0;
+
+		uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				objNameOrLabel = value;
+			else
+			{
+				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target label. Aborting!");
+				return nullptr;
+			}
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemId = value;
+			else
+				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target system. Defaulting to any system.");
+		}
+
+		return new CndSpaceEnter(conditionParent, objNameOrLabel, systemId);
+	}
+
 	Condition* TryReadConditionFromIni(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		if (ini.is_value("Cnd_BaseEnter"))
@@ -150,6 +182,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);
+
+		if (ini.is_value("Cnd_SpaceEnter"))
+			return ReadCndSpaceEnter(conditionParent, ini);
 
 		return nullptr;
 	}

@@ -6,7 +6,6 @@
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndDestroyed.h"
 #include "Conditions/CndDistVec.h"
-#include "Conditions/CndSpaceEnter.h"
 #include "Conditions/CndSpaceExit.h"
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCount.h"
@@ -445,17 +444,6 @@ namespace Missions
 
 								if (objNameOrLabel && systemId && distance > 0)
 									condition = ConditionPtr(new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId));
-							}
-							else if (ini.is_value("Cnd_SpaceEnter"))
-							{
-								uint objNameOrLabel = 0;
-								uint systemId = 0;
-
-								objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								systemId = CreateIdOrNull(ini.get_value_string(1));
-
-								if (objNameOrLabel && systemId)
-									condition = ConditionPtr(new CndSpaceEnter(conditionParent, objNameOrLabel, systemId));
 							}
 							else if (ini.is_value("Cnd_SpaceExit"))
 							{
@@ -1115,21 +1103,6 @@ namespace Missions
 		returncode = DEFAULT_RETURNCODE;
 		lastCharacterByClientId.erase(clientId);
 		RemoveClientFromMissions(clientId);
-	}
-
-	void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
-	{
-		returncode = DEFAULT_RETURNCODE;
-		if (spaceEnterConditions.empty())
-			return;
-		uint systemId;
-		pub::Player::GetSystem(clientId, systemId);
-		const std::unordered_set<CndSpaceEnter*> spaceEnterConditionsCopy(spaceEnterConditions);
-		for (const auto& cnd : spaceEnterConditionsCopy)
-		{
-			if (const auto& foundCondition = spaceEnterConditions.find(cnd); foundCondition != spaceEnterConditions.end() && cnd->Matches(clientId, systemId))
-				cnd->ExecuteTrigger();
-		}
 	}
 
 	static bool StartMission(const std::string& missionName)

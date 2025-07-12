@@ -5,8 +5,8 @@ namespace Missions
 {
 	struct ActRemoveLabel : Action
 	{
-		unsigned int objNameOrLabel = 0;
-		unsigned int label = 0;
+		uint objNameOrLabel = 0;
+		uint label = 0;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;
 	};

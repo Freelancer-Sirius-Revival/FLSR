@@ -9,9 +9,9 @@ namespace Missions
 	public:
 		enum class DestroyCondition
 		{
-			ALL,
-			SILENT,
-			EXPLODE
+			Any,
+			Vanish,
+			Explode
 		};
 
 	private:

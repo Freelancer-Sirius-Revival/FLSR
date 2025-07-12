@@ -410,7 +410,7 @@ namespace Missions
 							else if (ini.is_value("Cnd_Destroyed"))
 							{
 								uint objNameOrLabel = 0;
-								CndDestroyed::DestroyCondition reason = CndDestroyed::DestroyCondition::ALL;
+								CndDestroyed::DestroyCondition reason = CndDestroyed::DestroyCondition::Any;
 								uint killerNameOrLabel = 0;
 								int targetCount = -1;
 
@@ -418,11 +418,11 @@ namespace Missions
 								targetCount = ini.get_value_int(1);
 								const std::string val = ToLower(ini.get_value_string(2));
 								if (val == "explode")
-									reason = CndDestroyed::DestroyCondition::EXPLODE;
+									reason = CndDestroyed::DestroyCondition::Explode;
 								else if (val == "silent")
-									reason = CndDestroyed::DestroyCondition::SILENT;
+									reason = CndDestroyed::DestroyCondition::Vanish;
 								else
-									reason = CndDestroyed::DestroyCondition::ALL;
+									reason = CndDestroyed::DestroyCondition::Any;
 								killerNameOrLabel = std::strlen(ini.get_value_string(6)) ? CreateIdOrNull(ini.get_value_string(3)) : 0;
 
 								if (objNameOrLabel)

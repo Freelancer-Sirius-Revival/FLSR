@@ -42,7 +42,7 @@ namespace Missions
 			return true;
 		
 		// Check destruction conditions.
-		if ((condition == DestroyCondition::SILENT && killed) || (condition == DestroyCondition::EXPLODE && !killed))
+		if ((condition == DestroyCondition::Vanish && killed) || (condition == DestroyCondition::Explode && !killed))
 			return false;
 
 		// Check if killed object is part of the mission.

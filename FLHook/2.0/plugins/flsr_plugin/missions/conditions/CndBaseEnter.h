@@ -17,5 +17,11 @@ namespace Missions
 		bool Matches(const uint clientId, const uint baseId);
 	};
 
-	extern std::unordered_set<CndBaseEnter*> baseEnterConditions;
+	namespace Hooks
+	{
+		namespace CndBaseEnter
+		{
+			void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
+		}
+	}
 }

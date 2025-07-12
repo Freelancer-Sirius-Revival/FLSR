@@ -1,9 +1,10 @@
 #include "CndBaseEnter.h"
 #include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndBaseEnter*> baseEnterConditions;
+	std::unordered_set<CndBaseEnter*> registeredConditions;
 
 	CndBaseEnter::CndBaseEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint baseId) :
 		Condition(parent),
@@ -18,12 +19,12 @@ namespace Missions
 
 	void CndBaseEnter::Register()
 	{
-		baseEnterConditions.insert(this);
+		registeredConditions.insert(this);
 	}
 
 	void CndBaseEnter::Unregister()
 	{
-		baseEnterConditions.erase(this);
+		registeredConditions.erase(this);
 	}
 
 	bool CndBaseEnter::Matches(const uint clientId, const uint currentBaseId)
@@ -50,5 +51,23 @@ namespace Missions
 			}
 		}
 		return false;
+	}
+
+	namespace Hooks
+	{
+		namespace CndBaseEnter
+		{
+			void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				const std::unordered_set<Missions::CndBaseEnter*> currentConditions(registeredConditions);
+				for (const auto& condition : currentConditions)
+				{
+					if (registeredConditions.contains(condition) && condition->Matches(clientId, baseId))
+						condition->ExecuteTrigger();
+				}
+			}
+		}
 	}
 }

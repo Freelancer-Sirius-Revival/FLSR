@@ -6,6 +6,7 @@
 #include "Missions/LootProps.h"
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
+#include "Missions/conditions/CndBaseEnter.h"
 #include "Missions/conditions/CndProjHitCount.h"
 #include "MissionAbortFix.h"
 
@@ -259,9 +260,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::CharacterSelect_AFTER, PLUGIN_HkIServerImpl_CharacterSelect_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
 
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndBaseEnter::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipEquipDamage, PLUGIN_ShipEquipDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipHullDamage, PLUGIN_ShipHullDmg, 0));

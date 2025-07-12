@@ -1,4 +1,5 @@
 #include "IniReader.h"
+#include "CndBaseEnter.h"
 #include "CndProjHitCount.h"
 
 namespace Missions
@@ -11,6 +12,37 @@ namespace Missions
 	static void PrintErrorToConsole(const std::wstring& entryName, const ConditionParent& conditionParent, const uint argNum, const std::wstring& error)
 	{
 		ConPrint(L"ERROR: " + entryName + L" of Msn:" + std::to_wstring(conditionParent.missionId) + L" Trig:" + std::to_wstring(conditionParent.triggerId) + L" Arg " + std::to_wstring(argNum + 1)  + L" " + error + L"\n");
+	}
+
+	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		uint baseId = 0;
+
+		uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				objNameOrLabel = value;
+			else
+			{
+				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target label. Aborting!");
+				return nullptr;
+			}
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				baseId = value;
+			else
+				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target base. Defaulting to any base.");
+		}
+
+		return new CndBaseEnter(conditionParent, objNameOrLabel, baseId);
 	}
 
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -84,8 +116,12 @@ namespace Missions
 
 	Condition* TryReadConditionFromIni(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
+		if (ini.is_value("Cnd_BaseEnter"))
+			return ReadCndBaseEnter(conditionParent, ini);
+
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);
+
 		return nullptr;
 	}
 }

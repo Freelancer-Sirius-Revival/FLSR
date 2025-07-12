@@ -470,17 +470,6 @@ namespace Missions
 								if (objNameOrLabel && systemId)
 									condition = ConditionPtr(new CndSpaceExit(conditionParent, objNameOrLabel, systemId));
 							}
-							else if (ini.is_value("Cnd_BaseEnter"))
-							{
-								uint objNameOrLabel = 0;
-								uint baseId = 0;
-
-								objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								baseId = CreateIdOrNull(ini.get_value_string(1));
-
-								if (objNameOrLabel)
-									condition = ConditionPtr(new CndBaseEnter(conditionParent, objNameOrLabel, baseId));
-							}
 							else if (ini.is_value("Cnd_Timer"))
 							{
 								float lowerTimeInS = 0.0f;
@@ -1182,17 +1171,6 @@ namespace Missions
 		for (const auto& cnd : spaceEnterConditionsCopy)
 		{
 			if (const auto& foundCondition = spaceEnterConditions.find(cnd); foundCondition != spaceEnterConditions.end() && cnd->Matches(clientId, systemId))
-				cnd->ExecuteTrigger();
-		}
-	}
-
-	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
-	{
-		returncode = DEFAULT_RETURNCODE;
-		const std::unordered_set<CndBaseEnter*> baseEnterConditionsCopy(baseEnterConditions);
-		for (const auto& cnd : baseEnterConditionsCopy)
-		{
-			if (const auto& foundCondition = baseEnterConditions.find(cnd); foundCondition != baseEnterConditions.end() && cnd->Matches(clientId, baseId))
 				cnd->ExecuteTrigger();
 		}
 	}

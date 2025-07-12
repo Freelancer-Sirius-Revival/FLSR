@@ -396,10 +396,6 @@ namespace Missions
 								else
 									repeatable = Trigger::TriggerRepeatable::Off;
 							}
-							else if (ini.is_value("Cnd_True"))
-							{
-								condition = ConditionPtr(new CndTrue(conditionParent));
-							}
 							else if (ini.is_value("Act_DebugMsg"))
 							{
 								ActDebugMsgPtr action(new ActDebugMsg());

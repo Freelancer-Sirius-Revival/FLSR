@@ -8,6 +8,7 @@
 #include "CndSpaceEnter.h"
 #include "CndSpaceExit.h"
 #include "CndTimer.h"
+#include "CndTrue.h"
 
 namespace Missions
 {
@@ -379,6 +380,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_Timer"))
 			return ReadCndTimer(conditionParent, ini);
+
+		if (ini.is_value("Cnd_True"))
+			return new CndTrue(conditionParent);
 
 		return nullptr;
 	}

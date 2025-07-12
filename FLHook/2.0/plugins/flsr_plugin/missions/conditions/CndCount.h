@@ -23,8 +23,14 @@ namespace Missions
 		~CndCount();
 		void Register();
 		void Unregister();
-		bool Matches(const uint clientId, const uint baseId);
+		bool Matches(const uint clientId, const uint baseId) const;
 	};
 
-	extern std::unordered_map<uint, std::unordered_set<CndCount*>> countConditionsByMission;
+	namespace Hooks
+	{
+		namespace CndCount
+		{
+			void EvaluateCountConditions(const uint missionId, const std::unordered_map<uint, std::vector<MissionObject>>& objectsByLabel, const uint label);
+		}
+	}
 }

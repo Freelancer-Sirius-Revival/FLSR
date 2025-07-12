@@ -1,6 +1,7 @@
 #include "IniReader.h"
 #include "CndBaseEnter.h"
 #include "CndCloaked.h"
+#include "CndCount.h"
 #include "CndDestroyed.h"
 #include "CndDistVec.h"
 #include "CndProjHitCount.h"
@@ -55,7 +56,7 @@ namespace Missions
 		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
 		if (objNameOrLabel == 0)
 		{
-			PrintErrorToConsole(L"Cnd_Cloaked", conditionParent, argNum, L"No target label. Aborting!");
+			PrintErrorToConsole(L"Cnd_Cloaked", conditionParent, argNum, L"No target obj name or label. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -64,6 +65,45 @@ namespace Missions
 			cloaked = ini.get_value_bool(argNum);
 
 		return new CndCloaked(conditionParent, objNameOrLabel, cloaked);
+	}
+
+	static CndCount* ReadCndCount(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		int targetCount = 0;
+		CndCount::CountComparator comparator = CndCount::CountComparator::Equal;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_Count", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ini.get_value_bool(argNum);
+			if (value >= 0)
+				targetCount = value;
+			else
+				PrintErrorToConsole(L"Cnd_Count", conditionParent, argNum, L"Invalid target count. Must be equal or greater than 0 Defaulting to 0.");
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "less")
+				comparator = CndCount::CountComparator::Less;
+			else if (value == "greater")
+				comparator = CndCount::CountComparator::Greater;
+			else if (value != "equal")
+				PrintErrorToConsole(L"Cnd_Count", conditionParent, argNum, L"Invalid comparator. Must be LESS, GREATER, or EQUAL. Defaulting to EQUAL.");
+		}
+
+		return new CndCount(conditionParent, label, targetCount, comparator);
 	}
 
 	static CndDestroyed* ReadCndDestroyed(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -318,6 +358,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_Cloaked"))
 			return ReadCndCloaked(conditionParent, ini);
+
+		if (ini.is_value("Cnd_Count"))
+			return ReadCndCount(conditionParent, ini);
 
 		if (ini.is_value("Cnd_Destroyed"))
 			return ReadCndDestroyed(conditionParent, ini);

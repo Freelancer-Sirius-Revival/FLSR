@@ -87,24 +87,11 @@ namespace Missions
 			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
-
-		countConditionsByMission.erase(id);
 	}
 
-	void Mission::EvaluateCountConditions(const uint label)
+	void Mission::EvaluateCountConditions(const uint label) const
 	{
-		const auto& countConditions = countConditionsByMission.find(id);
-		if (countConditions == countConditionsByMission.end() || countConditions->second.size() == 0)
-			return;
-
-		const auto& labelEntries = objectsByLabel.find(label);
-		const uint count = labelEntries == objectsByLabel.end() ? 0 : labelEntries->second.size();
-		const auto& countConditionsCopy = std::unordered_set(countConditions->second);
-		for (const auto& cnd : countConditionsCopy)
-		{
-			if (countConditions->second.contains(cnd) && cnd->Matches(label, count))
-				cnd->ExecuteTrigger();
-		}
+		Hooks::CndCount::EvaluateCountConditions(id, objectsByLabel, label);
 	}
 
 	void Mission::AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels)

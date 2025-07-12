@@ -18,6 +18,7 @@ namespace Missions
 			Active,
 			Finished
 		};
+
 	public:
 		const std::string name;
 		const uint id;
@@ -37,10 +38,13 @@ namespace Missions
 		std::unordered_set<uint> objectIds;
 		std::unordered_set<uint> clientIds;
 		std::unordered_map<uint, Objectives> objectivesByObjectId;
+
 	private:
 		MissionState state;
 		bool triggerExecutionRunning;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
+
+		void EvaluateCountConditions(const uint label) const;
 
 	public:
 		Mission(const std::string name, const uint id, const bool initiallyActive);
@@ -49,7 +53,6 @@ namespace Missions
 		bool Start();
 		void End();
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
-		void EvaluateCountConditions(const uint label);
 		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);
 		void AddLabelToObject(const MissionObject& object, const uint label);
 		void RemoveLabelFromObject(const MissionObject& object, const uint label);

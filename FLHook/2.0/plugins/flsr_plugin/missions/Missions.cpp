@@ -4,7 +4,6 @@
 #include "LootProps.h"
 #include "Missions.h"
 #include "Conditions/CndTrue.h"
-#include "Conditions/CndCount.h"
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrigger.h"
@@ -400,28 +399,6 @@ namespace Missions
 							else if (ini.is_value("Cnd_True"))
 							{
 								condition = ConditionPtr(new CndTrue(conditionParent));
-							}
-							else if (ini.is_value("Cnd_Count"))
-							{
-								uint label = 0;
-								uint targetCount = 0;
-								CndCount::CountComparator comparator = CndCount::CountComparator::Equal;
-
-								label = CreateIdOrNull(ini.get_value_string(0));
-								targetCount = ini.get_value_int(1);
-								if(ini.get_num_parameters() > 2)
-								{
-									const auto& value = ToLower(ini.get_value_string(2));
-									if (value == "less")
-										comparator = CndCount::CountComparator::Less;
-									else if (value == "greater")
-										comparator = CndCount::CountComparator::Greater;
-									else
-										comparator = CndCount::CountComparator::Equal;
-								}
-
-								if (label && targetCount >= 0)
-									condition = ConditionPtr(new CndCount(conditionParent, label, targetCount, comparator));
 							}
 							else if (ini.is_value("Act_DebugMsg"))
 							{

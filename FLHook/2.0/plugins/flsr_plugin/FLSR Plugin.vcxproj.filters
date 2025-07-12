@@ -114,9 +114,6 @@
     <ClCompile Include="missions\actions\ActGiveObjList.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\LootProps.cpp">
-      <Filter>Missions</Filter>
-    </ClCompile>
     <ClCompile Include="Empathies.cpp" />
     <ClCompile Include="missions\actions\ActDebugMsg.cpp">
       <Filter>Missions\Actions</Filter>
@@ -138,6 +135,15 @@
     </ClCompile>
     <ClCompile Include="MissionAbortFix.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndProjHitCount.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\IniReader.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\LootProps.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,9 +255,6 @@
     <ClInclude Include="missions\actions\ActGiveObjList.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\LootProps.h">
-      <Filter>Missions</Filter>
-    </ClInclude>
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Plugin.h" />
@@ -278,6 +281,15 @@
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\MissionOffer.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndProjHitCount.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\IniReader.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\LootProps.h">
       <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>

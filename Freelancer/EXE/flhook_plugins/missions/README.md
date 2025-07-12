@@ -239,6 +239,12 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
+- `Cnd_ProjHitCount` Counts projectile hits to the target.
+    1. `STRING` Object by name or label to count projectile hits on.
+    1. `[INTEGER] :1` The count of projectile hits that must have happened.
+    1. `[Any|Hull|Shield] :Any` The surface the hit should be registered on.
+    1. `[Any|Projectile|Explosion] :Any` The damage type to register. `Any` means `Projectile` and `Explosion`.
+    1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
 
 ### Actions
 

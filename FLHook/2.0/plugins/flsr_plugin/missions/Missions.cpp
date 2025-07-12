@@ -12,6 +12,7 @@
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCount.h"
 #include "Conditions/CndCloaked.h"
+#include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrigger.h"
 #include "Actions/ActChangeState.h"
@@ -763,6 +764,16 @@ namespace Missions
 								action->targetObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->reputation = ini.get_value_float(2);
 								actions.push_back(action);
+							}
+							else
+							{
+								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);
+								if (cnd != nullptr)
+								{
+									if (condition != nullptr)
+										ConPrint(L"Trigger already has a condition! Overriding.");
+									condition = ConditionPtr(cnd);
+								}
 							}
 						}
 

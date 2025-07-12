@@ -6,7 +6,7 @@ namespace Missions
 	class CndSpaceExit : public Condition
 	{
 	private:
-		const uint objNameOrLabel;
+		const uint label;
 		const uint systemId;
 
 	public:
@@ -17,5 +17,11 @@ namespace Missions
 		bool Matches(const uint clientId, const uint systemId);
 	};
 
-	extern std::unordered_set<CndSpaceExit*> spaceExitConditions;
+	namespace Hooks
+	{
+		namespace CndSpaceExit
+		{
+			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId);
+		}
+	}
 }

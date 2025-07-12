@@ -445,17 +445,6 @@ namespace Missions
 								if (objNameOrLabel && systemId && distance > 0)
 									condition = ConditionPtr(new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId));
 							}
-							else if (ini.is_value("Cnd_SpaceExit"))
-							{
-								uint objNameOrLabel = 0;
-								uint systemId = 0;
-
-								objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								systemId = CreateIdOrNull(ini.get_value_string(1));
-
-								if (objNameOrLabel && systemId)
-									condition = ConditionPtr(new CndSpaceExit(conditionParent, objNameOrLabel, systemId));
-							}
 							else if (ini.is_value("Cnd_Timer"))
 							{
 								float lowerTimeInS = 0.0f;
@@ -973,17 +962,6 @@ namespace Missions
 				fulfilledDestructions.push_back(cnd);
 		}
 
-		std::vector<CndSpaceExit*> fulfilledSpaceExits;
-		// For SpaceExit we do not care whether it happened by despawn (dock/leaving character) or death - both mean the same to NPCs and other Players.
-		if (killedObject->is_player())
-		{
-			for (const auto& cnd : spaceExitConditions)
-			{
-				if (cnd->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
-					fulfilledSpaceExits.push_back(cnd);
-			}
-		}
-
 		if (killed)
 		{
 			// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
@@ -999,11 +977,6 @@ namespace Missions
 		for (const auto& cnd : fulfilledDestructions)
 		{
 			if (const auto& foundCondition = destroyedConditions.contains(cnd))
-				cnd->ExecuteTrigger();
-		}
-		for (const auto& cnd : fulfilledSpaceExits)
-		{
-			if (const auto& foundCondition = spaceExitConditions.contains(cnd))
 				cnd->ExecuteTrigger();
 		}
 	}

@@ -3,6 +3,7 @@
 #include "CndCloaked.h"
 #include "CndProjHitCount.h"
 #include "CndSpaceEnter.h"
+#include "CndSpaceExit.h"
 
 namespace Missions
 {
@@ -169,7 +170,38 @@ namespace Missions
 				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target system. Defaulting to any system.");
 		}
 
-		return new CndSpaceEnter(conditionParent, objNameOrLabel, systemId);
+		return new CndSpaceEnter(conditionParent, label, systemId);
+	}
+
+	static CndSpaceExit* ReadCndSpaceExit(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		uint systemId = 0;
+
+		uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				label = value;
+			else
+			{
+				PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"No target label. Aborting!");
+				return nullptr;
+			}
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemId = value;
+			else
+				PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"No target system. Defaulting to any system.");
+		}
+
+		return new CndSpaceExit(conditionParent, label, systemId);
 	}
 
 	Condition* TryReadConditionFromIni(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -185,6 +217,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_SpaceEnter"))
 			return ReadCndSpaceEnter(conditionParent, ini);
+
+		if (ini.is_value("Cnd_SpaceExit"))
+			return ReadCndSpaceExit(conditionParent, ini);
 
 		return nullptr;
 	}

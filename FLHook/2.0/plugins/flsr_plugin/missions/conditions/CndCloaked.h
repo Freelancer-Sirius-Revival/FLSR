@@ -17,5 +17,11 @@ namespace Missions
 		bool Matches(const MissionObject object);
 	};
 
-	extern std::unordered_set<CndCloaked*> cloakedConditions;
+	namespace Hooks
+	{
+		namespace CndCloaked
+		{
+			void __stdcall Elapse_Time_AFTER(float seconds);
+		}
+	}
 }

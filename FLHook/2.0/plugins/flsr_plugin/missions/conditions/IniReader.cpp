@@ -1,5 +1,6 @@
 #include "IniReader.h"
 #include "CndBaseEnter.h"
+#include "CndCloaked.h"
 #include "CndProjHitCount.h"
 
 namespace Missions
@@ -43,6 +44,31 @@ namespace Missions
 		}
 
 		return new CndBaseEnter(conditionParent, objNameOrLabel, baseId);
+	}
+
+	static CndCloaked* ReadCndCloaked(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		bool cloaked = false;
+
+		uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				objNameOrLabel = value;
+			else
+			{
+				PrintErrorToConsole(L"Cnd_Cloaked", conditionParent, argNum, L"No target label. Aborting!");
+				return nullptr;
+			}
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+			cloaked = ini.get_value_bool(argNum);
+
+		return new CndCloaked(conditionParent, objNameOrLabel, cloaked);
 	}
 
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -118,6 +144,9 @@ namespace Missions
 	{
 		if (ini.is_value("Cnd_BaseEnter"))
 			return ReadCndBaseEnter(conditionParent, ini);
+
+		if (ini.is_value("Cnd_Cloaked"))
+			return ReadCndCloaked(conditionParent, ini);
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);

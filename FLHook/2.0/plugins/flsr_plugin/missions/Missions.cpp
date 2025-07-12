@@ -8,10 +8,8 @@
 #include "Conditions/CndDistVec.h"
 #include "Conditions/CndSpaceEnter.h"
 #include "Conditions/CndSpaceExit.h"
-#include "Conditions/CndBaseEnter.h"
 #include "Conditions/CndTimer.h"
 #include "Conditions/CndCount.h"
-#include "Conditions/CndCloaked.h"
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrigger.h"
@@ -502,17 +500,6 @@ namespace Missions
 
 								if (label && targetCount >= 0)
 									condition = ConditionPtr(new CndCount(conditionParent, label, targetCount, comparator));
-							}
-							else if (ini.is_value("Cnd_Cloaked"))
-							{
-								uint objNameOrLabel = 0;
-								bool cloaked = false;
-
-								objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								cloaked = ini.get_value_bool(1);
-
-								if (objNameOrLabel)
-									condition = ConditionPtr(new CndCloaked(conditionParent, objNameOrLabel, cloaked));
 							}
 							else if (ini.is_value("Act_DebugMsg"))
 							{
@@ -1049,36 +1036,6 @@ namespace Missions
 		if (elapsedTimeInSec < 0.02f)
 			return;
 		elapsedTimeInSec = 0.0f;
-
-		if (!cloakedConditions.empty())
-		{
-			const std::unordered_set<CndCloaked*> cloakedConditionsCopy(cloakedConditions);
-			for (const auto cnd : cloakedConditionsCopy)
-			{
-				bool matchFound = false;
-				struct PlayerData* playerData = 0;
-				while (playerData = Players.traverse_active(playerData))
-				{
-					if (cnd->Matches(MissionObject(MissionObjectType::Client, playerData->iOnlineID)))
-					{
-						cnd->ExecuteTrigger();
-						matchFound = true;
-						break;
-					}
-				}
-				if (!matchFound)
-				{
-					for (uint objId : missions.at(cnd->parent.missionId).objectIds)
-					{
-						if (cnd->Matches(MissionObject(MissionObjectType::Object, objId)))
-						{
-							cnd->ExecuteTrigger();
-							break;
-						}
-					}
-				}
-			}
-		}
 
 		if (distVecConditions.empty())
 			return;

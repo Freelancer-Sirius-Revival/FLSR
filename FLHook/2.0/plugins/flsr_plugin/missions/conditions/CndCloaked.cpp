@@ -1,9 +1,10 @@
 #include "CndCloaked.h"
 #include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndCloaked*> cloakedConditions;
+	std::unordered_set<CndCloaked*> registeredConditions;
 
 	CndCloaked::CndCloaked(const ConditionParent& parent, const uint objNameOrLabel, const bool cloaked) :
 		Condition(parent),
@@ -18,15 +19,15 @@ namespace Missions
 
 	void CndCloaked::Register()
 	{
-		cloakedConditions.insert(this);
+		registeredConditions.insert(this);
 	}
 
 	void CndCloaked::Unregister()
 	{
-		cloakedConditions.erase(this);
+		registeredConditions.erase(this);
 	}
 
-	bool IsCloaked(uint objId)
+	static bool IsCloaked(uint objId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -98,5 +99,52 @@ namespace Missions
 			}
 		}
 		return false;
+	}
+
+	namespace Hooks
+	{
+		namespace CndCloaked
+		{
+			float elapsedTimeInSec = 0.0f;
+			void __stdcall Elapse_Time_AFTER(float seconds)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				elapsedTimeInSec += seconds;
+				if (elapsedTimeInSec < 0.02f)
+					return;
+				elapsedTimeInSec = 0.0f;
+
+				const std::unordered_set<Missions::CndCloaked*> currentConditions(registeredConditions);
+				for (const auto& condition : currentConditions)
+				{
+					if (!registeredConditions.contains(condition))
+						continue;
+
+					bool matchFound = false;
+					struct PlayerData* playerData = 0;
+					while (playerData = Players.traverse_active(playerData))
+					{
+						if (condition->Matches(MissionObject(MissionObjectType::Client, playerData->iOnlineID)))
+						{
+							condition->ExecuteTrigger();
+							matchFound = true;
+							break;
+						}
+					}
+					if (!matchFound)
+					{
+						for (const uint objId : missions.at(condition->parent.missionId).objectIds)
+						{
+							if (condition->Matches(MissionObject(MissionObjectType::Object, objId)))
+							{
+								condition->ExecuteTrigger();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

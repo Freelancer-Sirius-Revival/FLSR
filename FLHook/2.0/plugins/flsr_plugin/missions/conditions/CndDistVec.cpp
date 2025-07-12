@@ -1,9 +1,10 @@
 #include "CndDistVec.h"
 #include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndDistVec*> distVecConditions;
+	std::unordered_set<CndDistVec*> registeredConditions;
 
 	CndDistVec::CndDistVec(const ConditionParent& parent,
 							const uint objNameOrLabel,
@@ -26,66 +27,133 @@ namespace Missions
 
 	void CndDistVec::Register()
 	{
-		distVecConditions.insert(this);
+		registeredConditions.insert(this);
 	}
 
 	void CndDistVec::Unregister()
 	{
-		distVecConditions.erase(this);
+		registeredConditions.erase(this);
 	}
-
-	static bool IsInside(const DistVecMatchEntry& entry, const CndDistVec& condition)
+	
+	bool CndDistVec::IsDistanceMatching(uint objId)
 	{
-		const bool inside = condition.distance - HkDistance3D(condition.position, entry.position) > 0.0f;
-		return (condition.condition == CndDistVec::DistanceCondition::Inside && inside) || (condition.condition == CndDistVec::DistanceCondition::Outside && !inside);
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (!GetShipInspect(objId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
+			return false;
+		const bool inside = distance - HkDistance3D(position, inspect->cobj->vPos) > 0.0f;
+		return (condition == CndDistVec::DistanceCondition::Inside && inside) || (condition == CndDistVec::DistanceCondition::Outside && !inside);
 	}
 
-	bool CndDistVec::Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId)
+	bool CndDistVec::Matches(const MissionObject& object)
 	{
 		const auto& mission = missions.at(parent.missionId);
-		std::unordered_set<uint> validClientIds;
-		std::unordered_set<uint> validObjIds;
-		bool strangerRequested = objNameOrLabel == Stranger;
-		if (strangerRequested)
+		if (object.type == MissionObjectType::Client && objNameOrLabel == Stranger && !mission.clientIds.contains(object.id))
 		{
-			validClientIds = mission.clientIds;
-		}
-		else if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
-		{
-			validObjIds.insert(objectByName->second);
-		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
-		{
-			for (const auto& object : objectsByLabel->second)
+			uint shipId;
+			pub::Player::GetShip(object.id, shipId);
+			if (shipId && IsDistanceMatching(shipId))
 			{
-				if (object.type == MissionObjectType::Client)
-					validClientIds.insert(object.id);
-				else
-					validObjIds.insert(object.id);
-			}
-		}
-		
-		for (const auto& entry : clientsByClientId)
-		{
-			if (entry.second.systemId == systemId && ((strangerRequested && !validClientIds.contains(entry.first)) || (!strangerRequested && validClientIds.contains(entry.first))) && IsInside(entry.second, *this))
-			{
-				activator.type = MissionObjectType::Client;
-				activator.id = entry.first;
+				activator = object;
 				return true;
 			}
+			return false;
 		}
-		if (!strangerRequested)
+
+		if ((object.type == MissionObjectType::Client && !mission.clientIds.contains(object.id)) ||
+			(object.type == MissionObjectType::Object && !mission.objectIds.contains(object.id)))
 		{
-			for (const auto& entry : objectsByObjId)
+			return false;
+		}
+
+		if (object.type == MissionObjectType::Object)
+		{
+			if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				if (entry.second.systemId == systemId && validObjIds.contains(entry.first) && IsInside(entry.second, *this))
+				if (objectByName->second == object.id && IsDistanceMatching(object.id))
 				{
-					activator.type = MissionObjectType::Object;
-					activator.id = entry.first;
+					activator = object;
 					return true;
+				}
+				return false;
+			}
+		}
+		if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		{
+			for (const auto& labelObject : objectsByLabel->second)
+			{
+				if (object == labelObject)
+				{
+					if (object.type == MissionObjectType::Client)
+					{
+						uint shipId;
+						pub::Player::GetShip(object.id, shipId);
+						if (shipId && IsDistanceMatching(shipId))
+						{
+							activator = object;
+							return true;
+						}
+						return false;
+					}
+					else
+					{
+						if (IsDistanceMatching(object.id))
+						{
+							activator = object;
+							return true;
+						}
+						return false;
+					}
 				}
 			}
 		}
 		return false;
+	}
+
+	namespace Hooks
+	{
+		namespace CndDistVec
+		{
+			float elapsedTimeInSec = 0.0f;
+			void __stdcall Elapse_Time_AFTER(float seconds)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				elapsedTimeInSec += seconds;
+				if (elapsedTimeInSec < 0.02f)
+					return;
+				elapsedTimeInSec = 0.0f;
+
+				const std::unordered_set<Missions::CndDistVec*> currentConditions(registeredConditions);
+				for (const auto& condition : currentConditions)
+				{
+					if (!registeredConditions.contains(condition))
+						continue;
+
+					bool matchFound = false;
+					struct PlayerData* playerData = 0;
+					while (playerData = Players.traverse_active(playerData))
+					{
+						if (condition->Matches(MissionObject(MissionObjectType::Client, playerData->iOnlineID)))
+						{
+							condition->ExecuteTrigger();
+							matchFound = true;
+							break;
+						}
+					}
+					if (!matchFound)
+					{
+						for (const uint objId : missions.at(condition->parent.missionId).objectIds)
+						{
+							if (condition->Matches(MissionObject(MissionObjectType::Object, objId)))
+							{
+								condition->ExecuteTrigger();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

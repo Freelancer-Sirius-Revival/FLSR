@@ -220,13 +220,13 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Explode|Silent|All] :All` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Silent`) or whatever reason (`All`).
     1. `[STRING]` Object by name or label that must be the killer.
 - `Cnd_DistVec` Distance from a vector in space.
-    1. `Inside|Outside :Inside` Whether the objects must be within or outside this distance.
     1. `STRING|Stranger` Object by name or label to expect within the distance.
     1. `FLOAT :0` The x-axis position for this volume.
     1. `FLOAT :0` The y-axis position for this volume.
     1. `FLOAT :0` The z-axis position for this volume.
     1. `FLOAT :0` The distance from the given position to check.
     1. `STRING` The system nickname to place this volume into.
+    1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 - `Cnd_SpaceEnter` Only for players. Undocking from bases or spawning into space. Not jumping.
     1. `STRING|Stranger` The players  to await spawning into space.
     1. `[STRING] :any` The system nickname the player spawns into.

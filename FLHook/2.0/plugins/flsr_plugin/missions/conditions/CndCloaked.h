@@ -14,7 +14,7 @@ namespace Missions
 		~CndCloaked();
 		void Register();
 		void Unregister();
-		bool Matches(const MissionObject object);
+		bool Matches(const MissionObject& object);
 	};
 
 	namespace Hooks

@@ -8,6 +8,8 @@ namespace Missions
 {
 	class CndDistVecGoto : public CndDistVec
 	{
+	private:
+		const uint objNameOrLabel;
 	public:
 		CndDistVecGoto(const ConditionParent& parent,
 						const uint objNameOrLabel,
@@ -15,7 +17,8 @@ namespace Missions
 						const Vector& position,
 						const float distance,
 						const uint systemId) :
-			CndDistVec(parent, objNameOrLabel, condition, position, distance, systemId)
+			CndDistVec(parent, objNameOrLabel, condition, position, distance, systemId),
+			objNameOrLabel(objNameOrLabel)
 		{}
 
 		void ExecuteTrigger()

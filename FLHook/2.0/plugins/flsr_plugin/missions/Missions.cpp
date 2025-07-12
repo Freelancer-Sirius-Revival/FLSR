@@ -5,9 +5,6 @@
 #include "Missions.h"
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndDestroyed.h"
-#include "Conditions/CndDistVec.h"
-#include "Conditions/CndSpaceExit.h"
-#include "Conditions/CndTimer.h"
 #include "Conditions/CndCount.h"
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
@@ -425,25 +422,6 @@ namespace Missions
 
 								if (objNameOrLabel)
 									condition = ConditionPtr(new CndDestroyed(conditionParent, objNameOrLabel, reason, killerNameOrLabel, targetCount));
-							}
-							else if (ini.is_value("Cnd_DistVec"))
-							{
-								uint objNameOrLabel = 0;
-								CndDistVec::DistanceCondition reason = CndDistVec::DistanceCondition::Inside;
-								Vector position;
-								float distance = 0;
-								uint systemId = 0;
-
-								reason = ToLower(ini.get_value_string(0)) == "outside" ? CndDistVec::DistanceCondition::Outside : CndDistVec::DistanceCondition::Inside;
-								objNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
-								position.x = ini.get_value_float(2);
-								position.y = ini.get_value_float(3);
-								position.z = ini.get_value_float(4);
-								distance = ini.get_value_float(5);
-								systemId = CreateIdOrNull(ini.get_value_string(6));
-
-								if (objNameOrLabel && systemId && distance > 0)
-									condition = ConditionPtr(new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId));
 							}
 							else if (ini.is_value("Cnd_Count"))
 							{
@@ -966,73 +944,6 @@ namespace Missions
 		for (const auto& cnd : fulfilledDestructions)
 		{
 			if (const auto& foundCondition = destroyedConditions.contains(cnd))
-				cnd->ExecuteTrigger();
-		}
-	}
-
-	float elapsedTimeInSec = 0.0f;
-	void __stdcall Elapse_Time_AFTER(float seconds)
-	{
-		returncode = DEFAULT_RETURNCODE;
-
-		elapsedTimeInSec += seconds;
-		if (elapsedTimeInSec < 0.02f)
-			return;
-		elapsedTimeInSec = 0.0f;
-
-		if (distVecConditions.empty())
-			return;
-		
-		std::unordered_map<uint, DistVecMatchEntry> clientsByClientId;
-		std::unordered_map<uint, DistVecMatchEntry> objectsByObjId;
-		for (const auto cnd : distVecConditions)
-		{
-			const bool strangerRequested = cnd->objNameOrLabel == Stranger;
-			if (strangerRequested || !missions.at(cnd->parent.missionId).clientIds.empty())
-			{
-				struct PlayerData* playerData = 0;
-				while (playerData = Players.traverse_active(playerData))
-				{
-					if (clientsByClientId.contains(playerData->iOnlineID) || (!strangerRequested && !missions.at(cnd->parent.missionId).clientIds.contains(playerData->iOnlineID)))
-						continue;
-
-					uint shipId;
-					pub::Player::GetShip(playerData->iOnlineID, shipId);
-					if (shipId)
-					{
-						IObjRW* inspect;
-						StarSystem* starSystem;
-						if (!GetShipInspect(shipId, inspect, starSystem))
-							continue;
-						DistVecMatchEntry entry;
-						entry.systemId = inspect->cobj->system;
-						entry.position = inspect->cobj->vPos;
-						clientsByClientId[playerData->iOnlineID] = entry;
-					}
-				}
-			}
-			if (!strangerRequested)
-			{
-				for (uint objId : missions.at(cnd->parent.missionId).objectIds)
-				{
-					if (objectsByObjId.contains(objId))
-						continue;
-					IObjRW* inspect;
-					StarSystem* starSystem;
-					if (!GetShipInspect(objId, inspect, starSystem))
-						continue;
-					DistVecMatchEntry entry;
-					entry.systemId = inspect->cobj->system;
-					entry.position = inspect->cobj->vPos;
-					objectsByObjId[objId] = entry;
-				}
-			}
-		}
-
-		const std::unordered_set<CndDistVec*> distVecConditionsCopy(distVecConditions);
-		for (const auto& cnd : distVecConditionsCopy)
-		{
-			if (const auto& foundCondition = distVecConditions.find(cnd); foundCondition != distVecConditions.end() && cnd->Matches(clientsByClientId, objectsByObjId))
 				cnd->ExecuteTrigger();
 		}
 	}

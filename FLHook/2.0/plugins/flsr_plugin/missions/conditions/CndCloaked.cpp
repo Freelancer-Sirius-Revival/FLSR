@@ -36,7 +36,7 @@ namespace Missions
 		return reinterpret_cast<CEqObj*>(inspect->cobj)->get_cloak_percentage() > 0.9f;
 	}
 
-	bool CndCloaked::Matches(const MissionObject object)
+	bool CndCloaked::Matches(const MissionObject& object)
 	{
 		const auto& mission = missions.at(parent.missionId);
 		if (object.type == MissionObjectType::Client && objNameOrLabel == Stranger && !mission.clientIds.contains(object.id))

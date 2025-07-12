@@ -3,12 +3,6 @@
 
 namespace Missions
 {
-	struct DistVecMatchEntry
-	{
-		uint systemId;
-		Vector position;
-	};
-
 	class CndDistVec : public Condition
 	{
 	public:
@@ -18,12 +12,14 @@ namespace Missions
 			Outside
 		};
 
-	//private:
+	private:
 		const uint objNameOrLabel;
 		const DistanceCondition condition;
 		const Vector position;
 		const float distance;
 		const uint systemId;
+
+		bool IsDistanceMatching(uint objId);
 
 	public:
 		CndDistVec(const ConditionParent& parent,
@@ -35,8 +31,14 @@ namespace Missions
 		~CndDistVec();
 		void Register();
 		void Unregister();
-		bool Matches(const std::unordered_map<uint, DistVecMatchEntry>& clientsByClientId, const std::unordered_map<uint, DistVecMatchEntry>& objectsByObjId);
+		bool Matches(const MissionObject& object);
 	};
 
-	extern std::unordered_set<CndDistVec*> distVecConditions;
+	namespace Hooks
+	{
+		namespace CndDistVec
+		{
+			void __stdcall Elapse_Time_AFTER(float seconds);
+		}
+	}
 }

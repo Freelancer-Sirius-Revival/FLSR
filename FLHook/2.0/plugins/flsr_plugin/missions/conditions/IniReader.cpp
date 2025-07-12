@@ -1,6 +1,7 @@
 #include "IniReader.h"
 #include "CndBaseEnter.h"
 #include "CndCloaked.h"
+#include "CndDistVec.h"
 #include "CndProjHitCount.h"
 #include "CndSpaceEnter.h"
 #include "CndSpaceExit.h"
@@ -24,18 +25,13 @@ namespace Missions
 		uint baseId = 0;
 
 		uint argNum = 0;
-		if (ini.get_num_parameters() > argNum)
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
 		{
-			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
-			if (value != 0)
-				label = value;
-			else
-			{
-				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target label. Aborting!");
-				return nullptr;
-			}
-			argNum++;
+			PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
@@ -43,7 +39,7 @@ namespace Missions
 			if (value != 0)
 				baseId = value;
 			else
-				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"No target base. Defaulting to any base.");
+				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"Invalid target base. Defaulting to any base.");
 		}
 
 		return new CndBaseEnter(conditionParent, label, baseId);
@@ -55,23 +51,78 @@ namespace Missions
 		bool cloaked = false;
 
 		uint argNum = 0;
-		if (ini.get_num_parameters() > argNum)
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
 		{
-			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
-			if (value != 0)
-				objNameOrLabel = value;
-			else
-			{
-				PrintErrorToConsole(L"Cnd_Cloaked", conditionParent, argNum, L"No target label. Aborting!");
-				return nullptr;
-			}
-			argNum++;
+			PrintErrorToConsole(L"Cnd_Cloaked", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 			cloaked = ini.get_value_bool(argNum);
 
 		return new CndCloaked(conditionParent, objNameOrLabel, cloaked);
+	}
+
+	static CndDistVec* ReadCndDistVec(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		CndDistVec::DistanceCondition reason = CndDistVec::DistanceCondition::Inside;
+		Vector position;
+		float distance = 0;
+		uint systemId = 0;
+
+		uint argNum = 0;
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum + 2)
+		{
+			position.x = ini.get_value_float(argNum);
+			position.y = ini.get_value_float(argNum + 1);
+			position.z = ini.get_value_float(argNum + 2);
+		}
+		else
+		{
+			PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"No position vector. Aborting!");
+			return nullptr;
+		}
+		argNum += 3;
+
+		if (ini.get_num_parameters() > argNum)
+			distance = ini.get_value_float(argNum);
+		else
+		{
+			PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"No distance. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		systemId = CreateIdOrNull(ini.get_value_string(argNum));
+		if (systemId == 0)
+		{
+			PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"No system. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "outside")
+				reason = CndDistVec::DistanceCondition::Outside;
+			else if (value != "inside")
+				PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"Invalid distance relation. Must be INSIDE, or OUTSIDE. Defaulting to INSIDE.");
+			argNum++;
+		}
+
+		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId);
 	}
 
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -83,18 +134,13 @@ namespace Missions
 		uint inflictorObjNameOrLabel = 0;
 
 		uint argNum = 0;
-		if (ini.get_num_parameters() > argNum)
+		damagedObjNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (damagedObjNameOrLabel == 0)
 		{
-			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
-			if (value != 0)
-				damagedObjNameOrLabel = value;
-			else
-			{
-				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"No target obj name or label. Aborting!");
-				return nullptr;
-			}
-			argNum++;
+			PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
@@ -114,7 +160,7 @@ namespace Missions
 			else if (value == "shield")
 				targetSurface = CndProjHitCount::DamagedSurface::Shield;
 			else if (value != "any")
-				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage surface. Must be ANY, HULL, SHIELD. Defaulting to ANY.");
+				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage surface. Must be ANY, HULL, or SHIELD. Defaulting to ANY.");
 			argNum++;
 		}
 
@@ -126,7 +172,7 @@ namespace Missions
 			else if (value == "explosion")
 				damageType = CndProjHitCount::DamageType::Explosion;
 			else if (value != "any")
-				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage type. Must be ANY, PROJECTILE, EXPLOSION. Defaulting to ANY.");
+				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage type. Must be ANY, PROJECTILE, or EXPLOSION. Defaulting to ANY.");
 			argNum++;
 		}
 
@@ -136,7 +182,7 @@ namespace Missions
 			if (value != 0)
 				inflictorObjNameOrLabel = value;
 			else
-				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"No damage inflictor obj name or label. Defaulting to all mission objects.");
+				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage inflictor obj name or label. Defaulting to all mission objects.");
 			argNum++;
 		}
 
@@ -149,18 +195,13 @@ namespace Missions
 		uint systemId = 0;
 
 		uint argNum = 0;
-		if (ini.get_num_parameters() > argNum)
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
 		{
-			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
-			if (value != 0)
-				label = value;
-			else
-			{
-				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target label. Aborting!");
-				return nullptr;
-			}
-			argNum++;
+			PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
@@ -168,7 +209,7 @@ namespace Missions
 			if (value != 0)
 				systemId = value;
 			else
-				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target system. Defaulting to any system.");
+				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
 		return new CndSpaceEnter(conditionParent, label, systemId);
@@ -180,18 +221,13 @@ namespace Missions
 		uint systemId = 0;
 
 		uint argNum = 0;
-		if (ini.get_num_parameters() > argNum)
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
 		{
-			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
-			if (value != 0)
-				label = value;
-			else
-			{
-				PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"No target label. Aborting!");
-				return nullptr;
-			}
-			argNum++;
+			PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
@@ -199,7 +235,7 @@ namespace Missions
 			if (value != 0)
 				systemId = value;
 			else
-				PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"No target system. Defaulting to any system.");
+				PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
 		return new CndSpaceExit(conditionParent, label, systemId);
@@ -240,6 +276,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_Cloaked"))
 			return ReadCndCloaked(conditionParent, ini);
+
+		if (ini.is_value("Cnd_DistVec"))
+			return ReadCndDistVec(conditionParent, ini);
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);

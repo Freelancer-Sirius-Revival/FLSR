@@ -217,7 +217,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` can be the server when objects get despawned.
     1. `STRING|Stranger` Object by name or label to await the destruction of.
     1. `[INTEGER] :0` The specific count of objects that must be destroyed to meet this condition. Any negative value will make this wait until all occurances of the objects are destroyed.
-    1. `[Explode|Silent|All] :All` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Silent`) or whatever reason (`All`).
+    1. `[Explode|Vanish|Any] :Any` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Vanish`) or whatever reason (`Any`).
     1. `[STRING]` Object by name or label that must be the killer.
 - `Cnd_DistVec` Distance from a vector in space.
     1. `STRING|Stranger` Object by name or label to expect within the distance.

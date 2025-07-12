@@ -1,9 +1,10 @@
 #include "CndDestroyed.h"
 #include "../Mission.h"
+#include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndDestroyed*> destroyedConditions;
+	std::unordered_set<CndDestroyed*> registeredConditions;
 
 	CndDestroyed::CndDestroyed(const ConditionParent& parent,
 								const uint objNameOrLabel,
@@ -26,12 +27,12 @@ namespace Missions
 	void CndDestroyed::Register()
 	{
 		currentCount = 0;
-		destroyedConditions.insert(this);
+		registeredConditions.insert(this);
 	}
 
 	void CndDestroyed::Unregister()
 	{
-		destroyedConditions.erase(this);
+		registeredConditions.erase(this);
 	}
 
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
@@ -124,5 +125,23 @@ namespace Missions
 		}
 
 		return false;
+	}
+
+	namespace Hooks
+	{
+		namespace CndDestroyed
+		{
+			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				const std::unordered_set<Missions::CndDestroyed*> currentConditions(registeredConditions);
+				for (const auto& condition : currentConditions)
+				{
+					if (registeredConditions.contains(condition) && condition->Matches(killedObject, killed, killerId))
+						condition->ExecuteTrigger();
+				}
+			}
+		}
 	}
 }

@@ -1,6 +1,7 @@
 #include "IniReader.h"
 #include "CndBaseEnter.h"
 #include "CndCloaked.h"
+#include "CndDestroyed.h"
 #include "CndDistVec.h"
 #include "CndProjHitCount.h"
 #include "CndSpaceEnter.h"
@@ -65,6 +66,49 @@ namespace Missions
 		return new CndCloaked(conditionParent, objNameOrLabel, cloaked);
 	}
 
+	static CndDestroyed* ReadCndDestroyed(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		CndDestroyed::DestroyCondition reason = CndDestroyed::DestroyCondition::Any;
+		uint killerNameOrLabel = 0;
+		int targetCount = -1;
+
+		uint argNum = 0;
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_Destroyed", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+			targetCount = ini.get_value_int(argNum++);
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "explode")
+				reason = CndDestroyed::DestroyCondition::Explode;
+			else if (value == "vanish")
+				reason = CndDestroyed::DestroyCondition::Vanish;
+			else if (value != "any")
+				PrintErrorToConsole(L"Cnd_Destroyed", conditionParent, argNum, L"Invalid destruction type. Must be EXPLODE, VANISH, or ANY. Defaulting to ANY.");
+			argNum++;
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				killerNameOrLabel = value;
+			else
+				PrintErrorToConsole(L"Cnd_Destroyed", conditionParent, argNum, L"Invalid killer obj name or label. Defaulting to all mission objects.");
+		}
+
+		return new CndDestroyed(conditionParent, objNameOrLabel, reason, killerNameOrLabel, targetCount);
+	}
+
 	static CndDistVec* ReadCndDistVec(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
@@ -119,7 +163,6 @@ namespace Missions
 				reason = CndDistVec::DistanceCondition::Outside;
 			else if (value != "inside")
 				PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"Invalid distance relation. Must be INSIDE, or OUTSIDE. Defaulting to INSIDE.");
-			argNum++;
 		}
 
 		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId);
@@ -183,7 +226,6 @@ namespace Missions
 				inflictorObjNameOrLabel = value;
 			else
 				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage inflictor obj name or label. Defaulting to all mission objects.");
-			argNum++;
 		}
 
 		return new CndProjHitCount(conditionParent, damagedObjNameOrLabel, targetSurface, damageType, targetHitCount, inflictorObjNameOrLabel);
@@ -276,6 +318,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_Cloaked"))
 			return ReadCndCloaked(conditionParent, ini);
+
+		if (ini.is_value("Cnd_Destroyed"))
+			return ReadCndDestroyed(conditionParent, ini);
 
 		if (ini.is_value("Cnd_DistVec"))
 			return ReadCndDistVec(conditionParent, ini);

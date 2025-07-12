@@ -1,5 +1,4 @@
 #pragma once
-#include <FLHook.h>
 #include "Condition.h"
 
 namespace Missions
@@ -34,5 +33,11 @@ namespace Missions
 		bool Matches(const IObjRW* killedObject, const bool killed, const uint killerId);
 	};
 
-	extern std::unordered_set<CndDestroyed*> destroyedConditions;
+	namespace Hooks
+	{
+		namespace CndDestroyed
+		{
+			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId);
+		}
+	}
 }

@@ -4,7 +4,6 @@
 #include "LootProps.h"
 #include "Missions.h"
 #include "Conditions/CndTrue.h"
-#include "Conditions/CndDestroyed.h"
 #include "Conditions/CndCount.h"
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
@@ -401,27 +400,6 @@ namespace Missions
 							else if (ini.is_value("Cnd_True"))
 							{
 								condition = ConditionPtr(new CndTrue(conditionParent));
-							}
-							else if (ini.is_value("Cnd_Destroyed"))
-							{
-								uint objNameOrLabel = 0;
-								CndDestroyed::DestroyCondition reason = CndDestroyed::DestroyCondition::Any;
-								uint killerNameOrLabel = 0;
-								int targetCount = -1;
-
-								objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
-								targetCount = ini.get_value_int(1);
-								const std::string val = ToLower(ini.get_value_string(2));
-								if (val == "explode")
-									reason = CndDestroyed::DestroyCondition::Explode;
-								else if (val == "silent")
-									reason = CndDestroyed::DestroyCondition::Vanish;
-								else
-									reason = CndDestroyed::DestroyCondition::Any;
-								killerNameOrLabel = std::strlen(ini.get_value_string(6)) ? CreateIdOrNull(ini.get_value_string(3)) : 0;
-
-								if (objNameOrLabel)
-									condition = ConditionPtr(new CndDestroyed(conditionParent, objNameOrLabel, reason, killerNameOrLabel, targetCount));
 							}
 							else if (ini.is_value("Cnd_Count"))
 							{
@@ -921,14 +899,6 @@ namespace Missions
 	{
 		returncode = DEFAULT_RETURNCODE;
 
-		std::vector<CndDestroyed*> fulfilledDestructions;
-		// Copy the original list because it might be modified implicitely by the following code
-		for (const auto& cnd : destroyedConditions)
-		{
-			if (cnd->Matches(killedObject, killed, killerId))
-				fulfilledDestructions.push_back(cnd);
-		}
-
 		if (killed)
 		{
 			// Manually care for destruction of custom-spawned NPC equipment and cargo. Otherwise they loot everything always.
@@ -939,13 +909,6 @@ namespace Missions
 		}
 
 		RemoveObjectFromMissions(killedObject->cobj->id);
-
-		// Execute those after the objects were unregistered from the mission. Otherwise e.g. respawning would be blocked because they "still exist".
-		for (const auto& cnd : fulfilledDestructions)
-		{
-			if (const auto& foundCondition = destroyedConditions.contains(cnd))
-				cnd->ExecuteTrigger();
-		}
 	}
 
 	std::unordered_map<uint, CHARACTER_ID> lastCharacterByClientId;

@@ -303,13 +303,6 @@ namespace Mark
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 }
 
-namespace SolarInvincibility
-{
-    void LoadSettings();
-    void Initialize();
-    void TryRegisterInvincibleSolar(const std::string& nickname, const uint spaceObjId);
-}
-
 namespace SolarSpawn
 {
     struct SolarArchetype

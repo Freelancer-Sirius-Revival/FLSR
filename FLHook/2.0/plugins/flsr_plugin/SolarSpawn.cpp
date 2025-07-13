@@ -283,7 +283,6 @@ namespace SolarSpawn
 
 		// Expects general nickname to identify the configs
 		Cloak::TryRegisterNoCloakSolar(archetype.nickname, spaceObjId);
-		SolarInvincibility::TryRegisterInvincibleSolar(archetype.nickname, spaceObjId);
 
 		// If any fallback solars exists for this base, destroy it.
 		for (const auto& solar : spawnedSolars)

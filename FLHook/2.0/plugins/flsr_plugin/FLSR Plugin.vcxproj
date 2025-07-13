@@ -187,7 +187,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
-    <ClCompile Include="SolarInvincibility.cpp" />
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="SpawnProtection.cpp" />
     <ClCompile Include="Storage.cpp" />

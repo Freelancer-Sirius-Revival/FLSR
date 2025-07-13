@@ -24,6 +24,7 @@
 #include "Actions/ActAddCargo.h"
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
+#include "Actions/ActInvulnerable.h"
 #include "Objectives/ObjGotoArch.h"
 #include "MissionBoard.h"
 
@@ -635,6 +636,18 @@ namespace Missions
 								action->reputation = ini.get_value_float(2);
 								actions.push_back(action);
 							}
+							else if (ini.is_value("Act_Invulnerable"))
+							{
+								ActInvulnerablePtr action(new ActInvulnerable());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									action->preventNonPlayerDamage = ini.get_value_bool(1);
+								if (ini.get_num_parameters() > 2)
+									action->preventPlayerDamage = ini.get_value_bool(2);
+								if (ini.get_num_parameters() > 3)
+									action->maxHpLossPercentage = ini.get_value_float(3);
+								actions.push_back(action);
+								}
 							else
 							{
 								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);

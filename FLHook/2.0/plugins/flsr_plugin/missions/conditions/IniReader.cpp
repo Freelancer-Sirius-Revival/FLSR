@@ -3,6 +3,7 @@
 #include "CndCloaked.h"
 #include "CndCount.h"
 #include "CndDestroyed.h"
+#include "CndDistObj.h"
 #include "CndDistVec.h"
 #include "CndHealthDec.h"
 #include "CndProjHitCount.h"
@@ -149,6 +150,51 @@ namespace Missions
 		}
 
 		return new CndDestroyed(conditionParent, objNameOrLabel, reason, killerNameOrLabel, targetCount);
+	}
+
+	static CndDistObj* ReadCndDistObj(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		CndDistObj::DistanceCondition reason = CndDistObj::DistanceCondition::Inside;
+		float distance = 0;
+		uint otherObjNameOrLabel = 0;
+
+		uint argNum = 0;
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		otherObjNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (otherObjNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"No other ship. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+			distance = ini.get_value_float(argNum);
+		else
+		{
+			PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"No distance. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "outside")
+				reason = CndDistObj::DistanceCondition::Outside;
+			else if (value != "inside")
+				PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"Invalid distance relation. Must be INSIDE, or OUTSIDE. Defaulting to INSIDE.");
+		}
+
+		return new CndDistObj(conditionParent, objNameOrLabel, reason, distance, otherObjNameOrLabel);
 	}
 
 	static CndDistVec* ReadCndDistVec(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -404,6 +450,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_Destroyed"))
 			return ReadCndDestroyed(conditionParent, ini);
+
+		if (ini.is_value("Cnd_DistObj"))
+			return ReadCndDistObj(conditionParent, ini);
 
 		if (ini.is_value("Cnd_DistVec"))
 			return ReadCndDistVec(conditionParent, ini);

@@ -265,8 +265,14 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Explode|Vanish|Any] :Any` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Vanish`) or whatever reason (`Any`).
     1. `[STRING]` Object by name or label that must be the killer.
 
+- `Cnd_DistObj` Distance to another object in space.
+    1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
+    1. `STRING` Other object by name or label to expect within the distance. Can be a static world solar.
+    1. `FLOAT :0` The distance from the given position to check.
+    1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
+
 - `Cnd_DistVec` Distance from a vector in space.
-    1. `STRING|Stranger` Object by name or label to expect within the distance.
+    1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
     1. `FLOAT :0` The x-axis position for this volume.
     1. `FLOAT :0` The y-axis position for this volume.
     1. `FLOAT :0` The z-axis position for this volume.
@@ -384,7 +390,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.
-    1. `STRING` Object by name to send this comm. Must have a voice defined. Cannot be a player.
+    1. `STRING` Object by name to send this comm. Can be a static world solar. Must have a voice defined. Cannot be a player.
     1. `STRING` Multiple subsequent entries possible. Must be one of the defined voice’s sound messages. 
     1. `[FLOAT] : 0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.

@@ -160,6 +160,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActRemoveLabel.cpp" />
     <ClCompile Include="missions\actions\ActSendComm.cpp" />
     <ClCompile Include="missions\actions\ActSetNNObj.cpp" />
+    <ClCompile Include="missions\actions\ActSpawnFormation.cpp" />
     <ClCompile Include="missions\actions\ActSpawnShip.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\actions\ActSetVibe.cpp" />
@@ -177,6 +178,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
     <ClCompile Include="missions\conditions\Condition.cpp" />
     <ClCompile Include="missions\conditions\IniReader.cpp" />
+    <ClCompile Include="missions\Formations.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
@@ -219,6 +221,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActRemoveLabel.h" />
     <ClInclude Include="missions\actions\ActSendComm.h" />
     <ClInclude Include="missions\actions\ActSetNNObj.h" />
+    <ClInclude Include="missions\actions\ActSpawnFormation.h" />
     <ClInclude Include="missions\actions\ActSpawnShip.h" />
     <ClInclude Include="missions\actions\ActSpawnSolar.h" />
     <ClInclude Include="missions\actions\ActSetVibe.h" />
@@ -236,11 +239,13 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />
     <ClInclude Include="missions\conditions\IniReader.h" />
+    <ClInclude Include="missions\Formations.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionBoard.h" />
     <ClInclude Include="missions\MissionObject.h" />
     <ClInclude Include="missions\MissionOffer.h" />
     <ClInclude Include="missions\Missions.h" />
+    <ClInclude Include="missions\MsnFormation.h" />
     <ClInclude Include="missions\MsnSolar.h" />
     <ClInclude Include="missions\Npc.h" />
     <ClInclude Include="missions\NpcNames.h" />

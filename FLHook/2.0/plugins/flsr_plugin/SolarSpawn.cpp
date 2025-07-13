@@ -160,9 +160,7 @@ namespace SolarSpawn
 				if (ini.is_header("Solar"))
 				{
 					SolarArchetype solar;
-					solar.position.x = 0;
-					solar.position.y = 0;
-					solar.position.z = 0;
+					solar.position = { 0, 0, 0 };
 					solar.orientation = EulerMatrix(solar.position);
 
 					while (ini.read_value())

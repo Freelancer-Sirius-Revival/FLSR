@@ -151,7 +151,7 @@ This is the definition for a NPC archetype which again can be used by multiple `
 
 ## `[MsnNpc]`
 
-This is the definition for a single NPC for the mission. Multiple `MsnSolar` can be created for individual NPCs.
+This is the definition for a single NPC for the mission. Multiple `MsnNpc` can be created for individual NPCs.
 
 - `nickname` The object name of the NPC. Used by trigger conditions and actions.
     1. `STRING` The name. Must be unique in this mission.
@@ -186,6 +186,29 @@ This is the definition for a single NPC for the mission. Multiple `MsnSolar` can
 
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
+
+## `[MsnFormation]`
+
+This is the definition for an NPC formation. Multiple `MsnFormation` can be created for individual NPCs.
+
+- `nickname` The name of the formation. Used by trigger actions.
+    1. `STRING` The name. Must be unique in this mission.
+
+- `formation` The formation from `DATA/MISSIONS/formations.ini`.
+    1. `STRING` The formation name.
+
+- `ship` Multiple entries allowed. The ship to spawn. The order of these entries defines their position in the formation.
+    1. `STRING` The `MsnShip` nickname.
+
+- `position` Defines the position in space.
+    1. `FLOAT :0` The x-axis.
+    1. `FLOAT :0` The y-axis.
+    1. `FLOAT :0` The z-axis.
+
+- `[rotate]` Defines the rotation in space.
+    1. `FLOAT :0` The x-axis.
+    1. `FLOAT :0` The y-axis.
+    1. `FLOAT :0` The z-axis.
 
 ## `[ObjList]`
 
@@ -343,6 +366,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_SpawnShip` Spawns a ship. Only one instance of it can exist at the same time.
     1. `STRING` The `MsnNpc` nickname to spawn.
     1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
+    1. `[FLOAT] :0` Override for initial x-axis position.
+    1. `[FLOAT] :0` Override for initial y-axis position.
+    1. `[FLOAT] :0` Override for initial z-axis position.
+    1. `[FLOAT] :0` Override for initial x-axis rotation.
+    1. `[FLOAT] :0` Override for initial y-axis rotation.
+    1. `[FLOAT] :0` Override for initial z-axis rotation.
+
+- `Act_SpawnFormation` Spawns a formation of ships.
+    1. `STRING` The `MsnFormation` nickname to spawn.
     1. `[FLOAT] :0` Override for initial x-axis position.
     1. `[FLOAT] :0` Override for initial y-axis position.
     1. `[FLOAT] :0` Override for initial z-axis position.

@@ -324,9 +324,7 @@ namespace Cloak
 						{
 							NoCloakArea area;
 							area.objectId = CreateID(ini.get_value_string(0));
-							area.position.x = 0;
-							area.position.y = 0;
-							area.position.z = 0;
+							area.position = { 0, 0, 0 };
 							area.radius = ini.get_value_float(1);
 							area.NNVoiceMessageId = CreateID(ini.get_value_string(2));
 							noCloakObjectDefinitionsByNicknameId[area.objectId] = area;

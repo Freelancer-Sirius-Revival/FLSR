@@ -151,6 +151,12 @@
     <ClCompile Include="missions\conditions\CndDistObj.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\Formations.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnFormation.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -302,6 +308,15 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\CndDistObj.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MsnFormation.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Formations.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnFormation.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

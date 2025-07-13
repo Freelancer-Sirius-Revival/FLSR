@@ -2,6 +2,7 @@
 #include "Pilots.h"
 #include "Empathies.h"
 #include "GroupRep.h"
+#include "missions/Formations.h"
 #include "Missions/NpcNames.h"
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
@@ -28,6 +29,7 @@ void LoadSettings() {
 
     Pilots::ReadFiles();
     NpcNames::ReadFiles();
+    Formations::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];

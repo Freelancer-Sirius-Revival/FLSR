@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct Npc
 	{
-		std::string name = "";
+		uint id = 0;
 		uint archetypeId = 0;
 		uint loadoutId = 0;
 		std::string stateGraph = "";
@@ -18,7 +18,7 @@ namespace Missions
 
 	struct MsnNpc
 	{
-		std::string name = "";
+		uint id = 0;
 		uint npcId = 0;
 		uint idsName = 0;
 		uint systemId = 0;

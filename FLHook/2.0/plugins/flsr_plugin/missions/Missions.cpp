@@ -851,6 +851,8 @@ namespace Missions
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.");
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;
 		}
 		else if (IS_CMD("stop_mission"))
@@ -869,6 +871,8 @@ namespace Missions
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" ended.");
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;
 		}
 		else if (IS_CMD("reload_missions"))
@@ -885,6 +889,30 @@ namespace Missions
 			ClearMissions();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Stopped and reloaded all missions.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			return true;
+		}
+
+		else if (IS_CMD("getpos"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_SUPERADMIN))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			uint shipId;
+			pub::Player::GetShip(clientId, shipId);
+			IObjRW* inspect;
+			StarSystem* system;
+			if (shipId && GetShipInspect(shipId, inspect, system))
+				PrintUserCmdText(clientId, L"Pos: " + std::to_wstring(inspect->cobj->vPos.x) + L", " + std::to_wstring(inspect->cobj->vPos.y) + L", " + std::to_wstring(inspect->cobj->vPos.z));
+			else
+				PrintUserCmdText(clientId, L"You must be in space for that.");
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;

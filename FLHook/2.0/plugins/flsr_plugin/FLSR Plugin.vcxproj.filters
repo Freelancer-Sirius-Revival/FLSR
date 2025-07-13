@@ -145,6 +145,9 @@
     <ClCompile Include="missions\actions\ActInvulnerable.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndHealthDec.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -290,6 +293,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActInvulnerable.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHealthDec.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

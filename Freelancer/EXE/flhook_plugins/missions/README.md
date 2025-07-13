@@ -246,11 +246,13 @@ Only one condition must be present. If none is present, `Cnd_True` is used.
 
 The keyword `Stranger` is used to refer explicitely to all players not having a label assigned in this mission. It can be used in combination with action’s `Activator` to assign players to the mission.
 
-- `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be the server.
+- `Cnd_BaseEnter` Only for players. Landing or logging in to bases.
+    1. `STRING|Stranger` The players to await fully landing on a base.
+    1. `[STRING] :any` The base nickname the player lands on.
 
-- `Cnd_Timer` Waits until the time as passed. `Activator` will be the server.
-    1. `FLOAT` Lower limit of randomized time.
-    1. `[FLOAT] :0` Upper limit of randomized time. When not set or lower than the lower limit, the timer will always use a constant time of lthe lower limit.
+- `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
+    1. `STRING|Stranger` Object by name or label to watch cloaking state of.
+    1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
 
 - `Cnd_Count` Counts the objects from a label. `Activator` will be the server.
     1. `STRING` Objects by label to count.
@@ -272,6 +274,18 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING` The system nickname to place this volume into.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
+- `Cnd_HealthDec` When the hitpoints falls below a threshold.
+    1. `STRING|Stranger` Object by name or label to observe the hitpoints of.
+    1. `FLOAT :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
+    1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
+
+- `Cnd_ProjHitCount` Counts projectile hits to the target.
+    1. `STRING` Object by name or label to count projectile hits on.
+    1. `[INTEGER] :1` The count of projectile hits that must have happened.
+    1. `[Any|Hull|Shield] :Any` The surface the hit should be registered on.
+    1. `[Any|Projectile|Explosion] :Any` The damage type to register. `Any` means `Projectile` and `Explosion`.
+    1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
+
 - `Cnd_SpaceEnter` Only for players. Undocking from bases or spawning into space. Not jumping.
     1. `STRING|Stranger` The players  to await spawning into space.
     1. `[STRING] :any` The system nickname the player spawns into.
@@ -280,20 +294,11 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players to await despawning from space.
     1. `[STRING] :any` The system nickname the player despawns from.
 
-- `Cnd_BaseEnter` Only for players. Landing or logging in to bases.
-    1. `STRING|Stranger` The players to await fully landing on a base.
-    1. `[STRING] :any` The base nickname the player lands on.
+- `Cnd_Timer` Waits until the time as passed. `Activator` will be the server.
+    1. `FLOAT` Lower limit of randomized time.
+    1. `[FLOAT] :0` Upper limit of randomized time. When not set or lower than the lower limit, the timer will always use a constant time of lthe lower limit.
 
-- `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
-    1. `STRING|Stranger` Object by name or label to watch cloaking state of.
-    1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
-
-- `Cnd_ProjHitCount` Counts projectile hits to the target.
-    1. `STRING` Object by name or label to count projectile hits on.
-    1. `[INTEGER] :1` The count of projectile hits that must have happened.
-    1. `[Any|Hull|Shield] :Any` The surface the hit should be registered on.
-    1. `[Any|Projectile|Explosion] :Any` The damage type to register. `Any` means `Projectile` and `Explosion`.
-    1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
+- `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be the server.
 
 ### Actions
 

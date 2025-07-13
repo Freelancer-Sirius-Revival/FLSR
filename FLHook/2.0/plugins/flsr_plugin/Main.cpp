@@ -9,6 +9,7 @@
 #include "Missions/conditions/CndCloaked.h"
 #include "Missions/conditions/CndDestroyed.h"
 #include "Missions/conditions/CndDistVec.h"
+#include "Missions/conditions/CndHealthDec.h"
 #include "Missions/conditions/CndProjHitCount.h"
 #include "Missions/conditions/CndSpaceEnter.h"
 #include "Missions/conditions/CndSpaceExit.h"
@@ -257,6 +258,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDestroyed::ObjDestroyed, PLUGIN_SolarDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDestroyed::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDistVec::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipHullDamage, PLUGIN_ShipHullDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipEquipDamage, PLUGIN_ShipEquipDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipHullDamage, PLUGIN_ShipHullDmg, 0));

@@ -391,6 +391,21 @@ namespace Missions
 		if (objId)
 		{
 			mission.AddObject(objId, msnNpcId, msnNpcEntry->second.labels);
+
+			if (msnNpcEntry->second.startingObjId)
+			{
+				const auto& foundObjectEntry = mission.objectIdsByName.find(msnNpcEntry->second.startingObjId);
+				uint launchObjId = foundObjectEntry != mission.objectIdsByName.end() ? foundObjectEntry->second : msnNpcEntry->second.startingObjId;
+				IObjRW* inspect;
+				StarSystem* starSystem;
+				if (GetShipInspect(launchObjId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSOLAR_OBJECT) == CObject::CSOLAR_OBJECT)
+				{
+					const auto solarArchetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
+					if (solarArchetype->dockInfo.size() > 0)
+						pub::SpaceObj::Launch(objId, launchObjId, 0);
+				}
+			}
+
 			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
 			{
 				mission.objectivesByObjectId.try_emplace(objId, mission.id, objId, objectivesEntry->second.objectives);

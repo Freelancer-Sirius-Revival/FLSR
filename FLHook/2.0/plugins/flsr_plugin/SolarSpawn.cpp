@@ -160,9 +160,7 @@ namespace SolarSpawn
 				if (ini.is_header("Solar"))
 				{
 					SolarArchetype solar;
-					solar.position.x = 0;
-					solar.position.y = 0;
-					solar.position.z = 0;
+					solar.position = { 0, 0, 0 };
 					solar.orientation = EulerMatrix(solar.position);
 
 					while (ini.read_value())
@@ -283,7 +281,6 @@ namespace SolarSpawn
 
 		// Expects general nickname to identify the configs
 		Cloak::TryRegisterNoCloakSolar(archetype.nickname, spaceObjId);
-		SolarInvincibility::TryRegisterInvincibleSolar(archetype.nickname, spaceObjId);
 
 		// If any fallback solars exists for this base, destroy it.
 		for (const auto& solar : spawnedSolars)

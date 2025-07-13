@@ -3,7 +3,9 @@
 #include "CndCloaked.h"
 #include "CndCount.h"
 #include "CndDestroyed.h"
+#include "CndDistObj.h"
 #include "CndDistVec.h"
+#include "CndHealthDec.h"
 #include "CndProjHitCount.h"
 #include "CndSpaceEnter.h"
 #include "CndSpaceExit.h"
@@ -150,6 +152,51 @@ namespace Missions
 		return new CndDestroyed(conditionParent, objNameOrLabel, reason, killerNameOrLabel, targetCount);
 	}
 
+	static CndDistObj* ReadCndDistObj(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		CndDistObj::DistanceCondition reason = CndDistObj::DistanceCondition::Inside;
+		float distance = 0;
+		uint otherObjNameOrLabel = 0;
+
+		uint argNum = 0;
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		otherObjNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (otherObjNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"No other ship. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+			distance = ini.get_value_float(argNum);
+		else
+		{
+			PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"No distance. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "outside")
+				reason = CndDistObj::DistanceCondition::Outside;
+			else if (value != "inside")
+				PrintErrorToConsole(L"Cnd_DistObj", conditionParent, argNum, L"Invalid distance relation. Must be INSIDE, or OUTSIDE. Defaulting to INSIDE.");
+		}
+
+		return new CndDistObj(conditionParent, objNameOrLabel, reason, distance, otherObjNameOrLabel);
+	}
+
 	static CndDistVec* ReadCndDistVec(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
@@ -207,6 +254,44 @@ namespace Missions
 		}
 
 		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId);
+	}
+
+	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel;
+		float remainingHitpoints;
+		std::unordered_set<uint> colGrpIds;
+
+		uint argNum = 0;
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_HealthDec", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+			remainingHitpoints = ini.get_value_float(argNum);
+		else
+		{
+			PrintErrorToConsole(L"Cnd_HealthDec", conditionParent, argNum, L"No lost hitpoints threshold. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		for (int maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value == 0)
+				PrintErrorToConsole(L"Cnd_HealthDec", conditionParent, argNum, L"Invalid collision group name. Ignoring.");
+			else
+				colGrpIds.insert(value);
+		}
+		if (colGrpIds.empty())
+			colGrpIds.insert(RootGroup);
+
+		return new CndHealthDec(conditionParent, objNameOrLabel, remainingHitpoints, colGrpIds);
 	}
 
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -366,8 +451,14 @@ namespace Missions
 		if (ini.is_value("Cnd_Destroyed"))
 			return ReadCndDestroyed(conditionParent, ini);
 
+		if (ini.is_value("Cnd_DistObj"))
+			return ReadCndDistObj(conditionParent, ini);
+
 		if (ini.is_value("Cnd_DistVec"))
 			return ReadCndDistVec(conditionParent, ini);
+
+		if (ini.is_value("Cnd_HealthDec"))
+			return ReadCndHealthDec(conditionParent, ini);
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);

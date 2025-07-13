@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActSpawnShip : Action
 	{
-		std::string msnNpcName = "";
+		uint msnNpcId = 0;
 		uint objectivesId = 0;
 		Vector position = { std::numeric_limits<float>::infinity(), 0, 0 };
 		Matrix orientation = { { std::numeric_limits<float>::infinity(), 0, 0 } };

@@ -22,7 +22,6 @@
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
-    <ClCompile Include="SolarInvincibility.cpp" />
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
@@ -142,6 +141,21 @@
     </ClCompile>
     <ClCompile Include="missions\conditions\IniReader.cpp">
       <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActInvulnerable.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndHealthDec.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndDistObj.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\Formations.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnFormation.cpp">
+      <Filter>Missions\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -285,6 +299,24 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\IniReader.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActInvulnerable.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHealthDec.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndDistObj.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MsnFormation.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Formations.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnFormation.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

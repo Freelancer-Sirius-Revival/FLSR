@@ -339,7 +339,7 @@ namespace Missions
 		uint objId = TryCreateNpc(shipInfo);
 		if (objId == 0)
 		{
-			ConPrint(L"Error spawning MSN NPC Ship '" + stows(msnNpc.name) + L"' in system " + std::to_wstring(msnNpc.systemId) + L" at position " + std::to_wstring(msnNpc.position.x) + L", " + std::to_wstring(msnNpc.position.y) + L", " + std::to_wstring(msnNpc.position.z) + L"\n");
+			ConPrint(L"ERROR: MSN NPC " + std::to_wstring(msnNpc.id) + L" in system " + std::to_wstring(msnNpc.systemId) + L" at position " + std::to_wstring(msnNpc.position.x) + L", " + std::to_wstring(msnNpc.position.y) + L", " + std::to_wstring(msnNpc.position.z) + L"\n");
 			return 0;
 		}
 
@@ -370,32 +370,31 @@ namespace Missions
 
 	void ActSpawnShip::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		if (mission.objectIdsByName.contains(CreateID(msnNpcName.c_str())))
+		if (mission.objectIdsByName.contains(msnNpcId))
 			return;
 
-		for (const auto& msnNpc : mission.msnNpcs)
+		const auto& msnNpcEntry = mission.msnNpcs.find(msnNpcId);
+		if (msnNpcEntry == mission.msnNpcs.end())
 		{
-			if (msnNpc.name == msnNpcName)
+			ConPrint(L"ERROR: MSN NPC " + std::to_wstring(msnNpcId) + L" not found.\n");
+			return;
+		}
+
+		const auto& npcEntry = mission.npcs.find(msnNpcEntry->second.npcId);
+		if (npcEntry == mission.npcs.end())
+		{
+			ConPrint(L"ERROR: NPC " + std::to_wstring(msnNpcId) + L" not found.\n");
+			return;
+		}
+
+		const uint objId = CreateNPC(*this, msnNpcEntry->second, npcEntry->second);
+		if (objId)
+		{
+			mission.AddObject(objId, msnNpcId, msnNpcEntry->second.labels);
+			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
 			{
-				for (const auto& npc : mission.npcs)
-				{
-					if (CreateID(npc.name.c_str()) == msnNpc.npcId)
-					{
-						const uint objId = CreateNPC(*this, msnNpc, npc);
-						if (objId)
-						{
-							mission.AddObject(objId, CreateID(msnNpc.name.c_str()), msnNpc.labels);
-							if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
-							{
-								mission.objectivesByObjectId.try_emplace(objId, mission.id, objId, objectivesEntry->second.objectives);
-								mission.objectivesByObjectId.at(objId).Progress();
-							}
-							return;
-						}
-						break;
-					}
-				}
-				break;
+				mission.objectivesByObjectId.try_emplace(objId, mission.id, objId, objectivesEntry->second.objectives);
+				mission.objectivesByObjectId.at(objId).Progress();
 			}
 		}
 	}

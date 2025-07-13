@@ -3,6 +3,7 @@
 #include "MissionObject.h"
 #include "MissionOffer.h"
 #include "MsnSolar.h"
+#include "MsnFormation.h"
 #include "Npc.h"
 #include "Objectives/Objectives.h"
 
@@ -29,8 +30,9 @@ namespace Missions
 
 		std::vector<Trigger> triggers;
 		std::vector<MsnSolar> solars;
-		std::vector<Npc> npcs;
-		std::vector<MsnNpc> msnNpcs;
+		std::unordered_map<uint, Npc> npcs;
+		std::unordered_map<uint, MsnNpc> msnNpcs;
+		std::unordered_map<uint, MsnFormation> formations;
 		std::unordered_map<uint, ObjectivesArchetype> objectives;
 
 		std::unordered_map<uint, uint> objectIdsByName;

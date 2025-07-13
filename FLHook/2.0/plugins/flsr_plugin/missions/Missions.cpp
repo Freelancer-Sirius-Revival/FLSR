@@ -12,6 +12,7 @@
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActSpawnShip.h"
+#include "Actions/ActSpawnFormation.h"
 #include "Actions/ActEndMission.h"
 #include "Actions/ActDestroy.h"
 #include "Actions/ActPlaySoundEffect.h"
@@ -24,6 +25,7 @@
 #include "Actions/ActAddCargo.h"
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
+#include "Actions/ActInvulnerable.h"
 #include "Objectives/ObjGotoArch.h"
 #include "MissionBoard.h"
 
@@ -127,39 +129,48 @@ namespace Missions
 					if (missions.empty())
 						continue;
 
+					if (ini.is_header("MsnFormation"))
+					{
+						MsnFormation formation;
+						formation.position = { 0, 0, 0 };
+						formation.rotation = { 0, 0, 0 };
+
+						while (ini.read_value())
+						{
+							if (ini.is_value("nickname"))
+								formation.id = CreateIdOrNull(ini.get_value_string(0));
+							else if (ini.is_value("position"))
+								formation.position = ini.get_vector();
+							else if (ini.is_value("rotate"))
+								formation.rotation = ini.get_vector();
+							else if (ini.is_value("formation"))
+								formation.formationId = CreateIdOrNull(ini.get_value_string(0));
+							else if (ini.is_value("ship"))
+								formation.msnShipIds.push_back(CreateIdOrNull(ini.get_value_string(0)));
+						}
+						if (formation.id && formation.formationId && !formation.msnShipIds.empty())
+							missions.at(lastMissionId).formations.insert({ formation.id, formation });
+					}
+
 					if (ini.is_header("Npc"))
 					{
 						Npc npc;
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-							{
-								npc.name = ToLower(ini.get_value_string(0));
-							}
+								npc.id = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("archetype"))
-							{
 								npc.archetypeId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("loadout"))
-							{
 								npc.loadoutId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("state_graph"))
-							{
 								npc.stateGraph = ToLower(ini.get_value_string(0));
-							}
 							else if (ini.is_value("faction"))
-							{
 								npc.faction = ini.get_value_string(0);
-							}
 							else if (ini.is_value("pilot"))
-							{
 								npc.pilotId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("voice"))
-							{
 								npc.voiceId = CreateIdOrNull(ini.get_value_string(0));
-							}
 							else if (ini.is_value("space_costume"))
 							{
 								npc.costume.head = CreateIdOrNull(ini.get_value_string(0));
@@ -175,26 +186,22 @@ namespace Missions
 								}
 							}
 							else if (ini.is_value("level"))
-							{
 								npc.level = ini.get_value_int(0);
-							}
 						}
-						if (npc.archetypeId && !npc.name.empty() && !npc.stateGraph.empty())
-							missions.at(lastMissionId).npcs.push_back(npc);
+						if (npc.id && npc.archetypeId && !npc.stateGraph.empty())
+							missions.at(lastMissionId).npcs.insert({ npc.id, npc });
 					}
 
 					if (ini.is_header("MsnNpc"))
 					{
 						MsnNpc npc;
-						npc.position.x = 0;
-						npc.position.y = 0;
-						npc.position.z = 0;
+						npc.position = { 0, 0, 0 };
 						npc.orientation = EulerMatrix(npc.position);
 
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-								npc.name = ToLower(ini.get_value_string(0));
+								npc.id = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("string_id"))
 								npc.idsName = ini.get_value_int(0);
 							else if (ini.is_value("system"))
@@ -214,16 +221,14 @@ namespace Missions
 							else if (ini.is_value("label"))
 								npc.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
 						}
-						if (npc.npcId && !npc.name.empty() && npc.systemId)
-							missions.at(lastMissionId).msnNpcs.push_back(npc);
+						if (npc.id && npc.npcId && npc.systemId)
+							missions.at(lastMissionId).msnNpcs.insert({ npc.id, npc });
 					}
 
 					if (ini.is_header("MsnSolar"))
 					{
 						MsnSolar solar;
-						solar.position.x = 0;
-						solar.position.y = 0;
-						solar.position.z = 0;
+						solar.position = { 0, 0, 0 };
 						solar.orientation = EulerMatrix(solar.position);
 
 						while (ini.read_value())
@@ -463,7 +468,7 @@ namespace Missions
 							else if (ini.is_value("Act_SpawnShip"))
 							{
 								ActSpawnShipPtr action(new ActSpawnShip());
-								action->msnNpcName = ToLower(ini.get_value_string(0));
+								action->msnNpcId = CreateIdOrNull(ini.get_value_string(0));
 								const auto objectivesName = ToLower(ini.get_value_string(1));
 								action->objectivesId = objectivesName == "no_ol" ? 0 : CreateID(objectivesName.c_str());
 								if (ini.get_num_parameters() > 2)
@@ -479,6 +484,24 @@ namespace Missions
 									orientation.y = ini.get_value_float(6);
 									orientation.z = ini.get_value_float(7);
 									action->orientation = EulerMatrix(orientation);
+								}
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_SpawnFormation"))
+							{
+								ActSpawnFormationPtr action(new ActSpawnFormation());
+								action->msnFormationId = CreateIdOrNull(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+								{
+									action->position.x = ini.get_value_float(1);
+									action->position.y = ini.get_value_float(2);
+									action->position.z = ini.get_value_float(3);
+								}
+								if (ini.get_num_parameters() > 4)
+								{
+									action->rotation.x = ini.get_value_float(4);
+									action->rotation.y = ini.get_value_float(5);
+									action->rotation.z = ini.get_value_float(6);
 								}
 								actions.push_back(action);
 							}
@@ -635,6 +658,18 @@ namespace Missions
 								action->reputation = ini.get_value_float(2);
 								actions.push_back(action);
 							}
+							else if (ini.is_value("Act_Invulnerable"))
+							{
+								ActInvulnerablePtr action(new ActInvulnerable());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									action->preventNonPlayerDamage = ini.get_value_bool(1);
+								if (ini.get_num_parameters() > 2)
+									action->preventPlayerDamage = ini.get_value_bool(2);
+								if (ini.get_num_parameters() > 3)
+									action->maxHpLossPercentage = ini.get_value_float(3);
+								actions.push_back(action);
+								}
 							else
 							{
 								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);
@@ -838,6 +873,8 @@ namespace Missions
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" started.");
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;
 		}
 		else if (IS_CMD("stop_mission"))
@@ -856,6 +893,8 @@ namespace Missions
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" ended.");
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;
 		}
 		else if (IS_CMD("reload_missions"))
@@ -872,6 +911,30 @@ namespace Missions
 			ClearMissions();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Stopped and reloaded all missions.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			return true;
+		}
+
+		else if (IS_CMD("getpos"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_SUPERADMIN))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			uint shipId;
+			pub::Player::GetShip(clientId, shipId);
+			IObjRW* inspect;
+			StarSystem* system;
+			if (shipId && GetShipInspect(shipId, inspect, system))
+				PrintUserCmdText(clientId, L"Pos: " + std::to_wstring(inspect->cobj->vPos.x) + L", " + std::to_wstring(inspect->cobj->vPos.y) + L", " + std::to_wstring(inspect->cobj->vPos.z));
+			else
+				PrintUserCmdText(clientId, L"You must be in space for that.");
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;

@@ -305,7 +305,7 @@ namespace Missions
 						{
 							if (ini.is_value("nickname"))
 								nickname = ini.get_value_string(0);
-							else if (ini.is_value("GotoShip"))
+							else if (ini.is_value("GotoObj"))
 							{
 								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
 								arch->type = pub::AI::GotoOpType::Ship;

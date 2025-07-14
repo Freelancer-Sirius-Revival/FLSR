@@ -3,6 +3,7 @@
 #include "ObjGotoArch.h"
 #include "../Mission.h"
 #include "../Conditions/CndDistVec.h"
+#include "../Conditions/CndDistObj.h"
 
 namespace Missions
 {
@@ -13,16 +14,17 @@ namespace Missions
 	public:
 		CndDistVecGoto(const ConditionParent& parent,
 						const uint objNameOrLabel,
-						const DistanceCondition condition,
 						const Vector& position,
 						const float distance,
 						const uint systemId) :
-			CndDistVec(parent, objNameOrLabel, condition, position, distance, systemId),
+			CndDistVec(parent, objNameOrLabel, CndDistVec::DistanceCondition::Inside, position, distance, systemId),
 			objNameOrLabel(objNameOrLabel)
 		{}
 
 		void ExecuteTrigger()
 		{
+			Unregister();
+
 			const auto& missionEntry = missions.find(parent.missionId);
 			if (missionEntry == missions.end())
 				return;
@@ -35,12 +37,48 @@ namespace Missions
 			if (objective == missionEntry->second.objectivesByObjectId.end())
 				return;
 
+			objective->second.currentCondition = nullptr; // Has been unregistered.
 			objective->second.Progress();
 		}
 	};
 
-	Objectives::Objectives(const unsigned int parentMissionId, const unsigned int objId, const std::vector<ObjectiveEntry>& objectives) :
-		parentMissionId(parentMissionId),
+	class CndDistObjGoto : public CndDistObj
+	{
+	private:
+		const uint objNameOrLabel;
+	public:
+		CndDistObjGoto(const ConditionParent& parent,
+			const uint objNameOrLabel,
+			const float distance,
+			const uint otherObjNameOrLabel) :
+			CndDistObj(parent, objNameOrLabel, CndDistObj::DistanceCondition::Inside, distance, otherObjNameOrLabel),
+			objNameOrLabel(objNameOrLabel)
+		{}
+
+		void ExecuteTrigger()
+		{
+			Unregister();
+
+			const auto& missionEntry = missions.find(parent.missionId);
+			if (missionEntry == missions.end())
+				return;
+
+			const auto& objectEntry = missionEntry->second.objectIdsByName.find(objNameOrLabel);
+			if (objectEntry == missionEntry->second.objectIdsByName.end())
+				return;
+
+			const auto& objective = missionEntry->second.objectivesByObjectId.find(objectEntry->second);
+			if (objective == missionEntry->second.objectivesByObjectId.end())
+				return;
+
+			objective->second.currentCondition = nullptr; // Has been unregistered.
+			objective->second.Progress();
+		}
+	};
+
+
+	Objectives::Objectives(const uint missionId, const uint objId, const std::vector<ObjectiveEntry>& objectives) :
+		missionId(missionId),
 		objId(objId)
 	{
 		for (const auto& entry : objectives)
@@ -53,19 +91,19 @@ namespace Missions
 			currentCondition->Unregister();
 	}
 
-	static void ApplyObjective(uint objId, const uint parentMissionId, const ObjectiveEntry& entry, ConditionPtr& condition)
+	static void ApplyObjective(uint objId, const uint missionId, const ObjectiveEntry& entry, ConditionPtr& condition)
 	{
 		switch (entry.first)
 		{
 			case ObjectiveType::Goto:
 			{
-				const auto& missionEntry = missions.find(parentMissionId);
+				const auto& missionEntry = missions.find(missionId);
 				if (missionEntry == missions.end())
 					return;
 
 				IObjRW* inspect;
 				StarSystem* starSystem;
-				if (!(GetShipInspect(objId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CEQOBJ_MASK)))
+				if (!(GetShipInspect(objId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT)))
 					return;
 
 				const auto& gotoArch = std::static_pointer_cast<ObjGotoArchetype>(entry.second);
@@ -84,11 +122,32 @@ namespace Missions
 					if (!objNameOrLabel)
 						return;
 
-					condition = ConditionPtr(new CndDistVecGoto(ConditionParent(parentMissionId, 0),
-						objNameOrLabel, CndDistVec::DistanceCondition::Inside,
+					condition = ConditionPtr(new CndDistVecGoto(ConditionParent(missionId, 0),
+						objNameOrLabel,
 						gotoArch->type == pub::AI::GotoOpType::Vec ? gotoArch->position : gotoArch->spline[3],
 						gotoArch->range + std::clamp(10.0f, gotoArch->range * 0.1f, 100.0f), // Add tolerance area to make sure NPCs will really trigger this.
 						inspect->cobj->system
+					));
+					condition->Register();
+				}
+				else if (gotoArch->type == pub::AI::GotoOpType::Ship)
+				{
+					uint objNameOrLabel = 0;
+					for (const auto& entry : missionEntry->second.objectIdsByName)
+					{
+						if (entry.second == objId)
+						{
+							objNameOrLabel = entry.first;
+							break;
+						}
+					}
+					if (!objNameOrLabel)
+						return;
+
+					condition = ConditionPtr(new CndDistObjGoto(ConditionParent(missionId, 0),
+						objNameOrLabel,
+						gotoArch->range + std::clamp(10.0f, gotoArch->range * 0.1f, 100.0f), // Add tolerance area to make sure NPCs will really trigger this.
+						gotoArch->targetObjNameOrId
 					));
 					condition->Register();
 				}
@@ -152,10 +211,10 @@ namespace Missions
 		Cancel();
 		if (!objectives.empty())
 		{
-			ApplyObjective(objId, parentMissionId, objectives.front(), currentCondition);
+			ApplyObjective(objId, missionId, objectives.front(), currentCondition);
 			objectives.pop();
 		}
-		else if (const auto& missionEntry = missions.find(parentMissionId); missionEntry != missions.end())
+		else if (const auto& missionEntry = missions.find(missionId); missionEntry != missions.end())
 			missionEntry->second.objectivesByObjectId.erase(objId);
 	}
 

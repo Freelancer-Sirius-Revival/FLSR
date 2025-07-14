@@ -38,9 +38,14 @@ namespace Missions
 		state = initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive;
 	}
 
+	bool Mission::CanBeStarted() const
+	{
+		return state != MissionState::Active; // Allow (re-)starting any mission that isn't already running.
+	}
+
 	bool Mission::Start()
 	{
-		if (state == MissionState::Active) // Allow (re-)starting any mission that isn't already running.
+		if (!CanBeStarted())
 			return false;
 
 		state = MissionState::Active;

@@ -6,6 +6,7 @@
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrigger.h"
+#include "Actions/ActActMsn.h"
 #include "Actions/ActChangeState.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
@@ -434,6 +435,23 @@ namespace Missions
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);
 								action->activate = false;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_ActMsn"))
+							{
+								ActActMsnPtr action(new ActActMsn());
+								action->nameId = CreateIdOrNull(ini.get_value_string(0));
+								for (int index = 1, length = ini.get_num_parameters(); index < length; index++)
+								{
+									const auto& value = ToLower(ini.get_value_string(index));
+									if (value == "all")
+									{
+										action->playerLabelsToTransfer.clear();
+										action->playerLabelsToTransfer.insert(ActActMsnAllPlayerLabels);
+										break;
+									}
+									action->playerLabelsToTransfer.insert(CreateIdOrNull(value.c_str()));
+								}
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_AddLabel"))

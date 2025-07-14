@@ -157,6 +157,9 @@
     <ClCompile Include="missions\actions\ActSpawnFormation.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActActMsn.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -316,6 +319,9 @@
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActSpawnFormation.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActMsn.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

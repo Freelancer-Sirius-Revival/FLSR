@@ -11,7 +11,7 @@ namespace Missions
 {
 	class Mission
 	{
-	private:
+	public:
 		enum class MissionState
 		{
 			AwaitingInitialActivation,
@@ -19,8 +19,6 @@ namespace Missions
 			Active,
 			Finished
 		};
-
-	public:
 		const std::string name;
 		const uint id;
 		const bool initiallyActive;
@@ -51,6 +49,7 @@ namespace Missions
 		Mission(const std::string name, const uint id, const bool initiallyActive);
 		virtual ~Mission();
 		void Reset();
+		bool CanBeStarted() const;
 		bool Start();
 		void End();
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);

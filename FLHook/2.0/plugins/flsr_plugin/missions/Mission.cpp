@@ -22,8 +22,7 @@ namespace Missions
 		id(id),
 		initiallyActive(initiallyActive),
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
-		offerId(0),
-		triggerExecutionRunning(false)
+		offerId(0)
 	{}
 
 	Mission::~Mission()
@@ -41,7 +40,7 @@ namespace Missions
 
 	bool Mission::Start()
 	{
-		if (state != MissionState::Inactive && state != MissionState::AwaitingInitialActivation)
+		if (state == MissionState::Active) // Allow (re-)starting any mission that isn't already running.
 			return false;
 
 		state = MissionState::Active;
@@ -57,26 +56,31 @@ namespace Missions
 
 	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
 	{
+		const bool queueWasEmpty = triggerExecutionQueue.empty();
 		triggerExecutionQueue.push({ triggerId, activator });
 
-		// Directly after try to process all queued triggers.
-		if (triggerExecutionRunning)
+		// If the queue was empty, start processing. Otherwise assume this queue is being processed.
+		if (!queueWasEmpty)
 			return;
-		triggerExecutionRunning = true;
 
-		while (!triggerExecutionQueue.empty() && state != MissionState::Finished)
+		while (!triggerExecutionQueue.empty())
 		{
 			const auto& entry = triggerExecutionQueue.front();
 			Trigger& trigger = triggers.at(entry.first);
 			triggerExecutionQueue.pop();
-			trigger.Execute(entry.second);
+			trigger.Execute(entry.second); // This may also end the mission. In that case the execution queue is being emptied.
 		}
-		triggerExecutionRunning = false;
 	}
 
 	void Mission::End()
 	{
 		state = MissionState::Finished;
+
+		std::queue<std::pair<uint, MissionObject>> emptyQueue;
+		std::swap(triggerExecutionQueue, emptyQueue);
+
+		for (auto& trigger : triggers)
+			trigger.Deactivate();
 
 		for (const uint clientId : clientIds)
 			ClearMusic(clientId);
@@ -89,6 +93,12 @@ namespace Missions
 			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
+
+		objectIdsByName.clear();
+		objectsByLabel.clear();
+		objectIds.clear();
+		clientIds.clear();
+		objectivesByObjectId.clear();
 	}
 
 	void Mission::EvaluateCountConditions(const uint label) const

@@ -43,7 +43,6 @@ namespace Missions
 
 	private:
 		MissionState state;
-		bool triggerExecutionRunning;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
 
 		void EvaluateCountConditions(const uint label) const;

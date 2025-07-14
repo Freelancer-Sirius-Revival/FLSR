@@ -25,7 +25,7 @@
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
-    <ClCompile Include="missions\actions\ActActTrigger.cpp">
+    <ClCompile Include="missions\actions\ActActTrig.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActDestroy.cpp">
@@ -163,7 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
-    <ClInclude Include="missions\actions\ActActTrigger.h">
+    <ClInclude Include="missions\actions\ActActTrig.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActDestroy.h">

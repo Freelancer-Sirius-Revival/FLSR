@@ -5,7 +5,7 @@
 #include "Conditions/CndTrue.h"
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
-#include "Actions/ActActTrigger.h"
+#include "Actions/ActActTrig.h"
 #include "Actions/ActActMsn.h"
 #include "Actions/ActChangeState.h"
 #include "Actions/ActAddLabel.h"
@@ -421,7 +421,7 @@ namespace Missions
 							}
 							else if (ini.is_value("Act_ActTrig"))
 							{
-								ActActTriggerPtr action(new ActActTrigger());
+								ActActTrigPtr action(new ActActTrig());
 								action->nameId = CreateIdOrNull(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);
@@ -430,7 +430,7 @@ namespace Missions
 							}
 							else if (ini.is_value("Act_DeactTrig"))
 							{
-								ActActTriggerPtr action(new ActActTrigger());
+								ActActTrigPtr action(new ActActTrig());
 								action->nameId = CreateIdOrNull(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);

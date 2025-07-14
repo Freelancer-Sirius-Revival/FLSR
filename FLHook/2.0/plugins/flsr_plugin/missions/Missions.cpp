@@ -28,6 +28,7 @@
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
 #include "Objectives/ObjGotoArch.h"
+#include "Objectives/ObjFollowArch.h"
 #include "MissionBoard.h"
 
 namespace Missions
@@ -363,6 +364,18 @@ namespace Missions
 								arch->startWaitDistance = ini.get_value_float(16);
 								arch->endWaitDistance = ini.get_value_float(17);
 								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
+							}
+							else if (ini.is_value("Follow"))
+							{
+								ObjFollowArchetypePtr arch(new ObjFollowArchetype());
+								arch->objName = CreateIdOrNull(ini.get_value_string(0));
+								arch->maxDistance = ini.get_value_float(1);
+								arch->relativePosition.x = ini.get_value_float(2);
+								arch->relativePosition.y = ini.get_value_float(3);
+								arch->relativePosition.z = ini.get_value_float(4);
+								if (ini.get_num_parameters() > 5)
+									arch->unk = ini.get_value_float(5);
+								objectives.objectives.push_back({ ObjectiveType::Follow, arch });
 							}
 						}
 						if (!nickname.empty())

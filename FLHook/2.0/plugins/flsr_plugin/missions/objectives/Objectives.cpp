@@ -1,9 +1,10 @@
 #include <FLHook.h>
 #include "Objectives.h"
+#include "ObjFollowArch.h"
 #include "ObjGotoArch.h"
 #include "../Mission.h"
-#include "../Conditions/CndDistVec.h"
 #include "../Conditions/CndDistObj.h"
+#include "../Conditions/CndDistVec.h"
 
 namespace Missions
 {
@@ -95,6 +96,31 @@ namespace Missions
 	{
 		switch (entry.first)
 		{
+			case ObjectiveType::Follow:
+			{
+				const auto& missionEntry = missions.find(missionId);
+				if (missionEntry == missions.end())
+					return;
+
+				IObjRW* inspect;
+				StarSystem* starSystem;
+				if (!(GetShipInspect(objId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT)))
+					return;
+
+				const auto& followArch = std::static_pointer_cast<ObjFollowArchetype>(entry.second);
+				const auto& foundObject = missionEntry->second.objectIdsByName.find(followArch->objName);
+				if (foundObject == missionEntry->second.objectIdsByName.end())
+					return;
+
+				pub::AI::DirectiveFollowOp followOp;
+				followOp.fireWeapons = false;
+				followOp.followSpaceObj = foundObject->second;
+				followOp.maxDistance = followArch->maxDistance;
+				followOp.offset = followArch->relativePosition;
+				followOp.dunno2 = followArch->unk;
+				pub::AI::SubmitDirective(objId, &followOp);
+				break;
+			}
 			case ObjectiveType::Goto:
 			{
 				const auto& missionEntry = missions.find(missionId);

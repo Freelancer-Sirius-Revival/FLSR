@@ -327,6 +327,9 @@
     <ClInclude Include="missions\MatrixMath.h">
       <Filter>Missions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\objectives\ObjFollowArch.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

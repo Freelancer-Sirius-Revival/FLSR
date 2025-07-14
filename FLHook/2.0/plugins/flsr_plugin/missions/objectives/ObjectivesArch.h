@@ -6,7 +6,8 @@ namespace Missions
 {
 	enum class ObjectiveType
 	{
-		Goto
+		Goto,
+		Follow
 	};
 
 	typedef std::pair<ObjectiveType, std::shared_ptr<void>> ObjectiveEntry;

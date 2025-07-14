@@ -29,8 +29,8 @@ std::multimap<uint, ZONE> zones;
 std::multimap<uint, JUMPPOINT> jumpPoints;
 
 /** Multiply mat1 by mat2 and return the result */
-TransformMatrix ZoneUtilities::MultiplyMatrix(const TransformMatrix &mat1,
-                                      const TransformMatrix &mat2) {
+static TransformMatrix MultiplyMatrix(TransformMatrix &mat1,
+                                      TransformMatrix &mat2) {
     TransformMatrix result = {0};
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -40,7 +40,7 @@ TransformMatrix ZoneUtilities::MultiplyMatrix(const TransformMatrix &mat1,
 }
 
 /** Setup of transformation matrix using the vector p and the rotation r */
-TransformMatrix ZoneUtilities::SetupTransform(const Vector &p, const Vector &r) {
+static TransformMatrix SetupTransform(Vector &p, Vector &r) {
 // Convert degrees into radians
 #define PI (3.14159265358f)
     float ax = r.x * (PI / 180);
@@ -65,9 +65,9 @@ TransformMatrix ZoneUtilities::SetupTransform(const Vector &p, const Vector &r) 
     tmat.d[2][1] = 0;
     tmat.d[2][2] = 1;
     tmat.d[2][3] = 0;
-    tmat.d[3][0] = p.x;
-    tmat.d[3][1] = p.y;
-    tmat.d[3][2] = p.z;
+    tmat.d[3][0] = -p.x;
+    tmat.d[3][1] = -p.y;
+    tmat.d[3][2] = -p.z;
     tmat.d[3][3] = 1;
 
     // X-axis rotation matrix

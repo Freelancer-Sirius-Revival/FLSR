@@ -324,6 +324,9 @@
     <ClInclude Include="missions\actions\ActActMsn.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\MatrixMath.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

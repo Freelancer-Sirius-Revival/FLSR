@@ -292,9 +292,6 @@ extern EXPORT std::multimap<uint, ZONE> zones;
 extern EXPORT std::multimap<uint, JUMPPOINT> jumpPoints;
 
 namespace ZoneUtilities {
-
-EXPORT TransformMatrix MultiplyMatrix(const TransformMatrix& mat1, const TransformMatrix& mat2);
-EXPORT TransformMatrix SetupTransform(const Vector& p, const Vector& r);
 EXPORT void ReadUniverse(zone_map_t *set_mmapZones);
 EXPORT void ReadLootableZone(zone_map_t &set_mmapZones,
                              const std::string &systemNick,

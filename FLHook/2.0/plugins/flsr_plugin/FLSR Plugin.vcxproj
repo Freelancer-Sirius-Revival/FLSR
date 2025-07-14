@@ -242,6 +242,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\Condition.h" />
     <ClInclude Include="missions\conditions\IniReader.h" />
     <ClInclude Include="missions\Formations.h" />
+    <ClInclude Include="missions\MatrixMath.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionBoard.h" />
     <ClInclude Include="missions\MissionObject.h" />

@@ -416,6 +416,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
 
+- `Act_Relocate` Relocates an object.
+    1. `STRING|Activator` Object by name to relocate.
+    1. `FLOAT :0` Position on x-axis.
+    1. `FLOAT :0` Position on y-axis.
+    1. `FLOAT :0` Position on z-axis.
+    1. `[FLOAT]` Override for current x-axis rotation.
+    1. `[FLOAT]` Override for current y-axis rotation.
+    1. `[FLOAT]` Override for current z-axis rotation.
+
 - `Act_LightFuse` Executes an arbitary fuse.
     1. `STRING|Activator` Object by name or label to refer.
     1. `STRING` Fuse nickname to execute on the objects.

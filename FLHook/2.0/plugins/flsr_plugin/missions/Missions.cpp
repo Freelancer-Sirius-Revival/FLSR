@@ -18,6 +18,7 @@
 #include "Actions/ActEndMission.h"
 #include "Actions/ActDestroy.h"
 #include "Actions/ActPlaySoundEffect.h"
+#include "Actions/ActRelocate.h"
 #include "Actions/ActPlayMusic.h"
 #include "Actions/ActEtherComm.h"
 #include "Actions/ActSendComm.h"
@@ -199,7 +200,7 @@ namespace Missions
 					{
 						MsnNpc npc;
 						npc.position = { 0, 0, 0 };
-						npc.orientation = EulerMatrix(npc.position);
+						npc.orientation = EulerMatrix({ 0, 0, 0 });
 
 						while (ini.read_value())
 						{
@@ -232,7 +233,7 @@ namespace Missions
 					{
 						MsnSolar solar;
 						solar.position = { 0, 0, 0 };
-						solar.orientation = EulerMatrix(solar.position);
+						solar.orientation = EulerMatrix({ 0, 0, 0 });
 
 						while (ini.read_value())
 						{
@@ -721,7 +722,24 @@ namespace Missions
 								if (ini.get_num_parameters() > 3)
 									action->maxHpLossPercentage = ini.get_value_float(3);
 								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_Relocate"))
+							{
+								ActRelocatePtr action(new ActRelocate());
+								action->objName = CreateIdOrNull(ini.get_value_string(0));
+								action->position.x = ini.get_value_float(1);
+								action->position.y = ini.get_value_float(2);
+								action->position.z = ini.get_value_float(3);
+								if (ini.get_num_parameters() > 6)
+								{
+									Vector rotation;
+									rotation.x = ini.get_value_float(4);
+									rotation.y = ini.get_value_float(5);
+									rotation.z = ini.get_value_float(6);
+									action->orientation = EulerMatrix(rotation);
 								}
+								actions.push_back(action);
+							}
 							else
 							{
 								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);

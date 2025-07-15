@@ -163,6 +163,9 @@
     <ClCompile Include="missions\actions\ActActMsnTrig.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActRelocate.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -334,6 +337,9 @@
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActActMsnTrig.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRelocate.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

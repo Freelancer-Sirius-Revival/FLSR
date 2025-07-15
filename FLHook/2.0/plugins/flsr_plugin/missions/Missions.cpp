@@ -968,6 +968,54 @@ namespace Missions
 			return true;
 		}
 
+		else if (IS_CMD("act_trigger"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			const std::string msnNickname = wstos(ToLower(cmds->ArgStr(1)));
+			const std::string trigNickname = wstos(ToLower(cmds->ArgStr(2)));
+			ActActMsnTrig action;
+			action.missionId = CreateIdOrNull(msnNickname.c_str());
+			action.triggerId = CreateIdOrNull(trigNickname.c_str());
+			action.activate = true;
+			Mission msn("", 0, false);
+			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			return true;
+		}
+
+		else if (IS_CMD("deact_trigger"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			const std::string msnNickname = wstos(ToLower(cmds->ArgStr(1)));
+			const std::string trigNickname = wstos(ToLower(cmds->ArgStr(2)));
+			ActActMsnTrig action;
+			action.missionId = CreateIdOrNull(msnNickname.c_str());
+			action.triggerId = CreateIdOrNull(trigNickname.c_str());
+			action.activate = true;
+			Mission msn("", 0, false);
+			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			return true;
+		}
+
 		else if (IS_CMD("getpos"))
 		{
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;

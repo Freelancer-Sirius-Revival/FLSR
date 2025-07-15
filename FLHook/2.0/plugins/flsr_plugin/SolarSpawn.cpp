@@ -279,6 +279,11 @@ namespace SolarSpawn
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);
 
+		const auto& solarArchetype = Archetype::GetSolar(archetype.archetypeId);
+		if (solarArchetype && solarArchetype->bDestructible)
+			// Invincibility kicks in at 99% hitpoints loss. This still allows damaging shields or equipment.
+			pub::SpaceObj::SetInvincible2(spaceObjId, true, true, 0.99f);
+
 		// Expects general nickname to identify the configs
 		Cloak::TryRegisterNoCloakSolar(archetype.nickname, spaceObjId);
 

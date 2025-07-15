@@ -6,7 +6,7 @@
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrig.h"
-#include "Actions/ActActMsn.h""
+#include "Actions/ActActMsn.h"
 #include "Actions/ActActMsnTrig.h"
 #include "Actions/ActChangeState.h"
 #include "Actions/ActAddLabel.h"

@@ -139,6 +139,8 @@ File: EXE\Freelancer.exe
 # Multiplier for subtargeting HUD animations (make smaller for faster). - Dev
 0DFC09: 0.00001f	[ 0.6f ]
 
+# Enable CommComplete packets in multiplayer to be sent to server. - Venemon
+0CBEE7: 90 90	[ 74 25 ]
 
 ##############
 # On Base

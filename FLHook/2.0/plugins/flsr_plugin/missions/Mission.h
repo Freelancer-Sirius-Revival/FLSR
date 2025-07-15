@@ -39,6 +39,15 @@ namespace Missions
 		std::unordered_set<uint> clientIds;
 		std::unordered_map<uint, Objectives> objectivesByObjectId;
 
+		struct CommEntry
+		{
+			mstime sendTime;
+			uint voiceLineId;
+			MissionObject sender = { MissionObjectType::Client, 0 };
+			std::unordered_set<uint> receiverObjIds;
+		};
+		std::unordered_map<uint, CommEntry> ongoingComms;
+
 	private:
 		MissionState state;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
@@ -62,4 +71,12 @@ namespace Missions
 	};
 
 	extern std::unordered_map<uint, Mission> missions;
+
+	namespace Hooks
+	{
+		namespace Mission
+		{
+			void __stdcall Elapse_Time_AFTER(float seconds);
+		}
+	}
 }

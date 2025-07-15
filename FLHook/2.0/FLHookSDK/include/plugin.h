@@ -71,6 +71,7 @@ enum PLUGIN_CALLBACKS
 	PLUGIN_HkIServerImpl_AddTradeEquip_AFTER,
 	PLUGIN_HkIServerImpl_BaseInfoRequest,
 	PLUGIN_HkIServerImpl_BaseInfoRequest_AFTER,
+	PLUGIN_HkIServerImpl_CommComplete,
 	PLUGIN_HkIServerImpl_CreateNewCharacter,
 	PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER,
 	PLUGIN_HkIServerImpl_DelTradeEquip,

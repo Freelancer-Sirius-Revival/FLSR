@@ -1,4 +1,6 @@
 #include "Mission.h"
+#include "../Plugin.h"
+#include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
 
 namespace Missions
@@ -109,6 +111,7 @@ namespace Missions
 		objectIds.clear();
 		clientIds.clear();
 		objectivesByObjectId.clear();
+		ongoingComms.clear();
 	}
 
 	void Mission::EvaluateCountConditions(const uint label) const
@@ -248,5 +251,42 @@ namespace Missions
 		clientIds.erase(clientId);
 		for (const auto& label : labels)
 			EvaluateCountConditions(label);
+	}
+
+	namespace Hooks
+	{
+		namespace Mission
+		{
+			float elapsedTimeInSec = 0.0f;
+			void __stdcall Elapse_Time_AFTER(float seconds)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				elapsedTimeInSec += seconds;
+				if (elapsedTimeInSec < 1.0f)
+					return;
+				elapsedTimeInSec = 0.0f;
+
+				const mstime thresholdTime = timeInMS() - 10000;
+				for (auto& mission : missions)
+				{
+					std::vector<std::pair<uint, Missions::Mission::CommEntry>> entriesToRemove;
+					entriesToRemove.reserve(mission.second.ongoingComms.size());
+					for (const auto& comm : mission.second.ongoingComms)
+					{
+						if (comm.second.sendTime < thresholdTime)
+							entriesToRemove.push_back(comm);
+					}
+
+					for (const auto& entry : entriesToRemove)
+					{
+						Hooks::CndCommComplete::CommComplete(0, *entry.second.receiverObjIds.begin(), entry.second.voiceLineId, (Hooks::CndCommComplete::CommResult)0);
+						if (mission.second.ongoingComms.contains(entry.first))
+							mission.second.ongoingComms.erase(entry.first);
+						// else: The CndCommComplete has erased the comm-entry itself.
+					}
+				}
+			}
+		}
 	}
 }

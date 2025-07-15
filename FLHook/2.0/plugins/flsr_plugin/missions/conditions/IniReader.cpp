@@ -1,6 +1,7 @@
 #include "IniReader.h"
 #include "CndBaseEnter.h"
 #include "CndCloaked.h"
+#include "CndCommComplete.h"
 #include "CndCount.h"
 #include "CndDestroyed.h"
 #include "CndDistObj.h"
@@ -68,6 +69,21 @@ namespace Missions
 			cloaked = ini.get_value_bool(argNum);
 
 		return new CndCloaked(conditionParent, objNameOrLabel, cloaked);
+	}
+
+	static CndCommComplete* ReadCndCommComplete(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint commName = 0;
+
+		uint argNum = 0;
+		commName = CreateIdOrNull(ini.get_value_string(argNum));
+		if (commName == 0)
+		{
+			PrintErrorToConsole(L"Cnd_CommComplete", conditionParent, argNum, L"No comm label. Aborting!");
+			return nullptr;
+		}
+
+		return new CndCommComplete(conditionParent, commName);
 	}
 
 	static CndCount* ReadCndCount(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -444,6 +460,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_Cloaked"))
 			return ReadCndCloaked(conditionParent, ini);
+
+		if (ini.is_value("Cnd_CommComplete"))
+			return ReadCndCommComplete(conditionParent, ini);
 
 		if (ini.is_value("Cnd_Count"))
 			return ReadCndCount(conditionParent, ini);

@@ -298,6 +298,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
 
+- `Cnd_CommComplete` Waits for a comm to complete. See `Act_SendComm` and `Act_EtherComm`.
+    1. `STRING` The comm name to wait finishing for. Started comms not ending within 10 seconds will trigger `Cnd_CommComplete` to allow continuing the flow even if no player witnessed hearing it.
+
 - `Cnd_Count` Counts the objects from a label. `Activator` will be the server.
     1. `STRING` Objects by label to count.
     1. `INTEGER` The target count.

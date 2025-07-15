@@ -6,7 +6,8 @@
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrig.h"
-#include "Actions/ActActMsn.h"
+#include "Actions/ActActMsn.h""
+#include "Actions/ActActMsnTrig.h"
 #include "Actions/ActChangeState.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
@@ -435,7 +436,7 @@ namespace Missions
 							else if (ini.is_value("Act_ActTrig"))
 							{
 								ActActTrigPtr action(new ActActTrig());
-								action->nameId = CreateIdOrNull(ini.get_value_string(0));
+								action->triggerId = CreateIdOrNull(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);
 								action->activate = true;
@@ -444,7 +445,7 @@ namespace Missions
 							else if (ini.is_value("Act_DeactTrig"))
 							{
 								ActActTrigPtr action(new ActActTrig());
-								action->nameId = CreateIdOrNull(ini.get_value_string(0));
+								action->triggerId = CreateIdOrNull(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);
 								action->activate = false;
@@ -453,7 +454,7 @@ namespace Missions
 							else if (ini.is_value("Act_ActMsn"))
 							{
 								ActActMsnPtr action(new ActActMsn());
-								action->nameId = CreateIdOrNull(ini.get_value_string(0));
+								action->missionId = CreateIdOrNull(ini.get_value_string(0));
 								for (int index = 1, length = ini.get_num_parameters(); index < length; index++)
 								{
 									const auto& value = ToLower(ini.get_value_string(index));
@@ -465,6 +466,26 @@ namespace Missions
 									}
 									action->playerLabelsToTransfer.insert(CreateIdOrNull(value.c_str()));
 								}
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_ActMsnTrig"))
+							{
+								ActActMsnTrigPtr action(new ActActMsnTrig());
+								action->missionId = CreateIdOrNull(ini.get_value_string(0));
+								action->triggerId = CreateIdOrNull(ini.get_value_string(1));
+								if (ini.get_num_parameters() > 2)
+									action->probability = ini.get_value_float(2);
+								action->activate = true;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_DeactMsnTrig"))
+							{
+								ActActMsnTrigPtr action(new ActActMsnTrig());
+								action->missionId = CreateIdOrNull(ini.get_value_string(0));
+								action->triggerId = CreateIdOrNull(ini.get_value_string(1));
+								if (ini.get_num_parameters() > 2)
+									action->probability = ini.get_value_float(2);
+								action->activate = false;
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_AddLabel"))

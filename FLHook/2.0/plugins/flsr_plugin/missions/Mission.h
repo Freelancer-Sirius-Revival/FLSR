@@ -50,6 +50,7 @@ namespace Missions
 		virtual ~Mission();
 		void Reset();
 		bool CanBeStarted() const;
+		bool IsActive() const;
 		bool Start();
 		void End();
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);

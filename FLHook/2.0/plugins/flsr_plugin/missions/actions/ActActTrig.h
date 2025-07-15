@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActActTrig : Action
 	{
-		uint nameId = 0;
+		uint triggerId = 0;
 		bool activate = false;
 		float probability = 1.0f;
 

@@ -160,6 +160,9 @@
     <ClCompile Include="missions\actions\ActActMsn.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActActMsnTrig.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -329,6 +332,9 @@
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjFollowArch.h">
       <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActMsnTrig.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

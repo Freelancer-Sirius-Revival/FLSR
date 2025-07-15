@@ -372,6 +372,16 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Mission nickname to refer.
     1. `[STRING|All]` Multiple subsequent entries possible. A label whose assigned players are transferred over to the mission with the same label. `All` transfers over all players and their labels.
 
+- `Act_ActMsnTrig` Activates a trigger of a another mission.
+    1. `STRING` Mission nickname to refer.
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
+
+- `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
+    1. `STRING` Mission nickname to refer.
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to add.

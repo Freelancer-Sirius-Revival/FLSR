@@ -43,6 +43,11 @@ namespace Missions
 		return state != MissionState::Active; // Allow (re-)starting any mission that isn't already running.
 	}
 
+	bool Mission::IsActive() const
+	{
+		return state == MissionState::Active;
+	}
+
 	bool Mission::Start()
 	{
 		if (!CanBeStarted())

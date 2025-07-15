@@ -12,12 +12,12 @@ namespace Missions
 			return;
 		for (auto& trigger : mission.triggers)
 		{
-			if (trigger.nameId == nameId)
+			if (trigger.nameId == triggerId)
 			{
 				activate ? trigger.Activate() : trigger.Deactivate();
 				return;
 			}
 		}
-		ConPrint(L"Error: Act_ActTrig could not find trigger " + std::to_wstring(nameId) + L"\n");
+		ConPrint(L"ERROR: Act_ActTrig could not find trigger " + std::to_wstring(triggerId) + L"\n");
 	}
 }

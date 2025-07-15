@@ -7,12 +7,12 @@ namespace Missions
 	{
 		for (auto& missionEntry : missions)
 		{
-			if (CreateID(missionEntry.second.name.c_str()) == nameId)
+			if (CreateID(missionEntry.second.name.c_str()) == missionId)
 			{
 				auto& foundMission = missionEntry.second;
 				if (!foundMission.CanBeStarted())
 				{
-					ConPrint(L"ERROR: Act_ActMsn could not start already running mission " + std::to_wstring(nameId) + L"\n");
+					ConPrint(L"ERROR: Act_ActMsn could not start already running mission " + std::to_wstring(missionId) + L"\n");
 					return;
 				}
 
@@ -33,6 +33,6 @@ namespace Missions
 				return;
 			}
 		}
-		ConPrint(L"ERROR: Act_ActMsn could not find mission " + std::to_wstring(nameId) + L"\n");
+		ConPrint(L"ERROR: Act_ActMsn could not find mission " + std::to_wstring(missionId) + L"\n");
 	}
 }

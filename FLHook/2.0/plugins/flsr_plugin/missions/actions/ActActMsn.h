@@ -7,7 +7,7 @@ namespace Missions
 
 	struct ActActMsn : Action
 	{
-		uint nameId = 0;
+		uint missionId = 0;
 		std::unordered_set<uint> playerLabelsToTransfer;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;

@@ -29,8 +29,9 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
-#include "Objectives/ObjGotoArch.h"
-#include "Objectives/ObjFollowArch.h"
+#include "Objectives/ObjDelay.h"
+#include "Objectives/ObjGoto.h"
+#include "Objectives/ObjFollow.h"
 #include "MissionBoard.h"
 
 namespace Missions
@@ -308,9 +309,15 @@ namespace Missions
 						{
 							if (ini.is_value("nickname"))
 								nickname = ini.get_value_string(0);
+							else if (ini.is_value("Delay"))
+							{
+								ObjDelayPtr arch(new ObjDelay());
+								arch->timeInS = ini.get_value_int(0);
+								objectives.objectives.push_back({ ObjectiveType::Delay, arch });
+							}
 							else if (ini.is_value("GotoObj"))
 							{
-								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								ObjGotoPtr arch(new ObjGoto());
 								arch->type = pub::AI::GotoOpType::Ship;
 								const auto val = ToLower(ini.get_value_string(0));
 								if (val == "goto_no_cruise")
@@ -327,7 +334,7 @@ namespace Missions
 							}
 							else if (ini.is_value("GotoVec"))
 							{
-								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								ObjGotoPtr arch(new ObjGoto());
 								arch->type = pub::AI::GotoOpType::Vec;
 								const auto val = ToLower(ini.get_value_string(0));
 								if (val == "goto_no_cruise")
@@ -346,7 +353,7 @@ namespace Missions
 							}
 							else if (ini.is_value("GotoSpline"))
 							{
-								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								ObjGotoPtr arch(new ObjGoto());
 								arch->type = pub::AI::GotoOpType::Spline;
 								const auto val = ToLower(ini.get_value_string(0));
 								if (val == "goto_no_cruise")
@@ -369,7 +376,7 @@ namespace Missions
 							}
 							else if (ini.is_value("Follow"))
 							{
-								ObjFollowArchetypePtr arch(new ObjFollowArchetype());
+								ObjFollowPtr arch(new ObjFollow());
 								arch->objName = CreateIdOrNull(ini.get_value_string(0));
 								arch->maxDistance = ini.get_value_float(1);
 								arch->relativePosition.x = ini.get_value_float(2);

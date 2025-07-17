@@ -272,7 +272,7 @@
     <ClInclude Include="missions\actions\ActAddCargo.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\objectives\ObjGotoArch.h">
+    <ClInclude Include="missions\objectives\ObjGoto.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\Objectives.h">
@@ -342,7 +342,7 @@
     <ClInclude Include="missions\MatrixMath.h">
       <Filter>Missions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\objectives\ObjFollowArch.h">
+    <ClInclude Include="missions\objectives\ObjFollow.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActActMsnTrig.h">
@@ -359,6 +359,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\MissionShipSpawning.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjDelay.h">
+      <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

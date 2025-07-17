@@ -224,6 +224,9 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 ### Objectives
 
+- `Delay` Pauses for a time.
+    1. `INTEGER: :0` The time to pause.
+
 - `Follow` Follows the given target.
     1. `STRING` The target name ship to follow.
     1. `FLOAT :0` Maximum distance not to exceed.

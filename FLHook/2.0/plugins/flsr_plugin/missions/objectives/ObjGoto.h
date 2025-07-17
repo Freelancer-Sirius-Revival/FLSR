@@ -9,7 +9,7 @@ namespace Missions
 		NoCruise
 	};
 
-	struct ObjGotoArchetype
+	struct ObjGoto
 	{
 		pub::AI::GotoOpType type = pub::AI::GotoOpType::Undefined;
 		GotoMovement movement = GotoMovement::NoCruise;
@@ -22,5 +22,5 @@ namespace Missions
 		float startWaitDistance = 0.0f;
 		float endWaitDistance = 0.0f;
 	};
-	typedef std::shared_ptr<ObjGotoArchetype> ObjGotoArchetypePtr;
+	typedef std::shared_ptr<ObjGoto> ObjGotoPtr;
 }

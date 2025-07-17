@@ -7,6 +7,7 @@ namespace Missions
 	enum class ObjectiveType
 	{
 		Delay,
+		Dock,
 		Follow,
 		Goto
 	};

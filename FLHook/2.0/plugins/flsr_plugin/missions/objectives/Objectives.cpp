@@ -1,6 +1,7 @@
 #include <FLHook.h>
 #include "Objectives.h"
 #include "ObjDelay.h"
+#include "ObjDock.h"
 #include "ObjFollow.h"
 #include "ObjGoto.h"
 #include "../Mission.h"
@@ -155,6 +156,23 @@ namespace Missions
 				break;
 			}
 
+			case ObjectiveType::Dock:
+			{
+				const auto& dockArch = std::static_pointer_cast<ObjDock>(entry.second);
+				pub::AI::DirectiveDockOp dockOp;
+				dockOp.fireWeapons = false;
+				dockOp.dockTargetObjId = 0;
+				if (const auto& objectEntry = missionEntry->second.objectIdsByName.find(dockArch->targetObjNameOrId); objectEntry != missionEntry->second.objectIdsByName.end())
+					dockOp.dockTargetObjId = objectEntry->second;
+				if (!dockOp.dockTargetObjId)
+					dockOp.dockTargetObjId = dockArch->targetObjNameOrId;
+				pub::AI::SubmitDirective(objId, &dockOp);
+
+				// No condition. Never finishes.
+
+				break;
+			}
+
 			case ObjectiveType::Follow:
 			{
 				const auto& missionEntry = missions.find(missionId);
@@ -179,8 +197,7 @@ namespace Missions
 				followOp.dunno2 = followArch->unk;
 				pub::AI::SubmitDirective(objId, &followOp);
 
-				condition = ConditionPtr(new CndTimerDelay(ConditionParent(missionId, 0), objName, 0.0f));
-				condition->Register();
+				// No condition. Never finishes.
 
 				break;
 			}
@@ -226,9 +243,7 @@ namespace Missions
 					{
 						gotoOp.targetId = 0;
 						if (const auto& objectEntry = missionEntry->second.objectIdsByName.find(gotoArch->targetObjNameOrId); objectEntry != missionEntry->second.objectIdsByName.end())
-						{
 							gotoOp.targetId = objectEntry->second;
-						}
 						if (!gotoOp.targetId)
 							gotoOp.targetId = gotoArch->targetObjNameOrId;
 						break;

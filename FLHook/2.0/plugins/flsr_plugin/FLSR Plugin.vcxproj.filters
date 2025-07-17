@@ -363,6 +363,9 @@
     <ClInclude Include="missions\objectives\ObjDelay.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
+    <ClInclude Include="missions\objectives\ObjDock.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

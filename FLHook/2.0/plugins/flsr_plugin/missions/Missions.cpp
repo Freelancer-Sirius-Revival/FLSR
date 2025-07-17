@@ -30,6 +30,7 @@
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
 #include "Objectives/ObjDelay.h"
+#include "Objectives/ObjDock.h"
 #include "Objectives/ObjGoto.h"
 #include "Objectives/ObjFollow.h"
 #include "MissionBoard.h"
@@ -314,6 +315,12 @@ namespace Missions
 								ObjDelayPtr arch(new ObjDelay());
 								arch->timeInS = ini.get_value_int(0);
 								objectives.objectives.push_back({ ObjectiveType::Delay, arch });
+							}
+							else if (ini.is_value("Dock"))
+							{
+								ObjDockPtr arch(new ObjDock());
+								arch->targetObjNameOrId = CreateIdOrNull(ini.get_value_string(0));
+								objectives.objectives.push_back({ ObjectiveType::Dock, arch });
 							}
 							else if (ini.is_value("GotoObj"))
 							{

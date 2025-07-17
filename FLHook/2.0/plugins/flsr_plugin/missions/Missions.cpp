@@ -544,17 +544,19 @@ namespace Missions
 							{
 								ActSpawnFormationPtr action(new ActSpawnFormation());
 								action->msnFormationId = CreateIdOrNull(ini.get_value_string(0));
-								if (ini.get_num_parameters() > 1)
+								const auto objectivesName = ToLower(ini.get_value_string(1));
+								action->objectivesId = objectivesName == "no_ol" ? 0 : CreateID(objectivesName.c_str());
+								if (ini.get_num_parameters() > 2)
 								{
-									action->position.x = ini.get_value_float(1);
-									action->position.y = ini.get_value_float(2);
-									action->position.z = ini.get_value_float(3);
+									action->position.x = ini.get_value_float(2);
+									action->position.y = ini.get_value_float(3);
+									action->position.z = ini.get_value_float(4);
 								}
-								if (ini.get_num_parameters() > 4)
+								if (ini.get_num_parameters() > 5)
 								{
-									action->rotation.x = ini.get_value_float(4);
-									action->rotation.y = ini.get_value_float(5);
-									action->rotation.z = ini.get_value_float(6);
+									action->rotation.x = ini.get_value_float(5);
+									action->rotation.y = ini.get_value_float(6);
+									action->rotation.z = ini.get_value_float(7);
 								}
 								actions.push_back(action);
 							}

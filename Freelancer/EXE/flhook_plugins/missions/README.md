@@ -413,6 +413,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_SpawnFormation` Spawns a formation of ships.
     1. `STRING` The `MsnFormation` nickname to spawn.
+    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
     1. `[FLOAT] :0` Override for initial x-axis position.
     1. `[FLOAT] :0` Override for initial y-axis position.
     1. `[FLOAT] :0` Override for initial z-axis position.

@@ -6,6 +6,7 @@ namespace Missions
 	struct ActSpawnFormation : Action
 	{
 		uint msnFormationId = 0;
+		uint objectivesId = 0;
 		Vector position = { std::numeric_limits<float>::infinity(), 0, 0 };
 		Vector rotation = { std::numeric_limits<float>::infinity(), 0, 0 };
 

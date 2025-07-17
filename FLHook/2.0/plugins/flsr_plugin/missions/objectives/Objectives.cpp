@@ -143,6 +143,17 @@ namespace Missions
 
 		switch (entry.first)
 		{
+			case ObjectiveType::BreakFormation:
+			{
+				pub::AI::DirectiveIdleOp idleOp;
+				idleOp.fireWeapons = true;
+				pub::AI::SubmitDirective(objId, &idleOp);
+
+				condition = ConditionPtr(new CndTimerDelay(ConditionParent(missionId, 0), objName, 0.0f));
+				condition->Register();
+				break;
+			}
+
 			case ObjectiveType::Delay:
 			{
 				const auto& delayArch = std::static_pointer_cast<ObjDelay>(entry.second);

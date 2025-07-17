@@ -224,6 +224,8 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 ### Objectives
 
+- `BreakFormation` Breaks from the current formation.
+
 - `Delay` Pauses for a time.
     1. `INTEGER: :0` The time to pause.
 

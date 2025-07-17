@@ -310,6 +310,10 @@ namespace Missions
 						{
 							if (ini.is_value("nickname"))
 								nickname = ini.get_value_string(0);
+							else if (ini.is_value("BreakFormation"))
+							{
+								objectives.objectives.push_back({ ObjectiveType::BreakFormation, nullptr });
+							}
 							else if (ini.is_value("Delay"))
 							{
 								ObjDelayPtr arch(new ObjDelay());

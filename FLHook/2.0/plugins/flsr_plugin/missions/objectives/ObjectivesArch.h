@@ -6,6 +6,7 @@ namespace Missions
 {
 	enum class ObjectiveType
 	{
+		BreakFormation,
 		Delay,
 		Dock,
 		Follow,

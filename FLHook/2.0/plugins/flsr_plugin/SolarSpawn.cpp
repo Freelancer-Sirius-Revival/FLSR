@@ -275,7 +275,7 @@ namespace SolarSpawn
 
 		pub::AI::SetPersonalityParams personality;
 		personality.personality = Pilots::GetPilot(archetype.pilotId);
-		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
+		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_LEADER);
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);
 

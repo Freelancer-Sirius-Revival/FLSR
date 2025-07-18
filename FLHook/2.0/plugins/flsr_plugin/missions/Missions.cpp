@@ -33,6 +33,7 @@
 #include "Objectives/ObjDock.h"
 #include "Objectives/ObjGoto.h"
 #include "Objectives/ObjFollow.h"
+#include "Objectives/ObjMakeNewFormation.h"
 #include "MissionBoard.h"
 
 namespace Missions
@@ -396,6 +397,14 @@ namespace Missions
 								if (ini.get_num_parameters() > 5)
 									arch->unk = ini.get_value_float(5);
 								objectives.objectives.push_back({ ObjectiveType::Follow, arch });
+							}
+							else if (ini.is_value("MakeNewFormation"))
+							{
+								ObjMakeNewFormationPtr arch(new ObjMakeNewFormation());
+								arch->formationId = CreateIdOrNull(ini.get_value_string(0));
+								for (int index = 1, length = ini.get_num_parameters(); index < length; index++)
+									arch->objNameIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
+								objectives.objectives.push_back({ ObjectiveType::MakeNewFormation, arch });
 							}
 						}
 						if (!nickname.empty())

@@ -279,6 +279,10 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
     1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
 
+- `MakeNewFormation`
+    1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
+    1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
+
 ## `[Trigger]`
 
 Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated. Triggers are usually deactivated by default and should be activated as the mission progresses.

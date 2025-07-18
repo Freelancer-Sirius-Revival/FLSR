@@ -4,6 +4,8 @@
 #include "ObjDock.h"
 #include "ObjFollow.h"
 #include "ObjGoto.h"
+#include "ObjMakeNewFormation.h"
+#include "../Formations.h"
 #include "../Mission.h"
 #include "../Conditions/CndDistObj.h"
 #include "../Conditions/CndDistVec.h"
@@ -17,7 +19,7 @@ namespace Missions
 		const uint objName;
 	public:
 		CndDistVecGoto(const ConditionParent& parent,
-						const uint objNameOrLabel,
+						const uint objName,
 						const Vector& position,
 						const float distance,
 						const uint systemId) :
@@ -145,9 +147,19 @@ namespace Missions
 		{
 			case ObjectiveType::BreakFormation:
 			{
-				pub::AI::DirectiveIdleOp idleOp;
-				idleOp.fireWeapons = true;
-				pub::AI::SubmitDirective(objId, &idleOp);
+				pub::AI::DirectiveCancelOp cancelOp;
+				pub::AI::SubmitDirective(objId, &cancelOp);
+
+				pub::AI::SetPersonalityParams personality;
+				pub::AI::get_personality(objId, personality.personality);
+				const uint graphId = pub::AI::get_state_graph_id(objId);
+				personality.state_graph = pub::StateGraph::get_state_graph(graphId, pub::StateGraph::TYPE_LEADER);
+				personality.state_id = true;
+				personality.contentCallback = 0;
+				personality.directiveCallback = 0;
+				pub::AI::SubmitState(objId, &personality);
+
+				pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });
 
 				condition = ConditionPtr(new CndTimerDelay(ConditionParent(missionId, 0), objName, 0.0f));
 				condition->Register();
@@ -289,8 +301,57 @@ namespace Missions
 				gotoOp.startWaitDistance = gotoArch->startWaitDistance;
 				gotoOp.endWaitDistance = gotoArch->endWaitDistance;
 				pub::AI::SubmitDirective(objId, &gotoOp);
+				break;
 			}
-			break;
+
+			case ObjectiveType::MakeNewFormation:
+			{
+				const auto& formationArch = std::static_pointer_cast<ObjMakeNewFormation>(entry.second);
+				const auto& formation = Formations::GetFormation(formationArch->formationId);
+				std::vector<std::string> memberStateGraphs;
+				for (const auto& entry : missionEntry->second.objectIdsByName)
+				{
+					if (entry.second == objId)
+					{
+						if (const auto& msnNpcEntry = missionEntry->second.msnNpcs.find(entry.first); msnNpcEntry != missionEntry->second.msnNpcs.end())
+							if (const auto& npcEntry = missionEntry->second.npcs.find(msnNpcEntry->second.npcId); npcEntry != missionEntry->second.npcs.end())
+								memberStateGraphs.push_back(npcEntry->second.stateGraph);
+						break;
+					}
+				}
+				if (memberStateGraphs.empty())
+					return;
+
+				std::vector<uint> memberIds({ objId });
+				for (const auto& memberName : formationArch->objNameIds)
+				{
+					if (const auto& objectEntry = missionEntry->second.objectIdsByName.find(memberName); objectEntry != missionEntry->second.objectIdsByName.end())
+						memberIds.push_back(objectEntry->second);
+
+					if (const auto& msnNpcEntry = missionEntry->second.msnNpcs.find(memberName); msnNpcEntry != missionEntry->second.msnNpcs.end())
+						if (const auto& npcEntry = missionEntry->second.npcs.find(msnNpcEntry->second.npcId); npcEntry != missionEntry->second.npcs.end())
+							memberStateGraphs.push_back(npcEntry->second.stateGraph);
+				}
+				for (int index = 0, length = min(formation.size(), memberIds.size()); index < length; index++)
+				{
+					pub::AI::DirectiveCancelOp cancelOp;
+					pub::AI::SubmitDirective(memberIds[index], &cancelOp);
+
+					pub::AI::SetPersonalityParams personality;
+					pub::AI::get_personality(memberIds[index], personality.personality);
+					personality.state_graph = pub::StateGraph::get_state_graph(memberStateGraphs[index].c_str(), index == 0 ? pub::StateGraph::TYPE_LEADER : pub::StateGraph::TYPE_ESCORT);
+					personality.state_id = true;
+					personality.contentCallback = 0;
+					personality.directiveCallback = 0;
+					pub::AI::SubmitState(memberIds[index], &personality);
+
+					pub::AI::update_formation_state(memberIds[index], memberIds[0], formation[index]);
+				}
+
+				condition = ConditionPtr(new CndTimerDelay(ConditionParent(missionId, 0), objName, 0.0f));
+				condition->Register();
+				break;
+			}
 
 			default:
 				break;

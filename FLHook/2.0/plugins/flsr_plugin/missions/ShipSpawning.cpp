@@ -301,7 +301,7 @@ static void SetPersonality(const uint shipId, const std::string& stateGraph, con
 {
 	pub::AI::SetPersonalityParams personality;
 	personality.personality = overrideJobId ? Pilots::GetPilotWithJob(pilotId, overrideJobId) : Pilots::GetPilot(pilotId);
-	personality.state_graph = pub::StateGraph::get_state_graph(stateGraph.c_str(), pub::StateGraph::TYPE_STANDARD);
+	personality.state_graph = pub::StateGraph::get_state_graph(stateGraph.c_str(), pub::StateGraph::TYPE_LEADER);
 	personality.state_id = true;
 	personality.contentCallback = 0;
 	personality.directiveCallback = 0;
@@ -376,6 +376,8 @@ uint CreateNPC(const NpcCreationParams& params)
 	pub::AI::DirectiveCancelOp cancelOp;
 	cancelOp.fireWeapons = true;
 	pub::AI::SubmitDirective(objId, &cancelOp);
+
+	pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });
 
 	if (params.launchObjId)
 		LaunchNpcFromObj(objId, params.launchObjId);

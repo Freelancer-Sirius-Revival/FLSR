@@ -10,7 +10,8 @@ namespace Missions
 		Delay,
 		Dock,
 		Follow,
-		Goto
+		Goto,
+		MakeNewFormation
 	};
 
 	typedef std::pair<ObjectiveType, std::shared_ptr<void>> ObjectiveEntry;

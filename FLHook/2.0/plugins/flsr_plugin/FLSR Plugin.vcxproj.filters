@@ -360,6 +360,9 @@
     <ClInclude Include="missions\actions\MissionShipSpawning.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\objectives\ObjMakeNewFormation.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
     <ClInclude Include="missions\objectives\ObjDelay.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>

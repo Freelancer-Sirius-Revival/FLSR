@@ -17,8 +17,15 @@ namespace Missions
 		const Vector& actualRotation = rotation.x != std::numeric_limits<float>::infinity() ? rotation : msnFormation.rotation;
 		const auto& translationMatrix = SetupTransform(actualPosition, { 0, 0, 0 });
 
+		std::vector<uint> msnShipIdsToSpawn;
+		for (const auto& msnShipId : msnFormation.msnShipIds)
+		{
+			if (!mission.objectIdsByName.contains(msnShipId))
+				msnShipIdsToSpawn.push_back(msnShipId);
+		}
+
 		std::vector<uint> spawnedShipIds;
-		for (int index = 0, length = min(formation.size(), msnFormation.msnShipIds.size()); index < length; index++)
+		for (int index = 0, length = min(formation.size(), msnShipIdsToSpawn.size()); index < length; index++)
 		{
 			// Move the ships to the right spots locally and rotate the entirety of this to what we want in the end.
 			auto formationMatrix = SetupTransform(formation[index], actualRotation);
@@ -39,39 +46,30 @@ namespace Missions
 			orientation.data[2][1] = shipRotationMatrix.d[2][1];
 			orientation.data[2][2] = shipRotationMatrix.d[2][2];
 
-			const uint objId = SpawnShip(msnFormation.msnShipIds[index], mission, &position, &orientation);
+			const uint objId = SpawnShip(msnShipIdsToSpawn[index], mission, &position, &orientation);
 			if (objId)
 				spawnedShipIds.push_back(objId);
 		}
 
-		int leaderIndex = -1;
 		for (int index = 0, length = spawnedShipIds.size(); index < length; index++)
 		{
-			if (spawnedShipIds[index] == 0)
-				continue;
+			pub::AI::SetPersonalityParams personality;
+			pub::AI::get_personality(spawnedShipIds[index], personality.personality);
+			const uint graphId = pub::AI::get_state_graph_id(spawnedShipIds[index]); // This only works because all graphs will be LEADER type initially.
+			personality.state_graph = pub::StateGraph::get_state_graph(graphId, index == 0 ? pub::StateGraph::TYPE_LEADER : pub::StateGraph::TYPE_ESCORT);
+			personality.state_id = true;
+			personality.contentCallback = 0;
+			personality.directiveCallback = 0;
+			pub::AI::SubmitState(spawnedShipIds[index], &personality);
 
-			if (leaderIndex < 0)
-			{
-				leaderIndex = index;
-				continue;
-			}
-
-			pub::AI::DirectiveFollowOp followOp;
-			followOp.fireWeapons = false;
-			followOp.followSpaceObj = spawnedShipIds[leaderIndex];
-			followOp.maxDistance = 150.0f;
-			//followOp.dunno2 = 400.0f;
-			followOp.offset.x = formation[index].x - formation[leaderIndex].x;
-			followOp.offset.y = formation[index].y - formation[leaderIndex].y;
-			followOp.offset.z = formation[index].z - formation[leaderIndex].z;
-			pub::AI::SubmitDirective(spawnedShipIds[index], &followOp);
+			pub::AI::update_formation_state(spawnedShipIds[index], spawnedShipIds[0], formation[index]);
 		}
 
-		if (leaderIndex >= 0)
+		if (!spawnedShipIds.empty())
 		{			
 			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
 			{
-				const uint leaderId = spawnedShipIds[leaderIndex];
+				const uint leaderId = spawnedShipIds[0];
 				mission.objectivesByObjectId.try_emplace(leaderId, mission.id, leaderId, objectivesEntry->second.objectives);
 				mission.objectivesByObjectId.at(leaderId).Progress();
 			}

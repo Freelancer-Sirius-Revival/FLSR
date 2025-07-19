@@ -5324,7 +5324,8 @@ namespace pub
 	{
 		enum Type
 		{
-			TYPE_STANDARD = 0
+			TYPE_LEADER = 0,
+			TYPE_ESCORT = 1
 		};
 
 		IMPORT  int  get_state_graph(int, enum Type);

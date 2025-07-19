@@ -1005,8 +1005,6 @@ extern IMPORT std::multimap<uint, JUMPPOINT> jumpPoints;
 
 namespace ZoneUtilities
 {
-	IMPORT TransformMatrix MultiplyMatrix(const TransformMatrix& mat1, const TransformMatrix& mat2);
-	IMPORT TransformMatrix SetupTransform(const Vector& p, const Vector& r);
 	IMPORT void ReadUniverse(zone_map_t* set_mmapZones);
 	IMPORT void ReadLootableZone(zone_map_t& set_mmapZones, const std::string& systemNick, const std::string& defaultZoneNick, const std::string& file);
 	IMPORT void ReadSystemLootableZones(zone_map_t& set_mmapZones, const std::string& systemNick, const std::string& file);

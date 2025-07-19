@@ -5,7 +5,9 @@
 #include "Conditions/CndTrue.h"
 #include "Conditions/IniReader.h"
 #include "Actions/ActDebugMsg.h"
-#include "Actions/ActActTrigger.h"
+#include "Actions/ActActTrig.h"
+#include "Actions/ActActMsn.h"
+#include "Actions/ActActMsnTrig.h"
 #include "Actions/ActChangeState.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
@@ -16,6 +18,7 @@
 #include "Actions/ActEndMission.h"
 #include "Actions/ActDestroy.h"
 #include "Actions/ActPlaySoundEffect.h"
+#include "Actions/ActRelocate.h"
 #include "Actions/ActPlayMusic.h"
 #include "Actions/ActEtherComm.h"
 #include "Actions/ActSendComm.h"
@@ -26,7 +29,11 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
-#include "Objectives/ObjGotoArch.h"
+#include "Objectives/ObjDelay.h"
+#include "Objectives/ObjDock.h"
+#include "Objectives/ObjGoto.h"
+#include "Objectives/ObjFollow.h"
+#include "Objectives/ObjMakeNewFormation.h"
 #include "MissionBoard.h"
 
 namespace Missions
@@ -196,7 +203,7 @@ namespace Missions
 					{
 						MsnNpc npc;
 						npc.position = { 0, 0, 0 };
-						npc.orientation = EulerMatrix(npc.position);
+						npc.orientation = EulerMatrix({ 0, 0, 0 });
 
 						while (ini.read_value())
 						{
@@ -229,7 +236,7 @@ namespace Missions
 					{
 						MsnSolar solar;
 						solar.position = { 0, 0, 0 };
-						solar.orientation = EulerMatrix(solar.position);
+						solar.orientation = EulerMatrix({ 0, 0, 0 });
 
 						while (ini.read_value())
 						{
@@ -304,9 +311,25 @@ namespace Missions
 						{
 							if (ini.is_value("nickname"))
 								nickname = ini.get_value_string(0);
-							else if (ini.is_value("GotoShip"))
+							else if (ini.is_value("BreakFormation"))
 							{
-								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								objectives.objectives.push_back({ ObjectiveType::BreakFormation, nullptr });
+							}
+							else if (ini.is_value("Delay"))
+							{
+								ObjDelayPtr arch(new ObjDelay());
+								arch->timeInS = ini.get_value_int(0);
+								objectives.objectives.push_back({ ObjectiveType::Delay, arch });
+							}
+							else if (ini.is_value("Dock"))
+							{
+								ObjDockPtr arch(new ObjDock());
+								arch->targetObjNameOrId = CreateIdOrNull(ini.get_value_string(0));
+								objectives.objectives.push_back({ ObjectiveType::Dock, arch });
+							}
+							else if (ini.is_value("GotoObj"))
+							{
+								ObjGotoPtr arch(new ObjGoto());
 								arch->type = pub::AI::GotoOpType::Ship;
 								const auto val = ToLower(ini.get_value_string(0));
 								if (val == "goto_no_cruise")
@@ -323,7 +346,7 @@ namespace Missions
 							}
 							else if (ini.is_value("GotoVec"))
 							{
-								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								ObjGotoPtr arch(new ObjGoto());
 								arch->type = pub::AI::GotoOpType::Vec;
 								const auto val = ToLower(ini.get_value_string(0));
 								if (val == "goto_no_cruise")
@@ -342,7 +365,7 @@ namespace Missions
 							}
 							else if (ini.is_value("GotoSpline"))
 							{
-								ObjGotoArchetypePtr arch(new ObjGotoArchetype());
+								ObjGotoPtr arch(new ObjGoto());
 								arch->type = pub::AI::GotoOpType::Spline;
 								const auto val = ToLower(ini.get_value_string(0));
 								if (val == "goto_no_cruise")
@@ -362,6 +385,26 @@ namespace Missions
 								arch->startWaitDistance = ini.get_value_float(16);
 								arch->endWaitDistance = ini.get_value_float(17);
 								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
+							}
+							else if (ini.is_value("Follow"))
+							{
+								ObjFollowPtr arch(new ObjFollow());
+								arch->objName = CreateIdOrNull(ini.get_value_string(0));
+								arch->maxDistance = ini.get_value_float(1);
+								arch->relativePosition.x = ini.get_value_float(2);
+								arch->relativePosition.y = ini.get_value_float(3);
+								arch->relativePosition.z = ini.get_value_float(4);
+								if (ini.get_num_parameters() > 5)
+									arch->unk = ini.get_value_float(5);
+								objectives.objectives.push_back({ ObjectiveType::Follow, arch });
+							}
+							else if (ini.is_value("MakeNewFormation"))
+							{
+								ObjMakeNewFormationPtr arch(new ObjMakeNewFormation());
+								arch->formationId = CreateIdOrNull(ini.get_value_string(0));
+								for (int index = 1, length = ini.get_num_parameters(); index < length; index++)
+									arch->objNameIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
+								objectives.objectives.push_back({ ObjectiveType::MakeNewFormation, arch });
 							}
 						}
 						if (!nickname.empty())
@@ -420,8 +463,8 @@ namespace Missions
 							}
 							else if (ini.is_value("Act_ActTrig"))
 							{
-								ActActTriggerPtr action(new ActActTrigger());
-								action->nameId = CreateIdOrNull(ini.get_value_string(0));
+								ActActTrigPtr action(new ActActTrig());
+								action->triggerId = CreateIdOrNull(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);
 								action->activate = true;
@@ -429,10 +472,47 @@ namespace Missions
 							}
 							else if (ini.is_value("Act_DeactTrig"))
 							{
-								ActActTriggerPtr action(new ActActTrigger());
-								action->nameId = CreateIdOrNull(ini.get_value_string(0));
+								ActActTrigPtr action(new ActActTrig());
+								action->triggerId = CreateIdOrNull(ini.get_value_string(0));
 								if (ini.get_num_parameters() > 1)
 									action->probability = ini.get_value_float(1);
+								action->activate = false;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_ActMsn"))
+							{
+								ActActMsnPtr action(new ActActMsn());
+								action->missionId = CreateIdOrNull(ini.get_value_string(0));
+								for (int index = 1, length = ini.get_num_parameters(); index < length; index++)
+								{
+									const auto& value = ToLower(ini.get_value_string(index));
+									if (value == "all")
+									{
+										action->playerLabelsToTransfer.clear();
+										action->playerLabelsToTransfer.insert(ActActMsnAllPlayerLabels);
+										break;
+									}
+									action->playerLabelsToTransfer.insert(CreateIdOrNull(value.c_str()));
+								}
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_ActMsnTrig"))
+							{
+								ActActMsnTrigPtr action(new ActActMsnTrig());
+								action->missionId = CreateIdOrNull(ini.get_value_string(0));
+								action->triggerId = CreateIdOrNull(ini.get_value_string(1));
+								if (ini.get_num_parameters() > 2)
+									action->probability = ini.get_value_float(2);
+								action->activate = true;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_DeactMsnTrig"))
+							{
+								ActActMsnTrigPtr action(new ActActMsnTrig());
+								action->missionId = CreateIdOrNull(ini.get_value_string(0));
+								action->triggerId = CreateIdOrNull(ini.get_value_string(1));
+								if (ini.get_num_parameters() > 2)
+									action->probability = ini.get_value_float(2);
 								action->activate = false;
 								actions.push_back(action);
 							}
@@ -491,17 +571,19 @@ namespace Missions
 							{
 								ActSpawnFormationPtr action(new ActSpawnFormation());
 								action->msnFormationId = CreateIdOrNull(ini.get_value_string(0));
-								if (ini.get_num_parameters() > 1)
+								const auto objectivesName = ToLower(ini.get_value_string(1));
+								action->objectivesId = objectivesName == "no_ol" ? 0 : CreateID(objectivesName.c_str());
+								if (ini.get_num_parameters() > 2)
 								{
-									action->position.x = ini.get_value_float(1);
-									action->position.y = ini.get_value_float(2);
-									action->position.z = ini.get_value_float(3);
+									action->position.x = ini.get_value_float(2);
+									action->position.y = ini.get_value_float(3);
+									action->position.z = ini.get_value_float(4);
 								}
-								if (ini.get_num_parameters() > 4)
+								if (ini.get_num_parameters() > 5)
 								{
-									action->rotation.x = ini.get_value_float(4);
-									action->rotation.y = ini.get_value_float(5);
-									action->rotation.z = ini.get_value_float(6);
+									action->rotation.x = ini.get_value_float(5);
+									action->rotation.y = ini.get_value_float(6);
+									action->rotation.z = ini.get_value_float(7);
 								}
 								actions.push_back(action);
 							}
@@ -669,7 +751,24 @@ namespace Missions
 								if (ini.get_num_parameters() > 3)
 									action->maxHpLossPercentage = ini.get_value_float(3);
 								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_Relocate"))
+							{
+								ActRelocatePtr action(new ActRelocate());
+								action->objName = CreateIdOrNull(ini.get_value_string(0));
+								action->position.x = ini.get_value_float(1);
+								action->position.y = ini.get_value_float(2);
+								action->position.z = ini.get_value_float(3);
+								if (ini.get_num_parameters() > 6)
+								{
+									Vector rotation;
+									rotation.x = ini.get_value_float(4);
+									rotation.y = ini.get_value_float(5);
+									rotation.z = ini.get_value_float(6);
+									action->orientation = EulerMatrix(rotation);
 								}
+								actions.push_back(action);
+							}
 							else
 							{
 								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);
@@ -911,6 +1010,54 @@ namespace Missions
 			ClearMissions();
 			initialized = false;
 			PrintUserCmdText(clientId, L"Stopped and reloaded all missions.");
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			return true;
+		}
+
+		else if (IS_CMD("act_trigger"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			const std::string msnNickname = wstos(ToLower(cmds->ArgStr(1)));
+			const std::string trigNickname = wstos(ToLower(cmds->ArgStr(2)));
+			ActActMsnTrig action;
+			action.missionId = CreateIdOrNull(msnNickname.c_str());
+			action.triggerId = CreateIdOrNull(trigNickname.c_str());
+			action.activate = true;
+			Mission msn("", 0, false);
+			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
+
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			return true;
+		}
+
+		else if (IS_CMD("deact_trigger"))
+		{
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+
+			const uint clientId = ((CInGame*)cmds)->iClientID;
+			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
+			{
+				PrintUserCmdText(clientId, L"ERR No permission");
+				return false;
+			}
+
+			const std::string msnNickname = wstos(ToLower(cmds->ArgStr(1)));
+			const std::string trigNickname = wstos(ToLower(cmds->ArgStr(2)));
+			ActActMsnTrig action;
+			action.missionId = CreateIdOrNull(msnNickname.c_str());
+			action.triggerId = CreateIdOrNull(trigNickname.c_str());
+			action.activate = true;
+			Mission msn("", 0, false);
+			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
 			return true;

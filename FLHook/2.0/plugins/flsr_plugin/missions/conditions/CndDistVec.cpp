@@ -41,6 +41,8 @@ namespace Missions
 		StarSystem* starSystem;
 		if (!GetShipInspect(objId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
 			return false;
+		if (inspect->cobj->system != systemId)
+			return false;
 		const bool inside = distance - HkDistance3D(position, inspect->cobj->vPos) > 0.0f;
 		return (condition == CndDistVec::DistanceCondition::Inside && inside) || (condition == CndDistVec::DistanceCondition::Outside && !inside);
 	}

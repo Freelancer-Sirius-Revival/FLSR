@@ -4,13 +4,18 @@ For each mission you may create one new `.ini` file with any name you wish in `F
 
 This mission scripting system is mostly a re-implementation of Freelancer’s own mission scripting system. Although there are some differences due to changed requirements and use-cases in multiplayer.
 
+You may start as many different mission at any time. However, only one instance of the same mission can run at the same time.
+
 ## Console Commands
 
 - `start_mission <mission nickname>` Admin command (requires EVENT permission) to start this mission.
 - `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission.
 - `reload_missions` Admin command (requires EVENT permission) to stop all missions, reload them again from files, and start initially active missions. Do not use too fast or server will crash due to system-blocked INI files.
+- `act_trigger <mission nickname> <trigger nickname>` Admin command (requires EVENT permission) to activate the mission trigger. 
+- `deact_trigger <mission nickname> <trigger nickname>` Admin command (requires EVENT permission) to deactivate the mission trigger.
+- `getpos` Admin command (requires SUPERADMIN permission) to get the current ship position printed to chat.
 
-You may start as many different mission at any time. However, only one instance of the same mission can run at the same time.
+## Syntax
 
 The following explains the available sections and their key-values. Key-values are always written as
 - `key`
@@ -219,11 +224,24 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 ### Objectives
 
-- `GotoVec` Fly toward a specific point in space.
+- `BreakFormation` Breaks from the current formation.
+
+- `Delay` Pauses for a time.
+    1. `INTEGER: :0` The time to pause.
+
+- `Dock` Fly toward a specific object and dock to it.
+    1. `STRING` Object by name to dock to.
+
+- `Follow` Follows the given target.
+    1. `STRING` The target name ship to follow.
+    1. `FLOAT :0` Maximum distance not to exceed.
+    1. `FLOAT :0` The relative x-axis position to the target.
+    1. `FLOAT :0` The relative y-axis position to the target.
+    1. `FLOAT :0` The relative z-axis position to the target.
+
+- `GotoObj` Fly toward a specific object in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
-    1. `FLOAT :0` The x-axis position for the target.
-    1. `FLOAT :0` The y-axis position for the target.
-    1. `FLOAT :0` The z-axis position for the target.
+    1. `STRING` Object by name to fly to.
     1. `FLOAT :0` The distance from the given position to stop at.
     1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
@@ -249,6 +267,21 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `[STRING]` Object by name to wait for.
     1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
     1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+
+- `GotoVec` Fly toward a specific point in space.
+    1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
+    1. `FLOAT :0` The x-axis position for the target.
+    1. `FLOAT :0` The y-axis position for the target.
+    1. `FLOAT :0` The z-axis position for the target.
+    1. `FLOAT :0` The distance from the given position to stop at.
+    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[STRING]` Object by name to wait for.
+    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+
+- `MakeNewFormation`
+    1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
+    1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
 
 ## `[Trigger]`
 
@@ -276,6 +309,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
+
+- `Cnd_CommComplete` Waits for a comm to complete. See `Act_SendComm` and `Act_EtherComm`.
+    1. `STRING` The comm name to wait finishing for. Started comms not ending within 10 seconds will trigger `Cnd_CommComplete` to allow continuing the flow even if no player witnessed hearing it.
 
 - `Cnd_Count` Counts the objects from a label. `Activator` will be the server.
     1. `STRING` Objects by label to count.
@@ -352,6 +388,20 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
 
+- `Act_ActMsn` Activates another mission.
+    1. `STRING` Mission nickname to refer.
+    1. `[STRING|All]` Multiple subsequent entries possible. A label whose assigned players are transferred over to the mission with the same label. `All` transfers over all players and their labels.
+
+- `Act_ActMsnTrig` Activates a trigger of a another mission.
+    1. `STRING` Mission nickname to refer.
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
+
+- `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
+    1. `STRING` Mission nickname to refer.
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to add.
@@ -375,6 +425,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_SpawnFormation` Spawns a formation of ships.
     1. `STRING` The `MsnFormation` nickname to spawn.
+    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
     1. `[FLOAT] :0` Override for initial x-axis position.
     1. `[FLOAT] :0` Override for initial y-axis position.
     1. `[FLOAT] :0` Override for initial z-axis position.
@@ -385,6 +436,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_Destroy` Destroys an object.
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
+
+- `Act_Relocate` Relocates an object.
+    1. `STRING|Activator` Object by name to relocate.
+    1. `FLOAT :0` Position on x-axis.
+    1. `FLOAT :0` Position on y-axis.
+    1. `FLOAT :0` Position on z-axis.
+    1. `[FLOAT]` Override for current x-axis rotation.
+    1. `[FLOAT]` Override for current y-axis rotation.
+    1. `[FLOAT]` Override for current z-axis rotation.
 
 - `Act_LightFuse` Executes an arbitary fuse.
     1. `STRING|Activator` Object by name or label to refer.

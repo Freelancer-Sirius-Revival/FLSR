@@ -275,9 +275,14 @@ namespace SolarSpawn
 
 		pub::AI::SetPersonalityParams personality;
 		personality.personality = Pilots::GetPilot(archetype.pilotId);
-		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_STANDARD);
+		personality.state_graph = pub::StateGraph::get_state_graph("NOTHING", pub::StateGraph::TYPE_LEADER);
 		personality.state_id = true;
 		pub::AI::SubmitState(spaceObjId, &personality);
+
+		const auto& solarArchetype = Archetype::GetSolar(archetype.archetypeId);
+		if (solarArchetype && solarArchetype->bDestructible)
+			// Invincibility kicks in at 99% hitpoints loss. This still allows damaging shields or equipment.
+			pub::SpaceObj::SetInvincible2(spaceObjId, true, true, 0.99f);
 
 		// Expects general nickname to identify the configs
 		Cloak::TryRegisterNoCloakSolar(archetype.nickname, spaceObjId);

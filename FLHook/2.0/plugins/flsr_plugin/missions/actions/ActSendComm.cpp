@@ -2,15 +2,29 @@
 
 namespace Missions
 {
-	static void SendComm(uint receiverObjId, uint senderObjId, const std::vector<uint>& lines, float delay, bool global)
+	static void SendComm(const uint receiverObjId, uint senderObjId, const ActSendComm& action, const MissionObject& senderObject, Mission& mission)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		if (GetShipInspect(senderObjId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
+		if (!GetShipInspect(senderObjId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
+			return;
+
+		if (const auto& commEntry = mission.ongoingComms.find(action.name); commEntry != mission.ongoingComms.end())
 		{
-			const auto& object = dynamic_cast<CEqObj*>(inspect->cobj);
-			pub::SpaceObj::SendComm(object->id, receiverObjId, object->voiceId, &object->commCostume, 0, (uint*)lines.data(), lines.size(), 0, std::fmaxf(0.0f, delay), global);
+			commEntry->second.receiverObjIds.insert(receiverObjId);
 		}
+		else
+		{
+			Mission::CommEntry comm;
+			comm.sendTime = timeInMS();
+			comm.sender = senderObject;
+			comm.voiceLineId = action.lines.back();
+			comm.receiverObjIds.insert(receiverObjId);
+			mission.ongoingComms.insert({ action.name, comm });
+		}
+
+		const auto& object = dynamic_cast<CEqObj*>(inspect->cobj);
+		pub::SpaceObj::SendComm(object->id, receiverObjId, object->voiceId, &object->commCostume, 0, (uint*)(action.lines.data()), action.lines.size(), 0, std::fmaxf(0.0f, action.delay), action.global);
 	}
 
 	void ActSendComm::Execute(Mission& mission, const MissionObject& activator) const
@@ -38,14 +52,14 @@ namespace Missions
 				objId = activator.id;
 
 			if (objId)
-				SendComm(objId, senderObjId, lines, delay, global);
+				SendComm(objId, senderObjId, *this, activator, mission);
 		}
 		else
 		{
 			// Clients can only be addressed via Label.
 			if (const auto& objectByName = mission.objectIdsByName.find(receiverObjNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				SendComm(objectByName->second, senderObjId, lines, delay, global);
+				SendComm(objectByName->second, senderObjId, *this, MissionObject(MissionObjectType::Object, senderObjId), mission);
 			}
 			else if (const auto& objectsByLabel = mission.objectsByLabel.find(receiverObjNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
@@ -60,7 +74,7 @@ namespace Missions
 						objId = object.id;
 
 					if (objId)
-						SendComm(objId, senderObjId, lines, delay, global);
+						SendComm(objId, senderObjId, *this, object, mission);
 				}
 			}
 		}

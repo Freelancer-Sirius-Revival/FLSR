@@ -80,6 +80,7 @@ namespace Missions
 				}
 			}
 		}
+		return false;
 	}
 
 	bool CndDistObj::Matches(const MissionObject& object)

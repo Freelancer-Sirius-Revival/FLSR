@@ -8,12 +8,12 @@ namespace Missions
 {
 	struct Objectives
 	{
-		const unsigned int parentMissionId;
+		const uint missionId;
 		std::queue<ObjectiveEntry> objectives;
-		const unsigned int objId;
+		const uint objId;
 		ConditionPtr currentCondition;
 
-		Objectives(const unsigned int parentMissionId, const unsigned int objId, const std::vector<ObjectiveEntry>& objectives);
+		Objectives(const uint missionId, const uint objId, const std::vector<ObjectiveEntry>& objectives);
 		virtual ~Objectives();
 		void Progress();
 		void Cancel();

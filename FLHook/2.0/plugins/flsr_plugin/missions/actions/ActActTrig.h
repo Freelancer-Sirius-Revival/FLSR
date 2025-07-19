@@ -3,13 +3,13 @@
 
 namespace Missions
 {
-	struct ActActTrigger : Action
+	struct ActActTrig : Action
 	{
-		uint nameId = 0;
+		uint triggerId = 0;
 		bool activate = false;
 		float probability = 1.0f;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
-	typedef std::shared_ptr<ActActTrigger> ActActTriggerPtr;
+	typedef std::shared_ptr<ActActTrig> ActActTrigPtr;
 }

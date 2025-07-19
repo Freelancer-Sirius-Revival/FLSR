@@ -4,8 +4,22 @@
 
 namespace Missions
 {
-	static void SendComm(uint receiverObjId, const ActEtherComm& action)
+	static void SendComm(const uint receiverObjId, const ActEtherComm& action, Mission& mission)
 	{
+		if (const auto& commEntry = mission.ongoingComms.find(action.name); commEntry != mission.ongoingComms.end())
+		{
+			commEntry->second.receiverObjIds.insert(receiverObjId);
+		}
+		else
+		{
+			Mission::CommEntry comm;
+			comm.sendTime = timeInMS();
+			comm.sender = MissionObject(MissionObjectType::Client, 0);
+			comm.voiceLineId = action.lines.back();
+			comm.receiverObjIds.insert(receiverObjId);
+			mission.ongoingComms.insert({ action.name, comm });
+		}
+
 		pub::SpaceObj::SendComm(0, receiverObjId, action.senderVoiceId, &action.costume, action.senderIdsName, (uint*)(action.lines.data()), action.lines.size(), 0, std::fmaxf(0.0f, action.delay), action.global);
 	}
 
@@ -20,14 +34,14 @@ namespace Missions
 				objId = activator.id;
 
 			if (objId)
-				SendComm(objId, *this);
+				SendComm(objId, *this, mission);
 		}
 		else
 		{
 			// Clients can only be addressed via Label.
 			if (const auto& objectByName = mission.objectIdsByName.find(receiverObjNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
-				SendComm(objectByName->second, *this);
+				SendComm(objectByName->second, *this, mission);
 			}
 			else if (const auto& objectsByLabel = mission.objectsByLabel.find(receiverObjNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 			{
@@ -42,7 +56,7 @@ namespace Missions
 						objId = object.id;
 
 					if (objId)
-						SendComm(objId, *this);
+						SendComm(objId, *this, mission);
 				}
 			}
 		}

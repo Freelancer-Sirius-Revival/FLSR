@@ -142,7 +142,9 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
     <ClCompile Include="MissionAbortFix.cpp" />
-    <ClCompile Include="missions\actions\ActActTrigger.cpp" />
+    <ClCompile Include="missions\actions\ActActMsn.cpp" />
+    <ClCompile Include="missions\actions\ActActMsnTrig.cpp" />
+    <ClCompile Include="missions\actions\ActActTrig.cpp" />
     <ClCompile Include="missions\actions\ActAddCargo.cpp" />
     <ClCompile Include="missions\actions\ActAddLabel.cpp" />
     <ClCompile Include="missions\actions\ActAdjAcct.cpp" />
@@ -164,8 +166,11 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActSpawnShip.cpp" />
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\actions\ActSetVibe.cpp" />
+    <ClCompile Include="missions\actions\ActRelocate.cpp" />
+    <ClCompile Include="missions\actions\MissionShipSpawning.cpp" />
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp" />
     <ClCompile Include="missions\conditions\CndCloaked.cpp" />
+    <ClCompile Include="missions\conditions\CndCommComplete.cpp" />
     <ClCompile Include="missions\conditions\CndCount.cpp" />
     <ClCompile Include="missions\conditions\CndDestroyed.cpp" />
     <ClCompile Include="missions\conditions\CndDistObj.cpp" />
@@ -184,6 +189,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\Missions.cpp" />
     <ClCompile Include="missions\NpcNames.cpp" />
     <ClCompile Include="missions\objectives\Objectives.cpp" />
+    <ClCompile Include="missions\ShipSpawning.cpp" />
     <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
@@ -202,7 +208,9 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="MissionAbortFix.h" />
-    <ClInclude Include="missions\actions\ActActTrigger.h" />
+    <ClInclude Include="missions\actions\ActActMsn.h" />
+    <ClInclude Include="missions\actions\ActActMsnTrig.h" />
+    <ClInclude Include="missions\actions\ActActTrig.h" />
     <ClInclude Include="missions\actions\ActAddCargo.h" />
     <ClInclude Include="missions\actions\ActAddLabel.h" />
     <ClInclude Include="missions\actions\ActAdjAcct.h" />
@@ -225,8 +233,11 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSpawnShip.h" />
     <ClInclude Include="missions\actions\ActSpawnSolar.h" />
     <ClInclude Include="missions\actions\ActSetVibe.h" />
+    <ClInclude Include="missions\actions\ActRelocate.h" />
+    <ClInclude Include="missions\actions\MissionShipSpawning.h" />
     <ClInclude Include="missions\conditions\CndBaseEnter.h" />
     <ClInclude Include="missions\conditions\CndCloaked.h" />
+    <ClInclude Include="missions\conditions\CndCommComplete.h" />
     <ClInclude Include="missions\conditions\CndCount.h" />
     <ClInclude Include="missions\conditions\CndDestroyed.h" />
     <ClInclude Include="missions\conditions\CndDistObj.h" />
@@ -240,6 +251,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\Condition.h" />
     <ClInclude Include="missions\conditions\IniReader.h" />
     <ClInclude Include="missions\Formations.h" />
+    <ClInclude Include="missions\MatrixMath.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionBoard.h" />
     <ClInclude Include="missions\MissionObject.h" />
@@ -249,9 +261,14 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\MsnSolar.h" />
     <ClInclude Include="missions\Npc.h" />
     <ClInclude Include="missions\NpcNames.h" />
+    <ClInclude Include="missions\objectives\ObjDelay.h" />
+    <ClInclude Include="missions\objectives\ObjDock.h" />
+    <ClInclude Include="missions\objectives\ObjMakeNewFormation.h" />
     <ClInclude Include="missions\objectives\Objectives.h" />
     <ClInclude Include="missions\objectives\ObjectivesArch.h" />
-    <ClInclude Include="missions\objectives\ObjGotoArch.h" />
+    <ClInclude Include="missions\objectives\ObjFollow.h" />
+    <ClInclude Include="missions\objectives\ObjGoto.h" />
+    <ClInclude Include="missions\ShipSpawning.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="Pilots.h" />
     <ClInclude Include="Plugin.h" />

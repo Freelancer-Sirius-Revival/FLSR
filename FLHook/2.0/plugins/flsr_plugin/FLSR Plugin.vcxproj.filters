@@ -25,7 +25,7 @@
     <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
-    <ClCompile Include="missions\actions\ActActTrigger.cpp">
+    <ClCompile Include="missions\actions\ActActTrig.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActDestroy.cpp">
@@ -157,10 +157,28 @@
     <ClCompile Include="missions\actions\ActSpawnFormation.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActActMsn.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActActMsnTrig.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActRelocate.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndCommComplete.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\ShipSpawning.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\MissionShipSpawning.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
-    <ClInclude Include="missions\actions\ActActTrigger.h">
+    <ClInclude Include="missions\actions\ActActTrig.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActDestroy.h">
@@ -254,7 +272,7 @@
     <ClInclude Include="missions\actions\ActAddCargo.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\objectives\ObjGotoArch.h">
+    <ClInclude Include="missions\objectives\ObjGoto.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\Objectives.h">
@@ -317,6 +335,39 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActSpawnFormation.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActMsn.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MatrixMath.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjFollow.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActMsnTrig.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRelocate.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndCommComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\ShipSpawning.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\MissionShipSpawning.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjMakeNewFormation.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjDelay.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjDock.h">
+      <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@ namespace Missions
 {
 	class Mission
 	{
-	private:
+	public:
 		enum class MissionState
 		{
 			AwaitingInitialActivation,
@@ -19,8 +19,6 @@ namespace Missions
 			Active,
 			Finished
 		};
-
-	public:
 		const std::string name;
 		const uint id;
 		const bool initiallyActive;
@@ -41,9 +39,17 @@ namespace Missions
 		std::unordered_set<uint> clientIds;
 		std::unordered_map<uint, Objectives> objectivesByObjectId;
 
+		struct CommEntry
+		{
+			mstime sendTime;
+			uint voiceLineId;
+			MissionObject sender = { MissionObjectType::Client, 0 };
+			std::unordered_set<uint> receiverObjIds;
+		};
+		std::unordered_map<uint, CommEntry> ongoingComms;
+
 	private:
 		MissionState state;
-		bool triggerExecutionRunning;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
 
 		void EvaluateCountConditions(const uint label) const;
@@ -52,6 +58,8 @@ namespace Missions
 		Mission(const std::string name, const uint id, const bool initiallyActive);
 		virtual ~Mission();
 		void Reset();
+		bool CanBeStarted() const;
+		bool IsActive() const;
 		bool Start();
 		void End();
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
@@ -63,4 +71,12 @@ namespace Missions
 	};
 
 	extern std::unordered_map<uint, Mission> missions;
+
+	namespace Hooks
+	{
+		namespace Mission
+		{
+			void __stdcall Elapse_Time_AFTER(float seconds);
+		}
+	}
 }

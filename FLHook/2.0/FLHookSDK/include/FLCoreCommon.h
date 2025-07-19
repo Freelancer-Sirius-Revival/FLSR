@@ -4668,10 +4668,9 @@ namespace pub
 
 		public:
 			uint dockTargetObjId;
-			uint x10;   // 0
-			ushort x12; // 0
-			ushort x14; // 0xbb, 0x83 ??
-			int x18;    // -1
+			uint dockTargetDirectionObjId;   // 0, unless using a TLR and giving the direction by the end ring of the TLR
+			uint x12; // 0
+			int dockPortIndex; // -1
 			uint x1C;   // 0
 			float x20;  // 200
 			float x24;  // 500

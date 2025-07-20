@@ -9,7 +9,7 @@ namespace Missions
 		if (!GetShipInspect(senderObjId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
 			return;
 
-		if (const auto& commEntry = mission.ongoingComms.find(action.name); commEntry != mission.ongoingComms.end())
+		if (const auto& commEntry = mission.ongoingComms.find(action.id); commEntry != mission.ongoingComms.end())
 		{
 			commEntry->second.receiverObjIds.insert(receiverObjId);
 		}
@@ -20,7 +20,7 @@ namespace Missions
 			comm.sender = senderObject;
 			comm.voiceLineId = action.lines.back();
 			comm.receiverObjIds.insert(receiverObjId);
-			mission.ongoingComms.insert({ action.name, comm });
+			mission.ongoingComms.insert({ action.id, comm });
 		}
 
 		const auto& object = dynamic_cast<CEqObj*>(inspect->cobj);

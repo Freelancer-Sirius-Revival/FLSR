@@ -20,9 +20,9 @@ You may start as many different mission at any time. However, only one instance 
 The following explains the available sections and their key-values. Key-values are always written as
 - `key`
     1. `STRING` The first value which is required.
-    1. `[FLOAT]:42` Optional value that defaults to 42 and required floating point numbers.
-    1. `ACTIVE|INACTIVE` This value has two allowed values: Active and Inactive.
-    1. `[ACTIVE|INACTIVE] :INACTIVE` Optional value that allows Active or Inactive as value, and defaults to Inactive if not given.
+    1. `[FLOAT] :42` Optional value that defaults to 42 and required floating point numbers.
+    1. `Active|Inactive` This value has two allowed values: Active and Inactive.
+    1. `[Active|Inactive] :Inactive` Optional value that allows Active or Inactive as value, and defaults to Inactive if not given.
 - `[another key]` This key is optional.
 
 ## `Mission`
@@ -35,7 +35,7 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
     1. `STRING` The name. Must be unique among all missions on the server.
 
 - `[initstate]` Whether this mission starts directly at server startup. Ignored if `offer_type` is given.
-    1. `ACTIVE|INACTIVE :INACTIVE` The initial state.
+    1. `Active|Inactive :Inactive` The initial state.
 
 - `[offer_type]`
     1. `DestroyShips|DestroyInstallation|DestroyContraband|Assassinate|CapturePrisoner|RetrieveContraband` Defining the icon displayed on the Mission Board.
@@ -227,7 +227,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 - `BreakFormation` Breaks from the current formation.
 
 - `Delay` Pauses for a time.
-    1. `INTEGER: :0` The time to pause.
+    1. `INTEGER :0` The time to pause.
 
 - `Dock` Fly toward a specific object and dock to it.
     1. `STRING` Object by name to dock to.
@@ -283,6 +283,34 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
     1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
 
+## `[Dialog]`
+
+Dialogs are a shortcut to defining multiple `Act_SendComm` or `Act_EtherComm` for complex dialogs.
+
+- `nickname` The dialog name. Used by `Act_StartDialog`.
+    1. `STRING` The name. Must be unique in this mission.
+- `etherSender` A sender definition coming from no specific object (see `Act_EtherComm`).
+    1. `STRING` The name of this sender.
+    1. `STRING` The voice nickname to use for the sender.
+    1. `[INTEGER] :0` The sender’s resource ID to display as name below the comms window.
+    1. `[STRING]` The head nickname used for the sender.
+    1. `[STRING]` The body nickname used for the sender.
+    1. `[STRING]` The 1. accessory slot used for the sender.
+    1. `[STRING]` The 2. accessory slot used for the sender.
+    1. `[STRING]` The 3. accessory slot used for the sender.
+    1. `[STRING]` The 4. accessory slot used for the sender..
+    1. `[STRING]` The 5. accessory slot used for the sender.
+    1. `[STRING]` The 6. accessory slot used for the sender.
+    1. `[STRING]` The 7. accessory slot used for the sender.
+    1. `[STRING]` The 8. accessory slot used for the sender.
+- `line` In definition order: Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
+    1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
+    1. `STRING|Activator` Object by name or label to receive this comm.
+    1. `STRING` Object by name to send this comm. Can also be a static world solar, or `etherSender`. Must have a voice defined. Cannot be a player.
+    1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
+    1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
+
 ## `[Trigger]`
 
 Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated. Triggers are usually deactivated by default and should be activated as the mission progresses.
@@ -326,7 +354,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 
 - `Cnd_DistObj` Distance to another object in space. `Activator` will be the object coming into range.
     1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
-    1. `STRING` Other object by name or label to expect within the distance. Can be a static world solar.
+    1. `STRING` Other object by name or label to expect within the distance. Can also be a static world solar.
     1. `FLOAT :0` The distance from the given position to check.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
@@ -482,16 +510,16 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.
-    1. `STRING` Object by name to send this comm. Can be a static world solar. Must have a voice defined. Cannot be a player.
-    1. `STRING` Multiple subsequent entries possible. Must be one of the defined voice’s sound messages. 
-    1. `[FLOAT] : 0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `STRING` Object by name to send this comm. Can also be a static world solar. Must have a voice defined. Cannot be a player.
+    1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
+    1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
 - `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.
     1. `STRING` The voice nickname to use for the sender.
-    1. `STRING` Multiple subsequent entries possible. Must be one of the defined voice’s sound messages. 
+    1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
     1. `[INTEGER] :0` The sender’s resource ID to display as name below the comms window.
@@ -505,6 +533,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING]` The 6. accessory slot used for the sender.
     1. `[STRING]` The 7. accessory slot used for the sender.
     1. `[STRING]` The 8. accessory slot used for the sender.
+
+- `Act_StartDialog` Starts a `Dialog`.
+    1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
 
 - `Act_AdjAcct` Only for players. Adjusts the cash on the account. Cash will be automatically clamped to prevent overflows/underflows.
     1. `STRING|Activator` The players to have their cash being modified.

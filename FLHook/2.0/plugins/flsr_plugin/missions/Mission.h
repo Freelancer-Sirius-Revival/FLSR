@@ -5,6 +5,7 @@
 #include "MsnSolar.h"
 #include "MsnFormation.h"
 #include "Npc.h"
+#include "Dialog.h"
 #include "Objectives/Objectives.h"
 
 namespace Missions
@@ -32,6 +33,7 @@ namespace Missions
 		std::unordered_map<uint, MsnNpc> msnNpcs;
 		std::unordered_map<uint, MsnFormation> formations;
 		std::unordered_map<uint, ObjectivesArchetype> objectives;
+		std::unordered_map<uint, Dialog> dialogs;
 
 		std::unordered_map<uint, uint> objectIdsByName;
 		std::unordered_map<uint, std::vector<MissionObject>> objectsByLabel;

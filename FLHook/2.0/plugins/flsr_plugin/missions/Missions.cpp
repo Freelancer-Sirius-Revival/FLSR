@@ -22,6 +22,7 @@
 #include "Actions/ActPlayMusic.h"
 #include "Actions/ActEtherComm.h"
 #include "Actions/ActSendComm.h"
+#include "Actions/ActStartDialog.h"
 #include "Actions/ActSetNNObj.h"
 #include "Actions/ActAdjAcct.h"
 #include "Actions/ActAdjRep.h"
@@ -34,6 +35,7 @@
 #include "Objectives/ObjGoto.h"
 #include "Objectives/ObjFollow.h"
 #include "Objectives/ObjMakeNewFormation.h"
+#include "Dialog.h"
 #include "MissionBoard.h"
 
 namespace Missions
@@ -301,6 +303,67 @@ namespace Missions
 							solarArch.accessoryIds = std::vector(solar.costume.accessoryIds);
 							SolarSpawn::AppendSolarArchetype(solarArch);
 						}
+					}
+
+					if (ini.is_header("Dialog"))
+					{
+						Dialog dialog;
+						while (ini.read_value())
+						{
+							if (ini.is_value("nickname"))
+							{
+								dialog.id = CreateIdOrNull(ini.get_value_string(0));
+							}
+							else if (ini.is_value("etherSender"))
+							{
+								DialogEtherSender sender;
+								sender.id = CreateIdOrNull(ini.get_value_string(0));
+								sender.voiceId = CreateIdOrNull(ini.get_value_string(1));
+								sender.idsName = ini.get_value_int(2);
+								sender.costume.head = CreateIdOrNull(ini.get_value_string(3));
+								sender.costume.body = CreateIdOrNull(ini.get_value_string(4));
+								int count = 0;
+								while (count < 8)
+								{
+									const auto val = ini.get_value_string(5 + count);
+									if (strlen(val) == 0)
+										break;
+									sender.costume.accessory[count++] = CreateIdOrNull(val);
+								}
+								if (sender.id && sender.voiceId)
+									dialog.etherSenders.insert({ sender.id, sender });
+							}
+							else if (ini.is_value("line"))
+							{
+								DialogLine line;
+								line.id = CreateIdOrNull(ini.get_value_string(0));
+								line.receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
+								line.senderEtherSenderOrObjName = CreateIdOrNull(ini.get_value_string(2));
+								int pos = 3;
+								while (!ini.is_value_empty(pos))
+								{
+									const char* val = ini.get_value_string(pos);
+									// Make sure we do not go beyond the following numeric value.
+									char* end;
+									strtol(val, &end, 10);
+									if (end != val)
+										break;
+									line.lines.push_back(CreateIdOrNull(val));
+									pos++;
+								}
+								if (!ini.is_value_empty(pos++))
+									line.delay = ini.get_value_float(pos - 1);
+								if (ini.get_num_parameters() > pos)
+									line.global = ini.get_value_bool(pos);
+
+								if (line.id && line.senderEtherSenderOrObjName && !line.lines.empty())
+									dialog.lines.push_back(line);
+							}
+						}
+
+
+						if (dialog.id && !dialog.lines.empty())
+							missions.at(lastMissionId).dialogs.insert({ dialog.id, dialog });
 					}
 
 					if (ini.is_header("ObjList"))
@@ -617,7 +680,7 @@ namespace Missions
 							else if (ini.is_value("Act_Ethercomm"))
 							{
 								ActEtherCommPtr action(new ActEtherComm());
-								action->name = CreateIdOrNull(ini.get_value_string(0));
+								action->id = CreateIdOrNull(ini.get_value_string(0));
 								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->senderVoiceId = CreateIdOrNull(ini.get_value_string(2));
 								int pos = 3;
@@ -653,7 +716,7 @@ namespace Missions
 							else if (ini.is_value("Act_SendComm"))
 							{
 								ActSendCommPtr action(new ActSendComm());
-								action->name = CreateIdOrNull(ini.get_value_string(0));
+								action->id = CreateIdOrNull(ini.get_value_string(0));
 								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->senderObjName = CreateIdOrNull(ini.get_value_string(2));
 								int pos = 3;
@@ -674,6 +737,12 @@ namespace Missions
 									action->global = ini.get_value_bool(pos);
 								actions.push_back(action);
 							}
+							else if (ini.is_value("Act_StartDialog"))
+							{
+								ActStartDialogPtr action(new ActStartDialog());
+								action->dialogId = CreateIdOrNull(ini.get_value_string(0));
+								actions.push_back(action);
+								}
 							else if (ini.is_value("Act_SetNNObj"))
 							{
 								ActSetNNObjPtr action(new ActSetNNObj());

@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActEtherComm : Action
 	{
-		uint name = 0;
+		uint id = 0;
 		uint senderVoiceId = 0;
 		uint senderIdsName = 0;
 		uint receiverObjNameOrLabel = 0;

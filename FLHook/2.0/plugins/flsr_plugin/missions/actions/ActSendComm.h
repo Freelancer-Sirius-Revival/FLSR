@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct ActSendComm : Action
 	{
-		uint name = 0;
+		uint id = 0;
 		uint senderObjName = 0;
 		uint receiverObjNameOrLabel = 0;
 		std::vector<uint> lines;

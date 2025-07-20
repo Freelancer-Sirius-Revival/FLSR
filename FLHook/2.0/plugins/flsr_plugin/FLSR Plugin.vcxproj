@@ -167,6 +167,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActSpawnSolar.cpp" />
     <ClCompile Include="missions\actions\ActSetVibe.cpp" />
     <ClCompile Include="missions\actions\ActRelocate.cpp" />
+    <ClCompile Include="missions\actions\ActStartDialog.cpp" />
     <ClCompile Include="missions\actions\MissionShipSpawning.cpp" />
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp" />
     <ClCompile Include="missions\conditions\CndCloaked.cpp" />
@@ -234,6 +235,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSpawnSolar.h" />
     <ClInclude Include="missions\actions\ActSetVibe.h" />
     <ClInclude Include="missions\actions\ActRelocate.h" />
+    <ClInclude Include="missions\actions\ActStartDialog.h" />
     <ClInclude Include="missions\actions\MissionShipSpawning.h" />
     <ClInclude Include="missions\conditions\CndBaseEnter.h" />
     <ClInclude Include="missions\conditions\CndCloaked.h" />
@@ -250,6 +252,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />
     <ClInclude Include="missions\conditions\IniReader.h" />
+    <ClInclude Include="missions\Dialog.h" />
     <ClInclude Include="missions\Formations.h" />
     <ClInclude Include="missions\MatrixMath.h" />
     <ClInclude Include="missions\Mission.h" />

@@ -362,7 +362,6 @@ namespace Missions
 							}
 						}
 
-
 						if (dialog.id && !dialog.lines.empty())
 							missions.at(lastMissionId).dialogs.insert({ dialog.id, dialog });
 					}

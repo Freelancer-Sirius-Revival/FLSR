@@ -4,15 +4,13 @@
 
 namespace Missions
 {
-	std::unordered_map<Condition*, ConditionPtr> conditions;
-
 	static void PlayComm(Mission& mission, const MissionObject& activator, const Dialog& dialog, const int lineIndex)
 	{
 		if (lineIndex + 1 < dialog.lines.size())
 		{
 			const ConditionPtr condition = ConditionPtr(new ActDialogCndCommComplete(mission, activator, dialog, lineIndex));
 			condition->Register();
-			conditions.insert({ condition.get(), condition });
+			mission.dynamicConditions.insert({ condition.get(), condition });
 		}
 
 		const auto& line = dialog.lines[lineIndex];
@@ -56,8 +54,7 @@ namespace Missions
 		const int nextLineIndex = lineIndex + 1;
 		if (nextLineIndex < dialog.lines.size())
 			PlayComm(mission, activator, dialog, nextLineIndex);
-		Unregister();
-		conditions.erase(this);
+		mission.dynamicConditions.erase(this);
 	}
 
 	void ActStartDialog::Execute(Mission& mission, const MissionObject& activator) const

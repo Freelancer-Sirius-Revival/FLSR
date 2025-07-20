@@ -40,6 +40,7 @@ namespace Missions
 		std::unordered_set<uint> objectIds;
 		std::unordered_set<uint> clientIds;
 		std::unordered_map<uint, Objectives> objectivesByObjectId;
+		std::unordered_map<Condition*, ConditionPtr> dynamicConditions;
 
 		struct CommEntry
 		{

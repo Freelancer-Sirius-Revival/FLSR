@@ -175,6 +175,9 @@
     <ClCompile Include="missions\actions\MissionShipSpawning.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActStartDialog.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -368,6 +371,12 @@
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjDock.h">
       <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Dialog.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActStartDialog.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

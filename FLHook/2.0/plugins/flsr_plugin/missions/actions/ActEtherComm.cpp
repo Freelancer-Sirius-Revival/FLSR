@@ -6,7 +6,7 @@ namespace Missions
 {
 	static void SendComm(const uint receiverObjId, const ActEtherComm& action, Mission& mission)
 	{
-		if (const auto& commEntry = mission.ongoingComms.find(action.name); commEntry != mission.ongoingComms.end())
+		if (const auto& commEntry = mission.ongoingComms.find(action.id); commEntry != mission.ongoingComms.end())
 		{
 			commEntry->second.receiverObjIds.insert(receiverObjId);
 		}
@@ -17,7 +17,7 @@ namespace Missions
 			comm.sender = MissionObject(MissionObjectType::Client, 0);
 			comm.voiceLineId = action.lines.back();
 			comm.receiverObjIds.insert(receiverObjId);
-			mission.ongoingComms.insert({ action.name, comm });
+			mission.ongoingComms.insert({ action.id, comm });
 		}
 
 		pub::SpaceObj::SendComm(0, receiverObjId, action.senderVoiceId, &action.costume, action.senderIdsName, (uint*)(action.lines.data()), action.lines.size(), 0, std::fmaxf(0.0f, action.delay), action.global);

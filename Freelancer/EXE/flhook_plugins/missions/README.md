@@ -399,23 +399,6 @@ There can be as many actions as needed – even the same ones.
 
 The keyword `Activator` is used to refer explicitely to the object/player that fulfilled the trigger condition. Sometimes this can be the server itself (e.g. `Cnd_True`, `Cnd_Timer`). The `Activator` can be used in combination with the condition’s `Stranger` to assign players to the mission or do other things only to non-assigned players.
 
-- `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
-    1. `STRING` Arbitrary text to print.
-
-- `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
-
-- `Act_ChangeState` Sets the mission state. This does not end the mission!
-    1. `SUCCEED|FAIL :FAIL` The state to change into. Displays and plays respective text to all players of the mission. On `FAIL` it will re-offer the mission on the job board if applicable.
-    1. `INTEGER :0` Only for `FAIL`: The text ID to display.
-
-- `Act_ActTrig` Activates a trigger.
-    1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
-
-- `Act_DeactTrig` Deactivates a trigger.
-    1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
-
 - `Act_ActMsn` Activates another mission.
     1. `STRING` Mission nickname to refer.
     1. `[STRING|All]` Multiple subsequent entries possible. A label whose assigned players are transferred over to the mission with the same label. `All` transfers over all players and their labels.
@@ -425,95 +408,51 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
 
-- `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
-    1. `STRING` Mission nickname to refer.
+- `Act_ActTrig` Activates a trigger.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
+
+- `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
+    1. `STRING|Activator` The players to receive the cargo.
+    1. `STRING` The item nickname to use.
+    1. `INTEGER :0` Amount of items to add to cargo.
+    1. `[True|False :False]` Whether this cargo is flagged as mission item.
 
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to add.
 
-- `Act_RemoveLabel` Removes a label to the objects. **This is the only explicit way to unassign players from the mission.**
-    1. `STRING|Activator` Object by name or label to manipulate.
-    1. `STRING` The label to remove.
+- `Act_AdjAcct` Only for players. Adjusts the cash on the account. Cash will be automatically clamped to prevent overflows/underflows.
+    1. `STRING|Activator` The players to have their cash being modified.
+    1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.
+    1. `[True|False] :False` Split the cash across all player members of the receiving label equally. No effect if a singular player receives the cash.
 
-- `Act_SpawnSolar` Spawns a solar. Only one instance of it can exist at the same time.
-    1. `STRING` The `MsnSolar` nickname to spawn.
+- `Act_AdjRep` Only for players. Adjusts the reputation of the player toward a specific faction.
+    1. `STRING|Activator` The players to have their reputation being modified.
+    1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
+    1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
-- `Act_SpawnShip` Spawns a ship. Only one instance of it can exist at the same time.
-    1. `STRING` The `MsnNpc` nickname to spawn.
-    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
-    1. `[FLOAT] :0` Override for initial x-axis position.
-    1. `[FLOAT] :0` Override for initial y-axis position.
-    1. `[FLOAT] :0` Override for initial z-axis position.
-    1. `[FLOAT] :0` Override for initial x-axis rotation.
-    1. `[FLOAT] :0` Override for initial y-axis rotation.
-    1. `[FLOAT] :0` Override for initial z-axis rotation.
+- `Act_ChangeState` Sets the mission state. This does not end the mission!
+    1. `SUCCEED|FAIL :FAIL` The state to change into. Displays and plays respective text to all players of the mission. On `FAIL` it will re-offer the mission on the job board if applicable.
+    1. `INTEGER :0` Only for `FAIL`: The text ID to display.
 
-- `Act_SpawnFormation` Spawns a formation of ships.
-    1. `STRING` The `MsnFormation` nickname to spawn.
-    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
-    1. `[FLOAT] :0` Override for initial x-axis position.
-    1. `[FLOAT] :0` Override for initial y-axis position.
-    1. `[FLOAT] :0` Override for initial z-axis position.
-    1. `[FLOAT] :0` Override for initial x-axis rotation.
-    1. `[FLOAT] :0` Override for initial y-axis rotation.
-    1. `[FLOAT] :0` Override for initial z-axis rotation.
+- `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
+    1. `STRING` Mission nickname to refer.
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+
+- `Act_DeactTrig` Deactivates a trigger.
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+
+- `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
+    1. `STRING` Arbitrary text to print.
 
 - `Act_Destroy` Destroys an object.
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
 
-- `Act_Relocate` Relocates an object.
-    1. `STRING|Activator` Object by name to relocate.
-    1. `FLOAT :0` Position on x-axis.
-    1. `FLOAT :0` Position on y-axis.
-    1. `FLOAT :0` Position on z-axis.
-    1. `[FLOAT]` Override for current x-axis rotation.
-    1. `[FLOAT]` Override for current y-axis rotation.
-    1. `[FLOAT]` Override for current z-axis rotation.
-
-- `Act_LightFuse` Executes an arbitary fuse.
-    1. `STRING|Activator` Object by name or label to refer.
-    1. `STRING` Fuse nickname to execute on the objects.
-    1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
-    1. `[FLOAT]` Overrides the fuse lifetime by this value.
-
-- `Act_GiveObjList` Gives NPCs a list of objectives.
-    1. `STRING|Activator` The NPCs to receive the objectives.
-    1. `STRING` The `ObjList` nickname to refer to.
-
-- `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
-    1. `STRING|Activator` The players to set the message or waypoint.
-    1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
-    1. `[STRING]` The system nickname for the waypoint.
-    1. `[FLOAT] :0` The x-axis position for the waypoint.
-    1. `[FLOAT] :0` The y-axis position for the waypoint.
-    1. `[FLOAT] :0` The z-axis position for the waypoint.
-    1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
-    1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
-
-- `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
-    1. `STRING|Activator` The players to play the sound effect for.
-    1. `STRING` The sound nickname to play.
-
-- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
-    1. `STRING|Activator` The players to set music for.
-    1. `[STRING|None] :None` Overrides the space music.
-    1. `[STRING|None] :None` Overrides the danger music.
-    1. `[STRING|None] :None` Overrides the battle music.
-    1. `[STRING|None] :None` Overrides all music by this track.
-    1. `[FLOAT] :0` The time in seconds it takes to transition music.
-    1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
-
-- `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
-    1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
-    1. `STRING|Activator` Object by name or label to receive this comm.
-    1. `STRING` Object by name to send this comm. Can also be a static world solar. Must have a voice defined. Cannot be a player.
-    1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
-    1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
-    1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
+- `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
 
 - `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
@@ -534,32 +473,93 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING]` The 7. accessory slot used for the sender.
     1. `[STRING]` The 8. accessory slot used for the sender.
 
-- `Act_StartDialog` Starts a `Dialog`.
-    1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
-
-- `Act_AdjAcct` Only for players. Adjusts the cash on the account. Cash will be automatically clamped to prevent overflows/underflows.
-    1. `STRING|Activator` The players to have their cash being modified.
-    1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.
-    1. `[True|False] :False` Split the cash across all player members of the receiving label equally. No effect if a singular player receives the cash.
-
-- `Act_AdjRep` Only for players. Adjusts the reputation of the player toward a specific faction.
-    1. `STRING|Activator` The players to have their reputation being modified.
-    1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
-    1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
-    
-- `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
-    1. `STRING|Activator` The players to receive the cargo.
-    1. `STRING` The item nickname to use.
-    1. `INTEGER :0` Amount of items to add to cargo.
-    1. `[True|False :False]` Whether this cargo is flagged as mission item.
-
-- `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
-    1. `STRING|Activator` Object by name or label whose vibe will be set. For players this only works if the target is another player.
-    1. `STRING|Activator` Object by name or label to change the vibe toward. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
-    1. `FLOAT :0` The reputation value between `-1` and `1` to set the vibe on.
+- `Act_GiveObjList` Gives NPCs a list of objectives.
+    1. `STRING|Activator` The NPCs to receive the objectives.
+    1. `STRING` The `ObjList` nickname to refer to.
 
 - `Act_Invulnerable` Sets invulnerability for the target.
     1. `STRING|Activator` Object by name or label for which invulnerability will be set.
     1. `True|False :False` Whether to prevent non-player damage (NPCs, radiation, asteroid mines) or not.
     1. `[True|False] :False` Whether to prevent player damage or not.
     1. `[FLOAT] :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
+
+- `Act_LightFuse` Executes an arbitary fuse.
+    1. `STRING|Activator` Object by name or label to refer.
+    1. `STRING` Fuse nickname to execute on the objects.
+    1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
+    1. `[FLOAT]` Overrides the fuse lifetime by this value.
+
+- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
+    1. `STRING|Activator` The players to set music for.
+    1. `[STRING|None] :None` Overrides the space music.
+    1. `[STRING|None] :None` Overrides the danger music.
+    1. `[STRING|None] :None` Overrides the battle music.
+    1. `[STRING|None] :None` Overrides all music by this track.
+    1. `[FLOAT] :0` The time in seconds it takes to transition music.
+    1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
+
+- `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
+    1. `STRING|Activator` The players to play the sound effect for.
+    1. `STRING` The sound nickname to play.
+
+- `Act_RemoveLabel` Removes a label to the objects. **This is the only explicit way to unassign players from the mission.**
+    1. `STRING|Activator` Object by name or label to manipulate.
+    1. `STRING` The label to remove.
+
+- `Act_Relocate` Relocates an object.
+    1. `STRING|Activator` Object by name to relocate.
+    1. `FLOAT :0` Position on x-axis.
+    1. `FLOAT :0` Position on y-axis.
+    1. `FLOAT :0` Position on z-axis.
+    1. `[FLOAT]` Override for current x-axis rotation.
+    1. `[FLOAT]` Override for current y-axis rotation.
+    1. `[FLOAT]` Override for current z-axis rotation.
+
+- `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
+    1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
+    1. `STRING|Activator` Object by name or label to receive this comm.
+    1. `STRING` Object by name to send this comm. Can also be a static world solar. Must have a voice defined. Cannot be a player.
+    1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
+    1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
+
+- `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
+    1. `STRING|Activator` The players to set the message or waypoint.
+    1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
+    1. `[STRING]` The system nickname for the waypoint.
+    1. `[FLOAT] :0` The x-axis position for the waypoint.
+    1. `[FLOAT] :0` The y-axis position for the waypoint.
+    1. `[FLOAT] :0` The z-axis position for the waypoint.
+    1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
+    1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
+
+- `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
+    1. `STRING|Activator` Object by name or label whose vibe will be set. For players this only works if the target is another player.
+    1. `STRING|Activator` Object by name or label to change the vibe toward. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
+    1. `FLOAT :0` The reputation value between `-1` and `1` to set the vibe on.
+
+- `Act_SpawnFormation` Spawns a formation of ships.
+    1. `STRING` The `MsnFormation` nickname to spawn.
+    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
+    1. `[FLOAT] :0` Override for initial x-axis position.
+    1. `[FLOAT] :0` Override for initial y-axis position.
+    1. `[FLOAT] :0` Override for initial z-axis position.
+    1. `[FLOAT] :0` Override for initial x-axis rotation.
+    1. `[FLOAT] :0` Override for initial y-axis rotation.
+    1. `[FLOAT] :0` Override for initial z-axis rotation.
+
+- `Act_SpawnSolar` Spawns a solar. Only one instance of it can exist at the same time.
+    1. `STRING` The `MsnSolar` nickname to spawn.
+
+- `Act_SpawnShip` Spawns a ship. Only one instance of it can exist at the same time.
+    1. `STRING` The `MsnNpc` nickname to spawn.
+    1, `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
+    1. `[FLOAT] :0` Override for initial x-axis position.
+    1. `[FLOAT] :0` Override for initial y-axis position.
+    1. `[FLOAT] :0` Override for initial z-axis position.
+    1. `[FLOAT] :0` Override for initial x-axis rotation.
+    1. `[FLOAT] :0` Override for initial y-axis rotation.
+    1. `[FLOAT] :0` Override for initial z-axis rotation.
+
+- `Act_StartDialog` Starts a `Dialog`.
+    1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.

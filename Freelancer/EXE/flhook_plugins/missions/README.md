@@ -302,35 +302,35 @@ Only one condition must be present. If none is present, `Cnd_True` is used.
 
 The keyword `Stranger` is used to refer explicitely to all players not having a label assigned in this mission. It can be used in combination with action’s `Activator` to assign players to the mission.
 
-- `Cnd_BaseEnter` Only for players. Landing or logging in to bases.
+- `Cnd_BaseEnter` Only players. Landing or logging in to bases. `Activator` will be the landed player.
     1. `STRING|Stranger` The players to await fully landing on a base.
     1. `[STRING] :any` The base nickname the player lands on.
 
-- `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress)
+- `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress). `Activator` will be the cloaked/uncloaked object.
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
 
-- `Cnd_CommComplete` Waits for a comm to complete. See `Act_SendComm` and `Act_EtherComm`.
+- `Cnd_CommComplete` Waits for a comm to complete. See `Act_SendComm` and `Act_EtherComm`. `Activator` will be the sender of `Act_SendComm`, or nobody for `Act_EtherComm`.
     1. `STRING` The comm name to wait finishing for. Started comms not ending within 10 seconds will trigger `Cnd_CommComplete` to allow continuing the flow even if no player witnessed hearing it.
 
-- `Cnd_Count` Counts the objects from a label. `Activator` will be the server.
+- `Cnd_Count` Counts the objects from a label. `Activator` will be nobody.
     1. `STRING` Objects by label to count.
     1. `INTEGER` The target count.
     1. `[Less|Equal|Greater] :Equal` The comparator against the target count.
 
-- `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` can be the server when objects get despawned.
+- `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` will be either the killer, or nobody if despawned.
     1. `STRING|Stranger` Object by name or label to await the destruction of.
     1. `[INTEGER] :0` The specific count of objects that must be destroyed to meet this condition. Any negative value will make this wait until all occurances of the objects are destroyed.
     1. `[Explode|Vanish|Any] :Any` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Vanish`) or whatever reason (`Any`).
     1. `[STRING]` Object by name or label that must be the killer.
 
-- `Cnd_DistObj` Distance to another object in space.
+- `Cnd_DistObj` Distance to another object in space. `Activator` will be the object coming into range.
     1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
     1. `STRING` Other object by name or label to expect within the distance. Can be a static world solar.
     1. `FLOAT :0` The distance from the given position to check.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
-- `Cnd_DistVec` Distance from a vector in space.
+- `Cnd_DistVec` Distance from a vector in space. `Activator` will be the object coming into range.
     1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
     1. `FLOAT :0` The x-axis position for this volume.
     1. `FLOAT :0` The y-axis position for this volume.
@@ -339,31 +339,31 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING` The system nickname to place this volume into.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
-- `Cnd_HealthDec` When the hitpoints falls below a threshold.
+- `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` will be the damage inflictor.
     1. `STRING|Stranger` Object by name or label to observe the hitpoints of.
     1. `FLOAT :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
     1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
 
-- `Cnd_ProjHitCount` Counts projectile hits to the target.
+- `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` will be damage inflictor.
     1. `STRING` Object by name or label to count projectile hits on.
     1. `[INTEGER] :1` The count of projectile hits that must have happened.
     1. `[Any|Hull|Shield] :Any` The surface the hit should be registered on.
     1. `[Any|Projectile|Explosion] :Any` The damage type to register. `Any` means `Projectile` and `Explosion`.
     1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
 
-- `Cnd_SpaceEnter` Only for players. Undocking from bases or spawning into space. Not jumping.
+- `Cnd_SpaceEnter` Only players. Undocking from bases or spawning into space. No jumping. `Activator` will be the player.
     1. `STRING|Stranger` The players  to await spawning into space.
     1. `[STRING] :any` The system nickname the player spawns into.
 
-- `Cnd_SpaceExit` Only for players. Docking to bases, destruction, leaving the server, or changing to another character. Not jumping.
+- `Cnd_SpaceExit` Only players. Docking to bases, destruction, leaving the server, or changing to another character. No jumping. `Activator` will be the player.
     1. `STRING|Stranger` The players to await despawning from space.
     1. `[STRING] :any` The system nickname the player despawns from.
 
-- `Cnd_Timer` Waits until the time as passed. `Activator` will be the server.
+- `Cnd_Timer` Waits until the time as passed. `Activator` will be nobody.
     1. `FLOAT` Lower limit of randomized time.
     1. `[FLOAT] :0` Upper limit of randomized time. When not set or lower than the lower limit, the timer will always use a constant time of lthe lower limit.
 
-- `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be the server.
+- `Cnd_True` No values. This instantly lets the trigger execute. `Activator` will be nobody.
 
 ### Actions
 

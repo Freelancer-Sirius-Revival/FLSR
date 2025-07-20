@@ -94,6 +94,8 @@ namespace Missions
 		for (auto& trigger : triggers)
 			trigger.Deactivate();
 
+		dynamicConditions.clear();
+
 		for (const uint clientId : clientIds)
 			ClearMusic(clientId);
 

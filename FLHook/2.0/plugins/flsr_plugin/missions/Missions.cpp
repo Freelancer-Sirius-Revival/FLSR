@@ -330,6 +330,7 @@ namespace Missions
 										break;
 									sender.costume.accessory[count++] = CreateIdOrNull(val);
 								}
+								sender.costume.accessories = count;
 								if (sender.id && sender.voiceId)
 									dialog.etherSenders.insert({ sender.id, sender });
 							}
@@ -360,7 +361,6 @@ namespace Missions
 									dialog.lines.push_back(line);
 							}
 						}
-
 
 						if (dialog.id && !dialog.lines.empty())
 							missions.at(lastMissionId).dialogs.insert({ dialog.id, dialog });

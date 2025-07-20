@@ -330,6 +330,7 @@ namespace Missions
 										break;
 									sender.costume.accessory[count++] = CreateIdOrNull(val);
 								}
+								sender.costume.accessories = count;
 								if (sender.id && sender.voiceId)
 									dialog.etherSenders.insert({ sender.id, sender });
 							}

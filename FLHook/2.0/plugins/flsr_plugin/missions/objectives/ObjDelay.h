@@ -1,11 +1,15 @@
 #pragma once
-#include <FLHook.h>
+#include "Objective.h"
 
 namespace Missions
 {
-	struct ObjDelay
+	class ObjDelay : public Objective
 	{
-		uint timeInS;
+	private:
+		const uint timeInS;
+
+	public:
+		ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const uint timeInS);
+		void Execute(const uint objId) const;
 	};
-	typedef std::shared_ptr<ObjDelay> ObjDelayPtr;
 }

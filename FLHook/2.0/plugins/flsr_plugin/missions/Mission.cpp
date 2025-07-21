@@ -255,6 +255,16 @@ namespace Missions
 			EvaluateCountConditions(label);
 	}
 
+	uint Mission::FindObjNameByObjId(const uint objId)
+	{
+		for (const auto& entry : objectIdsByName)
+		{
+			if (entry.first == objId)
+				return entry.second;
+		}
+		return 0;
+	}
+
 	namespace Hooks
 	{
 		namespace Mission

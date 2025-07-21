@@ -178,6 +178,9 @@
     <ClCompile Include="missions\actions\ActStartDialog.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\ObjDelay.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -377,6 +380,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActStartDialog.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\Objective.h">
+      <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

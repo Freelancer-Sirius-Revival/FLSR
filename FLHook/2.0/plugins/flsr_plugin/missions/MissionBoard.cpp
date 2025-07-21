@@ -99,7 +99,7 @@ namespace MissionBoard
 		}
 	}
 
-	uint offerId = std::numeric_limits<uint>::max();
+	uint offerId = UINT_MAX;
 
 	uint AddMissionOffer(const MissionOffer& mission, const std::vector<uint>& bases)
 	{

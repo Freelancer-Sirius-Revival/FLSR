@@ -128,8 +128,12 @@ __declspec(naked) void CreateNewVectorEntry()
 	}
 }
 
+std::unordered_map<uint, iShipTable*> shipTableByShipId;
+
 void CheckDestruction()
 {
+	shipTableByShipId.erase(CurrentDestructediShip);
+
 	int dummysize = StorediShipTables.size(); //Game::Entity::vectortest.size();
 
 	for (int i = 0; i < dummysize; i++)
@@ -175,6 +179,8 @@ __declspec(naked) void DestructionCheck()
 			jmp JumpAdress2
 	}
 }
+
+uint wingId = UINT_MAX;
 
 //after a ship is being created, game assigns them into so called "population vectors" inside System Tables, they manage voices/loots and etc
 void CreatePopulationEntry(uint iShipID, uint iRep, uint iSystemID)
@@ -229,7 +235,7 @@ void CreatePopulationEntry(uint iShipID, uint iRep, uint iSystemID)
 	uint archetypeId;
 	pub::SpaceObj::GetArchetypeID(iShipID, archetypeId);
 	iShipTab->UnknownData[75] = archetypeId;
-	iShipTab->UnknownData[82] = 0; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
+	iShipTab->UnknownData[82] = wingId--; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
 	iShipTab->UnknownData[83] = 0xE8;
 	iShipTab->UnknownData[84] = (DWORD)Padfill2;
 	iShipTab->UnknownData[85] = 1;
@@ -253,6 +259,7 @@ void CreatePopulationEntry(uint iShipID, uint iRep, uint iSystemID)
 	iShipTableCurrent = iShipTab;
 
 	StorediShipTables.push_back(iShipTab);
+	shipTableByShipId.insert({ iShipID, iShipTab });
 
 	GetSystemInformationTable();
 	CreateNewVectorEntry();
@@ -261,6 +268,26 @@ void CreatePopulationEntry(uint iShipID, uint iRep, uint iSystemID)
 }
 
 /* End of Venemon's code */
+
+void AssignToWing(const uint shipId, const uint wingLeaderShipId)
+{
+	const auto& foundShipEntry = shipTableByShipId.find(shipId);
+	if (foundShipEntry == shipTableByShipId.end())
+		return;
+	
+	const auto& foundLeaderEntry = shipTableByShipId.find(wingLeaderShipId);
+	if (foundLeaderEntry == shipTableByShipId.end())
+		return;
+
+	foundShipEntry->second->UnknownData[82] = foundLeaderEntry->second->UnknownData[82];
+}
+
+void UnassignFromWing(const uint shipId)
+{
+	const auto& foundShipEntry = shipTableByShipId.find(shipId);
+	if (foundShipEntry != shipTableByShipId.end())
+		foundShipEntry->second->UnknownData[82] = wingId--;
+}
 
 static uint TryCreateNpc(const pub::SpaceObj::ShipInfo& shipInfo)
 {

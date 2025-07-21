@@ -8,10 +8,11 @@ namespace Missions
 		{
 			if (activator.type == MissionObjectType::Client)
 			{
-				uint objId;
-				pub::Player::GetShip(activator.id, objId);
-				if (objId)
-					pub::SpaceObj::SetInvincible2(objId, preventNonPlayerDamage, preventPlayerDamage, maxHpLossPercentage);
+				return; // This could interfer with Spawn Protection.
+				//uint objId;
+				//pub::Player::GetShip(activator.id, objId);
+				//if (objId)
+				//	pub::SpaceObj::SetInvincible2(objId, preventNonPlayerDamage, preventPlayerDamage, maxHpLossPercentage);
 			}
 			else if (mission.objectIds.contains(activator.id) && pub::SpaceObj::ExistsAndAlive(activator.id) == 0)
 				pub::SpaceObj::SetInvincible2(activator.id, preventNonPlayerDamage, preventPlayerDamage, maxHpLossPercentage);
@@ -29,7 +30,15 @@ namespace Missions
 			{
 				for (const auto& object : objectsByLabel->second)
 				{
-					if (pub::SpaceObj::ExistsAndAlive(object.id) == 0)
+					if (object.type == MissionObjectType::Client)
+					{
+						return; // This could interfer with Spawn Protection.
+						//uint objId;
+						//pub::Player::GetShip(activator.id, objId);
+						//if (objId)
+						//	pub::SpaceObj::SetInvincible2(objId, preventNonPlayerDamage, preventPlayerDamage, maxHpLossPercentage);
+					}
+					else if (pub::SpaceObj::ExistsAndAlive(object.id) == 0)
 					{
 						pub::SpaceObj::SetInvincible2(object.id, preventNonPlayerDamage, preventPlayerDamage, maxHpLossPercentage);
 					}

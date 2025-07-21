@@ -7,15 +7,13 @@ namespace Missions
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;
 
-		if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
-		{
-			if (mission.objectivesByObjectId.contains(objId))
-				mission.objectivesByObjectId.erase(objId);
-			mission.objectivesByObjectId.try_emplace(objId, mission.id, objId, objectivesEntry->second.objectives);
-			mission.objectivesByObjectId.at(objId).Progress();
+		IObjRW* inspect;
+		StarSystem* system;
+		if (!GetShipInspect(objId, inspect, system) || !(inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
 			return;
-		}
-		return;
+
+		if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
+			objectivesEntry->second.Progress(objId, 0);
 	}
 
 	void ActGiveObjList::Execute(Mission& mission, const MissionObject& activator) const

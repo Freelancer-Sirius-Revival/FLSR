@@ -11,7 +11,7 @@ namespace Missions
 	{
 		const uint missionId;
 		const uint triggerId;
-		ConditionParent(uint missionId, uint triggerId) : missionId(missionId), triggerId(triggerId) {}
+		ConditionParent(const uint missionId, const uint triggerId) : missionId(missionId), triggerId(triggerId) {}
 	};
 
 	class Condition

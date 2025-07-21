@@ -20,4 +20,6 @@ struct NpcCreationParams
 	uint launchObjId = 0;
 };
 
+void AssignToWing(const uint shipId, const uint wingLeaderShipId);
+void UnassignFromWing(const uint shipId);
 uint CreateNPC(const NpcCreationParams& params);

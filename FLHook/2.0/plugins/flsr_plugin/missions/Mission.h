@@ -6,6 +6,7 @@
 #include "MsnFormation.h"
 #include "Npc.h"
 #include "Dialog.h"
+#include <queue>
 #include "Objectives/Objectives.h"
 
 namespace Missions
@@ -32,15 +33,15 @@ namespace Missions
 		std::unordered_map<uint, Npc> npcs;
 		std::unordered_map<uint, MsnNpc> msnNpcs;
 		std::unordered_map<uint, MsnFormation> formations;
-		std::unordered_map<uint, ObjectivesArchetype> objectives;
+		std::unordered_map<uint, Objectives> objectives;
 		std::unordered_map<uint, Dialog> dialogs;
 
 		std::unordered_map<uint, uint> objectIdsByName;
 		std::unordered_map<uint, std::vector<MissionObject>> objectsByLabel;
 		std::unordered_set<uint> objectIds;
 		std::unordered_set<uint> clientIds;
-		std::unordered_map<uint, Objectives> objectivesByObjectId;
 		std::unordered_map<Condition*, ConditionPtr> dynamicConditions;
+		std::unordered_map<uint, ConditionPtr> objectiveConditionByObjectId;
 
 		struct CommEntry
 		{
@@ -71,6 +72,7 @@ namespace Missions
 		void RemoveLabelFromObject(const MissionObject& object, const uint label);
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
+		uint FindObjNameByObjId(const uint objId);
 	};
 
 	extern std::unordered_map<uint, Mission> missions;

@@ -30,11 +30,6 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
-#include "Objectives/ObjDelay.h"
-#include "Objectives/ObjDock.h"
-#include "Objectives/ObjGoto.h"
-#include "Objectives/ObjFollow.h"
-#include "Objectives/ObjMakeNewFormation.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
 
@@ -365,7 +360,7 @@ namespace Missions
 						if (dialog.id && !dialog.lines.empty())
 							missions.at(lastMissionId).dialogs.insert({ dialog.id, dialog });
 					}
-
+					/*
 					if (ini.is_header("ObjList"))
 					{
 						std::string nickname = "";
@@ -472,7 +467,7 @@ namespace Missions
 						}
 						if (!nickname.empty())
 							missions.at(lastMissionId).objectives.insert({ CreateID(nickname.c_str()), objectives });
-					}
+					}*/
 
 					if (ini.is_header("Trigger"))
 					{

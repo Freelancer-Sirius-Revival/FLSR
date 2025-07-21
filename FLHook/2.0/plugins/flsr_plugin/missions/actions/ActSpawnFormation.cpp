@@ -68,11 +68,7 @@ namespace Missions
 		if (!spawnedShipIds.empty())
 		{			
 			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
-			{
-				const uint leaderId = spawnedShipIds[0];
-				mission.objectivesByObjectId.try_emplace(leaderId, mission.id, leaderId, objectivesEntry->second.objectives);
-				mission.objectivesByObjectId.at(leaderId).Progress();
-			}
+				objectivesEntry->second.Progress(spawnedShipIds[0], 0);
 		}
 	}
 }

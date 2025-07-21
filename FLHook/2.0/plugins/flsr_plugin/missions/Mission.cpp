@@ -95,6 +95,7 @@ namespace Missions
 			trigger.Deactivate();
 
 		dynamicConditions.clear();
+		objectiveConditionByObjectId.clear();
 
 		for (const uint clientId : clientIds)
 			ClearMusic(clientId);
@@ -112,7 +113,6 @@ namespace Missions
 		objectsByLabel.clear();
 		objectIds.clear();
 		clientIds.clear();
-		objectivesByObjectId.clear();
 		ongoingComms.clear();
 	}
 
@@ -221,7 +221,8 @@ namespace Missions
 				labelsIt++;
 		}
 		objectIds.erase(objId);
-		objectivesByObjectId.erase(objId);
+		objectiveConditionByObjectId.erase(objId);
+
 		for (const auto& label : labels)
 			EvaluateCountConditions(label);
 	}
@@ -253,6 +254,16 @@ namespace Missions
 		clientIds.erase(clientId);
 		for (const auto& label : labels)
 			EvaluateCountConditions(label);
+	}
+
+	uint Mission::FindObjNameByObjId(const uint objId)
+	{
+		for (const auto& entry : objectIdsByName)
+		{
+			if (entry.first == objId)
+				return entry.second;
+		}
+		return 0;
 	}
 
 	namespace Hooks

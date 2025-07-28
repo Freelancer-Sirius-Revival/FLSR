@@ -6,13 +6,13 @@ namespace Missions
 {
 	ObjGotoSpline::ObjGotoSpline(const ObjectiveParent& parent,
 								const int objectiveIndex,
+								const Vector splinePoints[4],
 								const bool noCruise,
 								const float range,
 								const float thrust,
 								const uint objNameToWaitFor,
 								const float startWaitDistance,
-								const float endWaitDistance,
-								const Vector splinePoints[4]) :
+								const float endWaitDistance) :
 		Objective(parent, objectiveIndex),
 		ObjGoto(noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance)
 	{

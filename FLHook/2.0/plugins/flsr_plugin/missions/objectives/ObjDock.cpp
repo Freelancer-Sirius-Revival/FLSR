@@ -20,11 +20,11 @@ namespace Missions
 		pub::AI::DirectiveDockOp dockOp;
 		dockOp.fireWeapons = false;
 		dockOp.dockTargetObjId = 0;
-		dockOp.dockTargetDirectionObjId = 0;
 		if (const auto& objectEntry = mission.objectIdsByName.find(targetObjNameOrId); objectEntry != mission.objectIdsByName.end())
 			dockOp.dockTargetObjId = objectEntry->second;
 		if (!dockOp.dockTargetObjId)
 			dockOp.dockTargetObjId = targetObjNameOrId;
+		dockOp.dockTargetDirectionObjId = 0;
 		dockOp.x12 = 0;
 		dockOp.dockPortIndex = -1;
 		dockOp.x1C = 0;

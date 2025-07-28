@@ -12,13 +12,13 @@ namespace Missions
 	public:
 		ObjGotoSpline(const ObjectiveParent& parent,
 						const int objectiveIndex,
+						const Vector spline[4],
 						const bool noCruise,
 						const float range,
 						const float thrust,
 						const uint objNameToWaitFor,
 						const float startWaitDistance,
-						const float endWaitDistance,
-						const Vector spline[4]);
+						const float endWaitDistance);
 		void Execute(const uint objId) const;
 	};
 }

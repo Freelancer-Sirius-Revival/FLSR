@@ -6,13 +6,13 @@ namespace Missions
 {
 	ObjGotoVec::ObjGotoVec(const ObjectiveParent& parent,
 							const int objectiveIndex,
+							const Vector& position,
 							const bool noCruise,
 							const float range,
 							const float thrust,
 							const uint objNameToWaitFor,
 							const float startWaitDistance,
-							const float endWaitDistance,
-							const Vector& position) :
+							const float endWaitDistance) :
 		Objective(parent, objectiveIndex),
 		ObjGoto(noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance),
 		position(position)

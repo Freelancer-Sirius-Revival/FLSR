@@ -183,12 +183,13 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndTimer.cpp" />
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
     <ClCompile Include="missions\conditions\Condition.cpp" />
-    <ClCompile Include="missions\conditions\IniReader.cpp" />
+    <ClCompile Include="missions\conditions\CndIniReader.cpp" />
     <ClCompile Include="missions\Formations.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
     <ClCompile Include="missions\NpcNames.cpp" />
+    <ClCompile Include="missions\objectives\ObjIniReader.cpp" />
     <ClCompile Include="missions\objectives\ObjBreakFormation.cpp" />
     <ClCompile Include="missions\objectives\ObjCndDistObj.cpp" />
     <ClCompile Include="missions\objectives\ObjCndDistVec.cpp" />
@@ -264,7 +265,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndTimer.h" />
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />
-    <ClInclude Include="missions\conditions\IniReader.h" />
+    <ClInclude Include="missions\conditions\CndIniReader.h" />
     <ClInclude Include="missions\Dialog.h" />
     <ClInclude Include="missions\Formations.h" />
     <ClInclude Include="missions\MatrixMath.h" />
@@ -277,6 +278,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\MsnSolar.h" />
     <ClInclude Include="missions\Npc.h" />
     <ClInclude Include="missions\NpcNames.h" />
+    <ClInclude Include="missions\objectives\ObjIniReader.h" />
     <ClInclude Include="missions\objectives\ObjBreakFormation.h" />
     <ClInclude Include="missions\objectives\ObjCndDistObj.h" />
     <ClInclude Include="missions\objectives\ObjCndDistVec.h" />

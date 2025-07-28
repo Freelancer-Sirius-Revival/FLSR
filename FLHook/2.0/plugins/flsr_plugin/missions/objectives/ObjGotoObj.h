@@ -12,13 +12,13 @@ namespace Missions
 	public:
 		ObjGotoObj(const ObjectiveParent& parent,
 					const int objectiveIndex,
+					const uint targetObjNameOrId,
 					const bool noCruise,
 					const float range,
 					const float thrust,
 					const uint objNameToWaitFor,
 					const float startWaitDistance,
-					const float endWaitDistance,
-					const uint targetObjNameOrId);
+					const float endWaitDistance);
 		void Execute(const uint objId) const;
 	};
 }

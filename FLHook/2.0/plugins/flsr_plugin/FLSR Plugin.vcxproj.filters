@@ -139,7 +139,7 @@
     <ClCompile Include="missions\conditions\CndProjHitCount.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\IniReader.cpp">
+    <ClCompile Include="missions\conditions\CndIniReader.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActInvulnerable.cpp">
@@ -215,6 +215,9 @@
       <Filter>Missions\Objectives</Filter>
     </ClCompile>
     <ClCompile Include="missions\objectives\ObjBreakFormation.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjIniReader.cpp">
       <Filter>Missions\Objectives</Filter>
     </ClCompile>
   </ItemGroup>
@@ -354,7 +357,7 @@
     <ClInclude Include="missions\conditions\CndProjHitCount.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\IniReader.h">
+    <ClInclude Include="missions\conditions\CndIniReader.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActInvulnerable.h">
@@ -439,6 +442,9 @@
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjBreakFormation.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjIniReader.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>

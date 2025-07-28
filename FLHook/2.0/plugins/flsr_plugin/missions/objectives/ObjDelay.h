@@ -6,10 +6,10 @@ namespace Missions
 	class ObjDelay : public Objective
 	{
 	private:
-		const uint timeInS;
+		const float timeInS;
 
 	public:
-		ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const uint timeInS);
+		ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const float timeInS);
 		void Execute(const uint objId) const;
 	};
 }

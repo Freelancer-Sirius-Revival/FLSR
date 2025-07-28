@@ -15,9 +15,10 @@ namespace Missions
 
 	class Objective
 	{
+	protected:
+		const int objectiveIndex;
 	public:
 		const ObjectiveParent parent;
-		const int objectiveIndex;
 
 		Objective(const ObjectiveParent& parent, const int objectiveIndex);
 		virtual ~Objective() {};

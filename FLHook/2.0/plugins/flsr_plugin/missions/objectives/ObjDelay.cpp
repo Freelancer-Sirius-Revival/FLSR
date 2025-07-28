@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	ObjDelay::ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const uint timeInS) :
+	ObjDelay::ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const float timeInS) :
 		Objective(parent, objectiveIndex),
 		timeInS(timeInS)
 	{}

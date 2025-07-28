@@ -46,9 +46,18 @@ struct iShipTable // 1456 bytes
 	HMODULE ContentConfg;
 	uint iShipID;
 	iRepTable* iRepTab;
-	DWORD UnknownData[113];
+	DWORD unk1[75];
+	uint archetypeId;
+	DWORD unk2[6];
+	uint wingId;
+	DWORD unk3[25];
+	float lifetime;
+	DWORD unk4;
+	uint loadoutId;
+	float currentLifetime;
+	DWORD unk5;
 	pub::AI::Personality personality; // offset 0x1D0, size 984bytes
-	uint unk[2];
+	uint unk6[2];
 };
 
 struct EmptyPadding
@@ -140,9 +149,9 @@ void CheckDestruction()
 	{
 		if (CurrentDestructediShip == StorediShipTables[i]->iShipID)
 		{
-			free((DWORD*)StorediShipTables[i]->UnknownData[93]);
-			free((DWORD*)StorediShipTables[i]->UnknownData[84]);
-			free((DWORD*)StorediShipTables[i]->UnknownData[72]);
+			free((DWORD*)StorediShipTables[i]->unk3[10]);
+			free((DWORD*)StorediShipTables[i]->unk3[1]);
+			free((DWORD*)StorediShipTables[i]->unk1[72]);
 			free(StorediShipTables[i]->iRepTab);
 			free(StorediShipTables[i]);
 
@@ -230,26 +239,24 @@ void CreatePopulationEntry(uint iShipID, uint iRep, uint iSystemID)
 	iRepTab->EntityPhase = 0x2;
 	iRepTab->iRep = iRep;
 
-	iShipTab->UnknownData[72] = (DWORD)Padfill1;
-	iShipTab->UnknownData[73] = (DWORD)Padfill1;
+	iShipTab->unk1[72] = (DWORD)Padfill1;
+	iShipTab->unk1[73] = (DWORD)Padfill1;
 	uint archetypeId;
 	pub::SpaceObj::GetArchetypeID(iShipID, archetypeId);
-	iShipTab->UnknownData[75] = archetypeId;
-	iShipTab->UnknownData[82] = wingId--; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
-	iShipTab->UnknownData[83] = 0xE8;
-	iShipTab->UnknownData[84] = (DWORD)Padfill2;
-	iShipTab->UnknownData[85] = 1;
-	iShipTab->UnknownData[91] = 0; // high chance this is a "if player" check -1 points to player and plays death music in the server lmao
-	iShipTab->UnknownData[93] = (DWORD)Padfill3;
-	iShipTab->UnknownData[94] = 0x00000001;
-	iShipTab->UnknownData[104] = 0xBFF00000;
-	iShipTab->UnknownData[106] = 0;
-	iShipTab->UnknownData[107] = 5;
-	iShipTab->UnknownData[108] = 0xbf800000; // Life time drain, all important npcs use -1 so they dont get destroyed by the population manager
-	iShipTab->UnknownData[109] = 0x43fa0000; // possible life drain area
-	iShipTab->UnknownData[110] = NULL; //loadout hash
-	iShipTab->UnknownData[111] = 0x41c00000; // life time duration
-	iShipTab->UnknownData[113] = 0x4E6B79A3;
+	iShipTab->archetypeId = archetypeId;
+	iShipTab->wingId = wingId--; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
+	iShipTab->unk3[0] = 0xE8;
+	iShipTab->unk3[1] = (DWORD)Padfill2;
+	iShipTab->unk3[2] = 1;
+	iShipTab->unk3[8] = 0; // high chance this is a "if player" check -1 points to player and plays death music in the server lmao
+	iShipTab->unk3[10] = (DWORD)Padfill3;
+	iShipTab->unk3[11] = 1;
+	iShipTab->unk3[21] = 0xBFF00000; // -1.875f
+	iShipTab->unk3[23] = 0;
+	iShipTab->unk3[24] = 5;
+	iShipTab->lifetime = -1; // -1 makes the NPC persistent.
+	iShipTab->loadoutId = NULL; //loadout hash
+	iShipTab->currentLifetime = 24; // Resets to initial lifetime when player comes back into range.
 	pub::AI::get_personality(iShipID, iShipTab->personality);
 
 	Fndpop.iSystem = iSystemID;
@@ -279,14 +286,24 @@ void AssignToWing(const uint shipId, const uint wingLeaderShipId)
 	if (foundLeaderEntry == shipTableByShipId.end())
 		return;
 
-	foundShipEntry->second->UnknownData[82] = foundLeaderEntry->second->UnknownData[82];
+	foundShipEntry->second->wingId = foundLeaderEntry->second->wingId;
 }
 
 void UnassignFromWing(const uint shipId)
 {
 	const auto& foundShipEntry = shipTableByShipId.find(shipId);
 	if (foundShipEntry != shipTableByShipId.end())
-		foundShipEntry->second->UnknownData[82] = wingId--;
+		foundShipEntry->second->wingId = wingId--;
+}
+
+void SetLifeTime(const uint shipId, const float lifeTime)
+{
+	const auto& foundShipEntry = shipTableByShipId.find(shipId);
+	if (foundShipEntry != shipTableByShipId.end())
+	{
+		foundShipEntry->second->lifetime = lifeTime < 0.0f ? -1.0 : lifeTime * 15.0f; // 15 being the max decrement per second
+		foundShipEntry->second->currentLifetime = lifeTime <= 0.0f ? 1.0f : lifeTime * 15.0f;
+	}
 }
 
 static uint TryCreateNpc(const pub::SpaceObj::ShipInfo& shipInfo)

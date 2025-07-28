@@ -22,4 +22,5 @@ struct NpcCreationParams
 
 void AssignToWing(const uint shipId, const uint wingLeaderShipId);
 void UnassignFromWing(const uint shipId);
+void SetLifeTime(const uint shipId, const float lifeTime);
 uint CreateNPC(const NpcCreationParams& params);

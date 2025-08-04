@@ -876,10 +876,10 @@ namespace Missions
 			if (missionEntry.second.offerId == offerId)
 			{
 				auto& mission = missionEntry.second;
+				mission.Reset();
 				const uint labelId = CreateID("players");
 				for (const auto clientId : clientIds)
 					mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), labelId);
-				mission.Reset();
 				mission.Start();
 				return;
 			}

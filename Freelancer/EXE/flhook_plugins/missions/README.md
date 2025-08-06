@@ -477,7 +477,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` The NPCs to receive the objectives.
     1. `STRING` The `ObjList` nickname to refer to.
 
-- `Act_Invulnerable` Sets invulnerability for the target.
+- `Act_Invulnerable` Sets invulnerability for the target. Only for NPCs/Solars.
     1. `STRING|Activator` Object by name or label for which invulnerability will be set.
     1. `True|False :False` Whether to prevent non-player damage (NPCs, radiation, asteroid mines) or not.
     1. `[True|False] :False` Whether to prevent player damage or not.

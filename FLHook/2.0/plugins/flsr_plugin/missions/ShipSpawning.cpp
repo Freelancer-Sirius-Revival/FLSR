@@ -40,13 +40,15 @@ struct iRepTable
 	int iRep;
 };
 
-struct iShipTable
+struct iShipTable // 1456 bytes
 {
 	// This is a table that contains variables when ship was being created "mostly", majority of the stuff is not read after ship is created
 	HMODULE ContentConfg;
 	uint iShipID;
 	iRepTable* iRepTab;
-	DWORD UnknownData[512];
+	DWORD UnknownData[113];
+	pub::AI::Personality personality; // offset 0x1D0, size 984bytes
+	uint unk[2];
 };
 
 struct EmptyPadding
@@ -224,21 +226,25 @@ void CreatePopulationEntry(uint iShipID, uint iRep, uint iSystemID)
 
 	iShipTab->UnknownData[72] = (DWORD)Padfill1;
 	iShipTab->UnknownData[73] = (DWORD)Padfill1;
-	iShipTab->UnknownData[75] = 1;
+	uint archetypeId;
+	pub::SpaceObj::GetArchetypeID(iShipID, archetypeId);
+	iShipTab->UnknownData[75] = archetypeId;
 	iShipTab->UnknownData[82] = 0; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
 	iShipTab->UnknownData[83] = 0xE8;
 	iShipTab->UnknownData[84] = (DWORD)Padfill2;
 	iShipTab->UnknownData[85] = 1;
 	iShipTab->UnknownData[91] = 0; // high chance this is a "if player" check -1 points to player and plays death music in the server lmao
 	iShipTab->UnknownData[93] = (DWORD)Padfill3;
-	iShipTab->UnknownData[94] = 0xFFFFFFFF;
-	iShipTab->UnknownData[104] = 0x3ff00000;
-	iShipTab->UnknownData[106] = 1;
+	iShipTab->UnknownData[94] = 0x00000001;
+	iShipTab->UnknownData[104] = 0xBFF00000;
+	iShipTab->UnknownData[106] = 0;
 	iShipTab->UnknownData[107] = 5;
 	iShipTab->UnknownData[108] = 0xbf800000; // Life time drain, all important npcs use -1 so they dont get destroyed by the population manager
 	iShipTab->UnknownData[109] = 0x43fa0000; // possible life drain area
 	iShipTab->UnknownData[110] = NULL; //loadout hash
 	iShipTab->UnknownData[111] = 0x41c00000; // life time duration
+	iShipTab->UnknownData[113] = 0x4E6B79A3;
+	pub::AI::get_personality(iShipID, iShipTab->personality);
 
 	Fndpop.iSystem = iSystemID;
 	Fndpop.iZone = NULL;

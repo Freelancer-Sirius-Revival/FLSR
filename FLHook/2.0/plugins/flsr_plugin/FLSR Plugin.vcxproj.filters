@@ -139,7 +139,7 @@
     <ClCompile Include="missions\conditions\CndProjHitCount.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\IniReader.cpp">
+    <ClCompile Include="missions\conditions\CndIniReader.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActInvulnerable.cpp">
@@ -177,6 +177,48 @@
     </ClCompile>
     <ClCompile Include="missions\actions\ActStartDialog.cpp">
       <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjDelay.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndDistObj.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndDistVec.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndTimer.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndTrue.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjDock.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\Objective.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjFollow.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjGotoObj.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjGotoSpline.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjGotoVec.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjMakeNewFormation.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjBreakFormation.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjIniReader.cpp">
+      <Filter>Missions\Objectives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -281,9 +323,6 @@
     <ClInclude Include="missions\objectives\Objectives.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
-    <ClInclude Include="missions\objectives\ObjectivesArch.h">
-      <Filter>Missions\Objectives</Filter>
-    </ClInclude>
     <ClInclude Include="missions\actions\ActGiveObjList.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
@@ -318,7 +357,7 @@
     <ClInclude Include="missions\conditions\CndProjHitCount.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\IniReader.h">
+    <ClInclude Include="missions\conditions\CndIniReader.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActInvulnerable.h">
@@ -377,6 +416,36 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActStartDialog.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\Objective.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndDistObj.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndDistVec.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndTimer.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndTrue.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoObj.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoSpline.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoVec.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjBreakFormation.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjIniReader.h">
+      <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

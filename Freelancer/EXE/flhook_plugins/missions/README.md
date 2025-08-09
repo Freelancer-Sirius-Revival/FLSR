@@ -234,19 +234,19 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 - `Follow` Follows the given target.
     1. `STRING` The target name ship to follow.
-    1. `FLOAT :0` Maximum distance not to exceed.
     1. `FLOAT :0` The relative x-axis position to the target.
     1. `FLOAT :0` The relative y-axis position to the target.
     1. `FLOAT :0` The relative z-axis position to the target.
+    1. `[FLOAT] :100` Maximum distance not to exceed.
 
 - `GotoObj` Fly toward a specific object in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
     1. `STRING` Object by name to fly to.
-    1. `FLOAT :0` The distance from the given position to stop at.
-    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[FLOAT] :100` The distance from the given position to stop at.
+    1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
-    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
-    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+    1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
 - `GotoSpline` Fly toward a specific point in space along a spline.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
@@ -262,22 +262,22 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `FLOAT :0` The x-axis position of point 4.
     1. `FLOAT :0` The y-axis position of point 4.
     1. `FLOAT :0` The z-axis position of point 4.
-    1. `FLOAT :0` The distance from the given position to stop at.
-    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[FLOAT] :100` The distance from the given position to stop at.
+    1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
-    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
-    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+    1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
 - `GotoVec` Fly toward a specific point in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
     1. `FLOAT :0` The x-axis position for the target.
     1. `FLOAT :0` The y-axis position for the target.
     1. `FLOAT :0` The z-axis position for the target.
-    1. `FLOAT :0` The distance from the given position to stop at.
-    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[FLOAT] :100` The distance from the given position to stop at.
+    1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
-    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
-    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+    1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
 - `MakeNewFormation`
     1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.

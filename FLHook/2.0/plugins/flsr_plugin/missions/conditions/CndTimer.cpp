@@ -8,7 +8,7 @@ namespace Missions
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
 
-	std::unordered_set<CndTimer*> registeredConditions;
+	std::unordered_set<CndTimer*> observedCndTimer;
 
 	CndTimer::CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS) :
 		Condition(parent),
@@ -31,12 +31,12 @@ namespace Missions
 		else
 			targetTimeInS = std::uniform_real_distribution<float>(lowerTimeInS, upperTimeInS)(gen);
 
-		registeredConditions.insert(this);
+		observedCndTimer.insert(this);
 	}
 
 	void CndTimer::Unregister()
 	{
-		registeredConditions.erase(this);
+		observedCndTimer.erase(this);
 	}
 
 	bool CndTimer::Matches(const float elapsedTimeInS)
@@ -60,10 +60,10 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndTimer*> currentConditions(registeredConditions);
+				const std::unordered_set<Missions::CndTimer*> currentConditions(observedCndTimer);
 				for (const auto& condition : currentConditions)
 				{
-					if (registeredConditions.contains(condition) && condition->Matches(seconds))
+					if (observedCndTimer.contains(condition) && condition->Matches(seconds))
 						condition->ExecuteTrigger();
 				}
 			}

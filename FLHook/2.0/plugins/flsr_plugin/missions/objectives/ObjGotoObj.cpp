@@ -45,8 +45,6 @@ namespace Missions
 		gotoOp.endWaitDistance = endWaitDistance;
 		pub::AI::SubmitDirective(objId, &gotoOp);
 
-		const auto& condition = ConditionPtr(new ObjCndDistObj(parent, objectiveIndex, objId, range, targetObjNameOrId));
-		missions.at(parent.missionId).objectiveConditionByObjectId.insert({ objId, condition });
-		condition->Register();
+		RegisterCondition(objId, ConditionPtr(new ObjCndDistObj(parent, objectiveIndex, objId, range, targetObjNameOrId)));
 	}
 }

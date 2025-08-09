@@ -30,8 +30,6 @@ namespace Missions
 		followOp.dunno2 = 400.0f;
 		pub::AI::SubmitDirective(objId, &followOp);
 
-		const auto& condition = ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId));
-		mission.objectiveConditionByObjectId.insert({ objId, condition });
-		condition->Register();
+		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
 	}
 }

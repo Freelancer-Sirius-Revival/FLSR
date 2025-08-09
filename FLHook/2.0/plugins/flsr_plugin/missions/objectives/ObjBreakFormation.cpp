@@ -53,8 +53,6 @@ namespace Missions
 
 		OrderBreakFormation(objId);
 
-		const auto& condition = ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId));
-		missions.at(parent.missionId).objectiveConditionByObjectId.insert({ objId, condition });
-		condition->Register();
+		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
 	}
 }

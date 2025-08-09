@@ -17,6 +17,8 @@ namespace Missions
 	{
 	protected:
 		const int objectiveIndex;
+
+		void RegisterCondition(const uint objId, const ConditionPtr& condition) const;
 	public:
 		const ObjectiveParent parent;
 

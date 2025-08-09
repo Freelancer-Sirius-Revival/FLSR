@@ -54,8 +54,6 @@ namespace Missions
 			AssignToWing(memberId, objId);
 		}
 
-		const auto& condition = ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId));
-		mission.objectiveConditionByObjectId.insert({ objId, condition });
-		condition->Register();
+		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
 	}
 }

@@ -21,8 +21,6 @@ namespace Missions
 		delayOp.DelayTime = timeInS;
 		pub::AI::SubmitDirective(objId, &delayOp);
 
-		const auto& condition = ConditionPtr(new ObjCndTimer(parent, objectiveIndex, objId, timeInS));
-		missions.at(parent.missionId).objectiveConditionByObjectId.insert({ objId, condition });
-		condition->Register();
+		RegisterCondition(objId, ConditionPtr(new ObjCndTimer(parent, objectiveIndex, objId, timeInS)));
 	}
 }

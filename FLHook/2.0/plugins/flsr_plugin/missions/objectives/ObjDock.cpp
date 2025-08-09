@@ -33,8 +33,6 @@ namespace Missions
 		dockOp.x28 = 0;
 		pub::AI::SubmitDirective(objId, &dockOp);
 
-		const auto& condition = ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId));
-		mission.objectiveConditionByObjectId.insert({ objId, condition });
-		condition->Register();
+		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
 	}
 }

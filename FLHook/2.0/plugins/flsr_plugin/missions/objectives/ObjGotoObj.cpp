@@ -32,6 +32,8 @@ namespace Missions
 		gotoOp.targetId = 0;
 		if (const auto& objectEntry = mission.objectIdsByName.find(targetObjNameOrId); objectEntry != mission.objectIdsByName.end())
 			gotoOp.targetId = objectEntry->second;
+		if (!gotoOp.targetId)
+			gotoOp.targetId = targetObjNameOrId;
 		gotoOp.range = range;
 		gotoOp.thrust = thrust;
 		gotoOp.shipMoves = true;

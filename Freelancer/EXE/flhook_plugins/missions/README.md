@@ -237,7 +237,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `FLOAT :0` The relative x-axis position to the target.
     1. `FLOAT :0` The relative y-axis position to the target.
     1. `FLOAT :0` The relative z-axis position to the target.
-    1. `FLOAT :100` Maximum distance not to exceed.
+    1. `[FLOAT] :100` Maximum distance not to exceed.
 
 - `GotoObj` Fly toward a specific object in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.

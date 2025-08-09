@@ -260,8 +260,8 @@ namespace Missions
 	{
 		for (const auto& entry : objectIdsByName)
 		{
-			if (entry.first == objId)
-				return entry.second;
+			if (entry.second == objId)
+				return entry.first;
 		}
 		return 0;
 	}

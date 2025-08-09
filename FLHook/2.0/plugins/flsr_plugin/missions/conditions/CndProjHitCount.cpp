@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	std::unordered_set<CndProjHitCount*> registeredConditions;
+	std::unordered_set<CndProjHitCount*> observedCndProjHitCount;
 
 	CndProjHitCount::CndProjHitCount(const ConditionParent& parent,
 							const uint damagedObjNameOrLabel,
@@ -29,12 +29,12 @@ namespace Missions
 	void CndProjHitCount::Register()
 	{
 		currentHitCount = 0;
-		registeredConditions.insert(this);
+		observedCndProjHitCount.insert(this);
 	}
 
 	void CndProjHitCount::Unregister()
 	{
-		registeredConditions.erase(this);
+		observedCndProjHitCount.erase(this);
 	}
 
 	bool CndProjHitCount::Matches(const IObjRW* damagedObject, const DamageList* damageList, const DamagedSurface damagedSurface)
@@ -136,10 +136,10 @@ namespace Missions
 		if (incomingDamage <= 0.0f)
 			return;
 
-		const std::unordered_set<CndProjHitCount*> currentConditions(registeredConditions);
+		const std::unordered_set<CndProjHitCount*> currentConditions(observedCndProjHitCount);
 		for (const auto& condition : currentConditions)
 		{
-			if (registeredConditions.contains(condition) && condition->Matches(damagedObject, damageList, hitSurface))
+			if (observedCndProjHitCount.contains(condition) && condition->Matches(damagedObject, damageList, hitSurface))
 				condition->ExecuteTrigger();
 		}
 	}

@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	std::unordered_set<CndSpaceEnter*> registeredConditions;
+	std::unordered_set<CndSpaceEnter*> observedCndSpaceEnter;
 
 	CndSpaceEnter::CndSpaceEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
 		Condition(parent),
@@ -19,12 +19,12 @@ namespace Missions
 
 	void CndSpaceEnter::Register()
 	{
-		registeredConditions.insert(this);
+		observedCndSpaceEnter.insert(this);
 	}
 
 	void CndSpaceEnter::Unregister()
 	{
-		registeredConditions.erase(this);
+		observedCndSpaceEnter.erase(this);
 	}
 
 	bool CndSpaceEnter::Matches(const uint clientId, const uint currentSystemId)
@@ -61,15 +61,15 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				if (registeredConditions.empty())
+				if (observedCndSpaceEnter.empty())
 					return;
 				uint systemId;
 				pub::Player::GetSystem(clientId, systemId);
 
-				const std::unordered_set<Missions::CndSpaceEnter*> currentConditions(registeredConditions);
+				const std::unordered_set<Missions::CndSpaceEnter*> currentConditions(observedCndSpaceEnter);
 				for (const auto& condition : currentConditions)
 				{
-					if (registeredConditions.contains(condition) && condition->Matches(clientId, systemId))
+					if (observedCndSpaceEnter.contains(condition) && condition->Matches(clientId, systemId))
 						condition->ExecuteTrigger();
 				}
 			}

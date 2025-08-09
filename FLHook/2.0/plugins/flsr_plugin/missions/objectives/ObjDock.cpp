@@ -16,22 +16,27 @@ namespace Missions
 
 		Objective::Execute(objId);
 
-		auto& mission = missions.at(parent.missionId);
-		pub::AI::DirectiveDockOp dockOp;
-		dockOp.fireWeapons = false;
-		dockOp.dockTargetObjId = 0;
+		uint dockTargetObjId = 0;
+		const auto& mission = missions.at(parent.missionId);
 		if (const auto& objectEntry = mission.objectIdsByName.find(targetObjNameOrId); objectEntry != mission.objectIdsByName.end())
-			dockOp.dockTargetObjId = objectEntry->second;
-		if (!dockOp.dockTargetObjId)
-			dockOp.dockTargetObjId = targetObjNameOrId;
-		dockOp.dockTargetDirectionObjId = 0;
-		dockOp.x12 = 0;
-		dockOp.dockPortIndex = -1;
-		dockOp.x1C = 0;
-		dockOp.x20 = 200.0f;
-		dockOp.x24 = 500.0f;
-		dockOp.x28 = 0;
-		pub::AI::SubmitDirective(objId, &dockOp);
+			dockTargetObjId = objectEntry->second;
+		if (!dockTargetObjId)
+			dockTargetObjId = targetObjNameOrId;
+
+		if (pub::SpaceObj::ExistsAndAlive(dockTargetObjId) == 0)
+		{
+			pub::AI::DirectiveDockOp dockOp;
+			dockOp.fireWeapons = false;
+			dockOp.dockTargetObjId = dockTargetObjId;
+			dockOp.dockTargetDirectionObjId = 0;
+			dockOp.x12 = 0;
+			dockOp.dockPortIndex = -1;
+			dockOp.x1C = 0;
+			dockOp.x20 = 200.0f;
+			dockOp.x24 = 500.0f;
+			dockOp.x28 = 0;
+			pub::AI::SubmitDirective(objId, &dockOp);
+		}
 
 		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
 	}

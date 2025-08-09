@@ -1,5 +1,6 @@
 #include "ObjGotoObj.h"
 #include "ObjCndDistObj.h"
+#include "ObjCndTrue.h"
 #include "../Mission.h"
 
 namespace Missions
@@ -25,28 +26,37 @@ namespace Missions
 
 		Objective::Execute(objId);
 
+		uint targetObjId = 0;
 		const auto& mission = missions.at(parent.missionId);
-		pub::AI::DirectiveGotoOp gotoOp;
-		gotoOp.fireWeapons = false;
-		gotoOp.gotoType = pub::AI::GotoOpType::Vec;
-		gotoOp.targetId = 0;
 		if (const auto& objectEntry = mission.objectIdsByName.find(targetObjNameOrId); objectEntry != mission.objectIdsByName.end())
-			gotoOp.targetId = objectEntry->second;
-		if (!gotoOp.targetId)
-			gotoOp.targetId = targetObjNameOrId;
-		gotoOp.range = range;
-		gotoOp.thrust = thrust;
-		gotoOp.shipMoves = true;
-		gotoOp.shipMoves2 = true;
-		gotoOp.goToCruise = !noCruise;
-		gotoOp.goToNoCruise = noCruise;
-		gotoOp.objIdToWaitFor = 0;
-		if (const auto& objectEntry = mission.objectIdsByName.find(objNameToWaitFor); objectEntry != mission.objectIdsByName.end())
-			gotoOp.objIdToWaitFor = objectEntry->second;
-		gotoOp.startWaitDistance = startWaitDistance;
-		gotoOp.endWaitDistance = endWaitDistance;
-		pub::AI::SubmitDirective(objId, &gotoOp);
+			targetObjId = objectEntry->second;
+		if (!targetObjId)
+			targetObjId = targetObjNameOrId;
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndDistObj(parent, objectiveIndex, objId, range, targetObjNameOrId)));
+		if (pub::SpaceObj::ExistsAndAlive(targetObjId) == 0)
+		{
+			pub::AI::DirectiveGotoOp gotoOp;
+			gotoOp.fireWeapons = false;
+			gotoOp.gotoType = pub::AI::GotoOpType::Ship;
+			gotoOp.targetId = targetObjNameOrId;
+			gotoOp.range = range;
+			gotoOp.thrust = thrust;
+			gotoOp.shipMoves = true;
+			gotoOp.shipMoves2 = true;
+			gotoOp.goToCruise = !noCruise;
+			gotoOp.goToNoCruise = noCruise;
+			gotoOp.objIdToWaitFor = 0;
+			if (const auto& objectEntry = mission.objectIdsByName.find(objNameToWaitFor); objectEntry != mission.objectIdsByName.end())
+				gotoOp.objIdToWaitFor = objectEntry->second;
+			gotoOp.startWaitDistance = startWaitDistance;
+			gotoOp.endWaitDistance = endWaitDistance;
+			pub::AI::SubmitDirective(objId, &gotoOp);
+
+			RegisterCondition(objId, ConditionPtr(new ObjCndDistObj(parent, objectiveIndex, objId, range, targetObjNameOrId)));
+		}
+		else
+		{
+			RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
+		}
 	}
 }

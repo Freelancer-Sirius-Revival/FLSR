@@ -20,15 +20,16 @@ namespace Missions
 
 		auto& mission = missions.at(parent.missionId);
 		const auto& objectEntry = mission.objectIdsByName.find(targetObjName);
-		if (objectEntry == mission.objectIdsByName.end())
-			return;
-		pub::AI::DirectiveFollowOp followOp;
-		followOp.fireWeapons = false;
-		followOp.followSpaceObj = objectEntry->second;
-		followOp.maxDistance = maxDistance;
-		followOp.offset = position;
-		followOp.dunno2 = 400.0f;
-		pub::AI::SubmitDirective(objId, &followOp);
+		if (objectEntry != mission.objectIdsByName.end())
+		{
+			pub::AI::DirectiveFollowOp followOp;
+			followOp.fireWeapons = false;
+			followOp.followSpaceObj = objectEntry->second;
+			followOp.maxDistance = maxDistance;
+			followOp.offset = position;
+			followOp.dunno2 = 400.0f;
+			pub::AI::SubmitDirective(objId, &followOp);
+		}
 
 		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
 	}

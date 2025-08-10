@@ -22,14 +22,15 @@ namespace Missions
 		const auto& formation = Formations::GetFormation(formationId);
 
 		std::vector<uint> memberNames({ mission.FindObjNameByObjId(objId) });
-		memberNames.insert(memberNames.end(), objNames.begin(), objNames.end());
+		for (const auto& memberName : objNames)
+		{
+			if (mission.objectIdsByName.contains(memberName))
+				memberNames.push_back(memberName);
+		}
 
 		std::unordered_map<uint, std::string> stateGraphByMemberName;
 		for (const auto& name : memberNames)
 		{
-			if (!mission.objectIdsByName.contains(name))
-				continue;
-
 			if (const auto& msnNpcEntry = mission.msnNpcs.find(name); msnNpcEntry != mission.msnNpcs.end())
 				if (const auto& npcEntry = mission.npcs.find(msnNpcEntry->second.npcId); npcEntry != mission.npcs.end())
 					stateGraphByMemberName.insert({ name, npcEntry->second.stateGraph });

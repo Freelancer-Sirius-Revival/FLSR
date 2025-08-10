@@ -4,7 +4,6 @@
 namespace Missions
 {
 	ObjGotoSpline::ObjGotoSpline(const ObjectiveParent& parent,
-								const int objectiveIndex,
 								const Vector splinePoints[4],
 								const bool noCruise,
 								const float range,
@@ -12,7 +11,7 @@ namespace Missions
 								const uint objNameToWaitFor,
 								const float startWaitDistance,
 								const float endWaitDistance) :
-		Objective(parent, objectiveIndex),
+		Objective(parent),
 		ObjGoto(noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance)
 	{
 		spline[0] = splinePoints[0];
@@ -21,15 +20,15 @@ namespace Missions
 		spline[3] = splinePoints[3];
 	}
 
-	void ObjGotoSpline::Execute(const uint objId) const
+	void ObjGotoSpline::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 
 		pub::AI::DirectiveGotoOp gotoOp;
-		gotoOp.fireWeapons = false;
+		gotoOp.fireWeapons = !state.enforceObjective;
 		gotoOp.gotoType = pub::AI::GotoOpType::Spline;
 		gotoOp.spline[0] = spline[0];
 		gotoOp.spline[1] = spline[1];
@@ -47,8 +46,8 @@ namespace Missions
 			gotoOp.objIdToWaitFor = objectEntry->second;
 		gotoOp.startWaitDistance = startWaitDistance;
 		gotoOp.endWaitDistance = endWaitDistance;
-		pub::AI::SubmitDirective(objId, &gotoOp);
+		pub::AI::SubmitDirective(state.objId, &gotoOp);
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndDistVec(parent, objectiveIndex, objId, range, spline[3])));
+		RegisterCondition(state.objId, ConditionPtr(new ObjCndDistVec(parent, state, range, spline[3])));
 	}
 }

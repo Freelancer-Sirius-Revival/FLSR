@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "ObjectiveState.h"
 
 namespace Missions
 {
@@ -13,6 +14,6 @@ namespace Missions
 		std::vector<ObjectivePtr> objectives;
 
 		Objectives(const uint id, const uint missionId);
-		void Progress(const uint objId, const int index) const;
+		void Progress(const ObjectiveState& state) const;
 	};
 }

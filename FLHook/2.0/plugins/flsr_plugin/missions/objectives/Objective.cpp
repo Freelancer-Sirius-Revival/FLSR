@@ -2,15 +2,13 @@
 
 namespace Missions
 {
-	Objective::Objective(const ObjectiveParent& parent, const int objectiveIndex) :
-		parent(parent), objectiveIndex(objectiveIndex)
+	Objective::Objective(const ObjectiveParent& parent) : parent(parent)
 	{}
 
-	void Objective::Execute(const uint objId) const
+	void Objective::Execute(const ObjectiveState& state) const
 	{
 		pub::AI::DirectiveCancelOp cancelOp;
-		cancelOp.fireWeapons = false;
-		pub::AI::SubmitDirective(objId, &cancelOp);
+		pub::AI::SubmitDirective(state.objId, &cancelOp);
 	}
 
 	void Objective::RegisterCondition(const uint objId, const ConditionPtr& condition) const

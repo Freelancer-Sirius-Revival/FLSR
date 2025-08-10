@@ -205,6 +205,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\objectives\ObjGotoSpline.cpp" />
     <ClCompile Include="missions\objectives\ObjGotoVec.cpp" />
     <ClCompile Include="missions\objectives\ObjMakeNewFormation.cpp" />
+    <ClCompile Include="missions\objectives\ObjSetPriority.cpp" />
     <ClCompile Include="missions\ShipSpawning.cpp" />
     <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />
@@ -279,6 +280,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\MsnSolar.h" />
     <ClInclude Include="missions\Npc.h" />
     <ClInclude Include="missions\NpcNames.h" />
+    <ClInclude Include="missions\objectives\ObjectiveState.h" />
     <ClInclude Include="missions\objectives\ObjIdle.h" />
     <ClInclude Include="missions\objectives\ObjIniReader.h" />
     <ClInclude Include="missions\objectives\ObjBreakFormation.h" />
@@ -296,6 +298,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\objectives\Objectives.h" />
     <ClInclude Include="missions\objectives\ObjFollow.h" />
     <ClInclude Include="missions\objectives\ObjGoto.h" />
+    <ClInclude Include="missions\objectives\ObjSetPriority.h" />
     <ClInclude Include="missions\ShipSpawning.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="Pilots.h" />

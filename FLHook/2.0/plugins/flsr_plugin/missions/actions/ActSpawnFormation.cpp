@@ -70,7 +70,7 @@ namespace Missions
 		if (!spawnedShipIds.empty())
 		{			
 			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
-				objectivesEntry->second.Progress(spawnedShipIds[0], 0);
+				objectivesEntry->second.Progress(ObjectiveState(spawnedShipIds[0], 0, false));
 		}
 	}
 }

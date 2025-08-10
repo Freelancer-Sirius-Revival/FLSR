@@ -8,11 +8,10 @@ namespace Missions
 	{
 	private:
 		const ObjectiveParent parent;
-		const int objectiveIndex;
-		const uint objId;
+		const ObjectiveState state;
 
 	public:
-		ObjCndDistVec(const ObjectiveParent& parent, const int objectiveIndex, const uint objId, const float distance, const Vector& position);
+		ObjCndDistVec(const ObjectiveParent& parent, const ObjectiveState& state, const float distance, const Vector& position);
 		void ExecuteTrigger();
 	};
 }

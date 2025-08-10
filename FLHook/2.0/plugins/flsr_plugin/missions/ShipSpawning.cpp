@@ -424,7 +424,6 @@ uint CreateNPC(const NpcCreationParams& params)
 	CreatePopulationEntry(objId, shipInfo.iRep, shipInfo.iSystem);
 
 	pub::AI::DirectiveCancelOp cancelOp;
-	cancelOp.fireWeapons = true;
 	pub::AI::SubmitDirective(objId, &cancelOp);
 
 	pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });

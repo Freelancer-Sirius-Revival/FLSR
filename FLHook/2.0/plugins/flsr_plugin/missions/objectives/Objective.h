@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <FLHook.h>
+#include "ObjectiveState.h"
 #include "../Mission.h"
 #include "../conditions/CndTrue.h"
 
@@ -16,15 +17,13 @@ namespace Missions
 	class Objective
 	{
 	protected:
-		const int objectiveIndex;
-
 		void RegisterCondition(const uint objId, const ConditionPtr& condition) const;
 	public:
 		const ObjectiveParent parent;
 
-		Objective(const ObjectiveParent& parent, const int objectiveIndex);
+		Objective(const ObjectiveParent& parent);
 		virtual ~Objective() {};
-		virtual void Execute(const uint objId) const;
+		virtual void Execute(const ObjectiveState& state) const;
 	};
 	typedef std::shared_ptr<Objective> ObjectivePtr;
 }

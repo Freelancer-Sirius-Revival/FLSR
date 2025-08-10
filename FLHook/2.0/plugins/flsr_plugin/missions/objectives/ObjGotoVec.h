@@ -11,7 +11,6 @@ namespace Missions
 
 	public:
 		ObjGotoVec(const ObjectiveParent& parent,
-					const int objectiveIndex,
 					const Vector& position,
 					const bool noCruise,
 					const float range,
@@ -19,6 +18,6 @@ namespace Missions
 					const uint objNameToWaitFor,
 					const float startWaitDistance,
 					const float endWaitDistance);
-		void Execute(const uint objId) const;
+		void Execute(const ObjectiveState& state) const;
 	};
 }

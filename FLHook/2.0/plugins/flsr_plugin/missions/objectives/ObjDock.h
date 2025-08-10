@@ -9,7 +9,7 @@ namespace Missions
 		const uint targetObjNameOrId;
 
 	public:
-		ObjDock(const ObjectiveParent& parent, const int objectiveIndex, const uint targetObjNameOrId);
-		void Execute(const uint objId) const;
+		ObjDock(const ObjectiveParent& parent, const uint targetObjNameOrId);
+		void Execute(const ObjectiveState& state) const;
 	};
 }

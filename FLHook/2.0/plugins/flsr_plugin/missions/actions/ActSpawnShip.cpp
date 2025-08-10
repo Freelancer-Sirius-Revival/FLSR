@@ -10,7 +10,7 @@ namespace Missions
 		if (objId)
 		{
 			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
-				objectivesEntry->second.Progress(objId, 0);
+				objectivesEntry->second.Progress(ObjectiveState(objId, 0, false));
 		}
 	}
 }

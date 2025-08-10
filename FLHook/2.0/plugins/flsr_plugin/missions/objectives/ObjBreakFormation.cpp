@@ -4,14 +4,12 @@
 
 namespace Missions
 {
-	ObjBreakFormation::ObjBreakFormation(const ObjectiveParent& parent, const int objectiveIndex) :
-		Objective(parent, objectiveIndex)
+	ObjBreakFormation::ObjBreakFormation(const ObjectiveParent& parent) : Objective(parent)
 	{}
 
 	static void OrderBreakFormation(const uint objId)
 	{
 		pub::AI::DirectiveCancelOp cancelOp;
-		cancelOp.fireWeapons = true;
 		pub::AI::SubmitDirective(objId, &cancelOp);
 
 		pub::AI::SetPersonalityParams personality;
@@ -27,14 +25,14 @@ namespace Missions
 		UnassignFromWing(objId);
 	}
 
-	void ObjBreakFormation::Execute(const uint objId) const
+	void ObjBreakFormation::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 
-		uint shipId = objId;
+		uint shipId = state.objId;
 		IObjRW* inspect;
 		StarSystem* system;
 		if (!GetShipInspect(shipId, inspect, system))
@@ -49,8 +47,8 @@ namespace Missions
 				OrderBreakFormation(followers[index]->get_id());
 		}
 
-		OrderBreakFormation(objId);
+		OrderBreakFormation(state.objId);
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
+		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 	}
 }

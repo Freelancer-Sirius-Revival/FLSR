@@ -3,33 +3,33 @@
 
 namespace Missions
 {
-	ObjFollow::ObjFollow(const ObjectiveParent& parent, const int objectiveIndex, const uint targetObjName, const float maxDistance, const Vector& position) :
-		Objective(parent, objectiveIndex),
+	ObjFollow::ObjFollow(const ObjectiveParent& parent, const uint targetObjName, const float maxDistance, const Vector& position) :
+		Objective(parent),
 		targetObjName(targetObjName),
 		maxDistance(maxDistance),
 		position(position)
 	{}
 
-	void ObjFollow::Execute(const uint objId) const
+	void ObjFollow::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 
 		const auto& mission = missions.at(parent.missionId);
 		const auto& objectEntry = mission.objectIdsByName.find(targetObjName);
 		if (objectEntry != mission.objectIdsByName.end())
 		{
 			pub::AI::DirectiveFollowOp followOp;
-			followOp.fireWeapons = false;
+			followOp.fireWeapons = !state.enforceObjective;
 			followOp.followSpaceObj = objectEntry->second;
 			followOp.maxDistance = maxDistance;
 			followOp.offset = position;
 			followOp.dunno2 = 400.0f;
-			pub::AI::SubmitDirective(objId, &followOp);
+			pub::AI::SubmitDirective(state.objId, &followOp);
 		}
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
+		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 	}
 }

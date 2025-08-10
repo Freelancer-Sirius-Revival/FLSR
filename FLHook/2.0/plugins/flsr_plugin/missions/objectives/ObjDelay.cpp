@@ -3,23 +3,23 @@
 
 namespace Missions
 {
-	ObjDelay::ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const float timeInS) :
-		Objective(parent, objectiveIndex),
+	ObjDelay::ObjDelay(const ObjectiveParent& parent, const float timeInS) :
+		Objective(parent),
 		timeInS(timeInS)
 	{}
 
-	void ObjDelay::Execute(const uint objId) const
+	void ObjDelay::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 		
 		pub::AI::DirectiveDelayOp delayOp;
-		delayOp.fireWeapons = false;
+		delayOp.fireWeapons = !state.enforceObjective;
 		delayOp.DelayTime = timeInS;
-		pub::AI::SubmitDirective(objId, &delayOp);
+		pub::AI::SubmitDirective(state.objId, &delayOp);
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndTimer(parent, objectiveIndex, objId, timeInS)));
+		RegisterCondition(state.objId, ConditionPtr(new ObjCndTimer(parent, state, timeInS)));
 	}
 }

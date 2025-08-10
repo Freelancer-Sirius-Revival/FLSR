@@ -5,23 +5,23 @@
 
 namespace Missions
 {
-	ObjMakeNewFormation::ObjMakeNewFormation(const ObjectiveParent& parent, const int objectiveIndex, const uint formationId, const std::vector<uint>& objNames) :
-		Objective(parent, objectiveIndex),
+	ObjMakeNewFormation::ObjMakeNewFormation(const ObjectiveParent& parent, const uint formationId, const std::vector<uint>& objNames) :
+		Objective(parent),
 		formationId(formationId),
 		objNames(objNames)
 	{}
 
-	void ObjMakeNewFormation::Execute(const uint objId) const
+	void ObjMakeNewFormation::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 
 		const auto& mission = missions.at(parent.missionId);
 		const auto& formation = Formations::GetFormation(formationId);
 
-		std::vector<uint> memberNames({ mission.FindObjNameByObjId(objId) });
+		std::vector<uint> memberNames({ mission.FindObjNameByObjId(state.objId) });
 		for (const auto& memberName : objNames)
 		{
 			if (mission.objectIdsByName.contains(memberName))
@@ -50,10 +50,10 @@ namespace Missions
 			personality.directiveCallback = 0;
 			pub::AI::SubmitState(memberId, &personality);
 
-			pub::AI::update_formation_state(memberId, objId, formation[index]);
-			AssignToWing(memberId, objId);
+			pub::AI::update_formation_state(memberId, state.objId, formation[index]);
+			AssignToWing(memberId, state.objId);
 		}
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
+		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 	}
 }

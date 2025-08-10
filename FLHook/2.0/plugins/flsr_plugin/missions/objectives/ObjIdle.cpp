@@ -3,20 +3,20 @@
 
 namespace Missions
 {
-	ObjIdle::ObjIdle(const ObjectiveParent& parent, const int objectiveIndex) : Objective(parent, objectiveIndex)
+	ObjIdle::ObjIdle(const ObjectiveParent& parent) : Objective(parent)
 	{}
 
-	void ObjIdle::Execute(const uint objId) const
+	void ObjIdle::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 
 		pub::AI::DirectiveIdleOp idleOp;
-		idleOp.fireWeapons = false;
-		pub::AI::SubmitDirective(objId, &idleOp);
+		idleOp.fireWeapons = true;
+		pub::AI::SubmitDirective(state.objId, &idleOp);
 
-		RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
+		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 	}
 }

@@ -9,9 +9,9 @@ namespace Missions
 		missionId(missionId)
 	{}
 
-	void Objectives::Progress(const uint objId, const int index) const
+	void Objectives::Progress(const ObjectiveState& state) const
 	{
-		if (index >= 0 && index < objectives.size())
-			objectives[index]->Execute(objId);
+		if (state.objectiveIndex >= 0 && state.objectiveIndex < objectives.size())
+			objectives[state.objectiveIndex]->Execute(state);
 	}
 }

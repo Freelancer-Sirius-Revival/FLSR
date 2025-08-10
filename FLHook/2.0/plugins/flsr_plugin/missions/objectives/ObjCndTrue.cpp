@@ -2,11 +2,10 @@
 
 namespace Missions
 {
-	ObjCndTrue::ObjCndTrue(const ObjectiveParent& parent, const int objectiveIndex, const uint objId) :
+	ObjCndTrue::ObjCndTrue(const ObjectiveParent& parent, const ObjectiveState& state) :
 		CndTrue(ConditionParent(parent.missionId, 0)),
 		parent(parent),
-		objectiveIndex(objectiveIndex),
-		objId(objId)
+		state(state)
 	{}
 
 	void ObjCndTrue::ExecuteTrigger()
@@ -14,6 +13,8 @@ namespace Missions
 		Unregister();
 		const auto& mission = missions.at(parent.missionId);
 		const auto& objectives = mission.objectives.at(parent.objectivesId);
-		objectives.Progress(objId, objectiveIndex + 1);
+		ObjectiveState nextState(state);
+		nextState.objectiveIndex++;
+		objectives.Progress(nextState);
 	}
 }

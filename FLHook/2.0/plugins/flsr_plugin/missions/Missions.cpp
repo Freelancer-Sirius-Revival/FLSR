@@ -383,7 +383,7 @@ namespace Missions
 							Objectives objectives(objParent.objectivesId, objParent.missionId);
 							while (ini.read_value())
 							{
-								const auto& obj = TryReadObjectiveFromIni(objParent, objectives.objectives.size(), ini);
+								const auto& obj = TryReadObjectiveFromIni(objParent, ini);
 								if (obj != nullptr)
 									objectives.objectives.push_back(ObjectivePtr(obj));
 							}

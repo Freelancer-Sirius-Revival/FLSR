@@ -2,11 +2,10 @@
 
 namespace Missions
 {
-	ObjCndTimer::ObjCndTimer(const ObjectiveParent& parent, const int objectiveIndex, const uint objId, const float time) :
+	ObjCndTimer::ObjCndTimer(const ObjectiveParent& parent, const ObjectiveState& state, const float time) :
 		CndTimer(ConditionParent(parent.missionId, 0), time, 0.0f),
 		parent(parent),
-		objectiveIndex(objectiveIndex),
-		objId(objId)
+		state(state)
 	{}
 
 	void ObjCndTimer::ExecuteTrigger()
@@ -14,6 +13,8 @@ namespace Missions
 		Unregister();
 		const auto& mission = missions.at(parent.missionId);
 		const auto& objectives = mission.objectives.at(parent.objectivesId);
-		objectives.Progress(objId, objectiveIndex + 1);
+		ObjectiveState nextState(state);
+		nextState.objectiveIndex++;
+		objectives.Progress(nextState);
 	}
 }

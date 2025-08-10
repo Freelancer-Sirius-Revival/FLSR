@@ -9,6 +9,7 @@
 #include "ObjGotoVec.h"
 #include "ObjIdle.h"
 #include "ObjMakeNewFormation.h"
+#include "ObjSetPriority.h"
 
 namespace Missions
 {
@@ -22,7 +23,7 @@ namespace Missions
 		ConPrint(L"ERROR: " + entryName + L" of Msn:" + std::to_wstring(objectiveParent.missionId) + L" Obj:" + std::to_wstring(objectiveParent.objectivesId) + L" Arg " + std::to_wstring(argNum + 1) + L" " + error + L"\n");
 	}
 
-	static ObjDelay* ReadObjDelay(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjDelay* ReadObjDelay(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		float timeInS = 0;
 
@@ -33,10 +34,10 @@ namespace Missions
 		else
 			timeInS = value;
 
-		return new ObjDelay(objectiveParent, objectiveIndex, timeInS);
+		return new ObjDelay(objectiveParent, timeInS);
 	}
 
-	static ObjDock* ReadObjDock(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjDock* ReadObjDock(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		uint argNum = 0;
 		const uint targetObjNameOrId = CreateIdOrNull(ini.get_value_string(argNum));
@@ -46,10 +47,10 @@ namespace Missions
 			return nullptr;
 		}
 
-		return new ObjDock(objectiveParent, objectiveIndex, targetObjNameOrId);
+		return new ObjDock(objectiveParent, targetObjNameOrId);
 	}
 
-	static ObjFollow* ReadObjFollow(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjFollow* ReadObjFollow(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		uint targetObjName = 0;
 		float maxDistance = 100.0f;
@@ -86,10 +87,10 @@ namespace Missions
 				maxDistance = value;
 		}
 
-		return new ObjFollow(objectiveParent, objectiveIndex, targetObjName, maxDistance, position);
+		return new ObjFollow(objectiveParent, targetObjName, maxDistance, position);
 	}
 
-	static ObjGotoObj* ReadObjGotoObj(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjGotoObj* ReadObjGotoObj(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		uint targetObjNameOrId = 0;
 		bool noCruise = false;
@@ -163,10 +164,10 @@ namespace Missions
 				endWaitDistance = value;
 		}
 
-		return new ObjGotoObj(objectiveParent, objectiveIndex, targetObjNameOrId, noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance);
+		return new ObjGotoObj(objectiveParent, targetObjNameOrId, noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance);
 	}
 
-	static ObjGotoSpline* ReadObjGotoSpline(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjGotoSpline* ReadObjGotoSpline(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		Vector spline[4] = { { 0, 0, 0}, { 0, 0, 0}, { 0, 0, 0}, { 0, 0, 0} };
 		bool noCruise = false;
@@ -254,10 +255,10 @@ namespace Missions
 				endWaitDistance = value;
 		}
 
-		return new ObjGotoSpline(objectiveParent, objectiveIndex, spline, noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance);
+		return new ObjGotoSpline(objectiveParent, spline, noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance);
 	}
 
-	static ObjGotoVec* ReadObjGotoVec(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjGotoVec* ReadObjGotoVec(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		Vector position = { 0, 0, 0 };
 		bool noCruise = false;
@@ -336,10 +337,10 @@ namespace Missions
 				endWaitDistance = value;
 		}
 
-		return new ObjGotoVec(objectiveParent, objectiveIndex, position, noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance);
+		return new ObjGotoVec(objectiveParent, position, noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance);
 	}
 
-	static ObjMakeNewFormation* ReadObjMakeNewFormation(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjMakeNewFormation* ReadObjMakeNewFormation(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		uint formationId = 0;
 		std::vector<uint> objNames;
@@ -362,37 +363,54 @@ namespace Missions
 				objNames.push_back(value);
 		}
 
-		return new ObjMakeNewFormation(objectiveParent, objectiveIndex, formationId, objNames);
+		return new ObjMakeNewFormation(objectiveParent, formationId, objNames);
 	}
 
-	Objective* TryReadObjectiveFromIni(const ObjectiveParent& objectiveParent, const int objectiveIndex, INI_Reader& ini)
+	static ObjSetPriority* ReadObjSetPriority(const ObjectiveParent& objectiveParent, INI_Reader& ini)
+	{
+		bool enforceObjectives = false;
+
+		uint argNum = 0;
+		std::string priority = ToLower(ini.get_value_string(argNum));
+		if (priority == "always_execute")
+			enforceObjectives = true;
+		else if (priority != "normal")
+			PrintErrorToConsole(L"SetPriority", objectiveParent, argNum, L"Invalid priority. Defaulting to Normal!");
+
+		return new ObjSetPriority(objectiveParent, enforceObjectives);
+	}
+
+	Objective* TryReadObjectiveFromIni(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		if (ini.is_value("BreakFormation"))
-			return new ObjBreakFormation(objectiveParent, objectiveIndex);
+			return new ObjBreakFormation(objectiveParent);
 
 		if (ini.is_value("Delay"))
-			return ReadObjDelay(objectiveParent, objectiveIndex, ini);
+			return ReadObjDelay(objectiveParent, ini);
 
 		if (ini.is_value("Dock"))
-			return ReadObjDock(objectiveParent, objectiveIndex, ini);
+			return ReadObjDock(objectiveParent, ini);
 
 		if (ini.is_value("Follow"))
-			return ReadObjFollow(objectiveParent, objectiveIndex, ini);
+			return ReadObjFollow(objectiveParent, ini);
 
 		if (ini.is_value("GotoObj"))
-			return ReadObjGotoObj(objectiveParent, objectiveIndex, ini);
+			return ReadObjGotoObj(objectiveParent, ini);
 
 		if (ini.is_value("GotoSpline"))
-			return ReadObjGotoSpline(objectiveParent, objectiveIndex, ini);
+			return ReadObjGotoSpline(objectiveParent, ini);
 
 		if (ini.is_value("GotoVec"))
-			return ReadObjGotoVec(objectiveParent, objectiveIndex, ini);
+			return ReadObjGotoVec(objectiveParent, ini);
 
 		if (ini.is_value("Idle"))
-			return new ObjIdle(objectiveParent, objectiveIndex);
+			return new ObjIdle(objectiveParent);
 
 		if (ini.is_value("MakeNewFormation"))
-			return ReadObjMakeNewFormation(objectiveParent, objectiveIndex, ini);
+			return ReadObjMakeNewFormation(objectiveParent, ini);
+
+		if (ini.is_value("SetPriority"))
+			return ReadObjSetPriority(objectiveParent, ini);
 
 		return nullptr;
 	}

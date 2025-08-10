@@ -285,6 +285,9 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
     1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
 
+- `SetPriority` Sets the priority for all following objectives.
+    1. `Normal|Always_Execute` Whether the objectives can be paused by fights, or are enforced to ignore any disturbances.
+
 ## `[Dialog]`
 
 Dialogs are a shortcut to defining multiple `Act_SendComm` or `Act_EtherComm` for complex dialogs.

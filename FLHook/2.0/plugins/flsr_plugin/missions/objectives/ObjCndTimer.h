@@ -8,11 +8,10 @@ namespace Missions
 	{
 	private:
 		const ObjectiveParent parent;
-		const int objectiveIndex;
-		const uint objId;
+		const ObjectiveState state;
 
 	public:
-		ObjCndTimer(const ObjectiveParent& parent, const int objectiveIndex, const uint objId, const float time);
+		ObjCndTimer(const ObjectiveParent& parent, const ObjectiveState& state, const float time);
 		void ExecuteTrigger();
 	};
 }

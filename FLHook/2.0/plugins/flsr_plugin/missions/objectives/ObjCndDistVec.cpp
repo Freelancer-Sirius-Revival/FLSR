@@ -9,11 +9,10 @@ namespace Missions
 		return systemId;
 	}
 
-	ObjCndDistVec::ObjCndDistVec(const ObjectiveParent& parent, const int objectiveIndex, const uint objId, const float distance, const Vector& position) :
-		CndDistVec(ConditionParent(parent.missionId, 0), missions.at(parent.missionId).FindObjNameByObjId(objId), CndDistVec::DistanceCondition::Inside, position, distance, GetSystemId(objId)),
+	ObjCndDistVec::ObjCndDistVec(const ObjectiveParent& parent, const ObjectiveState& state, const float distance, const Vector& position) :
+		CndDistVec(ConditionParent(parent.missionId, 0), missions.at(parent.missionId).FindObjNameByObjId(state.objId), CndDistVec::DistanceCondition::Inside, position, distance, GetSystemId(state.objId)),
 		parent(parent),
-		objectiveIndex(objectiveIndex),
-		objId(objId)
+		state(state)
 	{}
 
 	void ObjCndDistVec::ExecuteTrigger()
@@ -21,6 +20,8 @@ namespace Missions
 		Unregister();
 		const auto& mission = missions.at(parent.missionId);
 		const auto& objectives = mission.objectives.at(parent.objectivesId);
-		objectives.Progress(objId, objectiveIndex + 1);
+		ObjectiveState nextState(state);
+		nextState.objectiveIndex++;
+		objectives.Progress(nextState);
 	}
 }

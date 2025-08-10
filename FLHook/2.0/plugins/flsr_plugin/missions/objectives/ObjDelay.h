@@ -9,7 +9,7 @@ namespace Missions
 		const float timeInS;
 
 	public:
-		ObjDelay(const ObjectiveParent& parent, const int objectiveIndex, const float timeInS);
-		void Execute(const uint objId) const;
+		ObjDelay(const ObjectiveParent& parent, const float timeInS);
+		void Execute(const ObjectiveState& state) const;
 	};
 }

@@ -5,7 +5,6 @@
 namespace Missions
 {
 	ObjGotoObj::ObjGotoObj(const ObjectiveParent& parent,
-							const int objectiveIndex,
 							const uint targetObjNameOrId,
 							const bool noCruise,
 							const float range,
@@ -13,17 +12,17 @@ namespace Missions
 							const uint objNameToWaitFor,
 							const float startWaitDistance,
 							const float endWaitDistance) :
-		Objective(parent, objectiveIndex),
+		Objective(parent),
 		ObjGoto(noCruise, range, thrust, objNameToWaitFor, startWaitDistance, endWaitDistance),
 		targetObjNameOrId(targetObjNameOrId)
 	{}
 
-	void ObjGotoObj::Execute(const uint objId) const
+	void ObjGotoObj::Execute(const ObjectiveState& state) const
 	{
-		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
+		if (pub::SpaceObj::ExistsAndAlive(state.objId) != 0)
 			return;
 
-		Objective::Execute(objId);
+		Objective::Execute(state);
 
 		uint targetObjId = 0;
 		const auto& mission = missions.at(parent.missionId);
@@ -35,7 +34,7 @@ namespace Missions
 		if (pub::SpaceObj::ExistsAndAlive(targetObjId) == 0)
 		{
 			pub::AI::DirectiveGotoOp gotoOp;
-			gotoOp.fireWeapons = false;
+			gotoOp.fireWeapons = !state.enforceObjective;
 			gotoOp.gotoType = pub::AI::GotoOpType::Ship;
 			gotoOp.targetId = targetObjNameOrId;
 			gotoOp.range = range;
@@ -49,13 +48,13 @@ namespace Missions
 				gotoOp.objIdToWaitFor = objectEntry->second;
 			gotoOp.startWaitDistance = startWaitDistance;
 			gotoOp.endWaitDistance = endWaitDistance;
-			pub::AI::SubmitDirective(objId, &gotoOp);
+			pub::AI::SubmitDirective(state.objId, &gotoOp);
 
-			RegisterCondition(objId, ConditionPtr(new ObjCndDistObj(parent, objectiveIndex, objId, range, targetObjNameOrId)));
+			RegisterCondition(state.objId, ConditionPtr(new ObjCndDistObj(parent, state, range, targetObjNameOrId)));
 		}
 		else
 		{
-			RegisterCondition(objId, ConditionPtr(new ObjCndTrue(parent, objectiveIndex, objId)));
+			RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 		}
 	}
 }

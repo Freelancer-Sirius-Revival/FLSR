@@ -10,6 +10,7 @@
 #include "ObjIdle.h"
 #include "ObjMakeNewFormation.h"
 #include "ObjSetPriority.h"
+#include "ObjStayInRange.h"
 
 namespace Missions
 {
@@ -380,6 +381,48 @@ namespace Missions
 		return new ObjSetPriority(objectiveParent, enforceObjectives);
 	}
 
+	static ObjStayInRange* ReadObjStayInRange(const ObjectiveParent& objectiveParent, INI_Reader& ini)
+	{
+		uint targetObjNameOrId = 0;
+		Vector position = { 0, 0, 0 };
+		float range = 100.0f;
+		bool active = true;
+
+		uint argNum = 0;
+		const char* val = ini.get_value_string(argNum);
+		char* end;
+		strtol(val, &end, 10);
+		if (end == val)
+			targetObjNameOrId = CreateIdOrNull(val);
+		else if (ini.get_num_parameters() > argNum + 2)
+		{
+			position.x = ini.get_value_float(argNum);
+			position.y = ini.get_value_float(argNum + 1);
+			position.z = ini.get_value_float(argNum + 2);
+		}
+		else
+		{
+			PrintErrorToConsole(L"StayInRange", objectiveParent, argNum, L"No target position. Aborting!");
+			return nullptr;
+		}
+		argNum += 3;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ini.get_value_float(argNum);
+			if (value < 1.0f)
+				PrintErrorToConsole(L"StayInRange", objectiveParent, argNum, L"Distance to stay in range is below 1. Defaulting to " + std::to_wstring(range) + L".");
+			else
+				range = value;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+			active  = ini.get_value_bool(argNum);
+
+		return new ObjStayInRange(objectiveParent, targetObjNameOrId, position, range, active);
+	}
+
 	Objective* TryReadObjectiveFromIni(const ObjectiveParent& objectiveParent, INI_Reader& ini)
 	{
 		if (ini.is_value("BreakFormation"))
@@ -411,6 +454,9 @@ namespace Missions
 
 		if (ini.is_value("SetPriority"))
 			return ReadObjSetPriority(objectiveParent, ini);
+
+		if (ini.is_value("StayInRange"))
+			return ReadObjStayInRange(objectiveParent, ini);
 
 		return nullptr;
 	}

@@ -226,6 +226,9 @@
     <ClCompile Include="missions\objectives\ObjSetPriority.cpp">
       <Filter>Missions\Objectives</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\ObjStayInRange.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -460,6 +463,9 @@
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjectiveState.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjStayInRange.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>

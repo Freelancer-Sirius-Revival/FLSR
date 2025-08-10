@@ -230,7 +230,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `INTEGER :0` The time to pause.
 
 - `Dock` Fly toward a specific object and dock to it.
-    1. `STRING` Object by name to dock to.
+    1. `STRING` Object by name to dock to. Can also be a static world solar.
 
 - `Follow` Follows the given target.
     1. `STRING` The target name ship to follow.
@@ -241,7 +241,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 - `GotoObj` Fly toward a specific object in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
-    1. `STRING` Object by name to fly to.
+    1. `STRING` Object by name to fly to. Can also be a static world solar.
     1. `[FLOAT] :100` The distance from the given position to stop at.
     1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
@@ -287,6 +287,20 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 - `SetPriority` Sets the priority for all following objectives.
     1. `Normal|Always_Execute` Whether the objectives can be paused by fights, or are enforced to ignore any disturbances.
+
+- `StayInRange` Enforces staying within range to the target until actively released. This comes with overloaded arguments as by vanilla Freelancer:
+
+    - For a target object:
+    1. `STRING` Object by name to stay close to. Can also be a static world solar.
+    1. `[FLOAT] :100` The maximum range to stay from the object.
+    1. `[True|False] :True` Whether `StayInRange` is enforced (`True`) or released (`False`).
+
+    - For a target position:
+    1. `FLOAT` The x-axis position for the target.
+    1. `FLOAT` The y-axis position for the target.
+    1. `FLOAT` The z-axis position for the target.
+    1. `[FLOAT] :100` The maximum range to stay from the object.
+    1. `[True|False] :True` Whether `StayInRange` is enforced (`True`) or released (`False`).
 
 ## `[Dialog]`
 

@@ -224,7 +224,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 ### Objectives
 
-- `BreakFormation` Breaks from the current formation.
+- `BreakFormation` Breaks from the current formation. When formation leader, it dissolves the formation entirely.
 
 - `Delay` Enforce a pause of any action or maneuver for a time.
     1. `INTEGER :0` The time to pause.

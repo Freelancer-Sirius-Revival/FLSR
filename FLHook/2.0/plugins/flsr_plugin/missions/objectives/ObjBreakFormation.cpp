@@ -43,10 +43,9 @@ namespace Missions
 		inspect->get_formation_leader(formationLeader);
 		if (formationLeader == inspect)
 		{
-			IObjRW** followers = nullptr;
-			uint followerCount = 0;
-			inspect->get_formation_followers(followers, followerCount);
-			for (uint index = 0; index < followerCount; index++)
+			auto followers = std::vector<IObjRW*>(inspect->get_formation_follower_count());
+			inspect->get_formation_followers(followers.data(), followers.size());
+			for (uint index = 0, length = followers.size(); index < length; index++)
 				OrderBreakFormation(followers[index]->get_id());
 		}
 

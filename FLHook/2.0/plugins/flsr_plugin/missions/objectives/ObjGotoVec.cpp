@@ -1,6 +1,5 @@
 #include "ObjGotoVec.h"
 #include "ObjCndDistVec.h"
-#include "../Mission.h"
 
 namespace Missions
 {

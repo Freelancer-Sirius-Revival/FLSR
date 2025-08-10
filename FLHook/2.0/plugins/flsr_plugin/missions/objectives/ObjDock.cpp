@@ -1,6 +1,5 @@
 #include "ObjDock.h"
 #include "ObjCndTrue.h"
-#include "../Mission.h"
 
 namespace Missions
 {

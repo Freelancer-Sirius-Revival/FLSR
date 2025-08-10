@@ -72,7 +72,7 @@ namespace Missions
 		void RemoveLabelFromObject(const MissionObject& object, const uint label);
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
-		uint FindObjNameByObjId(const uint objId);
+		uint FindObjNameByObjId(const uint objId) const;
 	};
 
 	extern std::unordered_map<uint, Mission> missions;

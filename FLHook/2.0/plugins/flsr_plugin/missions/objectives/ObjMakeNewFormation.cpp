@@ -1,6 +1,5 @@
 #include "ObjMakeNewFormation.h"
 #include "ObjCndTrue.h"
-#include "../Mission.h"
 #include "../Formations.h"
 #include "../ShipSpawning.h"
 
@@ -19,7 +18,7 @@ namespace Missions
 
 		Objective::Execute(objId);
 
-		auto& mission = missions.at(parent.missionId);
+		const auto& mission = missions.at(parent.missionId);
 		const auto& formation = Formations::GetFormation(formationId);
 
 		std::vector<uint> memberNames({ mission.FindObjNameByObjId(objId) });

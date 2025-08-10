@@ -1,6 +1,5 @@
 #include "ObjFollow.h"
 #include "ObjCndTrue.h"
-#include "../Mission.h"
 
 namespace Missions
 {
@@ -18,7 +17,7 @@ namespace Missions
 
 		Objective::Execute(objId);
 
-		auto& mission = missions.at(parent.missionId);
+		const auto& mission = missions.at(parent.missionId);
 		const auto& objectEntry = mission.objectIdsByName.find(targetObjName);
 		if (objectEntry != mission.objectIdsByName.end())
 		{

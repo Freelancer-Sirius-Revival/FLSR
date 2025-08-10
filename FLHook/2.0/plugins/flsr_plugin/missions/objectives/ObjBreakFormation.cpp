@@ -1,6 +1,5 @@
 #include "ObjBreakFormation.h"
 #include "ObjCndTrue.h"
-#include "../Mission.h"
 #include "../ShipSpawning.h"
 
 namespace Missions

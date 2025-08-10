@@ -1,6 +1,5 @@
 #include "ObjGotoSpline.h"
 #include "ObjCndDistVec.h"
-#include "../Mission.h"
 
 namespace Missions
 {

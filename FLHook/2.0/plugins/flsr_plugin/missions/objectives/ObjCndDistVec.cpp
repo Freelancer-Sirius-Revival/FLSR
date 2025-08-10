@@ -19,7 +19,7 @@ namespace Missions
 	void ObjCndDistVec::ExecuteTrigger()
 	{
 		Unregister();
-		auto& mission = missions.at(parent.missionId);
+		const auto& mission = missions.at(parent.missionId);
 		const auto& objectives = mission.objectives.at(parent.objectivesId);
 		objectives.Progress(objId, objectiveIndex + 1);
 	}

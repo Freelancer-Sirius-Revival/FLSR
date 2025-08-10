@@ -256,7 +256,7 @@ namespace Missions
 			EvaluateCountConditions(label);
 	}
 
-	uint Mission::FindObjNameByObjId(const uint objId)
+	uint Mission::FindObjNameByObjId(const uint objId) const
 	{
 		for (const auto& entry : objectIdsByName)
 		{

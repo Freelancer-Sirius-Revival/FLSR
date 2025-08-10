@@ -1,7 +1,6 @@
 #include "ObjGotoObj.h"
 #include "ObjCndDistObj.h"
 #include "ObjCndTrue.h"
-#include "../Mission.h"
 
 namespace Missions
 {

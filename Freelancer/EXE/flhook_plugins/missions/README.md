@@ -226,7 +226,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 - `BreakFormation` Breaks from the current formation.
 
-- `Delay` Pauses for a time.
+- `Delay` Enforce a pause of any action or maneuver for a time.
     1. `INTEGER :0` The time to pause.
 
 - `Dock` Fly toward a specific object and dock to it.
@@ -279,7 +279,9 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
     1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
-- `MakeNewFormation`
+- `Idle` Enforce idle mode, allowing automatic NPC behaviour to resume.
+
+- `MakeNewFormation` Create a new formation together with other ships.
     1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
     1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
 

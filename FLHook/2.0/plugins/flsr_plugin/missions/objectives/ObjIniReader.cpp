@@ -7,6 +7,7 @@
 #include "ObjGotoObj.h"
 #include "ObjGotoSpline.h"
 #include "ObjGotoVec.h"
+#include "ObjIdle.h"
 #include "ObjMakeNewFormation.h"
 
 namespace Missions
@@ -386,6 +387,9 @@ namespace Missions
 
 		if (ini.is_value("GotoVec"))
 			return ReadObjGotoVec(objectiveParent, objectiveIndex, ini);
+
+		if (ini.is_value("Idle"))
+			return new ObjIdle(objectiveParent, objectiveIndex);
 
 		if (ini.is_value("MakeNewFormation"))
 			return ReadObjMakeNewFormation(objectiveParent, objectiveIndex, ini);

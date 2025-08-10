@@ -220,6 +220,9 @@
     <ClCompile Include="missions\objectives\ObjIniReader.cpp">
       <Filter>Missions\Objectives</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\ObjIdle.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -445,6 +448,9 @@
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjIniReader.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjIdle.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>

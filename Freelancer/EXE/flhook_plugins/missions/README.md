@@ -55,6 +55,9 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[offer_bases]`
     1. `STRING` A list of base nicknames this mission will be visible on the Mission Board.
 
+- `[offer_reoffer]`
+    1. `Always|OnFail|OnSuccess|Never :Never` The condition under which the mission will be reoffered. Set by `Act_SetMsnResult`.
+
 ## `[MsnSolar]`
 
 This is the definition for a single solar for the mission. Multiple `MsnSolar` can be created for individual solars.
@@ -451,10 +454,6 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
-- `Act_ChangeState` Sets the mission state. This does not end the mission!
-    1. `SUCCEED|FAIL :FAIL` The state to change into. Displays and plays respective text to all players of the mission. On `FAIL` it will re-offer the mission on the job board if applicable.
-    1. `INTEGER :0` Only for `FAIL`: The text ID to display.
-
 - `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
     1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
@@ -470,8 +469,6 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_Destroy` Destroys an object.
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
-
-- `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
 
 - `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
@@ -542,6 +539,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
+- `Act_SetMsnResult` Sets the mission state. This does not end the mission!
+    1. `Success|Failure :Failure` Sets the mission result. Displays respective text to all players of the mission and victory or fail music.
+    1. `INTEGER :0` Only for `Failure`: The text ID to display.
+
 - `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` The players to set the message or waypoint.
     1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
@@ -582,3 +583,5 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_StartDialog` Starts a `Dialog`.
     1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
+
+- `Act_TerminateMsn` Terminates the mission and cleans up all spawned objects, waypoints, and music. Evaluates whether the mission is being reoffered to the mission board, depending on `Act_SetMsnResult`.

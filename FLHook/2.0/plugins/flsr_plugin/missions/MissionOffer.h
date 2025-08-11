@@ -3,6 +3,14 @@
 
 namespace Missions
 {
+	enum class MissionReofferCondition
+	{
+		Always,
+		OnFail,
+		OnSuccess,
+		Never
+	};
+
 	struct MissionOffer
 	{
 		pub::GF::MissionType type = pub::GF::MissionType::Unknown;
@@ -11,5 +19,7 @@ namespace Missions
 		uint text = 0;
 		uint reward = 0;
 		std::vector<uint> bases;
+		MissionReofferCondition reofferCondition = MissionReofferCondition::Never;
+		mstime reofferDelay = 0;
 	};
 }

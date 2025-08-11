@@ -24,7 +24,8 @@ namespace Missions
 		id(id),
 		initiallyActive(initiallyActive),
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
-		offerId(0)
+		offerId(0),
+		missionResult(MissionResult::Success)
 	{}
 
 	Mission::~Mission()
@@ -38,6 +39,7 @@ namespace Missions
 	{
 		End();
 		state = initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive;
+		missionResult = MissionResult::Success;
 	}
 
 	bool Mission::CanBeStarted() const
@@ -173,6 +175,8 @@ namespace Missions
 				objectsByLabel.erase(label);
 		}
 
+		EvaluateCountConditions(label);
+
 		// Once all labels were removed from a client, delete it from the mission.
 		if (object.type == MissionObjectType::Client)
 		{
@@ -184,10 +188,8 @@ namespace Missions
 						return;
 				}
 			}
-			clientIds.erase(object.id);
+			RemoveClient(object.id);
 		}
-
-		EvaluateCountConditions(label);
 	}
 
 	void Mission::RemoveObject(const uint objId)
@@ -231,6 +233,11 @@ namespace Missions
 	{
 		if (!clientIds.contains(clientId))
 			return;
+
+		uint msnId;
+		pub::Player::GetMsnID(clientId, msnId);
+		if (msnId == offerId)
+			pub::Player::SetMsnID(clientId, 0, 0, false, 0);
 
 		ClearMusic(clientId);
 		std::vector<uint> labels;

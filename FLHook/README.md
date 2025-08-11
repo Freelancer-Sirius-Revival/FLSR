@@ -11,6 +11,6 @@ This Hook is based on FL-Hook 2.1.
 	- *MSVC v142 x64/x86 Buildtools*
 	- *C++ MFC for v142 Buildtools* (not the Spectre version)
 4. Open the project file `2.0/project/FLHook.sln`
-5. Tell VS Code to NOT upgrade the project
+5. Tell Visual Studio to NOT upgrade the project
 
 The build output is located in `2.0/bin/`.

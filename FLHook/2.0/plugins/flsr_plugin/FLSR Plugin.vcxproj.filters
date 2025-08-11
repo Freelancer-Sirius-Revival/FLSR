@@ -58,7 +58,7 @@
     <ClCompile Include="missions\actions\ActRemoveLabel.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\actions\ActEndMission.cpp">
+    <ClCompile Include="missions\actions\ActTerminateMsn.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="missions\conditions\CndDistVec.cpp">
@@ -123,7 +123,7 @@
     <ClCompile Include="missions\actions\ActAdjRep.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\actions\ActChangeState.cpp">
+    <ClCompile Include="missions\actions\ActSetMsnResult.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActSetVibe.cpp">
@@ -274,7 +274,7 @@
     <ClInclude Include="missions\actions\ActRemoveLabel.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActEndMission.h">
+    <ClInclude Include="missions\actions\ActTerminateMsn.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndDistVec.h">
@@ -347,7 +347,7 @@
     <ClInclude Include="missions\actions\ActAdjRep.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\actions\ActChangeState.h">
+    <ClInclude Include="missions\actions\ActSetMsnResult.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActSetVibe.h">

@@ -1,5 +1,4 @@
-#include "ActChangeState.h"
-#include "../Missions.h"
+#include "ActSetMsnResult.h"
 
 namespace Missions
 {
@@ -7,11 +6,13 @@ namespace Missions
 	const uint failureMusicId = CreateID("music_failure");
 	const FmtStr successText(1231, 0);
 
-	void ActChangeState::Execute(Mission& mission, const MissionObject& activator) const
+	void ActSetMsnResult::Execute(Mission& mission, const MissionObject& activator) const
 	{
+		mission.missionResult = result;
+
 		pub::Audio::Tryptich music;
 		music.playOnce = true;
-		if (state == ChangeState::Succeed)
+		if (result == Mission::MissionResult::Success)
 		{
 			music.overrideMusic = victoryMusicId;
 			for (const auto& clientId : mission.clientIds)
@@ -25,7 +26,6 @@ namespace Missions
 		}
 		else
 		{
-			RegisterMissionToJobBoard(mission);
 			const FmtStr failText(failureStringId, 0);
 			music.crossFadeDurationInS = 1.0f;
 			music.overrideMusic = failureMusicId;
@@ -37,6 +37,14 @@ namespace Missions
 					pub::Audio::SetMusic(clientId, music);
 				}
 			}
+		}
+
+		for (const auto& clientId : mission.clientIds)
+		{
+			uint msnId;
+			pub::Player::GetMsnID(clientId, msnId);
+			if (msnId == mission.offerId)
+				pub::Player::SetMsnID(clientId, 0, 0, false, 0);
 		}
 	}
 }

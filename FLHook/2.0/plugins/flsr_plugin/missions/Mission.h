@@ -21,6 +21,11 @@ namespace Missions
 			Active,
 			Finished
 		};
+		enum class MissionResult
+		{
+			Success,
+			Failure
+		};
 		const std::string name;
 		const uint id;
 		const bool initiallyActive;
@@ -42,6 +47,8 @@ namespace Missions
 		std::unordered_set<uint> clientIds;
 		std::unordered_map<Condition*, ConditionPtr> dynamicConditions;
 		std::unordered_map<uint, ConditionPtr> objectiveConditionByObjectId;
+
+		MissionResult missionResult;
 
 		struct CommEntry
 		{

@@ -8,14 +8,14 @@
 #include "Actions/ActActTrig.h"
 #include "Actions/ActActMsn.h"
 #include "Actions/ActActMsnTrig.h"
-#include "Actions/ActChangeState.h"
+#include "Actions/ActSetMsnResult.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActSpawnShip.h"
 #include "Actions/ActSpawnFormation.h"
-#include "Actions/ActEndMission.h"
+#include "Actions/ActTerminateMsn.h"
 #include "Actions/ActDestroy.h"
 #include "Actions/ActPlaySoundEffect.h"
 #include "Actions/ActRelocate.h"
@@ -117,6 +117,18 @@ namespace Missions
 							{
 								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
 									offer.bases.push_back(CreateIdOrNull(ini.get_value_string(index)));
+							}
+							else if (ini.is_value("offer_reoffer"))
+							{
+								const auto value = ToLower(ini.get_value_string(0));
+								if (value == "always")
+									offer.reofferCondition = MissionReofferCondition::Always;
+								else if (value == "onfail")
+									offer.reofferCondition = MissionReofferCondition::OnFail;
+								else if (value == "onsuccess")
+									offer.reofferCondition = MissionReofferCondition::OnSuccess;
+								else
+									offer.reofferCondition = MissionReofferCondition::Never;
 							}
 						}
 						// Never automatically start missions which are offered on the mission board.
@@ -429,15 +441,15 @@ namespace Missions
 								action->message = ini.get_value_string(0);
 								actions.push_back(action);
 							}
-							else if (ini.is_value("Act_EndMission"))
+							else if (ini.is_value("Act_TerminateMsn"))
 							{
-								ActEndMissionPtr action(new ActEndMission());
+								ActTerminateMsnPtr action(new ActTerminateMsn());
 								actions.push_back(action);
 							}
-							else if (ini.is_value("Act_ChangeState"))
+							else if (ini.is_value("Act_SetMsnResult"))
 							{
-								ActChangeStatePtr action(new ActChangeState());
-								action->state = ToLower(ini.get_value_string(0)) == "succeed" ? ChangeState::Succeed : ChangeState::Fail;
+								ActSetMsnResultPtr action(new ActSetMsnResult());
+								action->result = ToLower(ini.get_value_string(0)) == "success" ? Mission::MissionResult::Success : Mission::MissionResult::Failure;
 								action->failureStringId = ini.get_value_int(1);
 								actions.push_back(action);
 							}

@@ -229,6 +229,9 @@
     <ClCompile Include="missions\objectives\ObjStayInRange.cpp">
       <Filter>Missions\Objectives</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActLeaveMsn.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -467,6 +470,9 @@
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjStayInRange.h">
       <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActLeaveMsn.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

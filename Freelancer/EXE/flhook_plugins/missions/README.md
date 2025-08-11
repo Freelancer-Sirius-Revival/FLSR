@@ -499,6 +499,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether to prevent player damage or not.
     1. `[FLOAT] :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
 
+- `Act_LeaveMsn` Only for players. Removes members of the label from the mission.
+    1. `STRING|Activator` The players to remove from the mission.
+    1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.
+    1. `[INTEGER] :0` Only for `Failure`: The text ID to display.
+
 - `Act_LightFuse` Executes an arbitary fuse.
     1. `STRING|Activator` Object by name or label to refer.
     1. `STRING` Fuse nickname to execute on the objects.
@@ -539,9 +544,8 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
-- `Act_SetMsnResult` Sets the mission state. This does not end the mission!
-    1. `Success|Failure :Failure` Sets the mission result. Displays respective text to all players of the mission and victory or fail music.
-    1. `INTEGER :0` Only for `Failure`: The text ID to display.
+- `Act_SetMsnResult` Sets the mission result. Relevant for reoffering missions to the job board. See `Mission: offer_reoffer`.
+    1. `Success|Failure :Failure` Sets the mission result.
 
 - `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` The players to set the message or waypoint.

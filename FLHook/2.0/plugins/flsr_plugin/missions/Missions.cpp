@@ -30,6 +30,7 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
+#include "Actions/ActLeaveMsn.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -450,7 +451,20 @@ namespace Missions
 							{
 								ActSetMsnResultPtr action(new ActSetMsnResult());
 								action->result = ToLower(ini.get_value_string(0)) == "success" ? Mission::MissionResult::Success : Mission::MissionResult::Failure;
-								action->failureStringId = ini.get_value_int(1);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_LeaveMsn"))
+							{
+								ActLeaveMsnPtr action(new ActLeaveMsn());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								const std::string& value = ToLower(ini.get_value_string(1));
+								if (value == "success")
+									action->leaveType = LeaveMsnType::Success;
+								else if (value == "failure")
+									action->leaveType = LeaveMsnType::Failure;
+								else
+									action->leaveType = LeaveMsnType::Silent;
+								action->failureStringId = ini.get_value_int(2);
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_ActTrig"))

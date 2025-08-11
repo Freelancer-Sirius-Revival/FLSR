@@ -37,20 +37,6 @@
 
 namespace Missions
 {	
-	void RegisterMissionToJobBoard(Mission& mission)
-	{
-		if (mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.bases.empty())
-		{
-			MissionBoard::MissionOffer offer;
-			offer.type = mission.offer.type;
-			offer.system = mission.offer.system;
-			offer.group = mission.offer.group;
-			offer.text = mission.offer.text;
-			offer.reward = mission.offer.reward;
-			mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.bases);
-		}
-	}
-
 	static uint CreateIdOrNull(const char* str)
 	{
 		return strlen(str) > 0 ? CreateID(str) : 0;
@@ -119,7 +105,7 @@ namespace Missions
 								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
 									offer.bases.push_back(CreateIdOrNull(ini.get_value_string(index)));
 							}
-							else if (ini.is_value("offer_reoffer"))
+							else if (ini.is_value("reoffer"))
 							{
 								const auto value = ToLower(ini.get_value_string(0));
 								if (value == "always")
@@ -131,6 +117,8 @@ namespace Missions
 								else
 									offer.reofferCondition = MissionReofferCondition::Never;
 							}
+							else if (ini.is_value("reoffer_delay"))
+								offer.reofferDelay = ini.get_value_int(0);
 						}
 						// Never automatically start missions which are offered on the mission board.
 						if (offer.type != pub::GF::MissionType::Unknown)
@@ -807,9 +795,6 @@ namespace Missions
 				ini.close();
 			}
 		}
-
-		for (auto& missionEntry : missions)
-			RegisterMissionToJobBoard(missionEntry.second);
 	}
 	
 	void StartMissionByOfferId(const uint offerId, const std::vector<uint>& clientIds)

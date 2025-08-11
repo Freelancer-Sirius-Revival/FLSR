@@ -1,5 +1,6 @@
 #include "Mission.h"
 #include "../Plugin.h"
+#include "MissionBoard.h"
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
 
@@ -25,7 +26,8 @@ namespace Missions
 		initiallyActive(initiallyActive),
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
 		offerId(0),
-		missionResult(MissionResult::Success)
+		missionResult(MissionResult::Success),
+		reofferRemainingTime(0.0f)
 	{}
 
 	Mission::~Mission()
@@ -40,6 +42,7 @@ namespace Missions
 		End();
 		state = initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive;
 		missionResult = MissionResult::Success;
+		reofferRemainingTime = 0.0f;
 	}
 
 	bool Mission::CanBeStarted() const
@@ -111,11 +114,32 @@ namespace Missions
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
 
+		// Clear mission ID for all involved clients.
+		for (const uint clientId : clientIds)
+		{
+			uint msnId;
+			pub::Player::GetMsnID(clientId, msnId);
+			if (msnId == offerId)
+				pub::Player::SetMsnID(clientId, 0, 0, false, 0);
+		}
+
 		objectIdsByName.clear();
 		objectsByLabel.clear();
 		objectIds.clear();
 		clientIds.clear();
 		ongoingComms.clear();
+
+		if (offerId)
+			MissionBoard::DeleteMissionOffer(offerId);
+
+		offerId = 0;
+
+		if ( offer.reofferCondition == MissionReofferCondition::Always ||
+			(offer.reofferCondition == MissionReofferCondition::OnFail && missionResult == Mission::MissionResult::Failure) ||
+			(offer.reofferCondition == MissionReofferCondition::OnSuccess && missionResult == Mission::MissionResult::Success))
+		{
+			reofferRemainingTime = offer.reofferDelay;
+		}
 	}
 
 	void Mission::EvaluateCountConditions(const uint label) const
@@ -273,6 +297,26 @@ namespace Missions
 		return 0;
 	}
 
+	static bool IsValidMissionForOffer(const Mission& mission)
+	{
+		return mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.bases.empty();
+	}
+
+	static void RegisterMissionToJobBoard(Mission& mission)
+	{
+		if (!IsValidMissionForOffer(mission))
+			return;
+		
+		mission.reofferRemainingTime = 0.0f;
+		MissionBoard::MissionOffer offer;
+		offer.type = mission.offer.type;
+		offer.system = mission.offer.system;
+		offer.group = mission.offer.group;
+		offer.text = mission.offer.text;
+		offer.reward = mission.offer.reward;
+		mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.bases);
+	}
+
 	namespace Hooks
 	{
 		namespace Mission
@@ -288,11 +332,23 @@ namespace Missions
 				elapsedTimeInSec = 0.0f;
 
 				const mstime thresholdTime = timeInMS() - 10000;
-				for (auto& mission : missions)
+				for (auto& missionEntry : missions)
 				{
+					auto& mission = missionEntry.second;
+
+					/* Reoffering missions to job board */
+					if (mission.offerId == 0 && IsValidMissionForOffer(mission))
+					{
+						if (mission.reofferRemainingTime > 0.0f)
+							mission.reofferRemainingTime -= seconds;
+						if (mission.reofferRemainingTime <= 0.0f)
+							RegisterMissionToJobBoard(mission);
+					}
+
+					/* Comms timeouts */
 					std::vector<std::pair<uint, Missions::Mission::CommEntry>> entriesToRemove;
-					entriesToRemove.reserve(mission.second.ongoingComms.size());
-					for (const auto& comm : mission.second.ongoingComms)
+					entriesToRemove.reserve(mission.ongoingComms.size());
+					for (const auto& comm : mission.ongoingComms)
 					{
 						if (comm.second.sendTime < thresholdTime)
 							entriesToRemove.push_back(comm);
@@ -301,8 +357,8 @@ namespace Missions
 					for (const auto& entry : entriesToRemove)
 					{
 						Hooks::CndCommComplete::CommComplete(0, *entry.second.receiverObjIds.begin(), entry.second.voiceLineId, (Hooks::CndCommComplete::CommResult)0);
-						if (mission.second.ongoingComms.contains(entry.first))
-							mission.second.ongoingComms.erase(entry.first);
+						if (mission.ongoingComms.contains(entry.first))
+							mission.ongoingComms.erase(entry.first);
 						// else: The CndCommComplete has erased the comm-entry itself.
 					}
 				}

@@ -20,6 +20,6 @@ namespace Missions
 		uint reward = 0;
 		std::vector<uint> bases;
 		MissionReofferCondition reofferCondition = MissionReofferCondition::Never;
-		mstime reofferDelay = 0;
+		int reofferDelay = 0;
 	};
 }

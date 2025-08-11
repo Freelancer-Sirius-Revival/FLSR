@@ -49,6 +49,7 @@ namespace Missions
 		std::unordered_map<uint, ConditionPtr> objectiveConditionByObjectId;
 
 		MissionResult missionResult;
+		float reofferRemainingTime;
 
 		struct CommEntry
 		{

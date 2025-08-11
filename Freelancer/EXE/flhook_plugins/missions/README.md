@@ -9,7 +9,7 @@ You may start as many different mission at any time. However, only one instance 
 ## Console Commands
 
 - `start_mission <mission nickname>` Admin command (requires EVENT permission) to start this mission.
-- `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission.
+- `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission. Does the same as `Act_TerminateMsn`.
 - `reload_missions` Admin command (requires EVENT permission) to stop all missions, reload them again from files, and start initially active missions. Do not use too fast or server will crash due to system-blocked INI files.
 - `act_trigger <mission nickname> <trigger nickname>` Admin command (requires EVENT permission) to activate the mission trigger. 
 - `deact_trigger <mission nickname> <trigger nickname>` Admin command (requires EVENT permission) to deactivate the mission trigger.
@@ -55,8 +55,10 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[offer_bases]`
     1. `STRING` A list of base nicknames this mission will be visible on the Mission Board.
 
-- `[offer_reoffer]`
+- `[reoffer]`
     1. `Always|OnFail|OnSuccess|Never :Never` The condition under which the mission will be reoffered. Set by `Act_SetMsnResult`.
+
+- `[reoffer_delay]` The time in seconds to wait before the mission is reoffered.
 
 ## `[MsnSolar]`
 

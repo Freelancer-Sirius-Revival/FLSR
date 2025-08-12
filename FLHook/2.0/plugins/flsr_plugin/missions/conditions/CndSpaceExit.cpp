@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	std::unordered_set<CndSpaceExit*> registeredConditions;
+	std::unordered_set<CndSpaceExit*> observedCndSpaceExit;
 
 	CndSpaceExit::CndSpaceExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
 		Condition(parent),
@@ -19,12 +19,12 @@ namespace Missions
 
 	void CndSpaceExit::Register()
 	{
-		registeredConditions.insert(this);
+		observedCndSpaceExit.insert(this);
 	}
 
 	void CndSpaceExit::Unregister()
 	{
-		registeredConditions.erase(this);
+		observedCndSpaceExit.erase(this);
 	}
 
 	bool CndSpaceExit::Matches(const uint clientId, const uint systemId)
@@ -61,13 +61,13 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				if (!killedObject->is_player() || registeredConditions.empty())
+				if (!killedObject->is_player() || observedCndSpaceExit.empty())
 					return;
 
-				const std::unordered_set<Missions::CndSpaceExit*> currentConditions(registeredConditions);
+				const std::unordered_set<Missions::CndSpaceExit*> currentConditions(observedCndSpaceExit);
 				for (const auto& condition : currentConditions)
 				{
-					if (registeredConditions.contains(condition) && condition->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
+					if (observedCndSpaceExit.contains(condition) && condition->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
 						condition->ExecuteTrigger();
 				}
 			}

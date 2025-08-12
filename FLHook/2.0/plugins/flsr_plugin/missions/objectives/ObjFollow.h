@@ -1,14 +1,17 @@
 #pragma once
-#include <FLHook.h>
+#include "Objective.h"
 
 namespace Missions
 {
-	struct ObjFollow
+	class ObjFollow : public Objective
 	{
-		uint objName = 0;
-		float maxDistance = 100.0f;
-		Vector relativePosition = { 0, 0, 0 };
-		float unk = 400;
+	private:
+		const uint targetObjName;
+		const float maxDistance;
+		const Vector position;
+
+	public:
+		ObjFollow(const ObjectiveParent& parent, const uint targetObjName, const float maxDistance, const Vector& position);
+		void Execute(const ObjectiveState& state) const;
 	};
-	typedef std::shared_ptr<ObjFollow> ObjFollowPtr;
 }

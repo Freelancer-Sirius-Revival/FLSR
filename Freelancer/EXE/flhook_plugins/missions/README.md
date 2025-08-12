@@ -9,7 +9,7 @@ You may start as many different mission at any time. However, only one instance 
 ## Console Commands
 
 - `start_mission <mission nickname>` Admin command (requires EVENT permission) to start this mission.
-- `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission.
+- `stop_mission <mission nickname>` Admin command (requires EVENT permission) to stop this mission. Does the same as `Act_TerminateMsn`.
 - `reload_missions` Admin command (requires EVENT permission) to stop all missions, reload them again from files, and start initially active missions. Do not use too fast or server will crash due to system-blocked INI files.
 - `act_trigger <mission nickname> <trigger nickname>` Admin command (requires EVENT permission) to activate the mission trigger. 
 - `deact_trigger <mission nickname> <trigger nickname>` Admin command (requires EVENT permission) to deactivate the mission trigger.
@@ -54,6 +54,11 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 
 - `[offer_bases]`
     1. `STRING` A list of base nicknames this mission will be visible on the Mission Board.
+
+- `[reoffer]`
+    1. `Always|OnFail|OnSuccess|Never :Never` The condition under which the mission will be reoffered. Set by `Act_SetMsnResult`.
+
+- `[reoffer_delay]` The time in seconds to wait before the mission is reoffered.
 
 ## `[MsnSolar]`
 
@@ -224,29 +229,29 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 
 ### Objectives
 
-- `BreakFormation` Breaks from the current formation.
+- `BreakFormation` Breaks from the current formation. When formation leader, it dissolves the formation entirely.
 
-- `Delay` Pauses for a time.
+- `Delay` Enforce a pause of any action or maneuver for a time.
     1. `INTEGER :0` The time to pause.
 
 - `Dock` Fly toward a specific object and dock to it.
-    1. `STRING` Object by name to dock to.
+    1. `STRING` Object by name to dock to. Can also be a static world solar.
 
 - `Follow` Follows the given target.
     1. `STRING` The target name ship to follow.
-    1. `FLOAT :0` Maximum distance not to exceed.
     1. `FLOAT :0` The relative x-axis position to the target.
     1. `FLOAT :0` The relative y-axis position to the target.
     1. `FLOAT :0` The relative z-axis position to the target.
+    1. `[FLOAT] :100` Maximum distance not to exceed.
 
 - `GotoObj` Fly toward a specific object in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
-    1. `STRING` Object by name to fly to.
-    1. `FLOAT :0` The distance from the given position to stop at.
-    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `STRING` Object by name to fly to. Can also be a static world solar.
+    1. `[FLOAT] :100` The distance from the given position to stop at.
+    1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
-    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
-    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+    1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
 - `GotoSpline` Fly toward a specific point in space along a spline.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
@@ -262,26 +267,45 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `FLOAT :0` The x-axis position of point 4.
     1. `FLOAT :0` The y-axis position of point 4.
     1. `FLOAT :0` The z-axis position of point 4.
-    1. `FLOAT :0` The distance from the given position to stop at.
-    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[FLOAT] :100` The distance from the given position to stop at.
+    1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
-    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
-    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+    1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
 - `GotoVec` Fly toward a specific point in space.
     1. `Goto_Cruise|Goto_No_Cruise` Whether to fly in cruise or not.
     1. `FLOAT :0` The x-axis position for the target.
     1. `FLOAT :0` The y-axis position for the target.
     1. `FLOAT :0` The z-axis position for the target.
-    1. `FLOAT :0` The distance from the given position to stop at.
-    1. `FLOAT|-1 :0` The absolute thrust speed to fly at. `-1` for max speed.
+    1. `[FLOAT] :100` The distance from the given position to stop at.
+    1. `[FLOAT|-1] :-1` The absolute thrust speed to fly at. `-1` for max speed.
     1. `[STRING]` Object by name to wait for.
-    1. `[FLOAT] :0` Distance to begin slowing down to wait for object.
-    1. `[FLOAT] :0` Distance to come to a full stop to wait for object.
+    1. `[FLOAT] :200` Distance to begin slowing down to wait for object.
+    1. `[FLOAT] :500` Distance to come to a full stop to wait for object.
 
-- `MakeNewFormation`
+- `Idle` Enforce idle mode, allowing automatic NPC behaviour to resume.
+
+- `MakeNewFormation` Create a new formation together with other ships.
     1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
     1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
+
+- `SetPriority` Sets the priority for all following objectives.
+    1. `Normal|Always_Execute` Whether the objectives can be paused by fights, or are enforced to ignore any disturbances.
+
+- `StayInRange` Enforces staying within range to the target until actively released. This comes with overloaded arguments as by vanilla Freelancer:
+
+    - For a target object:
+    1. `STRING` Object by name to stay close to. Can also be a static world solar.
+    1. `[FLOAT] :100` The maximum range to stay from the object.
+    1. `[True|False] :True` Whether `StayInRange` is enforced (`True`) or released (`False`).
+
+    - For a target position:
+    1. `FLOAT` The x-axis position for the target.
+    1. `FLOAT` The y-axis position for the target.
+    1. `FLOAT` The z-axis position for the target.
+    1. `[FLOAT] :100` The maximum range to stay from the object.
+    1. `[True|False] :True` Whether `StayInRange` is enforced (`True`) or released (`False`).
 
 ## `[Dialog]`
 
@@ -432,10 +456,6 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
-- `Act_ChangeState` Sets the mission state. This does not end the mission!
-    1. `SUCCEED|FAIL :FAIL` The state to change into. Displays and plays respective text to all players of the mission. On `FAIL` it will re-offer the mission on the job board if applicable.
-    1. `INTEGER :0` Only for `FAIL`: The text ID to display.
-
 - `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
     1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
@@ -451,8 +471,6 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_Destroy` Destroys an object.
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
-
-- `Act_EndMission` No values. Ends the mission and cleans up all spawned objects, waypoints, and music. This must be called to allow the mission to be re-started. Admin command `stop_mission` does the same.
 
 - `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
@@ -482,6 +500,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `True|False :False` Whether to prevent non-player damage (NPCs, radiation, asteroid mines) or not.
     1. `[True|False] :False` Whether to prevent player damage or not.
     1. `[FLOAT] :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
+
+- `Act_LeaveMsn` Only for players. Removes members of the label from the mission.
+    1. `STRING|Activator` The players to remove from the mission.
+    1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.
+    1. `[INTEGER] :0` Only for `Failure`: The text ID to display.
 
 - `Act_LightFuse` Executes an arbitary fuse.
     1. `STRING|Activator` Object by name or label to refer.
@@ -523,6 +546,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
+- `Act_SetMsnResult` Sets the mission result. Relevant for reoffering missions to the job board. See `Mission: offer_reoffer`.
+    1. `Success|Failure :Failure` Sets the mission result.
+
 - `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` The players to set the message or waypoint.
     1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
@@ -563,3 +589,5 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_StartDialog` Starts a `Dialog`.
     1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
+
+- `Act_TerminateMsn` Terminates the mission and cleans up all spawned objects, waypoints, and music. Evaluates whether the mission is being reoffered to the mission board, depending on `Act_SetMsnResult`.

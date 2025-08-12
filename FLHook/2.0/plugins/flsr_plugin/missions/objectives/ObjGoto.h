@@ -1,5 +1,4 @@
 #pragma once
-#include <FLHook.h>
 
 namespace Missions
 {
@@ -11,16 +10,24 @@ namespace Missions
 
 	struct ObjGoto
 	{
-		pub::AI::GotoOpType type = pub::AI::GotoOpType::Undefined;
-		GotoMovement movement = GotoMovement::NoCruise;
-		uint targetObjNameOrId = 0;
-		Vector position = { 0, 0, 0 };
-		Vector spline[4] = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
-		float range = 0.0f;
-		float thrust = -1.0f;
-		uint objNameToWaitFor = 0;
-		float startWaitDistance = 0.0f;
-		float endWaitDistance = 0.0f;
+		const bool noCruise;
+		const float range;
+		const float thrust;
+		const unsigned int objNameToWaitFor;
+		const float startWaitDistance;
+		const float endWaitDistance;
+		ObjGoto(const bool noCruise,
+				const float range,
+				const float thrust,
+				const unsigned int objNameToWaitFor,
+				const float startWaitDistance,
+				const float endWaitDistance) :
+			noCruise(noCruise),
+			range(range),
+			thrust(thrust),
+			objNameToWaitFor(objNameToWaitFor),
+			startWaitDistance(startWaitDistance),
+			endWaitDistance(endWaitDistance)
+		{}
 	};
-	typedef std::shared_ptr<ObjGoto> ObjGotoPtr;
 }

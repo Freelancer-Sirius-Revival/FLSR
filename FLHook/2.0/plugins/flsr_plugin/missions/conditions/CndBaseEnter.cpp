@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	std::unordered_set<CndBaseEnter*> registeredConditions;
+	std::unordered_set<CndBaseEnter*> observedCndBaseEnter;
 
 	CndBaseEnter::CndBaseEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint baseId) :
 		Condition(parent),
@@ -19,12 +19,12 @@ namespace Missions
 
 	void CndBaseEnter::Register()
 	{
-		registeredConditions.insert(this);
+		observedCndBaseEnter.insert(this);
 	}
 
 	void CndBaseEnter::Unregister()
 	{
-		registeredConditions.erase(this);
+		observedCndBaseEnter.erase(this);
 	}
 
 	bool CndBaseEnter::Matches(const uint clientId, const uint currentBaseId)
@@ -61,10 +61,10 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndBaseEnter*> currentConditions(registeredConditions);
+				const std::unordered_set<Missions::CndBaseEnter*> currentConditions(observedCndBaseEnter);
 				for (const auto& condition : currentConditions)
 				{
-					if (registeredConditions.contains(condition) && condition->Matches(clientId, baseId))
+					if (observedCndBaseEnter.contains(condition) && condition->Matches(clientId, baseId))
 						condition->ExecuteTrigger();
 				}
 			}

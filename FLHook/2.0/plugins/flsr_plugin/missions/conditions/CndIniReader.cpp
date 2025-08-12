@@ -1,4 +1,4 @@
-#include "IniReader.h"
+#include "CndIniReader.h"
 #include "CndBaseEnter.h"
 #include "CndCloaked.h"
 #include "CndCommComplete.h"
@@ -22,7 +22,7 @@ namespace Missions
 
 	static void PrintErrorToConsole(const std::wstring& entryName, const ConditionParent& conditionParent, const uint argNum, const std::wstring& error)
 	{
-		ConPrint(L"ERROR: " + entryName + L" of Msn:" + std::to_wstring(conditionParent.missionId) + L" Trig:" + std::to_wstring(conditionParent.triggerId) + L" Arg " + std::to_wstring(argNum + 1)  + L" " + error + L"\n");
+		ConPrint(L"ERROR: " + entryName + L" of Msn:" + std::to_wstring(conditionParent.missionId) + L" Trig:" + std::to_wstring(conditionParent.triggerId) + L" Arg " + std::to_wstring(argNum + 1) + L" " + error + L"\n");
 	}
 
 	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -103,7 +103,7 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			const auto& value = ini.get_value_bool(argNum);
+			const auto& value = ini.get_value_int(argNum);
 			if (value >= 0)
 				targetCount = value;
 			else
@@ -217,7 +217,7 @@ namespace Missions
 	{
 		uint objNameOrLabel = 0;
 		CndDistVec::DistanceCondition reason = CndDistVec::DistanceCondition::Inside;
-		Vector position;
+		Vector position = { 0, 0, 0 };
 		float distance = 0;
 		uint systemId = 0;
 
@@ -274,8 +274,8 @@ namespace Missions
 
 	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
-		uint objNameOrLabel;
-		float remainingHitpoints;
+		uint objNameOrLabel = 0;
+		float remainingHitpoints = 0;
 		std::unordered_set<uint> colGrpIds;
 
 		uint argNum = 0;
@@ -296,7 +296,7 @@ namespace Missions
 		}
 		argNum++;
 
-		for (int maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
+		for (const auto maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value == 0)

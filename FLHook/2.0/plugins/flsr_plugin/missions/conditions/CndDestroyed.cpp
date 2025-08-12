@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	std::unordered_set<CndDestroyed*> registeredConditions;
+	std::unordered_set<CndDestroyed*> observedCndDestroyed;
 
 	CndDestroyed::CndDestroyed(const ConditionParent& parent,
 								const uint objNameOrLabel,
@@ -27,12 +27,12 @@ namespace Missions
 	void CndDestroyed::Register()
 	{
 		currentCount = 0;
-		registeredConditions.insert(this);
+		observedCndDestroyed.insert(this);
 	}
 
 	void CndDestroyed::Unregister()
 	{
-		registeredConditions.erase(this);
+		observedCndDestroyed.erase(this);
 	}
 
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
@@ -135,10 +135,10 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndDestroyed*> currentConditions(registeredConditions);
+				const std::unordered_set<Missions::CndDestroyed*> currentConditions(observedCndDestroyed);
 				for (const auto& condition : currentConditions)
 				{
-					if (registeredConditions.contains(condition) && condition->Matches(killedObject, killed, killerId))
+					if (observedCndDestroyed.contains(condition) && condition->Matches(killedObject, killed, killerId))
 						condition->ExecuteTrigger();
 				}
 			}

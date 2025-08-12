@@ -4,7 +4,6 @@
 
 namespace Missions
 {
-    void RegisterMissionToJobBoard(Mission& mission);
     void StartMissionByOfferId(const uint offerId, const std::vector<uint>& clientIds);
     bool IsPartOfOfferedJob(const uint clientId);
     void RemoveClientFromCurrentOfferedJob(const uint clientId);

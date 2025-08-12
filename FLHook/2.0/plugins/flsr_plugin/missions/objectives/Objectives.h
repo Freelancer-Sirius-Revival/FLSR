@@ -1,21 +1,19 @@
 #pragma once
 #include <memory>
-#include <queue>
-#include "ObjectivesArch.h"
-#include "../Conditions/Condition.h"
+#include "ObjectiveState.h"
 
 namespace Missions
 {
+	class Objective;
+	typedef std::shared_ptr<Objective> ObjectivePtr;
+
 	struct Objectives
 	{
+		const uint id;
 		const uint missionId;
-		std::queue<ObjectiveEntry> objectives;
-		const uint objId;
-		ConditionPtr currentCondition;
+		std::vector<ObjectivePtr> objectives;
 
-		Objectives(const uint missionId, const uint objId, const std::vector<ObjectiveEntry>& objectives);
-		virtual ~Objectives();
-		void Progress();
-		void Cancel();
+		Objectives(const uint id, const uint missionId);
+		void Progress(const ObjectiveState& state) const;
 	};
 }

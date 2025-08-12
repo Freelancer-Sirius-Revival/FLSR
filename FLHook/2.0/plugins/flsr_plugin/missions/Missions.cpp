@@ -3,19 +3,19 @@
 #include "../Empathies.h"
 #include "Missions.h"
 #include "Conditions/CndTrue.h"
-#include "Conditions/IniReader.h"
+#include "Conditions/CndIniReader.h"
 #include "Actions/ActDebugMsg.h"
 #include "Actions/ActActTrig.h"
 #include "Actions/ActActMsn.h"
 #include "Actions/ActActMsnTrig.h"
-#include "Actions/ActChangeState.h"
+#include "Actions/ActSetMsnResult.h"
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuse.h"
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActSpawnShip.h"
 #include "Actions/ActSpawnFormation.h"
-#include "Actions/ActEndMission.h"
+#include "Actions/ActTerminateMsn.h"
 #include "Actions/ActDestroy.h"
 #include "Actions/ActPlaySoundEffect.h"
 #include "Actions/ActRelocate.h"
@@ -30,30 +30,13 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
-#include "Objectives/ObjDelay.h"
-#include "Objectives/ObjDock.h"
-#include "Objectives/ObjGoto.h"
-#include "Objectives/ObjFollow.h"
-#include "Objectives/ObjMakeNewFormation.h"
+#include "Actions/ActLeaveMsn.h"
+#include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
 
 namespace Missions
 {	
-	void RegisterMissionToJobBoard(Mission& mission)
-	{
-		if (mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.bases.empty())
-		{
-			MissionBoard::MissionOffer offer;
-			offer.type = mission.offer.type;
-			offer.system = mission.offer.system;
-			offer.group = mission.offer.group;
-			offer.text = mission.offer.text;
-			offer.reward = mission.offer.reward;
-			mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.bases);
-		}
-	}
-
 	static uint CreateIdOrNull(const char* str)
 	{
 		return strlen(str) > 0 ? CreateID(str) : 0;
@@ -122,6 +105,20 @@ namespace Missions
 								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
 									offer.bases.push_back(CreateIdOrNull(ini.get_value_string(index)));
 							}
+							else if (ini.is_value("reoffer"))
+							{
+								const auto value = ToLower(ini.get_value_string(0));
+								if (value == "always")
+									offer.reofferCondition = MissionReofferCondition::Always;
+								else if (value == "onfail")
+									offer.reofferCondition = MissionReofferCondition::OnFail;
+								else if (value == "onsuccess")
+									offer.reofferCondition = MissionReofferCondition::OnSuccess;
+								else
+									offer.reofferCondition = MissionReofferCondition::Never;
+							}
+							else if (ini.is_value("reoffer_delay"))
+								offer.reofferDelay = ini.get_value_int(0);
 						}
 						// Never automatically start missions which are offered on the mission board.
 						if (offer.type != pub::GF::MissionType::Unknown)
@@ -365,113 +362,34 @@ namespace Missions
 						if (dialog.id && !dialog.lines.empty())
 							missions.at(lastMissionId).dialogs.insert({ dialog.id, dialog });
 					}
-
+					
 					if (ini.is_header("ObjList"))
 					{
-						std::string nickname = "";
-						ObjectivesArchetype objectives;
+						uint nickname = 0;
+
+						const uint beginning = ini.tell();
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
-								nickname = ini.get_value_string(0);
-							else if (ini.is_value("BreakFormation"))
 							{
-								objectives.objectives.push_back({ ObjectiveType::BreakFormation, nullptr });
-							}
-							else if (ini.is_value("Delay"))
-							{
-								ObjDelayPtr arch(new ObjDelay());
-								arch->timeInS = ini.get_value_int(0);
-								objectives.objectives.push_back({ ObjectiveType::Delay, arch });
-							}
-							else if (ini.is_value("Dock"))
-							{
-								ObjDockPtr arch(new ObjDock());
-								arch->targetObjNameOrId = CreateIdOrNull(ini.get_value_string(0));
-								objectives.objectives.push_back({ ObjectiveType::Dock, arch });
-							}
-							else if (ini.is_value("GotoObj"))
-							{
-								ObjGotoPtr arch(new ObjGoto());
-								arch->type = pub::AI::GotoOpType::Ship;
-								const auto val = ToLower(ini.get_value_string(0));
-								if (val == "goto_no_cruise")
-									arch->movement = GotoMovement::NoCruise;
-								else
-									arch->movement = GotoMovement::Cruise;
-								arch->targetObjNameOrId = CreateIdOrNull(ini.get_value_string(1));
-								arch->range = ini.get_value_float(2);
-								arch->thrust = ini.get_value_float(3);
-								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(4));
-								arch->startWaitDistance = ini.get_value_float(5);
-								arch->endWaitDistance = ini.get_value_float(6);
-								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
-							}
-							else if (ini.is_value("GotoVec"))
-							{
-								ObjGotoPtr arch(new ObjGoto());
-								arch->type = pub::AI::GotoOpType::Vec;
-								const auto val = ToLower(ini.get_value_string(0));
-								if (val == "goto_no_cruise")
-									arch->movement = GotoMovement::NoCruise;
-								else
-									arch->movement = GotoMovement::Cruise;
-								arch->position.x = ini.get_value_float(1);
-								arch->position.y = ini.get_value_float(2);
-								arch->position.z = ini.get_value_float(3);
-								arch->range = ini.get_value_float(4);
-								arch->thrust = ini.get_value_float(5);
-								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(6));
-								arch->startWaitDistance = ini.get_value_float(7);
-								arch->endWaitDistance = ini.get_value_float(8);
-								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
-							}
-							else if (ini.is_value("GotoSpline"))
-							{
-								ObjGotoPtr arch(new ObjGoto());
-								arch->type = pub::AI::GotoOpType::Spline;
-								const auto val = ToLower(ini.get_value_string(0));
-								if (val == "goto_no_cruise")
-									arch->movement = GotoMovement::NoCruise;
-								else
-									arch->movement = GotoMovement::Cruise;
-								for (byte index = 0; index < 4; index++)
-								{
-									const byte offset = index * 3;
-									arch->spline[index].x = ini.get_value_float(1 + offset);
-									arch->spline[index].y = ini.get_value_float(2 + offset);
-									arch->spline[index].z = ini.get_value_float(3 + offset);
-								}
-								arch->range = ini.get_value_float(13);
-								arch->thrust = ini.get_value_float(14);
-								arch->objNameToWaitFor = CreateIdOrNull(ini.get_value_string(15));
-								arch->startWaitDistance = ini.get_value_float(16);
-								arch->endWaitDistance = ini.get_value_float(17);
-								objectives.objectives.push_back({ ObjectiveType::Goto, arch });
-							}
-							else if (ini.is_value("Follow"))
-							{
-								ObjFollowPtr arch(new ObjFollow());
-								arch->objName = CreateIdOrNull(ini.get_value_string(0));
-								arch->maxDistance = ini.get_value_float(1);
-								arch->relativePosition.x = ini.get_value_float(2);
-								arch->relativePosition.y = ini.get_value_float(3);
-								arch->relativePosition.z = ini.get_value_float(4);
-								if (ini.get_num_parameters() > 5)
-									arch->unk = ini.get_value_float(5);
-								objectives.objectives.push_back({ ObjectiveType::Follow, arch });
-							}
-							else if (ini.is_value("MakeNewFormation"))
-							{
-								ObjMakeNewFormationPtr arch(new ObjMakeNewFormation());
-								arch->formationId = CreateIdOrNull(ini.get_value_string(0));
-								for (int index = 1, length = ini.get_num_parameters(); index < length; index++)
-									arch->objNameIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
-								objectives.objectives.push_back({ ObjectiveType::MakeNewFormation, arch });
+								nickname = CreateIdOrNull(ini.get_value_string(0));
+								break;
 							}
 						}
-						if (!nickname.empty())
-							missions.at(lastMissionId).objectives.insert({ CreateID(nickname.c_str()), objectives });
+
+						if (nickname != 0)
+						{
+							ini.seek(beginning);
+							const ObjectiveParent objParent(lastMissionId, nickname);
+							Objectives objectives(objParent.objectivesId, objParent.missionId);
+							while (ini.read_value())
+							{
+								const auto& obj = TryReadObjectiveFromIni(objParent, ini);
+								if (obj != nullptr)
+									objectives.objectives.push_back(ObjectivePtr(obj));
+							}
+							missions.at(lastMissionId).objectives.insert({ objectives.id, objectives });
+						}
 					}
 
 					if (ini.is_header("Trigger"))
@@ -512,16 +430,29 @@ namespace Missions
 								action->message = ini.get_value_string(0);
 								actions.push_back(action);
 							}
-							else if (ini.is_value("Act_EndMission"))
+							else if (ini.is_value("Act_TerminateMsn"))
 							{
-								ActEndMissionPtr action(new ActEndMission());
+								ActTerminateMsnPtr action(new ActTerminateMsn());
 								actions.push_back(action);
 							}
-							else if (ini.is_value("Act_ChangeState"))
+							else if (ini.is_value("Act_SetMsnResult"))
 							{
-								ActChangeStatePtr action(new ActChangeState());
-								action->state = ToLower(ini.get_value_string(0)) == "succeed" ? ChangeState::Succeed : ChangeState::Fail;
-								action->failureStringId = ini.get_value_int(1);
+								ActSetMsnResultPtr action(new ActSetMsnResult());
+								action->result = ToLower(ini.get_value_string(0)) == "success" ? Mission::MissionResult::Success : Mission::MissionResult::Failure;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_LeaveMsn"))
+							{
+								ActLeaveMsnPtr action(new ActLeaveMsn());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								const std::string& value = ToLower(ini.get_value_string(1));
+								if (value == "success")
+									action->leaveType = LeaveMsnType::Success;
+								else if (value == "failure")
+									action->leaveType = LeaveMsnType::Failure;
+								else
+									action->leaveType = LeaveMsnType::Silent;
+								action->failureStringId = ini.get_value_int(2);
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_ActTrig"))
@@ -864,9 +795,6 @@ namespace Missions
 				ini.close();
 			}
 		}
-
-		for (auto& missionEntry : missions)
-			RegisterMissionToJobBoard(missionEntry.second);
 	}
 	
 	void StartMissionByOfferId(const uint offerId, const std::vector<uint>& clientIds)

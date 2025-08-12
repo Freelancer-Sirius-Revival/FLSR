@@ -1,5 +1,6 @@
 #include "ActSpawnFormation.h"
 #include "MissionShipSpawning.h"
+#include "../ShipSpawning.h"
 #include "../Formations.h"
 #include "../MatrixMath.h"
 
@@ -63,16 +64,13 @@ namespace Missions
 			pub::AI::SubmitState(spawnedShipIds[index], &personality);
 
 			pub::AI::update_formation_state(spawnedShipIds[index], spawnedShipIds[0], formation[index]);
+			AssignToWing(spawnedShipIds[index], spawnedShipIds[0]);
 		}
 
 		if (!spawnedShipIds.empty())
 		{			
 			if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())
-			{
-				const uint leaderId = spawnedShipIds[0];
-				mission.objectivesByObjectId.try_emplace(leaderId, mission.id, leaderId, objectivesEntry->second.objectives);
-				mission.objectivesByObjectId.at(leaderId).Progress();
-			}
+				objectivesEntry->second.Progress(ObjectiveState(spawnedShipIds[0], 0, false));
 		}
 	}
 }

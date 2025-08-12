@@ -1,11 +1,15 @@
 #pragma once
-#include <FLHook.h>
+#include "Objective.h"
 
 namespace Missions
 {
-	struct ObjDock
+	class ObjDock : public Objective
 	{
-		uint targetObjNameOrId;
+	private:
+		const uint targetObjNameOrId;
+
+	public:
+		ObjDock(const ObjectiveParent& parent, const uint targetObjNameOrId);
+		void Execute(const ObjectiveState& state) const;
 	};
-	typedef std::shared_ptr<ObjDock> ObjDockPtr;
 }

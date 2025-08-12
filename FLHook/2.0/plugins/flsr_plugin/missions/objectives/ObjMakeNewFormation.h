@@ -1,12 +1,16 @@
 #pragma once
-#include <FLHook.h>
+#include "Objective.h"
 
 namespace Missions
 {
-	struct ObjMakeNewFormation
+	class ObjMakeNewFormation : public Objective
 	{
-		uint formationId;
-		std::vector<uint> objNameIds;
+	private:
+		const uint formationId;
+		const std::vector<uint> objNames;
+
+	public:
+		ObjMakeNewFormation(const ObjectiveParent& parent, const uint formationId, const std::vector<uint>& objNames);
+		void Execute(const ObjectiveState& state) const;
 	};
-	typedef std::shared_ptr<ObjMakeNewFormation> ObjMakeNewFormationPtr;
 }

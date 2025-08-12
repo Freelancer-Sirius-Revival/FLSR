@@ -4,8 +4,8 @@
 
 namespace Missions
 {
-	std::unordered_set<CndHealthDec*> registeredHullConditions;
-	std::unordered_set<CndHealthDec*> registeredColGrpConditions;
+	std::unordered_set<CndHealthDec*> observedHullConditions;
+	std::unordered_set<CndHealthDec*> observedColGrpConditions;
 
 	CndHealthDec::CndHealthDec(const ConditionParent& parent, const uint objNameOrLabel, const float remainingHitpoints, const std::unordered_set<uint> colGrpIds) :
 		Condition(parent),
@@ -22,15 +22,15 @@ namespace Missions
 	void CndHealthDec::Register()
 	{
 		if (colGrpIds.contains(RootGroup))
-			registeredHullConditions.insert(this);
+			observedHullConditions.insert(this);
 		if (colGrpIds.size() > 1 || !colGrpIds.contains(RootGroup))
-			registeredColGrpConditions.insert(this);
+			observedColGrpConditions.insert(this);
 	}
 
 	void CndHealthDec::Unregister()
 	{
-		registeredHullConditions.erase(this);
-		registeredColGrpConditions.erase(this);
+		observedHullConditions.erase(this);
+		observedColGrpConditions.erase(this);
 	}
 
 	bool CndHealthDec::Matches(const IObjRW* damagedObject, const float incomingDamage, const DamageList* damageList, const CArchGroup* hitColGrp)
@@ -88,19 +88,19 @@ namespace Missions
 
 		if (hitColGrp == nullptr)
 		{
-			const std::unordered_set<CndHealthDec*> currentConditions(registeredHullConditions);
+			const std::unordered_set<CndHealthDec*> currentConditions(observedHullConditions);
 			for (const auto& condition : currentConditions)
 			{
-				if (registeredHullConditions.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
+				if (observedHullConditions.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
 					condition->ExecuteTrigger();
 			}
 		}
 		else
 		{
-			const std::unordered_set<CndHealthDec*> currentConditions(registeredColGrpConditions);
+			const std::unordered_set<CndHealthDec*> currentConditions(observedColGrpConditions);
 			for (const auto& condition : currentConditions)
 			{
-				if (registeredColGrpConditions.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
+				if (observedColGrpConditions.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
 					condition->ExecuteTrigger();
 			}
 		}

@@ -191,7 +191,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
-    <ClCompile Include="missions\NpcNames.cpp" />
+    <ClCompile Include="missions\NpcAppearances.cpp" />
     <ClCompile Include="missions\objectives\ObjIdle.cpp" />
     <ClCompile Include="missions\objectives\ObjIniReader.cpp" />
     <ClCompile Include="missions\objectives\ObjBreakFormation.cpp" />
@@ -286,7 +286,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\MsnFormation.h" />
     <ClInclude Include="missions\MsnSolar.h" />
     <ClInclude Include="missions\Npc.h" />
-    <ClInclude Include="missions\NpcNames.h" />
+    <ClInclude Include="missions\NpcAppearances.h" />
     <ClInclude Include="missions\objectives\ObjectiveState.h" />
     <ClInclude Include="missions\objectives\ObjIdle.h" />
     <ClInclude Include="missions\objectives\ObjIniReader.h" />

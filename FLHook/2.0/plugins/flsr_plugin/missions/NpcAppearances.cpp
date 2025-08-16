@@ -1,5 +1,4 @@
-#include "NpcNames.h"
-#include <FLHook.h>
+#include "NpcAppearances.h"
 #include <random>
 
 namespace NpcNames
@@ -9,6 +8,7 @@ namespace NpcNames
 
 	enum class Gender
 	{
+		None,
 		Male,
 		Female
 	};
@@ -19,8 +19,10 @@ namespace NpcNames
 	static std::unordered_map<uint, std::pair<uint, uint>> factionLastNames;
 	static std::unordered_map<uint, std::pair<uint, uint>> factionLargeShipNames;
 	static std::unordered_map<uint, uint> factionLargeShipDesignations;
+	static std::unordered_map<uint, std::vector<Costume>> factionMaleCostumes;
+	static std::unordered_map<uint, std::vector<Costume>> factionFemaleCostumes;
 
-	std::pair<unsigned int, unsigned int> GetRandomName(const unsigned int factionId, const unsigned int voiceId)
+	std::pair<uint, uint> GetRandomName(const uint factionId, const uint voiceId)
 	{
 		std::pair<uint, uint> result = { 0, 0 };
 		const auto& genderEntry = voiceGenders.find(voiceId);
@@ -37,7 +39,7 @@ namespace NpcNames
 		return result;
 	}
 
-	std::pair<unsigned int, unsigned int> GetRandomLargeShipName(const unsigned int factionId)
+	std::pair<uint, uint> GetRandomLargeShipName(const uint factionId)
 	{
 		std::pair<uint, uint> result = { 0, 0 };
 
@@ -50,10 +52,28 @@ namespace NpcNames
 		return result;
 	}
 
+	Costume GetRandomCostume(const uint factionId, const uint voiceId)
+	{
+		Costume result;
+		const auto& genderEntry = voiceGenders.find(voiceId);
+		if (genderEntry == voiceGenders.end())
+			return result;
+
+		const auto& factionCostumes = genderEntry->second == Gender::Male ? factionMaleCostumes : factionFemaleCostumes;
+		if (const auto& costumes = factionCostumes.find(factionId); costumes != factionCostumes.end())
+		{
+			const auto index = std::uniform_int_distribution(size_t(0), costumes->second.size())(gen);
+			result = costumes->second[index];
+		}
+
+		return result;
+	}
+
 	void ReadFiles()
 	{
 		std::string dataPath = "..\\data";
 		std::vector<std::string> voicePaths;
+		std::vector<std::string> bodyPartsPaths;
 		INI_Reader ini;
 		if (ini.open("freelancer.ini", false))
 		{
@@ -73,6 +93,9 @@ namespace NpcNames
 					{
 						if (ini.is_value("voices"))
 							voicePaths.push_back(ini.get_value_string(0));
+
+						if (ini.is_value("bodyparts"))
+							bodyPartsPaths.push_back(ini.get_value_string(0));
 					}
 				}
 			}
@@ -98,6 +121,43 @@ namespace NpcNames
 						}
 						if (voiceId)
 							voiceGenders.insert({ voiceId, gender });
+					}
+				}
+				ini.close();
+			}
+		}
+
+		std::unordered_map<uint, Gender> headGenders;
+		for (const auto& filePath : bodyPartsPaths)
+		{
+			if (ini.open((dataPath + "\\" + filePath).c_str(), false))
+			{
+				Gender gender = Gender::None;
+				while (ini.read_header())
+				{
+					if (ini.is_header("Skeleton"))
+					{
+						while (ini.read_value())
+						{
+							if (ini.is_value("sex"))
+							{
+								const std::string value = ToLower(ini.get_value_string(0));
+								if (value == "male")
+									gender = Gender::Male;
+								else if (value == "female")
+									gender = Gender::Female;
+								else
+									gender = Gender::None;
+							}
+						}
+					}
+					else if (ini.is_header("Head"))
+					{
+						while (ini.read_value())
+						{
+							if (gender != Gender::None && ini.is_value("nickname"))
+								headGenders.insert({ CreateID(ini.get_value_string(0)), gender });
+						}
 					}
 				}
 				ini.close();
@@ -145,6 +205,37 @@ namespace NpcNames
 						else if (ini.is_value("large_ship_desig"))
 						{
 							largeShipDesignation = ini.get_value_int(0);
+						}
+						else if (ini.is_value("space_costume"))
+						{
+							Costume costume;
+
+							std::string value = ini.get_value_string(0);
+							if (!value.empty())
+								costume.head = CreateID(value.c_str());
+
+							value = ini.get_value_string(1);
+							if (!value.empty())
+								costume.body = CreateID(value.c_str());
+
+							for (int index = 2, length = ini.get_num_parameters(); index < length; index++)
+							{
+								value = ini.get_value_string(index);
+								if (!value.empty())
+								{
+									costume.accessory[costume.accessories] = CreateID(value.c_str());
+									costume.accessories++;
+								}
+							}
+
+							const auto& genderEntry = headGenders.find(costume.head);
+							if (genderEntry != headGenders.end())
+							{
+								if (genderEntry->second == Gender::Male)
+									factionMaleCostumes[factionId].push_back(costume);
+								else if (genderEntry->second == Gender::Male)
+									factionFemaleCostumes[factionId].push_back(costume);
+							}
 						}
 					}
 					if (factionId)

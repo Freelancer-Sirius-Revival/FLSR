@@ -38,6 +38,11 @@ namespace Missions
 
 	bool CndInSystem::Matches(const uint clientId, const uint currentSystemId)
 	{
+		uint shipId;
+		pub::Player::GetShip(clientId, shipId);
+		if (!shipId) // When in space, the player always must have a ship ID.
+			return false;
+
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{

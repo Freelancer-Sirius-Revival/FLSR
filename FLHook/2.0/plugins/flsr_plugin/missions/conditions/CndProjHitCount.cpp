@@ -11,14 +11,16 @@ namespace Missions
 							const DamagedSurface targetSurface,
 							const DamageType damageType,
 							const uint targetHitCount,
-							const uint inflictorObjNameOrLabel) :
+							const uint inflictorObjNameOrLabel,
+							const bool damagedIsActivator) :
 		Condition(parent),
 		damagedObjNameOrLabel(damagedObjNameOrLabel),
 		targetSurface(targetSurface),
 		damageType(damageType),
 		targetHitCount(targetHitCount),
 		currentHitCount(0),
-		inflictorObjNameOrLabel(inflictorObjNameOrLabel)
+		inflictorObjNameOrLabel(inflictorObjNameOrLabel),
+		damagedIsActivator(damagedIsActivator)
 	{}
 
 	CndProjHitCount::~CndProjHitCount()
@@ -96,9 +98,9 @@ namespace Missions
 		if (!damagedObjMatches)
 			return false;
 
-		const MissionObject activatorObj = damageList->is_inflictor_a_player()
-			? MissionObject(MissionObjectType::Client, damageList->get_inflictor_owner_player())
-			: MissionObject(MissionObjectType::Object, damageList->get_inflictor_id());
+		const MissionObject inflictorObj = damageList->is_inflictor_a_player()
+												? MissionObject(MissionObjectType::Client, HkGetClientIDByShip(damageList->get_inflictor_id()))
+												: MissionObject(MissionObjectType::Object, damageList->get_inflictor_id());
 
 		bool inflictorObjMatches = true;
 		if (inflictorObjNameOrLabel != 0)
@@ -113,7 +115,7 @@ namespace Missions
 			{
 				for (const auto& object : objectsByLabel->second)
 				{
-					if (object == activatorObj)
+					if (object == inflictorObj)
 					{
 						inflictorObjMatches = true;
 						break;
@@ -124,7 +126,16 @@ namespace Missions
 
 		if (inflictorObjMatches)
 		{
-			activator = activatorObj;
+			if (damagedIsActivator)
+			{
+				activator = damagedObject->is_player()
+								? MissionObject(MissionObjectType::Client, damagedObject->cobj->ownerPlayer)
+								: MissionObject(MissionObjectType::Object, damagedObject->get_id());
+			}
+			else
+			{
+				activator = inflictorObj;
+			}
 			return true;
 		}
 		return false;

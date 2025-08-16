@@ -7,11 +7,16 @@ namespace Missions
 	std::unordered_set<CndHealthDec*> observedHullConditions;
 	std::unordered_set<CndHealthDec*> observedColGrpConditions;
 
-	CndHealthDec::CndHealthDec(const ConditionParent& parent, const uint objNameOrLabel, const float remainingHitpoints, const std::unordered_set<uint> colGrpIds) :
+	CndHealthDec::CndHealthDec(const ConditionParent& parent,
+								const uint objNameOrLabel,
+								const float remainingHitpoints,
+								const std::unordered_set<uint> colGrpIds,
+								const bool damagedIsActivator) :
 		Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		remainingHitpoints(remainingHitpoints),
-		colGrpIds(colGrpIds)
+		colGrpIds(colGrpIds),
+		damagedIsActivator(damagedIsActivator)
 	{}
 
 	CndHealthDec::~CndHealthDec()
@@ -46,9 +51,17 @@ namespace Missions
 				return false;
 		}
 
-		const MissionObject activatorObj = damageList->is_inflictor_a_player()
-											? MissionObject(MissionObjectType::Client, damageList->get_inflictor_owner_player())
+		const MissionObject inflictorObj = damageList->is_inflictor_a_player()
+											? MissionObject(MissionObjectType::Client, HkGetClientIDByShip(damageList->get_inflictor_id()))
 											: MissionObject(MissionObjectType::Object, damageList->get_inflictor_id());
+
+		MissionObject cndActivator = inflictorObj;
+		if (damagedIsActivator)
+		{
+			activator = damagedObject->is_player()
+				? MissionObject(MissionObjectType::Client, damagedObject->cobj->ownerPlayer)
+				: MissionObject(MissionObjectType::Object, damagedObject->cobj->id);
+		}
 
 		const auto& mission = missions.at(parent.missionId);
 		if (!damagedObject->is_player())
@@ -57,7 +70,7 @@ namespace Missions
 			{
 				if (objectByName->second == damagedObject->cobj->id)
 				{
-					activator = activatorObj;
+					activator = cndActivator;
 					return true;
 				}
 				return false;
@@ -67,12 +80,12 @@ namespace Missions
 		{
 			const MissionObject object = damagedObject->is_player()
 											? MissionObject(MissionObjectType::Client, damagedObject->cobj->ownerPlayer)
-											: MissionObject(MissionObjectType::Object, damagedObject->cobj->id);
+											: MissionObject(MissionObjectType::Object, damagedObject->get_id());
 			for (const auto& labelObject : objectsByLabel->second)
 			{
 				if (object == labelObject)
 				{
-					activator = activatorObj;
+					activator = cndActivator;
 					return true;
 				}
 			}

@@ -1,33 +1,33 @@
-#include "CndSpaceEnter.h"
+#include "CndSystemEnter.h"
 #include "../Mission.h"
 #include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndSpaceEnter*> observedCndSpaceEnter;
+	std::unordered_set<CndSystemEnter*> observedCndSystemEnter;
 
-	CndSpaceEnter::CndSpaceEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
+	CndSystemEnter::CndSystemEnter(const ConditionParent& parent, const uint label, const uint systemId) :
 		Condition(parent),
-		label(objNameOrLabel),
+		label(label),
 		systemId(systemId)
 	{}
 
-	CndSpaceEnter::~CndSpaceEnter()
+	CndSystemEnter::~CndSystemEnter()
 	{
 		Unregister();
 	}
 
-	void CndSpaceEnter::Register()
+	void CndSystemEnter::Register()
 	{
-		observedCndSpaceEnter.insert(this);
+		observedCndSystemEnter.insert(this);
 	}
 
-	void CndSpaceEnter::Unregister()
+	void CndSystemEnter::Unregister()
 	{
-		observedCndSpaceEnter.erase(this);
+		observedCndSystemEnter.erase(this);
 	}
 
-	bool CndSpaceEnter::Matches(const uint clientId, const uint currentSystemId)
+	bool CndSystemEnter::Matches(const uint clientId, const uint currentSystemId)
 	{
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
@@ -55,21 +55,21 @@ namespace Missions
 
 	namespace Hooks
 	{
-		namespace CndSpaceEnter
+		namespace CndSystemEnter
 		{
 			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				if (observedCndSpaceEnter.empty())
+				if (observedCndSystemEnter.empty())
 					return;
 				uint systemId;
 				pub::Player::GetSystem(clientId, systemId);
 
-				const std::unordered_set<Missions::CndSpaceEnter*> currentConditions(observedCndSpaceEnter);
+				const std::unordered_set<Missions::CndSystemEnter*> currentConditions(observedCndSystemEnter);
 				for (const auto& condition : currentConditions)
 				{
-					if (observedCndSpaceEnter.contains(condition) && condition->Matches(clientId, systemId))
+					if (observedCndSystemEnter.contains(condition) && condition->Matches(clientId, systemId))
 						condition->ExecuteTrigger();
 				}
 			}

@@ -26,16 +26,18 @@ namespace Missions
 		const DamageType damageType;
 		const uint targetHitCount;
 		const uint inflictorObjNameOrLabel;
+		const bool damagedIsActivator;
 
 		uint currentHitCount;
 
 	public:
 		CndProjHitCount(const ConditionParent& parent,
-					const uint damagedObjNameOrLabel,
-					const DamagedSurface targetSurface,
-					const DamageType damageType,
-					const uint targetHitCount,
-					const uint inflictorObjNameOrLabel);
+						const uint damagedObjNameOrLabel,
+						const DamagedSurface targetSurface,
+						const DamageType damageType,
+						const uint targetHitCount,
+						const uint inflictorObjNameOrLabel,
+						const bool damagedIsActivator);
 		~CndProjHitCount();
 		void Register();
 		void Unregister();

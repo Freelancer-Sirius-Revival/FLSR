@@ -370,11 +370,12 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `INTEGER` The target count.
     1. `[Less|Equal|Greater] :Equal` The comparator against the target count.
 
-- `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` will be either the killer, or nobody if despawned.
+- `Cnd_Destroyed` When something gets destroyed/despawned. `Activator` can be defined via the last argument.
     1. `STRING|Stranger` Object by name or label to await the destruction of.
     1. `[INTEGER] :0` The specific count of objects that must be destroyed to meet this condition. Any negative value will make this wait until all occurances of the objects are destroyed.
     1. `[Explode|Vanish|Any] :Any` Expects the destruction to be either by violence (`Explode`), despawn (e.g. by docking or explicit despawn) (`Vanish`) or whatever reason (`Any`).
     1. `[STRING]` Object by name or label that must be the killer.
+    1. `[Killer|Destroyed] :Killer` Sets whether `Activator` will be the killer or the destroyed object. If set to `Killer` and the object is being despawned, nobody will be the activator.
 
 - `Cnd_DistObj` Distance to another object in space. `Activator` will be the object coming into range.
     1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
@@ -391,17 +392,19 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING` The system nickname to place this volume into.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
-- `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` will be the damage inflictor.
+- `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` can be defined via the last argument.
     1. `STRING|Stranger` Object by name or label to observe the hitpoints of.
     1. `FLOAT :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
     1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
+    1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
-- `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` will be damage inflictor.
+- `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
     1. `STRING` Object by name or label to count projectile hits on.
     1. `[INTEGER] :1` The count of projectile hits that must have happened.
     1. `[Any|Hull|Shield] :Any` The surface the hit should be registered on.
     1. `[Any|Projectile|Explosion] :Any` The damage type to register. `Any` means `Projectile` and `Explosion`.
     1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
+    1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
 - `Cnd_SpaceEnter` Only players. Undocking from bases or spawning into space. No jumping. `Activator` will be the player.
     1. `STRING|Stranger` The players  to await spawning into space.

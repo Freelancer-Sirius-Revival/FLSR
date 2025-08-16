@@ -10,13 +10,15 @@ namespace Missions
 								const uint objNameOrLabel,
 								const DestroyCondition condition,
 								const uint killerNameOrLabel,
-								const int targetCount) :
+								const int targetCount,
+								const bool destroyedIsActivator) :
 		Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		condition(condition),
 		killerNameOrLabel(killerNameOrLabel),
 		targetCount(targetCount),
-		currentCount(0)
+		currentCount(0),
+		destroyedIsActivator(destroyedIsActivator)
 	{}
 
 	CndDestroyed::~CndDestroyed()
@@ -118,9 +120,18 @@ namespace Missions
 
 		if (foundAll)
 		{
-			const uint clientId = HkGetClientIDByShip(killerId);
-			activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
-			activator.id = clientId ? clientId : killerId;
+			if (destroyedIsActivator)
+			{
+				activator = killedObject->is_player()
+								? MissionObject(MissionObjectType::Client, killedObject->cobj->ownerPlayer)
+								: MissionObject(MissionObjectType::Object, killedObject->get_id());
+			}
+			else
+			{
+				const uint clientId = HkGetClientIDByShip(killerId);
+				activator.type = clientId ? MissionObjectType::Client : MissionObjectType::Object;
+				activator.id = clientId ? clientId : killerId;
+			}
 			return true;
 		}
 

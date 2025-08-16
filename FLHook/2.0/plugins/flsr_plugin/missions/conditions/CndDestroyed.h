@@ -18,6 +18,7 @@ namespace Missions
 		const DestroyCondition condition;
 		const uint killerNameOrLabel;
 		const int targetCount;
+		const bool destroyedIsActivator;
 
 		int currentCount;
 
@@ -26,7 +27,8 @@ namespace Missions
 						const uint objNameOrLabel,
 						const DestroyCondition condition,
 						const uint killerNameOrLabel,
-						const int targetCount);
+						const int targetCount,
+						const bool destroyedIsActivator);
 		~CndDestroyed();
 		void Register();
 		void Unregister();

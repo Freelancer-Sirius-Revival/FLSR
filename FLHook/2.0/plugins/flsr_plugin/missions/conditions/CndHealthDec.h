@@ -12,9 +12,14 @@ namespace Missions
 		const uint objNameOrLabel;
 		const float remainingHitpoints;
 		const std::unordered_set<uint> colGrpIds;
+		const bool damagedIsActivator;
 
 	public:
-		CndHealthDec(const ConditionParent& parent, const uint objNameOrLabel, const float remainingHitpoints, const std::unordered_set<uint> colGrpIds);
+		CndHealthDec(const ConditionParent& parent,
+						const uint objNameOrLabel,
+						const float remainingHitpoints,
+						const std::unordered_set<uint> colGrpIds,
+						const bool damagedIsActivator);
 		~CndHealthDec();
 		void Register();
 		void Unregister();

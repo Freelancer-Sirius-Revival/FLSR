@@ -7,6 +7,7 @@
 #include "CndDistObj.h"
 #include "CndDistVec.h"
 #include "CndHealthDec.h"
+#include "CndInSystem.h"
 #include "CndProjHitCount.h"
 #include "CndSystemEnter.h"
 #include "CndSystemExit.h"
@@ -336,6 +337,32 @@ namespace Missions
 		return new CndHealthDec(conditionParent, objNameOrLabel, remainingHitpoints, colGrpIds, damagedIsActivator);
 	}
 
+	static CndInSystem* ReadCndInSystem(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		uint systemId = 0;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_InSystem", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemId = value;
+			else
+				PrintErrorToConsole(L"Cnd_InSystem", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
+		}
+
+		return new CndInSystem(conditionParent, label, systemId);
+	}
+
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint damagedObjNameOrLabel = 0;
@@ -515,6 +542,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_HealthDec"))
 			return ReadCndHealthDec(conditionParent, ini);
+
+		if (ini.is_value("Cnd_InSystem"))
+			return ReadCndInSystem(conditionParent, ini);
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);

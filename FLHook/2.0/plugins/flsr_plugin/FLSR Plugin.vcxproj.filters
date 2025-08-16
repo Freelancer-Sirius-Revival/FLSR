@@ -232,6 +232,9 @@
     <ClCompile Include="missions\actions\ActLeaveMsn.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndInSystem.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -473,6 +476,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActLeaveMsn.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInSystem.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

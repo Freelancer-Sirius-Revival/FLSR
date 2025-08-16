@@ -6,9 +6,9 @@ namespace Missions
 {
 	std::unordered_set<CndSystemEnter*> observedCndSystemEnter;
 
-	CndSystemEnter::CndSystemEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
+	CndSystemEnter::CndSystemEnter(const ConditionParent& parent, const uint label, const uint systemId) :
 		Condition(parent),
-		label(objNameOrLabel),
+		label(label),
 		systemId(systemId)
 	{}
 

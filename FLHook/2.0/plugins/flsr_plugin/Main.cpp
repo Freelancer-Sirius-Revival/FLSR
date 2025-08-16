@@ -14,6 +14,7 @@
 #include "Missions/conditions/CndDistObj.h"
 #include "Missions/conditions/CndDistVec.h"
 #include "Missions/conditions/CndHealthDec.h"
+#include "Missions/conditions/CndInSystem.h"
 #include "Missions/conditions/CndProjHitCount.h"
 #include "Missions/conditions/CndSystemEnter.h"
 #include "Missions/conditions/CndSystemExit.h"
@@ -269,6 +270,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipHullDamage, PLUGIN_ShipHullDmg, 0));
     //p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipColGrpDamage, PLUGIN_SolarColGrpDmg, 0)); TODO needs the hook
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipHullDamage, PLUGIN_SolarHullDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::JumpInComplete_AFTER, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipEquipDamage, PLUGIN_ShipEquipDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipHullDamage, PLUGIN_ShipHullDmg, 0));

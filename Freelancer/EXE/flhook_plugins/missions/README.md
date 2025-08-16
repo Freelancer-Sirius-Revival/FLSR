@@ -398,6 +398,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
+- `Cnd_InSystem` Only players. Checks whether the player exists in space. `Activator` will be the player.
+    1. `STRING|Stranger` The players to expect in space.
+    1. `[STRING] :any` The system nickname to expect the player in.
+
 - `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
     1. `STRING` Object by name or label to count projectile hits on.
     1. `[INTEGER] :1` The count of projectile hits that must have happened.

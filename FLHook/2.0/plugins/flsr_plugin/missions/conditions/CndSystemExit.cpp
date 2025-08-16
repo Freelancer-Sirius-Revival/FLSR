@@ -6,9 +6,9 @@ namespace Missions
 {
 	std::unordered_set<CndSystemExit*> observedCndSystemExit;
 
-	CndSystemExit::CndSystemExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
+	CndSystemExit::CndSystemExit(const ConditionParent& parent, const uint label, const uint systemId) :
 		Condition(parent),
-		label(objNameOrLabel),
+		label(label),
 		systemId(systemId)
 	{}
 

@@ -10,7 +10,7 @@ namespace Missions
 		const uint systemId;
 
 	public:
-		CndSystemExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId);
+		CndSystemExit(const ConditionParent& parent, const uint label, const uint systemId);
 		~CndSystemExit();
 		void Register();
 		void Unregister();

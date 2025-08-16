@@ -801,10 +801,9 @@ namespace Missions
 	{
 		for (auto& missionEntry : missions)
 		{
-			if (missionEntry.second.offerId == offerId)
+			if (missionEntry.second.offerId == offerId && missionEntry.second.CanBeStarted())
 			{
 				auto& mission = missionEntry.second;
-				mission.Reset();
 				const uint labelId = CreateID("players");
 				for (const auto clientId : clientIds)
 					mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), labelId);
@@ -930,8 +929,11 @@ namespace Missions
 	{
 		for (auto& missionEntry : missions)
 		{
-			if (missionEntry.second.name == missionName)
-				return missionEntry.second.Start();
+			if (missionEntry.second.name == missionName && missionEntry.second.CanBeStarted())
+			{
+				missionEntry.second.Start();
+				return true;
+			}
 		}
 		return false;
 	}

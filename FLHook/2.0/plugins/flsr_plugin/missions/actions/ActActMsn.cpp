@@ -12,7 +12,7 @@ namespace Missions
 				auto& foundMission = missionEntry.second;
 				if (!foundMission.CanBeStarted())
 				{
-					ConPrint(L"ERROR: Act_ActMsn could not start already running mission " + std::to_wstring(missionId) + L"\n");
+					ConPrint(L"ERROR: Act_ActMsn could not start already running or finished mission " + std::to_wstring(missionId) + L"\n");
 					return;
 				}
 

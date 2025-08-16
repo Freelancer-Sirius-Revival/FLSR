@@ -69,10 +69,9 @@ namespace Missions
 	public:
 		Mission(const std::string name, const uint id, const bool initiallyActive);
 		virtual ~Mission();
-		void Reset();
 		bool CanBeStarted() const;
 		bool IsActive() const;
-		bool Start();
+		void Start();
 		void End();
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
 		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);

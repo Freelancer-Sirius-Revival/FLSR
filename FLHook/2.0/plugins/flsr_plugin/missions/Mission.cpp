@@ -37,58 +37,6 @@ namespace Missions
 		End();
 	}
 
-	void Mission::Reset()
-	{
-		End();
-		state = initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive;
-		missionResult = MissionResult::Success;
-		reofferRemainingTime = 0.0f;
-	}
-
-	bool Mission::CanBeStarted() const
-	{
-		return state != MissionState::Active; // Allow (re-)starting any mission that isn't already running.
-	}
-
-	bool Mission::IsActive() const
-	{
-		return state == MissionState::Active;
-	}
-
-	bool Mission::Start()
-	{
-		if (!CanBeStarted())
-			return false;
-
-		state = MissionState::Active;
-
-		for (auto& trigger : triggers)
-		{
-			trigger.Reset();
-			if (trigger.IsAwaitingInitialActivation())
-				trigger.Activate();
-		}
-		return true;
-	}
-
-	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
-	{
-		const bool queueWasEmpty = triggerExecutionQueue.empty();
-		triggerExecutionQueue.push({ triggerId, activator });
-
-		// If the queue was empty, start processing. Otherwise assume this queue is being processed.
-		if (!queueWasEmpty)
-			return;
-
-		while (!triggerExecutionQueue.empty())
-		{
-			const auto& entry = triggerExecutionQueue.front();
-			Trigger& trigger = triggers.at(entry.first);
-			triggerExecutionQueue.pop();
-			trigger.Execute(entry.second); // This may also end the mission. In that case the execution queue is being emptied.
-		}
-	}
-
 	void Mission::End()
 	{
 		state = MissionState::Finished;
@@ -134,11 +82,57 @@ namespace Missions
 
 		offerId = 0;
 
-		if ( offer.reofferCondition == MissionReofferCondition::Always ||
+		if (offer.reofferCondition == MissionReofferCondition::Always ||
 			(offer.reofferCondition == MissionReofferCondition::OnFail && missionResult == Mission::MissionResult::Failure) ||
 			(offer.reofferCondition == MissionReofferCondition::OnSuccess && missionResult == Mission::MissionResult::Success))
 		{
+			state = MissionState::Inactive;
 			reofferRemainingTime = offer.reofferDelay;
+		}
+	}
+
+	void Mission::Start()
+	{
+		if (!CanBeStarted())
+			return;
+
+		reofferRemainingTime = 0.0f;
+		missionResult = MissionResult::Success;
+		state = MissionState::Active;
+
+		for (auto& trigger : triggers)
+		{
+			trigger.Reset();
+			if (trigger.IsAwaitingInitialActivation())
+				trigger.Activate();
+		}
+	}
+
+	bool Mission::CanBeStarted() const
+	{
+		return state == MissionState::AwaitingInitialActivation || state == MissionState::Inactive;
+	}
+
+	bool Mission::IsActive() const
+	{
+		return state == MissionState::Active;
+	}
+
+	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
+	{
+		const bool queueWasEmpty = triggerExecutionQueue.empty();
+		triggerExecutionQueue.push({ triggerId, activator });
+
+		// If the queue was empty, start processing. Otherwise assume this queue is being processed.
+		if (!queueWasEmpty)
+			return;
+
+		while (!triggerExecutionQueue.empty())
+		{
+			const auto& entry = triggerExecutionQueue.front();
+			Trigger& trigger = triggers.at(entry.first);
+			triggerExecutionQueue.pop();
+			trigger.Execute(entry.second); // This may also end the mission. In that case the execution queue is being emptied.
 		}
 	}
 
@@ -337,7 +331,7 @@ namespace Missions
 					auto& mission = missionEntry.second;
 
 					/* Reoffering missions to job board */
-					if (mission.offerId == 0 && IsValidMissionForOffer(mission))
+					if (mission.CanBeStarted() && mission.offerId == 0 && IsValidMissionForOffer(mission))
 					{
 						if (mission.reofferRemainingTime > 0.0f)
 							mission.reofferRemainingTime -= seconds;

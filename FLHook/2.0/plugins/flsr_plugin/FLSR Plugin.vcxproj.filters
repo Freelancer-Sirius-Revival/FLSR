@@ -79,10 +79,10 @@
     <ClCompile Include="missions\actions\ActSetNNObj.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\CndSpaceEnter.cpp">
+    <ClCompile Include="missions\conditions\CndSystemEnter.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\CndSpaceExit.cpp">
+    <ClCompile Include="missions\conditions\CndSystemExit.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp">
@@ -301,10 +301,10 @@
     <ClInclude Include="missions\actions\ActSetNNObj.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSpaceEnter.h">
+    <ClInclude Include="missions\conditions\CndSystemEnter.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSpaceExit.h">
+    <ClInclude Include="missions\conditions\CndSystemExit.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndBaseEnter.h">

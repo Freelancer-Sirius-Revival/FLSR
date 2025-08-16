@@ -1,33 +1,33 @@
-#include "CndSpaceExit.h"
+#include "CndSystemExit.h"
 #include "../Mission.h"
 #include "../../Plugin.h"
 
 namespace Missions
 {
-	std::unordered_set<CndSpaceExit*> observedCndSpaceExit;
+	std::unordered_set<CndSystemExit*> observedCndSystemExit;
 
-	CndSpaceExit::CndSpaceExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
+	CndSystemExit::CndSystemExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId) :
 		Condition(parent),
 		label(objNameOrLabel),
 		systemId(systemId)
 	{}
 
-	CndSpaceExit::~CndSpaceExit()
+	CndSystemExit::~CndSystemExit()
 	{
 		Unregister();
 	}
 
-	void CndSpaceExit::Register()
+	void CndSystemExit::Register()
 	{
-		observedCndSpaceExit.insert(this);
+		observedCndSystemExit.insert(this);
 	}
 
-	void CndSpaceExit::Unregister()
+	void CndSystemExit::Unregister()
 	{
-		observedCndSpaceExit.erase(this);
+		observedCndSystemExit.erase(this);
 	}
 
-	bool CndSpaceExit::Matches(const uint clientId, const uint systemId)
+	bool CndSystemExit::Matches(const uint clientId, const uint systemId)
 	{
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
@@ -55,19 +55,19 @@ namespace Missions
 
 	namespace Hooks
 	{
-		namespace CndSpaceExit
+		namespace CndSystemExit
 		{
 			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				if (!killedObject->is_player() || observedCndSpaceExit.empty())
+				if (!killedObject->is_player() || observedCndSystemExit.empty())
 					return;
 
-				const std::unordered_set<Missions::CndSpaceExit*> currentConditions(observedCndSpaceExit);
+				const std::unordered_set<Missions::CndSystemExit*> currentConditions(observedCndSystemExit);
 				for (const auto& condition : currentConditions)
 				{
-					if (observedCndSpaceExit.contains(condition) && condition->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
+					if (observedCndSystemExit.contains(condition) && condition->Matches(killedObject->cobj->ownerPlayer, killedObject->cobj->system))
 						condition->ExecuteTrigger();
 				}
 			}

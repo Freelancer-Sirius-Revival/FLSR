@@ -3,15 +3,15 @@
 
 namespace Missions
 {
-	struct CndSpaceEnter : public Condition
+	struct CndSystemEnter : public Condition
 	{
 	private:
 		const uint label;
 		const uint systemId;
 
 	public:
-		CndSpaceEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId);
-		~CndSpaceEnter();
+		CndSystemEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId);
+		~CndSystemEnter();
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint systemId);
@@ -19,7 +19,7 @@ namespace Missions
 
 	namespace Hooks
 	{
-		namespace CndSpaceEnter
+		namespace CndSystemEnter
 		{
 			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId);
 		}

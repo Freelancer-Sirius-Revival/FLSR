@@ -8,8 +8,8 @@
 #include "CndDistVec.h"
 #include "CndHealthDec.h"
 #include "CndProjHitCount.h"
-#include "CndSpaceEnter.h"
-#include "CndSpaceExit.h"
+#include "CndSystemEnter.h"
+#include "CndSystemExit.h"
 #include "CndTimer.h"
 #include "CndTrue.h"
 
@@ -410,7 +410,7 @@ namespace Missions
 		return new CndProjHitCount(conditionParent, damagedObjNameOrLabel, targetSurface, damageType, targetHitCount, inflictorObjNameOrLabel, damagedIsActivator);
 	}
 
-	static CndSpaceEnter* ReadCndSpaceEnter(const ConditionParent& conditionParent, INI_Reader& ini)
+	static CndSystemEnter* ReadCndSystemEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
 		uint systemId = 0;
@@ -419,7 +419,7 @@ namespace Missions
 		label = CreateIdOrNull(ini.get_value_string(argNum));
 		if (label == 0)
 		{
-			PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"No target label. Aborting!");
+			PrintErrorToConsole(L"Cnd_SystemEnter", conditionParent, argNum, L"No target label. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -430,13 +430,13 @@ namespace Missions
 			if (value != 0)
 				systemId = value;
 			else
-				PrintErrorToConsole(L"Cnd_SpaceEnter", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
+				PrintErrorToConsole(L"Cnd_SystemEnter", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
-		return new CndSpaceEnter(conditionParent, label, systemId);
+		return new CndSystemEnter(conditionParent, label, systemId);
 	}
 
-	static CndSpaceExit* ReadCndSpaceExit(const ConditionParent& conditionParent, INI_Reader& ini)
+	static CndSystemExit* ReadCndSystemExit(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
 		uint systemId = 0;
@@ -445,7 +445,7 @@ namespace Missions
 		label = CreateIdOrNull(ini.get_value_string(argNum));
 		if (label == 0)
 		{
-			PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"No target label. Aborting!");
+			PrintErrorToConsole(L"Cnd_SystemExit", conditionParent, argNum, L"No target label. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -456,10 +456,10 @@ namespace Missions
 			if (value != 0)
 				systemId = value;
 			else
-				PrintErrorToConsole(L"Cnd_SpaceExit", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
+				PrintErrorToConsole(L"Cnd_SystemExit", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
-		return new CndSpaceExit(conditionParent, label, systemId);
+		return new CndSystemExit(conditionParent, label, systemId);
 	}
 
 	static CndTimer* ReadCndTimer(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -519,11 +519,11 @@ namespace Missions
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);
 
-		if (ini.is_value("Cnd_SpaceEnter"))
-			return ReadCndSpaceEnter(conditionParent, ini);
+		if (ini.is_value("Cnd_SystemEnter"))
+			return ReadCndSystemEnter(conditionParent, ini);
 
-		if (ini.is_value("Cnd_SpaceExit"))
-			return ReadCndSpaceExit(conditionParent, ini);
+		if (ini.is_value("Cnd_SystemExit"))
+			return ReadCndSystemExit(conditionParent, ini);
 
 		if (ini.is_value("Cnd_Timer"))
 			return ReadCndTimer(conditionParent, ini);

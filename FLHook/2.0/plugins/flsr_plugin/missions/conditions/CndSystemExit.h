@@ -3,15 +3,15 @@
 
 namespace Missions
 {
-	class CndSpaceExit : public Condition
+	class CndSystemExit : public Condition
 	{
 	private:
 		const uint label;
 		const uint systemId;
 
 	public:
-		CndSpaceExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId);
-		~CndSpaceExit();
+		CndSystemExit(const ConditionParent& parent, const uint objNameOrLabel, const uint systemId);
+		~CndSystemExit();
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint systemId);
@@ -19,7 +19,7 @@ namespace Missions
 
 	namespace Hooks
 	{
-		namespace CndSpaceExit
+		namespace CndSystemExit
 		{
 			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId);
 		}

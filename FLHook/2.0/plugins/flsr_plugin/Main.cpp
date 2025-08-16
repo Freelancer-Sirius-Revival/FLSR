@@ -15,8 +15,8 @@
 #include "Missions/conditions/CndDistVec.h"
 #include "Missions/conditions/CndHealthDec.h"
 #include "Missions/conditions/CndProjHitCount.h"
-#include "Missions/conditions/CndSpaceEnter.h"
-#include "Missions/conditions/CndSpaceExit.h"
+#include "Missions/conditions/CndSystemEnter.h"
+#include "Missions/conditions/CndSystemExit.h"
 #include "Missions/conditions/CndTimer.h"
 #include "MissionAbortFix.h"
 
@@ -277,8 +277,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     //p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipColGrpDamage, PLUGIN_SolarColGrpDmg, 0)); TODO needs the hook
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipHullDamage, PLUGIN_SolarHullDmg, 0));
     //p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipShieldDamage, PLUGIN_SolarShieldDmg, 0)); TODO needs the hook
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSpaceEnter::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSpaceExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemEnter::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndTimer::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 

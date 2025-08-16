@@ -235,6 +235,9 @@
     <ClCompile Include="missions\conditions\CndInSystem.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndOnBase.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -478,6 +481,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndInSystem.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndOnBase.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,6 +8,7 @@
 #include "CndDistVec.h"
 #include "CndHealthDec.h"
 #include "CndInSystem.h"
+#include "CndOnBase.h"
 #include "CndProjHitCount.h"
 #include "CndSystemEnter.h"
 #include "CndSystemExit.h"
@@ -363,6 +364,32 @@ namespace Missions
 		return new CndInSystem(conditionParent, label, systemId);
 	}
 
+	static CndOnBase* ReadCndOnBase(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		uint baseId = 0;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_OnBase", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				baseId = value;
+			else
+				PrintErrorToConsole(L"Cnd_OnBase", conditionParent, argNum, L"Invalid target base. Defaulting to any base.");
+		}
+
+		return new CndOnBase(conditionParent, label, baseId);
+	}
+
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint damagedObjNameOrLabel = 0;
@@ -545,6 +572,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_InSystem"))
 			return ReadCndInSystem(conditionParent, ini);
+
+		if (ini.is_value("Cnd_OnBase"))
+			return ReadCndOnBase(conditionParent, ini);
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);

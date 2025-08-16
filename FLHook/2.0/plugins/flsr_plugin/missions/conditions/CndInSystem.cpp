@@ -19,17 +19,16 @@ namespace Missions
 
 	void CndInSystem::Register()
 	{
-		observedCndInSystem.insert(this);
-
 		struct PlayerData* playerData = 0;
 		while (playerData = Players.traverse_active(playerData))
 		{
 			if (Matches(playerData->iOnlineID, playerData->iSystemID))
 			{
 				ExecuteTrigger();
-				break;
+				return;
 			}
 		}
+		observedCndInSystem.insert(this);
 	}
 
 	void CndInSystem::Unregister()

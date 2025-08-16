@@ -402,6 +402,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players to expect in space.
     1. `[STRING] :any` The system nickname to expect the player in.
 
+- `Cnd_OnBase` Only players. Checks whether the player is docked on a base. `Activator` will be the player.
+    1. `STRING|Stranger` The players to expect on a base.
+    1. `[STRING] :any` The base nickname to expect the player on.
+
 - `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
     1. `STRING` Object by name or label to count projectile hits on.
     1. `[INTEGER] :1` The count of projectile hits that must have happened.

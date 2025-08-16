@@ -1,5 +1,5 @@
 #include "ShipSpawning.h"
-#include "NpcNames.h"
+#include "NpcAppearances.h"
 #include "../Pilots.h"
 
 /* Code made by Venemon to register NPCs properly to the system. */
@@ -320,6 +320,13 @@ static uint TryCreateNpc(const pub::SpaceObj::ShipInfo& shipInfo)
 	}
 }
 
+static Costume CreatePilotCostume(const std::string& faction, const uint voiceId)
+{
+	if (faction.empty())
+		return Costume();
+	return NpcAppearances::GetRandomCostume(CreateID(faction.c_str()), voiceId);
+}
+
 static void CreatePilotName(const uint shipArchetypeId, const std::string& faction, const uint voiceId, FmtStr& output)
 {
 	if (faction.empty())
@@ -330,7 +337,7 @@ static void CreatePilotName(const uint shipArchetypeId, const std::string& facti
 	
 	if (largeShip)
 	{
-		const auto& result = NpcNames::GetRandomLargeShipName(CreateID(faction.c_str()));
+		const auto& result = NpcAppearances::GetRandomLargeShipName(CreateID(faction.c_str()));
 		output.begin_mad_lib(16162); // "%s0 %s1 %s2"
 		output.end_mad_lib();
 		output.append_string(ship->iIdsName);
@@ -341,7 +348,7 @@ static void CreatePilotName(const uint shipArchetypeId, const std::string& facti
 	{
 		output.begin_mad_lib(16163); // "%s0 %s1"
 		output.end_mad_lib();
-		const auto& result = NpcNames::GetRandomName(CreateID(faction.c_str()), voiceId);
+		const auto& result = NpcAppearances::GetRandomName(CreateID(faction.c_str()), voiceId);
 		output.append_string(result.first);
 		output.append_string(result.second);
 	}
@@ -388,7 +395,7 @@ uint CreateNPC(const NpcCreationParams& params)
 	shipInfo.vPos = params.position;
 	shipInfo.mOrientation = params.orientation;
 	shipInfo.iLoadout = params.loadoutId;
-	shipInfo.Costume = params.costume;
+	shipInfo.Costume = params.costume.head || params.costume.body ? params.costume : CreatePilotCostume(params.faction, params.voiceId);
 	shipInfo.iPilotVoice = params.voiceId;
 	shipInfo.iHitPointsLeft = params.hitpoints;
 	shipInfo.iLevel = params.level;

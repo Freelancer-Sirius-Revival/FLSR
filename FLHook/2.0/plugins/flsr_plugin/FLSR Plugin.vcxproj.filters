@@ -95,7 +95,7 @@
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Pilots.cpp" />
-    <ClCompile Include="missions\NpcNames.cpp">
+    <ClCompile Include="missions\NpcAppearances.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActAdjAcct.cpp">
@@ -326,7 +326,7 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="Pilots.h" />
-    <ClInclude Include="missions\NpcNames.h">
+    <ClInclude Include="missions\NpcAppearances.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActAdjAcct.h">

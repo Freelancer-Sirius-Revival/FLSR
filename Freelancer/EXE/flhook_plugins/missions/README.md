@@ -144,7 +144,7 @@ This is the definition for a NPC archetype which again can be used by multiple `
 - `[voice]` Required to allow comms sent from this base.
     1. `STRING` The voice nickname used.
 
-- `[space_costume]` Required to make a comms window visible to the player on interaction.
+- `[space_costume]` Required to make a comms window visible to the player on interaction. Takes a random one by the faction if empty.
     1. `[STRING]` The head nickname used.
     1. `[STRING]` The body nickname used.
     1. `[STRING]` The 1. accessory slot used.

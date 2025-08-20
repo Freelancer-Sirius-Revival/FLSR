@@ -14,6 +14,7 @@ namespace NpcAppearances
 	};
 
 	static std::unordered_map<uint, Gender> voiceGenders;
+	static std::unordered_map<uint, std::vector<uint>> factionVoices;
 	static std::unordered_map<uint, std::pair<uint, uint>> factionMaleFirstNames;
 	static std::unordered_map<uint, std::pair<uint, uint>> factionFemaleFirstNames;
 	static std::unordered_map<uint, std::pair<uint, uint>> factionLastNames;
@@ -21,6 +22,17 @@ namespace NpcAppearances
 	static std::unordered_map<uint, uint> factionLargeShipDesignations;
 	static std::unordered_map<uint, std::vector<Costume>> factionMaleCostumes;
 	static std::unordered_map<uint, std::vector<Costume>> factionFemaleCostumes;
+
+	uint GetRandomVoiceId(const uint factionId)
+	{
+		uint result = 0;
+		if (const auto& voiceEntry = factionVoices.find(factionId); voiceEntry != factionVoices.end())
+		{
+			const auto index = std::uniform_int_distribution(size_t(0), voiceEntry->second.size())(gen);
+			result = voiceEntry->second[index];
+		}
+		return result;
+	}
 
 	std::pair<uint, uint> GetRandomName(const uint factionId, const uint voiceId)
 	{
@@ -60,10 +72,10 @@ namespace NpcAppearances
 			return result;
 
 		const auto& factionCostumes = genderEntry->second == Gender::Male ? factionMaleCostumes : factionFemaleCostumes;
-		if (const auto& costumes = factionCostumes.find(factionId); costumes != factionCostumes.end())
+		if (const auto& costumesEntry = factionCostumes.find(factionId); costumesEntry != factionCostumes.end())
 		{
-			const auto index = std::uniform_int_distribution(size_t(0), costumes->second.size())(gen);
-			result = costumes->second[index];
+			const auto index = std::uniform_int_distribution(size_t(0), costumesEntry->second.size())(gen);
+			result = costumesEntry->second[index];
 		}
 
 		return result;
@@ -171,11 +183,14 @@ namespace NpcAppearances
 				if (ini.is_header("FactionProps"))
 				{
 					uint factionId = 0;
+					std::vector<uint> voiceIds;
 					std::pair<uint, uint> maleFirstNames;
 					std::pair<uint, uint> femaleFirstNames;
 					std::pair<uint, uint> lastNames;
 					std::pair<uint, uint> largeShipNames;
 					uint largeShipDesignation;
+					std::vector<Costume> maleCostumes;
+					std::vector<Costume> femaleCostumes;
 					while (ini.read_value())
 					{
 						if (ini.is_value("affiliation"))
@@ -206,6 +221,10 @@ namespace NpcAppearances
 						{
 							largeShipDesignation = ini.get_value_int(0);
 						}
+						else if (ini.is_value("voice"))
+						{
+							voiceIds.push_back(CreateID(ini.get_value_string(0)));
+						}
 						else if (ini.is_value("space_costume"))
 						{
 							Costume costume;
@@ -232,19 +251,22 @@ namespace NpcAppearances
 							if (genderEntry != headGenders.end())
 							{
 								if (genderEntry->second == Gender::Male)
-									factionMaleCostumes[factionId].push_back(costume);
+									maleCostumes.push_back(costume);
 								else if (genderEntry->second == Gender::Male)
-									factionFemaleCostumes[factionId].push_back(costume);
+									femaleCostumes.push_back(costume);
 							}
 						}
 					}
 					if (factionId)
 					{
+						factionVoices.insert({ factionId, voiceIds });
 						factionMaleFirstNames.insert({ factionId, maleFirstNames });
 						factionFemaleFirstNames.insert({ factionId, femaleFirstNames });
 						factionLastNames.insert({ factionId, lastNames });
 						factionLargeShipNames.insert({ factionId, largeShipNames });
 						factionLargeShipDesignations.insert({ factionId, largeShipDesignation });
+						factionMaleCostumes.insert({ factionId, maleCostumes });
+						factionFemaleCostumes.insert({ factionId, femaleCostumes });
 					}
 				}
 			}

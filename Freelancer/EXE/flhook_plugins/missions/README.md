@@ -141,7 +141,7 @@ This is the definition for a NPC archetype which again can be used by multiple `
 - `[pilot]` The AI for the pilot.
     1. `STRING` The pilot nickname used.
 
-- `[voice]` Required to allow comms sent from this base.
+- `[voice]` Required to allow comms sent from this base. Takes a random one by the faction if empty.
     1. `STRING` The voice nickname used.
 
 - `[space_costume]` Required to make a comms window visible to the player on interaction. Takes a random one by the faction if empty.

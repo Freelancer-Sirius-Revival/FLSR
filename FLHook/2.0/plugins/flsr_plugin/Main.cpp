@@ -19,6 +19,7 @@
 #include "Missions/conditions/CndSpaceExit.h"
 #include "Missions/conditions/CndTimer.h"
 #include "MissionAbortFix.h"
+#include "Missions/randomMissions/RandomMissions.h"
 
 std::mutex m_Mutex;
 
@@ -32,6 +33,7 @@ void LoadSettings() {
     Pilots::ReadFiles();
     NpcNames::ReadFiles();
     Formations::ReadFiles();
+	RandomMissions::ReadData();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];

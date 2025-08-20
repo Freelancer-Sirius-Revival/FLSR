@@ -38,6 +38,9 @@ namespace Missions
 
 	bool CndInSystem::Matches(const uint clientId, const uint currentSystemId)
 	{
+		if (!currentSystemId)
+			return false;
+
 		uint shipId;
 		pub::Player::GetShip(clientId, shipId);
 		if (!shipId) // When in space, the player always must have a ship ID.

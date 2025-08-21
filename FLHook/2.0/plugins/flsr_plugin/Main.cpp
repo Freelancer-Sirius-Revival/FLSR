@@ -4,6 +4,7 @@
 #include "GroupRep.h"
 #include "missions/Formations.h"
 #include "Missions/NpcAppearances.h"
+#include "Missions/BestPath.h"
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
 #include "Missions/Mission.h"
@@ -34,6 +35,7 @@ void LoadSettings() {
     Pilots::ReadFiles();
     NpcAppearances::ReadFiles();
     Formations::ReadFiles();
+    BestPath::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];
@@ -309,6 +311,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::CharacterSelect_AFTER, PLUGIN_HkIServerImpl_CharacterSelect_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BestPath::CollectJumpObjectsPerSystem, PLUGIN_HkTimerCheckKick, 0));
     
     return p_PI;
 }

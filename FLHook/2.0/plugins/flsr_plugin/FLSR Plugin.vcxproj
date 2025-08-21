@@ -158,6 +158,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActGiveObjList.cpp" />
     <ClCompile Include="missions\actions\ActInvulnerable.cpp" />
     <ClCompile Include="missions\actions\ActLightFuse.cpp" />
+    <ClCompile Include="missions\actions\ActNNPath.cpp" />
     <ClCompile Include="missions\actions\ActPlayMusic.cpp" />
     <ClCompile Include="missions\actions\ActPlaySoundEffect.cpp" />
     <ClCompile Include="missions\actions\ActRemoveLabel.cpp" />
@@ -246,6 +247,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActInvulnerable.h" />
     <ClInclude Include="missions\actions\Action.h" />
     <ClInclude Include="missions\actions\ActLightFuse.h" />
+    <ClInclude Include="missions\actions\ActNNPath.h" />
     <ClInclude Include="missions\actions\ActPlayMusic.h" />
     <ClInclude Include="missions\actions\ActPlaySoundEffect.h" />
     <ClInclude Include="missions\actions\ActRemoveLabel.h" />

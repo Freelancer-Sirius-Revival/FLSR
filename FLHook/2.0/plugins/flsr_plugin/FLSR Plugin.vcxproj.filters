@@ -79,6 +79,9 @@
     <ClCompile Include="missions\actions\ActSetNNObj.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActNNPath.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
     <ClCompile Include="missions\conditions\CndSystemEnter.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
@@ -485,6 +488,9 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\CndOnBase.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActNNPath.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

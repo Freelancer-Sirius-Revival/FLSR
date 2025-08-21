@@ -1004,7 +1004,7 @@ namespace pub
 		IMPORT  int SetInitialOrnt(unsigned int const&, class Matrix const&);
 		IMPORT  int SetInitialPos(unsigned int const&, class Vector const&);
 		IMPORT  int SetMissionObjectiveState(unsigned int const&, unsigned int const&, int, unsigned int);
-		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectivesEntries, struct FmtStr const& missionType, uchar objectiveType3, struct FmtStr const& missionDescription); //arg 2 = 12, arg 6 = 2 ?
+		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectivesId, struct MissionObjective const* objectiveStructure, uint objectivesEntries, struct FmtStr const& missionType, uchar unk, struct FmtStr const& missionDescription);
 		IMPORT  int SetMoneyNeededToNextRank(unsigned int, int);
 		IMPORT  int SetMonkey(unsigned int);
 		IMPORT  int SetMsnID(unsigned int clientId, unsigned int missionId, unsigned int acceptedByClientId, bool saveGame, unsigned int saveGameName);

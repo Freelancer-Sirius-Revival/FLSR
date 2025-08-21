@@ -573,14 +573,14 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_SetMsnResult` Sets the mission result. Relevant for reoffering missions to the job board. See `Mission: offer_reoffer`.
     1. `Success|Failure :Failure` Sets the mission result.
 
-- `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
+- `Act_SetNNObj` Only for players. Sets their current objective. Intermediate objective (Launch from Base, Dock to Tradelane, etc.) will be generated automatically. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` Players by label to set the message or waypoint.
     1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
     1. `[STRING]` The system nickname for the waypoint.
     1. `[FLOAT] :0` The x-axis position for the waypoint.
     1. `[FLOAT] :0` The y-axis position for the waypoint.
     1. `[FLOAT] :0` The z-axis position for the waypoint.
-    1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
+    1. `[True|False] :False` Whether this should generate a best-path route or just a direct waypoint at the target. For players not in the target system, best-path route will always be used until reaching the target system.
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 
 - `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.

@@ -1,6 +1,7 @@
 #include "Mission.h"
 #include "../Plugin.h"
 #include "MissionBoard.h"
+#include "ClientObjectives.h"
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
 
@@ -256,6 +257,7 @@ namespace Missions
 		pub::Player::GetMsnID(clientId, msnId);
 		if (msnId == offerId)
 			pub::Player::SetMsnID(clientId, 0, 0, false, 0);
+		ClientObjectives::ClearClientObjectives(clientId, offerId);
 
 		ClearMusic(clientId);
 		std::vector<uint> labels;

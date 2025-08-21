@@ -7,17 +7,19 @@ namespace Missions
 	namespace ClientObjectives
 	{
 		std::unordered_map<uint, Objective> objectiveByClientId;
-		std::unordered_map<uint, std::vector<pub::Player::MissionObjective>> objectivesByClientId;
+		std::unordered_map<uint, std::vector<pub::Player::MissionObjective>> computedObjectivesByClientId;
 
-		void DeleteClientObjectives(const uint clientId, const uint missionId)
+		void ClearClientObjectives(const uint clientId, const uint missionId)
 		{
 			if (missionId > 0)
 			{
-				if (const auto& entry = objectiveByClientId.find(clientId); entry == objectiveByClientId.end() || entry->second.missionId != missionId)
+				if (const auto& entry = objectiveByClientId.find(clientId); entry != objectiveByClientId.end() && entry->second.missionId == missionId)
 					return;
+				pub::Player::SetMissionObjectives(clientId, missionId, nullptr, 0, FmtStr(0, 0), 0, FmtStr(0, 0));
 			}
+
 			objectiveByClientId.erase(clientId);
-			objectivesByClientId.erase(clientId);
+			computedObjectivesByClientId.erase(clientId);
 		}
 
 		bool DoesClientHaveObjective(const uint clientId)
@@ -25,13 +27,7 @@ namespace Missions
 			return objectiveByClientId.contains(clientId);
 		}
 
-		void SetClientObjective(const uint clientId, const Objective objective)
-		{
-			DeleteClientObjectives(clientId, 0);
-			objectiveByClientId[clientId] = objective;
-		}
-
-		void SendClientObjectives(const uint clientId)
+		void ComputeAndSendClientObjectives(const uint clientId)
 		{
 			const auto& objectiveEntry = objectiveByClientId.find(clientId);
 			if (objectiveEntry == objectiveByClientId.end())
@@ -266,17 +262,36 @@ namespace Missions
 			}
 
 			// Check whether the client needs a packet with new objectives. This must be done to ensure constant re-generation of best path will not flood the network.
-			if (!AreObjectivesEqual(objectivesByClientId[clientId], objectives))
+			if (!AreObjectivesEqual(computedObjectivesByClientId[clientId], objectives))
 			{
 				// Save the current objectives for later comparison.
-				objectivesByClientId[clientId] = objectives;
+				computedObjectivesByClientId[clientId] = objectives;
 
 				FmtStr missionTitle(missionEntry->second.offer.title, 0);
 				FmtStr missionDescription(missionEntry->second.offer.description, 0);
-				pub::Player::SetMissionObjectives(clientId, 12, objectives.data(), objectives.size(), missionTitle, 2, missionDescription);
+				pub::Player::SetMissionObjectives(clientId, playerObjective.missionId, objectives.data(), objectives.size(), missionTitle, 0, missionDescription);
 			}
 
 			return true;
+		}
+
+		void SetClientObjective(const uint clientId, const Objective objective)
+		{
+			ClearClientObjectives(clientId, 0);
+			objectiveByClientId[clientId] = objective;
+			ComputeAndSendClientObjectives(clientId);
+		}
+
+		void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
+		{
+			returncode = DEFAULT_RETURNCODE;
+			ComputeAndSendClientObjectives(clientId);
+		}
+
+		void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+		{
+			returncode = DEFAULT_RETURNCODE;
+			ComputeAndSendClientObjectives(clientId);
 		}
 
 		float elapsedObjectivesTime = 0.0f;
@@ -298,7 +313,7 @@ namespace Missions
 					IObjRW* inspect;
 					StarSystem* starSystem;
 					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && inspect->is_using_tradelane(&inTradelane) == 0 && !inTradelane)
-						SendClientObjectives(playerData->iOnlineID);
+						ComputeAndSendClientObjectives(playerData->iOnlineID);
 				}
 			}
 		}

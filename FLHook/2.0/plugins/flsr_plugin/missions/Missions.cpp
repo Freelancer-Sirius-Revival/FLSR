@@ -899,9 +899,9 @@ namespace Missions
 		}
 	}
 
-	static void RemoveClientFromMissions(const uint client)
+	static void RemoveClientFromMissions(const uint clientId)
 	{
-		ClientObjectives::DeleteClientObjectives(client, 0);
+		ClientObjectives::ClearClientObjectives(clientId, 0);
 		// Removing a client from a mission could potentially end and remove it. So first gather the mission IDs and then delete them one by one.
 		std::vector<uint> ids;
 		for (const auto& entry : missions)
@@ -910,7 +910,7 @@ namespace Missions
 		for (const auto id : ids)
 		{
 			if (const auto& entry = missions.find(id); entry != missions.end())
-				entry->second.RemoveClient(client);
+				entry->second.RemoveClient(clientId);
 		}
 	}
 
@@ -942,20 +942,6 @@ namespace Missions
 		returncode = DEFAULT_RETURNCODE;
 		lastCharacterByClientId.erase(clientId);
 		RemoveClientFromMissions(clientId);
-	}
-
-	void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
-	{
-		returncode = DEFAULT_RETURNCODE;
-
-		ClientObjectives::SendClientObjectives(clientId);
-	}
-
-	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
-	{
-		returncode = DEFAULT_RETURNCODE;
-
-		ClientObjectives::SendClientObjectives(clientId);
 	}
 
 	static bool StartMission(const std::string& missionName)

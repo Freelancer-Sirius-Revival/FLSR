@@ -16,7 +16,8 @@ namespace Missions
 		pub::GF::MissionType type = pub::GF::MissionType::Unknown;
 		uint system = 0;
 		uint group = 0;
-		uint text = 0;
+		uint title = 0;
+		uint description = 0;
 		uint reward = 0;
 		std::vector<uint> bases;
 		MissionReofferCondition reofferCondition = MissionReofferCondition::Never;

@@ -46,7 +46,10 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[offer_faction]`
     1. `STRING` The faction name offering this mission. If the player has less than the (default) -0.2 reputation with it, this mission will not be displayed.
 
-- `[offer_string_id]`
+- `[offer_title_id]`
+    1. `INTEGER :0` The string id for the Mission title.
+    
+- `[offer_description_id]`
     1. `INTEGER :0` The string id for the detailed Mission Board text box.
 
 - `[offer_reward]`

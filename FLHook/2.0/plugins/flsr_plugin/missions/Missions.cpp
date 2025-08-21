@@ -97,8 +97,10 @@ namespace Missions
 								offer.system = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("offer_faction"))
 								pub::Reputation::GetReputationGroup(offer.group, ini.get_value_string(0));
-							else if (ini.is_value("offer_string_id"))
-								offer.text = ini.get_value_int(0);
+							else if (ini.is_value("offer_title_id"))
+								offer.title = ini.get_value_int(0);
+							else if (ini.is_value("offer_description_id"))
+								offer.description = ini.get_value_int(0);
 							else if (ini.is_value("offer_reward"))
 								offer.reward = ini.get_value_int(0);
 							else if (ini.is_value("offer_bases"))

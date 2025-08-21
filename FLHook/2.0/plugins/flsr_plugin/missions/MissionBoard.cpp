@@ -35,7 +35,7 @@ namespace MissionBoard
 		FmtStr header(327682, 0);
 		header.append_int(mission.reward);
 		message.append_fmt_str(header);
-		message.append_fmt_str(FmtStr(mission.text, 0));
+		message.append_fmt_str(FmtStr(mission.description, 0));
 		pos += message.flatten(buffer + pos, 0);
 		std::memcpy(buffer + pos, &mission.reward, sizeof(uint));
 		pos += sizeof(uint);

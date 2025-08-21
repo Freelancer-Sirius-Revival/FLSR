@@ -306,7 +306,8 @@ namespace Missions
 		offer.type = mission.offer.type;
 		offer.system = mission.offer.system;
 		offer.group = mission.offer.group;
-		offer.text = mission.offer.text;
+		offer.title = mission.offer.title;
+		offer.description = mission.offer.description;
 		offer.reward = mission.offer.reward;
 		mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.bases);
 	}

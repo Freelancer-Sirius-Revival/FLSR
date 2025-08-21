@@ -26,9 +26,9 @@ namespace NpcAppearances
 	uint GetRandomVoiceId(const uint factionId)
 	{
 		uint result = 0;
-		if (const auto& voiceEntry = factionVoices.find(factionId); voiceEntry != factionVoices.end())
+		if (const auto& voiceEntry = factionVoices.find(factionId); voiceEntry != factionVoices.end() && voiceEntry->second.size() > 0)
 		{
-			const auto index = std::uniform_int_distribution(size_t(0), voiceEntry->second.size())(gen);
+			const auto index = std::uniform_int_distribution(size_t(0), voiceEntry->second.size() - 1)(gen);
 			result = voiceEntry->second[index];
 		}
 		return result;
@@ -72,9 +72,9 @@ namespace NpcAppearances
 			return result;
 
 		const auto& factionCostumes = genderEntry->second == Gender::Male ? factionMaleCostumes : factionFemaleCostumes;
-		if (const auto& costumesEntry = factionCostumes.find(factionId); costumesEntry != factionCostumes.end())
+		if (const auto& costumesEntry = factionCostumes.find(factionId); costumesEntry != factionCostumes.end() && costumesEntry->second.size() > 0)
 		{
-			const auto index = std::uniform_int_distribution(size_t(0), costumesEntry->second.size())(gen);
+			const auto index = std::uniform_int_distribution(size_t(0), costumesEntry->second.size() - 1)(gen);
 			result = costumesEntry->second[index];
 		}
 
@@ -252,7 +252,7 @@ namespace NpcAppearances
 							{
 								if (genderEntry->second == Gender::Male)
 									maleCostumes.push_back(costume);
-								else if (genderEntry->second == Gender::Male)
+								else if (genderEntry->second == Gender::Female)
 									femaleCostumes.push_back(costume);
 							}
 						}

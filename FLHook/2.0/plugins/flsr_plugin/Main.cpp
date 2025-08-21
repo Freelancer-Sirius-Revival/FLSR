@@ -5,6 +5,7 @@
 #include "missions/Formations.h"
 #include "Missions/NpcAppearances.h"
 #include "Missions/BestPath.h"
+#include "Missions/ClientObjectives.h"
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
 #include "Missions/Mission.h"
@@ -297,7 +298,11 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::CharacterSelect_AFTER, PLUGIN_HkIServerImpl_CharacterSelect_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::Send_FLPACKET_COMMON_REQUEST_BEST_PATH, PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_REQUEST_BEST_PATH, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::MissionResponse, PLUGIN_HkIServerImpl_MissionResponse, 0));

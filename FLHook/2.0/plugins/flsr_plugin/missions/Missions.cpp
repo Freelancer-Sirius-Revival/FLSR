@@ -35,6 +35,7 @@
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
+#include "ClientObjectives.h"
 
 namespace Missions
 {	
@@ -900,6 +901,7 @@ namespace Missions
 
 	static void RemoveClientFromMissions(const uint client)
 	{
+		ClientObjectives::DeleteClientObjectives(client, 0);
 		// Removing a client from a mission could potentially end and remove it. So first gather the mission IDs and then delete them one by one.
 		std::vector<uint> ids;
 		for (const auto& entry : missions)
@@ -940,6 +942,20 @@ namespace Missions
 		returncode = DEFAULT_RETURNCODE;
 		lastCharacterByClientId.erase(clientId);
 		RemoveClientFromMissions(clientId);
+	}
+
+	void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		ClientObjectives::SendClientObjectives(clientId);
+	}
+
+	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+
+		ClientObjectives::SendClientObjectives(clientId);
 	}
 
 	static bool StartMission(const std::string& missionName)

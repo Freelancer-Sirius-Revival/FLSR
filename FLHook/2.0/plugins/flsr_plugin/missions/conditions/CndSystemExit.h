@@ -14,7 +14,7 @@ namespace Missions
 		~CndSystemExit();
 		void Register();
 		void Unregister();
-		bool Matches(const uint clientId, const uint systemId);
+		bool Matches(const uint clientId, const uint currentSystemId);
 	};
 
 	namespace Hooks

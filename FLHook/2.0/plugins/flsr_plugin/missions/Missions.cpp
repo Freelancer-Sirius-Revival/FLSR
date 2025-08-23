@@ -24,6 +24,7 @@
 #include "Actions/ActSendComm.h"
 #include "Actions/ActStartDialog.h"
 #include "Actions/ActSetNNObj.h"
+#include "Actions/ActNNPath.h"
 #include "Actions/ActAdjAcct.h"
 #include "Actions/ActAdjRep.h"
 #include "Actions/ActAddCargo.h"
@@ -677,6 +678,20 @@ namespace Missions
 							else if (ini.is_value("Act_SetNNObj"))
 							{
 								ActSetNNObjPtr action(new ActSetNNObj());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->message = ini.get_value_int(1);
+								action->systemId = CreateIdOrNull(ini.get_value_string(2));
+								action->position.x = ini.get_value_float(3);
+								action->position.y = ini.get_value_float(4);
+								action->position.z = ini.get_value_float(5);
+								if (ini.get_num_parameters() > 6)
+									action->bestRoute = ini.get_value_bool(6);
+								action->targetObjName = CreateIdOrNull(ini.get_value_string(7));
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_NNPath"))
+							{
+								ActNNPathPtr action(new ActNNPath());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->message = ini.get_value_int(1);
 								action->systemId = CreateIdOrNull(ini.get_value_string(2));

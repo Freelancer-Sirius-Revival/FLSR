@@ -29,6 +29,9 @@ namespace Missions
 
 	bool CndSystemEnter::Matches(const uint clientId, const uint currentSystemId)
 	{
+		if (!currentSystemId)
+			return false;
+
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{

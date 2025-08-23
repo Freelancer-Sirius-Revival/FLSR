@@ -3,7 +3,7 @@
 #include "Empathies.h"
 #include "GroupRep.h"
 #include "missions/Formations.h"
-#include "Missions/NpcNames.h"
+#include "Missions/NpcAppearances.h"
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
 #include "Missions/Mission.h"
@@ -32,7 +32,7 @@ void LoadSettings() {
     returncode = DEFAULT_RETURNCODE;
 
     Pilots::ReadFiles();
-    NpcNames::ReadFiles();
+    NpcAppearances::ReadFiles();
     Formations::ReadFiles();
 
     // Konfigpfad

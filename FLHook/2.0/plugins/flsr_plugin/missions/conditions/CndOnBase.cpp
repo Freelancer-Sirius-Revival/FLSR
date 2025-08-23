@@ -38,6 +38,9 @@ namespace Missions
 
 	bool CndOnBase::Matches(const uint clientId, const uint currentBaseId)
 	{
+		if (!currentBaseId)
+			return false;
+
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{

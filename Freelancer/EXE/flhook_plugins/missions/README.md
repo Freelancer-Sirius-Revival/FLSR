@@ -141,7 +141,7 @@ This is the definition for a NPC archetype which again can be used by multiple `
 - `[pilot]` The AI for the pilot.
     1. `STRING` The pilot nickname used.
 
-- `[voice]` Required to allow comms sent from this base.
+- `[voice]` Required to allow comms sent from this base. Takes a random one by the faction if empty.
     1. `STRING` The voice nickname used.
 
 - `[space_costume]` Required to make a comms window visible to the player on interaction. Takes a random one by the faction if empty.
@@ -448,7 +448,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
 
 - `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
-    1. `STRING|Activator` The players to receive the cargo.
+    1. `STRING|Activator` Players by label to receive the cargo.
     1. `STRING` The item nickname to use.
     1. `INTEGER :0` Amount of items to add to cargo.
     1. `[True|False :False]` Whether this cargo is flagged as mission item.
@@ -458,12 +458,12 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The label to add.
 
 - `Act_AdjAcct` Only for players. Adjusts the cash on the account. Cash will be automatically clamped to prevent overflows/underflows.
-    1. `STRING|Activator` The players to have their cash being modified.
+    1. `STRING|Activator` Players by label to have their cash being modified.
     1. `INTEGER :0` A positive or negative number of cash. Cannot exceed more than +-(2^32)-1.
     1. `[True|False] :False` Split the cash across all player members of the receiving label equally. No effect if a singular player receives the cash.
 
 - `Act_AdjRep` Only for players. Adjusts the reputation of the player toward a specific faction.
-    1. `STRING|Activator` The players to have their reputation being modified.
+    1. `STRING|Activator` Players by label to have their reputation being modified.
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
@@ -513,7 +513,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
 
 - `Act_LeaveMsn` Only for players. Removes members of the label from the mission.
-    1. `STRING|Activator` The players to remove from the mission.
+    1. `STRING|Activator` Players by label to remove from the mission.
     1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.
     1. `[INTEGER] :0` Only for `Failure`: The text ID to display.
 
@@ -523,8 +523,18 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
     1. `[FLOAT]` Overrides the fuse lifetime by this value.
 
+- `Act_NNPath` Only for players. Sets their normal player waypoint route. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
+    1. `STRING|Activator` Players by label to set the message or waypoint.
+    1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
+    1. `[STRING]` The system nickname for the waypoint.
+    1. `[FLOAT] :0` The x-axis position for the waypoint.
+    1. `[FLOAT] :0` The y-axis position for the waypoint.
+    1. `[FLOAT] :0` The z-axis position for the waypoint.
+    1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
+    1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
+    
 - `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
-    1. `STRING|Activator` The players to set music for.
+    1. `STRING|Activator` Players by label to set music for.
     1. `[STRING|None] :None` Overrides the space music.
     1. `[STRING|None] :None` Overrides the danger music.
     1. `[STRING|None] :None` Overrides the battle music.
@@ -533,7 +543,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
 
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
-    1. `STRING|Activator` The players to play the sound effect for.
+    1. `STRING|Activator` Players by label to play the sound effect for.
     1. `STRING` The sound nickname to play.
 
 - `Act_RemoveLabel` Removes a label to the objects. **This is the only explicit way to unassign players from the mission.**
@@ -561,7 +571,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `Success|Failure :Failure` Sets the mission result.
 
 - `Act_SetNNObj` Only for players. Sets their current objective. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
-    1. `STRING|Activator` The players to set the message or waypoint.
+    1. `STRING|Activator` Players by label to set the message or waypoint.
     1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
     1. `[STRING]` The system nickname for the waypoint.
     1. `[FLOAT] :0` The x-axis position for the waypoint.

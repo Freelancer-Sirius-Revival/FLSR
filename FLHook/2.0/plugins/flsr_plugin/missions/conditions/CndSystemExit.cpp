@@ -27,12 +27,15 @@ namespace Missions
 		observedCndSystemExit.erase(this);
 	}
 
-	bool CndSystemExit::Matches(const uint clientId, const uint systemId)
+	bool CndSystemExit::Matches(const uint clientId, const uint currentSystemId)
 	{
+		if (!currentSystemId)
+			return false;
+
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{
-			if (!mission.clientIds.contains(clientId) && (!systemId || systemId == systemId))
+			if (!mission.clientIds.contains(clientId) && (!systemId || systemId == currentSystemId))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = clientId;
@@ -43,7 +46,7 @@ namespace Missions
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
-				if (object.type == MissionObjectType::Client && object.id == clientId && (!systemId || systemId == systemId))
+				if (object.type == MissionObjectType::Client && object.id == clientId && (!systemId || systemId == currentSystemId))
 				{
 					activator = object;
 					return true;

@@ -301,7 +301,7 @@ void SetLifeTime(const uint shipId, const float lifeTime)
 	const auto& foundShipEntry = shipTableByShipId.find(shipId);
 	if (foundShipEntry != shipTableByShipId.end())
 	{
-		foundShipEntry->second->lifetime = lifeTime < 0.0f ? -1.0 : lifeTime * 15.0f; // 15 being the max decrement per second
+		foundShipEntry->second->lifetime = lifeTime < 0.0f ? -1.0f : lifeTime * 15.0f; // 15 being the max decrement per second
 		foundShipEntry->second->currentLifetime = lifeTime <= 0.0f ? 1.0f : lifeTime * 15.0f;
 	}
 }
@@ -318,6 +318,13 @@ static uint TryCreateNpc(const pub::SpaceObj::ShipInfo& shipInfo)
 	{
 		return 0;
 	}
+}
+
+static uint CreatePilotVoice(const std::string& faction)
+{
+	if (faction.empty())
+		return 0;
+	return NpcAppearances::GetRandomVoiceId(CreateID(faction.c_str()));
 }
 
 static Costume CreatePilotCostume(const std::string& faction, const uint voiceId)
@@ -387,6 +394,7 @@ static void LaunchNpcFromObj(const uint shipId, uint launchObjId)
 
 uint CreateNPC(const NpcCreationParams& params)
 {
+	const uint voiceId = params.voiceId ? params.voiceId : CreatePilotVoice(params.faction);
 	pub::SpaceObj::ShipInfo shipInfo;
 	std::memset(&shipInfo, 0, sizeof(shipInfo));
 	shipInfo.iFlag = 1;
@@ -395,8 +403,8 @@ uint CreateNPC(const NpcCreationParams& params)
 	shipInfo.vPos = params.position;
 	shipInfo.mOrientation = params.orientation;
 	shipInfo.iLoadout = params.loadoutId;
-	shipInfo.Costume = params.costume.head || params.costume.body ? params.costume : CreatePilotCostume(params.faction, params.voiceId);
-	shipInfo.iPilotVoice = params.voiceId;
+	shipInfo.Costume = params.costume.head || params.costume.body ? params.costume : CreatePilotCostume(params.faction, voiceId);
+	shipInfo.iPilotVoice = voiceId;
 	shipInfo.iHitPointsLeft = params.hitpoints;
 	shipInfo.iLevel = params.level;
 	// Do not set the cargo descriptors for ships. They must be probably allocated in "old ways" of FL's own code - incompatible to today's "new".
@@ -416,7 +424,7 @@ uint CreateNPC(const NpcCreationParams& params)
 		pilotName.end_mad_lib();
 	}
 	else
-		CreatePilotName(params.archetypeId, params.faction, params.voiceId, pilotName);
+		CreatePilotName(params.archetypeId, params.faction, voiceId, pilotName);
 
 	pub::Reputation::Alloc(shipInfo.iRep, formationName, pilotName);
 	uint groupId;

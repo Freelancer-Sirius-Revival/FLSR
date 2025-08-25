@@ -302,6 +302,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::Send_FLPACKET_COMMON_REQUEST_BEST_PATH, PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_REQUEST_BEST_PATH, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::GoTradelane_AFTER, PLUGIN_HkIServerImpl_GoTradelane_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::StopTradelane_AFTER, PLUGIN_HkIServerImpl_StopTradelane_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Initialize, PLUGIN_HkTimerCheckKick, 0));

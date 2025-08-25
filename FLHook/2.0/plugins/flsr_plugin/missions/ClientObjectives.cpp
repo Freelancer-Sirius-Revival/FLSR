@@ -179,6 +179,46 @@ namespace Missions
 			return false;
 		}
 
+		static bool HasPlayerPassedEntranceTradelaneRing(const uint clientId, const XRequestBestPath& route)
+		{
+			IObjRW* inspect;
+			StarSystem* system;
+			uint shipId;
+			pub::Player::GetShip(clientId, shipId);
+			if (route.waypointCount > 1 && route.entries[0].objId && route.entries[1].objId && // There must be at least 2 waypoints with ObjIds to form a tradelane.
+				shipId && GetShipInspect(shipId, inspect, system) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT) && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
+			{
+				uint currentTLRId = route.entries[0].objId; // Potential start of the current TLR.
+				uint targetTLRId = route.entries[1].objId; // Potential end of the current TLR.
+				if (GetShipInspect(targetTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing &&
+					GetShipInspect(currentTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
+				{
+					const CSolar* currentTLR = static_cast<CSolar*>(inspect->cobj);
+					uint nextTLRId = currentTLR->get_next_trade_ring();
+					while (nextTLRId)
+					{
+						if (nextTLRId == targetTLRId)
+							return true;
+						else if (GetShipInspect(nextTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
+							nextTLRId = static_cast<CSolar*>(inspect->cobj)->get_next_trade_ring();
+						else
+							break;
+					}
+					uint previousTLRId = currentTLR->get_prev_trade_ring();
+					while (previousTLRId)
+					{
+						if (previousTLRId == targetTLRId)
+							return true;
+						else if (GetShipInspect(previousTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
+							previousTLRId = static_cast<CSolar*>(inspect->cobj)->get_prev_trade_ring();
+						else
+							break;
+				}
+				}
+			}
+			return false;
+		}
+
 		bool __stdcall Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint clientId, const XRequestBestPath& data, int size)
 		{
 			// Players can have player-waypoints only when NOT in a mission. So we can safely assume this works as intended.
@@ -198,6 +238,7 @@ namespace Missions
 			if (missionEntry == missions.end())
 				return false;
 
+			// Apply object ID for last waypoint because FL drops that on computed paths.
 			auto& lastWaypoint = ((XRequestBestPathEntry*)data.entries)[data.waypointCount - 1];
 			if (lastWaypoint.systemId == intermediateDestination.systemId &&
 				lastWaypoint.position.x == intermediateDestination.position.x &&
@@ -207,8 +248,19 @@ namespace Missions
 				lastWaypoint.objId = intermediateDestination.objId;
 			}
 
+			bool preventSendingMissionMessage = false;
+			if (HasPlayerPassedEntranceTradelaneRing(clientId, data))
+			{
+				preventSendingMissionMessage = true;
+				// Remove the first TLR from the waypoints list because it was just entered.
+				XRequestBestPath& temp = (XRequestBestPath&)data;
+				temp.waypointCount--;
+				for (size_t index = 0; index < temp.waypointCount; index++)
+					temp.entries[index] = temp.entries[index + 1];
+			}
+
 			std::vector<pub::Player::MissionObjective> objectives;
-			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for potential MAIN objective
+			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for potential MAIN objective.
 			const size_t objectiveIndexOffset = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives) ? 1 : 0;
 			objectives.resize(data.waypointCount + objectiveIndexOffset);
 
@@ -222,6 +274,9 @@ namespace Missions
 				if (GetShipInspect(objId, inspect, system))
 				{
 					nextObjective.type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
+					if (!preventSendingMissionMessage)
+						nextObjective.type = nextObjective.type | pub::Player::MissionObjectiveType::MissionText;
+
 					if (inspect->cobj->type & ObjectType::TradelaneRing)
 					{
 						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && (inspect->cobj->type & ObjectType::JumpGate))
@@ -248,7 +303,9 @@ namespace Missions
 													  lastWaypoint.position.y == playerObjective.position.y &&
 													  lastWaypoint.position.z == playerObjective.position.z;
 
-			const pub::Player::MissionObjectiveType lastObjectiveType = (pub::Player::MissionObjectiveType)((uint)pub::Player::MissionObjectiveType::ObjectiveWaypoint | (uint)pub::Player::MissionObjectiveType::MissionText | (uint)pub::Player::MissionObjectiveType::ActiveLog);
+			uint lastObjectiveType = pub::Player::MissionObjectiveType::ObjectiveWaypoint | pub::Player::MissionObjectiveType::ActiveLog;
+			if (!preventSendingMissionMessage)
+				lastObjectiveType= lastObjectiveType | pub::Player::MissionObjectiveType::MissionText;
 
 			if (lastObjectiveIsMainObjective)
 			{
@@ -265,7 +322,8 @@ namespace Missions
 				marker.pos = waypoint.position;
 				marker.system = waypoint.systemId;
 				objectives[objectiveIndex].message.append_nav_marker(marker);
-				objectives[objectiveIndex].message.append_rep_instance(waypoint.objId);
+				if (waypoint.objId)
+					objectives[objectiveIndex].message.append_rep_instance(waypoint.objId);
 			}
 
 			if (!lastObjectiveIsMainObjective)
@@ -313,6 +371,18 @@ namespace Missions
 			ComputeAndSendClientObjectives(clientId);
 		}
 
+		void __stdcall GoTradelane_AFTER(unsigned int clientId, const XGoTradelane& tradeLaneInfo)
+		{
+			returncode = DEFAULT_RETURNCODE;
+			ComputeAndSendClientObjectives(clientId);
+		}
+
+		void __stdcall StopTradelane_AFTER(unsigned int clientId, unsigned int p2, unsigned int p3, unsigned int p4)
+		{
+			returncode = DEFAULT_RETURNCODE;
+			ComputeAndSendClientObjectives(clientId);
+		}
+
 		float elapsedObjectivesTime = 0.0f;
 		void __stdcall Elapse_Time_AFTER(float seconds)
 		{
@@ -325,14 +395,18 @@ namespace Missions
 				struct PlayerData* playerData = nullptr;
 				while (playerData = Players.traverse_active(playerData))
 				{
-					if (!objectiveByClientId.contains(playerData->iOnlineID) || HkIsInCharSelectMenu(playerData->iOnlineID))
+					if (!DoesClientHaveObjective(playerData->iOnlineID) || HkIsInCharSelectMenu(playerData->iOnlineID))
 						continue;
 
 					bool inTradelane = false;
 					IObjRW* inspect;
 					StarSystem* starSystem;
-					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && inspect->is_using_tradelane(&inTradelane) == 0 && !inTradelane)
-						ComputeAndSendClientObjectives(playerData->iOnlineID);
+					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
+					{
+						const CShip* ship = static_cast<CShip*>(inspect->cobj);
+						if (!ship->is_jumping() && !ship->is_using_tradelane() && !ship->is_launching())
+							ComputeAndSendClientObjectives(playerData->iOnlineID);
+					}
 				}
 			}
 		}

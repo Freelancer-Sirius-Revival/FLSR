@@ -1254,7 +1254,7 @@ if (set_bLogConnects)
                     "sys=%08x arch=%08x arch2=%08x",
                     wstos((const wchar_t*)Players.GetActiveCharacterName(iClientID))
                         .c_str(),
-                    iSystem, gtl.iTradelaneSpaceObj1, gtl.iTradelaneSpaceObj2);
+                    iSystem, gtl.enteredTradeLaneSpaceObjId, gtl.nextTradeLaneSpaceObjId);
             })
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_GoTradelane_AFTER, __stdcall,

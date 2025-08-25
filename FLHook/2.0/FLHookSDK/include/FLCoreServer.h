@@ -174,9 +174,9 @@ struct XTractorObjects
 
 struct XGoTradelane
 {
-	uint iShip;
-	uint iTradelaneSpaceObj1;
-	uint iTradelaneSpaceObj2;
+	uint shipId;
+	uint enteredTradeLaneSpaceObjId;
+	uint nextTradeLaneSpaceObjId;
 };
 
 struct CAccountListNode
@@ -943,7 +943,7 @@ namespace pub
 
 	namespace Player
 	{
-		enum class MissionObjectiveType : uint
+		enum MissionObjectiveType : uint
 		{
 			SimpleEntry          = 0,               // Non-objective entry, without waypoint on map
 			IntermediateWaypoint = (1 << 3) | (1 << 0), // No entry, with intermediate waypoint on map
@@ -954,7 +954,7 @@ namespace pub
 
 		struct MissionObjective
 		{
-			MissionObjectiveType type = MissionObjectiveType::IntermediateWaypoint;
+			uint type = MissionObjectiveType::IntermediateWaypoint;
 			FmtStr message = FmtStr(0, 0);
 		};
 

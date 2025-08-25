@@ -21,6 +21,6 @@ namespace Missions
 		uint reward = 0;
 		std::vector<uint> bases;
 		MissionReofferCondition reofferCondition = MissionReofferCondition::Never;
-		int reofferDelay = 0;
+		float reofferDelay = 0.0f;
 	};
 }

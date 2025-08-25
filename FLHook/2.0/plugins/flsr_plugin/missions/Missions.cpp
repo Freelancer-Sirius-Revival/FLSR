@@ -122,7 +122,7 @@ namespace Missions
 									offer.reofferCondition = MissionReofferCondition::Never;
 							}
 							else if (ini.is_value("reoffer_delay"))
-								offer.reofferDelay = ini.get_value_int(0);
+								offer.reofferDelay = ini.get_value_float(0);
 						}
 						// Never automatically start missions which are offered on the mission board.
 						if (offer.type != pub::GF::MissionType::Unknown)
@@ -341,7 +341,7 @@ namespace Missions
 								line.id = CreateIdOrNull(ini.get_value_string(0));
 								line.receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								line.senderEtherSenderOrObjName = CreateIdOrNull(ini.get_value_string(2));
-								int pos = 3;
+								uint pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
 									const char* val = ini.get_value_string(pos);
@@ -618,7 +618,7 @@ namespace Missions
 								action->id = CreateIdOrNull(ini.get_value_string(0));
 								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->senderVoiceId = CreateIdOrNull(ini.get_value_string(2));
-								int pos = 3;
+								uint pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
 									const char* val = ini.get_value_string(pos);
@@ -654,7 +654,7 @@ namespace Missions
 								action->id = CreateIdOrNull(ini.get_value_string(0));
 								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->senderObjName = CreateIdOrNull(ini.get_value_string(2));
-								int pos = 3;
+								uint pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
 									const char* val = ini.get_value_string(pos);

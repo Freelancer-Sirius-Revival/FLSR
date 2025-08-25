@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	static void PlayComm(Mission& mission, const MissionObject& activator, const Dialog& dialog, const int lineIndex)
+	static void PlayComm(Mission& mission, const MissionObject& activator, const Dialog& dialog, const size_t lineIndex)
 	{
 		if (lineIndex + 1 < dialog.lines.size())
 		{
@@ -51,7 +51,7 @@ namespace Missions
 
 	void ActDialogCndCommComplete::ExecuteTrigger()
 	{
-		const int nextLineIndex = lineIndex + 1;
+		const size_t nextLineIndex = lineIndex + 1;
 		if (nextLineIndex < dialog.lines.size())
 			PlayComm(mission, activator, dialog, nextLineIndex);
 		mission.dynamicConditions.erase(this);

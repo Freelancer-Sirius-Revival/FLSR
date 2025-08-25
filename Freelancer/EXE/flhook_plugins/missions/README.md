@@ -61,7 +61,8 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[reoffer]`
     1. `Always|OnFail|OnSuccess|Never :Never` The condition under which the mission will be reoffered. Set by `Act_SetMsnResult`.
 
-- `[reoffer_delay]` The time in seconds to wait before the mission is reoffered.
+- `[reoffer_delay]`
+    1. `FLOAT :0` The time in seconds to wait before the mission is reoffered.
 
 ## `[MsnSolar]`
 

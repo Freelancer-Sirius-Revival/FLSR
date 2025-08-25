@@ -3,7 +3,7 @@
 struct ObjectiveState
 {
 	unsigned int objId;
-	int objectiveIndex;
+	size_t objectiveIndex;
 	bool enforceObjective;
 
 	ObjectiveState(const unsigned int objId, const int objectiveIndex, const bool enforceObjective) :

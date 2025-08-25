@@ -1,10 +1,11 @@
 #include "ActNNPath.h"
+#include "../ClientObjectives.h"
 
 namespace Missions
 {
 	static void SetWaypoints(const Mission& mission, const uint clientId, const ActNNPath& action)
 	{
-		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+		if (ClientObjectives::DoesClientHaveObjective(clientId) || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
 
 		if (action.message)

@@ -46,8 +46,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				baseId = value;
-			else
-				PrintErrorToConsole(L"Cnd_BaseEnter", conditionParent, argNum, L"Invalid target base. Defaulting to any base.");
 		}
 
 		return new CndBaseEnter(conditionParent, label, baseId);
@@ -164,8 +162,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				killerNameOrLabel = value;
-			else
-				PrintErrorToConsole(L"Cnd_Destroyed", conditionParent, argNum, L"Invalid killer obj name or label. Defaulting to all mission objects.");
 		}
 		argNum++;
 
@@ -357,8 +353,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				systemId = value;
-			else
-				PrintErrorToConsole(L"Cnd_InSystem", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
 		return new CndInSystem(conditionParent, label, systemId);
@@ -383,8 +377,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				baseId = value;
-			else
-				PrintErrorToConsole(L"Cnd_OnBase", conditionParent, argNum, L"Invalid target base. Defaulting to any base.");
 		}
 
 		return new CndOnBase(conditionParent, label, baseId);
@@ -447,8 +439,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				inflictorObjNameOrLabel = value;
-			else
-				PrintErrorToConsole(L"Cnd_ProjHitCount", conditionParent, argNum, L"Invalid damage inflictor obj name or label. Defaulting to all mission objects.");
 		}
 		argNum++;
 
@@ -483,8 +473,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				systemId = value;
-			else
-				PrintErrorToConsole(L"Cnd_SystemEnter", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
 		return new CndSystemEnter(conditionParent, label, systemId);
@@ -509,8 +497,6 @@ namespace Missions
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
 				systemId = value;
-			else
-				PrintErrorToConsole(L"Cnd_SystemExit", conditionParent, argNum, L"Invalid target system. Defaulting to any system.");
 		}
 
 		return new CndSystemExit(conditionParent, label, systemId);

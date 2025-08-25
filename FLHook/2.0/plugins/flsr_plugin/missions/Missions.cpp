@@ -35,6 +35,7 @@
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
+#include "ClientObjectives.h"
 
 namespace Missions
 {	
@@ -97,8 +98,10 @@ namespace Missions
 								offer.system = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("offer_faction"))
 								pub::Reputation::GetReputationGroup(offer.group, ini.get_value_string(0));
-							else if (ini.is_value("offer_string_id"))
-								offer.text = ini.get_value_int(0);
+							else if (ini.is_value("offer_title_id"))
+								offer.title = ini.get_value_int(0);
+							else if (ini.is_value("offer_description_id"))
+								offer.description = ini.get_value_int(0);
 							else if (ini.is_value("offer_reward"))
 								offer.reward = ini.get_value_int(0);
 							else if (ini.is_value("offer_bases"))
@@ -119,7 +122,7 @@ namespace Missions
 									offer.reofferCondition = MissionReofferCondition::Never;
 							}
 							else if (ini.is_value("reoffer_delay"))
-								offer.reofferDelay = ini.get_value_int(0);
+								offer.reofferDelay = ini.get_value_float(0);
 						}
 						// Never automatically start missions which are offered on the mission board.
 						if (offer.type != pub::GF::MissionType::Unknown)
@@ -338,7 +341,7 @@ namespace Missions
 								line.id = CreateIdOrNull(ini.get_value_string(0));
 								line.receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								line.senderEtherSenderOrObjName = CreateIdOrNull(ini.get_value_string(2));
-								int pos = 3;
+								uint pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
 									const char* val = ini.get_value_string(pos);
@@ -615,7 +618,7 @@ namespace Missions
 								action->id = CreateIdOrNull(ini.get_value_string(0));
 								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->senderVoiceId = CreateIdOrNull(ini.get_value_string(2));
-								int pos = 3;
+								uint pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
 									const char* val = ini.get_value_string(pos);
@@ -651,7 +654,7 @@ namespace Missions
 								action->id = CreateIdOrNull(ini.get_value_string(0));
 								action->receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								action->senderObjName = CreateIdOrNull(ini.get_value_string(2));
-								int pos = 3;
+								uint pos = 3;
 								while (!ini.is_value_empty(pos))
 								{
 									const char* val = ini.get_value_string(pos);
@@ -896,8 +899,9 @@ namespace Missions
 		}
 	}
 
-	static void RemoveClientFromMissions(const uint client)
+	static void RemoveClientFromMissions(const uint clientId)
 	{
+		ClientObjectives::ClearClientObjectives(clientId, 0);
 		// Removing a client from a mission could potentially end and remove it. So first gather the mission IDs and then delete them one by one.
 		std::vector<uint> ids;
 		for (const auto& entry : missions)
@@ -906,7 +910,7 @@ namespace Missions
 		for (const auto id : ids)
 		{
 			if (const auto& entry = missions.find(id); entry != missions.end())
-				entry->second.RemoveClient(client);
+				entry->second.RemoveClient(clientId);
 		}
 	}
 

@@ -8,7 +8,7 @@ namespace Missions
 
 	void ActActTrig::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		if (probability < 1.0f && std::uniform_real_distribution<float>(0, 1)(gen) < probability)
+		if (probability <= 0.0f || (probability < 1.0f && std::uniform_real_distribution<float>(0, 1)(gen) > probability) )
 			return;
 		for (auto& trigger : mission.triggers)
 		{

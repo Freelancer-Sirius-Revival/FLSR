@@ -174,9 +174,9 @@ struct XTractorObjects
 
 struct XGoTradelane
 {
-	uint iShip;
-	uint iTradelaneSpaceObj1;
-	uint iTradelaneSpaceObj2;
+	uint shipId;
+	uint enteredTradeLaneSpaceObjId;
+	uint nextTradeLaneSpaceObjId;
 };
 
 struct CAccountListNode
@@ -943,7 +943,7 @@ namespace pub
 
 	namespace Player
 	{
-		enum class MissionObjectiveType : uint
+		enum MissionObjectiveType : uint
 		{
 			SimpleEntry          = 0,               // Non-objective entry, without waypoint on map
 			IntermediateWaypoint = (1 << 3) | (1 << 0), // No entry, with intermediate waypoint on map
@@ -954,7 +954,7 @@ namespace pub
 
 		struct MissionObjective
 		{
-			MissionObjectiveType type = MissionObjectiveType::IntermediateWaypoint;
+			uint type = MissionObjectiveType::IntermediateWaypoint;
 			FmtStr message = FmtStr(0, 0);
 		};
 
@@ -1004,7 +1004,7 @@ namespace pub
 		IMPORT  int SetInitialOrnt(unsigned int const&, class Matrix const&);
 		IMPORT  int SetInitialPos(unsigned int const&, class Vector const&);
 		IMPORT  int SetMissionObjectiveState(unsigned int const&, unsigned int const&, int, unsigned int);
-		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectiveType, struct MissionObjective const* objectiveStructure, uint objectivesEntries, struct FmtStr const& missionType, uchar objectiveType3, struct FmtStr const& missionDescription); //arg 2 = 12, arg 6 = 2 ?
+		IMPORT  int SetMissionObjectives(uint const& clientId, uint const& objectivesId, struct MissionObjective const* objectiveStructure, uint objectivesEntries, struct FmtStr const& missionType, uchar unk, struct FmtStr const& missionDescription);
 		IMPORT  int SetMoneyNeededToNextRank(unsigned int, int);
 		IMPORT  int SetMonkey(unsigned int);
 		IMPORT  int SetMsnID(unsigned int clientId, unsigned int missionId, unsigned int acceptedByClientId, bool saveGame, unsigned int saveGameName);

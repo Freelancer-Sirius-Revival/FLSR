@@ -175,6 +175,12 @@
     <ClCompile Include="missions\ShipSpawning.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\BestPath.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\ClientObjectives.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
     <ClCompile Include="missions\actions\MissionShipSpawning.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
@@ -403,6 +409,12 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\MatrixMath.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\BestPath.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\ClientObjectives.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjFollow.h">

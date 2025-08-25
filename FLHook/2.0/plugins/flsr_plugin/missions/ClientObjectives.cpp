@@ -27,11 +27,19 @@ namespace Missions
 			return objectiveByClientId.contains(clientId);
 		}
 
-		void ComputeAndSendClientObjectives(const uint clientId)
+		/*
+		   The final computed best path waypoint never contains the Object Id of the target object.
+		   Save it here from the original request to re-apply it afterwards.
+		*/
+		XRequestBestPathEntry intermediateDestination;
+
+		static void ComputeAndSendClientObjectives(const uint clientId)
 		{
 			const auto& objectiveEntry = objectiveByClientId.find(clientId);
 			if (objectiveEntry == objectiveByClientId.end())
 				return;
+
+			intermediateDestination.systemId = 0;
 
 			if (objectiveEntry->second.systemId)
 			{
@@ -100,6 +108,7 @@ namespace Missions
 					bestPath.entries[0] = destination;
 				}
 
+				intermediateDestination = destination;
 				// Players cannot have player-waypoints while being in a mission. So we can assume this always takes priority.
 				Server.RequestBestPath(clientId, (uchar*)&bestPath, 12 + (bestPath.waypointCount * 20));
 			}
@@ -189,14 +198,23 @@ namespace Missions
 			if (missionEntry == missions.end())
 				return false;
 
+			auto& lastWaypoint = ((XRequestBestPathEntry*)data.entries)[data.waypointCount - 1];
+			if (lastWaypoint.systemId == intermediateDestination.systemId &&
+				lastWaypoint.position.x == intermediateDestination.position.x &&
+				lastWaypoint.position.y == intermediateDestination.position.y &&
+				lastWaypoint.position.z == intermediateDestination.position.z)
+			{
+				lastWaypoint.objId = intermediateDestination.objId;
+			}
+
 			std::vector<pub::Player::MissionObjective> objectives;
 			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for potential MAIN objective
-			const int objectiveIndexOffset = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives) ? 1 : 0;
+			const size_t objectiveIndexOffset = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives) ? 1 : 0;
 			objectives.resize(data.waypointCount + objectiveIndexOffset);
 
 			// The first "best path" waypoint is being treated as objective to reach the actual destination.
 			auto& nextObjective = objectives[objectiveIndexOffset];
-			if (data.entries[0].objId > 0)
+			if (data.entries[0].objId != 0)
 			{
 				IObjRW* inspect;
 				StarSystem* system;
@@ -225,7 +243,6 @@ namespace Missions
 			}
 
 			const auto& playerObjective = objectiveByClientId[clientId];
-			const auto& lastWaypoint = data.entries[data.waypointCount - 1];
 			const bool lastObjectiveIsMainObjective = lastWaypoint.systemId == playerObjective.systemId && 
 													  lastWaypoint.position.x == playerObjective.position.x &&
 													  lastWaypoint.position.y == playerObjective.position.y &&
@@ -241,12 +258,14 @@ namespace Missions
 			}
 
 			// Translate all "best path" waypoints to nav map markers the objectives.
-			for (int waypointIndex = 0, objectiveIndex = objectiveIndexOffset; waypointIndex < data.waypointCount; waypointIndex++, objectiveIndex++)
+			for (size_t waypointIndex = 0, objectiveIndex = objectiveIndexOffset; waypointIndex < data.waypointCount; waypointIndex++, objectiveIndex++)
 			{
+				const auto& waypoint = data.entries[waypointIndex];
 				FmtStr::NavMarker marker;
-				marker.pos = data.entries[waypointIndex].position;
-				marker.system = data.entries->systemId;
+				marker.pos = waypoint.position;
+				marker.system = waypoint.systemId;
 				objectives[objectiveIndex].message.append_nav_marker(marker);
+				objectives[objectiveIndex].message.append_rep_instance(waypoint.objId);
 			}
 
 			if (!lastObjectiveIsMainObjective)

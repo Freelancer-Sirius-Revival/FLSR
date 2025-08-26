@@ -219,6 +219,11 @@ namespace Missions
 			return false;
 		}
 
+		static bool IsJumpObject(const IObjRW* inspect)
+		{
+			return (inspect->cobj->type & ObjectType::JumpGate) || (inspect->cobj->type & ObjectType::JumpHole) || (inspect->cobj->type & ObjectType::AirlockGate);
+		}
+
 		bool __stdcall Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint clientId, const XRequestBestPath& data, int size)
 		{
 			// Players can have player-waypoints only when NOT in a mission. So we can safely assume this works as intended.
@@ -279,7 +284,7 @@ namespace Missions
 
 					if (inspect->cobj->type & ObjectType::TradelaneRing)
 					{
-						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && (inspect->cobj->type & ObjectType::JumpGate))
+						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && IsJumpObject(inspect))
 						{
 							nextObjective.message = FmtStr(13071, 0);
 							nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
@@ -289,7 +294,7 @@ namespace Missions
 							nextObjective.message = FmtStr(13060, 0);
 						}
 					}
-					else if (inspect->cobj->type & ObjectType::JumpGate)
+					else if (IsJumpObject(inspect))
 					{
 						nextObjective.message = FmtStr(13080, 0);
 						nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);

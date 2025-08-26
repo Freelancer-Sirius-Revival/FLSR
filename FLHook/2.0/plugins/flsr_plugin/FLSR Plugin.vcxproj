@@ -192,6 +192,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\Condition.cpp" />
     <ClCompile Include="missions\conditions\CndIniReader.cpp" />
     <ClCompile Include="missions\Formations.cpp" />
+    <ClCompile Include="missions\LifeTimes.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
@@ -286,6 +287,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndIniReader.h" />
     <ClInclude Include="missions\Dialog.h" />
     <ClInclude Include="missions\Formations.h" />
+    <ClInclude Include="missions\LifeTimes.h" />
     <ClInclude Include="missions\MatrixMath.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionBoard.h" />

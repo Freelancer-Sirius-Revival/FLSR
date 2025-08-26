@@ -253,6 +253,9 @@
     <ClCompile Include="missions\actions\ActSetLifeTime.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\LifeTimes.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -515,6 +518,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActSetLifeTime.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\LifeTimes.h">
+      <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

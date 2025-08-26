@@ -574,7 +574,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
-- `Act_SetLifeTime` Once the NPC comes out of range from all players, its life time will be counted down. The life time will be restored completely if any player comes back into range to the NPC. All NPCs of a formation will be despawned if one of their members is running out of life time.
+- `Act_SetLifeTime` Only for NPCs or solars. Once the object comes out of range from all players, its life time will be counted down. The life time will be restored completely if any player comes back into range to the object. All NPCs of a formation will be despawned if one of their members is running out of life time.
     1. `STRING|Activator` Object by name or label to change life time of.
     1. `FLOAT :1` The life time in seconds. `-1` means infinite life time.
 

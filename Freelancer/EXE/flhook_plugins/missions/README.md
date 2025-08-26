@@ -294,6 +294,9 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `STRING` The formation from `DATA/MISSIONS/formations.ini`.
     1. `STRING` Multiple subsequent entries possible. The `MsnNpc` names of ships to add to this formation, in that order.
 
+- `SetLifeTime` Once the NPC comes out of range from all players, its life time will be counted down. The life time will be restored completely if any player comes back into range to the NPC. All NPCs of a formation will be despawned if one of their members is running out of life time.
+    1. `FLOAT :1` The life time in seconds. `-1` means infinite life time.
+
 - `SetPriority` Sets the priority for all following objectives.
     1. `Normal|Always_Execute` Whether the objectives can be paused by fights, or are enforced to ignore any disturbances.
 
@@ -570,6 +573,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
+
+- `Act_SetLifeTime` Once the NPC comes out of range from all players, its life time will be counted down. The life time will be restored completely if any player comes back into range to the NPC. All NPCs of a formation will be despawned if one of their members is running out of life time.
+    1. `STRING|Activator` Object by name or label to change life time of.
+    1. `FLOAT :1` The life time in seconds. `-1` means infinite life time.
 
 - `Act_SetMsnResult` Sets the mission result. Relevant for reoffering missions to the job board. See `Mission: offer_reoffer`.
     1. `Success|Failure :Failure` Sets the mission result.

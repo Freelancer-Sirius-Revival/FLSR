@@ -32,6 +32,7 @@
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
 #include "Actions/ActLeaveMsn.h"
+#include "Actions/ActSetLifeTime.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -535,6 +536,13 @@ namespace Missions
 								action->fuse = CreateIdOrNull(ini.get_value_string(1));
 								action->timeOffset = ini.get_value_float(2);
 								action->lifetimeOverride = ini.get_value_float(3);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_SetLifeTime"))
+							{
+								ActSetLifeTimePtr action(new ActSetLifeTime());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->lifeTime = ini.get_value_float(1);
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SpawnSolar"))

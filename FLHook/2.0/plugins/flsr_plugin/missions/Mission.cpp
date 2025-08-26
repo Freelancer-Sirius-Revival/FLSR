@@ -4,6 +4,7 @@
 #include "ClientObjectives.h"
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
+#include "ShipSpawning.h"
 
 namespace Missions
 {
@@ -59,7 +60,7 @@ namespace Missions
 		{
 			const auto objectId = *it;
 			it = objectIds.erase(it);
-			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
+			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0 && GetLifeTime(objectId) <= 0.0f)
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
 

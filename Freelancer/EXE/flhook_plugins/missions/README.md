@@ -622,4 +622,4 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_StartDialog` Starts a `Dialog`.
     1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
 
-- `Act_TerminateMsn` Terminates the mission and cleans up all spawned objects, waypoints, and music. Evaluates whether the mission is being reoffered to the mission board, depending on `Act_SetMsnResult`.
+- `Act_TerminateMsn` Terminates the mission and cleans up all spawned objects with infinite life time, waypoints, and music. Evaluates whether the mission is being reoffered to the mission board, depending on `Act_SetMsnResult`.

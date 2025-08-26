@@ -9,7 +9,7 @@ namespace Missions
 
 		IObjRW* inspect;
 		StarSystem* system;
-		if (!GetShipInspect(objId, inspect, system) || !(inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
+		if (!GetShipInspect(objId, inspect, system) || inspect->cobj->objectClass != CObject::CSHIP_OBJECT)
 			return;
 
 		if (const auto& objectivesEntry = mission.objectives.find(objectivesId); objectivesEntry != mission.objectives.end())

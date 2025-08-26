@@ -186,7 +186,7 @@ namespace Missions
 			uint shipId;
 			pub::Player::GetShip(clientId, shipId);
 			if (route.waypointCount > 1 && route.entries[0].objId && route.entries[1].objId && // There must be at least 2 waypoints with ObjIds to form a tradelane.
-				shipId && GetShipInspect(shipId, inspect, system) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT) && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
+				shipId && GetShipInspect(shipId, inspect, system) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
 			{
 				uint currentTLRId = route.entries[0].objId; // Potential start of the current TLR.
 				uint targetTLRId = route.entries[1].objId; // Potential end of the current TLR.
@@ -406,7 +406,7 @@ namespace Missions
 					bool inTradelane = false;
 					IObjRW* inspect;
 					StarSystem* starSystem;
-					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
+					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT)
 					{
 						const CShip* ship = static_cast<CShip*>(inspect->cobj);
 						if (!ship->is_jumping() && !ship->is_using_tradelane() && !ship->is_launching())

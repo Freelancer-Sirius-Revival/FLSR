@@ -387,7 +387,7 @@ static void LaunchNpcFromObj(const uint shipId, uint launchObjId)
 {
 	IObjRW* inspect;
 	StarSystem* starSystem;
-	if (GetShipInspect(launchObjId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSOLAR_OBJECT))
+	if (GetShipInspect(launchObjId, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSOLAR_OBJECT)
 	{
 		const auto solarArchetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
 		if (solarArchetype->dockInfo.size() > 0)

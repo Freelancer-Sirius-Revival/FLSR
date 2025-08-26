@@ -69,9 +69,9 @@ namespace GroupReputation
             return;
 
         uint victimReputationId;
-        if (killedObject->cobj->objectClass & CObject::CSHIP_OBJECT)
+        if (killedObject->cobj->objectClass == CObject::CSHIP_OBJECT)
             victimReputationId = reinterpret_cast<CEqObj*>(killedObject->cobj)->repVibe;
-        else if (killedObject->cobj->objectClass & CObject::CSOLAR_OBJECT)
+        else if (killedObject->cobj->objectClass == CObject::CSOLAR_OBJECT)
             // Solars have their nickname ID directly mapped to their Reputation ID
             victimReputationId = killedObject->cobj->id;
         else

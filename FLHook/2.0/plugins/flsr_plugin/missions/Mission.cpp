@@ -328,7 +328,6 @@ namespace Missions
 				elapsedTimeInSec += seconds;
 				if (elapsedTimeInSec < 1.0f)
 					return;
-				elapsedTimeInSec = 0.0f;
 
 				const mstime thresholdTime = timeInMS() - 10000;
 				for (auto& missionEntry : missions)
@@ -361,6 +360,8 @@ namespace Missions
 						// else: The CndCommComplete has erased the comm-entry itself.
 					}
 				}
+
+				elapsedTimeInSec = 0.0f;
 			}
 		}
 	}

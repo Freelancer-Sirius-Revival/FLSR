@@ -186,7 +186,7 @@ namespace Missions
 			uint shipId;
 			pub::Player::GetShip(clientId, shipId);
 			if (route.waypointCount > 1 && route.entries[0].objId && route.entries[1].objId && // There must be at least 2 waypoints with ObjIds to form a tradelane.
-				shipId && GetShipInspect(shipId, inspect, system) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT) && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
+				shipId && GetShipInspect(shipId, inspect, system) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
 			{
 				uint currentTLRId = route.entries[0].objId; // Potential start of the current TLR.
 				uint targetTLRId = route.entries[1].objId; // Potential end of the current TLR.
@@ -217,6 +217,11 @@ namespace Missions
 				}
 			}
 			return false;
+		}
+
+		static bool IsJumpObject(const IObjRW* inspect)
+		{
+			return (inspect->cobj->type & ObjectType::JumpGate) || (inspect->cobj->type & ObjectType::JumpHole) || (inspect->cobj->type & ObjectType::AirlockGate);
 		}
 
 		bool __stdcall Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint clientId, const XRequestBestPath& data, int size)
@@ -279,7 +284,7 @@ namespace Missions
 
 					if (inspect->cobj->type & ObjectType::TradelaneRing)
 					{
-						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && (inspect->cobj->type & ObjectType::JumpGate))
+						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && IsJumpObject(inspect))
 						{
 							nextObjective.message = FmtStr(13071, 0);
 							nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
@@ -289,7 +294,7 @@ namespace Missions
 							nextObjective.message = FmtStr(13060, 0);
 						}
 					}
-					else if (inspect->cobj->type & ObjectType::JumpGate)
+					else if (IsJumpObject(inspect))
 					{
 						nextObjective.message = FmtStr(13080, 0);
 						nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
@@ -401,7 +406,7 @@ namespace Missions
 					bool inTradelane = false;
 					IObjRW* inspect;
 					StarSystem* starSystem;
-					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
+					if (playerData->iShipID && GetShipInspect(playerData->iShipID, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT)
 					{
 						const CShip* ship = static_cast<CShip*>(inspect->cobj);
 						if (!ship->is_jumping() && !ship->is_using_tradelane() && !ship->is_launching())

@@ -9,6 +9,7 @@
 #include "ObjGotoVec.h"
 #include "ObjIdle.h"
 #include "ObjMakeNewFormation.h"
+#include "ObjSetLifeTime.h"
 #include "ObjSetPriority.h"
 #include "ObjStayInRange.h"
 
@@ -451,6 +452,9 @@ namespace Missions
 
 		if (ini.is_value("MakeNewFormation"))
 			return ReadObjMakeNewFormation(objectiveParent, ini);
+
+		if (ini.is_value("SetLifeTime"))
+			return new ObjSetLifeTime(objectiveParent, ini.get_value_float(0));
 
 		if (ini.is_value("SetPriority"))
 			return ReadObjSetPriority(objectiveParent, ini);

@@ -4,6 +4,8 @@
 #include "ClientObjectives.h"
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
+#include "ShipSpawning.h"
+#include "LifeTimes.h"
 
 namespace Missions
 {
@@ -59,7 +61,7 @@ namespace Missions
 		{
 			const auto objectId = *it;
 			it = objectIds.erase(it);
-			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0)
+			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0 && !(GetLifeTime(objectId) > 0.0f || GetSolarLifeTime(objectId) > 0.0f))
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
 
@@ -326,7 +328,6 @@ namespace Missions
 				elapsedTimeInSec += seconds;
 				if (elapsedTimeInSec < 1.0f)
 					return;
-				elapsedTimeInSec = 0.0f;
 
 				const mstime thresholdTime = timeInMS() - 10000;
 				for (auto& missionEntry : missions)
@@ -359,6 +360,8 @@ namespace Missions
 						// else: The CndCommComplete has erased the comm-entry itself.
 					}
 				}
+
+				elapsedTimeInSec = 0.0f;
 			}
 		}
 	}

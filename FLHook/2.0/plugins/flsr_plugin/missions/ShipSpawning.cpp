@@ -296,6 +296,17 @@ void UnassignFromWing(const uint shipId)
 		foundShipEntry->second->wingId = wingId--;
 }
 
+float GetLifeTime(const uint shipId)
+{
+	const auto& foundShipEntry = shipTableByShipId.find(shipId);
+	if (foundShipEntry != shipTableByShipId.end())
+	{
+		const float lifeTime = foundShipEntry->second->lifetime;
+		return lifeTime <= 0.0f ? lifeTime : lifeTime / 15.0f; // 15 being the max decrement per second
+	}
+	return -1.0f;
+}
+
 void SetLifeTime(const uint shipId, const float lifeTime)
 {
 	const auto& foundShipEntry = shipTableByShipId.find(shipId);
@@ -376,7 +387,7 @@ static void LaunchNpcFromObj(const uint shipId, uint launchObjId)
 {
 	IObjRW* inspect;
 	StarSystem* starSystem;
-	if (GetShipInspect(launchObjId, inspect, starSystem) && (inspect->cobj->objectClass & CObject::CSOLAR_OBJECT))
+	if (GetShipInspect(launchObjId, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSOLAR_OBJECT)
 	{
 		const auto solarArchetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
 		if (solarArchetype->dockInfo.size() > 0)

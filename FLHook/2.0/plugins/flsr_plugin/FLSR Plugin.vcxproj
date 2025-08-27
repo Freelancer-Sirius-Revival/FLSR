@@ -150,6 +150,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActAdjAcct.cpp" />
     <ClCompile Include="missions\actions\ActAdjRep.cpp" />
     <ClCompile Include="missions\actions\ActLeaveMsn.cpp" />
+    <ClCompile Include="missions\actions\ActSetLifeTime.cpp" />
     <ClCompile Include="missions\actions\ActSetMsnResult.cpp" />
     <ClCompile Include="missions\actions\ActDebugMsg.cpp" />
     <ClCompile Include="missions\actions\ActDestroy.cpp" />
@@ -191,6 +192,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\Condition.cpp" />
     <ClCompile Include="missions\conditions\CndIniReader.cpp" />
     <ClCompile Include="missions\Formations.cpp" />
+    <ClCompile Include="missions\LifeTimes.cpp" />
     <ClCompile Include="missions\Mission.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp" />
     <ClCompile Include="missions\Missions.cpp" />
@@ -211,6 +213,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\objectives\ObjGotoSpline.cpp" />
     <ClCompile Include="missions\objectives\ObjGotoVec.cpp" />
     <ClCompile Include="missions\objectives\ObjMakeNewFormation.cpp" />
+    <ClCompile Include="missions\objectives\ObjSetLifeTime.cpp" />
     <ClCompile Include="missions\objectives\ObjSetPriority.cpp" />
     <ClCompile Include="missions\objectives\ObjStayInRange.cpp" />
     <ClCompile Include="missions\ShipSpawning.cpp" />
@@ -240,6 +243,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActAdjAcct.h" />
     <ClInclude Include="missions\actions\ActAdjRep.h" />
     <ClInclude Include="missions\actions\ActLeaveMsn.h" />
+    <ClInclude Include="missions\actions\ActSetLifeTime.h" />
     <ClInclude Include="missions\actions\ActSetMsnResult.h" />
     <ClInclude Include="missions\actions\ActDebugMsg.h" />
     <ClInclude Include="missions\actions\ActDestroy.h" />
@@ -283,6 +287,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndIniReader.h" />
     <ClInclude Include="missions\Dialog.h" />
     <ClInclude Include="missions\Formations.h" />
+    <ClInclude Include="missions\LifeTimes.h" />
     <ClInclude Include="missions\MatrixMath.h" />
     <ClInclude Include="missions\Mission.h" />
     <ClInclude Include="missions\MissionBoard.h" />
@@ -311,6 +316,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\objectives\Objectives.h" />
     <ClInclude Include="missions\objectives\ObjFollow.h" />
     <ClInclude Include="missions\objectives\ObjGoto.h" />
+    <ClInclude Include="missions\objectives\ObjSetLifeTime.h" />
     <ClInclude Include="missions\objectives\ObjSetPriority.h" />
     <ClInclude Include="missions\objectives\ObjStayInRange.h" />
     <ClInclude Include="missions\ShipSpawning.h" />

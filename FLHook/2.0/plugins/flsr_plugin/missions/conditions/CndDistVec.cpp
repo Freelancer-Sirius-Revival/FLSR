@@ -39,7 +39,7 @@ namespace Missions
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		if (!GetShipInspect(objId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CSHIP_OBJECT))
+		if (!GetShipInspect(objId, inspect, starSystem) || inspect->cobj->objectClass != CObject::CSHIP_OBJECT)
 			return false;
 		if (inspect->cobj->system != systemId)
 			return false;

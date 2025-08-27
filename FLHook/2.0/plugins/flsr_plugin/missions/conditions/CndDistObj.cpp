@@ -49,7 +49,7 @@ namespace Missions
 	{
 		IObjRW* inspectA;
 		StarSystem* starSystem;
-		if (!GetShipInspect(objId, inspectA, starSystem) || !(inspectA->cobj->objectClass & CObject::CSHIP_OBJECT))
+		if (!GetShipInspect(objId, inspectA, starSystem) || inspectA->cobj->objectClass != CObject::CSHIP_OBJECT)
 			return false;
 
 		// Try to find any solar in the entire game first.

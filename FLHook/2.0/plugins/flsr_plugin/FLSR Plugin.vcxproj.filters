@@ -247,6 +247,15 @@
     <ClCompile Include="missions\conditions\CndOnBase.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\ObjSetLifeTime.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetLifeTime.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\LifeTimes.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -503,6 +512,15 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActNNPath.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjSetLifeTime.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetLifeTime.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\LifeTimes.h">
+      <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

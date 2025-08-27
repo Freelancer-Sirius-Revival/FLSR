@@ -1,5 +1,6 @@
-#include "Mission.h"
+#include "../Main.h"
 #include "../Plugin.h"
+#include "Mission.h"
 #include "MissionBoard.h"
 #include "ClientObjectives.h"
 #include "conditions/CndCommComplete.h"
@@ -54,7 +55,15 @@ namespace Missions
 		objectiveConditionByObjectId.clear();
 
 		for (const uint clientId : clientIds)
+		{
 			ClearMusic(clientId);
+
+			if (const auto& markEntry = markedObjIdsByClientId.find(clientId); markEntry != markedObjIdsByClientId.end())
+			{
+				for (const uint objId : markEntry->second)
+					Mark::UnmarkObject(markEntry->first, objId);
+			}
+		}
 
 		// Destroy all spawned objects of this mission.
 		for (auto it = objectIds.begin(); it != objectIds.end();)
@@ -78,6 +87,7 @@ namespace Missions
 		objectsByLabel.clear();
 		objectIds.clear();
 		clientIds.clear();
+		markedObjIdsByClientId.clear();
 		ongoingComms.clear();
 
 		if (offerId)
@@ -280,7 +290,16 @@ namespace Missions
 			else
 				labelsIt++;
 		}
+		
+		if (const auto& markEntry = markedObjIdsByClientId.find(clientId); markEntry != markedObjIdsByClientId.end())
+		{
+			for (const uint objId : markEntry->second)
+				Mark::UnmarkObject(markEntry->first, objId);
+		}
+		markedObjIdsByClientId.erase(clientId);
+
 		clientIds.erase(clientId);
+
 		for (const auto& label : labels)
 			EvaluateCountConditions(label);
 	}

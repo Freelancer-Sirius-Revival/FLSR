@@ -12,13 +12,13 @@ namespace Mark
     const uint CLEAR_ROTATION_TIMER_INTERVAL = 500;
 
     // Contains a set of currently market targets (the current system's) per client id.
-    static std::unordered_map<uint, std::set<uint>> currentlyMarkedObjectsPerClient;
+    std::unordered_map<uint, std::set<uint>> currentlyMarkedObjectsPerClient;
 
     // Contains a set of marked targets per system per character file name.
-    static std::unordered_map<std::wstring, std::unordered_map<uint, std::set<uint>>> markedObjectsPerCharacter;
-    static std::unordered_map<std::wstring, std::set<std::wstring>> markedCharactersPerCharacter;
+    std::unordered_map<std::wstring, std::unordered_map<uint, std::set<uint>>> markedObjectsPerCharacter;
+    std::unordered_map<std::wstring, std::set<std::wstring>> markedCharactersPerCharacter;
 
-    static std::set<std::wstring> cloakedCharacterFileNames;
+    std::set<std::wstring> cloakedCharacterFileNames;
 
     const uint UI_SELECT_ID = CreateID("ui_select_add");
     const uint UI_UNSELECT_ID = CreateID("ui_select_remove");
@@ -47,7 +47,7 @@ namespace Mark
         return false;
     }
 
-    uint FindClientIdByCharacterFileName(const std::wstring& characterFileName)
+    static uint FindClientIdByCharacterFileName(const std::wstring& characterFileName)
     {
         PlayerData* playerData = 0;
         while (playerData = Players.traverse_active(playerData))
@@ -62,7 +62,7 @@ namespace Mark
         return 0;
     }
 
-    void ClearNonExistingTargetIds(const std::wstring& characterFileName)
+    static void ClearNonExistingTargetIds(const std::wstring& characterFileName)
     {
         std::set<uint> deletedIds;
         std::vector<uint> emptySystemIds;
@@ -107,7 +107,7 @@ namespace Mark
             currentlyMarkedObjectsPerClient.erase(clientId);
     }
 
-    static std::queue<std::wstring> characterNamesForClearingRotation;
+    std::queue<std::wstring> characterNamesForClearingRotation;
 
     void RotateClearNonExistingTargetIds()
     {
@@ -124,12 +124,12 @@ namespace Mark
         }
     }
 
-    bool IsMarkedObject(const uint clientId, const uint targetId)
+    static bool IsMarkedObject(const uint clientId, const uint targetId)
     {
         return currentlyMarkedObjectsPerClient[clientId].contains(targetId);
     }
 
-    void UnmarkEverywhere(const uint targetId)
+    static void UnmarkEverywhere(const uint targetId)
     {
         for (const auto& markedObjectsPerClient : currentlyMarkedObjectsPerClient)
             UnmarkObject(markedObjectsPerClient.first, targetId);
@@ -141,7 +141,7 @@ namespace Mark
         }
     }
 
-    void DisposeCharacterEverywhere(const std::wstring& characterFileName)
+    static void DisposeCharacterEverywhere(const std::wstring& characterFileName)
     {
         for (auto& charactersPerCharacter : markedCharactersPerCharacter)
             charactersPerCharacter.second.erase(characterFileName);
@@ -149,7 +149,7 @@ namespace Mark
         cloakedCharacterFileNames.erase(characterFileName);
     }
 
-    void RefreshMarksForCurrentSystem(const uint clientId)
+    static void RefreshMarksForCurrentSystem(const uint clientId)
     {
         uint clientSystemId;
         pub::Player::GetSystem(clientId, clientSystemId);
@@ -170,7 +170,7 @@ namespace Mark
         // Marked players will be refreshed by CreateShip package checks.
     }
 
-    void Mark(const uint clientId, const uint targetId)
+    static void Mark(const uint clientId, const uint targetId)
     {
         uint shipId;
         pub::Player::GetShip(clientId, shipId);
@@ -210,7 +210,7 @@ namespace Mark
             pub::Audio::PlaySoundEffect(clientId, UI_SELECT_ID);
     }
 
-    void Unmark(const uint clientId, const uint targetId)
+    static void Unmark(const uint clientId, const uint targetId)
     {
         std::wstring characterFileName;
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
@@ -234,7 +234,7 @@ namespace Mark
             pub::Audio::PlaySoundEffect(clientId, UI_UNSELECT_ID);
     }
 
-    void UnmarkAll(const uint clientId)
+    static void UnmarkAll(const uint clientId)
     {
         std::wstring characterFileName;
         if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
@@ -252,7 +252,7 @@ namespace Mark
         currentlyMarkedObjectsPerClient.erase(clientId);
     }
 
-    void AddClientToEveryonesCurrentlyMarkedObjects(const uint clientId)
+    static void AddClientToEveryonesCurrentlyMarkedObjects(const uint clientId)
     {
         uint targetId;
         pub::Player::GetShip(clientId, targetId);
@@ -290,7 +290,7 @@ namespace Mark
         }
     }
 
-    void RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(const uint targetId)
+    static void RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(const uint targetId)
     {
         for (const auto& markedObjectsPerClientId : currentlyMarkedObjectsPerClient)
             UnmarkObject(markedObjectsPerClientId.first, targetId);
@@ -323,7 +323,7 @@ namespace Mark
         AddClientToEveryonesCurrentlyMarkedObjects(clientId);
     }
 
-    std::list<GROUP_MEMBER> GetGroupMemberClientIds(const uint clientId)
+    static std::list<GROUP_MEMBER> GetGroupMemberClientIds(const uint clientId)
     {
         std::list<GROUP_MEMBER> members;
         if (!HkIsValidClientID(clientId))
@@ -498,7 +498,7 @@ namespace Mark
         }
     }
 
-    void ClearCharacteData(const std::wstring characterFileName)
+    static void ClearCharacteData(const std::wstring characterFileName)
     {
         if (markedObjectsPerCharacter.contains(characterFileName))
             markedObjectsPerCharacter.erase(characterFileName);
@@ -525,7 +525,7 @@ namespace Mark
         ClearCharacteData(characterFileName);
     }
 
-    static std::wstring characterFileNameToRename;
+    std::wstring characterFileNameToRename;
 
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {

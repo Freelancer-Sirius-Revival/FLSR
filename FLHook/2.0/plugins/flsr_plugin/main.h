@@ -283,6 +283,8 @@ namespace LootBoxes
 namespace Mark
 {
     extern const uint CLEAR_ROTATION_TIMER_INTERVAL;
+    bool MarkObject(const uint clientId, const uint targetId);
+    bool UnmarkObject(const uint clientId, const uint targetId);
     void AddCloakedPlayer(const uint clientId);
     void RemoveCloakedPlayer(const uint clientId);
     void RotateClearNonExistingTargetIds();

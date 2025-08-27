@@ -256,6 +256,9 @@
     <ClCompile Include="missions\LifeTimes.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActMark.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -521,6 +524,9 @@
     </ClInclude>
     <ClInclude Include="missions\LifeTimes.h">
       <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActMark.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

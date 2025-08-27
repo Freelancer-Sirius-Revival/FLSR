@@ -51,7 +51,7 @@ namespace Missions
 			pub::AI::SubmitState(memberId, &personality);
 
 			pub::AI::update_formation_state(memberId, state.objId, formation[index]);
-			AssignToWing(memberId, state.objId);
+			ShipSpawning::AssignToWing(memberId, state.objId);
 		}
 
 		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));

@@ -33,6 +33,7 @@
 #include "Actions/ActInvulnerable.h"
 #include "Actions/ActLeaveMsn.h"
 #include "Actions/ActSetLifeTime.h"
+#include "Actions/ActMark.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -543,6 +544,15 @@ namespace Missions
 								ActSetLifeTimePtr action(new ActSetLifeTime());
 								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
 								action->lifeTime = ini.get_value_float(1);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_Mark"))
+							{
+								ActMarkPtr action(new ActMark());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->targetObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
+								if (ini.get_num_parameters() > 2)
+									action->marked = ini.get_value_bool(2);
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SpawnSolar"))

@@ -2,7 +2,8 @@
 #include "Pilots.h"
 #include "Empathies.h"
 #include "GroupRep.h"
-#include "missions/Formations.h"
+#include "Missions/ShipSpawning.h"
+#include "Missions/Formations.h"
 #include "Missions/NpcAppearances.h"
 #include "Missions/BestPath.h"
 #include "Missions/ClientObjectives.h"
@@ -263,6 +264,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ConnectionLimiter::Login_After, PLUGIN_HkIServerImpl_Login_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ConnectionLimiter::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShipSpawning::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShipSpawning::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndBaseEnter::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndCloaked::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));

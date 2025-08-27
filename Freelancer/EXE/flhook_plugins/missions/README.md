@@ -167,6 +167,8 @@ This is the definition for a NPC archetype which again can be used by multiple `
 
 This is the definition for a single NPC for the mission. Multiple `MsnNpc` can be created for individual NPCs.
 
+**NPCs are only simulated if at least one player is in space of the same system (dead or alive). Their simulation will be completely paused if the last player leaves the system space.**
+
 - `nickname` The object name of the NPC. Used by trigger conditions and actions.
     1. `STRING` The name. Must be unique in this mission.
 
@@ -529,6 +531,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Fuse nickname to execute on the objects.
     1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
     1. `[FLOAT]` Overrides the fuse lifetime by this value.
+
+- `Act_Mark` Only for players. Marks another object.
+    1. `STRING|Activator` Players by label to mark/unmark the target for.
+    1. `STRING` Object by name or label to mark or unmark.
+    1. `True|False :False` Whether to mark (`True`) or unmark (`False`) the target.
 
 - `Act_NNPath` Only for players. Sets their normal player waypoint route. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` Players by label to set the message or waypoint.

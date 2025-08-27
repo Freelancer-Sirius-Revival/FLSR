@@ -11,7 +11,7 @@ namespace Missions
 
 	void ObjSetLifeTime::Execute(const ObjectiveState& state) const
 	{
-		SetLifeTime(state.objId, lifetime);		
+		ShipSpawning::SetLifeTime(state.objId, lifetime);
 		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 	}
 }

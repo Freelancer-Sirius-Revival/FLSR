@@ -15,7 +15,7 @@ namespace Missions
 			return;
 
 		if (inspect->cobj->objectClass == CObject::CSHIP_OBJECT)
-			SetLifeTime(objId, lifeTime);
+			ShipSpawning::SetLifeTime(objId, lifeTime);
 		else
 			SetSolarLifeTime(objId, lifeTime);
 	}

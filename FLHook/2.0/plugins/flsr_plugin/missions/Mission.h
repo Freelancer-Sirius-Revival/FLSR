@@ -47,6 +47,7 @@ namespace Missions
 		std::unordered_set<uint> clientIds;
 		std::unordered_map<Condition*, ConditionPtr> dynamicConditions;
 		std::unordered_map<uint, ConditionPtr> objectiveConditionByObjectId;
+		std::unordered_map<uint, std::unordered_set<uint>> markedObjIdsByClientId;
 
 		MissionResult missionResult;
 		float reofferRemainingTime;

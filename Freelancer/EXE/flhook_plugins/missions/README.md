@@ -167,6 +167,8 @@ This is the definition for a NPC archetype which again can be used by multiple `
 
 This is the definition for a single NPC for the mission. Multiple `MsnNpc` can be created for individual NPCs.
 
+**NPCs are only simulated if at least one player is in space of the same system (dead or alive). Their simulation will be completely paused if the last player leaves the system space.**
+
 - `nickname` The object name of the NPC. Used by trigger conditions and actions.
     1. `STRING` The name. Must be unique in this mission.
 

@@ -64,7 +64,7 @@ namespace Missions
 			pub::AI::SubmitState(spawnedShipIds[index], &personality);
 
 			pub::AI::update_formation_state(spawnedShipIds[index], spawnedShipIds[0], formation[index]);
-			AssignToWing(spawnedShipIds[index], spawnedShipIds[0]);
+			ShipSpawning::AssignToWing(spawnedShipIds[index], spawnedShipIds[0]);
 		}
 
 		if (!spawnedShipIds.empty())

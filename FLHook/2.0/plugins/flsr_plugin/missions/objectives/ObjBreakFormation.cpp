@@ -22,7 +22,7 @@ namespace Missions
 		pub::AI::SubmitState(objId, &personality);
 
 		pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });
-		UnassignFromWing(objId);
+		ShipSpawning::UnassignFromWing(objId);
 	}
 
 	void ObjBreakFormation::Execute(const ObjectiveState& state) const

@@ -1,27 +1,33 @@
 #pragma once
 #include <FLHook.h>
 
-struct NpcCreationParams
+namespace ShipSpawning
 {
-	uint archetypeId;
-	uint loadoutId;
-	Vector position;
-	Matrix orientation;
-	uint systemId;
-	int hitpoints;
-	uint level;
-	uint voiceId = 0;
-	Costume costume;
-	uint idsName = 0;
-	std::string faction = "";
-	std::string stateGraphName;
-	uint pilotId;
-	uint pilotJobId = 0;
-	uint launchObjId = 0;
-};
+	struct NpcCreationParams
+	{
+		uint archetypeId;
+		uint loadoutId;
+		Vector position;
+		Matrix orientation;
+		uint systemId;
+		int hitpoints;
+		uint level;
+		uint voiceId = 0;
+		Costume costume;
+		uint idsName = 0;
+		std::string faction = "";
+		std::string stateGraphName;
+		uint pilotId;
+		uint pilotJobId = 0;
+		uint launchObjId = 0;
+	};
 
-void AssignToWing(const uint shipId, const uint wingLeaderShipId);
-void UnassignFromWing(const uint shipId);
-void SetLifeTime(const uint shipId, const float lifeTime);
-float GetLifeTime(const uint shipId);
-uint CreateNPC(const NpcCreationParams& params);
+	void AssignToWing(const uint shipId, const uint wingLeaderShipId);
+	void UnassignFromWing(const uint shipId);
+	void SetLifeTime(const uint shipId, const float lifeTime);
+	float GetLifeTime(const uint shipId);
+	uint CreateNPC(const NpcCreationParams& params);
+
+	void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId);
+	void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId);
+}

@@ -26,7 +26,7 @@ namespace Missions
 		const auto& msnNpc = msnNpcEntry->second;
 		const auto& npc = npcEntry->second;
 
-		NpcCreationParams params;
+		ShipSpawning::NpcCreationParams params;
 		params.archetypeId = npc.archetypeId;
 		params.loadoutId = npc.loadoutId;
 		params.position = positionOverride != nullptr ? *positionOverride : msnNpc.position;
@@ -47,7 +47,7 @@ namespace Missions
 			params.launchObjId = foundObjectEntry != mission.objectIdsByName.end() ? foundObjectEntry->second : msnNpc.startingObjId;
 		}
 
-		objId = CreateNPC(params);
+		objId = ShipSpawning::CreateNPC(params);
 
 		if (objId)
 			mission.AddObject(objId, msnNpcId, msnNpcEntry->second.labels);

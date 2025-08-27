@@ -61,7 +61,7 @@ namespace Missions
 		{
 			const auto objectId = *it;
 			it = objectIds.erase(it);
-			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0 && !(GetLifeTime(objectId) > 0.0f || GetSolarLifeTime(objectId) > 0.0f))
+			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0 && !(ShipSpawning::GetLifeTime(objectId) > 0.0f || GetSolarLifeTime(objectId) > 0.0f))
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
 		}
 

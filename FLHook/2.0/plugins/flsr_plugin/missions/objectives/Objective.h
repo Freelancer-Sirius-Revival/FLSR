@@ -3,7 +3,7 @@
 #include <FLHook.h>
 #include "ObjectiveState.h"
 #include "../Mission.h"
-#include "../conditions/CndTrue.h"
+#include "../conditions/Condition.h"
 
 namespace Missions
 {

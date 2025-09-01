@@ -230,6 +230,8 @@ This is the definition for an NPC formation. Multiple `MsnFormation` can be crea
 
 Objectives define a list of directives for NPCs to follow along. They can be assigned to NPCs as often as necessary.
 
+**Objectives only continue to be executed if at least one player is in space of the same system (dead or alive) as the NPC. As long as there is no player, Objective progression will be paused.**
+
 - `nickname` The objective list name. Used by actions.
     1. `STRING` The name. Must be unique in this mission.
 

@@ -81,6 +81,7 @@ namespace Missions
 			pub::Player::GetMsnID(clientId, msnId);
 			if (msnId == offerId)
 				pub::Player::SetMsnID(clientId, 0, 0, false, 0);
+			ClientObjectives::ClearClientObjectives(clientId, offerId);
 		}
 
 		objectIdsByName.clear();

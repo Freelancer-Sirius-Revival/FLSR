@@ -14,6 +14,7 @@ namespace Missions
 		music.playOnce = true;
 		if (action.leaveType == LeaveMsnType::Success)
 		{
+			music.crossFadeDurationInS = 0.25f;
 			music.overrideMusic = victoryMusicId;
 			if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId))
 			{

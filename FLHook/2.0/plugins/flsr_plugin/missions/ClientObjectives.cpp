@@ -13,7 +13,7 @@ namespace Missions
 		{
 			if (missionId > 0)
 			{
-				if (const auto& entry = objectiveByClientId.find(clientId); entry != objectiveByClientId.end() && entry->second.missionId == missionId)
+				if (const auto& entry = objectiveByClientId.find(clientId); entry == objectiveByClientId.end() || entry->second.missionId != missionId)
 					return;
 				pub::Player::SetMissionObjectives(clientId, missionId, nullptr, 0, FmtStr(0, 0), 0, FmtStr(0, 0));
 			}

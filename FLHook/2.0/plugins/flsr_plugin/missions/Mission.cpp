@@ -63,6 +63,12 @@ namespace Missions
 				for (const uint objId : markEntry->second)
 					Mark::UnmarkObject(markEntry->first, objId);
 			}
+
+			uint msnId;
+			pub::Player::GetMsnID(clientId, msnId);
+			if (msnId == offerId)
+				pub::Player::SetMsnID(clientId, 0, 0, false, 0);
+			ClientObjectives::ClearClientObjectives(clientId, id);
 		}
 
 		// Destroy all spawned objects of this mission.
@@ -72,16 +78,6 @@ namespace Missions
 			it = objectIds.erase(it);
 			if (pub::SpaceObj::ExistsAndAlive(objectId) == 0 && !(ShipSpawning::GetLifeTime(objectId) > 0.0f || GetSolarLifeTime(objectId) > 0.0f))
 				pub::SpaceObj::Destroy(objectId, DestroyType::VANISH);
-		}
-
-		// Clear mission ID for all involved clients.
-		for (const uint clientId : clientIds)
-		{
-			uint msnId;
-			pub::Player::GetMsnID(clientId, msnId);
-			if (msnId == offerId)
-				pub::Player::SetMsnID(clientId, 0, 0, false, 0);
-			ClientObjectives::ClearClientObjectives(clientId, offerId);
 		}
 
 		objectIdsByName.clear();
@@ -270,7 +266,7 @@ namespace Missions
 		pub::Player::GetMsnID(clientId, msnId);
 		if (msnId == offerId)
 			pub::Player::SetMsnID(clientId, 0, 0, false, 0);
-		ClientObjectives::ClearClientObjectives(clientId, offerId);
+		ClientObjectives::ClearClientObjectives(clientId, id);
 
 		ClearMusic(clientId);
 		std::vector<uint> labels;

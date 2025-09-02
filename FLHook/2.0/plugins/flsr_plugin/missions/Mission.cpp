@@ -357,7 +357,7 @@ namespace Missions
 					if (mission.CanBeStarted() && mission.offerId == 0 && IsValidMissionForOffer(mission))
 					{
 						if (mission.reofferRemainingTime > 0.0f)
-							mission.reofferRemainingTime -= seconds;
+							mission.reofferRemainingTime -= elapsedTimeInSec;
 						if (mission.reofferRemainingTime <= 0.0f)
 							RegisterMissionToJobBoard(mission);
 					}

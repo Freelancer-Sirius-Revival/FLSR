@@ -7,6 +7,7 @@
 #include "conditions/CndCount.h"
 #include "ShipSpawning.h"
 #include "LifeTimes.h"
+#include "objectives/ObjDock.h"
 
 namespace Missions
 {
@@ -378,6 +379,60 @@ namespace Missions
 				}
 
 				elapsedTimeInSec = 0.0f;
+			}
+
+			static void OrderBreakFormation(const uint objId)
+			{
+				pub::AI::SetPersonalityParams personality;
+				pub::AI::get_personality(objId, personality.personality);
+				const uint graphId = pub::AI::get_state_graph_id(objId);
+				personality.state_graph = pub::StateGraph::get_state_graph(graphId, pub::StateGraph::TYPE_LEADER);
+				personality.state_id = true;
+				personality.contentCallback = 0;
+				personality.directiveCallback = 0;
+				pub::AI::SubmitState(objId, &personality);
+
+				pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });
+				ShipSpawning::UnassignFromWing(objId);
+			}
+
+			int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				if (HkGetClientIDByShip(shipId) || response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
+					return 0;
+
+				for (auto& missionEntry : missions)
+				{
+					auto& mission = missionEntry.second;
+					if (mission.objectIds.contains(shipId))
+					{
+						uint objId = shipId;
+						IObjRW* inspect;
+						StarSystem* system;
+						if (!GetShipInspect(objId, inspect, system))
+							return 0;
+						IObjRW* formationLeader;
+						inspect->get_formation_leader(formationLeader);
+						if (formationLeader == inspect)
+						{
+							auto followers = std::vector<IObjRW*>(inspect->get_formation_follower_count());
+							inspect->get_formation_followers(followers.data(), followers.size());
+							for (uint index = 0, length = followers.size(); index < length; index++)
+							{
+								const uint followerObjId = followers[index]->get_id();
+								pub::AI::DirectiveCancelOp cancelOp;
+								pub::AI::SubmitDirective(followerObjId, &cancelOp);
+								OrderBreakFormation(followerObjId);
+								ObjDock(ObjectiveParent(mission.id, 0), dockTargetId).Execute(ObjectiveState(followerObjId, 0, true));
+							}
+						}
+						OrderBreakFormation(objId);
+					}
+				}
+
+				return 0;
 			}
 		}
 	}

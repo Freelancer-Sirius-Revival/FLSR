@@ -5,6 +5,9 @@
 
 namespace ShipSpawning
 {
+	#define ADDR_CONTENT_GETMISSIONPROPERTIES 0xB87D0
+	typedef bool(__cdecl* _GetMissionProperties)(uint shipId, st6::vector<uint>& missionProps);
+
 	/* Code made by Venemon to register NPCs properly to the system. */
 
 	DWORD dummy;
@@ -242,10 +245,24 @@ namespace ShipSpawning
 		iRepTab->EntityPhase = 0x2;
 		iRepTab->iRep = iRep;
 
+		IObjRW* inspect;
+		StarSystem* system;
+		uint archetypeId = 0;
+		if (GetShipInspect(iShipID, inspect, system))
+		{
+			archetypeId = inspect->cobj->archetype->iArchID;
+			const Archetype::Ship* arch = static_cast<Archetype::Ship*>(inspect->cobj->archetype);
+
+			uint arch2;
+			pub::SpaceObj::GetArchetypeID(iShipID, arch2);
+
+			st6::vector<uint> missionProps;
+			_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
+			if (GetMissionProperties(archetypeId, missionProps))
+				Padfill1->pad1 = missionProps[0];
+		}
 		iShipTab->unk1[72] = (DWORD)Padfill1;
-		iShipTab->unk1[73] = (DWORD)Padfill1;
-		uint archetypeId;
-		pub::SpaceObj::GetArchetypeID(iShipID, archetypeId);
+		iShipTab->unk1[73] = (DWORD)Padfill1 + 4;
 		iShipTab->archetypeId = archetypeId;
 		iShipTab->wingId = wingId--; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
 		iShipTab->unk3[0] = 0xE8;
@@ -279,8 +296,44 @@ namespace ShipSpawning
 
 	/* End of Venemon's code */
 
+	struct QueuedShipTableEntry
+	{
+		uint objId = 0;
+		uint repId = 0;
+		float lifeTime = -1.0f;
+		uint wingLeaderObjId = 0;
+		std::unordered_set<uint> wingEscortObjIds;
+	};
+
+	std::unordered_map<uint, std::vector<QueuedShipTableEntry>> shipIdsBySystemIdQueueForPopulationManager;
+
+	static QueuedShipTableEntry* FindQueuedShipEntryByShipId(const uint shipId)
+	{
+		for (auto& systemEntry : shipIdsBySystemIdQueueForPopulationManager)
+		{
+			for (auto& shipEntry : systemEntry.second)
+			{
+				if (shipEntry.objId == shipId)
+					return &shipEntry;
+			}
+		}
+		return nullptr;
+	}
+
 	void AssignToWing(const uint shipId, const uint wingLeaderShipId)
 	{
+		if (const auto& entry = FindQueuedShipEntryByShipId(shipId); entry)
+		{
+			entry->wingLeaderObjId = wingLeaderShipId;
+			return;
+		}
+
+		if (const auto& entry = FindQueuedShipEntryByShipId(wingLeaderShipId); entry)
+		{
+			entry->wingEscortObjIds.insert(shipId);
+			return;
+		}
+
 		const auto& foundShipEntry = shipTableByShipId.find(shipId);
 		if (foundShipEntry == shipTableByShipId.end())
 			return;
@@ -296,7 +349,23 @@ namespace ShipSpawning
 	{
 		const auto& foundShipEntry = shipTableByShipId.find(shipId);
 		if (foundShipEntry != shipTableByShipId.end())
+		{
 			foundShipEntry->second->wingId = wingId--;
+			for (auto& systemEntry : shipIdsBySystemIdQueueForPopulationManager)
+			{
+				for (auto& shipEntry : systemEntry.second)
+				{
+					if (shipEntry.wingEscortObjIds.contains(shipId))
+						shipEntry.wingEscortObjIds.erase(shipId);
+				}
+			}
+		}
+		else
+		{
+			const auto& entry = FindQueuedShipEntryByShipId(shipId);
+			if (entry)
+				entry->wingLeaderObjId = 0;
+		}
 	}
 
 	float GetLifeTime(const uint shipId)
@@ -312,11 +381,18 @@ namespace ShipSpawning
 
 	void SetLifeTime(const uint shipId, const float lifeTime)
 	{
+		const float newLifeTime = lifeTime < 0.0f ? -1.0f : lifeTime * 15.0f; // 15 being the max decrement per second;
 		const auto& foundShipEntry = shipTableByShipId.find(shipId);
 		if (foundShipEntry != shipTableByShipId.end())
 		{
-			foundShipEntry->second->lifetime = lifeTime < 0.0f ? -1.0f : lifeTime * 15.0f; // 15 being the max decrement per second
+			foundShipEntry->second->lifetime = newLifeTime;
 			foundShipEntry->second->currentLifetime = lifeTime <= 0.0f ? 1.0f : lifeTime * 15.0f;
+		}
+		else
+		{
+			const auto& entry = FindQueuedShipEntryByShipId(shipId);
+			if (entry)
+				entry->lifeTime = lifeTime;
 		}
 	}
 
@@ -406,8 +482,6 @@ namespace ShipSpawning
 		}
 	}
 
-	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> shipIdsBySystemIdQueueForPopulationManager;
-
 	uint CreateNPC(const NpcCreationParams& params)
 	{
 		const uint voiceId = params.voiceId ? params.voiceId : CreatePilotVoice(params.faction);
@@ -476,7 +550,12 @@ namespace ShipSpawning
 		if (foundPlayerInSameSystem)
 			CreatePopulationEntry(objId, shipInfo.iRep, shipInfo.iSystem);
 		else
-			shipIdsBySystemIdQueueForPopulationManager[params.systemId].push_back({ objId, shipInfo.iRep });
+		{
+			QueuedShipTableEntry entry;
+			entry.objId = objId;
+			entry.repId = shipInfo.iRep;
+			shipIdsBySystemIdQueueForPopulationManager[params.systemId].push_back(entry);
+		}
 
 		return objId;
 	}
@@ -486,8 +565,32 @@ namespace ShipSpawning
 		const auto& systemShipsEntry = shipIdsBySystemIdQueueForPopulationManager.find(systemId);
 		if (systemShipsEntry != shipIdsBySystemIdQueueForPopulationManager.end())
 		{
+			// Remove those NPCs that have been deleted before they were properly registered to the game.
+			for (auto it = systemShipsEntry->second.begin(); it != systemShipsEntry->second.end();)
+			{
+				if (pub::SpaceObj::ExistsAndAlive(it->objId) != 0)
+					it = systemShipsEntry->second.erase(it);
+				else
+					it++;
+			}
+
+			// Add table entries
 			for (const auto& shipInfo : systemShipsEntry->second)
-				CreatePopulationEntry(shipInfo.first, shipInfo.second, systemId);
+			{
+				CreatePopulationEntry(shipInfo.objId, shipInfo.repId, systemId);
+				SetLifeTime(shipInfo.objId, shipInfo.lifeTime);
+			}
+			// Add wing assignments once all NPCs were created
+			for (const auto& shipInfo : systemShipsEntry->second)
+			{
+				if (shipInfo.wingLeaderObjId)
+					AssignToWing(shipInfo.objId, shipInfo.wingLeaderObjId);
+				if (!shipInfo.wingEscortObjIds.empty())
+				{
+					for (const auto& escortId : shipInfo.wingEscortObjIds)
+						AssignToWing(escortId, shipInfo.objId);
+				}
+			}
 			shipIdsBySystemIdQueueForPopulationManager.erase(systemShipsEntry);
 		}
 	}

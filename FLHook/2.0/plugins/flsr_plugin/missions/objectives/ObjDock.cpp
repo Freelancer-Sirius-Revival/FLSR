@@ -37,6 +37,7 @@ namespace Missions
 			pub::AI::SubmitDirective(state.objId, &dockOp);
 		}
 
-		RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
+		if (parent.objectivesId)
+			RegisterCondition(state.objId, ConditionPtr(new ObjCndTrue(parent, state)));
 	}
 }

@@ -90,6 +90,7 @@ namespace Missions
 		namespace Mission
 		{
 			void __stdcall Elapse_Time_AFTER(float seconds);
+			int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
 		}
 	}
 }

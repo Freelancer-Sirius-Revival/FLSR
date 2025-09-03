@@ -230,6 +230,8 @@ This is the definition for an NPC formation. Multiple `MsnFormation` can be crea
 
 Objectives define a list of directives for NPCs to follow along. They can be assigned to NPCs as often as necessary.
 
+**Objectives only continue to be executed if at least one player is in space of the same system (dead or alive) as the NPC. As long as there is no player, Objective progression will be paused.**
+
 - `nickname` The objective list name. Used by actions.
     1. `STRING` The name. Must be unique in this mission.
 
@@ -240,7 +242,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
 - `Delay` Enforce a pause of any action or maneuver for a time.
     1. `INTEGER :0` The time to pause.
 
-- `Dock` Fly toward a specific object and dock to it.
+- `Dock` Fly toward a specific object and dock to it. When the NPC is formation leader, it will dissolve the formation and tell every member to dock, too.
     1. `STRING` Object by name to dock to. Can also be a static world solar.
 
 - `Follow` Follows the given target.

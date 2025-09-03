@@ -549,14 +549,14 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
     
-- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
+- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `Default`, player changes system, player docks, logs out from character.
     1. `STRING|Activator` Players by label to set music for.
-    1. `[STRING|None] :None` Overrides the space music.
-    1. `[STRING|None] :None` Overrides the danger music.
-    1. `[STRING|None] :None` Overrides the battle music.
+    1. `[STRING|Default] :Default` Overrides the space music.
+    1. `[STRING|Default] :Default` Overrides the danger music.
+    1. `[STRING|Default] :Default` Overrides the battle music.
     1. `[STRING|None] :None` Overrides all music by this track.
     1. `[FLOAT] :0` The time in seconds it takes to transition music.
-    1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
+    1. `[True|False] :False` Whether to play the override music only once and then return to other music.
 
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
     1. `STRING|Activator` Players by label to play the sound effect for.

@@ -621,10 +621,10 @@ namespace Missions
 							{
 								ActPlayMusicPtr action(new ActPlayMusic());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
-								action->music.spaceMusic = std::string(ini.get_value_string(1)) != "none" ? CreateIdOrNull(ini.get_value_string(1)) : 0;
-								action->music.dangerMusic = std::string(ini.get_value_string(2)) != "none" ? CreateIdOrNull(ini.get_value_string(2)) : 0;
-								action->music.battleMusic = std::string(ini.get_value_string(3)) != "none" ? CreateIdOrNull(ini.get_value_string(3)) : 0;
-								action->music.overrideMusic = std::string(ini.get_value_string(4)) != "none" ? CreateIdOrNull(ini.get_value_string(4)) : 0;
+								action->music.spaceMusic = ToLower(ini.get_value_string(1)) != "default" ? CreateIdOrNull(ini.get_value_string(1)) : 0;
+								action->music.dangerMusic = ToLower(ini.get_value_string(2)) != "default" ? CreateIdOrNull(ini.get_value_string(2)) : 0;
+								action->music.battleMusic = ToLower(ini.get_value_string(3)) != "default" ? CreateIdOrNull(ini.get_value_string(3)) : 0;
+								action->music.overrideMusic = ToLower(ini.get_value_string(4)) != "none" ? CreateIdOrNull(ini.get_value_string(4)) : 0;
 								action->music.crossFadeDurationInS = ini.get_value_float(5);
 								if (ini.get_num_parameters() > 6)
 									action->music.playOnce = ini.get_value_bool(6);

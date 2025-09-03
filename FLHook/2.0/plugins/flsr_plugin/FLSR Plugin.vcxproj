@@ -184,6 +184,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndDistVec.cpp" />
     <ClCompile Include="missions\conditions\CndHealthDec.cpp" />
     <ClCompile Include="missions\conditions\CndInSystem.cpp" />
+    <ClCompile Include="missions\conditions\CndLaunchComplete.cpp" />
     <ClCompile Include="missions\conditions\CndOnBase.cpp" />
     <ClCompile Include="missions\conditions\CndProjHitCount.cpp" />
     <ClCompile Include="missions\conditions\CndSystemEnter.cpp" />
@@ -279,6 +280,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndDistVec.h" />
     <ClInclude Include="missions\conditions\CndHealthDec.h" />
     <ClInclude Include="missions\conditions\CndInSystem.h" />
+    <ClInclude Include="missions\conditions\CndLaunchComplete.h" />
     <ClInclude Include="missions\conditions\CndOnBase.h" />
     <ClInclude Include="missions\conditions\CndProjHitCount.h" />
     <ClInclude Include="missions\conditions\CndSystemEnter.h" />

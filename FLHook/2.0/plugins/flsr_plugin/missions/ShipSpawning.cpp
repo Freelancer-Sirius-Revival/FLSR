@@ -52,7 +52,10 @@ namespace ShipSpawning
 		HMODULE ContentConfg;
 		uint iShipID;
 		iRepTable* iRepTab;
-		DWORD unk1[75];
+		DWORD unk1[72];
+		uint* missionProperties;
+		void* missionPropertiesEnd;
+		DWORD unk7;
 		uint archetypeId;
 		DWORD unk2[6];
 		uint wingId;
@@ -157,7 +160,7 @@ namespace ShipSpawning
 			{
 				free((DWORD*)StorediShipTables[i]->unk3[10]);
 				free((DWORD*)StorediShipTables[i]->unk3[1]);
-				free((DWORD*)StorediShipTables[i]->unk1[72]);
+				free(StorediShipTables[i]->missionProperties);
 				free(StorediShipTables[i]->iRepTab);
 				free(StorediShipTables[i]);
 
@@ -227,7 +230,6 @@ namespace ShipSpawning
 
 		iShipTable* iShipTab = (iShipTable*)malloc(sizeof(iShipTable));
 		iRepTable* iRepTab = (iRepTable*)malloc(sizeof(iRepTable));
-		EmptyPadding* Padfill1 = (EmptyPadding*)malloc(sizeof(EmptyPadding));
 		EmptyPadding* Padfill2 = (EmptyPadding*)malloc(sizeof(EmptyPadding));
 		EmptyPadding* Padfill3 = (EmptyPadding*)malloc(sizeof(EmptyPadding));
 
@@ -245,25 +247,29 @@ namespace ShipSpawning
 		iRepTab->EntityPhase = 0x2;
 		iRepTab->iRep = iRep;
 
+		iShipTab->missionProperties = nullptr;
+		iShipTab->missionPropertiesEnd = nullptr;
+		iShipTab->archetypeId = 0;
+
+		uint* missionProperties = nullptr;
 		IObjRW* inspect;
 		StarSystem* system;
-		uint archetypeId = 0;
 		if (GetShipInspect(iShipID, inspect, system))
 		{
-			archetypeId = inspect->cobj->archetype->iArchID;
-			const Archetype::Ship* arch = static_cast<Archetype::Ship*>(inspect->cobj->archetype);
+			iShipTab->archetypeId = inspect->cobj->archetype->iArchID;
 
-			uint arch2;
-			pub::SpaceObj::GetArchetypeID(iShipID, arch2);
-
-			st6::vector<uint> missionProps;
 			_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
-			if (GetMissionProperties(archetypeId, missionProps))
-				Padfill1->pad1 = missionProps[0];
+			st6::vector<uint> missionProps;
+			if (GetMissionProperties(iShipTab->archetypeId, missionProps))
+			{
+				const auto& missionPropertiesCount = missionProps.size();
+				iShipTab->missionProperties = (uint*)malloc(sizeof(uint) * missionPropertiesCount);
+				for (size_t index = 0; index < missionPropertiesCount; index++)
+					iShipTab->missionProperties[index] = missionProps[index];
+				iShipTab->missionPropertiesEnd = iShipTab->missionProperties + missionPropertiesCount;
+			}
 		}
-		iShipTab->unk1[72] = (DWORD)Padfill1;
-		iShipTab->unk1[73] = (DWORD)Padfill1 + 4;
-		iShipTab->archetypeId = archetypeId;
+
 		iShipTab->wingId = wingId--; // WingId - all of the same wing ID get despawned once a member reaches lifetime 0.
 		iShipTab->unk3[0] = 0xE8;
 		iShipTab->unk3[1] = (DWORD)Padfill2;
@@ -275,7 +281,7 @@ namespace ShipSpawning
 		iShipTab->unk3[23] = 0;
 		iShipTab->unk3[24] = 5;
 		iShipTab->lifetime = -1; // -1 makes the NPC persistent.
-		iShipTab->loadoutId = NULL; //loadout hash
+		iShipTab->loadoutId = 0;
 		iShipTab->currentLifetime = 24; // Resets to initial lifetime when player comes back into range.
 		pub::AI::get_personality(iShipID, iShipTab->personality);
 

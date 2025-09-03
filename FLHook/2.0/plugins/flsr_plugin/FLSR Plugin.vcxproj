@@ -233,6 +233,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\randomMissions\Offers.cpp" />
     <ClCompile Include="missions\randomMissions\RandomMissions.cpp" />
     <ClCompile Include="missions\randomMissions\Rewards.cpp" />
+    <ClCompile Include="missions\randomMissions\Vignette.cpp" />
     <ClCompile Include="missions\ShipSpawning.cpp" />
     <ClCompile Include="missions\Trigger.cpp" />
     <ClCompile Include="Modules.cpp" />

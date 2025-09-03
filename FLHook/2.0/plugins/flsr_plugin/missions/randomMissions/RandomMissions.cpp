@@ -7,6 +7,7 @@
 #include "NpcWaves.h"
 #include "Offers.h"
 #include "Rewards.h"
+#include "Vignette.h"
 
 namespace RandomMissions
 {
@@ -18,5 +19,6 @@ namespace RandomMissions
 		ReadNpcWaveData();
 		ReadOfferData();
 		ReadRewardData();
+		ReadVignetteData();
 	}
 }

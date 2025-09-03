@@ -17,7 +17,7 @@ namespace RandomMissions
 			if (ini.is_header("Group"))
 			{
 				uint factionId = 0;
-				std::unordered_set<uint> hostileFactions;
+				std::unordered_set<uint> hostileFactions{};
 				while (ini.read_value())
 				{
 					if (ini.is_value("nickname"))
@@ -38,7 +38,7 @@ namespace RandomMissions
 				}
 			}
 		}
-
+		ini.close();
 
 		if (!ini.open("..\\DATA\\MISSIONS\\faction_prop.ini", false)) return;
 
@@ -46,7 +46,7 @@ namespace RandomMissions
 		{
 			if (ini.is_header("FactionProps"))
 			{
-				Faction faction;
+				Faction faction{};
 				while (ini.read_value())
 				{
 					if (ini.is_value("affiliation"))

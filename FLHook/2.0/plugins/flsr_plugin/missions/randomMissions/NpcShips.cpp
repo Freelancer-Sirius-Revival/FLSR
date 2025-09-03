@@ -13,7 +13,7 @@ namespace RandomMissions
 		{
 			if (ini.is_header("NPCShipArch"))
 			{
-				NpcShip ship;
+				NpcShip ship{};
 				bool missionValid = false;
 				while (ini.read_value())
 				{

@@ -35,7 +35,7 @@ namespace RandomMissions
 			}
 			else if (ini.is_header("BaseFaction"))
 			{
-				BaseOffer offer;
+				BaseOffer offer{};
 				offer.baseId = baseId;
 				while (ini.read_value())
 				{

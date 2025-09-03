@@ -14,7 +14,7 @@ namespace RandomMissions
 			if (ini.is_header("Costume"))
 			{
 				uint costumeId = 0;
-				Costume costume;
+				Costume costume{};
 				while (ini.read_value())
 				{
 					if (ini.is_value("nickname"))

@@ -271,6 +271,9 @@
     <ClCompile Include="missions\conditions\CndJumpInComplete.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndInSpace.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -550,6 +553,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndJumpInComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInSpace.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>

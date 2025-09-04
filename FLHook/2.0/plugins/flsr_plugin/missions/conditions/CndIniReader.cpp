@@ -8,6 +8,7 @@
 #include "CndDistObj.h"
 #include "CndDistVec.h"
 #include "CndHealthDec.h"
+#include "CndInSpace.h"
 #include "CndInSystem.h"
 #include "CndInZone.h"
 #include "CndJumpInComplete.h"
@@ -364,6 +365,31 @@ namespace Missions
 		return new CndHealthDec(conditionParent, objNameOrLabel, remainingHitpoints, colGrpIds, damagedIsActivator);
 	}
 
+	static CndInSpace* ReadCndInSpace(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> systemIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_InSpace", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemIds.insert(value);
+			argNum++;
+		}
+
+		return new CndInSpace(conditionParent, label, systemIds);
+	}
+
 	static CndInSystem* ReadCndInSystem(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
@@ -677,6 +703,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_HealthDec"))
 			return ReadCndHealthDec(conditionParent, ini);
+
+		if (ini.is_value("Cnd_InSpace"))
+			return ReadCndInSpace(conditionParent, ini);
 
 		if (ini.is_value("Cnd_InSystem"))
 			return ReadCndInSystem(conditionParent, ini);

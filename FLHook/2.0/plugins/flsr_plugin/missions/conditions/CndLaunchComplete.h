@@ -14,7 +14,7 @@ namespace Missions
 		~CndLaunchComplete();
 		void Register();
 		void Unregister();
-		bool Matches(const uint clientId, const uint baseId);
+		bool Matches(const uint clientId, const uint currentBaseId);
 	};
 
 	namespace Hooks

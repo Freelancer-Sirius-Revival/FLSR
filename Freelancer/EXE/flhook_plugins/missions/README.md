@@ -421,6 +421,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` Object by name or label to expect in the zone.
     1. `STRING` Multiple subsequent entries possible. The zone nickname to expect the object in.
 
+- `Cnd_JumpInComplete` Only players. When fully jumped into a system. `Activator` will be the jumped-in player.
+    1. `STRING|Stranger` The players to await fully jumping into a system.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname the player jumped into. If none is given, any system will count.
+
 - `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
     1. `STRING|Stranger` The players to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.

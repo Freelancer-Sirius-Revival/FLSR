@@ -10,6 +10,7 @@
 #include "CndHealthDec.h"
 #include "CndInSystem.h"
 #include "CndInZone.h"
+#include "CndJumpInComplete.h"
 #include "CndLaunchComplete.h"
 #include "CndOnBase.h"
 #include "CndProjHitCount.h"
@@ -418,6 +419,31 @@ namespace Missions
 		return new CndInZone(conditionParent, label, zoneIds);
 	}
 
+	static CndJumpInComplete* ReadCndJumpInComplete(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> systemIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_JumpInComplete", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemIds.insert(value);
+			argNum++;
+		}
+
+		return new CndJumpInComplete(conditionParent, label, systemIds);
+	}
+
 	static CndLaunchComplete* ReadCndLaunchComplete(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
@@ -649,6 +675,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_InZone"))
 			return ReadCndInZone(conditionParent, ini);
+
+		if (ini.is_value("Cnd_JumpInComplete"))
+			return ReadCndJumpInComplete(conditionParent, ini);
 
 		if (ini.is_value("Cnd_LaunchComplete"))
 			return ReadCndLaunchComplete(conditionParent, ini);

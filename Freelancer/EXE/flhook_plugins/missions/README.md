@@ -413,6 +413,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players to expect in space.
     1. `[STRING] :any` The system nickname to expect the player in.
 
+- `Cnd_InZone` Checks if an object is within a zone. `Activator` will be the object in the zone.
+    1. `STRING|Stranger` Object by name or label to expect in the zone.
+    1. `STRING` Multiple subsequent entries possible. The zone nickname to expect the object in.
+
 - `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
     1. `STRING|Stranger` The players to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from.

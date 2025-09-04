@@ -365,9 +365,9 @@ Only one condition must be present. If none is present, `Cnd_True` is used.
 
 The keyword `Stranger` is used to refer explicitely to all players not having a label assigned in this mission. It can be used in combination with action’s `Activator` to assign players to the mission.
 
-- `Cnd_BaseEnter` Only players. Landing or logging in to bases. `Activator` will be the landed player.
+- `Cnd_BaseEnter` Only players. Landing or logging in to a base. `Activator` will be the landed player.
     1. `STRING|Stranger` The players to await fully landing on a base.
-    1. `[STRING] :any` The base nickname the player lands on.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player landed on. If none is given, any base will count.
 
 - `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress). `Activator` will be the cloaked/uncloaked object.
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
@@ -419,7 +419,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 
 - `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
     1. `STRING|Stranger` The players to await fully landing on a base.
-    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.
 
 - `Cnd_OnBase` Only players. Checks whether the player is docked on a base. `Activator` will be the player.
     1. `STRING|Stranger` The players to expect on a base.

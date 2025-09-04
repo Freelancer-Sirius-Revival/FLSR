@@ -32,7 +32,7 @@ namespace Missions
 	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint baseId = 0;
+		std::unordered_set<uint> baseIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
@@ -43,14 +43,15 @@ namespace Missions
 		}
 		argNum++;
 
-		if (ini.get_num_parameters() > argNum)
+		while (argNum < ini.get_num_parameters())
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				baseId = value;
+				baseIds.insert(value);
+			argNum++;
 		}
 
-		return new CndBaseEnter(conditionParent, label, baseId);
+		return new CndBaseEnter(conditionParent, label, baseIds);
 	}
 
 	static CndCloaked* ReadCndCloaked(const ConditionParent& conditionParent, INI_Reader& ini)

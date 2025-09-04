@@ -7,14 +7,14 @@ namespace Missions
 	{
 	private:
 		const uint label;
-		const uint baseId;
+		const std::unordered_set<uint> baseIds;
 
 	public:
-		CndBaseEnter(const ConditionParent& parent, const uint objNameOrLabel, const uint baseId);
+		CndBaseEnter(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds);
 		~CndBaseEnter();
 		void Register();
 		void Unregister();
-		bool Matches(const uint clientId, const uint baseId);
+		bool Matches(const uint clientId, const uint currentBaseId);
 	};
 
 	namespace Hooks

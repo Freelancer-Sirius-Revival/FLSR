@@ -1,8 +1,10 @@
-#pragma once
 #include "Vignette.h"
+#include <optional>
 
 namespace RandomMissions
 {
+	std::unordered_map<uint, std::vector<Vignette>> vignettesBySystemId;
+
 	void ReadVignetteData() {
 		INI_Reader ini;
 		if (!ini.open("..\\DATA\\UNIVERSE\\universe.ini", false)) return;
@@ -42,18 +44,21 @@ namespace RandomMissions
 			}
 
 			std::vector<Vignette> vignettes;
+			std::vector<Zone> zones;
 
 			while (ini.read_header())
 			{
 				if (ini.is_header("zone"))
 				{
-					Zone zone{};
+					Zone zone;
 					zone.systemId = systemId;
+					std::optional<VignetteType> vignette_type = std::nullopt;
 					while (ini.read_value())
 					{
 						if (ini.is_value("nickname"))
 						{
 							zone.id = CreateID(ini.get_value_string(0));
+							zone.nickname = ini.get_value_string(0);
 						}
 						else if (ini.is_value("pos"))
 						{
@@ -68,15 +73,15 @@ namespace RandomMissions
 							std::string typeStr = ToLower(ini.get_value_string(0));
 							if (typeStr == "open")
 							{
-								zone.type = VignetteTypeOpt::Open;
+								vignette_type = VignetteType::Open;
 							}
 							else if (typeStr == "field")
 							{
-								zone.type = VignetteTypeOpt::Field;
+								vignette_type = VignetteType::Field;
 							}
 							else if (typeStr == "exclusion")
 							{
-								zone.type = VignetteTypeOpt::Exclusion;
+								vignette_type = VignetteType::Exclusion;
 							}
 						}
 						else if (ini.is_value("shape"))
@@ -120,50 +125,69 @@ namespace RandomMissions
 					{
 						zone.size.y = zone.size.x;
 					}
-					if (zone.id && zone.type != VignetteTypeOpt::None)
+					if (zone.id && vignette_type.has_value())
 					{
 						Vignette vignette
 						{
-							static_cast<ZoneBase>(zone), // supertype values
+							zone, // supertype values
 							zone.size.x, // diameter
-							static_cast<VignetteType>(zone.type) // type
+							vignette_type.value() // type
 						};
 						vignettes.push_back(vignette);
+					}
+					else if (!zone.factionIds.empty())
+					{
+						zones.push_back(zone);
 					}
 				}
 			}
 			ini.close();
+
+			for (Vignette& vignette : vignettes)
+			{
+				for (const Zone& zone : zones)
+				{
+					if (vignette.Intersects(zone))
+					{
+						vignette.factionIds.insert(zone.factionIds.begin(), zone.factionIds.end());
+					}
+				}
+				if (!vignette.factionIds.empty())
+				{
+					vignettesBySystemId[systemId].push_back(vignette);
+				}
+			}
 		}
 	}
 
-	Vector VecAdd(Vector a, Vector b) {
+	static Vector VecAdd(const Vector& a, const Vector& b) {
 		return { a.x + b.x, a.y + b.y, a.z + b.z };
 	}
-	Vector VecSub(Vector a, Vector b) {
+	static Vector VecSub(const Vector& a, const Vector& b) {
 		return { a.x - b.x, a.y - b.y, a.z - b.z };
 	}
-	Vector VecNeg(Vector a) {
+	static Vector VecNeg(const Vector& a) {
 		return { -a.x, -a.y, -a.z };
 	}
-	Vector VecMul(Vector a, float b) {
+	static Vector VecMul(const Vector& a, float b) {
 		return { a.x * b, a.y * b, a.z * b };
 	}
-	Vector VecMul(Vector a, Vector b) {
+	static Vector VecMul(const Vector& a, const Vector& b) {
 		return { a.x * b.x, a.y * b.y, a.z * b.z };
 	}
-	Vector VecDiv(Vector a, float b) {
+	static Vector VecDiv(const Vector& a, float b) {
 		return { a.x / b, a.y / b, a.z / b };
 	}
-	Vector VecDiv(Vector a, Vector b) {
+	static Vector VecDiv(const Vector& a, const Vector& b) {
 		return { a.x / b.x, a.y / b.y, a.z / b.z };
 	}
-	float VecDistanceToOriginSquared(Vector a) {
+	static float VecDistanceToOriginSquared(const Vector& a) {
 		return a.x * a.x + a.y * a.y + a.z * a.z;
 	}
-	float VecDistanceSquared(Vector a, Vector b) {
+	static float VecDistanceSquared(const Vector& a, const Vector& b) {
 		return VecDistanceToOriginSquared(VecSub(a, b));
 	}
-	Vector VecClamp(Vector a, Vector min, Vector max) {
+	static Vector VecClamp(const Vector& a, const Vector& min, const Vector& max) {
 		return {
 			std::fmax(min.x, std::fmin(a.x, max.x)),
 			std::fmax(min.y, std::fmin(a.y, max.y)),
@@ -171,38 +195,38 @@ namespace RandomMissions
 		};
 	}
 
-	const float PI = 3.14159265358979323846f;
-	float DegToRad(float degrees) {
+	static const float PI = 3.14159265358979323846f;
+	static float DegToRad(const float degrees) {
 		return degrees * (PI / 180.0f);
 	}
-	Vector VecRotX(Vector point, float angleRad) {
-		float sinA = std::sin(angleRad);
-		float cosA = std::cos(angleRad);
+	static Vector VecRotX(const Vector& point, const float angleRad) {
+		const float sinA = std::sin(angleRad);
+		const float cosA = std::cos(angleRad);
 		return {
 			point.x,
 			point.y * cosA - point.z * sinA,
 			point.z * cosA + point.y * sinA
 		};
 	}
-	Vector VecRotY(Vector point, float angleRad) {
-		float sinA = std::sin(angleRad);
-		float cosA = std::cos(angleRad);
+	static Vector VecRotY(const Vector& point, const float angleRad) {
+		const float sinA = std::sin(angleRad);
+		const float cosA = std::cos(angleRad);
 		return {
 			point.x * cosA + point.z * sinA,
 			point.y,
 			point.z * cosA - point.x * sinA
 		};
 	}
-	Vector VecRotZ(Vector point, float angleRad) {
-		float sinA = std::sin(angleRad);
-		float cosA = std::cos(angleRad);
+	static Vector VecRotZ(const Vector& point, const float angleRad) {
+		const float sinA = std::sin(angleRad);
+		const float cosA = std::cos(angleRad);
 		return {
 			point.x * cosA - point.y * sinA,
 			point.y * cosA + point.x * sinA,
 			point.z
 		};
 	}
-	Vector VecRelativeTo(Vector point, Vector rotationCenter, Vector eulerDegrees) {
+	static Vector VecRelativeTo(const Vector& point, const Vector& rotationCenter, const Vector& eulerDegrees) {
 		// Move point relative to center
 		Vector local = VecSub(point, rotationCenter);
 
@@ -228,7 +252,7 @@ namespace RandomMissions
 		}
 	}
 
-	bool Vignette::IntersectsSphere(Vector zone_position, float zone_diameter) const
+	bool Vignette::IntersectsSphere(const Vector& zone_position, const float zone_diameter) const
 	{
 		// For two spheres to touch, their centers cannot be further apart than the radii of both spheres added together.
 		float radius_sum = (diameter + zone_diameter) / 2;
@@ -236,7 +260,7 @@ namespace RandomMissions
 		return VecDistanceSquared(position, zone_position) <= radius_sum * radius_sum;
 	}
 
-	bool Vignette::IntersectsBox(Vector zone_position, Vector zone_size, Vector zone_rotation) const
+	bool Vignette::IntersectsBox(const Vector& zone_position, const Vector& zone_size, const Vector& zone_rotation) const
 	{
 		// First, we calculate the vignette center relative to the local space of the box.
 		// This means that every calculation from now on can assume that the box is axis-aligned and its position is at the origin { 0, 0, 0 }.
@@ -253,39 +277,24 @@ namespace RandomMissions
 		return VecDistanceSquared(position_relative, closest_point_in_zone) <= radius * radius;
 	}
 
-	bool Vignette::IntersectsEllipsoid(Vector zone_position, Vector zone_size, Vector zone_rotation) const
+	bool Vignette::IntersectsEllipsoid(const Vector& zone_position, const Vector& zone_size, const Vector& zone_rotation) const
 	{
 		// As with boxes, we put the vignette center into the local space of the ellipsoid, so the ellipsoid is axis-aligned and at the origin.
 		Vector position_relative = VecRelativeTo(position, zone_position, zone_rotation);
 
-		// We now scale the entire coordinate system by dividing it by the ellipsoid's radii.
-		// This means that we're turning the ellipsoid into a unit sphere (meaning its radius is 1), still positioned at the local origin.
-		Vector zone_radii = VecDiv(zone_size, 2);
-		Vector position_scaled = VecDiv(position_relative, zone_radii);
-		float distance_scaled = std::sqrt(VecDistanceToOriginSquared(position_scaled));
-
-		// However, in doing so, we also need to scale the vignette the same way, turning it into an ellipsoid...
-		// Sounds weird and pointless, but it's actually the simplest way in this scenario.
-		float radius = diameter / 2;
-		Vector radii_scaled = VecDiv({ radius, radius, radius }, zone_radii);
-
-		// To avoid dividing by (near-)zero, we just assume that the vignette and the zone overlap if they're in basically the same place.
-		if (distance_scaled < 1e-6f)
-		{
-			return true;
-		}
 		// Now, we calculate the direction from the zone center to the vignette center as a unit vector.
-		Vector dir = VecDiv(position_scaled, distance_scaled);
+		float distance = std::sqrt(VecDistanceToOriginSquared(position_relative));
+		Vector dir = VecDiv(position_relative, distance);
 
-		// We use that direction to calculate what the "radius" of the scaled vignette is in this direction ("ellipsoidal radius projection").
-		float effective_radius = std::sqrt(VecDistanceToOriginSquared(VecMul(radii_scaled, dir)));
+		// We use that direction to calculate what the "radius" of the zone is in this direction ("ellipsoidal radius projection").
+		float effective_radius = std::sqrt(VecDistanceToOriginSquared(VecMul(zone_size, dir)));
 
-		// Now that we have the effective radius, we can check if the scaled vignette's effective radius and the scaled zone's radius (1) overlap,
+		// Now that we have the effective radius, we can check if the vignette's radius and the zone's effective radius overlap,
 		// which is done the same way as with two spheres.
-		return distance_scaled <= effective_radius + 1;
+		return distance <= diameter / 2 + effective_radius;
 	}
 
-	bool Vignette::IntersectsCylinder(Vector zone_position, float zone_diameter, float zone_height, Vector zone_rotation) const
+	bool Vignette::IntersectsCylinder(const Vector& zone_position, const float zone_diameter, const float zone_height, const Vector& zone_rotation) const
 	{
 		// This one needs some explaining.
 		// So, turns out that calculating overlap between a sphere and a cylinder directly is not as trivial as I thought it would be.
@@ -325,9 +334,10 @@ namespace RandomMissions
 		return distance_to_axis_squared <= radius_sum * radius_sum;
 	}
 
-	bool Vignette::IntersectsRing(Vector zone_position, float zone_diameter, float zone_diameter_inner, float zone_height, Vector zone_rotation) const
+	bool Vignette::IntersectsRing(const Vector& zone_position, const float zone_diameter, const float zone_diameter_inner, const float zone_height, const Vector& zone_rotation) const
 	{
-		// This could be done more efficiently by reusing some calculations between the two cylinder checks, but this will never get used anyway, so why bother?
+		// This could be done more efficiently by reusing some calculations between the two cylinder checks,
+		// but since this will likely never be used at all, I'll leave it as is for now.
 		return IntersectsCylinder(zone_position, zone_diameter, zone_height, zone_rotation) && !IntersectsCylinder(zone_position, zone_diameter_inner, zone_height, zone_rotation);
 	}
 }

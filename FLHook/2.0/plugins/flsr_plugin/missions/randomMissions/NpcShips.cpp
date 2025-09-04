@@ -1,4 +1,3 @@
-#pragma once
 #include "NpcShips.h"
 
 namespace RandomMissions

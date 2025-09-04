@@ -6,10 +6,10 @@ namespace Missions
 {
 	std::unordered_set<CndInSystem*> observedCndInSystem;
 
-	CndInSystem::CndInSystem(const ConditionParent& parent, const uint label, const uint systemId) :
+	CndInSystem::CndInSystem(const ConditionParent& parent, const uint label, const std::unordered_set<uint> systemIds) :
 		Condition(parent),
 		label(label),
-		systemId(systemId)
+		systemIds(systemIds)
 	{}
 
 	CndInSystem::~CndInSystem()
@@ -22,7 +22,7 @@ namespace Missions
 		struct PlayerData* playerData = 0;
 		while (playerData = Players.traverse_active(playerData))
 		{
-			if (Matches(playerData->iOnlineID, playerData->iSystemID))
+			if (Matches(playerData->iOnlineID))
 			{
 				ExecuteTrigger();
 				return;
@@ -36,20 +36,18 @@ namespace Missions
 		observedCndInSystem.erase(this);
 	}
 
-	bool CndInSystem::Matches(const uint clientId, const uint currentSystemId)
+	bool CndInSystem::Matches(const uint clientId)
 	{
-		if (!currentSystemId)
-			return false;
+		uint currentSystemId;
+		pub::Player::GetSystem(clientId, currentSystemId);
 
-		uint shipId;
-		pub::Player::GetShip(clientId, shipId);
-		if (!shipId) // When in space, the player always must have a ship ID.
+		if (!currentSystemId)
 			return false;
 
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{
-			if (!mission.clientIds.contains(clientId) && (!systemId || systemId == currentSystemId))
+			if (!mission.clientIds.contains(clientId) && systemIds.contains(currentSystemId))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = clientId;
@@ -60,7 +58,7 @@ namespace Missions
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
-				if (object.type == MissionObjectType::Client && object.id == clientId && (!systemId || systemId == currentSystemId))
+				if (object.type == MissionObjectType::Client && object.id == clientId && systemIds.contains(currentSystemId))
 				{
 					activator = object;
 					return true;
@@ -74,37 +72,38 @@ namespace Missions
 	{
 		namespace CndInSystem
 		{
-			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
+			void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 			{
 				returncode = DEFAULT_RETURNCODE;
-
-				if (observedCndInSystem.empty())
-					return;
-				uint systemId;
-				pub::Player::GetSystem(clientId, systemId);
 
 				const std::unordered_set<Missions::CndInSystem*> currentConditions(observedCndInSystem);
 				for (const auto& condition : currentConditions)
 				{
-					if (observedCndInSystem.contains(condition) && condition->Matches(clientId, systemId))
+					if (observedCndInSystem.contains(condition) && condition->Matches(clientId))
 						condition->ExecuteTrigger();
 				}
 			}
 
-			void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId)
+			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 			{
 				returncode = DEFAULT_RETURNCODE;
-
-				if (observedCndInSystem.empty())
-					return;
-				const uint clientId = HkGetClientIDByShip(shipId);
-				if (!clientId)
-					return;
 
 				const std::unordered_set<Missions::CndInSystem*> currentConditions(observedCndInSystem);
 				for (const auto& condition : currentConditions)
 				{
-					if (observedCndInSystem.contains(condition) && condition->Matches(clientId, systemId))
+					if (observedCndInSystem.contains(condition) && condition->Matches(clientId))
+						condition->ExecuteTrigger();
+				}
+			}
+
+			void __stdcall SystemSwitchOutComplete_AFTER(unsigned int objId, unsigned int clientId)
+			{
+				returncode = DEFAULT_RETURNCODE;
+
+				const std::unordered_set<Missions::CndInSystem*> currentConditions(observedCndInSystem);
+				for (const auto& condition : currentConditions)
+				{
+					if (observedCndInSystem.contains(condition) && condition->Matches(clientId))
 						condition->ExecuteTrigger();
 				}
 			}

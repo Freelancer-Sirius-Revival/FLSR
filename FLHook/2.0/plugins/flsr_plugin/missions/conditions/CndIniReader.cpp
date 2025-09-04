@@ -367,7 +367,7 @@ namespace Missions
 	static CndInSystem* ReadCndInSystem(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint systemId = 0;
+		std::unordered_set<uint> systemIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
@@ -378,14 +378,21 @@ namespace Missions
 		}
 		argNum++;
 
-		if (ini.get_num_parameters() > argNum)
+		while (argNum < ini.get_num_parameters())
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				systemId = value;
+				systemIds.insert(value);
+			argNum++;
 		}
 
-		return new CndInSystem(conditionParent, label, systemId);
+		if (systemIds.empty())
+		{
+			PrintErrorToConsole(L"Cnd_InSystem", conditionParent, 1, L"No system given. Aborting!");
+			return nullptr;
+		}
+
+		return new CndInSystem(conditionParent, label, systemIds);
 	}
 
 	static CndInZone* ReadCndInZone(const ConditionParent& conditionParent, INI_Reader& ini)

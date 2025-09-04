@@ -413,9 +413,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
-- `Cnd_InSystem` Only players. Checks whether the player exists in space. `Activator` will be the player.
-    1. `STRING|Stranger` The players to expect in space.
-    1. `[STRING] :any` The system nickname to expect the player in.
+- `Cnd_InSystem` Only players. Checks whether the player is within a system. This can be either in space, or docked to a base. `Activator` will be the player.
+    1. `STRING|Stranger` The players to expect to be in a system.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in.
 
 - `Cnd_InZone` Checks if an object is within a zone. `Activator` will be the object in the zone.
     1. `STRING|Stranger` Object by name or label to expect in the zone.

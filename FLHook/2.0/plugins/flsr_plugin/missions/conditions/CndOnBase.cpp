@@ -6,10 +6,10 @@ namespace Missions
 {
 	std::unordered_set<CndOnBase*> observedCndOnBase;
 
-	CndOnBase::CndOnBase(const ConditionParent& parent, const uint label, const uint baseId) :
+	CndOnBase::CndOnBase(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds) :
 		Condition(parent),
 		label(label),
-		baseId(baseId)
+		baseIds(baseIds)
 	{}
 
 	CndOnBase::~CndOnBase()
@@ -44,7 +44,7 @@ namespace Missions
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{
-			if (!mission.clientIds.contains(clientId) && (!baseId || baseId == currentBaseId))
+			if (!mission.clientIds.contains(clientId) && (baseIds.empty() || baseIds.contains(currentBaseId)))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = clientId;
@@ -55,7 +55,7 @@ namespace Missions
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
-				if (object.type == MissionObjectType::Client && object.id == clientId && (!baseId || baseId == currentBaseId))
+				if (object.type == MissionObjectType::Client && object.id == clientId && (baseIds.empty() || baseIds.contains(currentBaseId)))
 				{
 					activator = object;
 					return true;

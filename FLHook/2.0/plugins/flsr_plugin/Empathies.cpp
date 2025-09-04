@@ -92,6 +92,7 @@ namespace Empathies
 						if (ini.is_value("path"))
 						{
 							const std::string dataPath = ini.get_value_string(0);
+                            ini.close();
 							return GetModuleHandle((dataPath + "\\Content.dll").c_str());
 						}
 					}

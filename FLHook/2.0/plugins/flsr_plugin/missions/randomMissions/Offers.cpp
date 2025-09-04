@@ -1,4 +1,3 @@
-#pragma once
 #include "Offers.h"
 
 namespace RandomMissions

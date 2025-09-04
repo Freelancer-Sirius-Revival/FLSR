@@ -1,4 +1,3 @@
-#pragma once
 #include "RandomMissions.h"
 #include "Costumes.h"
 #include "Factions.h"

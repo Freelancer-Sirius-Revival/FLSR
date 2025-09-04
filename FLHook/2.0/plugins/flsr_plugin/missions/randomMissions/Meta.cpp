@@ -1,4 +1,3 @@
-#pragma once
 #include "Meta.h"
 
 #define METACPP_DLLVALUE(TYPE, OFFSET) (*(TYPE*)(DWORD(contentHandle) + (OFFSET)))
@@ -27,12 +26,14 @@ namespace RandomMissions
 				if (ini.is_value("path"))
 				{
 					const std::string dataPath = ini.get_value_string(0);
+					ini.close();
 					return GetModuleHandle((dataPath + "\\Content.dll").c_str());
 				}
 			}
 			break;
 		}
 		ini.close();
+		return nullptr;
 	}
 
 	void ReadMetadata() {

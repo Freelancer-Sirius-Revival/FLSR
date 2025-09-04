@@ -1,4 +1,3 @@
-#pragma once
 #include "NpcWaves.h"
 
 namespace RandomMissions

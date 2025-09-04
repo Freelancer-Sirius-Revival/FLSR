@@ -1,5 +1,6 @@
 #include "CndIniReader.h"
 #include "CndBaseEnter.h"
+#include "CndBaseExit.h"
 #include "CndCloaked.h"
 #include "CndCommComplete.h"
 #include "CndCount.h"
@@ -52,6 +53,31 @@ namespace Missions
 		}
 
 		return new CndBaseEnter(conditionParent, label, baseIds);
+	}
+
+	static CndBaseExit* ReadCndBaseExit(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> baseIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_BaseExit", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				baseIds.insert(value);
+			argNum++;
+		}
+
+		return new CndBaseExit(conditionParent, label, baseIds);
 	}
 
 	static CndCloaked* ReadCndCloaked(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -392,7 +418,6 @@ namespace Missions
 		return new CndInZone(conditionParent, label, zoneIds);
 	}
 
-
 	static CndLaunchComplete* ReadCndLaunchComplete(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
@@ -594,6 +619,9 @@ namespace Missions
 	{
 		if (ini.is_value("Cnd_BaseEnter"))
 			return ReadCndBaseEnter(conditionParent, ini);
+
+		if (ini.is_value("Cnd_BaseExit"))
+			return ReadCndBaseExit(conditionParent, ini);
 
 		if (ini.is_value("Cnd_Cloaked"))
 			return ReadCndCloaked(conditionParent, ini);

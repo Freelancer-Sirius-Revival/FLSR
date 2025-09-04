@@ -175,6 +175,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\MissionShipSpawning.cpp" />
     <ClCompile Include="missions\BestPath.cpp" />
     <ClCompile Include="missions\ClientObjectives.cpp" />
+    <ClCompile Include="missions\conditions\CndBaseExit.cpp" />
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp" />
     <ClCompile Include="missions\conditions\CndCloaked.cpp" />
     <ClCompile Include="missions\conditions\CndCommComplete.cpp" />
@@ -273,6 +274,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\BestPath.h" />
     <ClInclude Include="missions\ClientObjectives.h" />
     <ClInclude Include="missions\conditions\CndBaseEnter.h" />
+    <ClInclude Include="missions\conditions\CndBaseExit.h" />
     <ClInclude Include="missions\conditions\CndCloaked.h" />
     <ClInclude Include="missions\conditions\CndCommComplete.h" />
     <ClInclude Include="missions\conditions\CndCount.h" />

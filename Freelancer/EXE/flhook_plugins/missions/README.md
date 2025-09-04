@@ -369,6 +369,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player landed on. If none is given, any base will count.
 
+- `Cnd_BaseExit` Only players. Launching or logging out from a base. `Activator` will be the leaving player.
+    1. `STRING|Stranger` The players leaving a base.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player leaves from. If none is given, any base will count.
+
 - `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress). `Activator` will be the cloaked/uncloaked object.
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.

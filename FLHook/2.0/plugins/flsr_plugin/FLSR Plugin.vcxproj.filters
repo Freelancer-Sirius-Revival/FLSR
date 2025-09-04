@@ -265,6 +265,9 @@
     <ClCompile Include="missions\conditions\CndInZone.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndBaseExit.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -538,6 +541,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndInZone.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndBaseExit.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>

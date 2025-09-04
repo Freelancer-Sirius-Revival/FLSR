@@ -12,6 +12,7 @@
 #include "Missions/MissionBoard.h"
 #include "Missions/Mission.h"
 #include "Missions/conditions/CndBaseEnter.h"
+#include "Missions/conditions/CndBaseExit.h"
 #include "Missions/conditions/CndCloaked.h"
 #include "Missions/conditions/CndCommComplete.h"
 #include "Missions/conditions/CndDestroyed.h"
@@ -274,6 +275,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::ObjCndNpcSimulationRunning::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::ObjCndNpcSimulationRunning::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndBaseEnter::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndBaseExit::BaseExit_AFTER, PLUGIN_HkIServerImpl_BaseExit_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndCloaked::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndCommComplete::CommComplete, PLUGIN_HkIServerImpl_CommComplete, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDestroyed::ObjDestroyed, PLUGIN_SolarDestroyed, 0));

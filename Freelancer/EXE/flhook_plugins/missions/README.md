@@ -457,14 +457,23 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Mission nickname to refer.
     1. `[STRING|All]` Multiple subsequent entries possible. A label whose assigned players are transferred over to the mission with the same label. `All` transfers over all players and their labels.
 
-- `Act_ActMsnTrig` Activates a trigger of a another mission.
+- `Act_ActMsnTrig` Activates a trigger of a another mission. This works in two exclusive modes:
+    - A single trigger with optional probability to be activated:
     1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
-
-- `Act_ActTrig` Activates a trigger.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
+
+- `Act_ActTrig` Activates a trigger. This works in two exclusive modes:
+    - A single trigger with optional probability to be activated:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
 - `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
     1. `STRING|Activator` Players by label to receive the cargo.
@@ -486,14 +495,23 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
-- `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
+- `Act_DeactMsnTrig` Deactivates a trigger of a another mission. This works in two exclusive modes:
+    - A single trigger with optional probability to be deactivated:
     1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
-
-- `Act_DeactTrig` Deactivates a trigger.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for deactivation.
+
+- `Act_DeactTrig` Deactivates a trigger. This works in two exclusive modes:
+    - A single trigger with optional probability to be deactivated:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for deactivation.
 
 - `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
     1. `STRING` Arbitrary text to print.

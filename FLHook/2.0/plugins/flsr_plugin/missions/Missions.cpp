@@ -464,18 +464,34 @@ namespace Missions
 							else if (ini.is_value("Act_ActTrig"))
 							{
 								ActActTrigPtr action(new ActActTrig());
-								action->triggerId = CreateIdOrNull(ini.get_value_string(0));
-								if (ini.get_num_parameters() > 1)
-									action->probability = ini.get_value_float(1);
+								for (size_t arg = 0, length = ini.get_num_parameters(); arg < length; arg++)
+								{
+									if (arg % 2 == 0)
+									{
+										ActActTrigEntry entry;
+										entry.triggerId = CreateIdOrNull(ini.get_value_string(arg));
+										action->triggers.push_back(entry);
+									}
+									else
+										action->triggers.back().probability = ini.get_value_float(arg);
+								}
 								action->activate = true;
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_DeactTrig"))
 							{
 								ActActTrigPtr action(new ActActTrig());
-								action->triggerId = CreateIdOrNull(ini.get_value_string(0));
-								if (ini.get_num_parameters() > 1)
-									action->probability = ini.get_value_float(1);
+								for (size_t arg = 0, length = ini.get_num_parameters(); arg < length; arg++)
+								{
+									if (arg % 2 == 0)
+									{
+										ActActTrigEntry entry;
+										entry.triggerId = CreateIdOrNull(ini.get_value_string(arg));
+										action->triggers.push_back(entry);
+									}
+									else
+										action->triggers.back().probability = ini.get_value_float(arg);
+								}
 								action->activate = false;
 								actions.push_back(action);
 							}
@@ -500,9 +516,17 @@ namespace Missions
 							{
 								ActActMsnTrigPtr action(new ActActMsnTrig());
 								action->missionId = CreateIdOrNull(ini.get_value_string(0));
-								action->triggerId = CreateIdOrNull(ini.get_value_string(1));
-								if (ini.get_num_parameters() > 2)
-									action->probability = ini.get_value_float(2);
+								for (size_t arg = 1, length = ini.get_num_parameters(); arg < length; arg++)
+								{
+									if (arg % 2 == 1)
+									{
+										ActActTrigEntry entry;
+										entry.triggerId = CreateIdOrNull(ini.get_value_string(arg));
+										action->triggers.push_back(entry);
+									}
+									else
+										action->triggers.back().probability = ini.get_value_float(arg);
+								}
 								action->activate = true;
 								actions.push_back(action);
 							}
@@ -510,9 +534,17 @@ namespace Missions
 							{
 								ActActMsnTrigPtr action(new ActActMsnTrig());
 								action->missionId = CreateIdOrNull(ini.get_value_string(0));
-								action->triggerId = CreateIdOrNull(ini.get_value_string(1));
-								if (ini.get_num_parameters() > 2)
-									action->probability = ini.get_value_float(2);
+								for (size_t arg = 1, length = ini.get_num_parameters(); arg < length; arg++)
+								{
+									if (arg % 2 == 1)
+									{
+										ActActTrigEntry entry;
+										entry.triggerId = CreateIdOrNull(ini.get_value_string(arg));
+										action->triggers.push_back(entry);
+									}
+									else
+										action->triggers.back().probability = ini.get_value_float(arg);
+								}
 								action->activate = false;
 								actions.push_back(action);
 							}
@@ -1066,7 +1098,9 @@ namespace Missions
 			const std::string trigNickname = wstos(ToLower(cmds->ArgStr(2)));
 			ActActMsnTrig action;
 			action.missionId = CreateIdOrNull(msnNickname.c_str());
-			action.triggerId = CreateIdOrNull(trigNickname.c_str());
+			ActActTrigEntry entry;
+			entry.triggerId = CreateIdOrNull(trigNickname.c_str());
+			action.triggers.push_back(entry);
 			action.activate = true;
 			Mission msn("", 0, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
@@ -1090,7 +1124,9 @@ namespace Missions
 			const std::string trigNickname = wstos(ToLower(cmds->ArgStr(2)));
 			ActActMsnTrig action;
 			action.missionId = CreateIdOrNull(msnNickname.c_str());
-			action.triggerId = CreateIdOrNull(trigNickname.c_str());
+			ActActTrigEntry entry;
+			entry.triggerId = CreateIdOrNull(trigNickname.c_str());
+			action.triggers.push_back(entry);
 			action.activate = true;
 			Mission msn("", 0, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));

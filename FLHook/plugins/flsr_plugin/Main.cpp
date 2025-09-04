@@ -43,6 +43,7 @@
 #include "Missions/conditions/CndSystemSpaceExit.h"
 #include "Missions/conditions/CndTimer.h"
 #include "Missions/objectives/Objectives.h"
+#include "Missions/randomMissions/RandomMissions.h"
 
 std::mutex m_Mutex;
 
@@ -133,6 +134,8 @@ void LoadSettings() {
             Modules::SetModuleState("DiscordBot", false);
         }
     }
+
+    RandomMissions::ReadData();
     returncode = DEFAULT_RETURNCODE;
 }
 

@@ -14,6 +14,7 @@ namespace RandomMissions
 
 	extern std::unordered_map<uint, uint> owningFactionByBaseId;
 	extern std::unordered_map<uint, std::vector<BaseOffer>> offersByBaseId;
+	extern std::unordered_map<uint, std::pair<byte, byte>> offerCountByBaseId;
 
 	void ReadOfferData();
 }

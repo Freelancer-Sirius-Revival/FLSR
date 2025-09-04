@@ -16,6 +16,20 @@ namespace NpcShipArchetypes
         return true;
     }
 
+    static byte GetDifficulty(const char* str)
+    {
+        if (strlen(str) < 2)
+            return 0;
+
+        if (strchr(str, 'd') != str)
+            return 0;
+
+        const char* start = str + 1;
+        char* end;
+        const long diff = strtol(start, &end, 10);
+        return start != end ? std::min<byte>(255, diff) : 0;
+    }
+
     void ReadFiles()
     {
         std::string dataPath = "..\\data";;
@@ -72,11 +86,18 @@ namespace NpcShipArchetypes
                         }
                         else if (ini.is_value("level"))
                         {
-                            std::string value = ini.get_value_string(0);
-                            const auto dPos = value.find("d");
-                            if (dPos != std::string::npos)
-                                value = value.substr(dPos + 1);
-                            npcShipArch.level = std::min<uint>(255, stoi(value, NULL, 0));
+                            npcShipArch.level = GetDifficulty(ini.get_value_string(0));
+                        }
+                        else if (ini.is_value("npc_class"))
+                        {
+                            for (int i = 0, length = ini.get_num_parameters(); i < length; i++)
+                            {
+                                const auto value = ini.get_value_string(i);
+                                npcShipArch.classes.insert(CreateID(value));
+                                const auto diff = GetDifficulty(value);
+                                if (diff > 0)
+                                    npcShipArch.difficulties.insert(diff);
+                            }
                         }
                     }
 

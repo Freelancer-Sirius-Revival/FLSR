@@ -9,6 +9,9 @@ namespace RandomMissions
 		std::string name;
 		uint groupId = 0;
 		std::unordered_set<uint> hostileFactionIds;
+		std::unordered_set<uint> npcShipIds;
+		std::unordered_set<uint> maleVoiceIds;
+		std::unordered_set<uint> femaleVoiceIds;
 		Costume missionCommission;
 	};
 

@@ -11,6 +11,8 @@ namespace NpcShipArchetypes
 		std::string stateGraph = "";
 		uint pilotId = 0;
 		byte level = 0;
+		std::unordered_set<byte> difficulties;
+		std::unordered_set<uint> classes;
 	};
 
 	bool GetNpcShipArch(const uint id, NpcShipArch& result);

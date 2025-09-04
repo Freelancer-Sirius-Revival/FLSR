@@ -4,6 +4,7 @@ namespace RandomMissions
 {
 	std::unordered_map<uint, uint> owningFactionByBaseId;
 	std::unordered_map<uint, std::vector<BaseOffer>> offersByBaseId;
+	std::unordered_map<uint, std::pair<byte, byte>> offerCountByBaseId;
 
 	void ReadOfferData()
 	{
@@ -29,6 +30,16 @@ namespace RandomMissions
 				}
 				if (baseId)
 					owningFactionByBaseId[baseId] = owningFaction;
+			}
+			else if (ini.is_header("MVendor"))
+			{
+				while (ini.read_value())
+				{
+					if (ini.is_value("num_offers"))
+					{
+						offerCountByBaseId[baseId] = { ini.get_value_int(0), ini.get_value_int(1) };
+					}
+				}
 			}
 			else if (ini.is_header("BaseFaction"))
 			{

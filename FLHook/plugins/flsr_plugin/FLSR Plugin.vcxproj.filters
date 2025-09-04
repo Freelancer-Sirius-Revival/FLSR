@@ -307,6 +307,18 @@
     <ClCompile Include="missions\objectives\ObjUtils.cpp">
       <Filter>Missions\Objectives</Filter>
     </ClCompile>
+    <ClCompile Include="missions\randomMissions\Meta.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\Rewards.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\NpcWaves.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\NpcShips.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
     <ClCompile Include="missions\randomMissions\Offers.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
@@ -317,6 +329,9 @@
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
     <ClCompile Include="missions\randomMissions\RandomMissions.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\Vignette.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
     <ClCompile Include="missions\randomMissions\TradeMissions.cpp">
@@ -657,16 +672,34 @@
     <ClInclude Include="missions\conditions\CndHealthInc.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\randomMissions\Vignette.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
     <ClInclude Include="missions\randomMissions\Factions.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\randomMissions\NpcShips.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
     <ClInclude Include="missions\randomMissions\Offers.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Rewards.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\NpcWaves.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Meta.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="missions\randomMissions\Costumes.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="missions\randomMissions\RandomMissions.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\TradeMissions.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="NameLimiter.h" />
@@ -685,18 +718,12 @@
     <ClInclude Include="missions\objectives\ObjUtils.h">
       <Filter>Missions\Objectives</Filter>
     </ClInclude>
-    <ClInclude Include="missions\randomMissions\TradeMissions.h">
-      <Filter>Missions\RandomMissions</Filter>
-    </ClInclude>
     <ClInclude Include="DeathPenalty.h" />
     <ClInclude Include="missions\actions\ActDisplayMsg.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActPlayNN.h">
       <Filter>Missions\Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="missions\randomMissions\Meta.h">
-      <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndJoinGroup.h">
       <Filter>Missions\Conditions</Filter>

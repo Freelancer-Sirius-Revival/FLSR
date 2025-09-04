@@ -7,6 +7,14 @@ namespace RandomMissions
 {
 	float hostileDockingThreshold = -0.6f;
 	float minRequiredReputationForMissions = -0.2f;
+	std::vector<float> npcWaveSizeLikelihoods;
+	float npcSpawnDistance;
+	float solarSpawnDistance;
+	float secondWaypointDistance;
+	float npcStayInRangeDistance;
+	float playerStayInRangeDistance;
+	float playerStayInRangeDistanceTolerance;
+	float returnToMissionTimeSeconds;
 
 	static HMODULE LoadContentDll()
 	{
@@ -42,6 +50,18 @@ namespace RandomMissions
 
 		hostileDockingThreshold = METACPP_DLLVALUE(float, 0x11BCF4);
 		minRequiredReputationForMissions = METACPP_DLLVALUE(float, 0x1195BC);
+		for (uint i = 0; i <= 8; i++)
+		{
+			size_t offset = 0x11CC7C + i * sizeof(float);
+			npcWaveSizeLikelihoods.push_back(METACPP_DLLVALUE(float, offset));
+		}
+		npcSpawnDistance = METACPP_DLLVALUE(float, 0x0F17D9);
+		solarSpawnDistance = METACPP_DLLVALUE(float, 0x11C2B0);
+		secondWaypointDistance = METACPP_DLLVALUE(float, 0x11CBCC);
+		npcStayInRangeDistance = METACPP_DLLVALUE(float, 0x11C2CC);
+		playerStayInRangeDistance = METACPP_DLLVALUE(float, 0x11C2C8);
+		playerStayInRangeDistanceTolerance = METACPP_DLLVALUE(float, 0x11CAB4);
+		returnToMissionTimeSeconds = METACPP_DLLVALUE(float, 0x11C2DC);
 	}
 }
 

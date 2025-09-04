@@ -4,6 +4,10 @@
 #include "Factions.h"
 #include "Meta.h"
 #include "Offers.h"
+#include "NpcShips.h"
+#include "NpcWaves.h"
+#include "Rewards.h"
+#include "Vignette.h"
 
 namespace RandomMissions
 {
@@ -14,6 +18,11 @@ namespace RandomMissions
 		ReadCostumeData(); // Must be called before faction data
 		ReadFactionData();
 		ReadOfferData();
+		ReadNpcShipData();
+		ReadNpcWaveData();
+		ReadRewardData();
+		ReadVignetteData();
+		
 		ReadTradeCommoditiesData();
 
 		ConPrint(L"Done\n");

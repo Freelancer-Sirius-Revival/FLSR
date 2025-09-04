@@ -52,6 +52,15 @@ namespace RandomMissions
 						faction.name = ini.get_value_string(0);
 						faction.id = CreateID(faction.name.c_str());
 					}
+					else if (ini.is_value("npc_ship"))
+					{
+						faction.npcShipIds.insert(CreateID(ini.get_value_string(0)));
+					}
+					else if (ini.is_value("voice"))
+					{
+						faction.maleVoiceIds.insert(CreateID(ini.get_value_string(0)));
+						//TODO separate female voices
+					}
 					else if (ini.is_value("mc_costume"))
 					{
 						faction.missionCommission = costumeById[CreateID(ini.get_value_string(0))];

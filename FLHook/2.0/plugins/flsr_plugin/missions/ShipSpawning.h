@@ -10,10 +10,11 @@ namespace ShipSpawning
 		Vector position;
 		Matrix orientation;
 		uint systemId;
-		int hitpoints;
+		int hitpoints = -1;
 		uint level;
 		uint voiceId = 0;
 		Costume costume;
+		uint formationIdsName = 0;
 		uint idsName = 0;
 		std::string faction = "";
 		std::string stateGraphName;

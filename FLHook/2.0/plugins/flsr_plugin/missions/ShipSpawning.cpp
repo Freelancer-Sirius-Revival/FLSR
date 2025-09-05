@@ -430,31 +430,37 @@ namespace ShipSpawning
 		return NpcAppearances::GetRandomCostume(CreateID(faction.c_str()), voiceId);
 	}
 
-	static void CreatePilotName(const uint shipArchetypeId, const std::string& faction, const uint voiceId, FmtStr& output)
+	static bool CreatePilotName(const uint shipArchetypeId, const std::string& faction, const uint voiceId, FmtStr& output)
 	{
 		if (faction.empty())
-			return;
+			return false;
 
 		const auto& ship = Archetype::GetShip(shipArchetypeId);
-		bool largeShip = ship->iArchType & (ObjectType::Gunboat | ObjectType::Cruiser | ObjectType::Transport | ObjectType::Capital | ObjectType::Mining);
+		const bool largeShip = ship->iArchType & (ObjectType::Gunboat | ObjectType::Cruiser | ObjectType::Transport | ObjectType::Capital | ObjectType::Mining);
 	
 		if (largeShip)
 		{
 			const auto& result = NpcAppearances::GetRandomLargeShipName(CreateID(faction.c_str()));
-			output.begin_mad_lib(16162); // "%s0 %s1 %s2"
+			if (!result.second)
+				return false;
+			output.begin_mad_lib(result.first ? 16162 /* "%s0 %s1 %s2" */ : 16163 /* "%s0 %s1" */);
 			output.end_mad_lib();
 			output.append_string(ship->iIdsName);
-			output.append_string(result.first);
+			if (result.first)
+				output.append_string(result.first);
 			output.append_string(result.second);
 		}
 		else if (voiceId)
 		{
+			const auto& result = NpcAppearances::GetRandomName(CreateID(faction.c_str()), voiceId);
+			if (!result.first && !result.second)
+				return false;
 			output.begin_mad_lib(16163); // "%s0 %s1"
 			output.end_mad_lib();
-			const auto& result = NpcAppearances::GetRandomName(CreateID(faction.c_str()), voiceId);
 			output.append_string(result.first);
 			output.append_string(result.second);
 		}
+		return true;
 	}
 
 	static void SetPersonality(const uint shipId, const std::string& stateGraph, const uint pilotId, const uint overrideJobId)
@@ -507,13 +513,13 @@ namespace ShipSpawning
 
 		// Formation name is displayed above the pilot name in wireframe display.
 		// If this is given, the ship IDS Name will be used in scanner list. Keep empty to show Pilot Name in scanner list.
-		FmtStr formationName(0, 0);
-		formationName.begin_mad_lib(0);
-		formationName.end_mad_lib();
+		FmtStr formationName(params.formationIdsName, 0);
+		//formationName.begin_mad_lib(0);
+		//formationName.end_mad_lib();
 
 		// Pilot name to be displayed when clicking on the ship/wireframe display.
 		// Will be also displayed in scanner list if no formation name is given.
-		FmtStr pilotName(0, 0);
+		FmtStr pilotName(Archetype::GetShip(shipInfo.iShipArchetype)->iIdsName, 0);
 		if (params.idsName)
 		{
 			pilotName.begin_mad_lib(params.idsName);

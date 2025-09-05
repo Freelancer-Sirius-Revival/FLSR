@@ -157,7 +157,7 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
 - `nickname` The object name of the NPC. Used by trigger conditions and actions.
     1. `STRING` The name. Must be unique in this mission.
 
-- `[string_id]` The in-game display-name. If not given, a random name based on the used faction will be generated.
+- `[string_id]` The in-game display-name. If not given, a random name based on the used faction will be generated. If no name can be generated, uses the ship name.
     1. `INTEGER` The resource ID to use.
 
 - `system` The system to spawn into.

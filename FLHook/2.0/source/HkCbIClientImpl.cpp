@@ -882,12 +882,12 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_REQUESTCREATESHIPRESP(uint iClientID, b
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_SCANNOTIFY(uint iClientID, uint iDunno, uint iDunno2)
+bool HkIClientImpl::Send_FLPACKET_SERVER_SCANNOTIFY(uint clientId, uint shipId, uint goodId)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_SCANNOTIFY(iClientID, iDunno, iDunno2));
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_SCANNOTIFY(clientId, shipId, goodId));
 	return reinterpret_cast<bool>(vRet);
 }
 

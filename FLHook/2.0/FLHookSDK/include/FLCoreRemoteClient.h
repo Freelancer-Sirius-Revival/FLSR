@@ -291,7 +291,7 @@ public:
 	virtual void Send_FLPACKET_COMMON_PLAYER_DEL_TRADE_EQUIP(uint iClientID, uint iShipID, EquipDesc& equipDesc);
 	virtual bool Send_FLPACKET_COMMON_PLAYER_TRADE_REQUEST(uint iClientID, uint iShipID);
 	virtual void Send_FLPACKET_COMMON_PLAYER_STOP_TRADE_REQUEST(uint iClientID, uint iShipID);
-	EXPORT virtual bool Send_FLPACKET_SERVER_SCANNOTIFY(uint iClientID, uint iDunno, uint iDunno2);
+	EXPORT virtual bool Send_FLPACKET_SERVER_SCANNOTIFY(uint clientId, uint shipId, uint goodId);
 	EXPORT virtual bool Send_FLPACKET_SERVER_PLAYERLIST(uint iClientID, wchar_t*, uint, char);
 	EXPORT virtual void Send_FLPACKET_COMMON_PLAYER_LEFT(uint iClientID, uint iOtherClientID);
 	EXPORT virtual bool Send_FLPACKET_SERVER_PLAYERLIST_2(uint iClientID);

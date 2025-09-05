@@ -82,10 +82,10 @@
     <ClCompile Include="missions\actions\ActNNPath.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\CndSystemEnter.cpp">
+    <ClCompile Include="missions\conditions\CndSystemSpaceEnter.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\CndSystemExit.cpp">
+    <ClCompile Include="missions\conditions\CndSystemSpaceExit.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp">
@@ -259,6 +259,21 @@
     <ClCompile Include="missions\actions\ActMark.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndLaunchComplete.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndInZone.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndBaseExit.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndJumpInComplete.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndInSpace.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -328,10 +343,10 @@
     <ClInclude Include="missions\actions\ActSetNNObj.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSystemEnter.h">
+    <ClInclude Include="missions\conditions\CndSystemSpaceEnter.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSystemExit.h">
+    <ClInclude Include="missions\conditions\CndSystemSpaceExit.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndBaseEnter.h">
@@ -527,6 +542,21 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActMark.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndLaunchComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInZone.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndBaseExit.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndJumpInComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInSpace.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

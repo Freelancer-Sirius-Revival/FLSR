@@ -365,9 +365,13 @@ Only one condition must be present. If none is present, `Cnd_True` is used.
 
 The keyword `Stranger` is used to refer explicitely to all players not having a label assigned in this mission. It can be used in combination with action’s `Activator` to assign players to the mission.
 
-- `Cnd_BaseEnter` Only players. Landing or logging in to bases. `Activator` will be the landed player.
+- `Cnd_BaseEnter` Only players. Landing or logging in to a base. `Activator` will be the landed player.
     1. `STRING|Stranger` The players to await fully landing on a base.
-    1. `[STRING] :any` The base nickname the player lands on.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player landed on. If none is given, any base will count.
+
+- `Cnd_BaseExit` Only players. Launching or logging out from a base. `Activator` will be the leaving player.
+    1. `STRING|Stranger` The players leaving a base.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player leaves from. If none is given, any base will count.
 
 - `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress). `Activator` will be the cloaked/uncloaked object.
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
@@ -409,13 +413,29 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
-- `Cnd_InSystem` Only players. Checks whether the player exists in space. `Activator` will be the player.
-    1. `STRING|Stranger` The players to expect in space.
-    1. `[STRING] :any` The system nickname to expect the player in.
+- `Cnd_InSpace` Only players. Checks whether the player is in space. `Activator` will be the player.
+    1. `STRING|Stranger` The players to expect to be in space.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in. If none is given, any system will count.
 
-- `Cnd_OnBase` Only players. Checks whether the player is docked on a base. `Activator` will be the player.
+- `Cnd_InSystem` Only players. Checks whether the player is within a system. This can be either in space, or docked to a base. `Activator` will be the player.
+    1. `STRING|Stranger` The players to expect to be in a system.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in.
+
+- `Cnd_InZone` Checks if an object is within a zone. `Activator` will be the object in the zone.
+    1. `STRING|Stranger` Object by name or label to expect in the zone.
+    1. `STRING` Multiple subsequent entries possible. The zone nickname to expect the object in.
+
+- `Cnd_JumpInComplete` Only players. When fully jumped into a system. `Activator` will be the jumped-in player.
+    1. `STRING|Stranger` The players to await fully jumping into a system.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname the player jumped into. If none is given, any system will count.
+
+- `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
+    1. `STRING|Stranger` The players to await fully landing on a base.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.
+
+- `Cnd_OnBase` Only players. Checks if the player is on a base. `Activator` will be the player.
     1. `STRING|Stranger` The players to expect on a base.
-    1. `[STRING] :any` The base nickname to expect the player on.
+    1. `[STRING]` Multiple subsequent entries possible. The base nickname the player must be on. If none is given, any base will count.
 
 - `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
     1. `STRING` Object by name or label to count projectile hits on.
@@ -425,13 +445,15 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
-- `Cnd_SystemEnter` Only players. Undocking from bases or spawning into space. No jumping. `Activator` will be the player.
-    1. `STRING|Stranger` The players  to await spawning into space.
-    1. `[STRING] :any` The system nickname the player spawns into.
+- `Cnd_SystemSpaceEnter` Only players. When entering space of a system. `Activator` will be the player.
+    1. `STRING|Stranger` The players to await entering space.
+    1. `[Jump|Launch|Spawn|Any] :Any` The condition under which space is entered.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname the player entered. If none is given, any system will count.
 
-- `Cnd_SystemExit` Only players. Docking to bases, destruction, leaving the server, or changing to another character. No jumping. `Activator` will be the player.
-    1. `STRING|Stranger` The players to await despawning from space.
-    1. `[STRING] :any` The system nickname the player despawns from.
+- `Cnd_SystemSpaceExit` Only players. When leaving space of a system. `Activator` will be the player.
+    1. `STRING|Stranger` The players to await leaving space.
+    1. `[Jump|Dock|Explode|Vanish|Any] :Any` The condition under which space is left.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname the player left. If none is given, any system will count.
 
 - `Cnd_Timer` Waits until the time as passed. `Activator` will be nobody.
     1. `FLOAT` Lower limit of randomized time.
@@ -449,14 +471,23 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Mission nickname to refer.
     1. `[STRING|All]` Multiple subsequent entries possible. A label whose assigned players are transferred over to the mission with the same label. `All` transfers over all players and their labels.
 
-- `Act_ActMsnTrig` Activates a trigger of a another mission.
+- `Act_ActMsnTrig` Activates a trigger of a another mission. This works in two exclusive modes:
+    - A single trigger with optional probability to be activated:
     1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
-
-- `Act_ActTrig` Activates a trigger.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated or not.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
+
+- `Act_ActTrig` Activates a trigger. This works in two exclusive modes:
+    - A single trigger with optional probability to be activated:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
 - `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
     1. `STRING|Activator` Players by label to receive the cargo.
@@ -478,14 +509,23 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
-- `Act_DeactMsnTrig` Deactivates a trigger of a another mission.
+- `Act_DeactMsnTrig` Deactivates a trigger of a another mission. This works in two exclusive modes:
+    - A single trigger with optional probability to be deactivated:
     1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
-
-- `Act_DeactTrig` Deactivates a trigger.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Mission nickname to refer.
     1. `STRING` Trigger nickname to refer.
-    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated or not.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for deactivation.
+
+- `Act_DeactTrig` Deactivates a trigger. This works in two exclusive modes:
+    - A single trigger with optional probability to be deactivated:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for deactivation.
 
 - `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
     1. `STRING` Arbitrary text to print.
@@ -549,14 +589,14 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether this should be not a singular waypoint but an actual best-path route. **Best route may not work if the player does not have relevant system connections discovered.**
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
     
-- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `None`, player changes system, player docks, logs out from character.
+- `Act_PlayMusic` Only for players. Sets the music. This will remain until music is reset by all values being `Default`, player changes system, player docks, logs out from character.
     1. `STRING|Activator` Players by label to set music for.
-    1. `[STRING|None] :None` Overrides the space music.
-    1. `[STRING|None] :None` Overrides the danger music.
-    1. `[STRING|None] :None` Overrides the battle music.
+    1. `[STRING|Default] :Default` Overrides the space music.
+    1. `[STRING|Default] :Default` Overrides the danger music.
+    1. `[STRING|Default] :Default` Overrides the battle music.
     1. `[STRING|None] :None` Overrides all music by this track.
     1. `[FLOAT] :0` The time in seconds it takes to transition music.
-    1. `[True|False] :False` Whether to play the override music (5) only once and then return to other music.
+    1. `[True|False] :False` Whether to play the override music only once and then return to other music.
 
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
     1. `STRING|Activator` Players by label to play the sound effect for.

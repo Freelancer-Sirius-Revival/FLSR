@@ -3,11 +3,16 @@
 
 namespace Missions
 {
-	struct ActActTrig : Action
+	struct ActActTrigEntry
 	{
 		uint triggerId = 0;
-		bool activate = false;
 		float probability = 1.0f;
+	};
+
+	struct ActActTrig : Action
+	{
+		std::vector<ActActTrigEntry> triggers;
+		bool activate = false;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;
 	};

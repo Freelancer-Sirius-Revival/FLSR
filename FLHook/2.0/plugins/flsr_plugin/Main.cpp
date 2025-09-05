@@ -12,17 +12,22 @@
 #include "Missions/MissionBoard.h"
 #include "Missions/Mission.h"
 #include "Missions/conditions/CndBaseEnter.h"
+#include "Missions/conditions/CndBaseExit.h"
 #include "Missions/conditions/CndCloaked.h"
 #include "Missions/conditions/CndCommComplete.h"
 #include "Missions/conditions/CndDestroyed.h"
 #include "Missions/conditions/CndDistObj.h"
 #include "Missions/conditions/CndDistVec.h"
 #include "Missions/conditions/CndHealthDec.h"
+#include "Missions/conditions/CndInSpace.h"
 #include "Missions/conditions/CndInSystem.h"
+#include "Missions/conditions/CndInZone.h"
+#include "Missions/conditions/CndJumpInComplete.h"
+#include "Missions/conditions/CndLaunchComplete.h"
 #include "Missions/conditions/CndOnBase.h"
 #include "Missions/conditions/CndProjHitCount.h"
-#include "Missions/conditions/CndSystemEnter.h"
-#include "Missions/conditions/CndSystemExit.h"
+#include "Missions/conditions/CndSystemSpaceEnter.h"
+#include "Missions/conditions/CndSystemSpaceExit.h"
 #include "Missions/conditions/CndTimer.h"
 #include "Missions/objectives/Objectives.h"
 #include "MissionAbortFix.h"
@@ -272,6 +277,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::ObjCndNpcSimulationRunning::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::ObjCndNpcSimulationRunning::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndBaseEnter::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndBaseExit::BaseExit_AFTER, PLUGIN_HkIServerImpl_BaseExit_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndCloaked::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndCommComplete::CommComplete, PLUGIN_HkIServerImpl_CommComplete, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDestroyed::ObjDestroyed, PLUGIN_SolarDestroyed, 0));
@@ -282,8 +288,14 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipHullDamage, PLUGIN_ShipHullDmg, 0));
     //p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipColGrpDamage, PLUGIN_SolarColGrpDmg, 0)); TODO needs the hook
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipHullDamage, PLUGIN_SolarHullDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSpace::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSpace::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::JumpInComplete_AFTER, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInZone::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndJumpInComplete::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndLaunchComplete::LaunchComplete_AFTER, PLUGIN_HkIServerImpl_LaunchComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndOnBase::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipEquipDamage, PLUGIN_ShipEquipDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
@@ -293,8 +305,14 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     //p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipColGrpDamage, PLUGIN_SolarColGrpDmg, 0)); TODO needs the hook
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipHullDamage, PLUGIN_SolarHullDmg, 0));
     //p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipShieldDamage, PLUGIN_SolarShieldDmg, 0)); TODO needs the hook
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemEnter::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::CharacterInfoReq, PLUGIN_HkIServerImpl_CharacterInfoReq, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceExit::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceExit::SystemSwitchOutComplete, PLUGIN_HkIServerImpl_SystemSwitchOutComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndTimer::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));

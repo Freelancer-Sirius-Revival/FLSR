@@ -1,5 +1,6 @@
 #include "CndIniReader.h"
 #include "CndBaseEnter.h"
+#include "CndBaseExit.h"
 #include "CndCloaked.h"
 #include "CndCommComplete.h"
 #include "CndCount.h"
@@ -7,11 +8,15 @@
 #include "CndDistObj.h"
 #include "CndDistVec.h"
 #include "CndHealthDec.h"
+#include "CndInSpace.h"
 #include "CndInSystem.h"
+#include "CndInZone.h"
+#include "CndJumpInComplete.h"
+#include "CndLaunchComplete.h"
 #include "CndOnBase.h"
 #include "CndProjHitCount.h"
-#include "CndSystemEnter.h"
-#include "CndSystemExit.h"
+#include "CndSystemSpaceEnter.h"
+#include "CndSystemSpaceExit.h"
 #include "CndTimer.h"
 #include "CndTrue.h"
 
@@ -30,7 +35,7 @@ namespace Missions
 	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint baseId = 0;
+		std::unordered_set<uint> baseIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
@@ -41,14 +46,40 @@ namespace Missions
 		}
 		argNum++;
 
-		if (ini.get_num_parameters() > argNum)
+		while (argNum < ini.get_num_parameters())
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				baseId = value;
+				baseIds.insert(value);
+			argNum++;
 		}
 
-		return new CndBaseEnter(conditionParent, label, baseId);
+		return new CndBaseEnter(conditionParent, label, baseIds);
+	}
+
+	static CndBaseExit* ReadCndBaseExit(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> baseIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_BaseExit", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				baseIds.insert(value);
+			argNum++;
+		}
+
+		return new CndBaseExit(conditionParent, label, baseIds);
 	}
 
 	static CndCloaked* ReadCndCloaked(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -334,10 +365,35 @@ namespace Missions
 		return new CndHealthDec(conditionParent, objNameOrLabel, remainingHitpoints, colGrpIds, damagedIsActivator);
 	}
 
+	static CndInSpace* ReadCndInSpace(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> systemIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_InSpace", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemIds.insert(value);
+			argNum++;
+		}
+
+		return new CndInSpace(conditionParent, label, systemIds);
+	}
+
 	static CndInSystem* ReadCndInSystem(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint systemId = 0;
+		std::unordered_set<uint> systemIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
@@ -348,20 +404,108 @@ namespace Missions
 		}
 		argNum++;
 
-		if (ini.get_num_parameters() > argNum)
+		while (argNum < ini.get_num_parameters())
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				systemId = value;
+				systemIds.insert(value);
+			argNum++;
 		}
 
-		return new CndInSystem(conditionParent, label, systemId);
+		if (systemIds.empty())
+		{
+			PrintErrorToConsole(L"Cnd_InSystem", conditionParent, 1, L"No system given. Aborting!");
+			return nullptr;
+		}
+
+		return new CndInSystem(conditionParent, label, systemIds);
+	}
+
+	static CndInZone* ReadCndInZone(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> zoneIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_InZone", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				zoneIds.insert(value);
+			argNum++;
+		}
+
+		if (zoneIds.empty())
+		{
+			PrintErrorToConsole(L"Cnd_InZone", conditionParent, 1, L"No zones given. Aborting!");
+			return nullptr;
+		}
+
+		return new CndInZone(conditionParent, label, zoneIds);
+	}
+
+	static CndJumpInComplete* ReadCndJumpInComplete(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> systemIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_JumpInComplete", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				systemIds.insert(value);
+			argNum++;
+		}
+
+		return new CndJumpInComplete(conditionParent, label, systemIds);
+	}
+
+	static CndLaunchComplete* ReadCndLaunchComplete(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_set<uint> baseIds;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_LaunchComplete", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value != 0)
+				baseIds.insert(value);
+			argNum++;
+		}
+
+		return new CndLaunchComplete(conditionParent, label, baseIds);
 	}
 
 	static CndOnBase* ReadCndOnBase(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint baseId = 0;
+		std::unordered_set<uint> baseIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
@@ -372,14 +516,15 @@ namespace Missions
 		}
 		argNum++;
 
-		if (ini.get_num_parameters() > argNum)
+		while (argNum < ini.get_num_parameters())
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				baseId = value;
+				baseIds.insert(value);
+			argNum++;
 		}
 
-		return new CndOnBase(conditionParent, label, baseId);
+		return new CndOnBase(conditionParent, label, baseIds);
 	}
 
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -454,52 +599,86 @@ namespace Missions
 		return new CndProjHitCount(conditionParent, damagedObjNameOrLabel, targetSurface, damageType, targetHitCount, inflictorObjNameOrLabel, damagedIsActivator);
 	}
 
-	static CndSystemEnter* ReadCndSystemEnter(const ConditionParent& conditionParent, INI_Reader& ini)
+	static CndSystemSpaceEnter* ReadCndSystemSpaceEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint systemId = 0;
+		CndSystemSpaceEnter::SystemEnterCondition reason = CndSystemSpaceEnter::SystemEnterCondition::Any;
+		std::unordered_set<uint> systemIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
 		if (label == 0)
 		{
-			PrintErrorToConsole(L"Cnd_SystemEnter", conditionParent, argNum, L"No target label. Aborting!");
+			PrintErrorToConsole(L"Cnd_SystemSpaceEnter", conditionParent, argNum, L"No target label. Aborting!");
 			return nullptr;
 		}
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "jump")
+				reason = CndSystemSpaceEnter::SystemEnterCondition::Jump;
+			else if (value == "launch")
+				reason = CndSystemSpaceEnter::SystemEnterCondition::Launch;
+			else if (value == "spawn")
+				reason = CndSystemSpaceEnter::SystemEnterCondition::Spawn;
+			else if (value != "any")
+				PrintErrorToConsole(L"Cnd_SystemSpaceEnter", conditionParent, argNum, L"Invalid enter type. Must be JUMP, LAUNCH, SPAWN, or ANY. Defaulting to ANY.");
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				systemId = value;
+				systemIds.insert(value);
+			argNum++;
 		}
 
-		return new CndSystemEnter(conditionParent, label, systemId);
+		return new CndSystemSpaceEnter(conditionParent, label, reason, systemIds);
 	}
 
-	static CndSystemExit* ReadCndSystemExit(const ConditionParent& conditionParent, INI_Reader& ini)
+	static CndSystemSpaceExit* ReadCndSystemSpaceExit(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint systemId = 0;
+		CndSystemSpaceExit::SystemExitCondition reason = CndSystemSpaceExit::SystemExitCondition::Any;
+		std::unordered_set<uint> systemIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
 		if (label == 0)
 		{
-			PrintErrorToConsole(L"Cnd_SystemExit", conditionParent, argNum, L"No target label. Aborting!");
+			PrintErrorToConsole(L"Cnd_SystemSpaceExit", conditionParent, argNum, L"No target label. Aborting!");
 			return nullptr;
 		}
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "jump")
+				reason = CndSystemSpaceExit::SystemExitCondition::Jump;
+			else if (value == "vanish")
+				reason = CndSystemSpaceExit::SystemExitCondition::Vanish;
+			else if (value == "explode")
+				reason = CndSystemSpaceExit::SystemExitCondition::Explode;
+			else if (value == "dock")
+				reason = CndSystemSpaceExit::SystemExitCondition::Dock;
+			else if (value != "any")
+				PrintErrorToConsole(L"Cnd_SystemSpaceExit", conditionParent, argNum, L"Invalid enter type. Must be JUMP, DOCK, EXPLDOE, VANISH, or ANY. Defaulting to ANY.");
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				systemId = value;
+				systemIds.insert(value);
+			argNum++;
 		}
 
-		return new CndSystemExit(conditionParent, label, systemId);
+		return new CndSystemSpaceExit(conditionParent, label, reason, systemIds);
 	}
 
 	static CndTimer* ReadCndTimer(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -535,6 +714,9 @@ namespace Missions
 		if (ini.is_value("Cnd_BaseEnter"))
 			return ReadCndBaseEnter(conditionParent, ini);
 
+		if (ini.is_value("Cnd_BaseExit"))
+			return ReadCndBaseExit(conditionParent, ini);
+
 		if (ini.is_value("Cnd_Cloaked"))
 			return ReadCndCloaked(conditionParent, ini);
 
@@ -556,8 +738,20 @@ namespace Missions
 		if (ini.is_value("Cnd_HealthDec"))
 			return ReadCndHealthDec(conditionParent, ini);
 
+		if (ini.is_value("Cnd_InSpace"))
+			return ReadCndInSpace(conditionParent, ini);
+
 		if (ini.is_value("Cnd_InSystem"))
 			return ReadCndInSystem(conditionParent, ini);
+
+		if (ini.is_value("Cnd_InZone"))
+			return ReadCndInZone(conditionParent, ini);
+
+		if (ini.is_value("Cnd_JumpInComplete"))
+			return ReadCndJumpInComplete(conditionParent, ini);
+
+		if (ini.is_value("Cnd_LaunchComplete"))
+			return ReadCndLaunchComplete(conditionParent, ini);
 
 		if (ini.is_value("Cnd_OnBase"))
 			return ReadCndOnBase(conditionParent, ini);
@@ -565,11 +759,11 @@ namespace Missions
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);
 
-		if (ini.is_value("Cnd_SystemEnter"))
-			return ReadCndSystemEnter(conditionParent, ini);
+		if (ini.is_value("Cnd_SystemSpaceEnter"))
+			return ReadCndSystemSpaceEnter(conditionParent, ini);
 
-		if (ini.is_value("Cnd_SystemExit"))
-			return ReadCndSystemExit(conditionParent, ini);
+		if (ini.is_value("Cnd_SystemSpaceExit"))
+			return ReadCndSystemSpaceExit(conditionParent, ini);
 
 		if (ini.is_value("Cnd_Timer"))
 			return ReadCndTimer(conditionParent, ini);

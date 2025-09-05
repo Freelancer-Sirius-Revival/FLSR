@@ -520,13 +520,16 @@ namespace ShipSpawning
 		// Pilot name to be displayed when clicking on the ship/wireframe display.
 		// Will be also displayed in scanner list if no formation name is given.
 		FmtStr pilotName(Archetype::GetShip(shipInfo.iShipArchetype)->iIdsName, 0);
-		if (params.idsName)
+		if (!params.shipNameDisplayed)
 		{
-			pilotName.begin_mad_lib(params.idsName);
-			pilotName.end_mad_lib();
+			if (params.idsName)
+			{
+				pilotName.begin_mad_lib(params.idsName);
+				pilotName.end_mad_lib();
+			}
+			else
+				CreatePilotName(params.archetypeId, params.faction, voiceId, pilotName);
 		}
-		else
-			CreatePilotName(params.archetypeId, params.faction, voiceId, pilotName);
 
 		pub::Reputation::Alloc(shipInfo.iRep, formationName, pilotName);
 		uint groupId;

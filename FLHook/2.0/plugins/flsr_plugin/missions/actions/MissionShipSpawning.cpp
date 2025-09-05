@@ -37,6 +37,7 @@ namespace Missions
 		params.voiceId = msnNpc.voiceId;
 		params.costume = msnNpc.costume;
 		params.idsName = msnNpc.idsName;
+		params.shipNameDisplayed = msnNpc.shipNameDisplayed;
 		params.faction = npc.faction;
 		params.stateGraphName = npc.stateGraph;
 		params.pilotId = npc.pilotId;

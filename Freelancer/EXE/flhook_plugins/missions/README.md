@@ -160,6 +160,9 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
 - `[string_id]` The in-game display-name. If not given, a random name based on the used faction will be generated. If no name can be generated, uses the ship name.
     1. `INTEGER` The resource ID to use.
 
+- `[use_ship_ids]` Use the ship archetype IDS Name as in-game display-name.
+    1. `True|False :False` Whether to use the ship IDS Name or the `string_id`.
+
 - `system` The system to spawn into.
     1. `STRING` The system nickname.
 

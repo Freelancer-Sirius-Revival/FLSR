@@ -16,6 +16,7 @@ namespace ShipSpawning
 		Costume costume;
 		uint formationIdsName = 0;
 		uint idsName = 0;
+		bool shipNameDisplayed = false;
 		std::string faction = "";
 		std::string stateGraphName;
 		uint pilotId;

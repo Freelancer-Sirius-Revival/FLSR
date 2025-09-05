@@ -19,6 +19,7 @@ namespace Missions
 		uint id = 0;
 		uint npcId = 0;
 		uint idsName = 0;
+		bool shipNameDisplayed = false;
 		uint voiceId = 0;
 		Costume costume;
 		uint systemId = 0;

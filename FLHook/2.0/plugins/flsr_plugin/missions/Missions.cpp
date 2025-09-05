@@ -200,6 +200,8 @@ namespace Missions
 								npc.id = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("string_id"))
 								npc.idsName = ini.get_value_int(0);
+							else if (ini.is_value("use_ship_ids"))
+								npc.shipNameDisplayed = ini.get_value_bool(0);
 							else if (ini.is_value("system"))
 								npc.systemId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("position"))

@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> baseIds;
 
 	public:
-		CndLaunchComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds);
+		CndLaunchComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds);
 		~CndLaunchComplete();
 		void Register();
 		void Unregister();

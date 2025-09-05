@@ -6,7 +6,7 @@ namespace Missions
 {
 	std::unordered_set<CndJumpInComplete*> observedCndJumpInComplete;
 
-	CndJumpInComplete::CndJumpInComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint> systemIds) :
+	CndJumpInComplete::CndJumpInComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds) :
 		Condition(parent),
 		label(label),
 		systemIds(systemIds)

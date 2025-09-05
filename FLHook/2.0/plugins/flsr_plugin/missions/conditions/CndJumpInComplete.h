@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> systemIds;
 
 	public:
-		CndJumpInComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint> systemIds);
+		CndJumpInComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds);
 		~CndJumpInComplete();
 		void Register();
 		void Unregister();

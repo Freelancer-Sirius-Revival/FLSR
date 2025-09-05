@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> systemIds;
 
 	public:
-		CndInSystem(const ConditionParent& parent, const uint label, const std::unordered_set<uint> systemIds);
+		CndInSystem(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds);
 		~CndInSystem();
 		void Register();
 		void Unregister();

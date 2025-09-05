@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> baseIds;
 
 	public:
-		CndBaseEnter(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds);
+		CndBaseEnter(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds);
 		~CndBaseEnter();
 		void Register();
 		void Unregister();

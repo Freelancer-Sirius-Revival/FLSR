@@ -6,7 +6,7 @@ namespace Missions
 {
 	std::unordered_set<CndBaseExit*> observedCndBaseExit;
 
-	CndBaseExit::CndBaseExit(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds) :
+	CndBaseExit::CndBaseExit(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds) :
 		Condition(parent),
 		label(label),
 		baseIds(baseIds)

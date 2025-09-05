@@ -12,7 +12,7 @@ namespace Missions
 
 		bool IsInZone(uint objId);
 	public:
-		CndInZone(const ConditionParent& parent, const uint objNameOrLabel, const std::unordered_set<uint> zoneIds);
+		CndInZone(const ConditionParent& parent, const uint objNameOrLabel, const std::unordered_set<uint>& zoneIds);
 		~CndInZone();
 		void Register();
 		void Unregister();

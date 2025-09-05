@@ -6,7 +6,7 @@ namespace Missions
 {
 	std::unordered_set<CndLaunchComplete*> observedCndLaunchComplete;
 
-	CndLaunchComplete::CndLaunchComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds) :
+	CndLaunchComplete::CndLaunchComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds) :
 		Condition(parent),
 		label(label),
 		baseIds(baseIds)

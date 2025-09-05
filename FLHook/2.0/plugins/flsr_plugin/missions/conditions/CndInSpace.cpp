@@ -6,7 +6,7 @@ namespace Missions
 {
 	std::unordered_set<CndInSpace*> observedCndInSpace;
 
-	CndInSpace::CndInSpace(const ConditionParent& parent, const uint label, const std::unordered_set<uint> systemIds) :
+	CndInSpace::CndInSpace(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds) :
 		Condition(parent),
 		label(label),
 		systemIds(systemIds)

@@ -6,7 +6,7 @@ namespace Missions
 {
 	std::unordered_set<CndInZone*> observedCndInZone;
 
-	CndInZone::CndInZone(const ConditionParent& parent, const uint objNameOrLabel, const std::unordered_set<uint> zoneIds) :
+	CndInZone::CndInZone(const ConditionParent& parent, const uint objNameOrLabel, const std::unordered_set<uint>& zoneIds) :
 		Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		zoneIds(zoneIds)

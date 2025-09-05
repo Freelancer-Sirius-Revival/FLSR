@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> baseIds;
 
 	public:
-		CndBaseExit(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds);
+		CndBaseExit(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds);
 		~CndBaseExit();
 		void Register();
 		void Unregister();

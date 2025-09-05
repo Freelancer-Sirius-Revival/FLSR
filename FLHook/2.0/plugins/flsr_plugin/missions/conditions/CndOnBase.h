@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> baseIds;
 
 	public:
-		CndOnBase(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds);
+		CndOnBase(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds);
 		~CndOnBase();
 		void Register();
 		void Unregister();

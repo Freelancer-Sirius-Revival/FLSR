@@ -6,7 +6,7 @@ namespace Missions
 {
 	std::unordered_set<CndOnBase*> observedCndOnBase;
 
-	CndOnBase::CndOnBase(const ConditionParent& parent, const uint label, const std::unordered_set<uint> baseIds) :
+	CndOnBase::CndOnBase(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds) :
 		Condition(parent),
 		label(label),
 		baseIds(baseIds)

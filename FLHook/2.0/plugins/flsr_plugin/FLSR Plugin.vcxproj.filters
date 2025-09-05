@@ -85,7 +85,7 @@
     <ClCompile Include="missions\conditions\CndSystemSpaceEnter.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\CndSystemExit.cpp">
+    <ClCompile Include="missions\conditions\CndSystemSpaceExit.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="missions\conditions\CndBaseEnter.cpp">
@@ -346,7 +346,7 @@
     <ClInclude Include="missions\conditions\CndSystemSpaceEnter.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSystemExit.h">
+    <ClInclude Include="missions\conditions\CndSystemSpaceExit.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndBaseEnter.h">

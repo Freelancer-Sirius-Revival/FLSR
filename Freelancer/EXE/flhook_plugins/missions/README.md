@@ -450,9 +450,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Jump|Launch|Spawn|Any] :Any` The condition under which space is entered.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname the player entered. If none is given, any system will count.
 
-- `Cnd_SystemExit` Only players. Docking to bases, destruction, leaving the server, or changing to another character. No jumping. `Activator` will be the player.
-    1. `STRING|Stranger` The players to await despawning from space.
-    1. `[STRING] :any` The system nickname the player despawns from.
+- `Cnd_SystemSpaceExit` Only players. When leaving space of a system. `Activator` will be the player.
+    1. `STRING|Stranger` The players to await leaving space.
+    1. `[Jump|Dock|Explode|Vanish|Any] :Any` The condition under which space is left.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname the player left. If none is given, any system will count.
 
 - `Cnd_Timer` Waits until the time as passed. `Activator` will be nobody.
     1. `FLOAT` Lower limit of randomized time.

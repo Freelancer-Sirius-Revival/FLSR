@@ -27,7 +27,7 @@
 #include "Missions/conditions/CndOnBase.h"
 #include "Missions/conditions/CndProjHitCount.h"
 #include "Missions/conditions/CndSystemSpaceEnter.h"
-#include "Missions/conditions/CndSystemExit.h"
+#include "Missions/conditions/CndSystemSpaceExit.h"
 #include "Missions/conditions/CndTimer.h"
 #include "Missions/objectives/Objectives.h"
 #include "MissionAbortFix.h"
@@ -310,7 +310,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceEnter::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceExit::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceExit::SystemSwitchOutComplete, PLUGIN_HkIServerImpl_SystemSwitchOutComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndSystemSpaceExit::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndTimer::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));

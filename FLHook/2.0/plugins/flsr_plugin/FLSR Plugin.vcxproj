@@ -192,7 +192,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndOnBase.cpp" />
     <ClCompile Include="missions\conditions\CndProjHitCount.cpp" />
     <ClCompile Include="missions\conditions\CndSystemSpaceEnter.cpp" />
-    <ClCompile Include="missions\conditions\CndSystemExit.cpp" />
+    <ClCompile Include="missions\conditions\CndSystemSpaceExit.cpp" />
     <ClCompile Include="missions\conditions\CndTimer.cpp" />
     <ClCompile Include="missions\conditions\CndTrue.cpp" />
     <ClCompile Include="missions\conditions\Condition.cpp" />
@@ -292,7 +292,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndOnBase.h" />
     <ClInclude Include="missions\conditions\CndProjHitCount.h" />
     <ClInclude Include="missions\conditions\CndSystemSpaceEnter.h" />
-    <ClInclude Include="missions\conditions\CndSystemExit.h" />
+    <ClInclude Include="missions\conditions\CndSystemSpaceExit.h" />
     <ClInclude Include="missions\conditions\CndTimer.h" />
     <ClInclude Include="missions\conditions\CndTrue.h" />
     <ClInclude Include="missions\conditions\Condition.h" />

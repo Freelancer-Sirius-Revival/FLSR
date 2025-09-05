@@ -82,7 +82,7 @@
     <ClCompile Include="missions\actions\ActNNPath.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
-    <ClCompile Include="missions\conditions\CndSystemEnter.cpp">
+    <ClCompile Include="missions\conditions\CndSystemSpaceEnter.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="missions\conditions\CndSystemExit.cpp">
@@ -343,7 +343,7 @@
     <ClInclude Include="missions\actions\ActSetNNObj.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\conditions\CndSystemEnter.h">
+    <ClInclude Include="missions\conditions\CndSystemSpaceEnter.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndSystemExit.h">

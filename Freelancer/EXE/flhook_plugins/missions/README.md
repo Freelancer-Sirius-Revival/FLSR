@@ -445,9 +445,10 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[STRING|Stranger]` Damage inflictor object by name or label. If none is given, defaults to all mission objects and players.
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
-- `Cnd_SystemEnter` Only players. Undocking from bases or spawning into space. No jumping. `Activator` will be the player.
-    1. `STRING|Stranger` The players  to await spawning into space.
-    1. `[STRING] :any` The system nickname the player spawns into.
+- `Cnd_SystemSpaceEnter` Only players. When entering space of a system. `Activator` will be the player.
+    1. `STRING|Stranger` The players to await entering space.
+    1. `[Jump|Launch|Spawn|Any] :Any` The condition under which space is entered.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname the player entered. If none is given, any system will count.
 
 - `Cnd_SystemExit` Only players. Docking to bases, destruction, leaving the server, or changing to another character. No jumping. `Activator` will be the player.
     1. `STRING|Stranger` The players to await despawning from space.

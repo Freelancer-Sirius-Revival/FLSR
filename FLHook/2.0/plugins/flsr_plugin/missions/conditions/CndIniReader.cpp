@@ -15,7 +15,7 @@
 #include "CndLaunchComplete.h"
 #include "CndOnBase.h"
 #include "CndProjHitCount.h"
-#include "CndSystemEnter.h"
+#include "CndSystemSpaceEnter.h"
 #include "CndSystemExit.h"
 #include "CndTimer.h"
 #include "CndTrue.h"
@@ -599,28 +599,44 @@ namespace Missions
 		return new CndProjHitCount(conditionParent, damagedObjNameOrLabel, targetSurface, damageType, targetHitCount, inflictorObjNameOrLabel, damagedIsActivator);
 	}
 
-	static CndSystemEnter* ReadCndSystemEnter(const ConditionParent& conditionParent, INI_Reader& ini)
+	static CndSystemSpaceEnter* ReadCndSystemSpaceEnter(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
-		uint systemId = 0;
+		CndSystemSpaceEnter::SystemEnterCondition reason = CndSystemSpaceEnter::SystemEnterCondition::Any;
+		std::unordered_set<uint> systemIds;
 
 		uint argNum = 0;
 		label = CreateIdOrNull(ini.get_value_string(argNum));
 		if (label == 0)
 		{
-			PrintErrorToConsole(L"Cnd_SystemEnter", conditionParent, argNum, L"No target label. Aborting!");
+			PrintErrorToConsole(L"Cnd_SystemSpaceEnter", conditionParent, argNum, L"No target label. Aborting!");
 			return nullptr;
 		}
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "jump")
+				reason = CndSystemSpaceEnter::SystemEnterCondition::Jump;
+			else if (value == "launch")
+				reason = CndSystemSpaceEnter::SystemEnterCondition::Launch;
+			else if (value == "spawn")
+				reason = CndSystemSpaceEnter::SystemEnterCondition::Spawn;
+			else if (value != "any")
+				PrintErrorToConsole(L"Cnd_SystemSpaceEnter", conditionParent, argNum, L"Invalid enter type. Must be JUMP, LAUNCH, SPAWN, or ANY. Defaulting to ANY.");
+		}
+		argNum++;
+
+		while (argNum < ini.get_num_parameters())
+		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value != 0)
-				systemId = value;
+				systemIds.insert(value);
+			argNum++;
 		}
 
-		return new CndSystemEnter(conditionParent, label, systemId);
+		return new CndSystemSpaceEnter(conditionParent, label, reason, systemIds);
 	}
 
 	static CndSystemExit* ReadCndSystemExit(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -725,8 +741,8 @@ namespace Missions
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);
 
-		if (ini.is_value("Cnd_SystemEnter"))
-			return ReadCndSystemEnter(conditionParent, ini);
+		if (ini.is_value("Cnd_SystemSpaceEnter"))
+			return ReadCndSystemSpaceEnter(conditionParent, ini);
 
 		if (ini.is_value("Cnd_SystemExit"))
 			return ReadCndSystemExit(conditionParent, ini);

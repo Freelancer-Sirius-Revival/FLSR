@@ -145,21 +145,6 @@ This is the definition for a NPC archetype which again can be used by multiple `
 - `[pilot]` The AI for the pilot.
     1. `STRING` The pilot nickname used.
 
-- `[voice]` Required to allow comms sent from this base. Takes a random one by the faction if empty.
-    1. `STRING` The voice nickname used.
-
-- `[space_costume]` Required to make a comms window visible to the player on interaction. Takes a random one by the faction if empty.
-    1. `[STRING]` The head nickname used.
-    1. `[STRING]` The body nickname used.
-    1. `[STRING]` The 1. accessory slot used.
-    1. `[STRING]` The 2. accessory slot used.
-    1. `[STRING]` The 3. accessory slot used.
-    1. `[STRING]` The 4. accessory slot used.
-    1. `[STRING]` The 5. accessory slot used.
-    1. `[STRING]` The 6. accessory slot used.
-    1. `[STRING]` The 7. accessory slot used.
-    1. `[STRING]` The 8. accessory slot used.
-
 - `[level]` Sets the displayed level.
     1. `INTEGER` The level to show. Can be from 0 to 255.
 
@@ -190,6 +175,21 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
 
 - `npc` Defines the NPC archetype.
     1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
+
+- `[voice]` Required to allow comms sent from this base. Takes a random one by the NPC faction if empty.
+    1. `STRING` The voice nickname used.
+
+- `[space_costume]` Required to make a comms window visible to the player on interaction. Takes a random one by the NPC faction if empty.
+    1. `[STRING]` The head nickname used.
+    1. `[STRING]` The body nickname used.
+    1. `[STRING]` The 1. accessory slot used.
+    1. `[STRING]` The 2. accessory slot used.
+    1. `[STRING]` The 3. accessory slot used.
+    1. `[STRING]` The 4. accessory slot used.
+    1. `[STRING]` The 5. accessory slot used.
+    1. `[STRING]` The 6. accessory slot used.
+    1. `[STRING]` The 7. accessory slot used.
+    1. `[STRING]` The 8. accessory slot used.
 
 - `[hitpoints]` The absolute hitpoints to spawn this NPC with.
     1. `[INTEGER|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.

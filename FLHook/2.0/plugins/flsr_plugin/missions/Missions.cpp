@@ -181,22 +181,6 @@ namespace Missions
 								npc.faction = ini.get_value_string(0);
 							else if (ini.is_value("pilot"))
 								npc.pilotId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("voice"))
-								npc.voiceId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("space_costume"))
-							{
-								npc.costume.head = CreateIdOrNull(ini.get_value_string(0));
-								npc.costume.body = CreateIdOrNull(ini.get_value_string(1));
-								npc.costume.accessories = 0;
-								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
-								{
-									const char* accessoryNickname = ini.get_value_string(index + 2);
-									if (strlen(accessoryNickname) == 0)
-										break;
-									npc.costume.accessory[index] = CreateID(accessoryNickname);
-									npc.costume.accessories++;
-								}
-							}
 							else if (ini.is_value("level"))
 								npc.level = ini.get_value_int(0);
 						}
@@ -226,6 +210,22 @@ namespace Missions
 								npc.npcId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("hitpoints"))
 								npc.hitpoints = ini.get_value_int(0);
+							else if (ini.is_value("voice"))
+								npc.voiceId = CreateIdOrNull(ini.get_value_string(0));
+							else if (ini.is_value("space_costume"))
+							{
+								npc.costume.head = CreateIdOrNull(ini.get_value_string(0));
+								npc.costume.body = CreateIdOrNull(ini.get_value_string(1));
+								npc.costume.accessories = 0;
+								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
+								{
+									const char* accessoryNickname = ini.get_value_string(index + 2);
+									if (strlen(accessoryNickname) == 0)
+										break;
+									npc.costume.accessory[index] = CreateID(accessoryNickname);
+									npc.costume.accessories++;
+								}
+							}
 							else if (ini.is_value("pilot_job"))
 								npc.pilotJobId = CreateIdOrNull(ini.get_value_string(0));
 							else if (ini.is_value("arrival_obj"))

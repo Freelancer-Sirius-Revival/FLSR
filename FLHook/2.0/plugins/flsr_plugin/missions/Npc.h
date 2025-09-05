@@ -11,8 +11,6 @@ namespace Missions
 		std::string stateGraph = "";
 		uint pilotId = 0;
 		std::string faction = "";
-		uint voiceId = 0;
-		Costume costume;
 		byte level = 0;
 	};
 
@@ -21,6 +19,8 @@ namespace Missions
 		uint id = 0;
 		uint npcId = 0;
 		uint idsName = 0;
+		uint voiceId = 0;
+		Costume costume;
 		uint systemId = 0;
 		Vector position;
 		Matrix orientation;

@@ -34,8 +34,8 @@ namespace Missions
 		params.systemId = msnNpc.systemId;
 		params.hitpoints = msnNpc.hitpoints;
 		params.level = npc.level;
-		params.voiceId = npc.voiceId;
-		params.costume = npc.costume;
+		params.voiceId = msnNpc.voiceId;
+		params.costume = msnNpc.costume;
 		params.idsName = msnNpc.idsName;
 		params.faction = npc.faction;
 		params.stateGraphName = npc.stateGraph;

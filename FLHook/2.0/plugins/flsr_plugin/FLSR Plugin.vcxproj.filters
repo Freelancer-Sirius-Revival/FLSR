@@ -558,6 +558,7 @@
     <ClInclude Include="missions\conditions\CndInSpace.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="CloakSync.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

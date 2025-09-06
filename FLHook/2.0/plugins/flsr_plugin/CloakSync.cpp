@@ -31,11 +31,36 @@ namespace CloakSync
 		}
 	}
 
+	static void DeactivateAndSendCloakingDeviceState(const uint clientId, uint objId, const EquipDescVector& equipList)
+	{
+		IObjRW* inspect;
+		StarSystem* system;
+		if (!GetShipInspect(objId, inspect, system) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
+			return;
+		const auto& object = dynamic_cast<CEqObj*>(inspect->cobj);
+
+		for (const auto& entry : equipList.equip)
+		{
+			if (!entry.bMounted)
+				continue;
+
+			const auto& equip = object->equip_manager.FindByID(entry.sID);
+			if (equip->CEquipType == EquipmentClass::CloakingDevice)
+			{
+				XActivateEquip activate;
+				activate.iSpaceID = objId;
+				activate.sID = entry.sID;
+				activate.bActivate = false;
+				Server.ActivateEquip(clientId, activate);
+				SendEquipmentActivationState(clientId, objId, entry.sID, equip->isActive);
+			}
+		}
+	}
+
 	bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& packet)
 	{
 		returncode = DEFAULT_RETURNCODE;
-		if (!packet.clientId)
-			SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
+		SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
 		return true;
 	}
 
@@ -44,5 +69,19 @@ namespace CloakSync
 		returncode = DEFAULT_RETURNCODE;
 		SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
 		return true;
+	}
+
+	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+	{
+		returncode = DEFAULT_RETURNCODE;
+		PlayerData* playerData = nullptr;
+		while (playerData = Players.traverse_active(playerData))
+		{
+			if (playerData->iOnlineID == clientId)
+			{
+				DeactivateAndSendCloakingDeviceState(clientId, shipId, playerData->equipDescList);
+				break;
+			}
+		}
 	}
 }

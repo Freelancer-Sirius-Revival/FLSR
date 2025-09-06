@@ -158,7 +158,7 @@ struct FLPACKET_CREATESOLAR
 	Vector vPos;
 	Quaternion fOrientation;
 	uint64_t hitPoints;
-	EquipDescVector eqVector;
+	EquipDescVector equip;
 	st6::list<CollisionGroupDesc> colGrpDesc; //128
 	DamageList dmgList;
 	bool isDynamic;

@@ -129,6 +129,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="missions\MatrixMath.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />

@@ -2,6 +2,7 @@
 #include "NpcAppearances.h"
 #include "../Pilots.h"
 #include "../Plugin.h"
+#include "MatrixMath.h"
 
 namespace ShipSpawning
 {
@@ -491,8 +492,28 @@ namespace ShipSpawning
 				float dockRadius;
 				inspect->get_dock_hardpoints(0, &dockType, &dockMount, &dockPoint1, &dockPoint2, &dockRadius);
 				startPos = dockMount.position;
-				startOrientation = dockPoint1.orientation;
-				startVelocity = { dockMount.position.x - dockMount.position.x, dockPoint1.position.y - dockMount.position.y, dockPoint1.position.z - dockMount.position.z };
+				const auto& rotationMatrix = SetupTransform({ 0, 0, 0 }, { 0, 180, 0 });
+				TransformMatrix dockMountMatrix = SetupTransform({ 0, 0, 0 }, { 0, 0, 0 });
+				dockMountMatrix.d[0][0] = dockMount.orientation.data[0][0];
+				dockMountMatrix.d[0][1] = dockMount.orientation.data[0][1];
+				dockMountMatrix.d[0][2] = dockMount.orientation.data[0][2];
+				dockMountMatrix.d[1][0] = dockMount.orientation.data[1][0];
+				dockMountMatrix.d[1][1] = dockMount.orientation.data[1][1];
+				dockMountMatrix.d[1][2] = dockMount.orientation.data[1][2];
+				dockMountMatrix.d[2][0] = dockMount.orientation.data[2][0];
+				dockMountMatrix.d[2][1] = dockMount.orientation.data[2][1];
+				dockMountMatrix.d[2][2] = dockMount.orientation.data[2][2];
+				dockMountMatrix = MultiplyMatrix(dockMountMatrix, rotationMatrix);
+				startOrientation.data[0][0] = dockMountMatrix.d[0][0];
+				startOrientation.data[0][1] = dockMountMatrix.d[0][1];
+				startOrientation.data[0][2] = dockMountMatrix.d[0][2];
+				startOrientation.data[1][0] = dockMountMatrix.d[1][0];
+				startOrientation.data[1][1] = dockMountMatrix.d[1][1];
+				startOrientation.data[1][2] = dockMountMatrix.d[1][2];
+				startOrientation.data[2][0] = dockMountMatrix.d[2][0];
+				startOrientation.data[2][1] = dockMountMatrix.d[2][1];
+				startOrientation.data[2][2] = dockMountMatrix.d[2][2];
+				startVelocity = { dockPoint1.position.x - dockMount.position.x, dockPoint1.position.y - dockMount.position.y, dockPoint1.position.z - dockMount.position.z };
 				const float length = std::sqrt(std::pow(startVelocity.x, 2) + std::pow(startVelocity.y, 2) + std::pow(startVelocity.z, 2));
 				startVelocity.x = startVelocity.x / length * launchSpeed;
 				startVelocity.y = startVelocity.y / length * launchSpeed;

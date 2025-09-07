@@ -278,6 +278,9 @@
     <ClCompile Include="missions\actions\ActCloak.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\MatrixMath.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />

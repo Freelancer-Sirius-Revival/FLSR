@@ -161,8 +161,7 @@ struct XJettisonCargo
 {
 	uint iShip;
 	ushort iSlot;
-	ushort dunno;
-	ushort iCount;
+	uint iCount;
 };
 
 struct XTractorObjects

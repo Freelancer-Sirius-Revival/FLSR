@@ -43,7 +43,7 @@ namespace Missions
 		params.stateGraphName = npc.stateGraph;
 		params.pilotId = npc.pilotId;
 		params.pilotJobId = msnNpc.pilotJobId;
-		if (positionOverride != nullptr || orientationOverride != nullptr)
+		if (positionOverride == nullptr && orientationOverride == nullptr)
 		{
 			const auto& foundObjectEntry = mission.objectIdsByName.find(msnNpc.startingObjId);
 			params.launchObjId = foundObjectEntry != mission.objectIdsByName.end() ? foundObjectEntry->second : msnNpc.startingObjId;

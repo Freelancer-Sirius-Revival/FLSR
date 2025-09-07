@@ -1970,6 +1970,12 @@ namespace PhySys
 	IMPORT  enum IVP_BOOL(*m_pCollisionFilter)(class IVP_Real_Object*, class IVP_Real_Object*);
 };
 
+struct Transform
+{
+	Matrix orientation;
+	Vector position;
+};
+
 struct IMPORT EngineObject
 {
 
@@ -5561,7 +5567,7 @@ struct IMPORT IObjInspectImpl
 	virtual bool is_player() const;
 	virtual int get_hardpoint(const char*, Vector*, Matrix*) const;
 	virtual bool has_dock_hardpoints() const;
-	virtual int get_dock_hardpoints(int, enum TERMINAL_TYPE*, Transform*, Transform*, Transform*, float*) const;
+	virtual int get_dock_hardpoints(int dockIndex, Archetype::DockType*, Transform* dockMount, Transform* dockPoint1, Transform* dockPoint2, float* dockRadius) const;
 	virtual float get_time_to_accelerate(float, float, float, IObject::ThrustEquipType) const;
 	virtual float get_distance_travelled(float, float, float, IObject::ThrustEquipType) const;
 	virtual float get_projected_throttle(float, IObject::ThrustEquipType) const;
@@ -5670,7 +5676,7 @@ struct IObjRWAbstract
 	virtual bool is_player() const;                                                                                 // 188
 	virtual int get_hardpoint(const char*, Vector*, Matrix*) const;                                                 // 192
 	virtual bool has_dock_hardpoints() const;                                                                       // 196
-	virtual int get_dock_hardpoints(int, enum TERMINAL_TYPE*, Transform*, Transform*, Transform*, float*) const;    // 200
+	virtual int get_dock_hardpoints(int dockIndex, Archetype::DockType*, Transform* dockMount, Transform* dockPoint1, Transform* dockPoint2, float* dockRadius) const;    // 200
 	virtual float get_time_to_accelerate(float, float, float, IObject::ThrustEquipType) const;                      // 204
 	virtual float get_distance_travelled(float, float, float, IObject::ThrustEquipType) const;                      // 208
 	virtual float get_projected_throttle(float, IObject::ThrustEquipType) const;                                    // 212

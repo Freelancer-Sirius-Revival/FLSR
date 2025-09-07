@@ -200,8 +200,8 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
 - `[pilot_job]` Override for the job of the pilot.
     1. `STRING` The job nickname used.
 
-- `[arrival_obj]` Launches from a base or jump-object.
-    1. `STRING` The solar nickname to undock at spawn from.
+- `[arrival_obj]` Launches from a solar or NPC. They must each have valid `docking_sphere` entries.
+    1. `STRING` The object nickname to spawn from.
 
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.

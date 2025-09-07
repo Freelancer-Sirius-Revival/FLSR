@@ -376,7 +376,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players leaving a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player leaves from. If none is given, any base will count.
 
-- `Cnd_Cloaked` Checks whether the object is cloaked or not (>90% invisibility progress). `Activator` will be the cloaked/uncloaked object.
+- `Cnd_Cloaked` Checks whether the object is fully cloaked or not. `Activator` will be the cloaked/uncloaked object.
     1. `STRING|Stranger` Object by name or label to watch cloaking state of.
     1. `True|False :False` `False` if the target must be uncloaked, or `True` if it must be cloaked.
 
@@ -512,6 +512,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The faction name to change reputation toward. Relative changes according to `empathy.ini` will be computed.
     1. `FLOAT|ObjectDestruction|MissionSuccess|MissionFailure|MissionAbortion :ObjectDestruction` The change magnitue. Either uses a given value, or takes one of the predefined events from `empathy.ini`.
 
+- `Act_Cloak` Only for NPCs or solars. Cloaks or uncloaks them when a cloaking device is mounted.
+    1. `STRING|Activator` Object by name or label for which the cloak will be changed.
+    1. `True|False :False` Whether the cloak should be active or not.
+
 - `Act_DeactMsnTrig` Deactivates a trigger of a another mission. This works in two exclusive modes:
     - A single trigger with optional probability to be deactivated:
     1. `STRING` Mission nickname to refer.
@@ -560,7 +564,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` The NPCs to receive the objectives.
     1. `STRING` The `ObjList` nickname to refer to.
 
-- `Act_Invulnerable` Sets invulnerability for the target. Only for NPCs/Solars.
+- `Act_Invulnerable` Only for NPCs or solars. Sets invulnerability for the target.
     1. `STRING|Activator` Object by name or label for which invulnerability will be set.
     1. `True|False :False` Whether to prevent non-player damage (NPCs, radiation, asteroid mines) or not.
     1. `[True|False] :False` Whether to prevent player damage or not.

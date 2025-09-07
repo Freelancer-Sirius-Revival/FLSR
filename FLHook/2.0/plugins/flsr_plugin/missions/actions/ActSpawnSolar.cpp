@@ -1,5 +1,6 @@
 #include "../../Main.h"
 #include "ActSpawnSolar.h"
+#include "../../NpcCloaking.h"
 
 namespace Missions
 {
@@ -15,7 +16,10 @@ namespace Missions
 			{
 				const uint objId = SolarSpawn::SpawnSolarByName(mission.name + ":" + solar.name);
 				if (objId)
+				{
 					mission.AddObject(objId, CreateID(solar.name.c_str()), solar.labels);
+					NpcCloaking::RegisterObject(objId);
+				}
 				return;
 			}
 		}

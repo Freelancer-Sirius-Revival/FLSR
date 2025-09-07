@@ -129,6 +129,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
     <ClCompile Include="Discord.cpp" />
@@ -149,6 +150,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActAddLabel.cpp" />
     <ClCompile Include="missions\actions\ActAdjAcct.cpp" />
     <ClCompile Include="missions\actions\ActAdjRep.cpp" />
+    <ClCompile Include="missions\actions\ActCloak.cpp" />
     <ClCompile Include="missions\actions\ActLeaveMsn.cpp" />
     <ClCompile Include="missions\actions\ActMark.cpp" />
     <ClCompile Include="missions\actions\ActSetLifeTime.cpp" />
@@ -237,6 +239,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Main.h" />
@@ -248,6 +251,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActAddLabel.h" />
     <ClInclude Include="missions\actions\ActAdjAcct.h" />
     <ClInclude Include="missions\actions\ActAdjRep.h" />
+    <ClInclude Include="missions\actions\ActCloak.h" />
     <ClInclude Include="missions\actions\ActLeaveMsn.h" />
     <ClInclude Include="missions\actions\ActMark.h" />
     <ClInclude Include="missions\actions\ActSetLifeTime.h" />

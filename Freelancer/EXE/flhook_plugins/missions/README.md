@@ -343,7 +343,7 @@ Dialogs are a shortcut to defining multiple `Act_SendComm` or `Act_EtherComm` fo
     1. `[STRING]` The 8. accessory slot used for the sender.
 - `line` In definition order: Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
-    1. `STRING|Activator` Object by name or label to receive this comm.
+    1. `STRING|Activator` Object by name or label to receive this comm. Can also be a static world solar.
     1. `STRING` Object by name to send this comm. Can also be a static world solar, or `etherSender`. Must have a voice defined. Cannot be a player.
     1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
@@ -624,7 +624,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_SendComm` Sends communication from one object to others. A sender without proper space costume will not display a comms window. Note that players cannot receive such comms from objects that are not present at the client (e.g. NPCs outside their spawn/sync range).
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
-    1. `STRING|Activator` Object by name or label to receive this comm.
+    1. `STRING|Activator` Object by name or label to receive this comm. Can also be a static world solar.
     1. `STRING` Object by name to send this comm. Can also be a static world solar. Must have a voice defined. Cannot be a player.
     1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.

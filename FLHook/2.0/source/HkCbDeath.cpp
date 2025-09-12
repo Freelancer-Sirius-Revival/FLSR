@@ -407,7 +407,7 @@ __declspec(naked) void ShipColGrpDestroyedHookNaked()
     }
 }
 
-FARPROC ShipEquipDeathOrigFunc;
+FARPROC ShipAndSolarEquipDeathOrigFunc;
 
 void __stdcall ShipEquipDestroyedHook(IObjRW* iobj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
 {
@@ -427,7 +427,7 @@ __declspec(naked) void ShipEquipDestroyedHookNaked()
         push ecx
         call ShipEquipDestroyedHook
         pop ecx
-        mov eax, [ShipEquipDeathOrigFunc]
+        mov eax, [ShipAndSolarEquipDeathOrigFunc]
         jmp eax
     }
 }
@@ -451,6 +451,29 @@ __declspec(naked) void SolarColGrpDestroyedHookNaked()
         call SolarColGrpDestroyedHook
         pop ecx
         mov eax, [ShipAndSolarColGrpDeathOrigFunc]
+        jmp eax
+    }
+}
+
+void __stdcall SolarEquipDestroyedHook(IObjRW* iobj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
+{
+    TRY_HOOK
+    CALL_PLUGINS_V(PLUGIN_SolarEquipDestroyed, __stdcall, (IObjRW*, CEquip*, DamageEntry::SubObjFate fate, DamageList*), (iobj, equip, fate, dmgList));
+    CATCH_HOOK({})
+}
+
+__declspec(naked) void SolarEquipDestroyedHookNaked()
+{
+    __asm
+    {
+        push ecx
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push[esp + 0x10]
+        push ecx
+        call SolarEquipDestroyedHook
+        pop ecx
+        mov eax, [ShipAndSolarEquipDeathOrigFunc]
         jmp eax
     }
 }

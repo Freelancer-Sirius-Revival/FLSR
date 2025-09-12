@@ -41,17 +41,21 @@ PATCH_INFO piServerDLL = {
         //{0x6D67F4C,		&LootDestroyedNaked,				4, &LootDestroyedOrigFunc,	false},
         //{0x6D661C4,		&MineDestroyedNaked,				4, &MineDestroyedOrigFunc,		false},
         //{0x6D66694,		&GuidedDestroyedNaked,				4, &GuidedDestroyedOrigFunc,	false},
-        //{0x6D6733C,		&ShipColGrpDestroyedHookNaked,		4, &ShipAndSolarColGrpDeathOrigFunc,		false},
-        {0x6D67340,		&ShipEquipDestroyedHookNaked,		4, &ShipEquipDeathOrigFunc,		false},
-        //{0x6D6768C,		&SolarColGrpDestroyedHookNaked,		4, 0,							false}, // Same original function as ShipColGrpDeath
+        {0x6D6733C,		&ShipColGrpDestroyedHookNaked,		4, &ShipAndSolarColGrpDeathOrigFunc,		false},
+        {0x6D67340,		&ShipEquipDestroyedHookNaked,		4, &ShipAndSolarEquipDeathOrigFunc,		false},
+        {0x6D6768C,		&SolarColGrpDestroyedHookNaked,		4, 0,							false}, // Same original function as ShipColGrpDeath
+        {0x6D67690,		&SolarEquipDestroyedHookNaked,		4, 0,							false}, // Same original function as ShipEquipDeath
         {0x6D67274,		&ShipDestroyedNaked,				4, &ShipDestroyedOrigFunc,			false},
         {0x6D675C4,		&SolarDestroyedNaked,				4, &SolarDestroyedOrigFunc,		false},
         //{0x6D672A0,		&HookExplosionHitNaked,				4, &fpOldExplosionHit,		    false},
         {0x6D672CC,		&ShipHullDamageNaked,				4, &ShipHullDamageOrigFunc,		false},
         {0x6D6732C,		&ShipEquipDamageNaked,		        4, &ShipEquipDamageOrigFunc,	false},
         {0x6D67330,		&ShipShieldDamageNaked,		        4, &ShipShieldDamageOrigFunc,	false},
-        {0x6D67334,		&ShipColGrpDamageNaked,		        4, &ShipColGrpDamageOrigFunc,          false},
+        {0x6D67334,		&ShipColGrpDamageNaked,		        4, &ShipColGrpDamageOrigFunc,   false},
         {0x6D6761C,		&SolarHullDamageNaked,				4, &SolarHullDamageOrigFunc,    false},
+        {0x6D6767C,		&SolarEquipDamageNaked,             4, &SolarEquipDamageOrigFunc,	false},
+        {0x6D67680,		&SolarShieldDamageNaked,            4, &SolarShieldDamageOrigFunc,	false},
+        {0x6D67684,		&SolarColGrpDamageNaked,            4, &SolarColGrpDamageOrigFunc,  false},
         {0x6D6420C,		&HkIEngine::_LaunchPos,				4, &HkIEngine::fpOldLaunchPos,	false},
         {0x6D648E0,		&HkIEngine::FreeReputationVibe,		4, 0,							false},
 

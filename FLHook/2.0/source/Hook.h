@@ -779,6 +779,7 @@ void LootDestroyedNaked();
 void ShipColGrpDestroyedHookNaked();
 void ShipEquipDestroyedHookNaked();
 void SolarColGrpDestroyedHookNaked();
+void SolarEquipDestroyedHookNaked();
 
 // HkDamage
 void ApplyShipDamageListNaked();
@@ -788,6 +789,9 @@ void ShipEquipDamageNaked();
 void ShipShieldDamageNaked();
 void ShipColGrpDamageNaked();
 void SolarHullDamageNaked();
+void SolarEquipDamageNaked();
+void SolarShieldDamageNaked();
+void SolarColGrpDamageNaked();
 
 // HkCbCallbacks
 void _SendMessageHook();
@@ -872,7 +876,7 @@ extern EXPORT bool g_bMsgU;
 
 extern FARPROC ApplyShipDamageListOrigFunc;
 extern FARPROC ShipAndSolarColGrpDeathOrigFunc;
-extern FARPROC ShipEquipDeathOrigFunc;
+extern FARPROC ShipAndSolarEquipDeathOrigFunc;
 extern FARPROC ShipDestroyedOrigFunc;
 extern FARPROC SolarDestroyedOrigFunc;
 extern FARPROC LootDestroyedOrigFunc;
@@ -884,6 +888,9 @@ extern FARPROC ShipEquipDamageOrigFunc;
 extern FARPROC ShipShieldDamageOrigFunc;
 extern FARPROC ShipColGrpDamageOrigFunc;
 extern FARPROC SolarHullDamageOrigFunc;
+extern FARPROC SolarEquipDamageOrigFunc;
+extern FARPROC SolarShieldDamageOrigFunc;
+extern FARPROC SolarColGrpDamageOrigFunc;
 
 extern EXPORT CDPClientProxy **g_cClientProxyArray;
 extern EXPORT void *pClient;

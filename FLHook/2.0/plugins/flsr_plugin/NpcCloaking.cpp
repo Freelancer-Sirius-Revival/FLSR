@@ -243,7 +243,7 @@ namespace NpcCloaking
 		Update();
 	}
 
-	void __stdcall ShipDestroyed(IObjRW* killedObj, bool killed, uint killerObjId)
+	void __stdcall ShipAndSolarDestroyed(IObjRW* killedObj, bool killed, uint killerObjId)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
@@ -252,7 +252,7 @@ namespace NpcCloaking
 		objIdsToTransition.erase(objId);
 	}
 
-	void __stdcall ShipEquipDestroyedHook(IObjRW* obj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
+	void __stdcall ShipAndSolarEquipDestroyedHook(IObjRW* obj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
 	{
 		returncode = DEFAULT_RETURNCODE;
 
@@ -262,15 +262,6 @@ namespace NpcCloaking
 			SetTargetCloakState(obj->get_id(), false);
 			objEntry->second.proxyEquip = nullptr;
 		}
-	}
-
-	void __stdcall SolarDestroyed(IObjRW* killedObj, bool killed, uint killerObjId)
-	{
-		returncode = DEFAULT_RETURNCODE;
-
-		const uint objId = killedObj->get_id();
-		objData.erase(objId);
-		objIdsToTransition.erase(objId);
 	}
 
 	static void SendEquipmentActivationState(const uint clientId, const uint objId, const uint subObjId, const bool active)

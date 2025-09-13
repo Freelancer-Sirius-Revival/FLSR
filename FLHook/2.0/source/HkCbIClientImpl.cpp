@@ -429,6 +429,9 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_CREATESOLAR(uint iClientID, FLPACKET_CR
 	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR, bool, __stdcall, (uint, FLPACKET_CREATESOLAR&), (iClientID, pSolar));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_CREATESOLAR(iClientID, pSolar));
+
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, bool, , (uint, FLPACKET_CREATESOLAR&), (iClientID, pSolar));
+
 	return reinterpret_cast<bool>(vRet);
 }
 

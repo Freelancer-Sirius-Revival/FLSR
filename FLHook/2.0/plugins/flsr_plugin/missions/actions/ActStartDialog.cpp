@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	static void PlayComm(Mission& mission, const MissionObject& activator, const Dialog& dialog, const size_t lineIndex)
+	static void PlayComm(Mission& mission, const MissionObject activator, const Dialog& dialog, const size_t lineIndex)
 	{
 		if (lineIndex + 1 < dialog.lines.size())
 		{
@@ -41,10 +41,10 @@ namespace Missions
 		}
 	}
 
-	ActDialogCndCommComplete::ActDialogCndCommComplete(Mission& mission, const MissionObject& activator, const Dialog& dialog, const int lineIndex) :
+	ActDialogCndCommComplete::ActDialogCndCommComplete(Mission& mission, const MissionObject& originalActivator, const Dialog& dialog, const int lineIndex) :
 		CndCommComplete(ConditionParent(mission.id, 0), dialog.lines[lineIndex].id),
 		mission(mission),
-		activator(activator),
+		originalActivator(originalActivator),
 		dialog(dialog),
 		lineIndex(lineIndex)
 	{}
@@ -53,7 +53,7 @@ namespace Missions
 	{
 		const size_t nextLineIndex = lineIndex + 1;
 		if (nextLineIndex < dialog.lines.size())
-			PlayComm(mission, activator, dialog, nextLineIndex);
+			PlayComm(mission, originalActivator, dialog, nextLineIndex);
 		mission.dynamicConditions.erase(this);
 	}
 

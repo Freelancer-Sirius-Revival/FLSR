@@ -274,6 +274,13 @@
     <ClCompile Include="missions\conditions\CndInSpace.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="NpcCloaking.cpp" />
+    <ClCompile Include="missions\actions\ActCloak.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\MatrixMath.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -557,6 +564,10 @@
     </ClInclude>
     <ClInclude Include="missions\conditions\CndInSpace.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="NpcCloaking.h" />
+    <ClInclude Include="missions\actions\ActCloak.h">
+      <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

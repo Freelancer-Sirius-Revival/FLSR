@@ -2,6 +2,7 @@
 #include "NpcAppearances.h"
 #include "../Pilots.h"
 #include "../Plugin.h"
+#include "MatrixMath.h"
 
 namespace ShipSpawning
 {
@@ -474,13 +475,66 @@ namespace ShipSpawning
 		pub::AI::SubmitState(shipId, &personality);
 	}
 
-	static void LaunchNpcFromObj(const uint shipId, uint launchObjId)
+	static bool LaunchNpcFromNpc(uint shipArchetypeId, uint launchShipId, Vector& startPos, Matrix& startOrientation, Vector& startVelocity)
+	{
+		IObjRW* inspect;
+		StarSystem* starSystem;
+		if (GetShipInspect(launchShipId, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT)
+		{
+			const auto archetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
+			if (archetype->dockInfo.size() > 0)
+			{
+				const float launchSpeed = 100.0f;
+				Archetype::DockType dockType;
+				Transform dockMount;
+				Transform dockPoint1;
+				Transform dockPoint2;
+				float dockRadius;
+				inspect->get_dock_hardpoints(0, &dockType, &dockMount, &dockPoint1, &dockPoint2, &dockRadius);
+				startPos = dockMount.position;
+				const auto& rotationMatrix = SetupTransform({ 0, 0, 0 }, { 0, 180, 0 });
+				TransformMatrix dockMountMatrix = SetupTransform({ 0, 0, 0 }, { 0, 0, 0 });
+				dockMountMatrix.d[0][0] = dockMount.orientation.data[0][0];
+				dockMountMatrix.d[0][1] = dockMount.orientation.data[0][1];
+				dockMountMatrix.d[0][2] = dockMount.orientation.data[0][2];
+				dockMountMatrix.d[1][0] = dockMount.orientation.data[1][0];
+				dockMountMatrix.d[1][1] = dockMount.orientation.data[1][1];
+				dockMountMatrix.d[1][2] = dockMount.orientation.data[1][2];
+				dockMountMatrix.d[2][0] = dockMount.orientation.data[2][0];
+				dockMountMatrix.d[2][1] = dockMount.orientation.data[2][1];
+				dockMountMatrix.d[2][2] = dockMount.orientation.data[2][2];
+				dockMountMatrix = MultiplyMatrix(dockMountMatrix, rotationMatrix);
+				startOrientation.data[0][0] = dockMountMatrix.d[0][0];
+				startOrientation.data[0][1] = dockMountMatrix.d[0][1];
+				startOrientation.data[0][2] = dockMountMatrix.d[0][2];
+				startOrientation.data[1][0] = dockMountMatrix.d[1][0];
+				startOrientation.data[1][1] = dockMountMatrix.d[1][1];
+				startOrientation.data[1][2] = dockMountMatrix.d[1][2];
+				startOrientation.data[2][0] = dockMountMatrix.d[2][0];
+				startOrientation.data[2][1] = dockMountMatrix.d[2][1];
+				startOrientation.data[2][2] = dockMountMatrix.d[2][2];
+				startVelocity = { dockPoint1.position.x - dockMount.position.x, dockPoint1.position.y - dockMount.position.y, dockPoint1.position.z - dockMount.position.z };
+				const float length = std::sqrt(std::pow(startVelocity.x, 2) + std::pow(startVelocity.y, 2) + std::pow(startVelocity.z, 2));
+				startVelocity.x = startVelocity.x / length * launchSpeed;
+				startVelocity.y = startVelocity.y / length * launchSpeed;
+				startVelocity.z = startVelocity.z / length * launchSpeed;
+				const Vector parentVelocity = inspect->get_velocity();
+				startVelocity.x += parentVelocity.x;
+				startVelocity.y += parentVelocity.y;
+				startVelocity.z += parentVelocity.z;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	static void LaunchNpcFromSolar(const uint shipId, uint launchObjId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
 		if (GetShipInspect(launchObjId, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSOLAR_OBJECT)
 		{
-			const auto solarArchetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
+			const auto solarArchetype = dynamic_cast<Archetype::EqObj*>(inspect->cobj->archetype);
 			if (solarArchetype->dockInfo.size() > 0)
 			{
 				pub::SpaceObj::Launch(shipId, launchObjId, 0);
@@ -509,6 +563,16 @@ namespace ShipSpawning
 		shipInfo.iPilotVoice = voiceId;
 		shipInfo.iHitPointsLeft = params.hitpoints;
 		shipInfo.iLevel = params.level;
+		Vector launchPosition;
+		Matrix launchOrientation;
+		Vector launchSpeed;
+		if (params.launchObjId && LaunchNpcFromNpc(params.archetypeId, params.launchObjId, launchPosition, launchOrientation, launchSpeed))
+		{
+			shipInfo.vPos = launchPosition;
+			shipInfo.mOrientation = launchOrientation;
+			shipInfo.vLinearVelocity = launchSpeed;
+		}
+
 		// Do not set the cargo descriptors for ships. They must be probably allocated in "old ways" of FL's own code - incompatible to today's "new".
 
 		// Formation name is displayed above the pilot name in wireframe display.
@@ -548,7 +612,7 @@ namespace ShipSpawning
 		pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });
 
 		if (params.launchObjId)
-			LaunchNpcFromObj(objId, params.launchObjId);
+			LaunchNpcFromSolar(objId, params.launchObjId);
 
 		bool foundPlayerInSameSystem = false;
 		struct PlayerData* playerData = 0;

@@ -5,8 +5,8 @@ namespace Missions
 {
 	static void Mark(const uint clientId, const uint targetObjId, Mission& mission)
 	{
-		Mark::MarkObject(clientId, targetObjId);
-		mission.markedObjIdsByClientId[clientId].insert(targetObjId);
+		if (Mark::MarkObject(clientId, targetObjId))
+			mission.markedObjIdsByClientId[clientId].insert(targetObjId);
 	}
 
 	static void Unmark(const uint clientId, const uint targetObjId, Mission& mission)

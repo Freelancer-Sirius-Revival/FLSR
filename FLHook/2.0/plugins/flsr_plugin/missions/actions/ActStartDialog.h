@@ -8,12 +8,12 @@ namespace Missions
 	{
 	private:
 		Mission& mission;
-		const MissionObject& activator;
+		const MissionObject originalActivator;
 		const Dialog& dialog;
 		const int lineIndex;
 
 	public:
-		ActDialogCndCommComplete(Mission& mission, const MissionObject& activator, const Dialog& dialog, const int lineIndex);
+		ActDialogCndCommComplete(Mission& mission, const MissionObject& originalActivator, const Dialog& dialog, const int lineIndex);
 		void ExecuteTrigger();
 	};
 

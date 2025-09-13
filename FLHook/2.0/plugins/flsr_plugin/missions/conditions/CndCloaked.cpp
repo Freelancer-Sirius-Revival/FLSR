@@ -33,7 +33,7 @@ namespace Missions
 		StarSystem* starSystem;
 		if (!GetShipInspect(objId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
 			return false;
-		return reinterpret_cast<CEqObj*>(inspect->cobj)->get_cloak_percentage() > 0.9f;
+		return reinterpret_cast<CEqObj*>(inspect->cobj)->get_cloak_percentage() == 1.0f;
 	}
 
 	bool CndCloaked::Matches(const MissionObject& object)

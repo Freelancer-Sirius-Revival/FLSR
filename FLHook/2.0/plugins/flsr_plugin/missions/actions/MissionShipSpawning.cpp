@@ -1,5 +1,6 @@
 #include "MissionShipSpawning.h"
 #include "../ShipSpawning.h"
+#include "../../NpcCloaking.h"
 
 namespace Missions
 {
@@ -42,7 +43,7 @@ namespace Missions
 		params.stateGraphName = npc.stateGraph;
 		params.pilotId = npc.pilotId;
 		params.pilotJobId = msnNpc.pilotJobId;
-		if (positionOverride != nullptr || orientationOverride != nullptr)
+		if (positionOverride == nullptr && orientationOverride == nullptr)
 		{
 			const auto& foundObjectEntry = mission.objectIdsByName.find(msnNpc.startingObjId);
 			params.launchObjId = foundObjectEntry != mission.objectIdsByName.end() ? foundObjectEntry->second : msnNpc.startingObjId;
@@ -51,7 +52,10 @@ namespace Missions
 		objId = ShipSpawning::CreateNPC(params);
 
 		if (objId)
+		{
 			mission.AddObject(objId, msnNpcId, msnNpcEntry->second.labels);
+			NpcCloaking::RegisterObject(objId);
+		}
 		else
 			ConPrint(L"ERROR: MSN NPC " + std::to_wstring(msnNpc.id) + L" in system " + std::to_wstring(params.systemId) + L" at position " + std::to_wstring(params.position.x) + L", " + std::to_wstring(params.position.y) + L", " + std::to_wstring(params.position.z) + L"\n");
 

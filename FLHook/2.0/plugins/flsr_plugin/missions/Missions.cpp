@@ -34,6 +34,7 @@
 #include "Actions/ActLeaveMsn.h"
 #include "Actions/ActSetLifeTime.h"
 #include "Actions/ActMark.h"
+#include "Actions/ActCloak.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -587,6 +588,14 @@ namespace Missions
 								action->targetObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 								if (ini.get_num_parameters() > 2)
 									action->marked = ini.get_value_bool(2);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_Cloak"))
+							{
+								ActCloakPtr action(new ActCloak());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									action->cloaked = ini.get_value_bool(1);
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SpawnSolar"))

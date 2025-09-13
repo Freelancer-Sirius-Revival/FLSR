@@ -394,19 +394,22 @@ namespace Missions
 		char* end;
 		strtol(val, &end, 10);
 		if (end == val)
+		{
 			targetObjNameOrId = CreateIdOrNull(val);
+			argNum++;
+		}
 		else if (ini.get_num_parameters() > argNum + 2)
 		{
 			position.x = ini.get_value_float(argNum);
 			position.y = ini.get_value_float(argNum + 1);
 			position.z = ini.get_value_float(argNum + 2);
+			argNum += 3;
 		}
 		else
 		{
 			PrintErrorToConsole(L"StayInRange", objectiveParent, argNum, L"No target position. Aborting!");
 			return nullptr;
 		}
-		argNum += 3;
 
 		if (ini.get_num_parameters() > argNum)
 		{

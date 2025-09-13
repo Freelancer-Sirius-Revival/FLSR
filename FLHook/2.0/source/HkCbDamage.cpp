@@ -168,6 +168,7 @@ __declspec(naked) void ShipColGrpDamageNaked()
 	}
 }
 
+
 FARPROC SolarHullDamageOrigFunc;
 
 void __stdcall SolarHullDamage(IObjRW* iobj, float& incDmg, DamageList* dmg)
@@ -186,5 +187,71 @@ __declspec(naked) void SolarHullDamageNaked()
 		call SolarHullDamage
 		pop ecx
 		jmp[SolarHullDamageOrigFunc]
+	}
+}
+
+FARPROC SolarEquipDamageOrigFunc;
+
+void __stdcall SolarEquipDamage(IObjRW* iobj, CEquip* equipHit, float& incDmg, DamageList* dmg)
+{
+	CALL_PLUGINS_V(PLUGIN_SolarEquipDmg, __stdcall, (IObjRW * iobj, CEquip * equipHit, float& incDmg, DamageList * dmg), (iobj, equipHit, incDmg, dmg));
+}
+
+__declspec(naked) void SolarEquipDamageNaked()
+{
+	__asm {
+		push ecx
+		push[esp + 0x10]
+		lea eax, [esp + 0x10]
+		push eax
+		push[esp + 0x10]
+		push ecx
+		call SolarEquipDamage
+		pop ecx
+		jmp[SolarEquipDamageOrigFunc]
+	}
+}
+
+FARPROC SolarShieldDamageOrigFunc;
+
+void __stdcall SolarShieldDamage(IObjRW* iobj, CEShield* shieldHit, float& incDmg, DamageList* dmg)
+{
+	CALL_PLUGINS_V(PLUGIN_SolarShieldDmg, __stdcall, (IObjRW * iobj, CEShield * shieldHit, float& incDmg, DamageList * dmg), (iobj, shieldHit, incDmg, dmg));
+}
+
+__declspec(naked) void SolarShieldDamageNaked()
+{
+	__asm {
+		push ecx
+		push[esp + 0x10]
+		lea eax, [esp + 0x10]
+		push eax
+		push[esp + 0x10]
+		push ecx
+		call SolarShieldDamage
+		pop ecx
+		jmp[SolarShieldDamageOrigFunc]
+	}
+}
+
+FARPROC SolarColGrpDamageOrigFunc;
+
+void __stdcall SolarColGrpDamage(IObjRW* iobj, CArchGroup* colGrpHit, float& incDmg, DamageList* dmg)
+{
+	CALL_PLUGINS_V(PLUGIN_SolarColGrpDmg, __stdcall, (IObjRW * iobj, CArchGroup * colGrpHit, float& incDmg, DamageList * dmg), (iobj, colGrpHit, incDmg, dmg));
+}
+
+__declspec(naked) void SolarColGrpDamageNaked()
+{
+	__asm {
+		push ecx
+		push[esp + 0x10]
+		lea eax, [esp + 0x10]
+		push eax
+		push[esp + 0x10]
+		push ecx
+		call SolarColGrpDamage
+		pop ecx
+		jmp[SolarColGrpDamageOrigFunc]
 	}
 }

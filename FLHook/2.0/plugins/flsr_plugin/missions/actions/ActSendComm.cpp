@@ -43,7 +43,12 @@ namespace Missions
 		if (senderObjId == 0)
 			return;
 
-		if (receiverObjNameOrLabel == Activator)
+		uint receiverObjId = 0;
+		pub::SpaceObj::GetSolarRep(receiverObjNameOrLabel, reputationId);
+		// Solar IDs are the exact same as their reputation ID
+		if (reputationId != 0 && receiverObjNameOrLabel == reputationId)
+			SendComm(receiverObjId, senderObjId, *this, activator, mission);
+		else if (receiverObjNameOrLabel == Activator)
 		{
 			uint objId;
 			if (activator.type == MissionObjectType::Client)

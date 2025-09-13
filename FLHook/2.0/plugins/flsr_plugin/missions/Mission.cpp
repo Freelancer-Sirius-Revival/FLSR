@@ -111,9 +111,13 @@ namespace Missions
 		missionResult = MissionResult::Success;
 		state = MissionState::Active;
 
+		// First reset all triggers
+		for (auto& trigger : triggers)
+			trigger.Reset();
+
+		// Only now execute those that should be initially active. With e.g. Cnd_True they might instantly activate other triggers while we are still looping here.
 		for (auto& trigger : triggers)
 		{
-			trigger.Reset();
 			if (trigger.IsAwaitingInitialActivation())
 				trigger.Activate();
 		}

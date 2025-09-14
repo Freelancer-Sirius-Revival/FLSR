@@ -334,6 +334,9 @@
     <ClCompile Include="missions\randomMissions\Vignette.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\randomMissions\Generator.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
     <ClCompile Include="missions\randomMissions\TradeMissions.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
@@ -697,6 +700,9 @@
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="missions\randomMissions\RandomMissions.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Generator.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="missions\randomMissions\TradeMissions.h">

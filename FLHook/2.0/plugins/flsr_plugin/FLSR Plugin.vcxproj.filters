@@ -308,6 +308,9 @@
     <ClCompile Include="missions\randomMissions\Vignette.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\randomMissions\Generator.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />

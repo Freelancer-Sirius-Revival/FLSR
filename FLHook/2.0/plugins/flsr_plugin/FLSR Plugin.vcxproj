@@ -227,6 +227,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\objectives\ObjStayInRange.cpp" />
     <ClCompile Include="missions\randomMissions\Costumes.cpp" />
     <ClCompile Include="missions\randomMissions\Factions.cpp" />
+    <ClCompile Include="missions\randomMissions\Generator.cpp" />
     <ClCompile Include="missions\randomMissions\Meta.cpp" />
     <ClCompile Include="missions\randomMissions\NpcShips.cpp" />
     <ClCompile Include="missions\randomMissions\NpcWaves.cpp" />
@@ -347,6 +348,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\objectives\ObjStayInRange.h" />
     <ClInclude Include="missions\randomMissions\Costumes.h" />
     <ClInclude Include="missions\randomMissions\Factions.h" />
+    <ClInclude Include="missions\randomMissions\Generator.h" />
     <ClInclude Include="missions\randomMissions\Meta.h" />
     <ClInclude Include="missions\randomMissions\NpcShips.h" />
     <ClInclude Include="missions\randomMissions\NpcWaves.h" />

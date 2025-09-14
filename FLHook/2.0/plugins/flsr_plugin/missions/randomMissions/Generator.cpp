@@ -3,6 +3,7 @@
 #include "Factions.h"
 #include "Vignette.h"
 #include "../Mission.h"
+#include "../MissionBoard.h"
 
 namespace RandomMissions
 {
@@ -16,12 +17,26 @@ namespace RandomMissions
 		{
 			if (vignette.factionIds.contains(*hostileFactions.begin()))
 			{
-				Missions::Mission& a = (*Missions::missions.try_emplace(1234, "Test Mission", 1234, false).first).second;
-				a.offer.bases.push_back(baseId);
-				a.offer.group = offers[0].factionId;
-				a.offer.reward = 10000000;
-				a.offer.system = systemId;
-				a.offer.text = 460584;
+				Missions::Mission& mission = (*Missions::missions.try_emplace(1234, "Test Mission", 1234, false).first).second;
+				mission.offer.bases.push_back(baseId);
+				mission.offer.group = offers[0].factionId;
+				mission.offer.reward = 10000000;
+				mission.offer.system = systemId;
+				mission.offer.description = 460584;
+				mission.offer.title = 458806;
+				mission.offer.type = pub::GF::MissionType::DestroyShips;
+
+				MissionBoard::MissionOffer offer
+				{
+					.type = mission.offer.type,
+					.system = mission.offer.system,
+					.group = mission.offer.group,
+					.title = mission.offer.title,
+					.description = mission.offer.description,
+					.reward = mission.offer.reward
+				};
+
+				mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.bases);
 			}
 		}
 	}

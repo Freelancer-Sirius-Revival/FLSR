@@ -244,6 +244,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\randomMissions\RandomMissions.cpp" />
     <ClCompile Include="missions\randomMissions\Rewards.cpp" />
     <ClCompile Include="missions\randomMissions\Vignette.cpp" />
+    <ClCompile Include="missions\randomMissions\Generator.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="Pilots.cpp" />
@@ -379,6 +380,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\randomMissions\RandomMissions.h" />
     <ClInclude Include="missions\randomMissions\Rewards.h" />
     <ClInclude Include="missions\randomMissions\Vignette.h" />
+    <ClInclude Include="missions\randomMissions\Generator.h" />
     <ClInclude Include="Pilots.h" />
     <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="Plugin.h" />

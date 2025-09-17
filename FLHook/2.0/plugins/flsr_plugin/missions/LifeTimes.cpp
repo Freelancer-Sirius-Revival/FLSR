@@ -1,5 +1,5 @@
 #include <FLHook.h>
-#include "../../Plugin.h"
+#include "../Plugin.h"
 #include "LifeTimes.h"
 
 namespace Missions

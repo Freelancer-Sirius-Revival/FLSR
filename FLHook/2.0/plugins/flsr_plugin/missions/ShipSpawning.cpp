@@ -536,15 +536,7 @@ namespace ShipSpawning
 		{
 			const auto solarArchetype = dynamic_cast<Archetype::EqObj*>(inspect->cobj->archetype);
 			if (solarArchetype->dockInfo.size() > 0)
-			{
 				pub::SpaceObj::Launch(shipId, launchObjId, 0);
-				pub::AI::DirectiveLaunchOp launchOp;
-				launchOp.fireWeapons = true;
-				launchOp.launchFromObject = launchObjId;
-				launchOp.x10 = 2;
-				launchOp.x14 = 1;
-				pub::AI::SubmitDirective(shipId, &launchOp);
-			}
 		}
 	}
 

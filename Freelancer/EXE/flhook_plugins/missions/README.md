@@ -395,19 +395,19 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[STRING]` Object by name or label that must be the killer.
     1. `[Killer|Destroyed] :Killer` Sets whether `Activator` will be the killer or the destroyed object. If set to `Killer` and the object is being despawned, nobody will be the activator.
 
-- `Cnd_DistObj` Distance to another object in space. `Activator` will be the object coming into range.
+- `Cnd_DistObj` Distance to another object in space. `Activator` will be the object coming into range. Evaluation will only happen if the target and destination objects are in space of the same system each.
     1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
     1. `STRING` Other object by name or label to expect within the distance. Can also be a static world solar.
     1. `FLOAT :0` The distance from the given position to check.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
-- `Cnd_DistVec` Distance from a vector in space. `Activator` will be the object coming into range.
+- `Cnd_DistVec` Distance from a vector in space. `Activator` will be the object coming into range. Evaluation will only happen if the object is in space of the target system.
     1. `STRING|Stranger` Must be a ship. Object by name or label to expect within the distance.
     1. `FLOAT :0` The x-axis position for this volume.
     1. `FLOAT :0` The y-axis position for this volume.
     1. `FLOAT :0` The z-axis position for this volume.
     1. `FLOAT :0` The distance from the given position to check.
-    1. `STRING` The system nickname to place this volume into.
+    1. `STRING` The system nickname where the checks happen.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
 - `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` can be defined via the last argument.

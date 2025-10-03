@@ -374,95 +374,64 @@ HK_ERROR HkRemoveCargo(const std::wstring &wscCharname, uint iID, int iCount) {
 
 HK_ERROR HkAddCargo(const std::wstring &wscCharname, uint iGoodID, int iCount,
                     bool bMission) {
-    HK_GET_CLIENTID(iClientID, wscCharname);
+    HK_GET_CLIENTID(clientId, wscCharname);
 
-    if (iClientID == -1 || HkIsInCharSelectMenu(iClientID))
+    if (clientId == -1 || HkIsInCharSelectMenu(clientId))
         return HKE_PLAYER_NOT_LOGGED_IN;
 
-    /*	// anti-cheat related
-            char *szClassPtr;
-            memcpy(&szClassPtr, &Players, 4);
-            szClassPtr += 0x418 * (iClientID - 1);
-            EquipDescList *edlList = (EquipDescList*)szClassPtr + 0x328;
-            bool bCargoFound = true;
-            if(!edlList->find_matching_cargo(iGoodID, 0, 1))
-                    bCargoFound = false;*/
-
-    // add
-    const GoodInfo *gi;
-    if (!(gi = GoodList::find_by_id(iGoodID)))
+    const auto goodInfo = GoodList::find_by_id(iGoodID);
+    if (!goodInfo)
         return HKE_INVALID_GOOD;
 
-    bool bMultiCount;
-    memcpy(&bMultiCount, (char *)gi + 0x70, 1);
-
-    uint iBase = 0;
-    pub::Player::GetBase(iClientID, iBase);
-    uint iLocation = 0;
-    pub::Player::GetLocation(iClientID, iLocation);
+    uint base, location = 0;
+    pub::Player::GetBase(clientId, base);
+    pub::Player::GetLocation(clientId, location);
 
     // trick cheat detection
-    if (iBase) {
-        if (iLocation)
-            Server.LocationExit(iLocation, iClientID);
-        Server.BaseExit(iBase, iClientID);
-        if (!HkIsValidClientID(iClientID)) // got cheat kicked
+    if (base)
+    {
+        if (location)
+            Server.LocationExit(location, clientId);
+        Server.BaseExit(base, clientId);
+
+        if (!clientId)
             return HKE_PLAYER_NOT_LOGGED_IN;
     }
 
-    if (bMultiCount) { // it's a good that can have multiple units(commodities,
-                       // missile ammo, etc)
-        int iRet;
-
+    if (goodInfo->multiCount)
+    {
         // we need to do this, else server or client may crash
+        int iRet;
         std::list<CARGO_INFO> lstCargo;
         HkEnumCargo(wscCharname, lstCargo, iRet);
-        for (auto &cargo : lstCargo) {
-            if ((cargo.iArchID == iGoodID) && (cargo.bMission != bMission)) {
-                HkRemoveCargo(wscCharname, cargo.iID, cargo.iCount);
+        for (auto& cargo : lstCargo)
+        {
+            if (cargo.iArchID == iGoodID && cargo.bMission != bMission)
+            {
+                pub::Player::RemoveCargo(clientId, static_cast<ushort>(cargo.iID), cargo.iCount);
                 iCount += cargo.iCount;
             }
         }
 
-        pub::Player::AddCargo(iClientID, iGoodID, iCount, 1, bMission);
-    } else {
-        for (int i = 0; (i < iCount); i++)
-            pub::Player::AddCargo(iClientID, iGoodID, 1, 1, bMission);
+        pub::Player::AddCargo(clientId, iGoodID, iCount, 1.0f, bMission);
+    }
+    else
+    {
+        for (int i = 0; i < iCount; i++)
+            pub::Player::AddCargo(clientId, iGoodID, 1, 1.0f, bMission);
     }
 
-    if (iBase) { // player docked on base
+    if (base)
+    {
+        // player docked on base
         ///////////////////////////////////////////////////
         // fix, else we get anti-cheat msg when undocking
         // this DOES NOT disable anti-cheat-detection, we're
         // just making some adjustments so that we dont get kicked
 
-        Server.BaseEnter(iBase, iClientID);
-        if (iLocation)
-            Server.LocationEnter(iLocation, iClientID);
-
-        /*		// fix "Ship or Equipment not sold on base" kick
-                        if(!bCargoFound)
-                        {
-                                // get last equipid
-                                char *szLastEquipID = szClassPtr + 0x3C8;
-                                ushort sEquipID;
-                                memcpy(&sEquipID, szLastEquipID, 2);
-
-                                // add to check-list which is being compared to
-           the users equip-list when saving char EquipDesc ed; memset(&ed, 0,
-           sizeof(ed)); ed.id = sEquipID; ed.count = iCount; ed.archid =
-           iGoodID; edlList->add_equipment_item(ed, true);
-                        }
-
-                        // fix "Ship Related" kick, update crc
-                        ulong lCRC;
-                        __asm
-                        {
-                                mov ecx, [szClassPtr]
-                                call [CRCAntiCheat]
-                                mov [lCRC], eax
-                        }
-                        memcpy(szClassPtr + 0x320, &lCRC, 4);*/
+        Server.BaseEnter(base, clientId);
+        if (location)
+            Server.LocationEnter(location, clientId);
     }
 
     return HKE_OK;
@@ -1277,33 +1246,34 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::st
     if (!AddCargoDocked)
         AddCargoDocked = (_AddCargoDocked)((char*)hModServer + 0x6EFC0);
 
-    HK_GET_CLIENTID(iClientID, wscCharname);
+    HK_GET_CLIENTID(clientId, wscCharname);
 
-    if ((iClientID == -1) || HkIsInCharSelectMenu(iClientID))
-        return HKE_NO_CHAR_SELECTED;
-
-    uint iBase = 0;
-    pub::Player::GetBase(iClientID, iBase);
-    uint iLocation = 0;
-    pub::Player::GetLocation(iClientID, iLocation);
-
-    if (iLocation)
-        Server.LocationExit(iLocation, iClientID);
-    if (iBase)
-        Server.BaseExit(iBase, iClientID);
-
-    if (!HkIsValidClientID(iClientID))
+    if (clientId == -1 || HkIsInCharSelectMenu(clientId))
         return HKE_PLAYER_NOT_LOGGED_IN;
+
+    uint base, location = 0;
+    pub::Player::GetBase(clientId, base);
+    pub::Player::GetLocation(clientId, location);
+    // trick cheat detection
+    if (base)
+    {
+        if (location)
+            Server.LocationExit(location, clientId);
+        Server.BaseExit(base, clientId);
+
+        if (!clientId)
+            return HKE_PLAYER_NOT_LOGGED_IN;
+    }
 
     CacheString hardpoint;
     hardpoint.value = StringAlloc(scHardpoint.c_str(), false);
     CacheString* pHP = &hardpoint;
-    PlayerData* pd = &Players[iClientID];
+    PlayerData* playerData = &Players[clientId];
     int iOne = 1;
     int iMission = 0;
     int iMounted = 1;
     int iNumItems = 1;
-    float fHealth = 1;
+    float fHealth = 1.0f;
     __asm {
         push iOne
         push iMission
@@ -1312,14 +1282,22 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::st
         push iNumItems
         push pHP
         push iGoodID
-        mov ecx, pd
+        mov ecx, playerData
         call AddCargoDocked
     }
 
-    if (iBase)
-        Server.BaseEnter(iBase, iClientID);
-    if (iLocation)
-        Server.LocationEnter(iLocation, iClientID);
+    if (base)
+    {
+        // player docked on base
+        ///////////////////////////////////////////////////
+        // fix, else we get anti-cheat msg when undocking
+        // this DOES NOT disable anti-cheat-detection, we're
+        // just making some adjustments so that we dont get kicked
+
+        Server.BaseEnter(base, clientId);
+        if (location)
+            Server.LocationEnter(location, clientId);
+    }
 
     return HKE_OK;
 }

@@ -102,7 +102,7 @@ namespace LootBoxes
 							const uint archetypeId = CreateID(ini.get_value_string(0));
 							const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
 							if (goodInfo)
-								lootArchetypeCombinable[archetypeId] = (bool)goodInfo->iDunno2;
+								lootArchetypeCombinable[archetypeId] = goodInfo->multiCount;
 							lootBox.lootArchetypeIds.push_back(archetypeId);
 							lootBox.lootArchetypeNames.push_back(GetEquipmentName(archetypeId));
 							lootBox.highestLootArchetypeVolume = std::max(lootBox.highestLootArchetypeVolume, GetEquipmentVolume(archetypeId));

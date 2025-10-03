@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndDestroyed*> observedCndDestroyed;
+	std::vector<CndDestroyed*> orderedCndDestroyed;
 
 	CndDestroyed::CndDestroyed(const ConditionParent& parent,
 								const uint objNameOrLabel,
@@ -29,12 +30,15 @@ namespace Missions
 	void CndDestroyed::Register()
 	{
 		currentCount = 0;
-		observedCndDestroyed.insert(this);
+		if (observedCndDestroyed.insert(this).second);
+			orderedCndDestroyed.push_back(this);
 	}
 
 	void CndDestroyed::Unregister()
 	{
 		observedCndDestroyed.erase(this);
+		if (const auto it = std::find(orderedCndDestroyed.begin(), orderedCndDestroyed.end(), this); it != orderedCndDestroyed.end())
+			orderedCndDestroyed.erase(it);
 	}
 
 	bool CndDestroyed::Matches(const IObjRW* killedObject, const bool killed, const uint killerId)
@@ -146,7 +150,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndDestroyed*> currentConditions(observedCndDestroyed);
+				const auto currentConditions(orderedCndDestroyed);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndDestroyed.contains(condition) && condition->Matches(killedObject, killed, killerId))

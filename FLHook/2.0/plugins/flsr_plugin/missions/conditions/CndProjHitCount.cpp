@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndProjHitCount*> observedCndProjHitCount;
+	std::vector<CndProjHitCount*> orderedCndProjHitCount;
 
 	CndProjHitCount::CndProjHitCount(const ConditionParent& parent,
 							const uint damagedObjNameOrLabel,
@@ -31,12 +32,15 @@ namespace Missions
 	void CndProjHitCount::Register()
 	{
 		currentHitCount = 0;
-		observedCndProjHitCount.insert(this);
+		if (observedCndProjHitCount.insert(this).second);
+			orderedCndProjHitCount.push_back(this);
 	}
 
 	void CndProjHitCount::Unregister()
 	{
 		observedCndProjHitCount.erase(this);
+		if (const auto it = std::find(orderedCndProjHitCount.begin(), orderedCndProjHitCount.end(), this); it != orderedCndProjHitCount.end())
+			orderedCndProjHitCount.erase(it);
 	}
 
 	bool CndProjHitCount::Matches(const IObjRW* damagedObject, const DamageList* damageList, const DamagedSurface damagedSurface)
@@ -147,7 +151,7 @@ namespace Missions
 		if (incomingDamage <= 0.0f)
 			return;
 
-		const std::unordered_set<CndProjHitCount*> currentConditions(observedCndProjHitCount);
+		const auto currentConditions(orderedCndProjHitCount);
 		for (const auto& condition : currentConditions)
 		{
 			if (observedCndProjHitCount.contains(condition) && condition->Matches(damagedObject, damageList, hitSurface))

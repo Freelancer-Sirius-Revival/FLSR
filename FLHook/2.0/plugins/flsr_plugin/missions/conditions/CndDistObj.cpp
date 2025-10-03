@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndDistObj*> observedCndDistObj;
+	std::vector<CndDistObj*> orderedCndDistObj;
 
 	CndDistObj::CndDistObj(const ConditionParent& parent,
 								const uint objNameOrLabel,
@@ -25,12 +26,15 @@ namespace Missions
 
 	void CndDistObj::Register()
 	{
-		observedCndDistObj.insert(this);
+		if (observedCndDistObj.insert(this).second);
+			orderedCndDistObj.push_back(this);
 	}
 
 	void CndDistObj::Unregister()
 	{
 		observedCndDistObj.erase(this);
+		if (const auto it = std::find(orderedCndDistObj.begin(), orderedCndDistObj.end(), this); it != orderedCndDistObj.end())
+			orderedCndDistObj.erase(it);
 	}
 
 	bool CndDistObj::IsDistanceMatching(const CObject* objA, uint objIdB) const
@@ -162,7 +166,7 @@ namespace Missions
 					return;
 				elapsedTimeInSec = 0.0f;
 
-				const std::unordered_set<Missions::CndDistObj*> currentConditions(observedCndDistObj);
+				const auto currentConditions(orderedCndDistObj);
 				for (const auto& condition : currentConditions)
 				{
 					if (!observedCndDistObj.contains(condition))

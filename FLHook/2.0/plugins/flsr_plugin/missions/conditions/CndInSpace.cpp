@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndInSpace*> observedCndInSpace;
+	std::vector<CndInSpace*> orderedCndInSpace;
 
 	CndInSpace::CndInSpace(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds) :
 		Condition(parent),
@@ -28,12 +29,15 @@ namespace Missions
 				return;
 			}
 		}
-		observedCndInSpace.insert(this);
+		if (observedCndInSpace.insert(this).second);
+			orderedCndInSpace.push_back(this);
 	}
 
 	void CndInSpace::Unregister()
 	{
 		observedCndInSpace.erase(this);
+		if (const auto it = std::find(orderedCndInSpace.begin(), orderedCndInSpace.end(), this); it != orderedCndInSpace.end())
+			orderedCndInSpace.erase(it);
 	}
 
 	bool CndInSpace::Matches(const uint clientId)
@@ -89,7 +93,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndInSpace*> currentConditions(observedCndInSpace);
+				const auto currentConditions(orderedCndInSpace);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndInSpace.contains(condition) && condition->Matches(clientId))

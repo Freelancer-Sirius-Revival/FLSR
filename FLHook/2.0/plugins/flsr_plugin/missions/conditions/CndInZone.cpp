@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndInZone*> observedCndInZone;
+	std::vector<CndInZone*> orderedCndInZone;
 
 	CndInZone::CndInZone(const ConditionParent& parent, const uint objNameOrLabel, const std::unordered_set<uint>& zoneIds) :
 		Condition(parent),
@@ -22,12 +23,15 @@ namespace Missions
 
 	void CndInZone::Register()
 	{
-		observedCndInZone.insert(this);
+		if (observedCndInZone.insert(this).second);
+			orderedCndInZone.push_back(this);
 	}
 
 	void CndInZone::Unregister()
 	{
 		observedCndInZone.erase(this);
+		if (const auto it = std::find(orderedCndInZone.begin(), orderedCndInZone.end(), this); it != orderedCndInZone.end())
+			orderedCndInZone.erase(it);
 	}
 
 	bool CndInZone::IsInZone(uint objId)
@@ -129,7 +133,7 @@ namespace Missions
 					return;
 				elapsedTimeInSec = 0.0f;
 
-				const std::unordered_set<Missions::CndInZone*> currentConditions(observedCndInZone);
+				const auto currentConditions(orderedCndInZone);
 				for (const auto& condition : currentConditions)
 				{
 					if (!observedCndInZone.contains(condition))

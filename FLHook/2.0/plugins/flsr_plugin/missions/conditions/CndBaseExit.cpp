@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndBaseExit*> observedCndBaseExit;
+	std::vector<CndBaseExit*> orderedCndBaseExit;
 
 	CndBaseExit::CndBaseExit(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds) :
 		Condition(parent),
@@ -19,12 +20,15 @@ namespace Missions
 
 	void CndBaseExit::Register()
 	{
-		observedCndBaseExit.insert(this);
+		if (observedCndBaseExit.insert(this).second);
+			orderedCndBaseExit.push_back(this);
 	}
 
 	void CndBaseExit::Unregister()
 	{
 		observedCndBaseExit.erase(this);
+		if (const auto it = std::find(orderedCndBaseExit.begin(), orderedCndBaseExit.end(), this); it != orderedCndBaseExit.end())
+			orderedCndBaseExit.erase(it);
 	}
 
 	bool CndBaseExit::Matches(const uint clientId, const uint currentBaseId)
@@ -61,7 +65,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndBaseExit*> currentConditions(observedCndBaseExit);
+				const auto currentConditions(orderedCndBaseExit);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndBaseExit.contains(condition) && condition->Matches(clientId, baseId))

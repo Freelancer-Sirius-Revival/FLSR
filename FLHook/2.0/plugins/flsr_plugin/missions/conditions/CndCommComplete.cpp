@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndCommComplete*> observedCndCommComplete;
+	std::vector<CndCommComplete*> orderedCndCommComplete;
 
 	CndCommComplete::CndCommComplete(const ConditionParent& parent, const uint commName) :
 		Condition(parent),
@@ -18,12 +19,15 @@ namespace Missions
 
 	void CndCommComplete::Register()
 	{
-		observedCndCommComplete.insert(this);
+		if (observedCndCommComplete.insert(this).second);
+			orderedCndCommComplete.push_back(this);
 	}
 
 	void CndCommComplete::Unregister()
 	{
 		observedCndCommComplete.erase(this);
+		if (const auto it = std::find(orderedCndCommComplete.begin(), orderedCndCommComplete.end(), this); it != orderedCndCommComplete.end())
+			orderedCndCommComplete.erase(it);
 	}
 
 	bool CndCommComplete::Matches(const uint capturedVoiceLineId, const uint capturedReceiverObjId)
@@ -47,7 +51,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndCommComplete*> currentConditions(observedCndCommComplete);
+				const auto currentConditions(orderedCndCommComplete);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndCommComplete.contains(condition) && condition->Matches(voiceLineId, receiverObjId))

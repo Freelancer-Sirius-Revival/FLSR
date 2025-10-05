@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndLaunchComplete*> observedCndLaunchComplete;
+	std::vector<CndLaunchComplete*> orderedCndLaunchComplete;
 
 	CndLaunchComplete::CndLaunchComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds) :
 		Condition(parent),
@@ -19,12 +20,15 @@ namespace Missions
 
 	void CndLaunchComplete::Register()
 	{
-		observedCndLaunchComplete.insert(this);
+		if (observedCndLaunchComplete.insert(this).second);
+			orderedCndLaunchComplete.push_back(this);
 	}
 
 	void CndLaunchComplete::Unregister()
 	{
 		observedCndLaunchComplete.erase(this);
+		if (const auto it = std::find(orderedCndLaunchComplete.begin(), orderedCndLaunchComplete.end(), this); it != orderedCndLaunchComplete.end())
+			orderedCndLaunchComplete.erase(it);
 	}
 
 	bool CndLaunchComplete::Matches(const uint clientId, const uint currentBaseId)
@@ -65,7 +69,7 @@ namespace Missions
 				if (!clientId)
 					return;
 
-				const std::unordered_set<Missions::CndLaunchComplete*> currentConditions(observedCndLaunchComplete);
+				const auto currentConditions(orderedCndLaunchComplete);
 				for (const auto& condition : currentConditions)
 				{
 					IObjRW* inspect;

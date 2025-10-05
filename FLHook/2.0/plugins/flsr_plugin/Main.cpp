@@ -36,7 +36,6 @@
 std::mutex m_Mutex;
 
 PLUGIN_RETURNCODE returncode;
-_CRCAntiCheat CRCAntiCheat_FLSR;
 
 
 void LoadSettings() {

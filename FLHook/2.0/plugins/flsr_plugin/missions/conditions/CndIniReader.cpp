@@ -341,6 +341,16 @@ namespace Missions
 		}
 		argNum++;
 
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "damaged")
+				damagedIsActivator = true;
+			else if (value != "inflictor")
+				PrintErrorToConsole(L"Cnd_HealthDec", conditionParent, argNum, L"Invalid activator target. Must be INFLICTOR, or DAMAGED. Defaulting to INFLICTOR.");
+		}
+		argNum++;
+
 		for (const auto maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
@@ -351,16 +361,6 @@ namespace Missions
 		}
 		if (colGrpIds.empty())
 			colGrpIds.insert(RootGroup);
-		argNum++;
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			const auto& value = ToLower(ini.get_value_string(argNum));
-			if (value == "damaged")
-				damagedIsActivator = true;
-			else if (value != "inflictor")
-				PrintErrorToConsole(L"Cnd_HealthDec", conditionParent, argNum, L"Invalid activator target. Must be INFLICTOR, or DAMAGED. Defaulting to INFLICTOR.");
-		}
 
 		return new CndHealthDec(conditionParent, objNameOrLabel, remainingHitpoints, colGrpIds, damagedIsActivator);
 	}

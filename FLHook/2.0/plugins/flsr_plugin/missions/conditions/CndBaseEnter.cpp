@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndBaseEnter*> observedCndBaseEnter;
+	std::vector<CndBaseEnter*> orderedCndBaseEnter;
 
 	CndBaseEnter::CndBaseEnter(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds) :
 		Condition(parent),
@@ -19,12 +20,15 @@ namespace Missions
 
 	void CndBaseEnter::Register()
 	{
-		observedCndBaseEnter.insert(this);
+		if (observedCndBaseEnter.insert(this).second);
+			orderedCndBaseEnter.push_back(this);
 	}
 
 	void CndBaseEnter::Unregister()
 	{
 		observedCndBaseEnter.erase(this);
+		if (const auto it = std::find(orderedCndBaseEnter.begin(), orderedCndBaseEnter.end(), this); it != orderedCndBaseEnter.end())
+			orderedCndBaseEnter.erase(it);
 	}
 
 	bool CndBaseEnter::Matches(const uint clientId, const uint currentBaseId)
@@ -61,7 +65,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndBaseEnter*> currentConditions(observedCndBaseEnter);
+				const auto currentConditions(orderedCndBaseEnter);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndBaseEnter.contains(condition) && condition->Matches(clientId, baseId))

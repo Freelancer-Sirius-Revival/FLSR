@@ -412,9 +412,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 
 - `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` can be defined via the last argument.
     1. `STRING|Stranger` Object by name or label to observe the hitpoints of.
-    1. `FLOAT :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
-    1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
+    1. `FLOAT :0` The percentage of hitpoints the target must lose.
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
+    1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
 
 - `Cnd_InSpace` Only players. Checks whether the player is in space. `Activator` will be the player.
     1. `STRING|Stranger` The players to expect to be in space.

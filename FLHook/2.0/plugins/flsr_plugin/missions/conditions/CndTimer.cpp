@@ -9,6 +9,7 @@ namespace Missions
 	static std::mt19937 gen(rd());
 
 	std::unordered_set<CndTimer*> observedCndTimer;
+	std::vector<CndTimer*> orderedCndTimer;
 
 	CndTimer::CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS) :
 		Condition(parent),
@@ -31,12 +32,15 @@ namespace Missions
 		else
 			targetTimeInS = std::uniform_real_distribution<float>(lowerTimeInS, upperTimeInS)(gen);
 
-		observedCndTimer.insert(this);
+		if (observedCndTimer.insert(this).second);
+			orderedCndTimer.push_back(this);
 	}
 
 	void CndTimer::Unregister()
 	{
 		observedCndTimer.erase(this);
+		if (const auto it = std::find(orderedCndTimer.begin(), orderedCndTimer.end(), this); it != orderedCndTimer.end())
+			orderedCndTimer.erase(it);
 	}
 
 	bool CndTimer::Matches(const float elapsedTimeInS)
@@ -60,7 +64,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndTimer*> currentConditions(observedCndTimer);
+				const auto currentConditions(orderedCndTimer);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndTimer.contains(condition) && condition->Matches(seconds))

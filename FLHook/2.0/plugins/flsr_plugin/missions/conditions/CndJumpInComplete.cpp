@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndJumpInComplete*> observedCndJumpInComplete;
+	std::vector<CndJumpInComplete*> orderedCndJumpInComplete;
 
 	CndJumpInComplete::CndJumpInComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds) :
 		Condition(parent),
@@ -19,12 +20,15 @@ namespace Missions
 
 	void CndJumpInComplete::Register()
 	{
-		observedCndJumpInComplete.insert(this);
+		if (observedCndJumpInComplete.insert(this).second);
+			orderedCndJumpInComplete.push_back(this);
 	}
 
 	void CndJumpInComplete::Unregister()
 	{
 		observedCndJumpInComplete.erase(this);
+		if (const auto it = std::find(orderedCndJumpInComplete.begin(), orderedCndJumpInComplete.end(), this); it != orderedCndJumpInComplete.end())
+			orderedCndJumpInComplete.erase(it);
 	}
 
 	bool CndJumpInComplete::Matches(const uint clientId, const uint currentSystemId)
@@ -65,7 +69,7 @@ namespace Missions
 				if (!clientId)
 					return;
 
-				const std::unordered_set<Missions::CndJumpInComplete*> currentConditions(observedCndJumpInComplete);
+				const auto currentConditions(orderedCndJumpInComplete);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndJumpInComplete.contains(condition) && condition->Matches(clientId, systemId))

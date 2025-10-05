@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndSystemSpaceEnter*> observedCndSystemSpaceEnter;
+	std::vector<CndSystemSpaceEnter*> orderedCndSystemSpaceEnter;
 
 	CndSystemSpaceEnter::CndSystemSpaceEnter(const ConditionParent& parent, const uint label, const SystemEnterCondition condition, const std::unordered_set<uint>& systemIds) :
 		Condition(parent),
@@ -20,12 +21,15 @@ namespace Missions
 
 	void CndSystemSpaceEnter::Register()
 	{
-		observedCndSystemSpaceEnter.insert(this);
+		if (observedCndSystemSpaceEnter.insert(this).second);
+			orderedCndSystemSpaceEnter.push_back(this);
 	}
 
 	void CndSystemSpaceEnter::Unregister()
 	{
 		observedCndSystemSpaceEnter.erase(this);
+		if (const auto it = std::find(orderedCndSystemSpaceEnter.begin(), orderedCndSystemSpaceEnter.end(), this); it != orderedCndSystemSpaceEnter.end())
+			orderedCndSystemSpaceEnter.erase(it);
 	}
 
 	bool CndSystemSpaceEnter::Matches(const uint clientId, const SystemEnterCondition reason)
@@ -90,7 +94,7 @@ namespace Missions
 
 				const auto reason = undockedClientIds.contains(clientId) ? Missions::CndSystemSpaceEnter::SystemEnterCondition::Launch : Missions::CndSystemSpaceEnter::SystemEnterCondition::Spawn;
 
-				const std::unordered_set<Missions::CndSystemSpaceEnter*> currentConditions(observedCndSystemSpaceEnter);
+				const auto currentConditions(orderedCndSystemSpaceEnter);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndSystemSpaceEnter.contains(condition) && condition->Matches(clientId, reason))
@@ -102,7 +106,7 @@ namespace Missions
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndSystemSpaceEnter*> currentConditions(observedCndSystemSpaceEnter);
+				const auto currentConditions(orderedCndSystemSpaceEnter);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndSystemSpaceEnter.contains(condition) && condition->Matches(clientId, Missions::CndSystemSpaceEnter::SystemEnterCondition::Jump))

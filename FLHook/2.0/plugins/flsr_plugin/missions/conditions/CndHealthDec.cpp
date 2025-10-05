@@ -4,8 +4,8 @@
 
 namespace Missions
 {
-	std::unordered_set<CndHealthDec*> observedHullConditions;
-	std::unordered_set<CndHealthDec*> observedColGrpConditions;
+	std::unordered_set<CndHealthDec*> observedCndHealthDec;
+	std::vector<CndHealthDec*> orderedCndHealthDec;
 
 	CndHealthDec::CndHealthDec(const ConditionParent& parent,
 								const uint objNameOrLabel,
@@ -26,16 +26,15 @@ namespace Missions
 
 	void CndHealthDec::Register()
 	{
-		if (colGrpIds.contains(RootGroup))
-			observedHullConditions.insert(this);
-		if (colGrpIds.size() > 1 || !colGrpIds.contains(RootGroup))
-			observedColGrpConditions.insert(this);
+		if (observedCndHealthDec.insert(this).second)
+			orderedCndHealthDec.push_back(this);
 	}
 
 	void CndHealthDec::Unregister()
 	{
-		observedHullConditions.erase(this);
-		observedColGrpConditions.erase(this);
+		observedCndHealthDec.erase(this);
+		if (const auto it = std::find(orderedCndHealthDec.begin(), orderedCndHealthDec.end(), this); it != orderedCndHealthDec.end())
+			orderedCndHealthDec.erase(it);
 	}
 
 	bool CndHealthDec::Matches(const IObjRW* damagedObject, const float incomingDamage, const DamageList* damageList, const CArchGroup* hitColGrp)
@@ -99,23 +98,11 @@ namespace Missions
 		if (incomingDamage <= 0.0f)
 			return;
 
-		if (hitColGrp == nullptr)
+		const auto currentConditions(orderedCndHealthDec);
+		for (const auto& condition : currentConditions)
 		{
-			const std::unordered_set<CndHealthDec*> currentConditions(observedHullConditions);
-			for (const auto& condition : currentConditions)
-			{
-				if (observedHullConditions.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
-					condition->ExecuteTrigger();
-			}
-		}
-		else
-		{
-			const std::unordered_set<CndHealthDec*> currentConditions(observedColGrpConditions);
-			for (const auto& condition : currentConditions)
-			{
-				if (observedColGrpConditions.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
-					condition->ExecuteTrigger();
-			}
+			if (observedCndHealthDec.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
+				condition->ExecuteTrigger();
 		}
 	}
 

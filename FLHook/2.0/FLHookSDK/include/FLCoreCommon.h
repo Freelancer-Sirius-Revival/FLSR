@@ -4464,7 +4464,7 @@ public:
 	uint iDunno1[16];
 	/* 72 */ uint iArchID;
 	/* 76 */ uint iType; // 0=commodity, 2=hull, 3=ship
-	/* 80 */ uint i3;
+	/* 80 */ uint equipmentId;
 	/* 84 */ uint iShipGoodID; // if type = GOODINFO_TYPE_HULL
 	/* 88 */ float fPrice;
 	/* 92 */ float fGoodSellPrice;
@@ -4472,12 +4472,12 @@ public:
 	/* 100 */ float fBadSellPrice;
 	/* 104 */ float fGoodBuyPrice;
 	/* 108 */ uint iJumpDist;
-	/* 112 */ float iDunno2;
-	/* 116 */ float iDunno3;
-	/* 120 */ float iDunno4;
-	/* 124 */ float iDunno5;
-	/* 128 */ float iDunno6;
-	/* 132 */ float iDunno7;
+	/* 112 */ bool multiCount;
+	/* 116 */ char* shopArchetype;
+	/* 120 */ char* itemIcon;
+	/* 124 */ char* materialLibrary;
+	/* 128 */ char* hardpointChild;
+	/* 132 */ char* attachmentArchetype;
 	/* 136 */ uint iIDSName;
 	/* 140 */ uint iIDS;
 	/* 144 */ uint iHullGoodID; // if type = GOODINFO_TYPE_SHIP

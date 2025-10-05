@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndCloaked*> observedCndCloaked;
+	std::vector<CndCloaked*> orderedCndCloaked;
 
 	CndCloaked::CndCloaked(const ConditionParent& parent, const uint objNameOrLabel, const bool cloaked) :
 		Condition(parent),
@@ -19,12 +20,15 @@ namespace Missions
 
 	void CndCloaked::Register()
 	{
-		observedCndCloaked.insert(this);
+		if (observedCndCloaked.insert(this).second);
+			orderedCndCloaked.push_back(this);
 	}
 
 	void CndCloaked::Unregister()
 	{
 		observedCndCloaked.erase(this);
+		if (const auto it = std::find(orderedCndCloaked.begin(), orderedCndCloaked.end(), this); it != orderedCndCloaked.end())
+			orderedCndCloaked.erase(it);
 	}
 
 	static bool IsCloaked(uint objId)
@@ -115,7 +119,7 @@ namespace Missions
 					return;
 				elapsedTimeInSec = 0.0f;
 
-				const std::unordered_set<Missions::CndCloaked*> currentConditions(observedCndCloaked);
+				const auto currentConditions(orderedCndCloaked);
 				for (const auto& condition : currentConditions)
 				{
 					if (!observedCndCloaked.contains(condition))

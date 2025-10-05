@@ -5,6 +5,7 @@
 namespace Missions
 {
 	std::unordered_set<CndSystemSpaceExit*> observedCndSystemSpaceExit;
+	std::vector<CndSystemSpaceExit*> orderedCndSystemSpaceExit;
 
 	CndSystemSpaceExit::CndSystemSpaceExit(const ConditionParent& parent, const uint label, const SystemExitCondition condition, const std::unordered_set<uint>& systemIds) :
 		Condition(parent),
@@ -20,12 +21,15 @@ namespace Missions
 
 	void CndSystemSpaceExit::Register()
 	{
-		observedCndSystemSpaceExit.insert(this);
+		if (observedCndSystemSpaceExit.insert(this).second);
+			orderedCndSystemSpaceExit.push_back(this);
 	}
 
 	void CndSystemSpaceExit::Unregister()
 	{
 		observedCndSystemSpaceExit.erase(this);
+		if (const auto it = std::find(orderedCndSystemSpaceExit.begin(), orderedCndSystemSpaceExit.end(), this); it != orderedCndSystemSpaceExit.end())
+			orderedCndSystemSpaceExit.erase(it);
 	}
 
 	bool CndSystemSpaceExit::Matches(const uint clientId, const SystemExitCondition reason)
@@ -64,6 +68,16 @@ namespace Missions
 	{
 		namespace CndSystemSpaceExit
 		{
+			void static LoopThroughConditions(const uint clientId, const Missions::CndSystemSpaceExit::SystemExitCondition reason)
+			{
+				const auto currentConditions(orderedCndSystemSpaceExit);
+				for (const auto& condition : currentConditions)
+				{
+					if (observedCndSystemSpaceExit.contains(condition) && condition->Matches(clientId, reason))
+						condition->ExecuteTrigger();
+				}
+			}
+
 			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 			{
 				returncode = DEFAULT_RETURNCODE;
@@ -71,36 +85,21 @@ namespace Missions
 				if (!killedObject->is_player())
 					return;
 
-				const std::unordered_set<Missions::CndSystemSpaceExit*> currentConditions(observedCndSystemSpaceExit);
-				for (const auto& condition : currentConditions)
-				{
-					if (observedCndSystemSpaceExit.contains(condition) && condition->Matches(killedObject->cobj->ownerPlayer, killed ? Missions::CndSystemSpaceExit::SystemExitCondition::Explode : Missions::CndSystemSpaceExit::SystemExitCondition::Vanish))
-						condition->ExecuteTrigger();
-				}
+				LoopThroughConditions(killedObject->cobj->ownerPlayer, killed ? Missions::CndSystemSpaceExit::SystemExitCondition::Explode : Missions::CndSystemSpaceExit::SystemExitCondition::Vanish);
 			}
 
 			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndSystemSpaceExit*> currentConditions(observedCndSystemSpaceExit);
-				for (const auto& condition : currentConditions)
-				{
-					if (observedCndSystemSpaceExit.contains(condition) && condition->Matches(clientId, Missions::CndSystemSpaceExit::SystemExitCondition::Dock))
-						condition->ExecuteTrigger();
-				}
+				LoopThroughConditions(clientId, Missions::CndSystemSpaceExit::SystemExitCondition::Dock);
 			}
 
 			void __stdcall SystemSwitchOutComplete(unsigned int objId, unsigned int clientId)
 			{
 				returncode = DEFAULT_RETURNCODE;
 
-				const std::unordered_set<Missions::CndSystemSpaceExit*> currentConditions(observedCndSystemSpaceExit);
-				for (const auto& condition : currentConditions)
-				{
-					if (observedCndSystemSpaceExit.contains(condition) && condition->Matches(clientId, Missions::CndSystemSpaceExit::SystemExitCondition::Jump))
-						condition->ExecuteTrigger();
-				}
+				LoopThroughConditions(clientId, Missions::CndSystemSpaceExit::SystemExitCondition::Jump);
 			}
 		}
 	}

@@ -1,6 +1,9 @@
 File: EXE\common.dll
 
 
+# Skips the first-time machine speed test and assume the highest speed for determining default performance options. - BC46
+18D210: 1001i	[ -1i ]
+
 # Disable "ArchDB::Get" random mission spew warning. - adoxa
 0995B6: 90 90	[ FF 10 ]
 0995FC: 90 90	[ FF 12 ]

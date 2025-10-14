@@ -88,8 +88,8 @@ File: EXE\common.dll
 # Max dock acknowledge distance. - Dev
 18BDB4: 1250f	[ 1000f ]
 
-# Max docking initiation distance. - Dev
-13F48C: 999999f	[ 10000f ]
+# Removes the maximum docking initiation distance. - BC46
+0638AC: EB	[ 7B ]
 
 # Default repair price ratio (ships and collision groups) (both offsets must be changed). - FriendlyFire
 004A28: 0.03125f	[ 0.33f ]

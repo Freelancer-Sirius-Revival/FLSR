@@ -33,6 +33,10 @@ File: EXE\Freelancer.exe
 # Pub::Player::PopUpDialog won't lock controls. - Venemon
 08A53D: 00	[ 01 ]
 
+# Changes the ids_info of player waypoints to a non-uppercased string ("PLAYER WAYPOINT" -> "Player Waypoint"). - BC46
+075A56: 1102i	[ 1125i ]
+
+
 ##############
 # Main Menu
 ##############

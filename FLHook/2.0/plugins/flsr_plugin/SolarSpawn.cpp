@@ -281,8 +281,8 @@ namespace SolarSpawn
 
 		const auto& solarArchetype = Archetype::GetSolar(archetype.archetypeId);
 		if (solarArchetype && !solarArchetype->bDestructible)
-			// Invincibility kicks in at 99.999% hitpoints loss. This still allows damaging shields or equipment.
-			pub::SpaceObj::SetInvincible2(spaceObjId, true, true, 0.99999f);
+			// Invincibility kicks in at 99.999% hitpoints loss. This also the same way prevents complete destruction of equipment.
+			pub::SpaceObj::SetInvincible2(spaceObjId, true, true, 0.999f);
 
 		// Expects general nickname to identify the configs
 		Cloak::TryRegisterNoCloakSolar(archetype.nickname, spaceObjId);

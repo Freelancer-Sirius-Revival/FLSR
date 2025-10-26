@@ -648,8 +648,8 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 
 - `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
-    1. `STRING|Activator` Object by name or label whose vibe will be set. For players this only works if the target is another player.
-    1. `STRING|Activator` Object by name or label to change the vibe toward. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
+    1. `STRING|Activator` Object by name or label whose vibe will be set. Can also be a static world solar. For players this only works if the target is another player.
+    1. `STRING|Activator` Object by name or label to change the vibe toward. Can also be a static world solar. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
     1. `FLOAT :0` The reputation value between `-1` and `1` to set the vibe on.
 
 - `Act_SpawnFormation` Spawns a formation of ships.

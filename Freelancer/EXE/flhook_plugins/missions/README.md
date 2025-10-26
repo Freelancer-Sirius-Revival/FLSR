@@ -541,6 +541,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
 
+- `Act_DockInstant` Only for players. Forces docking instantly with the given target.
+    1. `STRING|Activator` Players by label to be force-docked instantly.
+    1. `STRING` Target object name or static solar to dock with.
+    1. `STRING` Dock hardpoint name to dock at.
+
 - `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.

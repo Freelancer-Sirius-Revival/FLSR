@@ -284,6 +284,9 @@
     <ClCompile Include="missions\actions\ActSetDockState.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActDockInstant.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -573,6 +576,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActSetDockState.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDockInstant.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

@@ -35,6 +35,7 @@
 #include "Actions/ActSetLifeTime.h"
 #include "Actions/ActMark.h"
 #include "Actions/ActCloak.h"
+#include "Actions/ActSetDockState.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -845,6 +846,18 @@ namespace Missions
 									rotation.y = ini.get_value_float(5);
 									rotation.z = ini.get_value_float(6);
 									action->orientation = EulerMatrix(rotation);
+								}
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_SetDockState"))
+							{
+								ActSetDockStatePtr action(new ActSetDockState());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									action->dockHardpoint = ToLower(ini.get_value_string(1));
+								if (ini.get_num_parameters() > 2)
+								{
+									action->opened = ToLower(ini.get_value_string(2)) == "opened";
 								}
 								actions.push_back(action);
 							}

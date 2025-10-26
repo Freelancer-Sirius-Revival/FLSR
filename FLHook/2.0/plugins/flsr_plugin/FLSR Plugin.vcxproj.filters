@@ -281,6 +281,9 @@
     <ClCompile Include="missions\MatrixMath.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActSetDockState.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -567,6 +570,9 @@
     </ClInclude>
     <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="missions\actions\ActCloak.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetDockState.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

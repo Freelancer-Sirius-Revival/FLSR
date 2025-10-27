@@ -35,6 +35,8 @@
 #include "Actions/ActSetLifeTime.h"
 #include "Actions/ActMark.h"
 #include "Actions/ActCloak.h"
+#include "Actions/ActSetDockState.h"
+#include "Actions/ActDockInstant.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -848,6 +850,22 @@ namespace Missions
 								}
 								actions.push_back(action);
 							}
+							else if (ini.is_value("Act_SetDockState"))
+							{
+								ActSetDockStatePtr action(new ActSetDockState());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->dockHardpoint = ToLower(ini.get_value_string(1));
+								action->opened = ToLower(ini.get_value_string(2)) == "opened";
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_DockInstant"))
+							{
+								ActDockInstantPtr action(new ActDockInstant());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->targetObjName = CreateIdOrNull(ini.get_value_string(1));
+								action->dockHardpoint = ToLower(ini.get_value_string(2));
+								actions.push_back(action);
+								}
 							else
 							{
 								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);

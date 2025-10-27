@@ -541,6 +541,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
 
+- `Act_DockInstant` Only for players. Forces docking instantly with the given target.
+    1. `STRING|Activator` Players by label to be force-docked instantly.
+    1. `STRING` Target object name or static solar to dock with.
+    1. `STRING` Dock hardpoint name to dock at.
+
 - `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.
@@ -630,6 +635,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
+- `Act_SetDockState` Manually sets the dock animation state. This stays until any ship’s dock maneuver resets the state respectively.
+    1. `STRING|Activator` Object by name or label to set the dock animation state to.
+    1. `STRING` Dock hardpoint name to execute the animation of.
+    1. `[Opened|Closed]: Closed` Whether to open or close the dock.
+
 - `Act_SetLifeTime` Only for NPCs or solars. Once the object comes out of range from all players, its life time will be counted down. The life time will be restored completely if any player comes back into range to the object. All NPCs of a formation will be despawned if one of their members is running out of life time.
     1. `STRING|Activator` Object by name or label to change life time of.
     1. `FLOAT :1` The life time in seconds. `-1` means infinite life time.
@@ -648,8 +658,8 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 
 - `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
-    1. `STRING|Activator` Object by name or label whose vibe will be set. For players this only works if the target is another player.
-    1. `STRING|Activator` Object by name or label to change the vibe toward. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
+    1. `STRING|Activator` Object by name or label whose vibe will be set. Can also be a static world solar. For players this only works if the target is another player.
+    1. `STRING|Activator` Object by name or label to change the vibe toward. Can also be a static world solar. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
     1. `FLOAT :0` The reputation value between `-1` and `1` to set the vibe on.
 
 - `Act_SpawnFormation` Spawns a formation of ships.

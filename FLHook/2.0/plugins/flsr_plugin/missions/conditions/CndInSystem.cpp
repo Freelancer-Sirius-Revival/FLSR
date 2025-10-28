@@ -29,7 +29,7 @@ namespace Missions
 				return;
 			}
 		}
-		if (observedCndInSystem.insert(this).second);
+		if (observedCndInSystem.insert(this).second)
 			orderedCndInSystem.push_back(this);
 	}
 

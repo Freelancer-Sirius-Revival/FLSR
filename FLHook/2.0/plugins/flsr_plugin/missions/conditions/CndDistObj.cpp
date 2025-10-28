@@ -26,7 +26,7 @@ namespace Missions
 
 	void CndDistObj::Register()
 	{
-		if (observedCndDistObj.insert(this).second);
+		if (observedCndDistObj.insert(this).second)
 			orderedCndDistObj.push_back(this);
 	}
 

@@ -28,7 +28,7 @@ namespace Missions
 
 	void CndDistVec::Register()
 	{
-		if (observedCndDistVec.insert(this).second);
+		if (observedCndDistVec.insert(this).second)
 			orderedCndDistVec.push_back(this);
 	}
 

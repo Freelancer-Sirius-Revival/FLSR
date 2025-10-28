@@ -20,7 +20,7 @@ namespace Missions
 
 	void CndBaseEnter::Register()
 	{
-		if (observedCndBaseEnter.insert(this).second);
+		if (observedCndBaseEnter.insert(this).second)
 			orderedCndBaseEnter.push_back(this);
 	}
 

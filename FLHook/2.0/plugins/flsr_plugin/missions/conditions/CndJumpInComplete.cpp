@@ -20,7 +20,7 @@ namespace Missions
 
 	void CndJumpInComplete::Register()
 	{
-		if (observedCndJumpInComplete.insert(this).second);
+		if (observedCndJumpInComplete.insert(this).second)
 			orderedCndJumpInComplete.push_back(this);
 	}
 

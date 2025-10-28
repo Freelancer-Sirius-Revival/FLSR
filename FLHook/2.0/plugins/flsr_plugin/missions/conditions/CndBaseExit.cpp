@@ -20,7 +20,7 @@ namespace Missions
 
 	void CndBaseExit::Register()
 	{
-		if (observedCndBaseExit.insert(this).second);
+		if (observedCndBaseExit.insert(this).second)
 			orderedCndBaseExit.push_back(this);
 	}
 

@@ -7,6 +7,7 @@
 #include "CndDestroyed.h"
 #include "CndDistObj.h"
 #include "CndDistVec.h"
+#include "CndHasCargo.h"
 #include "CndHealthDec.h"
 #include "CndInSpace.h"
 #include "CndInSystem.h"
@@ -314,6 +315,38 @@ namespace Missions
 		}
 
 		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId);
+	}
+
+	static CndHasCargo* ReadCndHasCargo(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_map<uint, uint> countPerCargo;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_HasCargo", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		const auto maxArgs = ini.get_num_parameters();
+		while (argNum < maxArgs)
+		{
+			const uint cargoId = CreateIdOrNull(ini.get_value_string(argNum++));
+			if (cargoId == 0)
+				PrintErrorToConsole(L"Cnd_HasCargo", conditionParent, argNum, L"Invalid archetype name. Ignoring.");
+
+			const int count = ini.get_value_int(argNum++);
+			if (count <= 0)
+				PrintErrorToConsole(L"Cnd_HasCargo", conditionParent, argNum, L"Invalid quantity. Defaulting to 1.");
+
+			if (cargoId)
+				countPerCargo.insert({ cargoId, std::max<uint>(count, 1) });
+		}
+
+		return new CndHasCargo(conditionParent, label, countPerCargo);
 	}
 
 	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -734,6 +767,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_DistVec"))
 			return ReadCndDistVec(conditionParent, ini);
+
+		if (ini.is_value("Cnd_HasCargo"))
+			return ReadCndHasCargo(conditionParent, ini);
 
 		if (ini.is_value("Cnd_HealthDec"))
 			return ReadCndHealthDec(conditionParent, ini);

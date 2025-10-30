@@ -287,6 +287,9 @@
     <ClCompile Include="missions\actions\ActDockInstant.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndHasCargo.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -580,6 +583,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActDockInstant.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHasCargo.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

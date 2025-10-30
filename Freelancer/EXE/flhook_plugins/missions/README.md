@@ -410,6 +410,12 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING` The system nickname where the checks happen.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
 
+- `Cnd_HasCargo` Only players. When the given cargo is in cargo hold. Does not count mounted items. **For now only evaluates on bases.**
+    1. `STRING|Stranger` The players to check the cargo hold of.
+    1. All cargo that must be present, defined in pairs of:
+        1. `STRING` The cargo nickname to check for.
+        1. `INTEGER :1` The minimum quantity of this cargo required.
+
 - `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` can be defined via the last argument.
     1. `STRING|Stranger` Object by name or label to observe the hitpoints of.
     1. `FLOAT :0` The percentage of hitpoints the target must lose.

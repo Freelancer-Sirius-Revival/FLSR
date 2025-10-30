@@ -19,6 +19,7 @@
 #include "Missions/conditions/CndDestroyed.h"
 #include "Missions/conditions/CndDistObj.h"
 #include "Missions/conditions/CndDistVec.h"
+#include "Missions/conditions/CndHasCargo.h"
 #include "Missions/conditions/CndHealthDec.h"
 #include "Missions/conditions/CndInSpace.h"
 #include "Missions/conditions/CndInSystem.h"
@@ -293,6 +294,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDestroyed::ObjDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDistObj::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndDistVec::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHasCargo::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHasCargo::ReqAddItem_AFTER, PLUGIN_HkIServerImpl_ReqAddItem_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHasCargo::ReqEquipment_AFTER, PLUGIN_HkIServerImpl_ReqEquipment_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipAndSolarColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipAndSolarHullDamage, PLUGIN_ShipHullDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipAndSolarColGrpDamage, PLUGIN_SolarColGrpDmg, 0));

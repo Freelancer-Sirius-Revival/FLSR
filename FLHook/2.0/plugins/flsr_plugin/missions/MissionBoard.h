@@ -11,9 +11,10 @@ namespace MissionBoard
 		uint title;
 		uint description;
 		uint reward;
+		std::unordered_set<uint> allowedShipArchetypeIds;
 	};
 
-	uint AddMissionOffer(const MissionOffer& mission, const std::vector<uint>& bases);
+	uint AddMissionOffer(const MissionOffer& mission, const std::unordered_set<uint>& baseIds);
 	void DeleteMissionOffer(const uint missionId);
 
 	void Initialize();

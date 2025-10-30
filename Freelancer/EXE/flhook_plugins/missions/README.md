@@ -55,6 +55,9 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[offer_reward]`
     1. `INTEGER :0` Amount of cash displayed on the Mission Board as reward.
 
+- `[offer_ship_restriction]`
+    1. `STRING` A list of ship nicknames that are allowed to take this mission. It will be displayed and declined with invalid ship.
+
 - `[offer_bases]`
     1. `STRING` A list of base nicknames this mission will be visible on the Mission Board.
 

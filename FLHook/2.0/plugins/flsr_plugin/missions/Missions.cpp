@@ -109,10 +109,15 @@ namespace Missions
 								offer.description = ini.get_value_int(0);
 							else if (ini.is_value("offer_reward"))
 								offer.reward = ini.get_value_int(0);
+							else if (ini.is_value("offer_ship_restriction"))
+							{
+								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
+									offer.shipArchetypeIds.insert(CreateIdOrNull(ini.get_value_string(index)));
+							}
 							else if (ini.is_value("offer_bases"))
 							{
 								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
-									offer.bases.push_back(CreateIdOrNull(ini.get_value_string(index)));
+									offer.baseIds.insert(CreateIdOrNull(ini.get_value_string(index)));
 							}
 							else if (ini.is_value("reoffer"))
 							{

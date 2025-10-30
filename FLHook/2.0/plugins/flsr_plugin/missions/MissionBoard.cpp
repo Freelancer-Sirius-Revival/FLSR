@@ -76,7 +76,7 @@ namespace MissionBoard
 	}
 
 	std::unordered_map<uint, MissionOffer> offersByOfferId;
-	std::unordered_map<uint, std::unordered_set<uint>> offerIdsByBase;
+	std::unordered_map<uint, std::unordered_set<uint>> offerIdsByBaseId;
 	std::unordered_map<uint, std::vector<std::pair<uint, uint>>> offerIndicesByClient;
 
 	static void SendDestroyMissionOfferToAll(const uint offerId)
@@ -101,11 +101,11 @@ namespace MissionBoard
 
 	uint offerId = UINT_MAX;
 
-	uint AddMissionOffer(const MissionOffer& mission, const std::vector<uint>& bases)
+	uint AddMissionOffer(const MissionOffer& mission, const std::unordered_set<uint>& baseIds)
 	{
 		offersByOfferId.insert({ offerId, mission });
-		for (const uint base : bases)
-			offerIdsByBase[base].insert(offerId);
+		for (const uint baseId : baseIds)
+			offerIdsByBaseId[baseId].insert(offerId);
 		// To avoid collisions with Freelancer's own mission offers. Count the custom mission offer IDs from high to low.
 		return offerId--;
 	}
@@ -113,7 +113,7 @@ namespace MissionBoard
 	void DeleteMissionOffer(const uint offerId)
 	{
 		offersByOfferId.erase(offerId);
-		for (auto& baseEntry : offerIdsByBase)
+		for (auto& baseEntry : offerIdsByBaseId)
 			baseEntry.second.erase(offerId);
 		SendDestroyMissionOfferToAll(offerId);
 	}
@@ -155,8 +155,19 @@ namespace MissionBoard
 					if (!base)
 						return;
 					// Nobody has yet taken upon the offer
-					if (offersByOfferId.contains(indexEntry.second))
+					if (const auto& offerEntry = offersByOfferId.find(indexEntry.second); offerEntry != offersByOfferId.end())
 					{
+						if (offerEntry->second.allowedShipArchetypeIds.size() > 0)
+						{
+							uint shipArchetypeId;
+							pub::Player::GetShipID(clientId, shipArchetypeId);
+							if (!offerEntry->second.allowedShipArchetypeIds.contains(shipArchetypeId))
+							{
+								SendMissionOfferRejection(clientId, boardIndex, base, 524390); // From FLSR Dialogs resources
+								return;
+							}
+						}
+
 						SendMissionOfferAcceptance(clientId, boardIndex, base);
 						std::vector<uint> groupMemberIds;
 						for (const auto memberId : groupMembers)
@@ -171,7 +182,7 @@ namespace MissionBoard
 					// Someone already removed it from the pool
 					else
 					{
-						SendMissionOfferRejection(clientId, boardIndex, base, 976);
+						SendMissionOfferRejection(clientId, boardIndex, base, 524389); // From FLSR Dialogs resources
 					}
 					return;
 				}
@@ -244,8 +255,8 @@ namespace MissionBoard
 		returncode = DEFAULT_RETURNCODE;
 
 		// Before the Complete Packet it sent, add the custom missions to the list.
-		const auto& entry = offerIdsByBase.find(base);
-		if (entry != offerIdsByBase.end())
+		const auto& entry = offerIdsByBaseId.find(base);
+		if (entry != offerIdsByBaseId.end())
 		{
 			int clientRep;
 			pub::Player::GetRep(clientId, clientRep);

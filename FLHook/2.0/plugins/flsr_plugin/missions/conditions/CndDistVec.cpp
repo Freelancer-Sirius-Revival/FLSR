@@ -12,13 +12,15 @@ namespace Missions
 							const DistanceCondition condition,
 							const Vector& position,
 							const float distance,
-							const uint systemId) :
+							const uint systemId,
+							const std::string hardpoint) :
 							Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		condition(condition),
 		position(position),
 		distance(distance),
-		systemId(systemId)
+		systemId(systemId),
+		hardpoint(hardpoint)
 	{}
 
 	CndDistVec::~CndDistVec()
@@ -39,7 +41,7 @@ namespace Missions
 			orderedCndDistVec.erase(it);
 	}
 	
-	bool CndDistVec::IsDistanceMatching(uint objId)
+	bool CndDistVec::IsDistanceMatching(uint objId) const
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -47,7 +49,11 @@ namespace Missions
 			return false;
 		if (inspect->cobj->system != systemId)
 			return false;
-		const bool inside = distance - HkDistance3D(position, inspect->cobj->vPos) > 0.0f;
+		Vector objPosition;
+		Matrix orientation;
+		if (hardpoint.empty() || inspect->get_hardpoint(hardpoint.c_str(), &objPosition, &orientation) != 0)
+			objPosition = inspect->cobj->vPos;
+		const bool inside = distance - HkDistance3D(position, objPosition) > 0.0f;
 		return (condition == CndDistVec::DistanceCondition::Inside && inside) || (condition == CndDistVec::DistanceCondition::Outside && !inside);
 	}
 

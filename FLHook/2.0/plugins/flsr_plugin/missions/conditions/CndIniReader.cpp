@@ -263,6 +263,7 @@ namespace Missions
 		Vector position = { 0, 0, 0 };
 		float distance = 0;
 		uint systemId = 0;
+		std::string hardpoint = "";
 
 		uint argNum = 0;
 		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
@@ -313,8 +314,16 @@ namespace Missions
 			else if (value != "inside")
 				PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"Invalid distance relation. Must be INSIDE, or OUTSIDE. Defaulting to INSIDE.");
 		}
+		argNum++;
 
-		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId);
+		if (ini.get_num_parameters() > argNum)
+		{
+			hardpoint = ToLower(ini.get_value_string(argNum));
+			if (hardpoint.empty())
+				PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"Invalid hardpoint. Defaulting to none.");
+		}
+
+		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId, hardpoint);
 	}
 
 	static CndHasCargo* ReadCndHasCargo(const ConditionParent& conditionParent, INI_Reader& ini)

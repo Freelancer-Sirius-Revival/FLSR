@@ -412,6 +412,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `FLOAT :0` The distance from the given position to check.
     1. `STRING` The system nickname where the checks happen.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
+    1. `[STRING]` The name of the hardpoint that will be used instead of the object’s center. Will be ignored if the hardpoint doesn’t exist.
 
 - `Cnd_HasCargo` Only players. When the given cargo is in cargo hold. Does not count mounted items. **For now only evaluates on bases.**
     1. `STRING|Stranger` The players to check the cargo hold of.

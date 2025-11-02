@@ -233,6 +233,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="Pilots.cpp" />
+    <ClCompile Include="PlayerLootSpawning.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
@@ -345,6 +346,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\ShipSpawning.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="Pilots.h" />
+    <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="Plugin.h" />
   </ItemGroup>
   <ItemGroup>

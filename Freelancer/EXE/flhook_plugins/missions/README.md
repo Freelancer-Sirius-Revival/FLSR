@@ -501,11 +501,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
-- `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
+- `Act_AddCargo` Only for players. Adds cargo. Will do nothing if player has not enough cargo space. **Doing this immediately after `Cnd_HasCargo` triggered by buying goods may trigger a cheat-detection kick.**
     1. `STRING|Activator` Players by label to receive the cargo.
     1. `STRING` The item nickname to use.
     1. `INTEGER :0` Amount of items to add to cargo.
-    1. `[True|False :False]` Whether this cargo is flagged as mission item.
+    1. `[True|False :False]` Whether this cargo is flagged as mission item. Only works for Commodities.
 
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.

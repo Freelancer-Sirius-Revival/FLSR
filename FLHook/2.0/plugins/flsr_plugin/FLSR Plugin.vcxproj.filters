@@ -290,6 +290,7 @@
     <ClCompile Include="missions\conditions\CndHasCargo.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerLootSpawning.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -587,6 +588,7 @@
     <ClInclude Include="missions\conditions\CndHasCargo.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerLootSpawning.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

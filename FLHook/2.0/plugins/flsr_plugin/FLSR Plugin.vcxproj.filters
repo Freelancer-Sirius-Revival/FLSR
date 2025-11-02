@@ -291,6 +291,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="PlayerLootSpawning.cpp" />
+    <ClCompile Include="missions\actions\ActRemoveCargo.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -589,6 +592,9 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="PlayerLootSpawning.h" />
+    <ClInclude Include="missions\actions\ActRemoveCargo.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

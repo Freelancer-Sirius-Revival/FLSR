@@ -129,6 +129,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="missions\actions\ActRemoveCargo.cpp" />
     <ClCompile Include="missions\actions\ActSetDockState.cpp" />
     <ClCompile Include="missions\actions\ActDockInstant.cpp" />
     <ClCompile Include="missions\conditions\CndHasCargo.cpp" />
@@ -245,6 +246,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="missions\actions\ActDockInstant.h" />
+    <ClInclude Include="missions\actions\ActRemoveCargo.h" />
     <ClInclude Include="missions\actions\ActSetDockState.h" />
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="NpcCloaking.h" />

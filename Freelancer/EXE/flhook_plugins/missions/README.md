@@ -623,6 +623,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Players by label to play the sound effect for.
     1. `STRING` The sound nickname to play.
 
+- `Act_RemoveCargo` Only for players. Removes cargo.
+    1. `STRING|Activator` Players by label to have the cargo removed from.
+    1. `STRING` The item nickname to use.
+    1. `INTEGER :0` Amount of items to remove from cargo.
+
 - `Act_RemoveLabel` Removes a label to the objects. **This is the only explicit way to unassign players from the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to remove.

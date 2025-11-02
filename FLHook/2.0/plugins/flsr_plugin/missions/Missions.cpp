@@ -28,6 +28,7 @@
 #include "Actions/ActAdjAcct.h"
 #include "Actions/ActAdjRep.h"
 #include "Actions/ActAddCargo.h"
+#include "Actions/ActRemoveCargo.h"
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
@@ -809,6 +810,14 @@ namespace Missions
 								action->count = std::max(0, ini.get_value_int(2));
 								if (ini.get_num_parameters() > 3)
 									action->missionFlagged = ini.get_value_bool(3);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_RemoveCargo"))
+							{
+								ActRemoveCargoPtr action(new ActRemoveCargo());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->itemId = CreateIdOrNull(ini.get_value_string(1));
+								action->count = std::max(0, ini.get_value_int(2));
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_GiveObjList"))

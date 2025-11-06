@@ -146,8 +146,9 @@ namespace Missions
 		{
 			const auto& entry = triggerExecutionQueue.front();
 			Trigger& trigger = triggers.at(entry.first);
+			const MissionObject activator = entry.second; // Copy the activator, or the following "pop" would remove it (because entry is just referenced)
 			triggerExecutionQueue.pop();
-			trigger.Execute(entry.second); // This may also end the mission. In that case the execution queue is being emptied.
+			trigger.Execute(activator); // This may also end the mission. In that case the execution queue is being emptied.
 		}
 	}
 

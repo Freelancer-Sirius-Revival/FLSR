@@ -23,7 +23,7 @@ namespace Missions
 
 	void CndInZone::Register()
 	{
-		if (observedCndInZone.insert(this).second);
+		if (observedCndInZone.insert(this).second)
 			orderedCndInZone.push_back(this);
 	}
 

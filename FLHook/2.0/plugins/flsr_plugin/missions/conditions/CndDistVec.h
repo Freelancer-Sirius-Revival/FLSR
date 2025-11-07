@@ -18,8 +18,9 @@ namespace Missions
 		const Vector position;
 		const float distance;
 		const uint systemId;
+		const std::string hardpoint;
 
-		bool IsDistanceMatching(uint objId);
+		bool IsDistanceMatching(uint objId) const;
 
 	public:
 		CndDistVec(const ConditionParent& parent,
@@ -27,7 +28,8 @@ namespace Missions
 					const DistanceCondition condition,
 					const Vector& position,
 					const float distance,
-					const uint systemId);
+					const uint systemId,
+					const std::string hardpoint);
 		~CndDistVec();
 		void Register();
 		void Unregister();

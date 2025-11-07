@@ -32,7 +32,7 @@ namespace Missions
 	void CndProjHitCount::Register()
 	{
 		currentHitCount = 0;
-		if (observedCndProjHitCount.insert(this).second);
+		if (observedCndProjHitCount.insert(this).second)
 			orderedCndProjHitCount.push_back(this);
 	}
 

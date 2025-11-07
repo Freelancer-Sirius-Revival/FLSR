@@ -21,7 +21,7 @@ namespace Missions
 
 	void CndSystemSpaceExit::Register()
 	{
-		if (observedCndSystemSpaceExit.insert(this).second);
+		if (observedCndSystemSpaceExit.insert(this).second)
 			orderedCndSystemSpaceExit.push_back(this);
 	}
 

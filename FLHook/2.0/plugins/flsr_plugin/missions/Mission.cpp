@@ -318,7 +318,7 @@ namespace Missions
 
 	static bool IsValidMissionForOffer(const Mission& mission)
 	{
-		return mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.bases.empty();
+		return mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.baseIds.empty();
 	}
 
 	static void RegisterMissionToJobBoard(Mission& mission)
@@ -334,7 +334,8 @@ namespace Missions
 		offer.title = mission.offer.title;
 		offer.description = mission.offer.description;
 		offer.reward = mission.offer.reward;
-		mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.bases);
+		offer.allowedShipArchetypeIds = mission.offer.shipArchetypeIds;
+		mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.baseIds);
 	}
 
 	namespace Hooks

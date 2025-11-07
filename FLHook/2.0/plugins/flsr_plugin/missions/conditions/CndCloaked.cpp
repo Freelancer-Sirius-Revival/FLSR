@@ -20,7 +20,7 @@ namespace Missions
 
 	void CndCloaked::Register()
 	{
-		if (observedCndCloaked.insert(this).second);
+		if (observedCndCloaked.insert(this).second)
 			orderedCndCloaked.push_back(this);
 	}
 

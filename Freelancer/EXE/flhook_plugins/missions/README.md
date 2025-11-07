@@ -55,6 +55,9 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[offer_reward]`
     1. `INTEGER :0` Amount of cash displayed on the Mission Board as reward.
 
+- `[offer_ship_restriction]`
+    1. `STRING` A list of ship nicknames that are allowed to take this mission. It will be displayed and declined with invalid ship.
+
 - `[offer_bases]`
     1. `STRING` A list of base nicknames this mission will be visible on the Mission Board.
 
@@ -409,6 +412,13 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `FLOAT :0` The distance from the given position to check.
     1. `STRING` The system nickname where the checks happen.
     1. `[Inside|Outside] :Inside` Whether the objects must be within or outside this distance.
+    1. `[STRING]` The name of the hardpoint that will be used instead of the object’s center. Will be ignored if the hardpoint doesn’t exist.
+
+- `Cnd_HasCargo` Only players. When the given cargo is in cargo hold. Does not count mounted items. **For now only evaluates on bases.**
+    1. `STRING|Stranger` The players to check the cargo hold of.
+    1. All cargo that must be present, defined in pairs of:
+        1. `STRING` The cargo nickname to check for.
+        1. `INTEGER :1` The minimum quantity of this cargo required.
 
 - `Cnd_HealthDec` When the hitpoints falls below a threshold. `Activator` can be defined via the last argument.
     1. `STRING|Stranger` Object by name or label to observe the hitpoints of.
@@ -492,11 +502,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
-- `Act_AddCargo` Only for players. Adds cargo. Will fail if player has not enough cargo space.
+- `Act_AddCargo` Only for players. Adds cargo. Will do nothing if player has not enough cargo space. **Doing this immediately after `Cnd_HasCargo` triggered by buying goods may trigger a cheat-detection kick.**
     1. `STRING|Activator` Players by label to receive the cargo.
     1. `STRING` The item nickname to use.
     1. `INTEGER :0` Amount of items to add to cargo.
-    1. `[True|False :False]` Whether this cargo is flagged as mission item.
+    1. `[True|False :False]` Whether this cargo is flagged as mission item. Only works for Commodities.
 
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.
@@ -613,6 +623,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
     1. `STRING|Activator` Players by label to play the sound effect for.
     1. `STRING` The sound nickname to play.
+
+- `Act_RemoveCargo` Only for players. Removes cargo.
+    1. `STRING|Activator` Players by label to have the cargo removed from.
+    1. `STRING` The item nickname to use.
+    1. `INTEGER :0` Amount of items to remove from cargo.
 
 - `Act_RemoveLabel` Removes a label to the objects. **This is the only explicit way to unassign players from the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.

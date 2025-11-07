@@ -20,7 +20,7 @@ namespace Missions
 
 	void CndLaunchComplete::Register()
 	{
-		if (observedCndLaunchComplete.insert(this).second);
+		if (observedCndLaunchComplete.insert(this).second)
 			orderedCndLaunchComplete.push_back(this);
 	}
 

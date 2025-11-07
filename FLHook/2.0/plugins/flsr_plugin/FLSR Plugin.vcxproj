@@ -129,8 +129,10 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="missions\actions\ActRemoveCargo.cpp" />
     <ClCompile Include="missions\actions\ActSetDockState.cpp" />
     <ClCompile Include="missions\actions\ActDockInstant.cpp" />
+    <ClCompile Include="missions\conditions\CndHasCargo.cpp" />
     <ClCompile Include="missions\MatrixMath.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
@@ -232,6 +234,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="Pilots.cpp" />
+    <ClCompile Include="PlayerLootSpawning.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
@@ -243,7 +246,9 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="missions\actions\ActDockInstant.h" />
+    <ClInclude Include="missions\actions\ActRemoveCargo.h" />
     <ClInclude Include="missions\actions\ActSetDockState.h" />
+    <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
@@ -343,6 +348,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\ShipSpawning.h" />
     <ClInclude Include="missions\Trigger.h" />
     <ClInclude Include="Pilots.h" />
+    <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="Plugin.h" />
   </ItemGroup>
   <ItemGroup>

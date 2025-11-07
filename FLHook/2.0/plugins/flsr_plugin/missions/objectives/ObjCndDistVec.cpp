@@ -10,7 +10,15 @@ namespace Missions
 	}
 
 	ObjCndDistVec::ObjCndDistVec(const ObjectiveParent& parent, const ObjectiveState& state, const float distance, const Vector& position) :
-		CndDistVec(ConditionParent(parent.missionId, 0), missions.at(parent.missionId).FindObjNameByObjId(state.objId), CndDistVec::DistanceCondition::Inside, position, distance, GetSystemId(state.objId)),
+		CndDistVec(
+			ConditionParent(parent.missionId, 0),
+			missions.at(parent.missionId).FindObjNameByObjId(state.objId),
+			CndDistVec::DistanceCondition::Inside,
+			position,
+			distance,
+			GetSystemId(state.objId),
+			""
+		),
 		parent(parent),
 		state(state)
 	{}

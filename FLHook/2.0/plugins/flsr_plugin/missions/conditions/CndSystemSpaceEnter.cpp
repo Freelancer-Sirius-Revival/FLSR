@@ -21,7 +21,7 @@ namespace Missions
 
 	void CndSystemSpaceEnter::Register()
 	{
-		if (observedCndSystemSpaceEnter.insert(this).second);
+		if (observedCndSystemSpaceEnter.insert(this).second)
 			orderedCndSystemSpaceEnter.push_back(this);
 	}
 

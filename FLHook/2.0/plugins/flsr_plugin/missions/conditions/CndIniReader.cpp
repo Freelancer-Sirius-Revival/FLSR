@@ -7,6 +7,7 @@
 #include "CndDestroyed.h"
 #include "CndDistObj.h"
 #include "CndDistVec.h"
+#include "CndHasCargo.h"
 #include "CndHealthDec.h"
 #include "CndInSpace.h"
 #include "CndInSystem.h"
@@ -262,6 +263,7 @@ namespace Missions
 		Vector position = { 0, 0, 0 };
 		float distance = 0;
 		uint systemId = 0;
+		std::string hardpoint = "";
 
 		uint argNum = 0;
 		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
@@ -312,8 +314,48 @@ namespace Missions
 			else if (value != "inside")
 				PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"Invalid distance relation. Must be INSIDE, or OUTSIDE. Defaulting to INSIDE.");
 		}
+		argNum++;
 
-		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId);
+		if (ini.get_num_parameters() > argNum)
+		{
+			hardpoint = ToLower(ini.get_value_string(argNum));
+			if (hardpoint.empty())
+				PrintErrorToConsole(L"Cnd_DistVec", conditionParent, argNum, L"Invalid hardpoint. Defaulting to none.");
+		}
+
+		return new CndDistVec(conditionParent, objNameOrLabel, reason, position, distance, systemId, hardpoint);
+	}
+
+	static CndHasCargo* ReadCndHasCargo(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+		std::unordered_map<uint, uint> countPerCargo;
+
+		uint argNum = 0;
+		label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(L"Cnd_HasCargo", conditionParent, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		const auto maxArgs = ini.get_num_parameters();
+		while (argNum < maxArgs)
+		{
+			const uint cargoId = CreateIdOrNull(ini.get_value_string(argNum++));
+			if (cargoId == 0)
+				PrintErrorToConsole(L"Cnd_HasCargo", conditionParent, argNum, L"Invalid archetype name. Ignoring.");
+
+			const int count = ini.get_value_int(argNum++);
+			if (count <= 0)
+				PrintErrorToConsole(L"Cnd_HasCargo", conditionParent, argNum, L"Invalid quantity. Defaulting to 1.");
+
+			if (cargoId)
+				countPerCargo.insert({ cargoId, std::max<uint>(count, 1) });
+		}
+
+		return new CndHasCargo(conditionParent, label, countPerCargo);
 	}
 
 	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -734,6 +776,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_DistVec"))
 			return ReadCndDistVec(conditionParent, ini);
+
+		if (ini.is_value("Cnd_HasCargo"))
+			return ReadCndHasCargo(conditionParent, ini);
 
 		if (ini.is_value("Cnd_HealthDec"))
 			return ReadCndHealthDec(conditionParent, ini);

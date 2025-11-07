@@ -19,7 +19,7 @@ namespace Missions
 
 	void CndCommComplete::Register()
 	{
-		if (observedCndCommComplete.insert(this).second);
+		if (observedCndCommComplete.insert(this).second)
 			orderedCndCommComplete.push_back(this);
 	}
 

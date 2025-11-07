@@ -27,7 +27,7 @@ namespace LootBoxes
 
 	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
 
-	float GetEquipmentVolume(const uint archetypeId)
+	static float GetEquipmentVolume(const uint archetypeId)
 	{
 		const Archetype::Equipment* equipment = Archetype::GetEquipment(archetypeId);
 		if (equipment)
@@ -35,7 +35,7 @@ namespace LootBoxes
 		return 0.0f;
 	}
 
-	std::wstring GetEquipmentName(const uint archetypeId)
+	static std::wstring GetEquipmentName(const uint archetypeId)
 	{
 		const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
 		if (goodInfo)
@@ -121,7 +121,7 @@ namespace LootBoxes
 		}
 	}
 
-	std::vector<CARGO_INFO> GetUnmountedCargoList(const uint clientId)
+	static std::vector<CARGO_INFO> GetUnmountedCargoList(const uint clientId)
 	{
 		int remainingHoldSize;
 		std::list<CARGO_INFO> cargoList;
@@ -138,7 +138,7 @@ namespace LootBoxes
 		return filteredCargoList;
 	}
 
-	bool Open(const uint clientId, const std::string lootBoxName, int openCount)
+	static bool Open(const uint clientId, const std::string lootBoxName, int openCount)
 	{
 		if (openCount < 1)
 			openCount = 1;
@@ -286,6 +286,5 @@ namespace LootBoxes
 			return true;
 		}
 		return false;
-
 	}
 }

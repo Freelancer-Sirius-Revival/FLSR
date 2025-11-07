@@ -30,7 +30,7 @@ namespace Missions
 	void CndDestroyed::Register()
 	{
 		currentCount = 0;
-		if (observedCndDestroyed.insert(this).second);
+		if (observedCndDestroyed.insert(this).second)
 			orderedCndDestroyed.push_back(this);
 	}
 

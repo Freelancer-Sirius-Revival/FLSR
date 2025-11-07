@@ -260,7 +260,7 @@ namespace Missions
 				// Remove the first TLR from the waypoints list because it was just entered.
 				XRequestBestPath& temp = (XRequestBestPath&)data;
 				temp.waypointCount--;
-				for (size_t index = 0; index < temp.waypointCount; index++)
+				for (int index = 0; index < temp.waypointCount; index++)
 					temp.entries[index] = temp.entries[index + 1];
 			}
 

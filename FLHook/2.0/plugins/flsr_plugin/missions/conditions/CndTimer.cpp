@@ -32,7 +32,7 @@ namespace Missions
 		else
 			targetTimeInS = std::uniform_real_distribution<float>(lowerTimeInS, upperTimeInS)(gen);
 
-		if (observedCndTimer.insert(this).second);
+		if (observedCndTimer.insert(this).second)
 			orderedCndTimer.push_back(this);
 	}
 

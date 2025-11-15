@@ -29,7 +29,7 @@ The following explains the available sections and their key-values. Key-values a
 
 The head of any mission. All sections following this one will be assigned to this mission. This also means you can put multiple `Mission` into one file with their respective following contents.
 
-To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player and group members accepting the mission will be automatically added to the label `players` for further reference in the mission.
+To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player The player and their group will be instantly given the label `players`. The player who accepted the mission will also be labelled `initial_player`.
 
 - `nickname` The name of the mission. Used for admin commands and debug output.
     1. `STRING` The name. Must be unique among all missions on the server.

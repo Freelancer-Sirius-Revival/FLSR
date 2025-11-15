@@ -146,8 +146,8 @@ namespace Missions
 		{
 			const auto& entry = triggerExecutionQueue.front();
 			Trigger& trigger = triggers.at(entry.first);
-			triggerExecutionQueue.pop();
 			trigger.Execute(entry.second); // This may also end the mission. In that case the execution queue is being emptied.
+			triggerExecutionQueue.pop();
 		}
 	}
 

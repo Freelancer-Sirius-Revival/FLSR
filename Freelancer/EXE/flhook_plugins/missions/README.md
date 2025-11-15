@@ -29,7 +29,7 @@ The following explains the available sections and their key-values. Key-values a
 
 The head of any mission. All sections following this one will be assigned to this mission. This also means you can put multiple `Mission` into one file with their respective following contents.
 
-To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player and group members accepting the mission will be automatically added to the label `players` for further reference in the mission.
+To offer a mission on a Mission Board on bases, set at least `offer_type` and one base in `offer_bases`. The `initstate` will be ignored for those missions. A mission from the Mission Board will be only started once the mission was accepted. The player The player and their group will be instantly given the label `players`. The player who accepted the mission will also be labelled `initial_player`.
 
 - `nickname` The name of the mission. Used for admin commands and debug output.
     1. `STRING` The name. Must be unique among all missions on the server.
@@ -67,7 +67,7 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 - `[reoffer_delay]`
     1. `FLOAT :0` The time in seconds to wait before the mission is reoffered.
 
-## `[MsnSolar]`
+## `MsnSolar`
 
 This is the definition for a single solar for the mission. Multiple `MsnSolar` can be created for individual solars.
 
@@ -126,7 +126,7 @@ This is the definition for a single solar for the mission. Multiple `MsnSolar` c
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
 
-## `[Npc]`
+## `Npc`
 
 This is the definition for a NPC archetype which again can be used by multiple `MsnNpc`. Multiple entries of this can exist.
 
@@ -209,7 +209,7 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
 
-## `[MsnFormation]`
+## `MsnFormation`
 
 This is the definition for an NPC formation. Multiple `MsnFormation` can be created for individual NPCs.
 
@@ -232,7 +232,7 @@ This is the definition for an NPC formation. Multiple `MsnFormation` can be crea
     1. `FLOAT :0` The y-axis.
     1. `FLOAT :0` The z-axis.
 
-## `[ObjList]`
+## `ObjList`
 
 Objectives define a list of directives for NPCs to follow along. They can be assigned to NPCs as often as necessary.
 
@@ -324,7 +324,7 @@ Objectives define a list of directives for NPCs to follow along. They can be ass
     1. `[FLOAT] :100` The maximum range to stay from the object.
     1. `[True|False] :True` Whether `StayInRange` is enforced (`True`) or released (`False`).
 
-## `[Dialog]`
+## `Dialog`
 
 Dialogs are a shortcut to defining multiple `Act_SendComm` or `Act_EtherComm` for complex dialogs.
 
@@ -352,9 +352,11 @@ Dialogs are a shortcut to defining multiple `Act_SendComm` or `Act_EtherComm` fo
     1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
 
-## `[Trigger]`
+## `Trigger`
 
-Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated. Triggers are usually deactivated by default and should be activated as the mission progresses.
+Triggers are the core logical elements of a mission. Multiple `Trigger` can be created for a mission. They always must contain a singular condition (`Cnd_`) which must be fulfilled to execute all actions (`Act_`). A condition of a trigger only can be fulfilled if the trigger is activated.
+
+Only exactly one trigger is being processed at the same time. Triggers are being processed in the same order as they were activated.
 
 - `nickname` The name of the trigger. Used as reference for following actions and for debug output.
     1. `STRING` The name. Must be unique within this mission.
@@ -368,6 +370,8 @@ Triggers are the core logical elements of a mission. Multiple `Trigger` can be c
 ### Conditions
 
 Only one condition must be present. If none is present, `Cnd_True` is used.
+
+Conditions will always pick only _one arbitrary_ member of a label to fulfill. To process all members of a label, set `repeatable` for the `Trigger` and do remove processed members from this label.
 
 The keyword `Stranger` is used to refer explicitely to all players not having a label assigned in this mission. It can be used in combination with action’s `Activator` to assign players to the mission.
 

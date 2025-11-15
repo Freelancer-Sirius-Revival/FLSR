@@ -42,7 +42,7 @@ namespace Missions
 		if (state != TriggerState::Inactive && state != TriggerState::AwaitingInitialActivation)
 			return;
 		state = TriggerState::Active;
-		condition->Register();
+		condition->Register(); // Some conditions can instantly finish and queue trigger execution.
 	}
 
 	void Trigger::Deactivate()
@@ -56,6 +56,10 @@ namespace Missions
 	void Trigger::Execute(const MissionObject& activator)
 	{
 		condition->Unregister();
+		// In case the trigger was deactivated again in between.
+		if (state != TriggerState::Active)
+			return;
+
 		auto& mission = missions.at(missionId);
 		for (const auto& action : actions)
 			action->Execute(mission, activator);

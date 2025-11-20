@@ -908,7 +908,7 @@ namespace Missions
 		}
 	}
 	
-	void StartMissionByOfferId(const uint offerId, const std::vector<uint>& clientIds)
+	void StartMissionByOfferId(const uint offerId, const uint startingClientId, const std::vector<uint>& clientIds)
 	{
 		for (auto& missionEntry : missions)
 		{
@@ -918,6 +918,7 @@ namespace Missions
 				const uint labelId = CreateID("players");
 				for (const auto clientId : clientIds)
 					mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), labelId);
+				mission.AddLabelToObject(MissionObject(MissionObjectType::Client, startingClientId), CreateID("initial_player"));
 				mission.Start();
 				return;
 			}

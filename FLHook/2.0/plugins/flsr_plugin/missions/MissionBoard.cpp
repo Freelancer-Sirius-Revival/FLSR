@@ -176,7 +176,7 @@ namespace MissionBoard
 							pub::Player::SetMsnID(memberId, indexEntry.second, clientId, false, 0);
 							groupMemberIds.push_back(memberId);
 						}
-						Missions::StartMissionByOfferId(indexEntry.second, groupMemberIds);
+						Missions::StartMissionByOfferId(indexEntry.second, clientId, groupMemberIds);
 						DeleteMissionOffer(indexEntry.second);
 					}
 					// Someone already removed it from the pool

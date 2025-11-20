@@ -21,7 +21,7 @@ namespace Missions
 		}
 	}
 
-	static void MarkObj(const uint clientId, const uint targetObjNameOrLabel, bool mark, Mission& mission)
+	static void MarkObj(const uint clientId, const uint targetObjNameOrLabel, const bool mark, Mission& mission)
 	{
 		// Clients can only be addressed via Label.
 		if (const auto& objectByName = mission.objectIdsByName.find(targetObjNameOrLabel); objectByName != mission.objectIdsByName.end())

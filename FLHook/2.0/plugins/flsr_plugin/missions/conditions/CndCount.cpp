@@ -3,7 +3,8 @@
 
 namespace Missions
 {
-	std::unordered_map<uint, std::unordered_set<CndCount*>> registeredConditionsByMissionId;
+	std::unordered_map<uint, std::unordered_set<CndCount*>> observedCndCountByMissionId;
+	std::unordered_map<uint, std::vector<CndCount*>> orderedCndCountByMissionId;
 
 	CndCount::CndCount(const ConditionParent& parent, const uint label, const uint targetCount, const CountComparator comparator) :
 		Condition(parent),
@@ -19,13 +20,25 @@ namespace Missions
 
 	void CndCount::Register()
 	{
-		registeredConditionsByMissionId[parent.missionId].insert(this);
-		Hooks::CndCount::EvaluateCountConditions(parent.missionId, missions.at(parent.missionId).objectsByLabel, label);
+		if (observedCndCountByMissionId[parent.missionId].insert(this).second)
+		{
+			orderedCndCountByMissionId[parent.missionId].push_back(this);
+			Hooks::CndCount::EvaluateCountConditions(parent.missionId, missions.at(parent.missionId).objectsByLabel, label);
+		}
 	}
 
 	void CndCount::Unregister()
 	{
-		registeredConditionsByMissionId[parent.missionId].erase(this);
+		observedCndCountByMissionId[parent.missionId].erase(this);
+		auto& orderedCndCount = orderedCndCountByMissionId[parent.missionId];
+		if (const auto it = std::find(orderedCndCount.begin(), orderedCndCount.end(), this); it != orderedCndCount.end())
+			orderedCndCount.erase(it);
+
+		if (observedCndCountByMissionId[parent.missionId].empty())
+		{
+			observedCndCountByMissionId.erase(parent.missionId);
+			orderedCndCountByMissionId.erase(parent.missionId);
+		}
 	}
 
 	bool CndCount::Matches(const uint currentLabel, const uint currentCount) const
@@ -55,18 +68,22 @@ namespace Missions
 		{
 			void EvaluateCountConditions(const uint missionId, const std::unordered_map<uint, std::vector<MissionObject>>& objectsByLabel, const uint label)
 			{
-				const auto& conditionsEntry = registeredConditionsByMissionId.find(missionId);
-				if (conditionsEntry == registeredConditionsByMissionId.end() || conditionsEntry->second.size() == 0)
+				const auto& observedCndCountEntry = observedCndCountByMissionId.find(missionId);
+				if (observedCndCountEntry == observedCndCountByMissionId.end() || observedCndCountEntry->second.size() == 0)
 					return;
 
-				const auto& registeredConditions = conditionsEntry->second;
+				const auto& orderedCndCountEntry = orderedCndCountByMissionId.find(missionId);
+				if (orderedCndCountEntry == orderedCndCountByMissionId.end() || orderedCndCountEntry->second.size() == 0)
+					return;
+
 				const auto& labelEntries = objectsByLabel.find(label);
 				const uint count = labelEntries == objectsByLabel.end() ? 0 : labelEntries->second.size();
 
-				const std::unordered_set<Missions::CndCount*> currentConditions(registeredConditions);
+				const auto& observedCndCount = observedCndCountEntry->second;
+				const auto currentConditions(orderedCndCountEntry->second);
 				for (const auto& condition : currentConditions)
 				{
-					if (registeredConditions.contains(condition) && condition->Matches(label, count))
+					if (observedCndCount.contains(condition) && condition->Matches(label, count))
 						condition->ExecuteTrigger();
 				}
 			}

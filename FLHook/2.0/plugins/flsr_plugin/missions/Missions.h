@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-    void StartMissionByOfferId(const uint offerId, const std::vector<uint>& clientIds);
+    void StartMissionByOfferId(const uint offerId, const uint startingClientId, const std::vector<uint>& clientIds);
     bool IsPartOfOfferedJob(const uint clientId);
     void RemoveClientFromCurrentOfferedJob(const uint clientId);
 

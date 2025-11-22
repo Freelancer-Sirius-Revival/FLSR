@@ -641,33 +641,35 @@ namespace Insurance
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         std::wstring characterFileName;
         if (HkGetCharFileName(info.wszCharname, characterFileName) != HKE_OK)
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
         DeleteInsuranceFileIfExisting(characterFileName);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         const std::wstring characterFileName = stows(std::string(characterId.charFilename).substr(0, 11));
         DeleteInsuranceFileIfExisting(characterFileName);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     static std::wstring characterFileNameToRename;
 
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        returncode = DEFAULT_RETURNCODE;
         if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
             characterFileNameToRename = L"";
+        returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        returncode = DEFAULT_RETURNCODE;
         if (!characterFileNameToRename.empty())
         {
             std::wstring characterFileName;
@@ -680,6 +682,7 @@ namespace Insurance
             }
         }
         characterFileNameToRename = L"";
+        returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 }

@@ -383,7 +383,8 @@ HK_ERROR HkAddCargo(const std::wstring &wscCharname, uint iGoodID, int iCount,
     if (!goodInfo)
         return HKE_INVALID_GOOD;
 
-    uint base, location = 0;
+    uint base = 0;
+    uint location = 0;
     pub::Player::GetBase(clientId, base);
     pub::Player::GetLocation(clientId, location);
 

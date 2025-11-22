@@ -148,14 +148,13 @@ namespace Missions
 		{
 			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto currentConditions(orderedCndDestroyed);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndDestroyed.contains(condition) && condition->Matches(killedObject, killed, killerId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

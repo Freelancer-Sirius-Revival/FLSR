@@ -79,26 +79,24 @@ namespace Missions
 		{
 			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const std::unordered_set<Missions::CndInSpace*> currentConditions(observedCndInSpace);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndInSpace.contains(condition) && condition->Matches(clientId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall SystemSwitchOutComplete_AFTER(unsigned int objId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto currentConditions(orderedCndInSpace);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndInSpace.contains(condition) && condition->Matches(clientId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

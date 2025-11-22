@@ -975,8 +975,8 @@ namespace Missions
 
 	void __stdcall Shutdown()
 	{
-		returncode = DEFAULT_RETURNCODE;
 		ClearMissions();
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	static void RemoveObjectFromMissions(const uint objId)
@@ -1010,32 +1010,31 @@ namespace Missions
 
 	void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		RemoveObjectFromMissions(killedObject->cobj->id);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	std::unordered_map<uint, CHARACTER_ID> lastCharacterByClientId;
 
 	void __stdcall CharacterSelect(const CHARACTER_ID& cId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		const auto& foundEntry = lastCharacterByClientId.find(clientId);
 		if (foundEntry == lastCharacterByClientId.end() || !(foundEntry->second == cId))
 			RemoveClientFromMissions(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall CharacterSelect_AFTER(const CHARACTER_ID& cId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		lastCharacterByClientId[clientId] = cId;
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		lastCharacterByClientId.erase(clientId);
 		RemoveClientFromMissions(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	static bool StartMission(const std::string& missionName)
@@ -1066,16 +1065,13 @@ namespace Missions
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (IS_CMD("start_mission"))
 		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
@@ -1085,17 +1081,16 @@ namespace Missions
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already running.");
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 		else if (IS_CMD("stop_mission"))
 		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
@@ -1105,17 +1100,16 @@ namespace Missions
 			else
 				PrintUserCmdText(clientId, L"Mission " + stows(targetNickname) + L" not found or already stopped.");
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 		else if (IS_CMD("reload_missions"))
 		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
@@ -1123,18 +1117,17 @@ namespace Missions
 			initialized = false;
 			PrintUserCmdText(clientId, L"Stopped and reloaded all missions.");
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 
 		else if (IS_CMD("act_trigger"))
 		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
@@ -1149,18 +1142,17 @@ namespace Missions
 			Mission msn("", 0, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 
 		else if (IS_CMD("deact_trigger"))
 		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
@@ -1175,18 +1167,17 @@ namespace Missions
 			Mission msn("", 0, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 
 		else if (IS_CMD("getpos"))
 		{
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_SUPERADMIN))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
@@ -1199,9 +1190,11 @@ namespace Missions
 			else
 				PrintUserCmdText(clientId, L"You must be in space for that.");
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL; // Must be set again because it gets unset somewhere before.
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
+
+		returncode = DEFAULT_RETURNCODE;
 		return false;
 	}
 }

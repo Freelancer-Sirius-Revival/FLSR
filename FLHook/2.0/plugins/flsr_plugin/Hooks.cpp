@@ -1,44 +1,48 @@
 #include "Main.h"
 
-namespace Hooks {
-
-
+namespace Hooks
+{
     //PopUpDialog
-    void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked) {
-        returncode = DEFAULT_RETURNCODE;
-
+    void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked)
+    {
         PopUp::HandleButtonClick(iClientID, buttonClicked);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     //CharacterSelect
-    void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-
+    void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID)
+    {
         //NewPlayerMessage
         Tools::HkNewPlayerMessage(iClientID, cId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     // LaunchComplete
-    void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip) {
-        returncode = DEFAULT_RETURNCODE;
-
+    void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip)
+    {
         //Get ClientID
         uint iClientID = HkGetClientIDByShip(iShip);
         if (!iClientID)
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
 
         //Show WelcomePopUp
         if (Modules::GetModuleState("WelcomeMSG"))
         {
             PopUp::WelcomeBox(iClientID);
         }
-		    }
-
-    void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller) {
         returncode = DEFAULT_RETURNCODE;
+	}
 
+    void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller)
+    {
         if (!HkIsValidClientID(iClientIDVictim))
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
 
         std::wstring victim, killer;
 		Tools::eDeathTypes DeathType;
@@ -104,29 +108,28 @@ namespace Hooks {
         victim.erase(std::remove_if(victim.begin(), victim.end(), [](unsigned char c) { return std::isspace(c); }), victim.end());
     
         // Remove whitespaces from killer
-        killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());    
+        killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());
+        returncode = DEFAULT_RETURNCODE;
     }
 
 
     //BaseEnter_AFTER
-    void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-
+    void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID)
+    {
         if (Modules::GetModuleState("InsuranceModule"))
         {
             Insurance::UseInsurance(iClientID);
         }
-		
+        returncode = DEFAULT_RETURNCODE;
     }
 
-    void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID) {
-        returncode = DEFAULT_RETURNCODE;
-
-        //Insurance
+    void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID)
+    {
         if (Modules::GetModuleState("InsuranceModule") && !Insurance::IsInsurancePresent(iClientID))
         {
             const bool insuranceRequested = Insurance::IsInsuranceRequested(iClientID);
             Insurance::CreateNewInsurance(iClientID, !insuranceRequested);
         }
+        returncode = DEFAULT_RETURNCODE;
     }
 }

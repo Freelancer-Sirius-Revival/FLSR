@@ -346,11 +346,12 @@ namespace Missions
 			float elapsedTimeInSec = 0.0f;
 			void __stdcall Elapse_Time_AFTER(float seconds)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				elapsedTimeInSec += seconds;
 				if (elapsedTimeInSec < 1.0f)
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return;
+				}
 
 				const mstime thresholdTime = timeInMS() - 10000;
 				for (auto& missionEntry : missions)
@@ -385,6 +386,7 @@ namespace Missions
 				}
 
 				elapsedTimeInSec = 0.0f;
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			static void OrderBreakFormation(const uint objId)
@@ -404,10 +406,11 @@ namespace Missions
 
 			int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				if (HkGetClientIDByShip(shipId) || response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return 0;
+				}
 
 				for (auto& missionEntry : missions)
 				{
@@ -418,7 +421,10 @@ namespace Missions
 						IObjRW* inspect;
 						StarSystem* system;
 						if (!GetShipInspect(objId, inspect, system))
+						{
+							returncode = DEFAULT_RETURNCODE;
 							return 0;
+						}
 						IObjRW* formationLeader;
 						inspect->get_formation_leader(formationLeader);
 						if (formationLeader == inspect)
@@ -437,7 +443,7 @@ namespace Missions
 						OrderBreakFormation(objId);
 					}
 				}
-
+				returncode = DEFAULT_RETURNCODE;
 				return 0;
 			}
 		}

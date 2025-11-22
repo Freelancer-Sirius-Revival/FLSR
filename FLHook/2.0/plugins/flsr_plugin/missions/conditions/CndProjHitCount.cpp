@@ -165,26 +165,26 @@ namespace Missions
 		{
 			void __stdcall ShipAndSolarEquipDamage(const IObjRW* damagedObject, const CEquip* hitEquip, const float& incomingDamage, const DamageList* damageList)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(damagedObject, incomingDamage, damageList, Missions::CndProjHitCount::DamagedSurface::Hull);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall ShipAndSolarColGrpDamage(const IObjRW* damagedObject, const CArchGroup* hitColGrp, const float& incomingDamage, const DamageList* damageList)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(damagedObject, incomingDamage, damageList, Missions::CndProjHitCount::DamagedSurface::Hull);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall ShipAndSolarHullDamage(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(damagedObject, incomingDamage, damageList, Missions::CndProjHitCount::DamagedSurface::Hull);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall ShipAndSolarShieldDamage(const IObjRW* damagedObject, const CEShield* hitShield, const float& incomingDamage, const DamageList* damageList)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(damagedObject, incomingDamage, damageList, Missions::CndProjHitCount::DamagedSurface::Shield);
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

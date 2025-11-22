@@ -58,43 +58,41 @@ namespace EquipWhiteList
 
 	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint shipArchetypeId;
 		pub::Player::GetShipID(clientId, shipArchetypeId);
 		if (UnmountIllegalEquipment(Players[clientId].equipDescList, shipArchetypeId, clientId))
 			PrintUserCmdText(clientId, L"Some equipment has been unmounted due to changed requirements.");
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint shipArchetypeId;
 		pub::Player::GetShipID(clientId, shipArchetypeId);
 		if (UnmountIllegalEquipment(Players[clientId].equipDescList, shipArchetypeId, clientId))
 			PrintUserCmdText(clientId, L"Some equipment has been unmounted due to changed requirements.");
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	static std::unordered_map<uint, uint> boughtShipArchByClientId;
 
 	void __stdcall GFGoodBuy(const SGFGoodBuyInfo& gbi, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		boughtShipArchByClientId.erase(clientId);
 		const GoodInfo* goodInfo = GoodList::find_by_id(gbi.iGoodID);
 		if (!goodInfo || goodInfo->iType != 3)
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 		const GoodInfo* hullGoodInfo = GoodList::find_by_id(goodInfo->iHullGoodID);
 		if (hullGoodInfo && hullGoodInfo->iType == 2)
 			boughtShipArchByClientId[clientId] = hullGoodInfo->iShipGoodID;
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint shipArchetypeId;
 		if (boughtShipArchByClientId.contains(clientId))
 		{
@@ -104,12 +102,11 @@ namespace EquipWhiteList
 		else
 			pub::Player::GetShipID(clientId, shipArchetypeId);
 		UnmountIllegalEquipment(*((EquipDescList*)&equipDescriptorList), shipArchetypeId, clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ReqAddItem(unsigned int& goodArchetypeId, char* hardpoint, int& count, float& status, bool& mounted, uint clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint shipArchetypeId;
 		pub::Player::GetShipID(clientId, shipArchetypeId);
 		if (allowedEquipmentArchetypeIdsPerShipArchetypeId.contains(goodArchetypeId)
@@ -120,5 +117,6 @@ namespace EquipWhiteList
 			strcpy(hardpoint, EquipDesc::CARGO_BAY_HP_NAME.value);
 			SendNNMessages(clientId);
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

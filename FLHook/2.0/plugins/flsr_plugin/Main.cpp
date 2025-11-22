@@ -41,8 +41,6 @@ PLUGIN_RETURNCODE returncode;
 
 
 void LoadSettings() {
-    returncode = DEFAULT_RETURNCODE;
-
     Pilots::ReadFiles();
     NpcAppearances::ReadFiles();
     Formations::ReadFiles();
@@ -148,8 +146,8 @@ void LoadSettings() {
             ConPrint(L"Module failed to load: DiscordBot\n");
             Modules::SetModuleState("DiscordBot", false);
         }
-
     }
+    returncode = DEFAULT_RETURNCODE;
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)

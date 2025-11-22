@@ -75,14 +75,13 @@ namespace Missions
 		{
 			void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto currentConditions(orderedCndOnBase);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndOnBase.contains(condition) && condition->Matches(clientId, baseId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

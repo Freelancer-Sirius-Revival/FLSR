@@ -39,11 +39,12 @@ namespace Missions
 			float elapsedTimeInSec = 0.0f;
 			void __stdcall Elapse_Time_AFTER(float seconds)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				elapsedTimeInSec += seconds;
 				if (elapsedTimeInSec < 1.0f)
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return;
+				}
 
 				const std::unordered_map<uint, LifeTime> currentLifeTimesBySolarId(lifeTimesBySolarId);
 				for (auto& solarLifeTimeEntry : currentLifeTimesBySolarId)
@@ -73,6 +74,7 @@ namespace Missions
 				}
 
 				elapsedTimeInSec = 0.0f;
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

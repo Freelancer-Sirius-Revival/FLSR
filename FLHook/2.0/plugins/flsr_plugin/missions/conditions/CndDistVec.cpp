@@ -129,11 +129,12 @@ namespace Missions
 			float elapsedTimeInSec = 0.0f;
 			void __stdcall Elapse_Time_AFTER(float seconds)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				elapsedTimeInSec += seconds;
 				if (elapsedTimeInSec < 0.02f)
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return;
+				}
 				elapsedTimeInSec = 0.0f;
 
 				const auto currentConditions(orderedCndDistVec);
@@ -165,6 +166,7 @@ namespace Missions
 						}
 					}
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

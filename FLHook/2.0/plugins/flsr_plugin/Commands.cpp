@@ -548,13 +548,11 @@ namespace Commands
                     wscParam = wscCmd.substr(wcslen(UserCmds[i].wszCmd) + 1);
                 }
                 UserCmds[i].proc(iClientID, wscParam);
-                returncode = SKIPPLUGINS_NOFUNCTIONCALL; // we handled the command,
-                // return immediatly
+                returncode = SKIPPLUGINS_NOFUNCTIONCALL;
                 return true;
             }
         }
-        returncode = DEFAULT_RETURNCODE; // we did not handle the command, so let
-        // other plugins or FLHook kick in
+        returncode = DEFAULT_RETURNCODE;
         return false;
     }
 }

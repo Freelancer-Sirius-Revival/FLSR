@@ -62,7 +62,7 @@ namespace Missions
 		uint lastMissionId = 0;
 
 		const std::regex filePattern(".+\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
-		for (const auto& entry : std::filesystem::directory_iterator(missionDirectory))
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(missionDirectory))
 		{
 			const std::string fileName = wstos(entry.path().filename());
 			INI_Reader ini;

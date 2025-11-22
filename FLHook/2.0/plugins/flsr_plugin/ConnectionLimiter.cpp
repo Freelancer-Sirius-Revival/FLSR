@@ -50,32 +50,35 @@ namespace ConnectionLimiter
 
 	void __stdcall Login_After(struct SLoginInfo const& li, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		std::wstring ipAddress;
 		HkGetPlayerIP(clientId, ipAddress);
 		if (ipAddress == L"")
 		{
 			kickPlayer(clientId);
+			returncode = DEFAULT_RETURNCODE;
 			return;
 		}
 		
 		if (canHaveUnlimitedCharacters(clientId))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		ipAddressByClientId[clientId] = ipAddress;
 		ipAddressesCounter[ipAddress]++;
 		if (ipAddressesCounter[ipAddress] > maxParallelConnectionsPerIpAddress)
 			kickPlayer(clientId);
+
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		std::wstring ipAddress = ipAddressByClientId[clientId];
 		if (ipAddress != L"")
 			ipAddressesCounter[ipAddress] = static_cast<ushort>(std::max(ipAddressesCounter[ipAddress] - 1, 0));
 		ipAddressByClientId.erase(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

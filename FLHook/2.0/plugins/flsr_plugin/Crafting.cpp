@@ -286,7 +286,6 @@ namespace Crafting
 
 	bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		if (Modules::GetModuleState("Crafting"))
 		{
 			if (ToLower(argumentsWS).find(L"/craft") == 0)
@@ -308,6 +307,7 @@ namespace Crafting
 				return true;
 			}
 		}
+		returncode = DEFAULT_RETURNCODE;
 		return false;
 	}
 }

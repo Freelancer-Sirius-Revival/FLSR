@@ -323,8 +323,6 @@ namespace SolarSpawn
 
 	bool __stdcall Send_FLPACKET_SERVER_LAUNCH(uint iClientID, FLPACKET_LAUNCH& pLaunch)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (spawnedSolars.contains(pLaunch.iSolarObjId))
 		{
 			LaunchComm comm;
@@ -332,6 +330,7 @@ namespace SolarSpawn
 			comm.dockId = pLaunch.iDock;
 			unprocessedLaunchComms[iClientID] = comm;
 		}
+		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}
 
@@ -400,13 +399,15 @@ namespace SolarSpawn
 
 	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (!unprocessedLaunchComms.contains(clientId))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		SendLaunchWellWishes(shipId, unprocessedLaunchComms[clientId].solarObjId, unprocessedLaunchComms[clientId].dockId);
 		unprocessedLaunchComms.erase(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	struct DockQueue
@@ -418,10 +419,9 @@ namespace SolarSpawn
 	// Gets called whenever a dock request begins, ends, is cancelled, or the ship is destroyed/despawned. Does not get called when the station gets destroyed.
 	int __cdecl Dock_Call_After(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, DOCK_HOST_RESPONSE response)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (!spawnedSolars.contains(dockTargetId))
 		{
+			returncode = DEFAULT_RETURNCODE;
 			return 0;
 		}
 
@@ -429,6 +429,7 @@ namespace SolarSpawn
 		if (dockPortIndex < 0 || response == DOCK_HOST_RESPONSE::DOCK)
 		{
 			dockQueues[dockTargetId].erase(ship);
+			returncode = DEFAULT_RETURNCODE;
 			return 0;
 		}
 
@@ -438,10 +439,16 @@ namespace SolarSpawn
 		StarSystem* starSystem;
 		uint targetId = dockTargetId;
 		if (!GetShipInspect(targetId, inspect, starSystem))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return 0;
+		}
 		const CEqObj* solar = static_cast<CEqObj*>(inspect->cobj);
 		if (!solar->voiceId)
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return 0;
+		}
 		const Archetype::EqObj* solarArchetype = static_cast<Archetype::EqObj*>(solar->archetype);
 		Archetype::DockType dockType;
 		try
@@ -450,7 +457,8 @@ namespace SolarSpawn
 		}
 		catch (const std::out_of_range& e)
 		{
-			return false;
+			returncode = DEFAULT_RETURNCODE;
+			return 0;
 		}
 		
 		std::vector<uint> lines;
@@ -602,6 +610,7 @@ namespace SolarSpawn
 
 		uint shipId = ship;
 		pub::SpaceObj::SendComm(solar->id, shipId, solar->voiceId, &solar->commCostume, 0, lines.data(), lines.size(), 19007 /* base comms type*/, 0.5f, true);
+		returncode = DEFAULT_RETURNCODE;
 		return 0;
 	}
 
@@ -648,11 +657,12 @@ namespace SolarSpawn
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		const uint objId = killedObject->cobj->id;
 		if (!spawnedSolars.contains(objId))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 		CreateFallbackBaseIfNeeded(killedObject);
 		spawnedSolars.erase(objId);
 
@@ -666,34 +676,41 @@ namespace SolarSpawn
 				pub::Player::ForceLand(inspect->cobj->ownerPlayer, static_cast<CEqObj*>(killedObject->cobj)->dockWithBaseId);
 		}
 		dockQueues.erase(objId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (IS_CMD("kill"))
 		{
 			const uint clientId = ((CInGame*)cmds)->iClientID;
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = DEFAULT_RETURNCODE;
 				return false;
 			}
 
 			uint shipId;
 			pub::Player::GetShip(clientId, shipId);
 			if (!shipId)
+			{
+				returncode = DEFAULT_RETURNCODE;
 				return false;
+			}
 			uint targetId;
 			pub::SpaceObj::GetTarget(shipId, targetId);
 			if (!targetId)
+			{
+				returncode = DEFAULT_RETURNCODE;
 				return false;
+			}
 			if (DestroySolar(targetId))
 			{
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}
+			returncode = DEFAULT_RETURNCODE;
 			return false;
 		}
 
@@ -703,6 +720,7 @@ namespace SolarSpawn
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = DEFAULT_RETURNCODE;
 				return false;
 			}
 
@@ -713,6 +731,7 @@ namespace SolarSpawn
 			}
 
 			PrintUserCmdText(clientId, L"ERR solar not found: " + cmds->ArgStr(1));
+			returncode = DEFAULT_RETURNCODE;
 			return false;
 		}
 
@@ -722,6 +741,7 @@ namespace SolarSpawn
 			if (!(cmds->rights & CCMDS_RIGHTS::RIGHT_EVENTMODE))
 			{
 				PrintUserCmdText(clientId, L"ERR No permission");
+				returncode = DEFAULT_RETURNCODE;
 				return false;
 			}
 
@@ -735,6 +755,7 @@ namespace SolarSpawn
 					if (!shipId)
 					{
 						PrintUserCmdText(clientId, L"ERR must be in spoace");
+						returncode = DEFAULT_RETURNCODE;
 						return false;
 					}
 
@@ -743,6 +764,7 @@ namespace SolarSpawn
 					if (!systemId)
 					{
 						PrintUserCmdText(clientId, L"ERR must be a system");
+						returncode = DEFAULT_RETURNCODE;
 						return false;
 					}
 
@@ -756,8 +778,10 @@ namespace SolarSpawn
 				}
 			}
 			PrintUserCmdText(clientId, L"ERR solar not found: " + stows(targetNickname));
+			returncode = DEFAULT_RETURNCODE;
 			return false;
 		}
+		returncode = DEFAULT_RETURNCODE;
 		return false;
 	}
 }

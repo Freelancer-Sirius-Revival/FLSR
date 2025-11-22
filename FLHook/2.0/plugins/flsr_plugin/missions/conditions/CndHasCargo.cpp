@@ -110,20 +110,20 @@ namespace Missions
 		{
 			void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall ReqAddItem_AFTER(unsigned int& goodArchetypeId, char* hardpoint, int& count, float& status, bool& mounted, uint clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall ReqEquipment_AFTER(const EquipDescList& equipDescriptorList, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

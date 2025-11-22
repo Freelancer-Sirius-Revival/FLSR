@@ -63,11 +63,12 @@ namespace Missions
 		{
 			void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const uint clientId = HkGetClientIDByShip(shipId);
 				if (!clientId)
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return;
+				}
 
 				const auto currentConditions(orderedCndJumpInComplete);
 				for (const auto& condition : currentConditions)
@@ -75,6 +76,7 @@ namespace Missions
 					if (observedCndJumpInComplete.contains(condition) && condition->Matches(clientId, systemId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

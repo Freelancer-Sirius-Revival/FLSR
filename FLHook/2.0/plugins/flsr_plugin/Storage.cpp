@@ -463,7 +463,6 @@ namespace Storage
 
 	bool UserCmd_Storage(const uint clientId, const std::wstring& arguments)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		const std::wstring argumentsLowered = ToLower(arguments);
 
 		if (argumentsLowered.find(L"/deposit") == 0)
@@ -565,6 +564,7 @@ namespace Storage
 			return true;
 		}
 
+		returncode = DEFAULT_RETURNCODE;
 		return false;
 	}
 }

@@ -920,8 +920,6 @@ namespace Cloak
 
 	void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
 		{
 			if (clientCloakStats[clientId].activatorCargoId == activateEquip.sID)
@@ -930,80 +928,75 @@ namespace Cloak
 			if (clientCloakStats[clientId].engineCargoId == activateEquip.sID)
 				clientCloakStats[clientId].engineKillActive = !activateEquip.bActivate;
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			const uint clientId = HkGetClientIDByShip(shipId);
 			if (!clientId)
+			{
+				returncode = DEFAULT_RETURNCODE;
 				return;
+			}
 
 			QueueUncloak(clientId, UncloakReason::User);
 
 			if (IsValidCloakableClient(clientId))
 				clientCloakStats[clientId].dockingManeuverActive = false;
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			ClearClientData(clientId);
 			InstallCloak(clientId);
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 	
 	int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule") && !CheckDockCall(ship, dockTargetId, dockPortIndex, response))
+		{
 			returncode = NOFUNCTIONCALL;
-
+			return 0;
+		}
+		returncode = DEFAULT_RETURNCODE;
 		return 0;
 	}
 
 	void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 			QueueUncloak(clientId, UncloakReason::Docking);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
-		{
 			ClearClientData(clientId);
-		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
-		{
 			RemoveCloakingDevices(clientId);
-		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule") && !EquipCloakingDevices(clientId))
 			RemoveCloakingDevices(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void SetServerSideEngineState(const uint clientId, const bool active)
@@ -1021,8 +1014,6 @@ namespace Cloak
 
 	void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			AttemptInitialUncloak(clientId);
@@ -1044,20 +1035,18 @@ namespace Cloak
 				}
 			}
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 			ClearClientData(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			const uint clientId = object->cobj->GetOwnerPlayer();
@@ -1072,12 +1061,11 @@ namespace Cloak
 				}
 			}
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule"))
 		{
 			auto& systemNoCloakAreas = noCloakAreasPerSystem[killedObject->cobj->system];
@@ -1090,29 +1078,30 @@ namespace Cloak
 				}
 			}
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule") && killed)
 		{
 			const uint killedClientId = killedObject->cobj->GetOwnerPlayer();
 			if (HkIsValidClientID(killedClientId))
 				ClearClientData(killedClientId);
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void GuidedInit(CGuided* guided, CGuided::CreateParms& parms)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint objId = parms.ownerId;
 		IObjRW* inspect;
 		StarSystem* starSystem;
 		if (!GetShipInspect(objId, inspect, starSystem))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		IObjRW* ownerTarget = nullptr;
 		inspect->get_target(ownerTarget);
@@ -1127,6 +1116,7 @@ namespace Cloak
 			parms.target = nullptr;
 			parms.subObjId = 0;
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam)
@@ -1153,9 +1143,8 @@ namespace Cloak
 	 */
 	void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (Modules::GetModuleState("CloakModule") && activateCruise.bActivate)
 			SetServerSideEngineState(clientId, true);
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

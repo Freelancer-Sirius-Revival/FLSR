@@ -7,15 +7,18 @@ namespace BatsBotsShipTransferFix
 
 	void __stdcall GFGoodBuy(const SGFGoodBuyInfo& gbi, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		boughtShipArchByClientId.erase(clientId);
 		const GoodInfo* goodInfo = GoodList::find_by_id(gbi.iGoodID);
 		if (!goodInfo || goodInfo->iType != 3)
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 		const GoodInfo* hullGoodInfo = GoodList::find_by_id(goodInfo->iHullGoodID);
 		if (hullGoodInfo && hullGoodInfo->iType == 2)
 			boughtShipArchByClientId[clientId] = hullGoodInfo->iShipGoodID;
+
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	struct Result
@@ -42,15 +45,19 @@ namespace BatsBotsShipTransferFix
 
 	void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (!boughtShipArchByClientId.contains(clientId))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		Archetype::Ship* ship = Archetype::GetShip(boughtShipArchByClientId[clientId]);
 		boughtShipArchByClientId.erase(clientId);
 		if (!ship)
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		float refund = 0;
 		EquipDescList* list = (EquipDescList*)&equipDescriptorList;
@@ -79,5 +86,7 @@ namespace BatsBotsShipTransferFix
 		}
 		if (refund > 0.0f)
 			pub::Player::AdjustCash(clientId, static_cast<int>(std::ceil(refund)));
+
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

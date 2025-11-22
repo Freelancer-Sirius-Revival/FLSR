@@ -112,14 +112,14 @@ namespace Missions
 		{
 			void __stdcall ShipAndSolarColGrpDamage(const IObjRW* damagedObject, const CArchGroup* hitColGrp, const float& incomingDamage, const DamageList* damageList)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(damagedObject, incomingDamage, damageList, hitColGrp);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall ShipAndSolarHullDamage(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				LoopThroughConditions(damagedObject, incomingDamage, damageList, nullptr);
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

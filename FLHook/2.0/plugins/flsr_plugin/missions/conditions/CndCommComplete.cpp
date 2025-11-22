@@ -49,14 +49,13 @@ namespace Missions
 		{
 			void __stdcall CommComplete(unsigned int senderObjId, unsigned int receiverObjId, unsigned int voiceLineId, enum CommResult commResult)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto currentConditions(orderedCndCommComplete);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndCommComplete.contains(condition) && condition->Matches(voiceLineId, receiverObjId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

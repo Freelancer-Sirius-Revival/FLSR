@@ -14,6 +14,7 @@
 #include "CndInZone.h"
 #include "CndJumpInComplete.h"
 #include "CndLaunchComplete.h"
+#include "CndLeaveMsn.h"
 #include "CndOnBase.h"
 #include "CndProjHitCount.h"
 #include "CndSystemSpaceEnter.h"
@@ -544,6 +545,23 @@ namespace Missions
 		return new CndLaunchComplete(conditionParent, label, baseIds);
 	}
 
+	static CndLeaveMsn* ReadCndLeaveMsn(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+
+		const uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const std::string value = ToLower(ini.get_value_string(argNum));
+			if (value != "any")
+				label = CreateIdOrNull(value.c_str());
+		}
+		else
+			PrintErrorToConsole(L"Cnd_LeaveMsn", conditionParent, argNum, L"No target label. Defaulting to ANY.");
+
+		return new CndLeaveMsn(conditionParent, label);
+	}
+
 	static CndOnBase* ReadCndOnBase(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
@@ -797,6 +815,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_LaunchComplete"))
 			return ReadCndLaunchComplete(conditionParent, ini);
+
+		if (ini.is_value("Cnd_LeaveMsn"))
+			return ReadCndLeaveMsn(conditionParent, ini);
 
 		if (ini.is_value("Cnd_OnBase"))
 			return ReadCndOnBase(conditionParent, ini);

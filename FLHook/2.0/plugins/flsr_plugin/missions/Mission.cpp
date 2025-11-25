@@ -5,6 +5,7 @@
 #include "ClientObjectives.h"
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
+#include "conditions/CndLeaveMsn.h"
 #include "ShipSpawning.h"
 #include "LifeTimes.h"
 #include "objectives/ObjDock.h"
@@ -267,6 +268,8 @@ namespace Missions
 	{
 		if (!clientIds.contains(clientId))
 			return;
+
+		Hooks::CndLeaveMsn::EvaluateLeaveMission(id, clientId);
 
 		uint msnId;
 		pub::Player::GetMsnID(clientId, msnId);

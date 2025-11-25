@@ -1006,6 +1006,13 @@ namespace Missions
 			if (const auto& entry = missions.find(id); entry != missions.end())
 				entry->second.RemoveClient(clientId);
 		}
+
+		// Remove all mission cargo to avoid it being left-over in the cargo hold.
+		for (const auto& equip : Players[clientId].equipDescList.equip)
+		{
+			if (equip.bMission)
+				pub::Player::RemoveCargo(clientId, equip.sID, equip.iCount);
+		}
 	}
 
 	void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)

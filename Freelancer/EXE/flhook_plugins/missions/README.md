@@ -450,6 +450,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.
 
+- `Cnd_LeaveMsn` Only players. When leaving the mission by any means, including Mission Abort.
+    1. `STRING|Any :Any` The players to await leaving. Matches any player if `Any` is given.
+
 - `Cnd_OnBase` Only players. Checks if the player is on a base. `Activator` will be the player.
     1. `STRING|Stranger` The players to expect on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player must be on. If none is given, any base will count.
@@ -510,7 +513,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Players by label to receive the cargo.
     1. `STRING` The item nickname to use.
     1. `INTEGER :0` Amount of items to add to cargo.
-    1. `[True|False :False]` Whether this cargo is flagged as mission item. Only works for Commodities.
+    1. `[True|False :False]` Whether this cargo is flagged as mission item. Only works for Commodities. A mission item cannot be sold, traded to other players, or dropped into space. It will be deleted on death, or when a player switches character or leaves the server. It must be manually removed when leaving the mission, or on mission success or abortion.
 
 - `Act_AddLabel` Adds a label to the objects. **This is the only way to assign players to the mission.**
     1. `STRING|Activator` Object by name or label to manipulate.

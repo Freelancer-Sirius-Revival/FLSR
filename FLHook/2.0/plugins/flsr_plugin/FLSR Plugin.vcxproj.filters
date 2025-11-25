@@ -294,6 +294,9 @@
     <ClCompile Include="missions\actions\ActRemoveCargo.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndLeaveMsn.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -594,6 +597,9 @@
     <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="missions\actions\ActRemoveCargo.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndLeaveMsn.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -120,10 +120,11 @@ namespace MissionBoard
 
 	void __stdcall MissionResponse(uint boardIndex, uint origin, bool accepted, uint clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (!accepted)
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		st6::vector<uint> groupMembers;
 		pub::Player::GetGroupMembers(clientId, groupMembers);
@@ -149,11 +150,13 @@ namespace MissionBoard
 			{
 				if (indexEntry.first == boardIndex)
 				{
-					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 					uint base;
 					pub::Player::GetBase(clientId, base);
 					if (!base)
+					{
+						returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 						return;
+					}
 					// Nobody has yet taken upon the offer
 					if (const auto& offerEntry = offersByOfferId.find(indexEntry.second); offerEntry != offersByOfferId.end())
 					{
@@ -164,6 +167,7 @@ namespace MissionBoard
 							if (!offerEntry->second.allowedShipArchetypeIds.contains(shipArchetypeId))
 							{
 								SendMissionOfferRejection(clientId, boardIndex, base, 524390); // From FLSR Dialogs resources
+								returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 								return;
 							}
 						}
@@ -184,20 +188,23 @@ namespace MissionBoard
 					{
 						SendMissionOfferRejection(clientId, boardIndex, base, 524389); // From FLSR Dialogs resources
 					}
+					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 					return;
 				}
 			}
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall AbortMission(uint clientId, uint missionId)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		if (Missions::IsPartOfOfferedJob(clientId))
 		{
 			Missions::RemoveClientFromCurrentOfferedJob(clientId);
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return;
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	static HMODULE LoadContentDll()
@@ -244,16 +251,14 @@ namespace MissionBoard
 
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		const uint index = *((uint*)data + 2);
 		missionBoardOffersMaxIndexByClient[clientId] = std::max<uint>(missionBoardOffersMaxIndexByClient[clientId], index);
+		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}
 
 	bool __stdcall Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint clientId, uint base)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		// Before the Complete Packet it sent, add the custom missions to the list.
 		const auto& entry = offerIdsByBaseId.find(base);
 		if (entry != offerIdsByBaseId.end())
@@ -274,6 +279,8 @@ namespace MissionBoard
 				}
 			}
 		}
+
+		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}
 
@@ -285,19 +292,19 @@ namespace MissionBoard
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		ClearJobBoardClientData(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		ClearJobBoardClientData(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		ClearJobBoardClientData(clientId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

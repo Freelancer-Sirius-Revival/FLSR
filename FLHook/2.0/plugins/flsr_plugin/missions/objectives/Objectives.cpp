@@ -81,26 +81,24 @@ namespace Missions
 		{
 			void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const std::unordered_set<Missions::ObjCndNpcSimulationRunning*> currentConditions(observedObjCndPlayerInSystemSpace);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedObjCndPlayerInSystemSpace.contains(condition) && condition->Matches(clientId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const std::unordered_set<Missions::ObjCndNpcSimulationRunning*> currentConditions(observedObjCndPlayerInSystemSpace);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedObjCndPlayerInSystemSpace.contains(condition) && condition->Matches(clientId))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

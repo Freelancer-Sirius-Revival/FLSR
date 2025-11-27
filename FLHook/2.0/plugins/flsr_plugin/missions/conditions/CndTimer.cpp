@@ -62,14 +62,13 @@ namespace Missions
 		{
 			void __stdcall Elapse_Time_AFTER(float seconds)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto currentConditions(orderedCndTimer);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndTimer.contains(condition) && condition->Matches(seconds))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

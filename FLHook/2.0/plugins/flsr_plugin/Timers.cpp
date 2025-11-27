@@ -9,7 +9,6 @@ namespace Timers {
     };
 
     int __stdcall Update() {
-        returncode = DEFAULT_RETURNCODE;
 
         // call timers
         for (uint i = 0; (i < sizeof(Timers) / sizeof(TIMER)); i++) {
@@ -19,6 +18,7 @@ namespace Timers {
             }
         }
 
+        returncode = DEFAULT_RETURNCODE;
         return 0; // it doesnt matter what we return here since we have set the
                   // return code to "DEFAULT_RETURNCODE", so FLHook will just ignore
                   // it

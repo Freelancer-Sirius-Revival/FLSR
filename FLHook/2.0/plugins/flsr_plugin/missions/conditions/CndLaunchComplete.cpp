@@ -63,11 +63,12 @@ namespace Missions
 		{
 			void __stdcall LaunchComplete_AFTER(unsigned int launchObjId, unsigned int shipId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const uint clientId = HkGetClientIDByShip(shipId);
 				if (!clientId)
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return;
+				}
 
 				const auto currentConditions(orderedCndLaunchComplete);
 				for (const auto& condition : currentConditions)
@@ -82,6 +83,7 @@ namespace Missions
 						condition->ExecuteTrigger();
 					}
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

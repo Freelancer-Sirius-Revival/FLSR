@@ -668,21 +668,19 @@ namespace ShipSpawning
 
 	void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint systemId;
 		pub::SpaceObj::GetSystem(shipId, systemId);
 		if (systemId)
 			AddQueuedShipsToPopulationManager(systemId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		uint systemId;
 		pub::SpaceObj::GetSystem(shipId, systemId);
 		if (systemId)
 			AddQueuedShipsToPopulationManager(systemId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

@@ -80,26 +80,26 @@ namespace Missions
 
 			void __stdcall ObjDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				if (!killedObject->is_player())
+				{
+					returncode = DEFAULT_RETURNCODE;
 					return;
+				}
 
 				LoopThroughConditions(killedObject->cobj->ownerPlayer, killed ? Missions::CndSystemSpaceExit::SystemExitCondition::Explode : Missions::CndSystemSpaceExit::SystemExitCondition::Vanish);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				LoopThroughConditions(clientId, Missions::CndSystemSpaceExit::SystemExitCondition::Dock);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall SystemSwitchOutComplete(unsigned int objId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				LoopThroughConditions(clientId, Missions::CndSystemSpaceExit::SystemExitCondition::Jump);
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

@@ -404,68 +404,68 @@ namespace Mark
 
     void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         currentlyMarkedObjectsPerClient.erase(clientId);
         RefreshMarksForCurrentSystem(clientId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         currentlyMarkedObjectsPerClient.erase(clientId);
         RefreshMarksForCurrentSystem(clientId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         currentlyMarkedObjectsPerClient.erase(clientId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         if (clientId && ship.clientId)
         {
             std::wstring currentCharacterFileName;
             if (HkGetCharFileName(ARG_CLIENTID(clientId), currentCharacterFileName) != HKE_OK ||
                 !markedCharactersPerCharacter.contains(currentCharacterFileName)
             )
+            {
+                returncode = DEFAULT_RETURNCODE;
                 return true;
+            }
 
             std::wstring targetCharacterFileName;
             if (HkGetCharFileName(ARG_CLIENTID(ship.clientId), targetCharacterFileName) != HKE_OK ||
                 !markedCharactersPerCharacter[currentCharacterFileName].contains(targetCharacterFileName) ||
                 cloakedCharacterFileNames.contains(targetCharacterFileName)
             )
+            {
+                returncode = DEFAULT_RETURNCODE;
                 return true;
+            }
 
             MarkObject(clientId, ship.iSpaceID);
         }
 
+        returncode = DEFAULT_RETURNCODE;
         return true;
     }
 
     void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state)
     {
-        returncode = DEFAULT_RETURNCODE;
         currentlyMarkedObjectsPerClient.erase(clientId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
-        returncode = DEFAULT_RETURNCODE;
         UnmarkEverywhere(killedObject->cobj->get_id());
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         const CSimple* obj = killedObject->cobj;
         if (!killed) // Despawned
         {
@@ -492,10 +492,14 @@ namespace Mark
             {
                 std::wstring characterFileName;
                 if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+                {
+                    returncode = DEFAULT_RETURNCODE;
                     return;
+                }
                 DisposeCharacterEverywhere(characterFileName);
             }
         }
+        returncode = DEFAULT_RETURNCODE;
     }
 
     static void ClearCharacteData(const std::wstring characterFileName)
@@ -509,35 +513,37 @@ namespace Mark
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         std::wstring characterFileName;
         if (HkGetCharFileName(info.wszCharname, characterFileName) != HKE_OK)
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
         DisposeCharacterEverywhere(characterFileName);
         ClearCharacteData(characterFileName);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         const std::wstring characterFileName = stows(std::string(characterId.charFilename).substr(0, 11));
         DisposeCharacterEverywhere(characterFileName);
         ClearCharacteData(characterFileName);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     std::wstring characterFileNameToRename;
 
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        returncode = DEFAULT_RETURNCODE;
         if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
             characterFileNameToRename = L"";
+        returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        returncode = DEFAULT_RETURNCODE;
         if (!characterFileNameToRename.empty())
         {
             std::wstring characterFileName;
@@ -564,6 +570,7 @@ namespace Mark
             }
         }
         characterFileNameToRename = L"";
+        returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 }

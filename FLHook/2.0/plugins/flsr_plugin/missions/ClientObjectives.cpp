@@ -213,7 +213,7 @@ namespace Missions
 							previousTLRId = static_cast<CSolar*>(inspect->cobj)->get_prev_trade_ring();
 						else
 							break;
-				}
+					}
 				}
 			}
 			return false;
@@ -233,15 +233,19 @@ namespace Missions
 				return true;
 			}
 
-			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-
 			// Early exit if no "best path" was generated or the character has somehow left by now.
-			if (data.waypointCount == 0 || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId)) 
+			if (data.waypointCount == 0 || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			{
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
+			}
 
 			const auto& missionEntry = missions.find(objectiveByClientId[clientId].missionId);
 			if (missionEntry == missions.end())
+			{
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
+			}
 
 			// Apply object ID for last waypoint because FL drops that on computed paths.
 			auto& lastWaypoint = ((XRequestBestPathEntry*)data.entries)[data.waypointCount - 1];
@@ -354,6 +358,7 @@ namespace Missions
 				pub::Player::SetMissionObjectives(clientId, playerObjective.missionId, objectives.data(), objectives.size(), missionTitle, 0, missionDescription);
 			}
 
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
 
@@ -366,33 +371,31 @@ namespace Missions
 
 		void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 		{
-			returncode = DEFAULT_RETURNCODE;
 			ComputeAndSendClientObjectives(clientId);
+			returncode = DEFAULT_RETURNCODE;
 		}
 
 		void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 		{
-			returncode = DEFAULT_RETURNCODE;
 			ComputeAndSendClientObjectives(clientId);
+			returncode = DEFAULT_RETURNCODE;
 		}
 
 		void __stdcall GoTradelane_AFTER(unsigned int clientId, const XGoTradelane& tradeLaneInfo)
 		{
-			returncode = DEFAULT_RETURNCODE;
 			ComputeAndSendClientObjectives(clientId);
+			returncode = DEFAULT_RETURNCODE;
 		}
 
 		void __stdcall StopTradelane_AFTER(unsigned int clientId, unsigned int p2, unsigned int p3, unsigned int p4)
 		{
-			returncode = DEFAULT_RETURNCODE;
 			ComputeAndSendClientObjectives(clientId);
+			returncode = DEFAULT_RETURNCODE;
 		}
 
 		float elapsedObjectivesTime = 0.0f;
 		void __stdcall Elapse_Time_AFTER(float seconds)
 		{
-			returncode = DEFAULT_RETURNCODE;
-
 			elapsedObjectivesTime += seconds;
 			if (elapsedObjectivesTime > 2.0f)
 			{
@@ -414,6 +417,7 @@ namespace Missions
 					}
 				}
 			}
+			returncode = DEFAULT_RETURNCODE;
 		}
 	}
 }

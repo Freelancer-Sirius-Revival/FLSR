@@ -72,46 +72,43 @@ namespace Missions
 
 			void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				undockedClientIds.insert(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall CharacterInfoReq(unsigned int clientId, bool p2)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				undockedClientIds.erase(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2)
 			{
-				returncode = DEFAULT_RETURNCODE;
 				undockedClientIds.erase(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto reason = undockedClientIds.contains(clientId) ? Missions::CndSystemSpaceEnter::SystemEnterCondition::Launch : Missions::CndSystemSpaceEnter::SystemEnterCondition::Spawn;
-
 				const auto currentConditions(orderedCndSystemSpaceEnter);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndSystemSpaceEnter.contains(condition) && condition->Matches(clientId, reason))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 
 			void __stdcall SystemSwitchOutComplete_AFTER(unsigned int objId, unsigned int clientId)
 			{
-				returncode = DEFAULT_RETURNCODE;
-
 				const auto currentConditions(orderedCndSystemSpaceEnter);
 				for (const auto& condition : currentConditions)
 				{
 					if (observedCndSystemSpaceEnter.contains(condition) && condition->Matches(clientId, Missions::CndSystemSpaceEnter::SystemEnterCondition::Jump))
 						condition->ExecuteTrigger();
 				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

@@ -15,7 +15,6 @@ namespace Missions
 				return;
 			}
 		}
-
 	}
 
 	void ActRemoveCargo::Execute(Mission& mission, const MissionObject& activator) const

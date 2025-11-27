@@ -5,10 +5,11 @@ namespace PlayerLootSpawning
 {
 	void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		if (!killed || !killedObject->is_player() || !(killedObject->cobj->objectClass & CObject::CSHIP_OBJECT))
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 
 		CShip* ship = reinterpret_cast<CShip*>(killedObject->cobj);
 		const int maxSpawnRadius = std::max<int>(2, std::ceil(ship->radiusCentered / 4.0f));
@@ -60,5 +61,6 @@ namespace PlayerLootSpawning
 			equipDescList.remove_equipment_item(equip.sID, equip.iCount);
 		}
 		ship->clear_equip_and_cargo();
+		returncode = DEFAULT_RETURNCODE;
 	}
 }

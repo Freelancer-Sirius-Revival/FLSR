@@ -233,35 +233,35 @@ namespace NpcCloaking
 	float elapsedTimeInSec = 0.0f;
 	void __stdcall Elapse_Time_AFTER(float seconds)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		elapsedTimeInSec += seconds;
 		if (elapsedTimeInSec < 0.2f)
+		{
+			returncode = DEFAULT_RETURNCODE;
 			return;
+		}
 		elapsedTimeInSec = 0.0f;
 
 		Update();
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ShipAndSolarDestroyed(IObjRW* killedObj, bool killed, uint killerObjId)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		const uint objId = killedObj->get_id();
 		objData.erase(objId);
 		objIdsToTransition.erase(objId);
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ShipAndSolarEquipDestroyedHook(IObjRW* obj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList)
 	{
-		returncode = DEFAULT_RETURNCODE;
-
 		const auto& objEntry = objData.find(obj->get_id());
 		if (objEntry != objData.end() && objEntry->second.proxyEquip == equip)
 		{
 			SetTargetCloakState(obj->get_id(), false);
 			objEntry->second.proxyEquip = nullptr;
 		}
+		returncode = DEFAULT_RETURNCODE;
 	}
 
 	static void SendEquipmentActivationState(const uint clientId, const uint objId, const uint subObjId, const bool active)
@@ -313,20 +313,20 @@ namespace NpcCloaking
 
 	bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& packet)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		if (!packet.clientId)
 		{
 			SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
 			SendShieldState(clientId, packet.iSpaceID);
 		}
+		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}
 
 	bool Send_FLPACKET_SERVER_CREATESOLAR_AFTER(uint clientId, FLPACKET_CREATESOLAR& packet)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
 		SendShieldState(clientId, packet.iSpaceID);
+		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}
 }

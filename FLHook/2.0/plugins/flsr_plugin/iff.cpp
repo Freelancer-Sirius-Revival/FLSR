@@ -319,11 +319,10 @@ namespace IFF
 
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         if (clientId && ship.clientId)
             UpdateAttitude(clientId, ship.clientId);
 
+        returncode = DEFAULT_RETURNCODE;
         return true;
     }
 
@@ -410,30 +409,26 @@ namespace IFF
 
     void __stdcall ShipEquipDamage(const IObjRW* damagedObject, const CEquip* hitEquip, const float& incomingDamage, const DamageList* damageList)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         ShipDamaged(damagedObject, incomingDamage, damageList);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall ShipShieldDamage(const IObjRW* damagedObject, const CEShield* hitShield, const float& incomingDamage, const DamageList* damageList)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         ShipDamaged(damagedObject, incomingDamage, damageList);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall ShipColGrpDamage(const IObjRW* damagedObject, const CArchGroup* hitColGrp, const float& incomingDamage, const DamageList* damageList)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         ShipDamaged(damagedObject, incomingDamage, damageList);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall ShipHullDamage(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         ShipDamaged(damagedObject, incomingDamage, damageList);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void DeleteCharacterFromIFF(const std::string& characterFileName)
@@ -454,32 +449,31 @@ namespace IFF
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         DeleteCharacterFromIFF(GetCharacterFileName(info.wszCharname));
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
         DeleteCharacterFromIFF(characterFileName);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     static std::string characterFileNameToRename;
 
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        returncode = DEFAULT_RETURNCODE;
         if (onlyDelete)
             characterFileNameToRename = "";
         else
             characterFileNameToRename = GetCharacterFileName(charname);
+        returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        returncode = DEFAULT_RETURNCODE;
         if (!characterFileNameToRename.empty())
         {
             const std::string& characterFileName = GetCharacterFileName(newCharname);
@@ -508,6 +502,7 @@ namespace IFF
             }
         }
         characterFileNameToRename = "";
+        returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 }

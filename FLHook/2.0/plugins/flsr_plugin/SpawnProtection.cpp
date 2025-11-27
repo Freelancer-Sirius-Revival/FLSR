@@ -59,25 +59,25 @@ namespace SpawnProtection
 
     void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         ActivateSpawnProtection(shipId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId)
     {
-        returncode = DEFAULT_RETURNCODE;
         ActivateSpawnProtection(shipId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId)
     {
-        returncode = DEFAULT_RETURNCODE;
         ActivateSpawnProtection(shipId);
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId)
     {
-        returncode = DEFAULT_RETURNCODE;
         ActivateSpawnProtection(shipId);
+        returncode = DEFAULT_RETURNCODE;
     }
 }

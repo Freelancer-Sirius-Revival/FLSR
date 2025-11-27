@@ -265,7 +265,6 @@ namespace LootBoxes
 
 	bool UserCmd_Open(const uint clientId, const std::wstring& argumentsWS)
 	{
-		returncode = DEFAULT_RETURNCODE;
 		if (ToLower(argumentsWS).find(L"/open") == 0)
 		{
 			const std::wstring& arguments = Trim(GetParamToEnd(argumentsWS, ' ', 1));
@@ -285,6 +284,7 @@ namespace LootBoxes
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
+		returncode = DEFAULT_RETURNCODE;
 		return false;
 	}
 }

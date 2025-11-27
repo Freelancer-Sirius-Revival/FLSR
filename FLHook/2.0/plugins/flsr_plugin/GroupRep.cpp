@@ -59,27 +59,39 @@ namespace GroupReputation
 
     void __stdcall ObjectDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
-        returncode = DEFAULT_RETURNCODE;
-
         if (!killed || killedObject->is_player())
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
 
         const uint killerClientId = HkGetClientIDByShip(killerShipId);
         if (!killerClientId)
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
 
         uint victimReputationId;
         if (killedObject->cobj->objectClass == CObject::CSHIP_OBJECT)
+        {
             victimReputationId = reinterpret_cast<CEqObj*>(killedObject->cobj)->repVibe;
+        }
         else if (killedObject->cobj->objectClass == CObject::CSOLAR_OBJECT)
+        {
             // Solars have their nickname ID directly mapped to their Reputation ID
             victimReputationId = killedObject->cobj->id;
+        }
         else
+        {
+            returncode = DEFAULT_RETURNCODE;
             return;
+        }
 
         uint victimGroupId;
         Reputation::Vibe::GetAffiliation(victimReputationId, victimGroupId, false);
 
         ChangeReputationOfGroup(killerClientId, victimGroupId);
+        returncode = DEFAULT_RETURNCODE;
     }
 }

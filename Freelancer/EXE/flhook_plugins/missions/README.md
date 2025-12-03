@@ -419,7 +419,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[STRING]` The name of the hardpoint that will be used instead of the object’s center. Will be ignored if the hardpoint doesn’t exist.
 
 - `Cnd_HasCargo` Only players. When the given cargo is in cargo hold. Does not count mounted items. **For now only evaluates on bases.**
-    1. `STRING|Stranger` The players to check the cargo hold of.
+    1. `STRING|Stranger` The players by label to check the cargo hold of.
     1. All cargo that must be present, defined in pairs of:
         1. `STRING` The cargo nickname to check for.
         1. `INTEGER :1` The minimum quantity of this cargo required.
@@ -431,11 +431,11 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Root|STRING] :Root` Multiple subsequent entries possible. Lists the target’s collision groups to check the hitpoint loss of.
 
 - `Cnd_InSpace` Only players. Checks whether the player is in space. `Activator` will be the player.
-    1. `STRING|Stranger` The players to expect to be in space.
+    1. `STRING|Stranger` The players by label to expect to be in space.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in. If none is given, any system will count.
 
 - `Cnd_InSystem` Only players. Checks whether the player is within a system. This can be either in space, or docked to a base. `Activator` will be the player.
-    1. `STRING|Stranger` The players to expect to be in a system.
+    1. `STRING|Stranger` The players by label to expect to be in a system.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in.
 
 - `Cnd_InZone` Checks if an object is within a zone. `Activator` will be the object in the zone.
@@ -443,18 +443,18 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING` Multiple subsequent entries possible. The zone nickname to expect the object in.
 
 - `Cnd_JumpInComplete` Only players. When fully jumped into a system. `Activator` will be the jumped-in player.
-    1. `STRING|Stranger` The players to await fully jumping into a system.
+    1. `STRING|Stranger` The players by label to await fully jumping into a system.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname the player jumped into. If none is given, any system will count.
 
 - `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
-    1. `STRING|Stranger` The players to await fully landing on a base.
+    1. `STRING|Stranger` The players by label to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.
 
 - `Cnd_LeaveMsn` Only players. When leaving the mission by any means, including Mission Abort.
-    1. `STRING|Any :Any` The players to await leaving. Matches any player if `Any` is given.
+    1. `STRING|Any :Any` The players by label to await leaving. Matches any mission player if `Any` is given.
 
 - `Cnd_OnBase` Only players. Checks if the player is on a base. `Activator` will be the player.
-    1. `STRING|Stranger` The players to expect on a base.
+    1. `STRING|Stranger` The players by label to expect on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player must be on. If none is given, any base will count.
 
 - `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
@@ -466,12 +466,12 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `[Inflictor|Damaged] :Inflictor` Sets whether `Activator` will be the damage inflictor or the damaged object.
 
 - `Cnd_SystemSpaceEnter` Only players. When entering space of a system. `Activator` will be the player.
-    1. `STRING|Stranger` The players to await entering space.
+    1. `STRING|Stranger` The players by label to await entering space.
     1. `[Jump|Launch|Spawn|Any] :Any` The condition under which space is entered.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname the player entered. If none is given, any system will count.
 
 - `Cnd_SystemSpaceExit` Only players. When leaving space of a system. `Activator` will be the player.
-    1. `STRING|Stranger` The players to await leaving space.
+    1. `STRING|Stranger` The players by label to await leaving space.
     1. `[Jump|Dock|Explode|Vanish|Any] :Any` The condition under which space is left.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname the player left. If none is given, any system will count.
 

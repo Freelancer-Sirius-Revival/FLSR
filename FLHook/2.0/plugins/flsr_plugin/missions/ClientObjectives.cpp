@@ -139,8 +139,10 @@ namespace Missions
 				}
 				else
 				{
-					bestPath.waypointCount = 1;
+					// To set a simple waypoint we still have to set a start and end. Make them the same to be a spot.
+					bestPath.waypointCount = 2;
 					bestPath.entries[0] = destination;
+					bestPath.entries[1] = destination;
 				}
 
 				intermediateDestination = destination;

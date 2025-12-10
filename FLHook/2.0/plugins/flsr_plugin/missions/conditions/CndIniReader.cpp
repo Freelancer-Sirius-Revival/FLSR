@@ -9,6 +9,7 @@
 #include "CndDistVec.h"
 #include "CndHasCargo.h"
 #include "CndHealthDec.h"
+#include "CndHealthInc.h"
 #include "CndInSpace.h"
 #include "CndInSystem.h"
 #include "CndInZone.h"
@@ -24,6 +25,8 @@
 
 namespace Missions
 {
+	const uint RootGroup = CreateID("root");
+
 	static uint CreateIdOrNull(const char* str)
 	{
 		return strlen(str) > 0 ? CreateID(str) : 0;
@@ -362,7 +365,7 @@ namespace Missions
 	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
-		float remainingHitpoints = 0;
+		float relativeHitpointsThreshold = 0;
 		std::unordered_set<uint> colGrpIds;
 		bool damagedIsActivator = false;
 
@@ -376,7 +379,7 @@ namespace Missions
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
-			remainingHitpoints = ini.get_value_float(argNum);
+			relativeHitpointsThreshold = ini.get_value_float(argNum);
 		else
 		{
 			PrintErrorToConsole(L"Cnd_HealthDec", conditionParent, argNum, L"No lost hitpoints threshold. Aborting!");
@@ -405,7 +408,56 @@ namespace Missions
 		if (colGrpIds.empty())
 			colGrpIds.insert(RootGroup);
 
-		return new CndHealthDec(conditionParent, objNameOrLabel, remainingHitpoints, colGrpIds, damagedIsActivator);
+		return new CndHealthDec(conditionParent, objNameOrLabel, relativeHitpointsThreshold, colGrpIds, damagedIsActivator);
+	}
+
+	static CndHealthInc* ReadCndHealthInc(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint objNameOrLabel = 0;
+		float relativeHitpointsThreshold = 0;
+		std::unordered_set<uint> colGrpIds;
+		bool repairedIsActivator = false;
+
+		uint argNum = 0;
+		objNameOrLabel = CreateIdOrNull(ini.get_value_string(argNum));
+		if (objNameOrLabel == 0)
+		{
+			PrintErrorToConsole(L"Cnd_HealthInc", conditionParent, argNum, L"No target obj name or label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+			relativeHitpointsThreshold = ini.get_value_float(argNum);
+		else
+		{
+			PrintErrorToConsole(L"Cnd_HealthInc", conditionParent, argNum, L"No gained hitpoints threshold. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& value = ToLower(ini.get_value_string(argNum));
+			if (value == "repaired")
+				repairedIsActivator = true;
+			else if (value != "inflictor")
+				PrintErrorToConsole(L"Cnd_HealthInc", conditionParent, argNum, L"Invalid activator target. Must be INFLICTOR, or REPAIRED. Defaulting to INFLICTOR.");
+		}
+		argNum++;
+
+		for (const auto maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
+		{
+			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
+			if (value == 0)
+				PrintErrorToConsole(L"Cnd_HealthInc", conditionParent, argNum, L"Invalid collision group name. Ignoring.");
+			else
+				colGrpIds.insert(value);
+		}
+		if (colGrpIds.empty())
+			colGrpIds.insert(RootGroup);
+
+		return new CndHealthInc(conditionParent, objNameOrLabel, relativeHitpointsThreshold, colGrpIds, repairedIsActivator);
 	}
 
 	static CndInSpace* ReadCndInSpace(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -800,6 +852,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_HealthDec"))
 			return ReadCndHealthDec(conditionParent, ini);
+
+		if (ini.is_value("Cnd_HealthInc"))
+			return ReadCndHealthInc(conditionParent, ini);
 
 		if (ini.is_value("Cnd_InSpace"))
 			return ReadCndInSpace(conditionParent, ini);

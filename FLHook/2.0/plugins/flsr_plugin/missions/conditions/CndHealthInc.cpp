@@ -1,4 +1,4 @@
-#include "CndHealthDec.h"
+#include "CndHealthInc.h"
 #include "../Mission.h"
 #include "../../Plugin.h"
 
@@ -6,40 +6,40 @@ namespace Missions
 {
 	const uint RootGroup = CreateID("root");
 
-	std::unordered_set<CndHealthDec*> observedCndHealthDec;
-	std::vector<CndHealthDec*> orderedCndHealthDec;
+	std::unordered_set<CndHealthInc*> observedCndHealthInc;
+	std::vector<CndHealthInc*> orderedCndHealthInc;
 
-	CndHealthDec::CndHealthDec(const ConditionParent& parent,
-								const uint objNameOrLabel,
-								const float relativeHitpointsThreshold,
-								const std::unordered_set<uint> colGrpIds,
-								const bool damagedIsActivator) :
+	CndHealthInc::CndHealthInc(const ConditionParent& parent,
+		const uint objNameOrLabel,
+		const float relativeHitpointsThreshold,
+		const std::unordered_set<uint> colGrpIds,
+		const bool repairedIsActivator) :
 		Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		relativeHitpointsThreshold(relativeHitpointsThreshold),
 		colGrpIds(colGrpIds),
-		damagedIsActivator(damagedIsActivator)
+		repairedIsActivator(repairedIsActivator)
 	{}
 
-	CndHealthDec::~CndHealthDec()
+	CndHealthInc::~CndHealthInc()
 	{
 		Unregister();
 	}
 
-	void CndHealthDec::Register()
+	void CndHealthInc::Register()
 	{
-		if (observedCndHealthDec.insert(this).second)
-			orderedCndHealthDec.push_back(this);
+		if (observedCndHealthInc.insert(this).second)
+			orderedCndHealthInc.push_back(this);
 	}
 
-	void CndHealthDec::Unregister()
+	void CndHealthInc::Unregister()
 	{
-		observedCndHealthDec.erase(this);
-		if (const auto it = std::find(orderedCndHealthDec.begin(), orderedCndHealthDec.end(), this); it != orderedCndHealthDec.end())
-			orderedCndHealthDec.erase(it);
+		observedCndHealthInc.erase(this);
+		if (const auto it = std::find(orderedCndHealthInc.begin(), orderedCndHealthInc.end(), this); it != orderedCndHealthInc.end())
+			orderedCndHealthInc.erase(it);
 	}
 
-	bool CndHealthDec::Matches(const IObjRW* damagedObject, const float incomingDamage, const DamageList* damageList, const CArchGroup* hitColGrp)
+	bool CndHealthInc::Matches(const IObjRW* damagedObject, const float incomingDamage, const DamageList* damageList, const CArchGroup* hitColGrp)
 	{
 		if (hitColGrp == nullptr)
 		{
@@ -53,11 +53,11 @@ namespace Missions
 		}
 
 		const MissionObject inflictorObj = damageList->is_inflictor_a_player()
-											? MissionObject(MissionObjectType::Client, HkGetClientIDByShip(damageList->get_inflictor_id()))
-											: MissionObject(MissionObjectType::Object, damageList->get_inflictor_id());
+			? MissionObject(MissionObjectType::Client, HkGetClientIDByShip(damageList->get_inflictor_id()))
+			: MissionObject(MissionObjectType::Object, damageList->get_inflictor_id());
 
 		MissionObject cndActivator = inflictorObj;
-		if (damagedIsActivator)
+		if (repairedIsActivator)
 		{
 			activator = damagedObject->is_player()
 				? MissionObject(MissionObjectType::Client, damagedObject->cobj->ownerPlayer)
@@ -80,8 +80,8 @@ namespace Missions
 		if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
 		{
 			const MissionObject object = damagedObject->is_player()
-											? MissionObject(MissionObjectType::Client, damagedObject->cobj->ownerPlayer)
-											: MissionObject(MissionObjectType::Object, damagedObject->get_id());
+				? MissionObject(MissionObjectType::Client, damagedObject->cobj->ownerPlayer)
+				: MissionObject(MissionObjectType::Object, damagedObject->get_id());
 			for (const auto& labelObject : objectsByLabel->second)
 			{
 				if (object == labelObject)
@@ -96,21 +96,21 @@ namespace Missions
 
 	static void LoopThroughConditions(const IObjRW* damagedObject, const float incomingDamage, const DamageList* damageList, const CArchGroup* hitColGrp)
 	{
-		// Ignore any damage caused by repair guns.
-		if (incomingDamage <= 0.0f)
+		// Only allow damage caused by repair guns.
+		if (incomingDamage >= 0.0f)
 			return;
 
-		const auto currentConditions(orderedCndHealthDec);
+		const auto currentConditions(orderedCndHealthInc);
 		for (const auto& condition : currentConditions)
 		{
-			if (observedCndHealthDec.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
+			if (observedCndHealthInc.contains(condition) && condition->Matches(damagedObject, incomingDamage, damageList, hitColGrp))
 				condition->ExecuteTrigger();
 		}
 	}
 
 	namespace Hooks
 	{
-		namespace CndHealthDec
+		namespace CndHealthInc
 		{
 			void __stdcall ShipAndSolarColGrpDamage(const IObjRW* damagedObject, const CArchGroup* hitColGrp, const float& incomingDamage, const DamageList* damageList)
 			{

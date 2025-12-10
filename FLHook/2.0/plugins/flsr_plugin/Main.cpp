@@ -21,6 +21,7 @@
 #include "Missions/conditions/CndDistVec.h"
 #include "Missions/conditions/CndHasCargo.h"
 #include "Missions/conditions/CndHealthDec.h"
+#include "Missions/conditions/CndHealthInc.h"
 #include "Missions/conditions/CndInSpace.h"
 #include "Missions/conditions/CndInSystem.h"
 #include "Missions/conditions/CndInZone.h"
@@ -302,6 +303,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipAndSolarHullDamage, PLUGIN_ShipHullDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipAndSolarColGrpDamage, PLUGIN_SolarColGrpDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthDec::ShipAndSolarHullDamage, PLUGIN_SolarHullDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthInc::ShipAndSolarColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthInc::ShipAndSolarHullDamage, PLUGIN_ShipHullDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthInc::ShipAndSolarColGrpDamage, PLUGIN_SolarColGrpDmg, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndHealthInc::ShipAndSolarHullDamage, PLUGIN_SolarHullDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSpace::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSpace::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));

@@ -297,6 +297,9 @@
     <ClCompile Include="missions\conditions\CndLeaveMsn.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndHealthInc.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -599,6 +602,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\conditions\CndLeaveMsn.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHealthInc.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>

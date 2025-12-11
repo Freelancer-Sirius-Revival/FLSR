@@ -81,6 +81,13 @@ struct SSPObjCollisionInfo
 	DWORD dwTargetShip;
 };
 
+struct XActivateObject
+{
+	uint	spaceObjId;
+	bool	activate;
+	uint	dockIndex;
+};
+
 struct XActivateEquip
 {
 	uint	iSpaceID;

@@ -4826,7 +4826,7 @@ namespace pub
 
 		public:
 			uint launchFromObject;
-			uint x10; // 2, cannot be -1, defaults to -1
+			uint dockIndex;
 			uint x14; // 1, cannot be 0, defaults to 0
 		};
 

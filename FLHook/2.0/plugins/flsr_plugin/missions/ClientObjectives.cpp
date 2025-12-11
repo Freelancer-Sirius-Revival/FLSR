@@ -27,6 +27,41 @@ namespace Missions
 			return objectiveByClientId.contains(clientId);
 		}
 
+		static bool AreObjectivesEqual(const std::vector<pub::Player::MissionObjective>& objectivesA, const std::vector<pub::Player::MissionObjective>& objectivesB)
+		{
+			if (objectivesA.size() != objectivesB.size())
+				return false;
+
+			for (size_t index = 0, length = objectivesB.size(); index < length; index++)
+			{
+				if (objectivesA[index].type != objectivesB[index].type)
+					return false;
+
+				const size_t bufferSize = 1024;
+				char flatFmtStrA[bufferSize];
+				const size_t sizeA = objectivesA[index].message.flatten(flatFmtStrA, bufferSize);
+				char flatFmtStrB[bufferSize];
+				const size_t sizeB = objectivesB[index].message.flatten(flatFmtStrB, bufferSize);
+				if (sizeA != sizeB || std::memcmp(flatFmtStrA, flatFmtStrB, sizeA) != 0)
+					return false;
+			}
+
+			return true;
+		}
+
+		void static SetObjectives(const uint clientId, const uint missionId, const MissionOffer& missionOffer, const std::vector<pub::Player::MissionObjective>& objectives)
+		{
+			if(!AreObjectivesEqual(computedObjectivesByClientId[clientId], objectives))
+			{
+				// Save the current objectives for later comparison.
+				computedObjectivesByClientId[clientId] = objectives;
+
+				FmtStr missionTitle(missionOffer.title, 0);
+				FmtStr missionDescription(missionOffer.description, 0);
+				pub::Player::SetMissionObjectives(clientId, missionId, objectives.data(), objectives.size(), missionTitle, 0, missionDescription);
+			}
+		}
+
 		/*
 		   The final computed best path waypoint never contains the Object Id of the target object.
 		   Save it here from the original request to re-apply it afterwards.
@@ -104,8 +139,10 @@ namespace Missions
 				}
 				else
 				{
-					bestPath.waypointCount = 1;
+					// To set a simple waypoint we still have to set a start and end. Make them the same to be a spot.
+					bestPath.waypointCount = 2;
 					bestPath.entries[0] = destination;
+					bestPath.entries[1] = destination;
 				}
 
 				intermediateDestination = destination;
@@ -114,30 +151,16 @@ namespace Missions
 			}
 			else
 			{
-				// Just for Display message stuff without waypoints
+				// Just to display messages without waypoints
+				const auto& missionEntry = missions.find(objectiveByClientId[clientId].missionId);
+				if (missionEntry != missions.end())
+				{
+					pub::Player::MissionObjective objective;
+					objective.message = FmtStr(objectiveEntry->second.message, 0);
+					objective.type = pub::Player::MissionObjectiveType::MissionText | pub::Player::MissionObjectiveType::SimpleEntry | pub::Player::MissionObjectiveType::ActiveLog;
+					SetObjectives(clientId, objectiveEntry->second.missionId, missionEntry->second.offer, std::vector<pub::Player::MissionObjective>({ objective }));
+				}
 			}
-		}
-
-		static bool AreObjectivesEqual(const std::vector<pub::Player::MissionObjective>& objectivesA, const std::vector<pub::Player::MissionObjective>& objectivesB)
-		{
-			if (objectivesA.size() != objectivesB.size())
-				return false;
-
-			for (size_t index = 0, length = objectivesB.size(); index < length; index++)
-			{
-				if (objectivesA[index].type != objectivesB[index].type)
-					return false;
-
-				const size_t bufferSize = 1024;
-				char flatFmtStrA[bufferSize];
-				const size_t sizeA = objectivesA[index].message.flatten(flatFmtStrA, bufferSize);
-				char flatFmtStrB[bufferSize];
-				const size_t sizeB = objectivesB[index].message.flatten(flatFmtStrB, bufferSize);
-				if (sizeA != sizeB || std::memcmp(flatFmtStrA, flatFmtStrB, sizeA) != 0)
-					return false;
-			}
-
-			return true;
 		}
 
 		static bool AppendLaunchToSpaceObjectiveIfNecessary(const uint clientId, std::vector<pub::Player::MissionObjective>& objectives)
@@ -347,16 +370,7 @@ namespace Missions
 				objectives.push_back(finalObjective);
 			}
 
-			// Check whether the client needs a packet with new objectives. This must be done to ensure constant re-generation of best path will not flood the network.
-			if (!AreObjectivesEqual(computedObjectivesByClientId[clientId], objectives))
-			{
-				// Save the current objectives for later comparison.
-				computedObjectivesByClientId[clientId] = objectives;
-
-				FmtStr missionTitle(missionEntry->second.offer.title, 0);
-				FmtStr missionDescription(missionEntry->second.offer.description, 0);
-				pub::Player::SetMissionObjectives(clientId, playerObjective.missionId, objectives.data(), objectives.size(), missionTitle, 0, missionDescription);
-			}
+			SetObjectives(clientId, playerObjective.missionId, missionEntry->second.offer, objectives);
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;

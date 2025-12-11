@@ -233,7 +233,7 @@ public:
 	virtual void unknown_54(uint iClientID, uint iDunno, uint iDunno2, uint iDunno3);
 	virtual int Send_FLPACKET_COMMON_UPDATEOBJECT(uint iClientID, SSPObjUpdateInfoSimple& pUpdate);
 	virtual bool Send_FLPACKET_SERVER_DESTROYOBJECT(uint iClientID, FLPACKET_DESTROYOBJECT& pDestroy);
-	virtual bool Send_FLPACKET_SERVER_ACTIVATEOBJECT(uint iClientID, XActivateEquip& aq);
+	virtual bool Send_FLPACKET_SERVER_ACTIVATEOBJECT(uint iClientID, XActivateObject& aq);
 	virtual bool Send_FLPACKET_SERVER_SYSTEM_SWITCH_OUT(uint iClientID, FLPACKET_SYSTEM_SWITCH_OUT& switchOutPacket);
 	virtual bool Send_FLPACKET_SERVER_SYSTEM_SWITCH_IN(uint iClientID, FLPACKET_SYSTEM_SWITCH_IN& switchInPacket);
 	virtual bool Send_FLPACKET_SERVER_LAND(uint iClientID, FLPACKET_LAND& pLand);

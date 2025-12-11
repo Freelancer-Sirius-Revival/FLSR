@@ -475,69 +475,98 @@ namespace ShipSpawning
 		pub::AI::SubmitState(shipId, &personality);
 	}
 
-	static bool LaunchNpcFromNpc(uint shipArchetypeId, uint launchShipId, Vector& startPos, Matrix& startOrientation, Vector& startVelocity)
+	static bool GetLaunchPositionAndDock(const uint shipArchetypeId, uint launchObjId, Vector& startPos, Matrix& startOrientation, int& dockIndex)
 	{
+		dockIndex = 0;
+		_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
+		st6::vector<uint> missionProps;
+		if (!GetMissionProperties(shipArchetypeId, missionProps))
+			return false;
+
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		if (GetShipInspect(launchShipId, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT)
+		if (!GetShipInspect(launchObjId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
+			return false;
+		
+		const auto& launchObj = reinterpret_cast<CEqObj*>(inspect->cobj);
+		const auto& launchObjArchetype = reinterpret_cast<Archetype::EqObj*>(launchObj->archetype);
+		switch (launchObjArchetype->iArchType)
 		{
-			const auto archetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
-			if (archetype->dockInfo.size() > 0)
+			case ObjectType::DockingRing:
+			case ObjectType::JumpGate:
+			case ObjectType::JumpHole:
+			case ObjectType::AirlockGate:
+				startPos = launchObj->vPos;
+				startOrientation = launchObj->mRot;
+				dockIndex = 0;
+				return true;
+			default:
+				break;
+		}
+
+		if (launchObjArchetype->dockInfo.size() > 0 && launchObj->launch_pos(startPos, startOrientation, dockIndex) != 0)
+			return true;
+		
+		return false;
+	}
+
+	static bool LaunchNpcFromObject(uint shipId, uint launchObjId, int dockIndex)
+	{
+		IObjRW* launchObjInspect;
+		StarSystem* starSystem;
+		if (!GetShipInspect(launchObjId, launchObjInspect, starSystem) || !(launchObjInspect->cobj->objectClass & CObject::CEQOBJ_MASK))
+			return false;
+		
+		const auto& launchObj = reinterpret_cast<CEqObj*>(launchObjInspect->cobj);
+		const auto& launchObjArchetype = reinterpret_cast<Archetype::EqObj*>(launchObj->archetype);
+		switch (launchObjArchetype->iArchType)
+		{
+			case ObjectType::DockingRing:
+				pub::SpaceObj::Launch(shipId, launchObjId, 0);
+				return true;
+
+			case ObjectType::JumpGate:
+			case ObjectType::JumpHole:
+			case ObjectType::AirlockGate:
+				pub::SpaceObj::JumpIn(shipId, launchObjId);
+				return true;
+
+			case ObjectType::Fighter:
+			case ObjectType::Freighter:
+			case ObjectType::Transport:
+			case ObjectType::Mining:
+			case ObjectType::Gunboat:
+			case ObjectType::Cruiser:
+			case ObjectType::Capital:
+			case ObjectType::Station:
 			{
-				const float launchSpeed = 100.0f;
-				Archetype::DockType dockType;
-				Transform dockMount;
-				Transform dockPoint1;
-				Transform dockPoint2;
-				float dockRadius;
-				inspect->get_dock_hardpoints(0, &dockType, &dockMount, &dockPoint1, &dockPoint2, &dockRadius);
-				startPos = dockMount.position;
-				const auto& rotationMatrix = SetupTransform({ 0, 0, 0 }, { 0, 180, 0 });
-				TransformMatrix dockMountMatrix = SetupTransform({ 0, 0, 0 }, { 0, 0, 0 });
-				dockMountMatrix.d[0][0] = dockMount.orientation.data[0][0];
-				dockMountMatrix.d[0][1] = dockMount.orientation.data[0][1];
-				dockMountMatrix.d[0][2] = dockMount.orientation.data[0][2];
-				dockMountMatrix.d[1][0] = dockMount.orientation.data[1][0];
-				dockMountMatrix.d[1][1] = dockMount.orientation.data[1][1];
-				dockMountMatrix.d[1][2] = dockMount.orientation.data[1][2];
-				dockMountMatrix.d[2][0] = dockMount.orientation.data[2][0];
-				dockMountMatrix.d[2][1] = dockMount.orientation.data[2][1];
-				dockMountMatrix.d[2][2] = dockMount.orientation.data[2][2];
-				dockMountMatrix = MultiplyMatrix(dockMountMatrix, rotationMatrix);
-				startOrientation.data[0][0] = dockMountMatrix.d[0][0];
-				startOrientation.data[0][1] = dockMountMatrix.d[0][1];
-				startOrientation.data[0][2] = dockMountMatrix.d[0][2];
-				startOrientation.data[1][0] = dockMountMatrix.d[1][0];
-				startOrientation.data[1][1] = dockMountMatrix.d[1][1];
-				startOrientation.data[1][2] = dockMountMatrix.d[1][2];
-				startOrientation.data[2][0] = dockMountMatrix.d[2][0];
-				startOrientation.data[2][1] = dockMountMatrix.d[2][1];
-				startOrientation.data[2][2] = dockMountMatrix.d[2][2];
-				startVelocity = { dockPoint1.position.x - dockMount.position.x, dockPoint1.position.y - dockMount.position.y, dockPoint1.position.z - dockMount.position.z };
-				const float length = std::sqrt(std::pow(startVelocity.x, 2) + std::pow(startVelocity.y, 2) + std::pow(startVelocity.z, 2));
-				startVelocity.x = startVelocity.x / length * launchSpeed;
-				startVelocity.y = startVelocity.y / length * launchSpeed;
-				startVelocity.z = startVelocity.z / length * launchSpeed;
-				const Vector parentVelocity = inspect->get_velocity();
-				startVelocity.x += parentVelocity.x;
-				startVelocity.y += parentVelocity.y;
-				startVelocity.z += parentVelocity.z;
+				Vector globalShipHpPosition;
+				Matrix globalShipHpOrientation;
+				IObjRW* shipInspect;
+				if (!GetShipInspect(shipId, shipInspect, starSystem) || shipInspect->get_hardpoint("hpmount", &globalShipHpPosition, &globalShipHpOrientation) != 0)
+					return false;
+
+				const auto& globalShipPosition = shipInspect->cobj->vPos;
+				const Vector offset = { globalShipPosition.x - globalShipHpPosition.x , globalShipPosition.y - globalShipHpPosition.y, globalShipPosition.z - globalShipHpPosition.z };
+				const Vector newShipPosition = { globalShipPosition.x + offset.x, globalShipPosition.y + offset.y, globalShipPosition.z + offset.z, };
+				pub::SpaceObj::Relocate(shipId, shipInspect->cobj->system, newShipPosition, shipInspect->cobj->mRot);
+
+				// TODO: Set the docking bay as "in use"
+				//pub::SpaceObj::Activate(launchObjId, true, dockIndex);
+
+				pub::AI::DirectiveLaunchOp launchOp;
+				launchOp.fireWeapons = false;
+				launchOp.launchFromObject = launchObjId;
+				launchOp.dockIndex = dockIndex;
+				launchOp.x14 = 1;
+				pub::AI::SubmitDirective(shipId, &launchOp);
+
+				// TODO: Close the dock door
+				//pub::ReportFreeTerminal(launchObjId, dockIndex);
 				return true;
 			}
 		}
 		return false;
-	}
-
-	static void LaunchNpcFromSolar(const uint shipId, uint launchObjId)
-	{
-		IObjRW* inspect;
-		StarSystem* starSystem;
-		if (GetShipInspect(launchObjId, inspect, starSystem) && inspect->cobj->objectClass == CObject::CSOLAR_OBJECT)
-		{
-			const auto solarArchetype = dynamic_cast<Archetype::EqObj*>(inspect->cobj->archetype);
-			if (solarArchetype->dockInfo.size() > 0)
-				pub::SpaceObj::Launch(shipId, launchObjId, 0);
-		}
 	}
 
 	uint CreateNPC(const NpcCreationParams& params)
@@ -548,23 +577,18 @@ namespace ShipSpawning
 		shipInfo.iFlag = 1;
 		shipInfo.iSystem = params.systemId;
 		shipInfo.iShipArchetype = params.archetypeId;
-		shipInfo.vPos = params.position;
-		shipInfo.mOrientation = params.orientation;
 		shipInfo.iLoadout = params.loadoutId;
 		shipInfo.Costume = params.costume.head || params.costume.body ? params.costume : CreatePilotCostume(params.faction, voiceId);
 		shipInfo.iPilotVoice = voiceId;
 		shipInfo.iHitPointsLeft = params.hitpoints;
 		shipInfo.iLevel = params.level;
-		Vector launchPosition;
-		Matrix launchOrientation;
-		Vector launchSpeed;
-		if (params.launchObjId && LaunchNpcFromNpc(params.archetypeId, params.launchObjId, launchPosition, launchOrientation, launchSpeed))
+		int launchDockIndex = -1;
+		if (!params.launchObjId || !GetLaunchPositionAndDock(params.archetypeId, params.launchObjId, shipInfo.vPos, shipInfo.mOrientation, launchDockIndex))
 		{
-			shipInfo.vPos = launchPosition;
-			shipInfo.mOrientation = launchOrientation;
-			shipInfo.vLinearVelocity = launchSpeed;
+			launchDockIndex = -1;
+			shipInfo.vPos = params.position;
+			shipInfo.mOrientation = params.orientation;
 		}
-
 		// Do not set the cargo descriptors for ships. They must be probably allocated in "old ways" of FL's own code - incompatible to today's "new".
 
 		// Formation name is displayed above the pilot name in wireframe display.
@@ -603,8 +627,8 @@ namespace ShipSpawning
 
 		pub::AI::update_formation_state(objId, objId, { 0, 0, 0 });
 
-		if (params.launchObjId)
-			LaunchNpcFromSolar(objId, params.launchObjId);
+		if (launchDockIndex != -1)
+			LaunchNpcFromObject(objId, params.launchObjId, launchDockIndex);
 
 		bool foundPlayerInSameSystem = false;
 		struct PlayerData* playerData = 0;

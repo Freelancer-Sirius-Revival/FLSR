@@ -43,12 +43,12 @@ namespace Missions
 	{
 		if (hitColGrp == nullptr)
 		{
-			if (!colGrpIds.contains(RootGroup) || (damagedObject->cobj->get_max_hit_pts() * relativeHitpointsThreshold < damagedObject->cobj->hitPoints - incomingDamage))
+			if (!colGrpIds.contains(RootGroup) || (damagedObject->cobj->get_max_hit_pts() * relativeHitpointsThreshold > damagedObject->cobj->hitPoints - incomingDamage))
 				return false;
 		}
 		else
 		{
-			if (!colGrpIds.contains(CreateID(hitColGrp->colGrp->name.value)) || hitColGrp->GetMaxHitPoints() * relativeHitpointsThreshold < hitColGrp->hitPts - incomingDamage)
+			if (!colGrpIds.contains(CreateID(hitColGrp->colGrp->name.value)) || hitColGrp->GetMaxHitPoints() * relativeHitpointsThreshold > hitColGrp->hitPts - incomingDamage)
 				return false;
 		}
 

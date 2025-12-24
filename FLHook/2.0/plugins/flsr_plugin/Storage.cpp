@@ -129,7 +129,7 @@ namespace Storage
 	}
 
 	static bool initialized = false;
-	void InitializeStorageSystem()
+	void Initialize()
 	{
 		if (initialized)
 			return;

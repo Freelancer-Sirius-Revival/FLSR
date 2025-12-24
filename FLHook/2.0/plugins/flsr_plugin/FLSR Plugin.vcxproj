@@ -247,6 +247,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Insurance.h" />
     <ClInclude Include="missions\actions\ActDockInstant.h" />
     <ClInclude Include="missions\actions\ActRemoveCargo.h" />
     <ClInclude Include="missions\actions\ActSetDockState.h" />

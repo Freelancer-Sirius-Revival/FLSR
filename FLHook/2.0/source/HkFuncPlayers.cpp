@@ -1242,6 +1242,35 @@ HK_ERROR HkAntiCheat(uint iClientID) {
 
 HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint)
 {
+    HK_GET_CLIENTID(clientId, wscCharname);
+
+    if ((clientId == -1) || HkIsInCharSelectMenu(clientId))
+        return HKE_NO_CHAR_SELECTED;
+
+    if (!Players[clientId].enteredBase)
+    {
+        Players[clientId].enteredBase = Players[clientId].iBaseID;
+        Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true, clientId);
+        Players[clientId].enteredBase = 0;
+    }
+    else
+    {
+        Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true, clientId);
+    }
+
+    // Add to check-list which is being compared to the users equip-list when
+    // saving char to fix "Ship or Equipment not sold on base" kick
+    EquipDesc ed;
+    ed.sID = Players[clientId].lastEquipId++;
+    ed.iCount = 1;
+    ed.iArchID = iGoodID;
+    Players[clientId].lShadowEquipDescList.add_equipment_item(ed, false);
+
+    return HKE_OK;
+}
+
+HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint, int iNumItems, bool bMounted)
+{
     typedef bool(__stdcall* _AddCargoDocked)(uint iGoodID, CacheString*& hardpoint, int iNumItems, float fHealth, int bMounted, int bMission, uint iOne);
     static _AddCargoDocked AddCargoDocked = 0;
     if (!AddCargoDocked)
@@ -1252,7 +1281,8 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::st
     if (clientId == -1 || HkIsInCharSelectMenu(clientId))
         return HKE_PLAYER_NOT_LOGGED_IN;
 
-    uint base, location = 0;
+    uint base = 0;
+    uint location = 0;
     pub::Player::GetBase(clientId, base);
     pub::Player::GetLocation(clientId, location);
     // trick cheat detection
@@ -1272,8 +1302,7 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::st
     PlayerData* playerData = &Players[clientId];
     int iOne = 1;
     int iMission = 0;
-    int iMounted = 1;
-    int iNumItems = 1;
+    int iMounted = bMounted;
     float fHealth = 1.0f;
     __asm {
         push iOne

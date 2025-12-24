@@ -43,9 +43,7 @@ namespace Globals {
     const std::string CLOAK_CONFIG_FILE = "\\flhook_plugins\\FLSR-Cloak.cfg";
     const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
     const std::string LOOTBOXES_CONFIG_FILE = "\\flhook_plugins\\FLSR-LootBoxes.cfg";
-    const std::string FLHOOKUSER_FILE = "\\flhookuser.ini";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
-    const std::string INSURANCE_STORE = "\\flhook_plugins\\flsr-insurance\\";
     const std::string LIBRELANCER_SDK = "\\flhook_plugins\\librelancer-sdk\\";
     const std::string CMP_DUMP_FOLDER = "\\flhook_plugins\\flsr-cmpdumps\\";
     const std::string Equip_WHITELIST_FILE = "\\flhook_plugins\\FLSR-EquipWhiteList.cfg";
@@ -195,25 +193,8 @@ namespace Hooks {
     void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
-    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
-    void __stdcall BaseEnter_AFTER(unsigned int iBaseID, unsigned int iClientID);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }
-
-namespace Insurance
-{
-    extern float insuranceEquipmentCostFactor;
-
-    void CreateNewInsurance(const uint clientId, bool onlyFreeItems);
-    void UseInsurance(const uint clientId);
-    bool IsInsuranceRequested(const uint clientId);
-    bool IsInsurancePresent(const uint clientId);
-    void UserCMD_INSURANCE(const uint clientId, const std::wstring& argumentsWS);
-    void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);
-    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
-    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
-    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
-}
 
 namespace IFF
 {
@@ -433,7 +414,7 @@ namespace SpawnProtection
 
 namespace Storage
 {
-    void InitializeStorageSystem();
+    void Initialize();
     bool UserCmd_Storage(const uint clientId, const std::wstring& arguments);
 }
 

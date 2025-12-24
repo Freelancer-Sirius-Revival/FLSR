@@ -609,6 +609,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="NameLimiter.h" />
+    <ClInclude Include="Insurance.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

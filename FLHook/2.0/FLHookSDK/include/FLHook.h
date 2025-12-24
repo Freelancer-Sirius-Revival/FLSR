@@ -522,6 +522,7 @@ IMPORT std::string HkGetPlayerSystemS(uint iClientID);
 IMPORT bool IsInRange(uint iClientID, float fDistance);
 IMPORT std::wstring GetLocation(uint iClientID);
 IMPORT HK_ERROR HkAddEquip(const std::wstring& wscCharname, uint iGoodID, const std::string& scHardpoint);
+IMPORT HK_ERROR HkAddEquip(const std::wstring& wscCharname, uint iGoodID, const std::string& scHardpoint, int iNumItems, bool bMounted);
 IMPORT HK_ERROR HkAntiCheat(uint iClientID);
 IMPORT void HkDelayedKick(uint iClientID, uint secs);
 IMPORT HK_ERROR HkDeleteCharacter(CAccount* acc, std::wstring& wscCharname);

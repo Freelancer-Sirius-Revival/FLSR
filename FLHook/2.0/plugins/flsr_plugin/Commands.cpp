@@ -535,7 +535,6 @@ namespace Commands
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
         {L"/contributor", UserCMD_Contributor},
-        {L"/autoinsurance", Insurance::UserCMD_INSURANCE},
         {L"/help", UserCmd_HELP},
         {L"/cloak", Cloak::UserCmd_CLOAK},
         {L"/c", Cloak::UserCmd_CLOAK},

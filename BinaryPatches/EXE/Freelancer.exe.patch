@@ -220,10 +220,6 @@ File: EXE\Freelancer.exe
 # Maximum value of any single good. ~Dev
 1CAEE8: 999999999f	[ 9999999f ]
 
-# Repair cost based on ship cost, not armor. - adoxa
-0B3A0E: 50 FF 15 FC 61 5C 00 90 89 44 E4 14 FF 15 58 61 5C 00 89 C1 FF 15 18 64 5C 00 D9 E8	[ 3B C7 74 2A 50 FF 15 FC 61 5C 00 83 C4 04 3B C7 89 44 24 10 74 18 D9 05 DC 75 5C 00 ]
-0B3A30: 58	[ 1C ]
-
 # Resale % for ships. - Dev
 1D6D38: 0.5f	[ 0.8f ]
 

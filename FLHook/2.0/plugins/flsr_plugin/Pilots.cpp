@@ -893,19 +893,26 @@ namespace Pilots
 									block.attack_order[index].flag = 0;
 
 									std::string flags = ToLower(ini.get_value_string(2));
+									std::vector<std::string> splitFlags;
 									size_t delimiterPos;
 									while ((delimiterPos = flags.find('|')) != std::string::npos)
 									{
-										const std::string line = Trim(flags.substr(0, delimiterPos));
-										if (line == "guns")
-											block.attack_order[index].flag |= 1;
-										else if (line == "guided")
-											block.attack_order[index].flag |= 2;
-										else if (line == "unguided")
-											block.attack_order[index].flag |= 4;
-										else if (line == "torpedo")
-											block.attack_order[index].flag |= 8;
+										splitFlags.push_back(flags.substr(0, delimiterPos));
 										flags.erase(0, delimiterPos + 1);
+									}
+									splitFlags.push_back(flags.substr(0, delimiterPos));
+
+									for (auto& flag : splitFlags)
+									{
+										flag = Trim(flag);
+										if (flag == "guns")
+											block.attack_order[index].flag |= 1;
+										else if (flag == "guided")
+											block.attack_order[index].flag |= 2;
+										else if (flag == "unguided")
+											block.attack_order[index].flag |= 4;
+										else if (flag == "torpedo")
+											block.attack_order[index].flag |= 8;
 									}
 
 									if (endOfList)

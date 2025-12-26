@@ -171,6 +171,7 @@ namespace Insurance
                 typeString = "consumables";
                 break;
         }
+        std::filesystem::create_directory(outputDirectory);
         IniWrite(filePath, "Insurance", "type", typeString.c_str());
     }
 
@@ -181,6 +182,7 @@ namespace Insurance
         insurance.items = entries;
 
         const auto& filePath = GetInsuranceFilePath(clientId);
+        std::filesystem::create_directory(outputDirectory);
         IniWrite(filePath, "Insurance", "deposit", std::to_string(depositedMoney));
         const size_t bufferSize = 65535;
         char* keyValues = static_cast<char*>(malloc(bufferSize));

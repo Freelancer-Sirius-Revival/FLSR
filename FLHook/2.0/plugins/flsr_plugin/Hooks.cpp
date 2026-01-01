@@ -111,25 +111,4 @@ namespace Hooks
         killer.erase(std::remove_if(killer.begin(), killer.end(), [](unsigned char c) { return std::isspace(c); }), killer.end());
         returncode = DEFAULT_RETURNCODE;
     }
-
-
-    //BaseEnter_AFTER
-    void __stdcall BaseEnter_AFTER(unsigned int iBaseID,unsigned int iClientID)
-    {
-        if (Modules::GetModuleState("InsuranceModule"))
-        {
-            Insurance::UseInsurance(iClientID);
-        }
-        returncode = DEFAULT_RETURNCODE;
-    }
-
-    void __stdcall PlayerLaunch_After(unsigned int iShip, unsigned int iClientID)
-    {
-        if (Modules::GetModuleState("InsuranceModule") && !Insurance::IsInsurancePresent(iClientID))
-        {
-            const bool insuranceRequested = Insurance::IsInsuranceRequested(iClientID);
-            Insurance::CreateNewInsurance(iClientID, !insuranceRequested);
-        }
-        returncode = DEFAULT_RETURNCODE;
-    }
 }

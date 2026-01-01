@@ -607,6 +607,7 @@
     <ClInclude Include="missions\conditions\CndHealthInc.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="Insurance.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

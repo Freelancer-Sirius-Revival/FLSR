@@ -103,6 +103,9 @@
   - [Freelancer Patch 1.1](https://www.moddb.com/games/freelancer/downloads/freelancer-patch-11)
   - Freelancer Beta sounds
 
+- [Might_Impress](https://www.moddb.com/members/might-impress)
+  - [Compact Factions Display](https://www.moddb.com/games/freelancer/addons/compact-factions-display), modified by Skotty
+  
 - [M0tah](https://the-starport.com/forums/user/m0tah)
   - DelayDisplay plugin
   - MultiCruise plugins

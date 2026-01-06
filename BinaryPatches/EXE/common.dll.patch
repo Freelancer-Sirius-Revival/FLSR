@@ -99,9 +99,6 @@ File: EXE\common.dll
 0D6431: 44 00	[ ED 02 ]
 0D6461: 50 8D 8B D4 00 00 00 6A 40 51 E8 B0 FB FC FF 83 C4 0C 89 83 D0 00 00 00 C6 83 14 01 00 00 01 E9 9D 02 00 00	[ 83 C9 FF 33 C0 8B FE F2 AE F7 D1 49 8B C1 83 F8 40 8D 93 D4 00 00 00 72 05 B8 3F 00 00 00 8B C8 8B FA 8B D1 ]
 
-# Allow F3 dock manouver on CAPITAL type ships. Requires docking_sphere to be set for these ships. - BC46
-63657: 20	[ 00 ]
-
 
 ### These following patches are done via FLSR-LargeShipSteering.dll as client plugin.
 ### If they would be applied generally, the server would mistake large ships as FIGHTER type for their naming and cause some behaviour issues.

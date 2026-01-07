@@ -1000,15 +1000,15 @@ ClientInfo[iClientID].iTradePartner = 0;
     Called when player connects or pushes f1
     **************************************************************************************************************/
 
-    void __stdcall CharacterInfoReq(unsigned int iClientID, bool p2) {
+    void __stdcall CharacterInfoReq(unsigned int iClientID, bool loadingPrevented) {
         ISERVER_LOG();
         ISERVER_LOGARG_UI(iClientID);
-        ISERVER_LOGARG_UI(p2);
+        ISERVER_LOGARG_UI(loadingPrevented);
 
         CHECK_FOR_DISCONNECT
 
             CALL_PLUGINS_V(PLUGIN_HkIServerImpl_CharacterInfoReq, __stdcall,
-                (unsigned int iClientID, bool p2), (iClientID, p2));
+                (unsigned int iClientID, bool loadingPrevented), (iClientID, loadingPrevented));
 
         try {
             if (!ClientInfo[iClientID].bCharSelected)
@@ -1022,7 +1022,7 @@ ClientInfo[iClientID].iTradePartner = 0;
                 }
             }
 
-            Server.CharacterInfoReq(iClientID, p2);
+            Server.CharacterInfoReq(iClientID, loadingPrevented);
         }
         catch (...) { // something is wrong with charfile
             HkAddKickLog(iClientID, L"Corrupt charfile?");
@@ -1031,7 +1031,7 @@ ClientInfo[iClientID].iTradePartner = 0;
         }
 
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_CharacterInfoReq_AFTER, __stdcall,
-            (unsigned int iClientID, bool p2), (iClientID, p2));
+            (unsigned int iClientID, bool p2), (iClientID, loadingPrevented));
     }
 
     /**************************************************************************************************************

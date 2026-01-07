@@ -300,6 +300,7 @@
     <ClCompile Include="missions\conditions\CndHealthInc.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="NameLimiter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -607,6 +608,7 @@
     <ClInclude Include="missions\conditions\CndHealthInc.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="NameLimiter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

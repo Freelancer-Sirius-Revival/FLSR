@@ -3,6 +3,7 @@
 #include "Empathies.h"
 #include "GroupRep.h"
 #include "NpcCloaking.h"
+#include "NameLimiter.h"
 #include "Missions/ShipSpawning.h"
 #include "Missions/Formations.h"
 #include "Missions/NpcAppearances.h"
@@ -285,6 +286,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShipSpawning::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&PlayerLootSpawning::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NameLimiter::CreateNewCharacter, PLUGIN_HkIServerImpl_CreateNewCharacter, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::ObjCndNpcSimulationRunning::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::ObjCndNpcSimulationRunning::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));

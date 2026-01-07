@@ -136,6 +136,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndHealthInc.cpp" />
     <ClCompile Include="missions\conditions\CndLeaveMsn.cpp" />
     <ClCompile Include="missions\MatrixMath.cpp" />
+    <ClCompile Include="NameLimiter.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
@@ -253,6 +254,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="missions\conditions\CndHealthInc.h" />
     <ClInclude Include="missions\conditions\CndLeaveMsn.h" />
+    <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />

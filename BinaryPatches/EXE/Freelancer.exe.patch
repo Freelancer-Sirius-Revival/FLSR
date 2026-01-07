@@ -18,8 +18,9 @@ File: EXE\Freelancer.exe
 # Interface
 ##########################################
 
-# Shows the current worth in Multiplayer. - adoxa
+# Shows the current worth in Multiplayer. - adoxa, BC46
 0A8004: 1A	[ 05 ]
+0A8180: 05	[ 18 ]
 
 # Range at which an object is no longer "unknown". - FriendlyFire
 0D1750: 10000f	[ 14000f ]

@@ -632,6 +632,12 @@ bool UserCmd_Process(uint iClientID, const std::wstring& wscCmd) {
         }
     }
 
+    if (wscCmd.starts_with('/'))
+    {
+        PrintUserCmdText(iClientID, L"No valid command: " + wscCmd);
+        return true;
+    }
+
     return false;
 }
 

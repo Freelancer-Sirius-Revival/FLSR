@@ -1,4 +1,5 @@
 #include "Main.h"
+#include "NameLimiter.h"
 
 namespace Commands
 {
@@ -508,6 +509,27 @@ namespace Commands
         return;
     }
 
+    static void UserCMD_Rename(uint clientId, const std::wstring& wscParam)
+    {
+        const std::wstring trimmedName = Trim(wscParam);
+        if (NameLimiter::IsCharacterNameAllowed(wstos(trimmedName)))
+        {
+            const auto result = HkRename(ARG_CLIENTID(clientId), trimmedName, false);
+            if (result == HKE_CHARNAME_ALREADY_EXISTS)
+                PrintUserCmdText(clientId, L"The character name is already taken. Please try another name.");
+            else if (result == HKE_CHARNAME_TOO_LONG)
+                PrintUserCmdText(clientId, L"The character name must not be longer than 24 characters. Please try another name.");
+            else if (result == HKE_CHARNAME_TOO_SHORT)
+                PrintUserCmdText(clientId, L"Please enter a name.");
+            else if (result != HKE_OK)
+                PrintUserCmdText(clientId, L"Something went wrong while renaming. Try again.");
+        }
+        else
+        {
+            PrintUserCmdText(clientId, L"The entered name is invalid. Please try again using the following valid characters: a-z A-Z 0-9 & ( ) [ ] { } < > - . : = _");
+        }
+    }
+
     USERCMD UserCmds[] = {
         {L"/uv", UserCmd_UV},
         {L"/sendcash", UserCMD_SendCash},
@@ -534,6 +556,7 @@ namespace Commands
         {L"/neutral", IFF::UserCmd_Neutral},
         {L"/friend", IFF::UserCmd_Allied},
         {L"/iff", IFF::UserCmd_Attitude},
+        {L"/rename", UserCMD_Rename},
     };
 
     // User command processing

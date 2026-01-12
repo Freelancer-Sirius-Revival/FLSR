@@ -37,6 +37,9 @@ File: EXE\Freelancer.exe
 # Changes the ids_info of player waypoints to a non-uppercased string ("PLAYER WAYPOINT" -> "Player Waypoint"). - BC46
 075A56: 1102i	[ 1125i ]
 
+# Comm window remains visible while the Nav Map is open. - DiscountMarkiplier
+0CD8BA: 00 00	[ 0C 01 ]
+
 
 ##############
 # Main Menu

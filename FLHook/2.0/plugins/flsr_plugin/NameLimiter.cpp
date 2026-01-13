@@ -4,7 +4,7 @@
 
 namespace NameLimiter
 {
-	const std::regex allowedCharacters(R"(((?![lI]{4,})[a-zA-Z0-9]|&|\(|\)|\[|\]|\{|\}|<|>|-|\.|:|=|_)+)");
+	const std::regex allowedCharacters(R"(((?![lI]{4,})[a-zA-Z0-9]|&|\(|\)|\[|\]|\{|\}|<|>|-|\.|:|=|'|_)+)");
 
 	bool IsCharacterNameAllowed(const std::string& characterName)
 	{

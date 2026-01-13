@@ -301,6 +301,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="NameLimiter.cpp" />
+    <ClCompile Include="ExplosionDamage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -609,6 +610,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
     <ClInclude Include="NameLimiter.h" />
+    <ClInclude Include="ExplosionDamage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

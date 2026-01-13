@@ -783,7 +783,8 @@ void SolarEquipDestroyedHookNaked();
 
 // HkDamage
 void ApplyShipDamageListNaked();
-void HookExplosionHitNaked();
+void ShipExplosionHitNaked();
+void SolarExplosionHitNaked();
 void ShipHullDamageNaked();
 void ShipEquipDamageNaked();
 void ShipShieldDamageNaked();
@@ -882,11 +883,12 @@ extern FARPROC SolarDestroyedOrigFunc;
 extern FARPROC LootDestroyedOrigFunc;
 extern FARPROC MineDestroyedOrigFunc;
 extern FARPROC GuidedDestroyedOrigFunc;
-extern FARPROC fpOldExplosionHit;
+extern FARPROC ShipExplosionHitOrigFunc;
 extern FARPROC ShipHullDamageOrigFunc;
 extern FARPROC ShipEquipDamageOrigFunc;
 extern FARPROC ShipShieldDamageOrigFunc;
 extern FARPROC ShipColGrpDamageOrigFunc;
+extern FARPROC SolarExplosionHitOrigFunc;
 extern FARPROC SolarHullDamageOrigFunc;
 extern FARPROC SolarEquipDamageOrigFunc;
 extern FARPROC SolarShieldDamageOrigFunc;

@@ -5,9 +5,6 @@ File: EXE\server.dll
 # Weapons
 ##########################################
 
-# Fix explosion damage not causing full damage (or no damage) on large ships and bases. - M0tah
-00960C: 00	[ 0C ]
-
 # Energy weapons don't damage power. - adoxa
 00AFC0: C2 08 00	[ D9 44 24 ]
 

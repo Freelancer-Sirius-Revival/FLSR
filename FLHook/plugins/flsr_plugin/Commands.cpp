@@ -1,5 +1,6 @@
 #include "Main.h"
 #include "NameLimiter.h"
+#include "IFF.h"
 
 namespace Commands
 {

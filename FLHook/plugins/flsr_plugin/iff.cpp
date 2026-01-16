@@ -1,4 +1,5 @@
-#include "main.h"
+#include "IFF.h"
+#include "Plugin.h"
 
 /**
 * IFF PLUGIN - setting players hostile, neutral, or allied in space.
@@ -27,7 +28,7 @@ namespace IFF
 
     static std::unordered_map<std::string, std::unordered_map<std::string, Attitude>> characterFileNamesToCharacterFileNameAttitudes;
 
-    void ApplyAttitude(const std::pair<uint, uint>& clientIds, const Attitude attitude)
+    static void ApplyAttitude(const std::pair<uint, uint>& clientIds, const Attitude attitude)
     {
         float attitudeValue;
         switch (attitude)
@@ -53,7 +54,7 @@ namespace IFF
         pub::Reputation::SetAttitude(reputationMapIds.second, reputationMapIds.first, attitudeValue);
     }
 
-    std::string GetCharacterFileName(const std::wstring& characterName)
+    static std::string GetCharacterFileName(const std::wstring& characterName)
     {
         std::wstring characterFileName;
         if (HkGetCharFileName(characterName, characterFileName) != HKE_OK)
@@ -61,7 +62,7 @@ namespace IFF
         return wstos(characterFileName);
     }
 
-    std::pair<Attitude, Attitude> GetAttitudeTowards(const std::pair<std::wstring, std::wstring>& characterNames)
+    static std::pair<Attitude, Attitude> GetAttitudeTowards(const std::pair<std::wstring, std::wstring>& characterNames)
     {
         const std::string& firstCharacterFileName = GetCharacterFileName(characterNames.first);
         const std::string& secondCharacterFileName = GetCharacterFileName(characterNames.second);
@@ -71,12 +72,12 @@ namespace IFF
         };
     }
 
-    std::wstring GetCharacterName(const uint clientId)
+    static std::wstring GetCharacterName(const uint clientId)
     {
         return (wchar_t*)Players.GetActiveCharacterName(clientId);
     }
 
-    void UpdateAttitude(const uint clientId, const uint otherClientId)
+    static void UpdateAttitude(const uint clientId, const uint otherClientId)
     {
         const auto& attitudes = GetAttitudeTowards({ GetCharacterName(clientId), GetCharacterName(otherClientId) });
         Attitude priorityAttitude = Attitude::Neutral;
@@ -96,7 +97,7 @@ namespace IFF
         ApplyAttitude({ clientId, otherClientId }, priorityAttitude);
     }
 
-    std::string GetPlayerAttitudesFilePath()
+    static std::string GetPlayerAttitudesFilePath()
     {
         return scAcctPath + "\\iff.ini";
     }
@@ -130,7 +131,7 @@ namespace IFF
         }
     }
 
-    std::string GetAttitudeStringValue(const Attitude attitude)
+    static std::string GetAttitudeStringValue(const Attitude attitude)
     {
         std::string attitudeValue;
         switch (attitude)
@@ -144,7 +145,7 @@ namespace IFF
         return "";
     }
 
-    void WriteCharacterAttitude(const std::wstring& sourceCharacterName, const std::wstring& targetCharacterName, const Attitude attitude)
+    static void WriteCharacterAttitude(const std::wstring& sourceCharacterName, const std::wstring& targetCharacterName, const Attitude attitude)
     {
         const std::string& sourceCharacterFileName = GetCharacterFileName(sourceCharacterName);
         const std::string& targetCharacterFileName = GetCharacterFileName(targetCharacterName);
@@ -156,7 +157,7 @@ namespace IFF
             IniDelete(GetPlayerAttitudesFilePath(), sourceCharacterFileName, targetCharacterFileName);
     }
 
-    uint GetClientId(const std::wstring& characterName)
+    static uint GetClientId(const std::wstring& characterName)
     {
         uint clientId = -1;
         bool idStringType = false;
@@ -165,7 +166,7 @@ namespace IFF
         return -1;
     }
 
-    std::wstring GetCharacterNameByTarget(const uint targettingClientId)
+    static std::wstring GetCharacterNameByTarget(const uint targettingClientId)
     {
         uint shipId;
         pub::Player::GetShip(targettingClientId, shipId);
@@ -184,7 +185,7 @@ namespace IFF
         return L"";
     }
 
-    std::pair<Attitude, Attitude> TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring targetCharacterName, const Attitude attitude)
+    static std::pair<Attitude, Attitude> TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring targetCharacterName, const Attitude attitude)
     {
         std::pair<Attitude, Attitude> attitudeChange = { attitude, attitude };
 
@@ -278,7 +279,7 @@ namespace IFF
         }
     }
 
-    std::wstring GetAttitudeDisplayString(const Attitude attitude)
+    static std::wstring GetAttitudeDisplayString(const Attitude attitude)
     {
         switch (attitude)
         {
@@ -326,7 +327,7 @@ namespace IFF
         return true;
     }
 
-    bool AreInSameGroup(const uint clientAId, const uint clientBId)
+    static bool AreInSameGroup(const uint clientAId, const uint clientBId)
     {
         if (!HkIsValidClientID(clientAId) || !HkIsValidClientID(clientBId))
             return false;
@@ -343,7 +344,7 @@ namespace IFF
         return false;
     }
 
-    void ShipDamaged(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
+    static void ShipDamaged(const IObjRW* damagedObject, const float& incomingDamage, const DamageList* damageList)
     {
         if (incomingDamage <= 0.0f)
             return;
@@ -431,7 +432,7 @@ namespace IFF
         returncode = DEFAULT_RETURNCODE;
     }
 
-    void DeleteCharacterFromIFF(const std::string& characterFileName)
+    static void DeleteCharacterFromIFF(const std::string& characterFileName)
     {
         characterFileNamesToCharacterFileNameAttitudes.erase(characterFileName);
         IniDelSection(GetPlayerAttitudesFilePath(), characterFileName);
@@ -460,40 +461,28 @@ namespace IFF
         returncode = DEFAULT_RETURNCODE;
     }
 
-    static std::string characterFileNameToRename;
-
-    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
-    {
-        if (onlyDelete)
-            characterFileNameToRename = "";
-        else
-            characterFileNameToRename = GetCharacterFileName(charname);
-        returncode = DEFAULT_RETURNCODE;
-        return HKE_OK;
-    }
-
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (!characterFileNameToRename.empty())
+        if (std::string oldCharacterFileName = GetCharacterFileName(charname); !oldCharacterFileName.empty())
         {
             const std::string& characterFileName = GetCharacterFileName(newCharname);
             for (auto& characterFileNameToCharacterFileNameAttitudes : characterFileNamesToCharacterFileNameAttitudes)
             {
-                if (characterFileNameToCharacterFileNameAttitudes.second.contains(characterFileNameToRename))
+                if (characterFileNameToCharacterFileNameAttitudes.second.contains(oldCharacterFileName))
                 {
-                    characterFileNameToCharacterFileNameAttitudes.second[characterFileName] = characterFileNameToCharacterFileNameAttitudes.second[characterFileNameToRename];
-                    characterFileNameToCharacterFileNameAttitudes.second.erase(characterFileNameToRename);
+                    characterFileNameToCharacterFileNameAttitudes.second[characterFileName] = characterFileNameToCharacterFileNameAttitudes.second[oldCharacterFileName];
+                    characterFileNameToCharacterFileNameAttitudes.second.erase(oldCharacterFileName);
                     const std::string& attitudeValue = GetAttitudeStringValue(characterFileNameToCharacterFileNameAttitudes.second[characterFileName]);
                     if (!attitudeValue.empty())
                         IniWrite(GetPlayerAttitudesFilePath(), characterFileNameToCharacterFileNameAttitudes.first, characterFileName, attitudeValue);
-                    IniDelete(GetPlayerAttitudesFilePath(), characterFileNameToCharacterFileNameAttitudes.first, characterFileNameToRename);
+                    IniDelete(GetPlayerAttitudesFilePath(), characterFileNameToCharacterFileNameAttitudes.first, oldCharacterFileName);
                     continue;
                 }
             }
 
-            characterFileNamesToCharacterFileNameAttitudes[characterFileName] = characterFileNamesToCharacterFileNameAttitudes[characterFileNameToRename];
-            characterFileNamesToCharacterFileNameAttitudes.erase(characterFileNameToRename);
-            IniDelSection(GetPlayerAttitudesFilePath(), characterFileNameToRename);
+            characterFileNamesToCharacterFileNameAttitudes[characterFileName] = characterFileNamesToCharacterFileNameAttitudes[oldCharacterFileName];
+            characterFileNamesToCharacterFileNameAttitudes.erase(oldCharacterFileName);
+            IniDelSection(GetPlayerAttitudesFilePath(), oldCharacterFileName);
             for (const auto& characterFileNameAttitudes : characterFileNamesToCharacterFileNameAttitudes[characterFileName])
             {
                 const std::string& attitudeValue = GetAttitudeStringValue(characterFileNameAttitudes.second);
@@ -501,7 +490,6 @@ namespace IFF
                     IniWrite(GetPlayerAttitudesFilePath(), characterFileName, characterFileNameAttitudes.first, attitudeValue);
             }
         }
-        characterFileNameToRename = "";
         returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }

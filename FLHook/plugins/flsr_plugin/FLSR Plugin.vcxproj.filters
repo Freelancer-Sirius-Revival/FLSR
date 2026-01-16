@@ -610,6 +610,7 @@
     </ClInclude>
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="Insurance.h" />
+    <ClInclude Include="IFF.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

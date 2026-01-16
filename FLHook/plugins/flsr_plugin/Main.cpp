@@ -37,6 +37,7 @@
 #include "MissionAbortFix.h"
 #include "PlayerLootSpawning.h"
 #include "Insurance.h"
+#include "IFF.h"
 
 std::mutex m_Mutex;
 
@@ -178,7 +179,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::ShipShieldDamage, PLUGIN_ShipShieldDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::CreateNewCharacter_After, PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::DestroyCharacter_After, PLUGIN_HkIServerImpl_DestroyCharacter_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::HkRename, PLUGIN_HkCb_Rename, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));

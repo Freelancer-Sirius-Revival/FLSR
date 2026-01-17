@@ -49,16 +49,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
-    <IncludePath>..\include\ext;..\include\Tools;$(IncludePath)</IncludePath>
+    <IncludePath>..\dependencies\spdlog-1.17.0\include;..\include\ext;..\include\Tools;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
-    <IncludePath>..\include\ext;..\include\Tools;$(IncludePath)</IncludePath>
+    <IncludePath>..\dependencies\spdlog-1.17.0\include;..\include\ext;..\include\Tools;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" />
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgTriplet>
     </VcpkgTriplet>

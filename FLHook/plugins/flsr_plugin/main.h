@@ -24,7 +24,6 @@
 #include <sstream>
 #include <numeric>
 #include <unordered_map>
-#include <openssl/sha.h>
 
 //Offsets
 #define ADDR_CLIENT_NEWPLAYER 0x8010

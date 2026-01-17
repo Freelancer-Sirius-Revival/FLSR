@@ -139,7 +139,7 @@ namespace Discord {
 				sMessage = std::regex_replace(sMessage, emojiRegex, "");
 
 				//Get Username
-				std::string scUsername = (ServerUser.nickname.empty() ? DiscordUser.username : ServerUser.nickname);
+				std::string scUsername = (ServerUser.get_nickname().empty() ? DiscordUser.username : ServerUser.get_nickname());
 
 				//Discord
 				std::string scReplyMessage = scUsername + ": " + sMessage;

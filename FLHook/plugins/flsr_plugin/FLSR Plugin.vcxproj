@@ -45,13 +45,15 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>flsr</TargetName>
+    <IncludePath>$(ProjectDir)dependencies\libdpp-10.1.4-win32-debug\include\dpp-10.1;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Project)dependencies\libdpp-10.1.4-win32-debug\lib\dpp-10.1;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>flsr</TargetName>
+    <IncludePath>$(ProjectDir)dependencies\libdpp-10.1.4-win32-release\include\dpp-10.1;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Project)dependencies\libdpp-10.1.4-win32-release\lib\dpp-10.1;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" />
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgInstalledDir>
     </VcpkgInstalledDir>
@@ -76,18 +78,17 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>FLHook.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FLHook.lib;rpcrt4.lib;dpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
       <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
 xcopy /y  "$(OutDir)$(TargetName).pdb" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)dpp.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)zlibd1.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-debug\bin\dpp.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-debug\bin\libcrypto-1_1.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-debug\bin\libssl-1_1.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-debug\bin\opus.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-debug\bin\zlib1.dll" "$(DistDir)"
 
 if "$(FLHOOK_COPY_PATH)" NEQ "" (
 xcopy /y  "$(OutDir)$(TargetName).dll" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
@@ -108,16 +109,15 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>rpcrt4.lib;dpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y  "$(OutDir)$(TargetName).dll" "$(DistDir)flhook_plugins\"
-xcopy /y  "$(OutDir)dpp.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)libcrypto-3.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)libsodium.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)libssl-3.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)opus.dll" "$(DistDir)"
-xcopy /y  "$(OutDir)zlib1.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-release\bin\dpp.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-release\bin\libcrypto-1_1.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-release\bin\libssl-1_1.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-release\bin\opus.dll" "$(DistDir)"
+xcopy /y  "$(ProjectDir)dependencies\libdpp-10.1.4-win32-release\bin\zlib1.dll" "$(DistDir)"
 
 if "$(FLHOOK_COPY_PATH)" NEQ "" (
 xcopy /y  "$(OutDir)$(TargetName).dll" "$(FLHOOK_COPY_PATH)\flhook_plugins\"

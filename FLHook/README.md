@@ -10,8 +10,9 @@ This Hook is based on FL-Hook 2.1.
 	- *Windows Universal C-Runtime*
 	- *MSVC v142 x64/x86 Buildtools*
 	- *C++ MFC for v142 Buildtools* (not the Spectre version)
+	- *MSVC v143 x64/x86 Buildtools*
+	- *C++ MFC for v143 Buildtools* (not the Spectre version)
 4. Open the project file `project/FLHook.sln`
 5. Tell Visual Studio to NOT upgrade the project
-6. In Visual Studio, open the integrated terminal and run `vcpkg integrate install` to enable vcpkg for dependency download.
 
 The build output is located in `bin/`.

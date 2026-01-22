@@ -1,6 +1,9 @@
 #include "Main.h"
 #include "NameLimiter.h"
 #include "IFF.h"
+#include "Carrier.h"
+#include "Cloak.h"
+#include "Mark.h"
 
 namespace Commands
 {
@@ -541,7 +544,7 @@ namespace Commands
         {L"/c", Cloak::UserCmd_CLOAK},
         {L"/uncloak", Cloak::UserCmd_UNCLOAK},
         {L"/uc", Cloak::UserCmd_UNCLOAK},
-        {L"/dock", Docking::UserCmd_Dock},
+        {L"/dock", Carrier::UserCmd_Dock},
         {L"/mark", Mark::UserCmd_Mark},
         {L"/m", Mark::UserCmd_Mark},
         {L"/groupmark", Mark::UserCmd_GroupMark},

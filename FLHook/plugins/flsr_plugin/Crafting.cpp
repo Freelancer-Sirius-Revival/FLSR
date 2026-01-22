@@ -27,10 +27,10 @@ namespace Crafting
 		uint successSoundId = 0;
 	};
 
-	static std::unordered_map<std::string, Recipe> recipes;
+	std::unordered_map<std::string, Recipe> recipes;
 
-	static uint defaultSuccessSoundId = 0;
-	static uint failSoundId = 0;
+	uint defaultSuccessSoundId = 0;
+	uint failSoundId = 0;
 
 	const uint NOT_ENOUGH_MONEY = pub::GetNicknameId("not_enough_money");
 	const uint INSUFFICIENT_CARGO_SPACE_ID = pub::GetNicknameId("insufficient_cargo_space");
@@ -39,6 +39,8 @@ namespace Crafting
 
 	void LoadSettings()
 	{
+		ConPrint(L"Initializing Crafting... ");
+
 		HkLoadStringDLLs();
 
 		char currentDirectory[MAX_PATH];
@@ -101,9 +103,11 @@ namespace Crafting
 			}
 			ini.close();
 		}
+
+		ConPrint(L"Done\n");
 	}
 
-    std::vector<CARGO_INFO> GetUnmountedCargoList(const uint clientId)
+    static std::vector<CARGO_INFO> GetUnmountedCargoList(const uint clientId)
     {
         int remainingHoldSize;
         std::list<CARGO_INFO> cargoList;
@@ -120,7 +124,7 @@ namespace Crafting
         return filteredCargoList;
     }
 
-	bool Craft(const uint clientId, const std::string& recipeName, int batchCount)
+	static bool Craft(const uint clientId, const std::string& recipeName, int batchCount)
 	{
 		if (batchCount < 1)
 			batchCount = 1;

@@ -1,9 +1,16 @@
 ﻿#include "Main.h"
-#include "Pilots.h"
+#include "Carrier.h"
+#include "Cloak.h"
 #include "Empathies.h"
 #include "GroupRep.h"
-#include "NpcCloaking.h"
+#include "IFF.h"
+#include "Insurance.h"
+#include "Mark.h"
+#include "MissionAbortFix.h"
 #include "NameLimiter.h"
+#include "NpcCloaking.h"
+#include "Pilots.h"
+#include "PlayerLootSpawning.h"
 #include "Missions/ShipSpawning.h"
 #include "Missions/Formations.h"
 #include "Missions/NpcAppearances.h"
@@ -34,10 +41,6 @@
 #include "Missions/conditions/CndSystemSpaceExit.h"
 #include "Missions/conditions/CndTimer.h"
 #include "Missions/objectives/Objectives.h"
-#include "MissionAbortFix.h"
-#include "PlayerLootSpawning.h"
-#include "Insurance.h"
-#include "IFF.h"
 
 std::mutex m_Mutex;
 
@@ -61,12 +64,6 @@ void LoadSettings() {
     //Load Module-Settings
     Modules::LoadModules();
 
-    if (Modules::GetModuleState("CarrierModule"))
-    {
-        ConPrint(L"Module loaded: Carrier\n");
-        Docking::LoadSettings();
-    }
-
     SolarSpawn::LoadSettings();
 
     // POPUP-Module #############################################################################
@@ -85,13 +82,6 @@ void LoadSettings() {
 
     EquipWhiteList::LoadEquipWhiteList();
     ConPrint(L"Module loaded: EquipWhiteList\n");
-
-	//CLOAK-Module ##############################################################################
-    if (Modules::GetModuleState("CloakModule"))
-    {
-        Cloak::LoadCloakSettings();
-        ConPrint(L"Module loaded: Cloak\n");
-    }
 
     //CMPDUMPS     #############################################################################
     if (Modules::GetModuleState("UpdateCMP"))
@@ -214,7 +204,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::DestroyCharacter_After, PLUGIN_HkIServerImpl_DestroyCharacter_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::HkRename, PLUGIN_HkCb_Rename, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
     
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EquipWhiteList::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
@@ -226,17 +215,16 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BatsBotsShipTransferFix::GFGoodBuy, PLUGIN_HkIServerImpl_GFGoodBuy, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BatsBotsShipTransferFix::ReqEquipment, PLUGIN_HkIServerImpl_ReqEquipment, 0));
 
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::ReqShipArch_After, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::LaunchComplete_After, PLUGIN_HkIServerImpl_LaunchComplete, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::JumpInComplete_After, PLUGIN_HkIServerImpl_JumpInComplete, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::CreateNewCharacter_After, PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::DestroyCharacter_After, PLUGIN_HkIServerImpl_DestroyCharacter_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::HkRename, PLUGIN_HkCb_Rename, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Docking::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::ReqShipArch_After, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::LaunchComplete_After, PLUGIN_HkIServerImpl_LaunchComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::JumpInComplete_After, PLUGIN_HkIServerImpl_JumpInComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::CreateNewCharacter_After, PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::DestroyCharacter_After, PLUGIN_HkIServerImpl_DestroyCharacter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::LaunchComplete_AFTER, PLUGIN_HkIServerImpl_LaunchComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SpawnProtection::JumpInComplete_AFTER, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));

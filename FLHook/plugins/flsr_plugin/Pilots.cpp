@@ -1046,6 +1046,8 @@ namespace Pilots
 
 	void ReadFiles()
 	{
+		ConPrint(L"Initializing Pilots... ");
+
 		std::string dataPath = "..\\data";
 		INI_Reader ini;
 		if (ini.open("freelancer.ini", false))
@@ -1067,5 +1069,7 @@ namespace Pilots
 		// Those file paths are hardcoded by Freelancer itself.
 		ReadFile(dataPath + "\\missions\\pilots_population.ini");
 		ReadFile(dataPath + "\\missions\\pilots_story.ini");
+
+		ConPrint(L"Done\n");
 	}
 }

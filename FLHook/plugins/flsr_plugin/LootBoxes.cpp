@@ -3,7 +3,7 @@
 
 namespace LootBoxes
 {
-	static std::mt19937 randomizer(std::random_device{}());
+	std::mt19937 randomizer(std::random_device{}());
 
 	struct LootBox
 	{
@@ -19,11 +19,11 @@ namespace LootBoxes
 		float highestLootArchetypeVolume = 0.0f;
 	};
 
-	static std::unordered_map<std::string, LootBox> lootBoxes;
-	static std::unordered_map<uint, bool> lootArchetypeCombinable;
+	std::unordered_map<std::string, LootBox> lootBoxes;
+	std::unordered_map<uint, bool> lootArchetypeCombinable;
 
-	static uint successSoundId = 0;
-	static uint failSoundId = 0;
+	uint successSoundId = 0;
+	uint failSoundId = 0;
 
 	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
 
@@ -47,12 +47,14 @@ namespace LootBoxes
 		return L"";
 	}
 
-	static bool initialized = false;
+	bool initialized = false;
 	void ReadInitialData()
 	{
 		if (initialized)
 			return;
 		initialized = true;
+
+		ConPrint(L"Initializing Loot Boxes... ");
 
 		HkLoadStringDLLs();
 
@@ -117,7 +119,8 @@ namespace LootBoxes
 				}
 			}
 			ini.close();
-			ConPrint(L"Module loaded: Loot Boxes\n");
+
+			ConPrint(L"Done\n");
 		}
 	}
 

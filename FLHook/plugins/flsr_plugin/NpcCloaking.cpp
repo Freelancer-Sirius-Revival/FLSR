@@ -28,6 +28,8 @@ namespace NpcCloaking
 
 	void ReadFiles()
 	{
+		ConPrint(L"Initializing NPC Cloaking... ");
+
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
 		const std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-Cloak.cfg";
@@ -78,6 +80,8 @@ namespace NpcCloaking
 			}
 			ini.close();
 		}
+
+		ConPrint(L"Done\n");
 	}
 
 	std::unordered_map<uint, ObjectData> objData;

@@ -3,7 +3,7 @@
 // This solves a bug where nanobots or shield batteries will be transferred to a new ship if that has a capacity of 0 for those.
 namespace BatsBotsShipTransferFix
 {
-	static std::unordered_map<uint, uint> boughtShipArchByClientId;
+	std::unordered_map<uint, uint> boughtShipArchByClientId;
 
 	void __stdcall GFGoodBuy(const SGFGoodBuyInfo& gbi, unsigned int clientId)
 	{

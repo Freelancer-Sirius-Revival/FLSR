@@ -5,10 +5,12 @@ namespace EquipWhiteList
 	const uint NO_PLACE_TO_MOUNT_ID = CreateID("no_place_to_mount");
 	const uint LOADED_INTO_CARGO_HOLD_ID = CreateID("loaded_into_cargo_hold");
 
-	static std::unordered_map<uint, std::unordered_set<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
+	std::unordered_map<uint, std::unordered_set<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
 
 	void LoadEquipWhiteList()
 	{
+		ConPrint(L"Initializing Equip Whitelist... ");
+
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
 		std::string configFilePath = std::string(currentDirectory) + Globals::Equip_WHITELIST_FILE;
@@ -28,6 +30,8 @@ namespace EquipWhiteList
 			}
 			ini.close();
 		}
+
+		ConPrint(L"Done\n");
 	}
 
 	static void SendNNMessages(const uint clientId)

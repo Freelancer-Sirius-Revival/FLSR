@@ -1,5 +1,4 @@
-#include "../Main.h"
-#include "../Plugin.h"
+#include "../Mark.h"
 #include "Mission.h"
 #include "MissionBoard.h"
 #include "ClientObjectives.h"
@@ -9,6 +8,7 @@
 #include "ShipSpawning.h"
 #include "LifeTimes.h"
 #include "objectives/ObjDock.h"
+#include "../Plugin.h"
 
 namespace Missions
 {

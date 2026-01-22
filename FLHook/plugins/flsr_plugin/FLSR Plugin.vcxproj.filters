@@ -6,7 +6,7 @@
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
     <ClCompile Include="Discord.cpp" />
-    <ClCompile Include="Docking.cpp" />
+    <ClCompile Include="Carrier.cpp" />
     <ClCompile Include="EquipWhiteList.cpp" />
     <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
@@ -611,6 +611,9 @@
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="Insurance.h" />
     <ClInclude Include="IFF.h" />
+    <ClInclude Include="Carrier.h" />
+    <ClInclude Include="Cloak.h" />
+    <ClInclude Include="Mark.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

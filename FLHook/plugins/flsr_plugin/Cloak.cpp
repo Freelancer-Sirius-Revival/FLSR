@@ -1,4 +1,6 @@
-#include "Main.h"
+#include "Cloak.h"
+#include "Mark.h"
+#include "Plugin.h"
 
 /**
  * CLOAKING PLUGIN
@@ -87,11 +89,11 @@ namespace Cloak
 
 	// When a player joins when another player is in cloak-transition, timings get confused.
 	// To counter this, a Cloaking Device with zero-time is used to completely cloak/uncloak at the end of the transitions to make sur the state is always where it should be.
-	static uint instantCloakingDeviceArchetypeId = 0;
+	uint instantCloakingDeviceArchetypeId = 0;
 	// When toggling cloak extremely fast, small lags can cause confusion of state at the client. Cloak/uncloak durations can be prolonged to reduce this effect.
-	static uint cloakTransitionProlongation = 1;
-	static float jumpGateDecloakRadius = 2000.0f;
-	static float jumpHoleDecloakRadius = 1000.0f;
+	uint cloakTransitionProlongation = 1;
+	float jumpGateDecloakRadius = 2000.0f;
+	float jumpHoleDecloakRadius = 1000.0f;
 
 	struct ShipEffectDefinition
 	{
@@ -151,10 +153,10 @@ namespace Cloak
 		Disrupted
 	};
 
-	static std::set<uint> cloakActivatorArchetypeIds;
-	static std::vector<ShipEffectDefinition> shipEffects;
-	static std::unordered_map<uint, ClientCloakStats> clientCloakStats;
-	static std::unordered_map<uint, UncloakReason> clientIdsRequestingUncloak;
+	std::set<uint> cloakActivatorArchetypeIds;
+	std::vector<ShipEffectDefinition> shipEffects;
+	std::unordered_map<uint, ClientCloakStats> clientCloakStats;
+	std::unordered_map<uint, UncloakReason> clientIdsRequestingUncloak;
 
 	struct NoCloakArea
 	{
@@ -163,9 +165,9 @@ namespace Cloak
 		float radius;
 		uint NNVoiceMessageId;
 	};
-	static std::unordered_map<uint, std::vector<NoCloakArea>> noCloakAreasPerSystem;
-	static std::unordered_map<uint, NoCloakArea> noCloakObjectDefinitionsByNicknameId;
-	static std::vector<NoCloakArea> unprocessedObjectNoCloakAreas;
+	std::unordered_map<uint, std::vector<NoCloakArea>> noCloakAreasPerSystem;
+	std::unordered_map<uint, NoCloakArea> noCloakObjectDefinitionsByNicknameId;
+	std::vector<NoCloakArea> unprocessedObjectNoCloakAreas;
 
 	bool static IsValidCloakableClient(const uint clientId)
 	{
@@ -249,11 +251,11 @@ namespace Cloak
 		clientIdsRequestingUncloak.erase(clientId);
 	}
 
-	void LoadCloakSettings()
+	static void LoadCloakSettings()
 	{
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-		const std::string configFilePath = std::string(currentDirectory) + Globals::CLOAK_CONFIG_FILE;
+		const std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-Cloak.cfg";
 
 		INI_Reader ini;
 		if (ini.open(configFilePath.c_str(), false))
@@ -337,7 +339,7 @@ namespace Cloak
 		}
 	}
 
-	static bool initialized = false;
+	bool initialized = false;
 
 	// This must be executed AFTER LoadCloakSettings and when the game data has already been stored to memory.
 	void InitializeWithGameData()
@@ -345,6 +347,10 @@ namespace Cloak
 		if (initialized)
 			return;
 		initialized = true;
+
+		ConPrint(L"Initializing Cloak... ");
+
+		LoadCloakSettings();
 
 		for (auto& shipEffect : shipEffects)
 		{
@@ -357,6 +363,8 @@ namespace Cloak
 		}
 
 		CollectNoCloakObjectsPerSystem();
+
+		ConPrint(L"Done\n");
 	}
 
 	static std::list<CARGO_INFO> GetClientCargoList(uint clientId)
@@ -821,9 +829,6 @@ namespace Cloak
 	// This is executed to make sure players that spawn into a system with other cloaking players have their visibility synced.
 	void UpdateCloakClients()
 	{
-		if (!Modules::GetModuleState("CloakModule"))
-			return;
-
 		if (lastSynchronizeTimeStamp == 0)
 			lastSynchronizeTimeStamp = timeInMS();
 
@@ -920,7 +925,7 @@ namespace Cloak
 
 	void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip)
 	{
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
+		if (IsValidCloakableClient(clientId))
 		{
 			if (clientCloakStats[clientId].activatorCargoId == activateEquip.sID)
 				ToggleClientCloakActivator(clientId, activateEquip.bActivate);
@@ -933,36 +938,32 @@ namespace Cloak
 
 	void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId)
 	{
-		if (Modules::GetModuleState("CloakModule"))
+		const uint clientId = HkGetClientIDByShip(shipId);
+		if (!clientId)
 		{
-			const uint clientId = HkGetClientIDByShip(shipId);
-			if (!clientId)
-			{
-				returncode = DEFAULT_RETURNCODE;
-				return;
-			}
-
-			QueueUncloak(clientId, UncloakReason::User);
-
-			if (IsValidCloakableClient(clientId))
-				clientCloakStats[clientId].dockingManeuverActive = false;
+			returncode = DEFAULT_RETURNCODE;
+			return;
 		}
+
+		QueueUncloak(clientId, UncloakReason::User);
+
+		if (IsValidCloakableClient(clientId))
+			clientCloakStats[clientId].dockingManeuverActive = false;
+
 		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId)
 	{
-		if (Modules::GetModuleState("CloakModule"))
-		{
-			ClearClientData(clientId);
-			InstallCloak(clientId);
-		}
+		ClearClientData(clientId);
+		InstallCloak(clientId);
+
 		returncode = DEFAULT_RETURNCODE;
 	}
 	
 	int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
 	{
-		if (Modules::GetModuleState("CloakModule") && !CheckDockCall(ship, dockTargetId, dockPortIndex, response))
+		if (!CheckDockCall(ship, dockTargetId, dockPortIndex, response))
 		{
 			returncode = NOFUNCTIONCALL;
 			return 0;
@@ -973,33 +974,30 @@ namespace Cloak
 
 	void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane)
 	{
-		if (Modules::GetModuleState("CloakModule"))
-			QueueUncloak(clientId, UncloakReason::Docking);
+		QueueUncloak(clientId, UncloakReason::Docking);
 		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 	{
-		if (Modules::GetModuleState("CloakModule"))
-			ClearClientData(clientId);
+		ClearClientData(clientId);
 		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 	{
-		if (Modules::GetModuleState("CloakModule"))
-			RemoveCloakingDevices(clientId);
+		RemoveCloakingDevices(clientId);
 		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
 	{
-		if (Modules::GetModuleState("CloakModule") && !EquipCloakingDevices(clientId))
+		if (!EquipCloakingDevices(clientId))
 			RemoveCloakingDevices(clientId);
 		returncode = DEFAULT_RETURNCODE;
 	}
 
-	void SetServerSideEngineState(const uint clientId, const bool active)
+	static void SetServerSideEngineState(const uint clientId, const bool active)
 	{
 		if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].engineCargoId)
 		{
@@ -1014,25 +1012,22 @@ namespace Cloak
 
 	void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId)
 	{
-		if (Modules::GetModuleState("CloakModule"))
+		AttemptInitialUncloak(clientId);
+
+		// Fix bug of Throttle on server not being correctly set.
+		if (IsValidCloakableClient(clientId))
 		{
-			AttemptInitialUncloak(clientId);
-
-			// Fix bug of Throttle on server not being correctly set.
-			if (IsValidCloakableClient(clientId))
+			// When saving the CShip result via CObject::Find permanently it always crashed the server
+			// when a player with Cloak + Energy-using Engine docked to a base on zero energy.
+			// Instead get it via the InspectionObj in the hope this is more performant than Find on each invokation.
+			CShip* ship = (CShip*)(clientCloakStats[clientId].shipInspect->cobj);
+			if (ship)
 			{
-				// When saving the CShip result via CObject::Find permanently it always crashed the server
-				// when a player with Cloak + Energy-using Engine docked to a base on zero energy.
-				// Instead get it via the InspectionObj in the hope this is more performant than Find on each invokation.
-				CShip* ship = (CShip*)(clientCloakStats[clientId].shipInspect->cobj);
-				if (ship)
-				{
-					ship->set_throttle(updateInfo.throttle);
+				ship->set_throttle(updateInfo.throttle);
 
-					// Setting Throttle on the ship makes the server think that engine was turned on again.
-					if (clientCloakStats[clientId].engineKillActive)
-						SetServerSideEngineState(clientId, false);
-				}
+				// Setting Throttle on the ship makes the server think that engine was turned on again.
+				if (clientCloakStats[clientId].engineKillActive)
+					SetServerSideEngineState(clientId, false);
 			}
 		}
 		returncode = DEFAULT_RETURNCODE;
@@ -1040,25 +1035,21 @@ namespace Cloak
 
 	void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state)
 	{
-		if (Modules::GetModuleState("CloakModule"))
-			ClearClientData(clientId);
+		ClearClientData(clientId);
 		returncode = DEFAULT_RETURNCODE;
 	}
 
 	void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList)
 	{
-		if (Modules::GetModuleState("CloakModule"))
+		const uint clientId = object->cobj->GetOwnerPlayer();
+		if (IsValidCloakableClient(clientId))
 		{
-			const uint clientId = object->cobj->GetOwnerPlayer();
-			if (IsValidCloakableClient(clientId))
+			EquipDesc equipDescriptor;
+			equip->GetEquipDesc(equipDescriptor);
+			if (clientCloakStats[clientId].activatorCargoId == equipDescriptor.sID)
 			{
-				EquipDesc equipDescriptor;
-				equip->GetEquipDesc(equipDescriptor);
-				if (clientCloakStats[clientId].activatorCargoId == equipDescriptor.sID)
-				{
-					clientCloakStats[clientId].activatorCargoId = 0;
-					QueueUncloak(clientId, UncloakReason::Destroyed);
-				}
+				clientCloakStats[clientId].activatorCargoId = 0;
+				QueueUncloak(clientId, UncloakReason::Destroyed);
 			}
 		}
 		returncode = DEFAULT_RETURNCODE;
@@ -1066,16 +1057,13 @@ namespace Cloak
 
 	void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
-		if (Modules::GetModuleState("CloakModule"))
+		auto& systemNoCloakAreas = noCloakAreasPerSystem[killedObject->cobj->system];
+		for (auto it = systemNoCloakAreas.begin(); it != systemNoCloakAreas.end(); it++)
 		{
-			auto& systemNoCloakAreas = noCloakAreasPerSystem[killedObject->cobj->system];
-			for (auto it = systemNoCloakAreas.begin(); it != systemNoCloakAreas.end(); it++)
+			if (it->objectId == killedObject->cobj->get_id())
 			{
-				if (it->objectId == killedObject->cobj->get_id())
-				{
-					systemNoCloakAreas.erase(it);
-					break;
-				}
+				systemNoCloakAreas.erase(it);
+				break;
 			}
 		}
 		returncode = DEFAULT_RETURNCODE;
@@ -1083,7 +1071,7 @@ namespace Cloak
 
 	void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
-		if (Modules::GetModuleState("CloakModule") && killed)
+		if (killed)
 		{
 			const uint killedClientId = killedObject->cobj->GetOwnerPlayer();
 			if (HkIsValidClientID(killedClientId))
@@ -1121,7 +1109,7 @@ namespace Cloak
 
 	void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam)
 	{
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
+		if (IsValidCloakableClient(clientId))
 		{
 			const CloakState cloakState = clientCloakStats[clientId].cloakState;
 			ToggleClientCloakActivator(clientId, cloakState == CloakState::Uncloaked || cloakState == CloakState::Uncloaking);
@@ -1130,7 +1118,7 @@ namespace Cloak
 
 	void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam)
 	{
-		if (Modules::GetModuleState("CloakModule") && IsValidCloakableClient(clientId))
+		if (IsValidCloakableClient(clientId))
 			ToggleClientCloakActivator(clientId, false);
 	}
 
@@ -1143,7 +1131,7 @@ namespace Cloak
 	 */
 	void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise)
 	{
-		if (Modules::GetModuleState("CloakModule") && activateCruise.bActivate)
+		if (activateCruise.bActivate)
 			SetServerSideEngineState(clientId, true);
 		returncode = DEFAULT_RETURNCODE;
 	}

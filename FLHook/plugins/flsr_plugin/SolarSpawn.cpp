@@ -1,5 +1,6 @@
 #include "Main.h"
 #include "Pilots.h"
+#include "Cloak.h"
 #include <random>
 
 /**
@@ -307,11 +308,13 @@ namespace SolarSpawn
 			return;
 		initialized = true;
 
+		ConPrint(L"Initializing Solar Spawning... ");
 		for (SolarArchetype& solar : solarArchetypes)
 		{
 			if (solar.autospawn)
 				CreateSolar(solar);
 		}
+		ConPrint(L"Done\n");
 	}
 
 	struct LaunchComm

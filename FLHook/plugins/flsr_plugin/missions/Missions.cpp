@@ -954,13 +954,20 @@ namespace Missions
 			return;
 		initialized = true;
 
+		ConPrint(L"Initializing Missions... ");
+
 		LoadSettings();
+
+
+		ConPrint(L"Starting initial missions... \n");
 
 		for (auto& missionEntry : missions)
 		{
 			if (missionEntry.second.initiallyActive)
 				missionEntry.second.Start();
 		}
+
+		ConPrint(L"Done initializing Missions\n");
 	}
 
 	static void ClearMissions()

@@ -38,8 +38,6 @@ namespace Globals {
 
     //FilePaths
     const std::string PLUGIN_CONFIG_FILE = "\\flhook_plugins\\flsr.cfg";
-    const std::string CARRIER_CONFIG_FILE = "\\flhook_plugins\\FLSR-Carrier.cfg";
-    const std::string CLOAK_CONFIG_FILE = "\\flhook_plugins\\FLSR-Cloak.cfg";
     const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
     const std::string LOOTBOXES_CONFIG_FILE = "\\flhook_plugins\\FLSR-LootBoxes.cfg";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
@@ -171,64 +169,12 @@ namespace Tools {
  
 }
 
-namespace Docking
-{
-    void LoadSettings();
-    void InitializeWithGameData();
-    void __stdcall LaunchComplete_After(unsigned int baseId, unsigned int shipId);
-    void __stdcall JumpInComplete_After(unsigned int systemId, unsigned int shipId);
-    int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
-    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
-    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
-    void __stdcall ReqShipArch_After(unsigned int archetypeId, unsigned int clientId);
-    void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);
-    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
-    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
-    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
-    void UserCmd_Dock(const uint clientId, const std::wstring& wscParam);
-}
-
 namespace Hooks {
     void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }
-
-namespace Cloak
-{
-    enum class CloakState
-    {
-        Uncloaked,
-        Cloaking,
-        Cloaked,
-        Uncloaking
-    };
-
-    void LoadCloakSettings();
-    void InitializeWithGameData();
-    void UpdateCloakClients();
-    CloakState GetClientCloakState(uint clientId);
-    bool TryRegisterNoCloakSolar(const std::string& nickname, uint objectId);
-    extern const uint TIMER_INTERVAL;
-    void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
-    void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
-    void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
-    void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane);
-    int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
-    void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
-    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
-    void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
-    void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
-    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
-    void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList);
-    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void GuidedInit(CGuided* guided, CGuided::CreateParms& parms);
-    void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise);
-    void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
-    void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);
-}
 
 namespace Crafting
 {
@@ -240,31 +186,6 @@ namespace LootBoxes
 {
     void ReadInitialData();
     bool UserCmd_Open(const uint clientId, const std::wstring& argumentsWS);
-}
-
-namespace Mark
-{
-    extern const uint CLEAR_ROTATION_TIMER_INTERVAL;
-    bool MarkObject(const uint clientId, const uint targetId);
-    bool UnmarkObject(const uint clientId, const uint targetId);
-    void AddCloakedPlayer(const uint clientId);
-    void RemoveCloakedPlayer(const uint clientId);
-    void RotateClearNonExistingTargetIds();
-    void UserCmd_Mark(const uint clientId, const std::wstring& wscParam);
-    void UserCmd_GroupMark(const uint clientId, const std::wstring& wscParam);
-    void UserCmd_UnMark(const uint clientId, const std::wstring& wscParam);
-    void UserCmd_UnGroupMark(const uint clientId, const std::wstring& wscParam);
-    void UserCmd_UnMarkAll(const uint clientId, const std::wstring& wscParam);
-    void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId);
-    void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
-    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
-    bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship);
-    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
-    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
-    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
-    HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 }
 
 namespace SolarSpawn

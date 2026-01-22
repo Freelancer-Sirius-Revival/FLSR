@@ -1,4 +1,6 @@
 #include "Main.h"
+#include "Cloak.h"
+#include "Mark.h"
 
 namespace Timers {
 

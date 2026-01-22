@@ -1,4 +1,6 @@
-#include "Main.h"
+#include "Mark.h"
+#include <queue>
+#include "Plugin.h"
 
 /**
 * Mark 1 -> requires Client and Target to be in same system
@@ -532,44 +534,33 @@ namespace Mark
         returncode = DEFAULT_RETURNCODE;
     }
 
-    std::wstring characterFileNameToRename;
-
-    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
-    {
-        if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
-            characterFileNameToRename = L"";
-        returncode = DEFAULT_RETURNCODE;
-        return HKE_OK;
-    }
-
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (!characterFileNameToRename.empty())
+        if (std::wstring oldCharacterFileName; HkGetCharFileName(charname, oldCharacterFileName) == HKE_OK)
         {
             std::wstring characterFileName;
             if (HkGetCharFileName(newCharname, characterFileName) == HKE_OK)
             {
-                if (markedObjectsPerCharacter.contains(characterFileNameToRename))
+                if (markedObjectsPerCharacter.contains(oldCharacterFileName))
                 {
-                    markedObjectsPerCharacter[characterFileName] = markedObjectsPerCharacter[characterFileNameToRename];
-                    markedObjectsPerCharacter.erase(characterFileNameToRename);
+                    markedObjectsPerCharacter[characterFileName] = markedObjectsPerCharacter[oldCharacterFileName];
+                    markedObjectsPerCharacter.erase(oldCharacterFileName);
                 }
-                if (markedCharactersPerCharacter.contains(characterFileNameToRename))
+                if (markedCharactersPerCharacter.contains(oldCharacterFileName))
                 {
-                    markedCharactersPerCharacter[characterFileName] = markedCharactersPerCharacter[characterFileNameToRename];
-                    markedCharactersPerCharacter.erase(characterFileNameToRename);
+                    markedCharactersPerCharacter[characterFileName] = markedCharactersPerCharacter[oldCharacterFileName];
+                    markedCharactersPerCharacter.erase(oldCharacterFileName);
                 }
                 for (auto& otherCharacter : markedCharactersPerCharacter)
                 {
-                    if (otherCharacter.second.contains(characterFileNameToRename))
+                    if (otherCharacter.second.contains(oldCharacterFileName))
                     {
-                        otherCharacter.second.erase(characterFileNameToRename);
+                        otherCharacter.second.erase(oldCharacterFileName);
                         otherCharacter.second.insert(characterFileName);
                     }
                 }
             }
         }
-        characterFileNameToRename = L"";
         returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }

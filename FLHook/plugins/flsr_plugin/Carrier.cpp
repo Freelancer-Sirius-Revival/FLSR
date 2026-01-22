@@ -1,4 +1,7 @@
-#include "Main.h"
+#include "Carrier.h"
+#include <algorithm>
+#include "Cloak.h"
+#include "Plugin.h"
 
 /**
 * CARRIER PLUGIN
@@ -35,7 +38,7 @@
     Player (forcefully gets) unassigned & leaves carrier
 */
 
-namespace Docking
+namespace Carrier
 {
     struct CarrierDefinition
     {
@@ -45,7 +48,7 @@ namespace Docking
         uint baseId = 0;
         float dockOffset[3] = { 0,0,0 };
     };
-    static std::unordered_map<uint, CarrierDefinition> carrierDefinitionByShipArchetypeId;
+    std::unordered_map<uint, CarrierDefinition> carrierDefinitionByShipArchetypeId;
 
     enum class DockState
     {
@@ -62,8 +65,8 @@ namespace Docking
         bool assigned = false;
         DockState dockState = DockState::Undocked;
     };
-    static std::unordered_map<uint, CarrierAssignment> carrierAssignmentByCharacterFileNameId;
-    static std::unordered_map<uint, std::wstring> lastRegularBaseNameByCharacterFileNameId;
+    std::unordered_map<uint, CarrierAssignment> carrierAssignmentByCharacterFileNameId;
+    std::unordered_map<uint, std::wstring> lastRegularBaseNameByCharacterFileNameId;
 
     struct Location
     {
@@ -71,30 +74,30 @@ namespace Docking
         Vector position;
         Matrix orientation;
     };
-    static std::unordered_map<uint, Location> dockLocationByCharacterFileNameIds;
+    std::unordered_map<uint, Location> dockLocationByCharacterFileNameIds;
 
     struct UndockPath
     {
         std::vector<uint> remainingJumpPath;
         Location lastDockLocation;
     };
-    static std::unordered_map<uint, UndockPath> undockPathByClientId;
+    std::unordered_map<uint, UndockPath> undockPathByClientId;
 
-    static std::unordered_map<uint, std::vector<uint>> shortestSystemPathToTargets;
+    std::unordered_map<uint, std::vector<uint>> shortestSystemPathToTargets;
     // The order of systems to jump through is reversed to use pop_back() when traversing a path.
-    static std::unordered_map<uint, std::vector<uint>> shortestJumpObjectPathToTargets;
+    std::unordered_map<uint, std::vector<uint>> shortestJumpObjectPathToTargets;
 
-    static uint dockSystemId = 0;
-    static float dockRadius = 100.0f;
+    uint dockSystemId = 0;
+    float dockRadius = 100.0f;
 
-    static std::set<uint> carrierClientIdInJump;
+    std::set<uint> carrierClientIdInJump;
 
-    std::string GetCarrierMapFilePath()
+    static std::string GetCarrierMapFilePath()
     {
         return scAcctPath + "\\carriers.ini";
     }
 
-    std::string GetCharacterFileName(const uint clientId)
+    static std::string GetCharacterFileName(const uint clientId)
     {
         if(!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
             return "";
@@ -107,7 +110,7 @@ namespace Docking
     /**
     * Assigning a character to a carrier means they will respawn from this carrier each time they die.
     */
-    void AssignCharacterToCarrier(const std::string& characterFileName, const std::string& carrierFileName, const uint carrierShiparchId)
+    static void AssignCharacterToCarrier(const std::string& characterFileName, const std::string& carrierFileName, const uint carrierShiparchId)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         carrierAssignmentByCharacterFileNameId[characterFileNameId].characterFileName = characterFileName;
@@ -122,7 +125,7 @@ namespace Docking
     /**
     * Unassigning a character from a carrier means they will still only spawn from the carrier one last time.
     */
-    void UnassignCharacterFromCarrier(const std::string& characterFileName)
+    static void UnassignCharacterFromCarrier(const std::string& characterFileName)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
@@ -132,13 +135,13 @@ namespace Docking
         }
     }
 
-    void DeleteCharacterCarrierDockLocation(const std::string& characterFileName)
+    static void DeleteCharacterCarrierDockLocation(const std::string& characterFileName)
     {
         dockLocationByCharacterFileNameIds.erase(CreateID(characterFileName.c_str()));
         IniDelete(GetCarrierMapFilePath(), characterFileName, "carrier_dock_location");
     }
 
-    void RemoveCharacterFromCarrier(const std::string characterFileName)
+    static void RemoveCharacterFromCarrier(const std::string characterFileName)
     {
         const std::string& carrierFilePath = GetCarrierMapFilePath();
         carrierAssignmentByCharacterFileNameId.erase(CreateID(characterFileName.c_str()));
@@ -147,12 +150,12 @@ namespace Docking
         IniDelete(carrierFilePath, characterFileName, "carrier_shiparchetype");
     }
 
-    bool IsLinkedToCarrier(const uint characterFileNameId)
+    static bool IsLinkedToCarrier(const uint characterFileNameId)
     {
         return carrierAssignmentByCharacterFileNameId.contains(characterFileNameId) && !carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName.empty();
     }
 
-    bool IsCarrierBase(const uint baseId)
+    static bool IsCarrierBase(const uint baseId)
     {
         for (const auto& carrierDefinition : carrierDefinitionByShipArchetypeId)
         {
@@ -162,7 +165,7 @@ namespace Docking
         return false;
     }
 
-    void SaveCharacterLastRegularBase(const std::string& characterFileName, const uint baseId)
+    static void SaveCharacterLastRegularBase(const std::string& characterFileName, const uint baseId)
     {
         if (IsCarrierBase(baseId))
             return;
@@ -171,7 +174,7 @@ namespace Docking
         IniWrite(GetCarrierMapFilePath(), characterFileName, "last_regular_base", wstos(baseName));
     }
 
-    void SaveCharacterCarrierDockLocation(const std::string& characterFileName, const uint systemId, const Vector& position, const Matrix& orientation)
+    static void SaveCharacterCarrierDockLocation(const std::string& characterFileName, const uint systemId, const Vector& position, const Matrix& orientation)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         Location location;
@@ -187,7 +190,7 @@ namespace Docking
         );
     }
 
-    void SaveCharacterDockState(const std::string& characterFileName, const DockState dockState)
+    static void SaveCharacterDockState(const std::string& characterFileName, const DockState dockState)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         carrierAssignmentByCharacterFileNameId[characterFileNameId].dockState = dockState;
@@ -207,7 +210,7 @@ namespace Docking
         IniWrite(GetCarrierMapFilePath(), characterFileName, "dock_state", dockStateString);
     }
 
-    void ReadCharacterData()
+    static void ReadCharacterData()
     {
         INI_Reader ini;
         if (ini.open(GetCarrierMapFilePath().c_str(), false))
@@ -263,11 +266,11 @@ namespace Docking
         }
     }
 
-    void LoadSettings()
+    static void LoadSettings()
     {
         char currentDirectory[MAX_PATH];
         GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-        const std::string configFilePath = std::string(currentDirectory) + Globals::CARRIER_CONFIG_FILE;
+        const std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-Carrier.cfg";
 
         carrierDefinitionByShipArchetypeId.clear();
         INI_Reader ini;
@@ -366,7 +369,7 @@ namespace Docking
         }
     }
 
-    static bool initialized = false;
+    bool initialized = false;
 
     // This must be executed AFTER LoadSettings and when the game data has already been stored to memory.
     void InitializeWithGameData()
@@ -374,6 +377,10 @@ namespace Docking
         if (initialized)
             return;
         initialized = true;
+
+        ConPrint(L"Initializing Carrier... ");
+
+        LoadSettings();
 
         std::vector<CSolar*> jumpObjects;
         CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
@@ -407,9 +414,11 @@ namespace Docking
         }
 
         ReadCharacterData();
+
+        ConPrint(L"Done\n");
     }
 
-    bool AreInSameGroup(const uint clientAId, const uint clientBId)
+    static bool AreInSameGroup(const uint clientAId, const uint clientBId)
     {
         if (!HkIsValidClientID(clientAId) || !HkIsValidClientID(clientBId))
             return false;
@@ -426,7 +435,7 @@ namespace Docking
         return false;
     }
 
-    bool IsCarrier(const uint clientId)
+    static bool IsCarrier(const uint clientId)
     {
         if (!HkIsValidClientID(clientId))
             return false;
@@ -439,7 +448,7 @@ namespace Docking
         return carrierDefinitionByShipArchetypeId.contains(shiparchId) && carrierDefinitionByShipArchetypeId[shiparchId].slots > 0;
     }
 
-    void TryDock(const uint clientId)
+    static void TryDock(const uint clientId)
     {
         const std::string& clientFileName = GetCharacterFileName(clientId);
         if (clientFileName.empty())
@@ -546,7 +555,7 @@ namespace Docking
         }
     }
 
-    uint FindCarrierClientIdBySlottedClientId(const uint slottedClientId)
+    static uint FindCarrierClientIdBySlottedClientId(const uint slottedClientId)
     {
         const std::string& fileName = GetCharacterFileName(slottedClientId);
         if (fileName.empty())
@@ -565,7 +574,7 @@ namespace Docking
         return 0;
     }
 
-    bool IsCarrierReachable(const uint clientId, const uint carrierId)
+    static bool IsCarrierReachable(const uint clientId, const uint carrierId)
     {
         if (!HkIsValidClientID(carrierId))
             return false;
@@ -615,7 +624,7 @@ namespace Docking
         Error
     };
 
-    JumpState TryJumpToNextSystem(const uint clientId)
+    static JumpState TryJumpToNextSystem(const uint clientId)
     {
         if (!undockPathByClientId.contains(clientId))
             return JumpState::NoJumpPath;
@@ -634,7 +643,7 @@ namespace Docking
         return JumpState::Error;
     }
 
-    void TryReachCarrier(const uint clientId)
+    static void TryReachCarrier(const uint clientId)
     {
         if (!HkIsValidClientID(clientId))
             return;
@@ -743,121 +752,115 @@ namespace Docking
 
     void __stdcall LaunchComplete_After(unsigned int objectId, unsigned int shipId)
     {
-        if (Modules::GetModuleState("CarrierModule"))
+        const uint clientId = HkGetClientIDByShip(shipId);
+        if (!clientId)
         {
-            const uint clientId = HkGetClientIDByShip(shipId);
-            if (!clientId)
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return;
-            }
-
-            const std::string& fileName = GetCharacterFileName(clientId);
-            if (fileName.empty())
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return;
-            }
-
-            const uint fileNameId = CreateID(fileName.c_str());
-
-            // Check if the undock happened from a carrier base.
-            uint baseId;
-            pub::SpaceObj::GetDockingTarget(objectId, baseId);
-            if (!IsCarrierBase(baseId))
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return;
-            }
-
-            uint targetSystemId = 0;
-            undockPathByClientId[clientId].lastDockLocation.systemId = 0;
-            // Check if the player should try to start from a carrier.
-            if (IsLinkedToCarrier(fileNameId))
-            {
-                const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
-                if (carrierId)
-                {
-                    uint carrierSystemId;
-                    pub::Player::GetSystem(carrierId, carrierSystemId);
-                    if (carrierSystemId)
-                        targetSystemId = carrierSystemId;
-                }
-            }
-
-            // If the carrier is not found in any system try to return to the last dock-in position.
-            if (!targetSystemId && dockLocationByCharacterFileNameIds.contains(fileNameId))
-            {
-                // Target the location where the player docked to the carrier.
-                undockPathByClientId[clientId].lastDockLocation = dockLocationByCharacterFileNameIds[fileNameId];
-                targetSystemId = undockPathByClientId[clientId].lastDockLocation.systemId;
-            }
-
-            // If still no target location was found then directly beam back to the last regular base.
-            if (!targetSystemId && lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
-            {
-                if (HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]) == HKE_OK)
-                {
-                    undockPathByClientId.erase(clientId);
-                    returncode = DEFAULT_RETURNCODE;
-                    return;
-                }
-            }
-
-            // Check if a path to the target system exists.
-            if (shortestJumpObjectPathToTargets.contains(targetSystemId))
-            {
-                undockPathByClientId[clientId].remainingJumpPath = shortestJumpObjectPathToTargets[targetSystemId];
-            }
-            else
-            {
-                PrintUserCmdText(clientId, L"BUG: Cannot find target system. Report to developer: " + std::to_wstring(targetSystemId));
-                undockPathByClientId.erase(clientId);
-            }
-
-            TryReachCarrier(clientId);
+            returncode = DEFAULT_RETURNCODE;
+            return;
         }
+
+        const std::string& fileName = GetCharacterFileName(clientId);
+        if (fileName.empty())
+        {
+            returncode = DEFAULT_RETURNCODE;
+            return;
+        }
+
+        const uint fileNameId = CreateID(fileName.c_str());
+
+        // Check if the undock happened from a carrier base.
+        uint baseId;
+        pub::SpaceObj::GetDockingTarget(objectId, baseId);
+        if (!IsCarrierBase(baseId))
+        {
+            returncode = DEFAULT_RETURNCODE;
+            return;
+        }
+
+        uint targetSystemId = 0;
+        undockPathByClientId[clientId].lastDockLocation.systemId = 0;
+        // Check if the player should try to start from a carrier.
+        if (IsLinkedToCarrier(fileNameId))
+        {
+            const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
+            if (carrierId)
+            {
+                uint carrierSystemId;
+                pub::Player::GetSystem(carrierId, carrierSystemId);
+                if (carrierSystemId)
+                    targetSystemId = carrierSystemId;
+            }
+        }
+
+        // If the carrier is not found in any system try to return to the last dock-in position.
+        if (!targetSystemId && dockLocationByCharacterFileNameIds.contains(fileNameId))
+        {
+            // Target the location where the player docked to the carrier.
+            undockPathByClientId[clientId].lastDockLocation = dockLocationByCharacterFileNameIds[fileNameId];
+            targetSystemId = undockPathByClientId[clientId].lastDockLocation.systemId;
+        }
+
+        // If still no target location was found then directly beam back to the last regular base.
+        if (!targetSystemId && lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
+        {
+            if (HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]) == HKE_OK)
+            {
+                undockPathByClientId.erase(clientId);
+                returncode = DEFAULT_RETURNCODE;
+                return;
+            }
+        }
+
+        // Check if a path to the target system exists.
+        if (shortestJumpObjectPathToTargets.contains(targetSystemId))
+        {
+            undockPathByClientId[clientId].remainingJumpPath = shortestJumpObjectPathToTargets[targetSystemId];
+        }
+        else
+        {
+            PrintUserCmdText(clientId, L"BUG: Cannot find target system. Report to developer: " + std::to_wstring(targetSystemId));
+            undockPathByClientId.erase(clientId);
+        }
+
+        TryReachCarrier(clientId);
         returncode = DEFAULT_RETURNCODE;
     }
 
     int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
     {
-        if (Modules::GetModuleState("CarrierModule"))
+        const uint clientId = HkGetClientIDByShip(shipId);
+        if (!clientId)
         {
-            const uint clientId = HkGetClientIDByShip(shipId);
-            if (!clientId)
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return 0;
-            }
+            returncode = DEFAULT_RETURNCODE;
+            return 0;
+        }
 
-            carrierClientIdInJump.erase(clientId);
+        carrierClientIdInJump.erase(clientId);
 
-            // Cancel docking?
-            if (dockPortIndex == -1)
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return 0;
-            }
+        // Cancel docking?
+        if (dockPortIndex == -1)
+        {
+            returncode = DEFAULT_RETURNCODE;
+            return 0;
+        }
 
-            uint shiparchId;
-            pub::Player::GetShipID(clientId, shiparchId);
-            if (!shiparchId)
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return 0;
-            }
+        uint shiparchId;
+        pub::Player::GetShipID(clientId, shiparchId);
+        if (!shiparchId)
+        {
+            returncode = DEFAULT_RETURNCODE;
+            return 0;
+        }
 
-            if (carrierDefinitionByShipArchetypeId.contains(shiparchId))
-            {
-                uint dockTargetType;
-                pub::SpaceObj::GetType(dockTargetId, dockTargetType);
-                if (dockTargetType == ObjectType::JumpHole || dockTargetType == ObjectType::JumpGate)
-                    carrierClientIdInJump.insert(clientId);
+        if (carrierDefinitionByShipArchetypeId.contains(shiparchId))
+        {
+            uint dockTargetType;
+            pub::SpaceObj::GetType(dockTargetId, dockTargetType);
+            if (dockTargetType == ObjectType::JumpHole || dockTargetType == ObjectType::JumpGate)
+                carrierClientIdInJump.insert(clientId);
 
-                returncode = DEFAULT_RETURNCODE;
-                return 0;
-            }
+            returncode = DEFAULT_RETURNCODE;
+            return 0;
         }
 
         returncode = DEFAULT_RETURNCODE;
@@ -866,91 +869,83 @@ namespace Docking
 
     void __stdcall JumpInComplete_After(unsigned int systemId, unsigned int shipId)
     {
-        if (Modules::GetModuleState("CarrierModule"))
-        {
-            uint clientId = HkGetClientIDByShip(shipId);
-            if (clientId)
-                carrierClientIdInJump.erase(clientId);
+        uint clientId = HkGetClientIDByShip(shipId);
+        if (clientId)
+            carrierClientIdInJump.erase(clientId);
 
-            if (undockPathByClientId.contains(clientId))
-                TryReachCarrier(clientId);
-        }
+        if (undockPathByClientId.contains(clientId))
+            TryReachCarrier(clientId);
+
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
     {
-        if (Modules::GetModuleState("CarrierModule"))
+        carrierClientIdInJump.erase(clientId);
+        undockPathByClientId.erase(clientId);
+
+        // Check if the player is related to any carrier.
+        const std::string& characterFileName = GetCharacterFileName(clientId);
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
+        if (IsLinkedToCarrier(characterFileNameId))
         {
-            carrierClientIdInJump.erase(clientId);
-            undockPathByClientId.erase(clientId);
-
-            // Check if the player is related to any carrier.
-            const std::string& characterFileName = GetCharacterFileName(clientId);
-            const uint characterFileNameId = CreateID(characterFileName.c_str());
-            if (IsLinkedToCarrier(characterFileNameId))
+            const auto& assignment = carrierAssignmentByCharacterFileNameId[characterFileNameId];
+            // Do nothing if fully undocked.
+            if (assignment.dockState == DockState::Undocked)
             {
-                const auto& assignment = carrierAssignmentByCharacterFileNameId[characterFileNameId];
-                // Do nothing if fully undocked.
-                if (assignment.dockState == DockState::Undocked)
-                {
-                    returncode = DEFAULT_RETURNCODE;
-                    return;
-                }
-
-                // TODO This will cause the player never be able to leave the base. TryReachCarrier will always teleport back when no undockPath given
-                // Shortcut check if carrier is even reachable. Leads to instant beam back.
-                //uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
-                //if (carrierId && !IsCarrierReachable(clientId, carrierId))
-                //    SaveCharacterDockState(fileName, DockState::Undocking);
-
-                // When logging into space.
-                if (assignment.dockState == DockState::Undocking)
-                    TryReachCarrier(clientId);
-                // When coming just out of a base. LaunchComplete does the rest.
-                else if (assignment.dockState == DockState::Docked)
-                    SaveCharacterDockState(characterFileName, DockState::Undocking);
+                returncode = DEFAULT_RETURNCODE;
+                return;
             }
+
+            // TODO This will cause the player never be able to leave the base. TryReachCarrier will always teleport back when no undockPath given
+            // Shortcut check if carrier is even reachable. Leads to instant beam back.
+            //uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
+            //if (carrierId && !IsCarrierReachable(clientId, carrierId))
+            //    SaveCharacterDockState(fileName, DockState::Undocking);
+
+            // When logging into space.
+            if (assignment.dockState == DockState::Undocking)
+                TryReachCarrier(clientId);
+            // When coming just out of a base. LaunchComplete does the rest.
+            else if (assignment.dockState == DockState::Docked)
+                SaveCharacterDockState(characterFileName, DockState::Undocking);
         }
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
     {
-        if (Modules::GetModuleState("CloakModule"))
+        undockPathByClientId.erase(clientId);
+
+        const std::string& characterFileName = GetCharacterFileName(clientId);
+        if (characterFileName.empty())
         {
-            undockPathByClientId.erase(clientId);
+            returncode = DEFAULT_RETURNCODE;
+            return;
+        }
+        const uint characterFileNameId = CreateID(characterFileName.c_str());
 
-            const std::string& characterFileName = GetCharacterFileName(clientId);
-            if (characterFileName.empty())
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return;
-            }
-            const uint characterFileNameId = CreateID(characterFileName.c_str());
+        if (IsCarrierBase(baseId))
+        {
+            SaveCharacterDockState(characterFileName, DockState::Docked);
+        }
+        else
+        {
+            SaveCharacterLastRegularBase(characterFileName, baseId);
+            // Unassign the player from a carrier once docked to another base than the carrier's interior.
+            if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
+                RemoveCharacterFromCarrier(characterFileName);
+            if (dockLocationByCharacterFileNameIds.contains(characterFileNameId))
+                DeleteCharacterCarrierDockLocation(characterFileName);
 
-            if (IsCarrierBase(baseId))
+            if (IsCarrier(clientId))
             {
-                SaveCharacterDockState(characterFileName, DockState::Docked);
-            }
-            else
-            {
-                SaveCharacterLastRegularBase(characterFileName, baseId);
-                // Unassign the player from a carrier once docked to another base than the carrier's interior.
-                if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
-                    RemoveCharacterFromCarrier(characterFileName);
-                if (dockLocationByCharacterFileNameIds.contains(characterFileNameId))
-                    DeleteCharacterCarrierDockLocation(characterFileName);
-
-                if (IsCarrier(clientId))
+                for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
                 {
-                    for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
+                    if (assignment.second.carrierFileName == characterFileName)
                     {
-                        if (assignment.second.carrierFileName == characterFileName)
-                        {
-                            SaveCharacterLastRegularBase(assignment.second.characterFileName, baseId);
-                            DeleteCharacterCarrierDockLocation(assignment.second.characterFileName);
-                        }
+                        SaveCharacterLastRegularBase(assignment.second.characterFileName, baseId);
+                        DeleteCharacterCarrierDockLocation(assignment.second.characterFileName);
                     }
                 }
             }
@@ -958,7 +953,7 @@ namespace Docking
         returncode = DEFAULT_RETURNCODE;
     }
 
-    void ClearCarrier(const std::string carrierFileName)
+    static void ClearCarrier(const std::string carrierFileName)
     {
         const uint carrierFileNameId = CreateID(carrierFileName.c_str());
         std::vector<std::string> characterFileNamesToRemove;
@@ -971,7 +966,7 @@ namespace Docking
             RemoveCharacterFromCarrier(characterFileName);
     }
 
-    void ClearCarrier(const uint clientId)
+    static void ClearCarrier(const uint clientId)
     {
         const std::string& fileName = GetCharacterFileName(clientId);
         if (!fileName.empty())
@@ -980,14 +975,11 @@ namespace Docking
 
     void __stdcall ReqShipArch_After(unsigned int archetypeId, unsigned int clientId)
     {
-        if (Modules::GetModuleState("CarrierModule"))
-        {
-            ClearCarrier(clientId);
-        }
+        ClearCarrier(clientId);
         returncode = DEFAULT_RETURNCODE;
     }
 
-    void DeleteCharacterFromRecords(const std::string& characterFileName)
+    static void DeleteCharacterFromRecords(const std::string& characterFileName)
     {
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         carrierAssignmentByCharacterFileNameId.erase(characterFileNameId);
@@ -1018,7 +1010,7 @@ namespace Docking
         returncode = DEFAULT_RETURNCODE;
     }
 
-    void MoveCharacterInRecords(const std::string& oldCharacterFileName, const std::string& newCharacterFileName)
+    static void MoveCharacterInRecords(const std::string& oldCharacterFileName, const std::string& newCharacterFileName)
     {
         const uint oldCharacterFileNameId = CreateID(oldCharacterFileName.c_str());
         const uint newCharacterFileNameId = CreateID(newCharacterFileName.c_str());
@@ -1060,34 +1052,20 @@ namespace Docking
         }
     }
 
-    static std::wstring characterFileNameToRename;
-
-    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
-    {
-        if (onlyDelete || HkGetCharFileName(charname, characterFileNameToRename) != HKE_OK)
-            characterFileNameToRename = L"";
-        returncode = DEFAULT_RETURNCODE;
-        return HKE_OK;
-    }
-
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (!characterFileNameToRename.empty())
+        if (std::wstring oldCharacterFileName; HkGetCharFileName(charname, oldCharacterFileName) == HKE_OK)
         {
             std::wstring newCharacterFileName;
             if (HkGetCharFileName(newCharname, newCharacterFileName) == HKE_OK)
-                MoveCharacterInRecords(wstos(characterFileNameToRename), wstos(newCharacterFileName));
+                MoveCharacterInRecords(wstos(oldCharacterFileName), wstos(newCharacterFileName));
         }
-        characterFileNameToRename = L"";
         returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 
     void UserCmd_Dock(const uint clientId, const std::wstring& wscParam)
     {
-        if (Modules::GetModuleState("CarrierModule"))
-        {
-            TryDock(clientId);
-        }
+        TryDock(clientId);
     }
 }

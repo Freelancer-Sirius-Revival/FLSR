@@ -1,6 +1,7 @@
 #include "Main.h"
 #include "rpcdce.h"
 #include <regex>
+#include <filesystem>
 
 namespace Storage
 {
@@ -135,11 +136,11 @@ namespace Storage
 			return;
 		initialized = true;
 
+		ConPrint(L"Initializing Storage... ");
+
 		// Set up the directory name for all save files of this plugin.
 		outputDirectory = scAcctPath + "\\storages\\";
-
-		if (!std::filesystem::is_directory(outputDirectory))
-			return;
+		std::filesystem::create_directory(outputDirectory);
 
 		// Read all storage save files
 		const std::regex filePattern(".{4}-.{4}-.{4}-.{4}\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
@@ -171,6 +172,8 @@ namespace Storage
 			}
 			base = Universe::GetNextBase();
 		}
+
+		ConPrint(L"Done\n");
 	}
 
 	std::string GetCharacterFileName(const uint clientId)

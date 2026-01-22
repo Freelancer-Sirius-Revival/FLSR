@@ -15,6 +15,8 @@ namespace Insurance
             return;
         initialized = true;
 
+        ConPrint(L"Initializing Insurance... ");
+
         const HMODULE commonHandle = GetModuleHandle("common.dll");
         if (commonHandle)
             shipRepairCostFactor = *(float*)(DWORD(commonHandle) + 0x004A28);
@@ -25,6 +27,8 @@ namespace Insurance
 
         // Set up the directory name for all save files of this plugin.
         outputDirectory = scAcctPath + "\\insurances\\";
+
+        ConPrint(L"Done\n");
     }
 
     static std::string GetCharacterFileName(const uint clientId)

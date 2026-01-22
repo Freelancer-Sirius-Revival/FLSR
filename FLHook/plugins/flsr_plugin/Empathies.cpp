@@ -184,10 +184,14 @@ namespace Empathies
             return;
         initialized = true;
 
+        ConPrint(L"Initializing Empathies... ");
+
         ReadFiles(); // Requires Reputations to have been loaded.
 
         const HMODULE contentHandle = LoadContentDll();
         if (contentHandle)
             maxReputationThreshold = 1.0f - static_cast<float>(*(double*)(DWORD(contentHandle) + 0x11B930));
+
+        ConPrint(L"Done\n");
     }
 }

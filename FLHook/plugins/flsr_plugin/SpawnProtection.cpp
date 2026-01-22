@@ -3,8 +3,8 @@
 namespace SpawnProtection
 {
     const mstime TIMER_INTERVAL = 500;
-    static std::unordered_map<uint, mstime> protectionEndTimePerShip;
-    static mstime protectionDuration = 0;
+    std::unordered_map<uint, mstime> protectionEndTimePerShip;
+    mstime protectionDuration = 0;
 
     void LoadSettings()
     {

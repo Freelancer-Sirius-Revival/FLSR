@@ -26,7 +26,7 @@ namespace IFF
         Allied
     };
 
-    static std::unordered_map<std::string, std::unordered_map<std::string, Attitude>> characterFileNamesToCharacterFileNameAttitudes;
+    std::unordered_map<std::string, std::unordered_map<std::string, Attitude>> characterFileNamesToCharacterFileNameAttitudes;
 
     static void ApplyAttitude(const std::pair<uint, uint>& clientIds, const Attitude attitude)
     {
@@ -102,12 +102,15 @@ namespace IFF
         return scAcctPath + "\\iff.ini";
     }
 
-    static bool initialized = false;
+    bool initialized = false;
     void ReadCharacterData()
     {
         if (initialized)
             return;
         initialized = true;
+
+        ConPrint(L"Initializing IFF... ");
+
         INI_Reader ini;
         if (ini.open(GetPlayerAttitudesFilePath().c_str(), false))
         {
@@ -129,6 +132,8 @@ namespace IFF
             }
             ini.close();
         }
+
+        ConPrint(L"Done\n");
     }
 
     static std::string GetAttitudeStringValue(const Attitude attitude)

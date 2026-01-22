@@ -126,7 +126,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BatsBotsShipTransferFix.cpp" />
+    <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp" />
+    <ClCompile Include="bugfixes\MissionAbortFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
     <ClCompile Include="missions\actions\ActRemoveCargo.cpp" />
@@ -150,7 +151,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
-    <ClCompile Include="MissionAbortFix.cpp" />
     <ClCompile Include="missions\actions\ActActMsn.cpp" />
     <ClCompile Include="missions\actions\ActActMsnTrig.cpp" />
     <ClCompile Include="missions\actions\ActActTrig.cpp" />
@@ -248,6 +248,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bugfixes\MissionAbortFix.h" />
     <ClInclude Include="Carrier.h" />
     <ClInclude Include="Cloak.h" />
     <ClInclude Include="IFF.h" />
@@ -264,7 +265,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="MissionAbortFix.h" />
     <ClInclude Include="missions\actions\ActActMsn.h" />
     <ClInclude Include="missions\actions\ActActMsnTrig.h" />
     <ClInclude Include="missions\actions\ActActTrig.h" />

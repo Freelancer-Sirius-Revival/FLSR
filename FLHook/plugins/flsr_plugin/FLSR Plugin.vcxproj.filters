@@ -23,7 +23,6 @@
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
     <ClCompile Include="SolarSpawn.cpp" />
-    <ClCompile Include="BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="missions\actions\ActActTrig.cpp">
       <Filter>Missions\Actions</Filter>
@@ -135,7 +134,6 @@
     <ClCompile Include="missions\conditions\CndCloaked.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
-    <ClCompile Include="MissionAbortFix.cpp" />
     <ClCompile Include="missions\MissionBoard.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
@@ -301,6 +299,12 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="NameLimiter.cpp" />
+    <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="bugfixes\MissionAbortFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -428,7 +432,6 @@
     <ClInclude Include="missions\conditions\CndCloaked.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="MissionAbortFix.h" />
     <ClInclude Include="missions\MissionBoard.h">
       <Filter>Missions</Filter>
     </ClInclude>
@@ -614,6 +617,9 @@
     <ClInclude Include="Carrier.h" />
     <ClInclude Include="Cloak.h" />
     <ClInclude Include="Mark.h" />
+    <ClInclude Include="bugfixes\MissionAbortFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />
@@ -634,6 +640,9 @@
     </Filter>
     <Filter Include="Missions\Objectives">
       <UniqueIdentifier>{70fb0779-62c5-431f-b907-c667ee804cd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bugfixes">
+      <UniqueIdentifier>{99a19828-e408-49ee-a814-954a7bf2b111}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

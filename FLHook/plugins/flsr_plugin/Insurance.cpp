@@ -207,9 +207,9 @@ namespace Insurance
         free(keyValues);
     }
 
-    static void DeleteInsuranceIfExisting(const uint clientId)
+    static void DeleteInsuranceIfExisting(const std::string characterFileName)
     {
-        const auto& filePath = GetInsuranceFilePath(clientId);
+        const auto& filePath = outputDirectory + characterFileName + ".ini";
         try
         {
             std::filesystem::remove(filePath);
@@ -598,15 +598,16 @@ namespace Insurance
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        DeleteInsuranceIfExisting(clientId);
-
+        std::wstring characterFileName;
+        if (HkGetCharFileName(info.wszCharname, characterFileName) == HKE_OK)
+            DeleteInsuranceIfExisting(wstos(characterFileName));
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        DeleteInsuranceIfExisting(clientId);
-
+        const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
+        DeleteInsuranceIfExisting(characterFileName);
         returncode = DEFAULT_RETURNCODE;
     }
 

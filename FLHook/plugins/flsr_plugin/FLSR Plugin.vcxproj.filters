@@ -620,6 +620,9 @@
     <ClInclude Include="bugfixes\MissionAbortFix.h">
       <Filter>Bugfixes</Filter>
     </ClInclude>
+    <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

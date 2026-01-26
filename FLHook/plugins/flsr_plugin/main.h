@@ -234,12 +234,6 @@ namespace EquipWhiteList
     void __stdcall ReqAddItem(unsigned int& goodArchetypeId, char* hardpoint, int& count, float& status, bool& mounted, uint clientId);
 }
 
-namespace BatsBotsShipTransferFix
-{
-    void __stdcall GFGoodBuy(const SGFGoodBuyInfo& gbi, unsigned int clientId);
-    void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId);
-}
-
 namespace Discord {
     struct ChatMessage {
         std::wstring wscCharname;
@@ -312,12 +306,6 @@ namespace SpawnProtection
     void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId);
     void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId);
     void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId);
-}
-
-namespace Storage
-{
-    void Initialize();
-    bool UserCmd_Storage(const uint clientId, const std::wstring& arguments);
 }
 
 namespace ConnectionLimiter

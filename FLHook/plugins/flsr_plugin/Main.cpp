@@ -204,6 +204,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::CreateNewCharacter_After, PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::DestroyCharacter_After, PLUGIN_HkIServerImpl_DestroyCharacter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
     

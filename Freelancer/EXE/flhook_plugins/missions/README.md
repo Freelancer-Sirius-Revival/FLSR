@@ -70,6 +70,7 @@ To offer a mission on a Mission Board on bases, set at least `offer_type` and on
 ## `MsnSolar`
 
 This is the definition for a single solar for the mission. Multiple `MsnSolar` can be created for individual solars.
+The hitpoints defined in the archetype will always apply, even if not set as `destructible`. The `destructible` flag only decides whether the health bar is displayed to players. As precaution, any non `destructible` solars will automatically spawned invincible. This can be overriden by using `Act_Invulnerable` after spawn (e.g. to allow full destruction of equipment).
 
 - `nickname` The object name of the solar. Used by trigger conditions and actions. Solar-Spawn-Plugin can use these by prefixing the name with `mission-nickname:`, e.g. `my_first_mission:some_station`.
     1. `STRING` The name. Must be unique in this mission.

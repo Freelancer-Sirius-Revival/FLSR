@@ -655,9 +655,19 @@ namespace Insurance
         returncode = DEFAULT_RETURNCODE;
     }
 
+    std::wstring oldCharacterFileName = L"";
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        std::wstring output = L"";
+        oldCharacterFileName = HkGetCharFileName(charname, output) == HKE_OK ? output : L"";
+        returncode = DEFAULT_RETURNCODE;
+        return HKE_OK;
+    }
+
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (std::wstring oldCharacterFileName; HkGetCharFileName(charname, oldCharacterFileName) == HKE_OK)
+        if (!oldCharacterFileName.empty())
         {
             const std::string sOldCharacterFileName = wstos(oldCharacterFileName);
             if (onlyDelete)

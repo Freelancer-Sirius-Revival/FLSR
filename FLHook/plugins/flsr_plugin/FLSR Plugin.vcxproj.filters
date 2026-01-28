@@ -620,6 +620,7 @@
     <ClInclude Include="bugfixes\MissionAbortFix.h">
       <Filter>Bugfixes</Filter>
     </ClInclude>
+    <ClInclude Include="Storage.h" />
     <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h">
       <Filter>Bugfixes</Filter>
     </ClInclude>

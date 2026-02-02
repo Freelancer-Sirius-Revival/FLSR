@@ -1346,6 +1346,7 @@ enum class DamageCause
 	Suicide = 0x8,
 	DummyDisrupter = 0xC0,
 	UnkDisrupter = 0x15,
+	RandomTlrDisruption = 0x17,
 	Admin = 0x18
 };
 

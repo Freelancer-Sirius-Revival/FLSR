@@ -1,5 +1,6 @@
 #include "ObjGotoSpline.h"
 #include "ObjCndDistVec.h"
+#include "ObjUtils.h"
 
 namespace Missions
 {
@@ -40,10 +41,10 @@ namespace Missions
 		gotoOp.shipMoves2 = true;
 		gotoOp.goToCruise = !noCruise;
 		gotoOp.goToNoCruise = noCruise;
-		gotoOp.objIdToWaitFor = 0;
-		const auto& mission = missions.at(parent.missionId);
-		if (const auto& objectEntry = mission.objectIdsByName.find(objNameToWaitFor); objectEntry != mission.objectIdsByName.end())
-			gotoOp.objIdToWaitFor = objectEntry->second;
+		if (uint waitForObjId; FindObjectByNameOrFirstPlayerByLabel(missions.at(parent.missionId), objNameToWaitFor, waitForObjId))
+			gotoOp.objIdToWaitFor = waitForObjId;
+		else
+			gotoOp.objIdToWaitFor = 0;
 		gotoOp.startWaitDistance = startWaitDistance;
 		gotoOp.endWaitDistance = endWaitDistance;
 		pub::AI::SubmitDirective(state.objId, &gotoOp);

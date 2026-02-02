@@ -1,5 +1,6 @@
 #include "ObjStayInRange.h"
 #include "ObjCndTrue.h"
+#include "ObjUtils.h"
 
 namespace Missions
 {
@@ -38,16 +39,17 @@ namespace Missions
 			if (zoneParams.iZoneType == ZoneType::SpaceObj)
 			{
 				uint targetObjId = 0;
-				const auto& mission = missions.at(parent.missionId);
-				if (const auto& objectEntry = mission.objectIdsByName.find(targetObjNameOrId); objectEntry != mission.objectIdsByName.end())
-					targetObjId = objectEntry->second;
-				if (!targetObjId)
-					targetObjId = targetObjNameOrId;
+				if (!FindObjectByNameOrFirstPlayerByLabel(missions.at(parent.missionId), targetObjNameOrId, targetObjId))
+				{
+					// Assume the target to be a static world object.
+					if (pub::SpaceObj::ExistsAndAlive(targetObjNameOrId) == 0)
+						targetObjId = targetObjNameOrId;
+				}
 
 				if (targetObjId)
 					zoneParams.iSpaceObj = targetObjId;
 				else
-					zoneParams.iDunno_0x10 = 2;
+					zoneParams.iDunno_0x10 = ZoneSetup::Delete;
 			}
 			else
 			{

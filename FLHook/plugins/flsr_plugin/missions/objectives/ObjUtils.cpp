@@ -18,13 +18,14 @@ bool FindObjectByNameOrFirstPlayerByLabel(const Missions::Mission& mission, cons
 				pub::Player::GetShip(object.id, shipId);
 				if (shipId)
 				{
-					foundObjId = object.id;
+					foundObjId = shipId;
+					ConPrint(L"Found player ship");
 					break;
 				}
 			}
 		}
 	}
-	if (!foundObjId || pub::SpaceObj::ExistsAndAlive(foundObjId) != 0)
+	if (pub::SpaceObj::ExistsAndAlive(foundObjId) != 0)
 		foundObjId = 0;
 	return foundObjId != 0;
 }

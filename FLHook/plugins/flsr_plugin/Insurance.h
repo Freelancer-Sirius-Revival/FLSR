@@ -11,6 +11,7 @@ namespace Insurance
 	void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);
 	void __stdcall BaseExit_After(unsigned int baseId, unsigned int clientId);
 	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
+	HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 	HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete);
 	bool UserCmds(const uint clientId, const std::wstring& argumentsWS);
 }

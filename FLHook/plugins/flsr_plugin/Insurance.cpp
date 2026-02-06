@@ -207,9 +207,9 @@ namespace Insurance
         free(keyValues);
     }
 
-    static void DeleteInsuranceIfExisting(const uint clientId)
+    static void DeleteInsuranceIfExisting(const std::string characterFileName)
     {
-        const auto& filePath = GetInsuranceFilePath(clientId);
+        const auto& filePath = outputDirectory + characterFileName + ".ini";
         try
         {
             std::filesystem::remove(filePath);
@@ -282,7 +282,9 @@ namespace Insurance
             // Equip with price=0 is fixed equipment and must always be restored
             if (IsEquipment(archetypeType) && (good->fPrice == 0.0f || (insurance.type & InsuranceType::Equipment)))
             {
-                totalCost += static_cast<int>(std::floor(good->fPrice));
+                // Equipment always is stored by its max repair cost.
+                // This way there will always be enough money deposited for full repair, or restoring the item based on full repair price.
+                totalCost += static_cast<int>(std::floor(good->fPrice * equipmentRepairCostFactor));
                 InsuredItem insured;
                 insured.archId = equip.get_arch_id();
                 insured.count = 1;
@@ -459,7 +461,7 @@ namespace Insurance
                     itemToAdds.push_back(insuredItem);
                     const GoodInfo* good = GoodList::find_by_id(insuredItem.archId);
                     if (good)
-                        restoreCost += good->fPrice;
+                        restoreCost += good->fPrice * equipmentRepairCostFactor;
                 }
             }
             else if (IsConsumable(equipment->get_class_type()))
@@ -598,15 +600,16 @@ namespace Insurance
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        DeleteInsuranceIfExisting(clientId);
-
+        std::wstring characterFileName;
+        if (HkGetCharFileName(info.wszCharname, characterFileName) == HKE_OK)
+            DeleteInsuranceIfExisting(wstos(characterFileName));
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        DeleteInsuranceIfExisting(clientId);
-
+        const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
+        DeleteInsuranceIfExisting(characterFileName);
         returncode = DEFAULT_RETURNCODE;
     }
 
@@ -654,9 +657,19 @@ namespace Insurance
         returncode = DEFAULT_RETURNCODE;
     }
 
+    std::wstring oldCharacterFileName = L"";
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        std::wstring output = L"";
+        oldCharacterFileName = HkGetCharFileName(charname, output) == HKE_OK ? output : L"";
+        returncode = DEFAULT_RETURNCODE;
+        return HKE_OK;
+    }
+
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (std::wstring oldCharacterFileName; HkGetCharFileName(charname, oldCharacterFileName) == HKE_OK)
+        if (!oldCharacterFileName.empty())
         {
             const std::string sOldCharacterFileName = wstos(oldCharacterFileName);
             if (onlyDelete)
@@ -731,21 +744,21 @@ namespace Insurance
             {
                 switch (insuranceByCharacterFileName[GetCharacterFileName(clientId)].type)
                 {
-                case InsuranceType::None:
-                    PrintUserCmdText(clientId, L"Insurance deactivated.");
-                    break;
+                    case InsuranceType::None:
+                        PrintUserCmdText(clientId, L"Insurance deactivated. Dock on a base and type /insurance to set up insurance.");
+                        break;
 
-                case InsuranceType::Equipment:
-                    PrintUserCmdText(clientId, L"Insurance activated for ship and equipment.");
-                    break;
+                    case InsuranceType::Equipment:
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and equipment. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        break;
 
-                case InsuranceType::Consumables:
-                    PrintUserCmdText(clientId, L"Insurance activated for ship and consumables.");
-                    break;
+                    case InsuranceType::Consumables:
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        break;
 
-                case InsuranceType::All:
-                    PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables.");
-                    break;
+                    case InsuranceType::All:
+                        PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        break;
                 }
             }
             else if (!baseId)

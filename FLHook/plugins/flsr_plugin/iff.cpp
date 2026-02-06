@@ -466,9 +466,19 @@ namespace IFF
         returncode = DEFAULT_RETURNCODE;
     }
 
+    std::string oldCharacterFileName = "";
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        std::wstring output = L"";
+        oldCharacterFileName = HkGetCharFileName(charname, output) == HKE_OK ? wstos(output) : "";
+        returncode = DEFAULT_RETURNCODE;
+        return HKE_OK;
+    }
+
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (std::string oldCharacterFileName = GetCharacterFileName(charname); !oldCharacterFileName.empty())
+        if (!oldCharacterFileName.empty())
         {
             const std::string& characterFileName = GetCharacterFileName(newCharname);
             for (auto& characterFileNameToCharacterFileNameAttitudes : characterFileNamesToCharacterFileNameAttitudes)
@@ -495,6 +505,7 @@ namespace IFF
                     IniWrite(GetPlayerAttitudesFilePath(), characterFileName, characterFileNameAttitudes.first, attitudeValue);
             }
         }
+        oldCharacterFileName = "";
         returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -137,6 +137,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndHealthInc.cpp" />
     <ClCompile Include="missions\conditions\CndLeaveMsn.cpp" />
     <ClCompile Include="missions\MatrixMath.cpp" />
+    <ClCompile Include="missions\objectives\ObjUtils.cpp" />
+    <ClCompile Include="missions\randomMissions\TradeMissions.cpp" />
     <ClCompile Include="NameLimiter.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
@@ -234,6 +236,10 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\objectives\ObjStayInRange.cpp" />
     <ClCompile Include="missions\ShipSpawning.cpp" />
     <ClCompile Include="missions\Trigger.cpp" />
+    <ClCompile Include="missions\randomMissions\Costumes.cpp" />
+    <ClCompile Include="missions\randomMissions\Factions.cpp" />
+    <ClCompile Include="missions\randomMissions\Offers.cpp" />
+    <ClCompile Include="missions\randomMissions\RandomMissions.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="Pilots.cpp" />
@@ -248,6 +254,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h" />
     <ClInclude Include="bugfixes\MissionAbortFix.h" />
     <ClInclude Include="Carrier.h" />
     <ClInclude Include="Cloak.h" />
@@ -260,6 +267,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="missions\conditions\CndHealthInc.h" />
     <ClInclude Include="missions\conditions\CndLeaveMsn.h" />
+    <ClInclude Include="missions\objectives\ObjUtils.h" />
+    <ClInclude Include="missions\randomMissions\TradeMissions.h" />
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="Empathies.h" />
@@ -358,9 +367,14 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\objectives\ObjStayInRange.h" />
     <ClInclude Include="missions\ShipSpawning.h" />
     <ClInclude Include="missions\Trigger.h" />
+    <ClInclude Include="missions\randomMissions\Costumes.h" />
+    <ClInclude Include="missions\randomMissions\Factions.h" />
+    <ClInclude Include="missions\randomMissions\Offers.h" />
+    <ClInclude Include="missions\randomMissions\RandomMissions.h" />
     <ClInclude Include="Pilots.h" />
     <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="Plugin.h" />
+    <ClInclude Include="Storage.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">

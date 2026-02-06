@@ -33,7 +33,7 @@ namespace Missions
 		MissionOffer offer;
 		uint offerId;
 
-		std::vector<Trigger> triggers;
+		std::unordered_map<uint, Trigger> triggers;
 		std::vector<MsnSolar> solars;
 		std::unordered_map<uint, Npc> npcs;
 		std::unordered_map<uint, MsnNpc> msnNpcs;
@@ -64,6 +64,7 @@ namespace Missions
 	private:
 		MissionState state;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
+		bool markedForDeletion;
 
 		void EvaluateCountConditions(const uint label) const;
 
@@ -73,7 +74,7 @@ namespace Missions
 		bool CanBeStarted() const;
 		bool IsActive() const;
 		void Start();
-		void End();
+		void End(bool markForDeletion = false, bool allowRestart = false);
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
 		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);
 		void AddLabelToObject(const MissionObject& object, const uint label);
@@ -81,6 +82,8 @@ namespace Missions
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
 		uint FindObjNameByObjId(const uint objId) const;
+		bool ToBeDeleted() const;
+		bool TryAddToJobBoard();
 	};
 
 	extern std::unordered_map<uint, Mission> missions;

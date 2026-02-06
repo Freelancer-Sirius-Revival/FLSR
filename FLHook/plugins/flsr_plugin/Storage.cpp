@@ -1,7 +1,8 @@
-#include "Main.h"
+#include "Storage.h"
 #include "rpcdce.h"
 #include <regex>
 #include <filesystem>
+#include "Plugin.h"
 
 namespace Storage
 {
@@ -25,16 +26,16 @@ namespace Storage
 		std::unordered_map<uint, Storage> storagesByBaseId = {};
 	};
 
-	static std::unordered_map<std::string, Account> accountByAccountUid;
-	static std::vector<uint> excludedBaseIds;
-	static std::unordered_map<std::string, std::string> accountUidByCharacterFileName;
+	std::unordered_map<std::string, Account> accountByAccountUid;
+	std::vector<uint> excludedBaseIds;
+	std::unordered_map<std::string, std::string> accountUidByCharacterFileName;
 
-	static std::string outputDirectory;
-	static int maxCharacterMoney = 999999999;
+	std::string outputDirectory;
+	int maxCharacterMoney = 999999999;
 
-	static std::unordered_map<std::wstring, uint> baseIdsByLoweredDisplayName;
+	std::unordered_map<std::wstring, uint> baseIdsByLoweredDisplayName;
 
-	std::wstring GetBaseName(const uint baseId)
+	static std::wstring GetBaseName(const uint baseId)
 	{
 		uint strId;
 		pub::GetBaseStridName(strId, baseId);
@@ -43,7 +44,7 @@ namespace Storage
 		return std::to_wstring(baseId);
 	}
 
-	std::wstring GetEquipmentName(const uint archetypeId)
+	static std::wstring GetEquipmentName(const uint archetypeId)
 	{
 		const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
 		if (goodInfo && goodInfo->iIDSName > 0)
@@ -51,7 +52,7 @@ namespace Storage
 		return std::to_wstring(archetypeId);
 	}
 
-	void LoadStorage(const std::wstring& filePath)
+	static void LoadStorage(const std::wstring& filePath)
 	{
 		INI_Reader ini;
 		if (ini.open(wstos(filePath).c_str(), false))
@@ -108,7 +109,7 @@ namespace Storage
 		}
 	}
 
-	void LoadLinkedCharacters(const std::wstring& filePath)
+	static void LoadLinkedCharacters(const std::wstring& filePath)
 	{
 		INI_Reader ini;
 		if (ini.open(wstos(filePath).c_str(), false))
@@ -129,7 +130,7 @@ namespace Storage
 		}
 	}
 
-	static bool initialized = false;
+	bool initialized = false;
 	void Initialize()
 	{
 		if (initialized)
@@ -176,7 +177,7 @@ namespace Storage
 		ConPrint(L"Done\n");
 	}
 
-	std::string GetCharacterFileName(const uint clientId)
+	static std::string GetCharacterFileName(const uint clientId)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return "";
@@ -186,7 +187,13 @@ namespace Storage
 		return wstos(characterFileName);
 	}
 
-	void SwitchToAccount(const uint clientId, const std::string accountUid)
+	static void UnlinkFromAccount(const std::string characterFileName)
+	{
+		IniDelete(outputDirectory + "\\linked_chars.ini", "LinkedCharacters", characterFileName);
+		accountUidByCharacterFileName.erase(characterFileName);
+	}
+
+	static void SwitchToAccount(const uint clientId, const std::string accountUid)
 	{
 		if (!accountByAccountUid.contains(accountUid))
 		{
@@ -206,25 +213,25 @@ namespace Storage
 		PrintUserCmdText(clientId, L"Switched to the storage account!");
 	}
 
-	bool HasAccount(const uint clientId)
+	static bool HasAccount(const uint clientId)
 	{
 		return accountUidByCharacterFileName.contains(GetCharacterFileName(clientId));
 	}
 
-	bool IsPlayerDocked(const uint clientId)
+	static bool IsPlayerDocked(const uint clientId)
 	{
 		uint baseId;
 		pub::Player::GetBase(clientId, baseId);
-		return baseId;
+		return baseId != 0;
 	}
 
-	Account& GetAccount(const uint clientId)
+	static Account& GetAccount(const uint clientId)
 	{
 		const std::string& accountUid = accountUidByCharacterFileName[GetCharacterFileName(clientId)];
 		return accountByAccountUid[accountUid];
 	}
 
-	void ShowCurrentAccountUid(const uint clientId)
+	static void ShowCurrentAccountUid(const uint clientId)
 	{
 		if (HasAccount(clientId))
 			PrintUserCmdText(clientId, L"Active storage account ID: " + stows(GetAccount(clientId).uid));
@@ -232,7 +239,7 @@ namespace Storage
 			PrintUserCmdText(clientId, L"No active storage account. Create one by typing: /storage new");
 	}
 
-	void CreateNewAccount(const uint clientId)
+	static void CreateNewAccount(const uint clientId)
 	{
 		uint attempts = 0;
 		std::string uuidString = "";
@@ -274,7 +281,7 @@ namespace Storage
 		SwitchToAccount(clientId, uuidString);
 	}
 
-	void ListStorages(const uint clientId)
+	static void ListStorages(const uint clientId)
 	{
 		if (!HasAccount(clientId))
 		{
@@ -296,7 +303,7 @@ namespace Storage
 			PrintUserCmdText(clientId, L"Stored items on: " + result);
 	}
 
-	void ListStoredItems(const uint clientId, const uint baseId)
+	static void ListStoredItems(const uint clientId, const uint baseId)
 	{
 		if (!HasAccount(clientId))
 		{
@@ -326,7 +333,7 @@ namespace Storage
 			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountByName[name]) + L"\u00D7 " + name);
 	}
 
-	void ListUnmountedCharacterItems(const uint clientId)
+	static void ListUnmountedCharacterItems(const uint clientId)
 	{
 		if (!IsPlayerDocked(clientId))
 		{
@@ -355,17 +362,17 @@ namespace Storage
 			PrintUserCmdText(clientId, L"[" + std::to_wstring(number++) + L"] " + std::to_wstring(itemCountByName[name]) + L"\u00D7 " + name);
 	}
 
-	void StoreItem(const uint clientId, const uint baseId, const uint itemId)
+	static void StoreItem(const uint clientId, const uint baseId, const uint itemId)
 	{
 
 	}
 
-	void UnstoreItem(const uint clientId, const uint baseId, const uint itemId)
+	static void UnstoreItem(const uint clientId, const uint baseId, const uint itemId)
 	{
 
 	}
 
-	std::wstring PrintMoney(const int64_t amount)
+	static std::wstring PrintMoney(const int64_t amount)
 	{
 		std::wstring result = std::to_wstring(amount);
 		for (int pos = result.size() - 3; pos > 0; pos = pos - 3)
@@ -373,7 +380,7 @@ namespace Storage
 		return L"$" + result;
 	}
 
-	void DepositMoney(const uint clientId, const int64_t amount)
+	static void DepositMoney(const uint clientId, const int64_t amount)
 	{
 		if (!IsPlayerDocked(clientId))
 		{
@@ -412,7 +419,7 @@ namespace Storage
 		PrintUserCmdText(clientId, PrintMoney(amount) + L" deposited to bank.");
 	}
 
-	void WithdrawMoney(const uint clientId, const int64_t amount)
+	static void WithdrawMoney(const uint clientId, const int64_t amount)
 	{
 		if (!IsPlayerDocked(clientId))
 		{
@@ -452,7 +459,7 @@ namespace Storage
 		PrintUserCmdText(clientId, PrintMoney(amount) + L" withdrawn from bank.");
 	}
 
-	void ShowCurrentMoney(const uint clientId)
+	static void ShowCurrentMoney(const uint clientId)
 	{
 		if (!HasAccount(clientId))
 		{
@@ -462,6 +469,51 @@ namespace Storage
 
 		const Account& account = GetAccount(clientId);
 		PrintUserCmdText(clientId, L"Currently banked money: " + PrintMoney(account.money) + L".");
+	}
+
+	void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
+	{
+		std::wstring characterFileName;
+		if (HkGetCharFileName(info.wszCharname, characterFileName) == HKE_OK)
+			UnlinkFromAccount(wstos(characterFileName));
+		returncode = DEFAULT_RETURNCODE;
+	}
+
+	void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
+	{
+		const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
+		UnlinkFromAccount(characterFileName);
+		returncode = DEFAULT_RETURNCODE;
+	}
+
+	std::wstring oldCharacterFileName = L"";
+
+	HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+	{
+		std::wstring output = L"";
+		oldCharacterFileName = HkGetCharFileName(charname, output) == HKE_OK ? output : L"";
+		returncode = DEFAULT_RETURNCODE;
+		return HKE_OK;
+	}
+
+	HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+	{
+		if (!oldCharacterFileName.empty())
+		{
+			const std::string sOldCharacterFileName = wstos(oldCharacterFileName);
+			const auto& result = accountUidByCharacterFileName.find(sOldCharacterFileName);
+			if (std::wstring newCharacterFileName; result != accountUidByCharacterFileName.end() && HkGetCharFileName(newCharname, newCharacterFileName) == HKE_OK)
+			{
+				const std::string& accountUid = result->second;
+				const std::string sNewCharacterFileName = wstos(newCharacterFileName);
+				IniWrite(outputDirectory + "\\linked_chars.ini", "LinkedCharacters", sNewCharacterFileName, accountUid);
+				accountUidByCharacterFileName[sNewCharacterFileName] = accountUid;
+			}
+			UnlinkFromAccount(sOldCharacterFileName);
+		}
+		oldCharacterFileName = L"";
+		returncode = DEFAULT_RETURNCODE;
+		return HKE_OK;
 	}
 
 	bool UserCmd_Storage(const uint clientId, const std::wstring& arguments)

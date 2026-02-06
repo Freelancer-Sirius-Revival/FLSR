@@ -1,0 +1,14 @@
+#pragma once
+
+namespace RandomMissions
+{
+	void ReadTradeCommoditiesData();
+
+	namespace Hooks
+	{
+		namespace TradeMissions
+		{
+			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
+		}
+	}
+}

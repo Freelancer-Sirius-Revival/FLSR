@@ -1,5 +1,6 @@
 #include "ObjFollow.h"
 #include "ObjCndTrue.h"
+#include "ObjUtils.h"
 
 namespace Missions
 {
@@ -17,13 +18,11 @@ namespace Missions
 
 		Objective::Execute(state);
 
-		const auto& mission = missions.at(parent.missionId);
-		const auto& objectEntry = mission.objectIdsByName.find(targetObjName);
-		if (objectEntry != mission.objectIdsByName.end())
+		if (uint followTargetSpaceObjId; FindObjectByNameOrFirstPlayerByLabel(missions.at(parent.missionId), targetObjName, followTargetSpaceObjId))
 		{
 			pub::AI::DirectiveFollowOp followOp;
 			followOp.fireWeapons = !state.enforceObjective;
-			followOp.followSpaceObj = objectEntry->second;
+			followOp.followSpaceObj = followTargetSpaceObjId;
 			followOp.maxDistance = maxDistance;
 			followOp.offset = position;
 			followOp.dunno2 = 400.0f;

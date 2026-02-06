@@ -33,7 +33,8 @@ namespace Missions
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
 		offerId(0),
 		missionResult(MissionResult::Success),
-		reofferRemainingTime(0.0f)
+		reofferRemainingTime(0.0f),
+		markedForDeletion(false)
 	{}
 
 	Mission::~Mission()
@@ -43,15 +44,15 @@ namespace Missions
 		End();
 	}
 
-	void Mission::End()
+	void Mission::End(bool markForDeletion, bool allowRestart)
 	{
-		state = MissionState::Finished;
+		state = allowRestart ? MissionState::Inactive : MissionState::Finished;
 
 		std::queue<std::pair<uint, MissionObject>> emptyQueue;
 		std::swap(triggerExecutionQueue, emptyQueue);
 
 		for (auto& trigger : triggers)
-			trigger.Deactivate();
+			trigger.second.Deactivate();
 
 		dynamicConditions.clear();
 		objectiveConditionByObjectId.clear();
@@ -114,13 +115,13 @@ namespace Missions
 
 		// First reset all triggers
 		for (auto& trigger : triggers)
-			trigger.Reset();
+			trigger.second.Reset();
 
 		// Only now execute those that should be initially active. With e.g. Cnd_True they might instantly activate other triggers while we are still looping here.
 		for (auto& trigger : triggers)
 		{
-			if (trigger.IsAwaitingInitialActivation())
-				trigger.Activate();
+			if (trigger.second.IsAwaitingInitialActivation())
+				trigger.second.Activate();
 		}
 	}
 
@@ -320,26 +321,34 @@ namespace Missions
 		return 0;
 	}
 
-	static bool IsValidMissionForOffer(const Mission& mission)
+	bool Mission::ToBeDeleted() const
 	{
-		return mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.baseIds.empty();
+		return markedForDeletion;
 	}
 
-	static void RegisterMissionToJobBoard(Mission& mission)
+	bool Mission::TryAddToJobBoard()
 	{
-		if (!IsValidMissionForOffer(mission))
-			return;
-		
-		mission.reofferRemainingTime = 0.0f;
-		MissionBoard::MissionOffer offer;
-		offer.type = mission.offer.type;
-		offer.system = mission.offer.system;
-		offer.group = mission.offer.group;
-		offer.title = mission.offer.title;
-		offer.description = mission.offer.description;
-		offer.reward = mission.offer.reward;
-		offer.allowedShipArchetypeIds = mission.offer.shipArchetypeIds;
-		mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.baseIds);
+		if (offer.type == pub::GF::MissionType::Unknown ||
+			offer.baseIds.empty() ||
+			!CanBeStarted() ||
+			reofferRemainingTime > 0.0f ||
+			offerId != 0)
+		{
+			return false;
+		}
+
+		reofferRemainingTime = 0.0f;
+		MissionBoard::MissionOffer boardOffer;
+		boardOffer.type = offer.type;
+		boardOffer.system = offer.system;
+		boardOffer.group = offer.group;
+		boardOffer.title = offer.title;
+		boardOffer.description = offer.description;
+		boardOffer.reward = offer.reward;
+		boardOffer.allowedShipArchetypeIds = offer.shipArchetypeIds;
+		offerId = MissionBoard::AddMissionOffer(boardOffer, offer.baseIds);
+
+		return true;
 	}
 
 	namespace Hooks
@@ -357,18 +366,20 @@ namespace Missions
 				}
 
 				const mstime thresholdTime = timeInMS() - 10000;
+				std::unordered_set<uint> missionIdsToDelete;
 				for (auto& missionEntry : missions)
 				{
 					auto& mission = missionEntry.second;
 
-					/* Reoffering missions to job board */
-					if (mission.CanBeStarted() && mission.offerId == 0 && IsValidMissionForOffer(mission))
+					if (mission.ToBeDeleted())
 					{
-						if (mission.reofferRemainingTime > 0.0f)
-							mission.reofferRemainingTime -= elapsedTimeInSec;
-						if (mission.reofferRemainingTime <= 0.0f)
-							RegisterMissionToJobBoard(mission);
+						missionIdsToDelete.insert(mission.id);
+						continue;
 					}
+
+					/* Reoffering missions to job board */
+					mission.reofferRemainingTime = max(0.0f, mission.reofferRemainingTime - elapsedTimeInSec);
+					mission.TryAddToJobBoard();
 
 					/* Comms timeouts */
 					std::vector<std::pair<uint, Missions::Mission::CommEntry>> entriesToRemove;
@@ -386,6 +397,13 @@ namespace Missions
 							mission.ongoingComms.erase(entry.first);
 						// else: The CndCommComplete has erased the comm-entry itself.
 					}
+				}
+
+				for (const uint missionId : missionIdsToDelete)
+				{
+					const auto& mission = missions.at(missionId);
+					MissionBoard::DeleteMissionOffer(mission.offerId);
+					missions.erase(missionId);
 				}
 
 				elapsedTimeInSec = 0.0f;

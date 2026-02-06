@@ -305,6 +305,24 @@
     <ClCompile Include="bugfixes\MissionAbortFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\ObjUtils.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\Offers.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\Factions.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\Costumes.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\RandomMissions.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\TradeMissions.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -611,6 +629,18 @@
     <ClInclude Include="missions\conditions\CndHealthInc.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\randomMissions\Factions.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Offers.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Costumes.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\RandomMissions.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="Insurance.h" />
     <ClInclude Include="IFF.h" />
@@ -619,6 +649,16 @@
     <ClInclude Include="Mark.h" />
     <ClInclude Include="bugfixes\MissionAbortFix.h">
       <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="Storage.h" />
+    <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjUtils.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\TradeMissions.h">
+      <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -640,6 +680,9 @@
     </Filter>
     <Filter Include="Missions\Objectives">
       <UniqueIdentifier>{70fb0779-62c5-431f-b907-c667ee804cd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\RandomMissions">
+      <UniqueIdentifier>{b1e62351-7d74-4aca-a463-435fd8c842db}</UniqueIdentifier>
     </Filter>
     <Filter Include="Bugfixes">
       <UniqueIdentifier>{99a19828-e408-49ee-a814-954a7bf2b111}</UniqueIdentifier>

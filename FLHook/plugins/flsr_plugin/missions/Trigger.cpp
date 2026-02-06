@@ -6,14 +6,11 @@
 
 namespace Missions
 {
-	Trigger::Trigger(const std::string name,
-					const uint id,
+	Trigger::Trigger(const uint id,
 					const uint missionId,
 					const bool initiallyActive,
 					const TriggerRepeatable repeatable) :
-		name(name),
 		id(id),
-		nameId(CreateID(name.c_str())),
 		missionId(missionId),
 		initiallyActive(initiallyActive),
 		state(initiallyActive ? TriggerState::AwaitingInitialActivation : TriggerState::Inactive),

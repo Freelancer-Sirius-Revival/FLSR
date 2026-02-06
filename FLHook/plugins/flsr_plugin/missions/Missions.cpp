@@ -107,7 +107,7 @@ namespace Missions
 							else if (ini.is_value("offer_title_id"))
 								offer.title = ini.get_value_int(0);
 							else if (ini.is_value("offer_description_id"))
-								offer.description = ini.get_value_int(0);
+								offer.description = FmtStr(ini.get_value_int(0), 0);
 							else if (ini.is_value("offer_reward"))
 								offer.reward = ini.get_value_int(0);
 							else if (ini.is_value("offer_ship_restriction"))
@@ -411,23 +411,29 @@ namespace Missions
 
 					if (ini.is_header("Trigger"))
 					{
-						const uint id = missions.at(lastMissionId).triggers.size();
+						uint id = 0;
 						const uint missionId = lastMissionId;
-						std::string name = "";
 						bool initiallyActive = false;
 						Trigger::TriggerRepeatable repeatable = Trigger::TriggerRepeatable::Off;
 						ConditionPtr condition = nullptr;
 						std::vector<ActionPtr> actions;
 
-						const ConditionParent conditionParent(missionId, id);
-
+						const auto start = ini.tell();
 						while (ini.read_value())
 						{
 							if (ini.is_value("nickname"))
 							{
-								name = ToLower(ini.get_value_string(0));
+								id = CreateIdOrNull(ini.get_value_string(0));
+								break;
 							}
-							else if (ini.is_value("InitState"))
+						}
+						ini.seek(start);
+
+						const ConditionParent conditionParent(missionId, id);
+
+						while (id && ini.read_value())
+						{
+							if (ini.is_value("InitState"))
 							{
 								initiallyActive = ToLower(ini.get_value_string(0)) == "active";
 							}
@@ -751,7 +757,7 @@ namespace Missions
 							{
 								ActSetNNObjPtr action(new ActSetNNObj());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
-								action->message = ini.get_value_int(1);
+								action->message = FmtStr(ini.get_value_int(1), 0);
 								action->systemId = CreateIdOrNull(ini.get_value_string(2));
 								action->position.x = ini.get_value_float(3);
 								action->position.y = ini.get_value_float(4);
@@ -879,25 +885,25 @@ namespace Missions
 								action->targetObjName = CreateIdOrNull(ini.get_value_string(1));
 								action->dockHardpoint = ToLower(ini.get_value_string(2));
 								actions.push_back(action);
-								}
+							}
 							else
 							{
 								const auto& cnd = TryReadConditionFromIni(conditionParent, ini);
 								if (cnd != nullptr)
 								{
 									if (condition != nullptr)
-										ConPrint(L"Trigger already has a condition! Overriding.");
+										ConPrint(L"Trigger " + std::to_wstring(id) + L" already has a condition! Overriding.");
 									condition = ConditionPtr(cnd);
 								}
 							}
 						}
 
-						if (!name.empty())
+						if (id)
 						{
-							missions.at(missionId).triggers.emplace_back(name, id, missionId, initiallyActive, repeatable);
+							missions.at(missionId).triggers.try_emplace(id, id, missionId, initiallyActive, repeatable);
 							Trigger& trigger = missions.at(missionId).triggers.at(id);
 							if (condition == nullptr)
-								ConPrint(L"Trigger '" + stows(trigger.name) + L"' has no condition! Falling back to Cnd_True\n");
+								ConPrint(L"Trigger " + std::to_wstring(id) + L" has no condition! Falling back to Cnd_True\n");
 							trigger.condition = condition != nullptr ? condition : ConditionPtr(new CndTrue({ missionId, id }));
 							trigger.actions = actions;
 						}
@@ -1070,7 +1076,7 @@ namespace Missions
 		{
 			if (missionEntry.second.name == missionName)
 			{
-				missionEntry.second.End();
+				missionEntry.second.End(false, true);
 				return true;
 			}
 		}

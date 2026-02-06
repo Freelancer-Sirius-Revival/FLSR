@@ -1,6 +1,7 @@
 #include "ObjGotoObj.h"
 #include "ObjCndDistObj.h"
 #include "ObjCndTrue.h"
+#include "ObjUtils.h"
 
 namespace Missions
 {
@@ -24,14 +25,16 @@ namespace Missions
 
 		Objective::Execute(state);
 
-		uint targetObjId = 0;
 		const auto& mission = missions.at(parent.missionId);
-		if (const auto& objectEntry = mission.objectIdsByName.find(targetObjNameOrId); objectEntry != mission.objectIdsByName.end())
-			targetObjId = objectEntry->second;
-		if (!targetObjId)
-			targetObjId = targetObjNameOrId;
+		uint targetObjId = 0;
+		if (!FindObjectByNameOrFirstPlayerByLabel(mission, targetObjNameOrId, targetObjId))
+		{
+			// Assume the target to be a static world object.
+			if (pub::SpaceObj::ExistsAndAlive(targetObjNameOrId) == 0)
+				targetObjId = targetObjNameOrId;
+		}
 
-		if (pub::SpaceObj::ExistsAndAlive(targetObjId) == 0)
+		if (targetObjId)
 		{
 			pub::AI::DirectiveGotoOp gotoOp;
 			gotoOp.fireWeapons = !state.enforceObjective;
@@ -43,9 +46,10 @@ namespace Missions
 			gotoOp.shipMoves2 = true;
 			gotoOp.goToCruise = !noCruise;
 			gotoOp.goToNoCruise = noCruise;
-			gotoOp.objIdToWaitFor = 0;
-			if (const auto& objectEntry = mission.objectIdsByName.find(objNameToWaitFor); objectEntry != mission.objectIdsByName.end())
-				gotoOp.objIdToWaitFor = objectEntry->second;
+			if (uint waitForObjId; FindObjectByNameOrFirstPlayerByLabel(mission, objNameToWaitFor, waitForObjId))
+				gotoOp.objIdToWaitFor = waitForObjId;
+			else
+				gotoOp.objIdToWaitFor = 0;
 			gotoOp.startWaitDistance = startWaitDistance;
 			gotoOp.endWaitDistance = endWaitDistance;
 			pub::AI::SubmitDirective(state.objId, &gotoOp);

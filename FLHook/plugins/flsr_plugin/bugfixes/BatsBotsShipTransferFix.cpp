@@ -1,4 +1,5 @@
-#include "Main.h"
+#include "BatsBotsShipTransferFix.h"
+#include "../Plugin.h"
 
 // This solves a bug where nanobots or shield batteries will be transferred to a new ship if that has a capacity of 0 for those.
 namespace BatsBotsShipTransferFix
@@ -30,7 +31,7 @@ namespace BatsBotsShipTransferFix
 	static Result ReduceAndRefund(const st6::list<EquipDesc>::iterator& it, const int maxCount, const uint clientId)
 	{
 		Result result;
-		const int countDiff = std::max(0, it->get_count() - maxCount);
+		const int countDiff = max(0, it->get_count() - maxCount);
 		if (countDiff <= 0)
 			return result;
 		const GoodInfo* goodInfo = GoodList::find_by_id(it->get_arch_id());

@@ -137,6 +137,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndHealthInc.cpp" />
     <ClCompile Include="missions\conditions\CndLeaveMsn.cpp" />
     <ClCompile Include="missions\MatrixMath.cpp" />
+    <ClCompile Include="missions\objectives\ObjUtils.cpp" />
     <ClCompile Include="NameLimiter.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
@@ -248,6 +249,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h" />
     <ClInclude Include="bugfixes\MissionAbortFix.h" />
     <ClInclude Include="Carrier.h" />
     <ClInclude Include="Cloak.h" />
@@ -260,6 +262,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="missions\conditions\CndHealthInc.h" />
     <ClInclude Include="missions\conditions\CndLeaveMsn.h" />
+    <ClInclude Include="missions\objectives\ObjUtils.h" />
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="Empathies.h" />
@@ -361,6 +364,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Pilots.h" />
     <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="Plugin.h" />
+    <ClInclude Include="Storage.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\project\FLHook.vcxproj">

@@ -305,6 +305,9 @@
     <ClCompile Include="bugfixes\MissionAbortFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
+    <ClCompile Include="missions\objectives\ObjUtils.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -619,6 +622,13 @@
     <ClInclude Include="Mark.h" />
     <ClInclude Include="bugfixes\MissionAbortFix.h">
       <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="Storage.h" />
+    <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjUtils.h">
+      <Filter>Missions\Objectives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

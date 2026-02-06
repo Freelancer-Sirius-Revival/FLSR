@@ -207,9 +207,9 @@ namespace Insurance
         free(keyValues);
     }
 
-    static void DeleteInsuranceIfExisting(const uint clientId)
+    static void DeleteInsuranceIfExisting(const std::string characterFileName)
     {
-        const auto& filePath = GetInsuranceFilePath(clientId);
+        const auto& filePath = outputDirectory + characterFileName + ".ini";
         try
         {
             std::filesystem::remove(filePath);
@@ -598,15 +598,16 @@ namespace Insurance
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        DeleteInsuranceIfExisting(clientId);
-
+        std::wstring characterFileName;
+        if (HkGetCharFileName(info.wszCharname, characterFileName) == HKE_OK)
+            DeleteInsuranceIfExisting(wstos(characterFileName));
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        DeleteInsuranceIfExisting(clientId);
-
+        const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
+        DeleteInsuranceIfExisting(characterFileName);
         returncode = DEFAULT_RETURNCODE;
     }
 
@@ -654,9 +655,19 @@ namespace Insurance
         returncode = DEFAULT_RETURNCODE;
     }
 
+    std::wstring oldCharacterFileName = L"";
+
+    HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
+    {
+        std::wstring output = L"";
+        oldCharacterFileName = HkGetCharFileName(charname, output) == HKE_OK ? output : L"";
+        returncode = DEFAULT_RETURNCODE;
+        return HKE_OK;
+    }
+
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (std::wstring oldCharacterFileName; HkGetCharFileName(charname, oldCharacterFileName) == HKE_OK)
+        if (!oldCharacterFileName.empty())
         {
             const std::string sOldCharacterFileName = wstos(oldCharacterFileName);
             if (onlyDelete)

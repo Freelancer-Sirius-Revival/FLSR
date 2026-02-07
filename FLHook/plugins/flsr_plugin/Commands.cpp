@@ -522,7 +522,7 @@ namespace Commands
             if (result == HKE_CHARNAME_ALREADY_EXISTS)
                 PrintUserCmdText(clientId, L"The character name is already taken. Please try another name.");
             else if (result == HKE_CHARNAME_TOO_LONG)
-                PrintUserCmdText(clientId, L"The character name must not be longer than 24 characters. Please try another name.");
+                PrintUserCmdText(clientId, L"The character name must not be longer than 23 characters. Please try another name.");
             else if (result == HKE_CHARNAME_TOO_SHORT)
                 PrintUserCmdText(clientId, L"Please enter a name.");
             else if (result != HKE_OK)

@@ -40,6 +40,9 @@ File: EXE\Freelancer.exe
 # Comm window remains visible while the Nav Map is open. - DiscountMarkiplier
 0CD8BA: 00 00	[ 0C 01 ]
 
+# Prevents the Request to Trade button from flickering when maximizing the HUD. - BC46
+0E19C6: EB 09	[ 6A 00 ]
+
 
 ##############
 # Main Menu

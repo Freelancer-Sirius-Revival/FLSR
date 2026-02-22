@@ -10,6 +10,28 @@ namespace ExplosionDamage
 		return (sq1 * sq1 + sq2 * sq2 + sq3 * sq3 - radius * radius);
 	}
 
+	static bool IsChildOfObject(const CObject* rootObject, const CArchGroup* colGrp, const CObject* otherObject)
+	{
+		// Animated ship parts are independent objects in space with COBJECT_MASK and the same archetype. In this case go further for more checks.
+		if (otherObject != rootObject && otherObject->objectClass == CObject::COBJECT_MASK && otherObject->archetype == rootObject->archetype)
+		{
+			ModelBinary* leaf = otherObject->index;
+			void* lastObject = nullptr;
+			bool childOfColGrp = false;
+			while (leaf != nullptr)
+			{
+				if (leaf->type == ModelType::Object)
+					lastObject = leaf->data1;
+				else if (leaf->type == ModelType::Virtual)
+					childOfColGrp = leaf->data1 == colGrp->rootIndex->data1;
+				leaf = leaf->parent;
+			}
+
+			return lastObject == rootObject && (colGrp == nullptr || childOfColGrp);
+		}
+		return false;
+	}
+
 	static float CalculateDistanceToShipSurface(const IObjRW* iobj, const Vector& explosionPosition)
 	{
 		float physicalRadius;
@@ -20,7 +42,7 @@ namespace ExplosionDamage
 		const int collisionCount = PhySys::FindRayCollisions(iobj->cobj->system, explosionPosition, physicalCenter, rayHits, 16);
 		for (size_t index = 0; index < collisionCount; index++)
 		{
-			if (reinterpret_cast<CSimple*>(rayHits[index].cobj) != iobj->cobj)
+			if (reinterpret_cast<CObject*>(rayHits[index].cobj) != iobj->cobj && !IsChildOfObject(iobj->cobj, nullptr, reinterpret_cast<CObject*>(rayHits[index].cobj)))
 				continue;
 			const Vector explosionVelocity = { explosionPosition.x - rayHits[index].position.x,
 											   explosionPosition.y - rayHits[index].position.y,
@@ -91,30 +113,7 @@ namespace ExplosionDamage
 
 			const float damage = explosion->explosionArchetype->fHullDamage * equip->archetype->fExplosionResistance * damageFraction;
 			iobj->damage_ext_eq(equip, damage, dmg);
-			ConPrint(stows(equip->archetype->szName) + L": " + std::to_wstring(damage) + L"\n");
 		}
-	}
-
-	static bool IsChildOfObject(const CObject* rootObject, const CArchGroup* colGrp, const CObject* otherObject)
-	{
-		// Animated ship parts are independent objects in space with COBJECT_MASK and the same archetype. In this case go further for more checks.
-		if (otherObject != rootObject && otherObject->objectClass == CObject::COBJECT_MASK && otherObject->archetype == rootObject->archetype)
-		{
-			ModelBinary* leaf = otherObject->index;
-			void* lastObject = nullptr;
-			bool childOfColGrp = false;
-			while (leaf != nullptr)
-			{
-				if (leaf->type == ModelType::Object)
-					lastObject = leaf->data1;
-				else if (leaf->type == ModelType::Virtual)
-					childOfColGrp = leaf->data1 == colGrp->rootIndex->data1;
-				leaf = leaf->parent;
-			}
-
-			return lastObject == rootObject && (colGrp == nullptr || childOfColGrp);
-		}
-		return false;
 	}
 
 	static void DealHullAndColGrpDamage(IObjRW* iobj, const ExplosionDamageEvent* explosion, DamageList* dmg)

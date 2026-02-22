@@ -1,12 +1,9 @@
 #include "ExplosionDamage.h"
 #include "Plugin.h"
-#include "FLCoreDACom.h"
 #include <algorithm>
 
 namespace ExplosionDamage
 {
-	const uint rootCrc = DACOM_CRC::GetCRC32("root");
-
 	static float SquaredDistance3D(const Vector& v1, const Vector& v2, const float radius)
 	{
 		const float sq1 = v1.x - v2.x, sq2 = v1.y - v2.y, sq3 = v1.z - v2.z;
@@ -94,20 +91,34 @@ namespace ExplosionDamage
 
 			const float damage = explosion->explosionArchetype->fHullDamage * equip->archetype->fExplosionResistance * damageFraction;
 			iobj->damage_ext_eq(equip, damage, dmg);
+			ConPrint(stows(equip->archetype->szName) + L": " + std::to_wstring(damage) + L"\n");
 		}
+	}
+
+	static bool IsChildOfObject(const CObject* rootObject, const CArchGroup* colGrp, const CObject* otherObject)
+	{
+		// Animated ship parts are independent objects in space with COBJECT_MASK and the same archetype. In this case go further for more checks.
+		if (otherObject != rootObject && otherObject->objectClass == CObject::COBJECT_MASK && otherObject->archetype == rootObject->archetype)
+		{
+			ModelBinary* leaf = otherObject->index;
+			void* lastObject = nullptr;
+			bool childOfColGrp = false;
+			while (leaf != nullptr)
+			{
+				if (leaf->type == ModelType::Object)
+					lastObject = leaf->data1;
+				else if (leaf->type == ModelType::Virtual)
+					childOfColGrp = leaf->data1 == colGrp->rootIndex->data1;
+				leaf = leaf->parent;
+			}
+
+			return lastObject == rootObject && (colGrp == nullptr || childOfColGrp);
+		}
+		return false;
 	}
 
 	static void DealHullAndColGrpDamage(IObjRW* iobj, const ExplosionDamageEvent* explosion, DamageList* dmg)
 	{
-		//long* instances;
-		//int foundInstances = 0;
-		//CompoundInstanceList((long)iobj->cobj->index, &foundInstances, &instances);
-		//for (size_t index = 0; index < foundInstances; index++)
-		//{
-		//	auto bla= iobj->cobj->inst_to_part(instances[index]);
-		//	bla = bla;
-		//}
-
 		float minSingleRootDamage = 0.0f;
 		float maxSingleRootDamage = 0.0f;
 		float damageToHull = 0.0f;
@@ -122,16 +133,12 @@ namespace ExplosionDamage
 			damageToHull = damage;
 		}
 
-		ConPrint(L"\n\nobjectClass " + std::to_wstring(iobj->cobj->objectClass) + L"\n");
-		ConPrint(L"Obj " + std::to_wstring((uint)iobj->cobj) + L"\n");
-		ConPrint(L"Obj MB " + std::to_wstring((uint)iobj->cobj->index) + L"\n");
-		ConPrint(L"arch " + std::to_wstring(iobj->cobj->archetype->get_id()) + L"\n");
 		if (iobj->cobj->objectClass & CObject::CEQOBJ_MASK)
 		{
 			const CEquipManager& equipManager = reinterpret_cast<CEqObj*>(iobj->cobj)->equip_manager;
 			CArchGroupManager& colGrpManager = reinterpret_cast<CEqObj*>(iobj->cobj)->archGroupManager;
 			CArchGrpTraverser traverser;
-			CArchGroup* colGrp;
+			CArchGroup* colGrp = nullptr;
 			while (colGrp = colGrpManager.Traverse(traverser))
 			{
 				if (colGrp->colGrp->explosionResistance == 0.0f)
@@ -143,48 +150,22 @@ namespace ExplosionDamage
 				float squaredDistance = -1.0f;
 				PhySys::RayHit rayHits[16];
 				const int collisionCount = PhySys::FindRayCollisions(iobj->cobj->system, explosion->explosionPosition, centerOfMass, rayHits, 16);
-				ConPrint(L"collisionCount: " + std::to_wstring(collisionCount) + L"\n");
 				for (size_t index = 0; index < collisionCount; index++)
 				{
-					CSimple* rayHitObj = reinterpret_cast<CSimple*>(rayHits[index].cobj);
-					// // Moving ship parts are independent objects in space with COBJECT_MASK and the same archetype. In this case go further for more checks.
-					//if (rayHitObj != iobj->cobj && !(rayHitObj->objectClass == CObject::COBJECT_MASK && rayHitObj->archetype == iobj->cobj->archetype))
-					//{
-					//	continue;
-					//}
-
-					if (rayHitObj != iobj->cobj)
+					if (reinterpret_cast<CObject*>(rayHits[index].cobj) == iobj->cobj)
 					{
-						ConPrint(L"Hit Obj: " + std::to_wstring((uint)rayHitObj) + L"\n");
-						ConPrint(L"arch " + std::to_wstring(rayHitObj->archetype->get_id()) + L"\n");
-						ConPrint(L"0x0: " + std::to_wstring(rayHitObj->index->type) + L"\n");
-						ConPrint(L"0x4: " + std::to_wstring((uint)rayHitObj->index->cobj) + L"\n");
-						ConPrint(L"0x8: " + std::to_wstring((uint)rayHitObj->index->x08[0]) + L"\n");
-						ConPrint(L"0xC: " + std::to_wstring((uint)rayHitObj->index->x08[4]) + L"\n");
-						ConPrint(L"0x10: " + std::to_wstring((uint)rayHitObj->index->parent) + L"\n");
+						const auto instanceId = iobj->cobj->part_to_inst(rayHits[index].hitPartOrHardpointCrc);
 
-						//ConPrint(L"Type: " + std::to_wstring(rayHitObj->index->type) + L"\n");
-						//ConPrint(L"Parent: " + std::to_wstring((uint)rayHitObj->index->cobj) + L"\n");
-						//while (rayHitObj->index && rayHitObj->index->parent)
-						//{
-						//	rayHitObj = rayHitObj->index->cobj;
-						//	ConPrint(L"Obj: " + std::to_wstring((uint)rayHitObj) + L"\n");
-						//	ConPrint(L"arch " + std::to_wstring(rayHitObj->archetype->get_id()) + L"\n");
-						//	ConPrint(L"Type: " + std::to_wstring(rayHitObj->index->type) + L"\n");
-						//	ConPrint(L"Parent: " + std::to_wstring((uint)rayHitObj->index->cobj) + L"\n");
-						//}
+						// Find if the hit object is equipment. If so, skip because we do treat them not as extension of the colGrp.
+						const auto subObjId = reinterpret_cast<CEqObj*>(iobj->cobj)->inst_to_subobj_id(instanceId);
+						if (equipManager.FindByID(subObjId))
+							continue;
 
-						continue;
+						if (!instanceId || !colGrp->IsInstInGroup(instanceId))
+							continue;
 					}
-
-					const auto instanceId = iobj->cobj->part_to_inst(rayHits[index].hitPartOrHardpointCrc);
-
-					// Find if the hit object is equipment. If so, skip because we do treat them not as extension of the colGrp.
-					const auto subObjId = reinterpret_cast<CEqObj*>(iobj->cobj)->inst_to_subobj_id(instanceId);
-					if (equipManager.FindByID(subObjId))
-						continue;
-
-					if (!instanceId || !colGrp->IsInstInGroup(instanceId))
+					// Animated ship parts are independent objects in space.
+					else if (!IsChildOfObject(iobj->cobj, colGrp, reinterpret_cast<CObject*>(rayHits[index].cobj)))
 						continue;
 
 					const Vector explosionVelocity = { explosion->explosionPosition.x - rayHits[index].position.x,
@@ -204,6 +185,7 @@ namespace ExplosionDamage
 
 				const float damage = explosion->explosionArchetype->fHullDamage * colGrp->colGrp->explosionResistance * damageFraction;
 				iobj->damage_col_grp(colGrp, damage, dmg);
+				ConPrint(stows(colGrp->colGrp->name.value) + L": " + std::to_wstring(damage) + L"\n");
 
 				if (colGrp->IsRootHealthProxy())
 				{
@@ -218,6 +200,7 @@ namespace ExplosionDamage
 		// Limit the actual damage by the lower and upper clamp to be sure there's no damage multiplication done by collision groups. The most single dealt damage sets the bar.
 		// Do not skip on applying hull damage. Even at 0 it must be done to inform the ship about being hit by something.
 		iobj->damage_hull(std::ranges::clamp(damageToHull, minSingleRootDamage, maxSingleRootDamage), dmg);
+		ConPrint(L"Hull: " + std::to_wstring(std::ranges::clamp(damageToHull, minSingleRootDamage, maxSingleRootDamage)) + L"\n");
 	}
 
 	bool __stdcall ExplosionHit(IObjRW* iobj, ExplosionDamageEvent* explosion, DamageList* dmg)

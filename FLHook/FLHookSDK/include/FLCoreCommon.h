@@ -1379,6 +1379,21 @@ public:
 	bool unk;
 };
 
+enum ModelType : DWORD
+{
+	Object = 0,
+	Virtual = 2,
+};
+
+struct ModelBinary
+{
+	ModelType type;
+	void* data1; // Is a CObject in case of Type = 0
+	void* data2;
+	void* data3;
+	ModelBinary* parent; // 0x10
+};
+
 class IMPORT CArchGroup
 {
 public:
@@ -1428,7 +1443,7 @@ protected:
 public:
 	/* 0  */ CEqObj* owner;
 	/* 1  */ Archetype::CollisionGroup* colGrp;
-	/* 2  */ int rootIndex;
+	/* 2  */ ModelBinary* rootIndex;
 	/* 3  */ float hitPts;
 	/* 4  */ uint dunno;
 	/* 5  */ uint state;
@@ -1975,20 +1990,6 @@ struct Transform
 {
 	Matrix orientation;
 	Vector position;
-};
-
-enum ModelType : DWORD
-{
-	Root = 0,
-	Child = 2,
-};
-
-struct ModelBinary
-{
-	ModelType type;
-	struct CSimple* cobj;
-	BYTE x08[0x8];
-	ModelBinary* parent; // 0x10
 };
 
 struct IMPORT EngineObject

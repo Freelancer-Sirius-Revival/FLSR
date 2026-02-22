@@ -1879,7 +1879,7 @@ namespace PhySys
 		struct CSimple* cobj;
 		Vector position;
 		Vector normalizedVelocity;
-		uint unknown;
+		uint hitPartOrHardpointCrc; // This is the Dacom CRC32, not the usual ID crc.
 	};
 
 	IMPORT  float  ANOM_LIMITS_MAX_ANGULAR_VELOCITY_PER_PSI;
@@ -1907,8 +1907,8 @@ namespace PhySys
 	IMPORT  void  Detach(struct CObject*, struct DetachParms const&);
 	IMPORT  int  DetachPhantom(void*);
 	IMPORT  int  FindRayCollisions(unsigned int, class Vector const&, class Vector const&, struct RayHit*, int);
-	IMPORT  int  FindRayIntersect(struct CObject*, class Vector const&, class Vector const&, struct RayHit*, int);
-	IMPORT  int  FindSphereCollisions(unsigned int, class Vector const&, float, struct CObject**, int);
+	IMPORT  int  FindRayIntersect(::CObject*, class Vector const&, class Vector const&, struct RayHit*, int);
+	IMPORT  int  FindSphereCollisions(unsigned int, class Vector const&, float, ::CObject**, int);
 	IMPORT  float  GOLEM_ANGULAR_DAMP_FACTOR;
 	IMPORT  class Vector  GOLEM_CHILD_ANGULAR_DAMP;
 	IMPORT  float  GOLEM_CHILD_LINEAR_DAMP;
@@ -1977,6 +1977,20 @@ struct Transform
 	Vector position;
 };
 
+enum ModelType : DWORD
+{
+	Root = 0,
+	Child = 2,
+};
+
+struct ModelBinary
+{
+	ModelType type;
+	struct CSimple* cobj;
+	BYTE x08[0x8];
+	ModelBinary* parent; // 0x10
+};
+
 struct IMPORT EngineObject
 {
 
@@ -2014,7 +2028,7 @@ public:
 	void set_transform(class Transform const&);
 	void update_tree(void)const;
 
-	void* index;
+	ModelBinary* index;
 	Matrix mRot;
 	Vector vPos;
 	float fRadius;

@@ -163,7 +163,8 @@
 
 ## Special Thanks to:
 - [Aingar](https://github.com/Aingar) for helping a lot with Hook programming
-- [BC46](https://github.com/BC46) for creating [Freealncer: HD Edition](https://github.com/FLHDE/freelancer-hd-edition) and it’s upscaled textures, fixes, and also many useful hacks and plugins
+- [Venemon](https://www.moddb.com/members/venemon) for helping a lot with Hook programming
+- [BC46](https://github.com/BC46) for creating [Freealncer: HD Edition](https://github.com/FLHDE/freelancer-hd-edition) and its upscaled textures, fixes, and also many useful hacks and plugins
 - [Callum](https://github.com/CallumDev) for creating [LancerEdit](https://github.com/Librelancer/Librelancer)
 - [Jason Hood](https://github.com/adoxa) for many useful hacks and plugins
 - [Treewyrm](https://github.com/treewyrm) for [MaxLancer](https://github.com/treewyrm/MAXLancer) plugin for 3dsMax

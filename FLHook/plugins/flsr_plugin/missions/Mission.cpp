@@ -51,7 +51,7 @@ namespace Missions
 		std::swap(triggerExecutionQueue, emptyQueue);
 
 		for (auto& trigger : triggers)
-			trigger.Deactivate();
+			trigger.second.Deactivate();
 
 		dynamicConditions.clear();
 		objectiveConditionByObjectId.clear();
@@ -114,13 +114,13 @@ namespace Missions
 
 		// First reset all triggers
 		for (auto& trigger : triggers)
-			trigger.Reset();
+			trigger.second.Reset();
 
 		// Only now execute those that should be initially active. With e.g. Cnd_True they might instantly activate other triggers while we are still looping here.
 		for (auto& trigger : triggers)
 		{
-			if (trigger.IsAwaitingInitialActivation())
-				trigger.Activate();
+			if (trigger.second.IsAwaitingInitialActivation())
+				trigger.second.Activate();
 		}
 	}
 

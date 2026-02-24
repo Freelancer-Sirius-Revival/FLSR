@@ -320,6 +320,9 @@
     <ClCompile Include="missions\randomMissions\RandomMissions.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\randomMissions\TradeMissions.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -653,6 +656,9 @@
     </ClInclude>
     <ClInclude Include="missions\objectives\ObjUtils.h">
       <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\TradeMissions.h">
+      <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

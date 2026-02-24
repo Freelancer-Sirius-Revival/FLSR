@@ -3,4 +3,5 @@
 namespace RandomMissions
 {
 	void ReadData();
+	void Initialize();
 }

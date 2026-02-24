@@ -21,8 +21,6 @@ namespace Missions
 			Manual
 		};
 
-		const std::string name;
-		const uint nameId;
 		const uint id;
 		const uint missionId;
 		const bool initiallyActive;
@@ -42,8 +40,7 @@ namespace Missions
 		ConditionPtr condition;
 		std::vector<ActionPtr> actions;
 
-		Trigger(const std::string name,
-				const uint id,
+		Trigger(const uint id,
 				const uint missionId,
 				const bool initiallyActive,
 				const TriggerRepeatable repeatable);

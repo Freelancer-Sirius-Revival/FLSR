@@ -12,6 +12,7 @@ namespace RandomMissions
 		float maxDifficulty = 0.0f;
 	};
 
+	extern std::unordered_map<uint, uint> owningFactionByBaseId;
 	extern std::unordered_map<uint, std::vector<BaseOffer>> offersByBaseId;
 
 	void ReadOfferData();

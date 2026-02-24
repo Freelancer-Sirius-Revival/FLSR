@@ -2,6 +2,7 @@
 
 namespace RandomMissions
 {
+	std::unordered_map<uint, uint> owningFactionByBaseId;
 	std::unordered_map<uint, std::vector<BaseOffer>> offersByBaseId;
 
 	void ReadOfferData()
@@ -10,6 +11,7 @@ namespace RandomMissions
 		if (!ini.open("..\\DATA\\MISSIONS\\mbases.ini", false)) return;
 
 		uint baseId = 0;
+		uint owningFaction = 0;
 		while (ini.read_header())
 		{
 			if (ini.is_header("MBase"))
@@ -20,7 +22,13 @@ namespace RandomMissions
 					{
 						baseId = CreateID(ini.get_value_string(0));
 					}
+					else if (ini.is_value("local_faction"))
+					{
+						owningFaction = CreateID(ini.get_value_string(0));
+					}
 				}
+				if (baseId)
+					owningFactionByBaseId[baseId] = owningFaction;
 			}
 			else if (ini.is_header("BaseFaction"))
 			{
@@ -39,8 +47,8 @@ namespace RandomMissions
 						offer.weight = ini.get_value_float(3);
 					}
 				}
-				if (offer.weight > 0.0f)
-					offersByBaseId[baseId].push_back(offer);
+				// Also add factions that may not offer normal missions. This is still used for trade missions.
+				offersByBaseId[baseId].push_back(offer);
 			}
 		}
 		ini.close();

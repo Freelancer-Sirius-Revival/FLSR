@@ -367,6 +367,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BestPath::CollectJumpObjectsPerSystem, PLUGIN_HkTimerCheckKick, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Initialize, PLUGIN_HkTimerCheckKick, 0));
     
     return p_PI;
 }

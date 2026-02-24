@@ -32,9 +32,9 @@ namespace Missions
 
 		for (auto& trigger : mission.triggers)
 		{
-			if (trigger.nameId == targetTriggerId)
+			if (trigger.second.id == targetTriggerId)
 			{
-				activate ? trigger.Activate() : trigger.Deactivate();
+				activate ? trigger.second.Activate() : trigger.second.Deactivate();
 				return;
 			}
 		}

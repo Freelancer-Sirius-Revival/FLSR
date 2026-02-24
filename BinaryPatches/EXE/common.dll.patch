@@ -28,6 +28,9 @@ File: EXE\common.dll
 # Force NPCs to use correct chase behavior for shiptypes that are not FIGHTER or FREIGHTER - Aingar
 66148: 7F	[ 03 ]
 
+# Formation Members will use their thrusters - Venemon
+763B6: 90 90	[ 84 C0 ]
+
 
 ##########################################
 # Weapons

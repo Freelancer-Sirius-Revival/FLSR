@@ -3,9 +3,15 @@
 #include "Offers.h"
 #include "Factions.h"
 #include "../Mission.h"
-#include "../actions/ActActTrig.h"
+#include "../conditions/CndTimer.h"
+#include "../conditions/CndDestroyed.h"
+#include "../conditions/CndLeaveMsn.h"
+#include "../conditions/CndBaseEnter.h"
+#include "../conditions/CndInSystem.h"
+#include "../actions/ActLeaveMsn.h"
+#include "../actions/ActTerminateMsn.h"
 #include "../actions/ActSetNNObj.h"
-#include "../actions/ActStartDialog.h"
+#include "../actions/ActEtherComm.h"
 #include "../actions/ActAdjRep.h"
 #include "../actions/ActAdjAcct.h"
 #include "../actions/ActAddCargo.h"
@@ -214,11 +220,15 @@ namespace RandomMissions
 		std::ranges::shuffle(shuffledBaseFactions, rd);
 
 		RandomDestination destination = {};
+		uint factionId = 0;
 		for (const auto& faction : shuffledBaseFactions)
 		{
 			destination = GetRandomCommodityAndTargetBase(baseId, faction.factionId, factionById[faction.factionId].hostileFactionIds);
 			if (destination.commodityIndex >= 0 && destination.baseId)
+			{
+				factionId = faction.factionId;
 				break;
+			}
 		}
 		if (destination.commodityIndex < 0 || !destination.baseId)
 			return -1;
@@ -257,31 +267,245 @@ namespace RandomMissions
 		mission.offer.reofferCondition = Missions::MissionReofferCondition::Never;
 		mission.offer.reofferDelay = 0.0f;
 
-		uint triggerId = CreateID("init");
-		mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
-		Missions::Trigger& trigger = mission.triggers.at(triggerId);
-
-		uint targetObjId = 0;
-		uint targetSystemId = 0;
-		for (const auto& base : lstBases)
+		/* Set Objective */
 		{
-			if (base.iBaseID == destination.baseId)
+			const uint triggerId = CreateID("setObjective");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			uint targetObjId = 0;
 			{
-				targetSystemId = base.iSystemID;
-				targetObjId = base.iObjectID;
-				break;
+				uint targetSystemId = 0;
+				for (const auto& base : lstBases)
+				{
+					if (base.iBaseID == destination.baseId)
+					{
+						targetSystemId = base.iSystemID;
+						targetObjId = base.iObjectID;
+						break;
+					}
+				}
+				IObjRW* inspect;
+				StarSystem* system;
+				if (GetShipInspect(targetObjId, inspect, system))
+				{
+					Missions::ActSetNNObjPtr action(new Missions::ActSetNNObj());
+					action->label = CreateID("players");
+					action->systemId = targetSystemId;
+					action->targetObjName = targetObjId;
+					action->message = 327757;
+					action->position = inspect->get_position();
+					action->bestRoute = true;
+					trigger.actions.push_back(action);
+				}
+			}
+
+			{
+				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
+				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->id = CreateID("msnGoToTarget");
+				msnComms->senderVoiceId = CreateID("mc_leg_m01");
+				msnComms->senderIdsName = 13015;
+				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
+				trigger.actions.push_back(msnComms);
 			}
 		}
-		IObjRW* inspect;
-		StarSystem* system;
-		GetShipInspect(targetObjId, inspect, system);
-		Missions::ActSetNNObjPtr action(new Missions::ActSetNNObj());
-		action->label = CreateID("players");
-		action->systemId = targetSystemId;
-		action->targetObjName = targetObjId;
-		action->message = 327757;
-		action->position = inspect->get_position();
-		action->bestRoute = true;
-		trigger.actions.push_back(action);
+
+		/* Add Cargo */
+		{
+			const uint triggerId = CreateID("addCargo");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndTimer(Missions::ConditionParent(missionId, triggerId), 1.0f, 0.0f));
+
+			{
+				Missions::ActAddCargoPtr action(new Missions::ActAddCargo());
+				action->label = CreateID("initial_player");
+				action->itemId = commodity.id;
+				action->count = 1;
+				action->missionFlagged = true;
+				trigger.actions.push_back(action);
+			}
+		}
+
+		/* Initial Player Death */
+		{
+			const uint triggerId = CreateID("death");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndDestroyed(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), Missions::CndDestroyed::DestroyCondition::Explode, 0, 1, false));
+
+			{
+				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
+				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->id = CreateID("msnLostLoot");
+				msnComms->senderVoiceId = CreateID("mc_leg_m01");
+				msnComms->senderIdsName = 13015;
+				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->lines = std::vector<uint>({ CreateID("rmb_fail_destroyedloot_02-") });
+				trigger.actions.push_back(msnComms);
+			}
+
+			{
+				//Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
+				//adjRep->objNameOrLabel = CreateID("players");
+				//pub::Reputation::GetReputationGroup(adjRep->groupId, groupName);
+				//adjRep->change = 0.0f;
+				//adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
+				//trigger.actions.push_back(adjRep);
+			}
+
+			{
+				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
+				leaveMsn->label = CreateID("players");
+				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
+				leaveMsn->failureStringId = 13088;
+				trigger.actions.push_back(leaveMsn);
+			}
+
+			{
+				Missions::ActTerminateMsnPtr endMsn(new Missions::ActTerminateMsn());
+				trigger.actions.push_back(endMsn);
+			}
+		}
+
+		/* Initial Player Leaves */
+		{
+			const uint triggerId = CreateID("leavingMsn");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveMsn(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player")));
+
+			{
+				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
+				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->id = CreateID("msnLeftLoot");
+				msnComms->senderVoiceId = CreateID("mc_leg_m01");
+				msnComms->senderIdsName = 13015;
+				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->lines = std::vector<uint>({ CreateID("rmb_fail_destroyedloot_02-") });
+				trigger.actions.push_back(msnComms);
+			}
+
+			{
+				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
+				removeCargo->label = CreateID("initial_player");
+				removeCargo->itemId = commodity.id;
+				removeCargo->count = 1;
+				trigger.actions.push_back(removeCargo);
+			}
+
+			//{
+			//	Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
+			//	adjRep->objNameOrLabel = CreateID("players");
+			//	pub::Reputation::GetReputationGroup(adjRep->groupId, groupName);
+			//	adjRep->change = 0.0f;
+			//	adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
+			//	trigger.actions.push_back(adjRep);
+			//}
+
+			{
+				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
+				leaveMsn->label = CreateID("players");
+				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
+				leaveMsn->failureStringId = 13088;
+				trigger.actions.push_back(leaveMsn);
+			}
+
+			{
+				Missions::ActTerminateMsnPtr endMsn(new Missions::ActTerminateMsn());
+				trigger.actions.push_back(endMsn);
+			}
+		}
+
+
+		/* Land on Any Base */
+		{
+			const uint triggerId = CreateID("landOnAnyBase");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), {}));
+
+			// Remove cargo because Freelancer does not transfer MISSION CARGO flag
+			{
+				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
+				removeCargo->label = CreateID("initial_player");
+				removeCargo->itemId = commodity.id;
+				removeCargo->count = 1;
+				trigger.actions.push_back(removeCargo);
+			}
+
+			// Re-add cargo to keep it visible as MISSION CARGO flagged item
+			{
+				Missions::ActAddCargoPtr action(new Missions::ActAddCargo());
+				action->label = CreateID("initial_player");
+				action->itemId = commodity.id;
+				action->count = 1;
+				action->missionFlagged = true;
+				trigger.actions.push_back(action);
+			}
+		}
+
+		/* Land on Target Base */
+		{
+			const uint triggerId = CreateID("landOnTargetBase");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), { targetBaseId }));
+			// No check follows if we actually have the cargo in bay. If it would be lost before, the mission would've failed anyway.
+
+			{
+				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
+				removeCargo->label = CreateID("initial_player");
+				removeCargo->itemId = commodity.id;
+				removeCargo->count = 1;
+				trigger.actions.push_back(removeCargo);
+			}
+
+			//{
+			//	Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
+			//	adjRep->objNameOrLabel = CreateID("players");
+			//	pub::Reputation::GetReputationGroup(adjRep->groupId, groupName);
+			//	adjRep->change = reputation;
+			//	trigger.actions.push_back(adjRep);
+			//}
+
+			{
+				Missions::ActAdjAcctPtr adjAcct(new Missions::ActAdjAcct());
+				adjAcct->label = CreateID("players");
+				adjAcct->cash = reward;
+				adjAcct->splitBetweenPlayers = true;
+				trigger.actions.push_back(adjAcct);
+			}
+
+			{
+				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
+				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->id = CreateID("msnCargoDelivered");
+				msnComms->senderVoiceId = CreateID("mc_leg_m01");
+				msnComms->senderIdsName = 13015;
+				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->lines = std::vector<uint>({ CreateID("rmb_success_returnloot_01-") });
+				trigger.actions.push_back(msnComms);
+			}
+
+			{
+				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
+				leaveMsn->label = CreateID("players");
+				leaveMsn->leaveType = Missions::LeaveMsnType::Success;
+				trigger.actions.push_back(leaveMsn);
+			}
+
+			{
+				Missions::ActTerminateMsnPtr endMsn(new Missions::ActTerminateMsn());
+				trigger.actions.push_back(endMsn);
+			}
+		}
 	}
 }

@@ -51,7 +51,7 @@ namespace Missions
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{
-			if (!mission.clientIds.contains(clientId) && systemIds.contains(currentSystemId))
+			if (!mission.clientIds.contains(clientId) && (systemIds.empty() || systemIds.contains(currentSystemId)))
 			{
 				activator.type = MissionObjectType::Client;
 				activator.id = clientId;
@@ -62,7 +62,7 @@ namespace Missions
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
-				if (object.type == MissionObjectType::Client && object.id == clientId && systemIds.contains(currentSystemId))
+				if (object.type == MissionObjectType::Client && object.id == clientId && (systemIds.empty() || systemIds.contains(currentSystemId)))
 				{
 					activator = object;
 					return true;

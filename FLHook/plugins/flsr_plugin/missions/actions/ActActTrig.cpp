@@ -30,14 +30,9 @@ namespace Missions
 			return;
 		}
 
-		for (auto& trigger : mission.triggers)
-		{
-			if (trigger.second.id == targetTriggerId)
-			{
-				activate ? trigger.second.Activate() : trigger.second.Deactivate();
-				return;
-			}
-		}
-		ConPrint(L"ERROR: Act_ActTrig could not find trigger " + std::to_wstring(targetTriggerId) + L"\n");
+		if (const auto& triggerEntry = mission.triggers.find(targetTriggerId); triggerEntry != mission.triggers.end())
+			activate ? triggerEntry->second.Activate() : triggerEntry->second.Deactivate();
+		else
+			ConPrint(L"ERROR: Act_ActTrig could not find trigger " + std::to_wstring(targetTriggerId) + L"\n");
 	}
 }

@@ -8,6 +8,6 @@
 *.pdb
 *.ilk
 *.user
-2.0/bin/*
-2.0/int/*
-2.0/vcpkg_installed/*
+bin/*
+int/*
+vcpkg_installed/*

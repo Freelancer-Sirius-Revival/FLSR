@@ -1,0 +1,658 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Chat.cpp" />
+    <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="Commands.cpp" />
+    <ClCompile Include="Crafting.cpp" />
+    <ClCompile Include="Discord.cpp" />
+    <ClCompile Include="Carrier.cpp" />
+    <ClCompile Include="EquipWhiteList.cpp" />
+    <ClCompile Include="GroupRep.cpp" />
+    <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="IFF.cpp" />
+    <ClCompile Include="LootBoxes.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mark.cpp" />
+    <ClCompile Include="Modules.cpp" />
+    <ClCompile Include="PopUp.cpp" />
+    <ClCompile Include="Insurance.cpp" />
+    <ClCompile Include="SendCash.cpp" />
+    <ClCompile Include="SpawnProtection.cpp" />
+    <ClCompile Include="Storage.cpp" />
+    <ClCompile Include="Timers.cpp" />
+    <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="SolarSpawn.cpp" />
+    <ClCompile Include="ConnectionLimiter.cpp" />
+    <ClCompile Include="missions\actions\ActActTrig.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActDestroy.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActLightFuse.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnSolar.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndDestroyed.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndTrue.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\Mission.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\Missions.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\Trigger.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActAddLabel.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActRemoveLabel.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActTerminateMsn.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndDistVec.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActPlayMusic.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActPlaySoundEffect.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActEtherComm.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSendComm.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetNNObj.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActNNPath.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndSystemSpaceEnter.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndSystemSpaceExit.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndBaseEnter.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndTimer.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnShip.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Pilots.cpp" />
+    <ClCompile Include="missions\NpcAppearances.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActAdjAcct.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActAddCargo.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\Objectives.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\Condition.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActGiveObjList.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Empathies.cpp" />
+    <ClCompile Include="missions\actions\ActDebugMsg.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndCount.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActAdjRep.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetMsnResult.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetVibe.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndCloaked.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\MissionBoard.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndProjHitCount.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndIniReader.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActInvulnerable.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndHealthDec.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndDistObj.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\Formations.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSpawnFormation.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActActMsn.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActActMsnTrig.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActRelocate.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndCommComplete.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\ShipSpawning.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\BestPath.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\ClientObjectives.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\MissionShipSpawning.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActStartDialog.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjDelay.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndDistObj.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndDistVec.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndTimer.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjCndTrue.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjDock.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\Objective.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjFollow.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjGotoObj.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjGotoSpline.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjGotoVec.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjMakeNewFormation.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjBreakFormation.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjIniReader.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjIdle.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjSetPriority.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjStayInRange.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActLeaveMsn.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndInSystem.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndOnBase.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjSetLifeTime.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetLifeTime.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\LifeTimes.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActMark.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndLaunchComplete.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndInZone.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndBaseExit.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndJumpInComplete.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndInSpace.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="NpcCloaking.cpp" />
+    <ClCompile Include="missions\actions\ActCloak.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\MatrixMath.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetDockState.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActDockInstant.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndHasCargo.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerLootSpawning.cpp" />
+    <ClCompile Include="missions\actions\ActRemoveCargo.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndLeaveMsn.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndHealthInc.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="NameLimiter.cpp" />
+    <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="bugfixes\MissionAbortFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\objectives\ObjUtils.cpp">
+      <Filter>Missions\Objectives</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="missions\actions\ActActTrig.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDestroy.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\Action.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActLightFuse.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnSolar.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndDestroyed.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndTrue.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Mission.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Missions.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MsnSolar.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Trigger.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\Condition.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAddLabel.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRemoveLabel.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActTerminateMsn.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndDistVec.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlayMusic.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlaySoundEffect.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActEtherComm.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSendComm.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MissionObject.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetNNObj.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndSystemSpaceEnter.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndSystemSpaceExit.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndBaseEnter.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndTimer.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Npc.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnShip.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Pilots.h" />
+    <ClInclude Include="missions\NpcAppearances.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAdjAcct.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAddCargo.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGoto.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\Objectives.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActGiveObjList.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Empathies.h" />
+    <ClInclude Include="GroupRep.h" />
+    <ClInclude Include="Plugin.h" />
+    <ClInclude Include="missions\actions\ActDebugMsg.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndCount.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActAdjRep.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetMsnResult.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetVibe.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndCloaked.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MissionBoard.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MissionOffer.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndProjHitCount.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndIniReader.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActInvulnerable.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHealthDec.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndDistObj.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MsnFormation.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Formations.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSpawnFormation.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActMsn.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\MatrixMath.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\BestPath.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\ClientObjectives.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjFollow.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActActMsnTrig.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActRelocate.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndCommComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\ShipSpawning.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\MissionShipSpawning.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjMakeNewFormation.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjDelay.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjDock.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\Dialog.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActStartDialog.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\Objective.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndDistObj.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndDistVec.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndTimer.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjCndTrue.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoObj.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoSpline.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjGotoVec.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjBreakFormation.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjIniReader.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjIdle.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjSetPriority.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjectiveState.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjStayInRange.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActLeaveMsn.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInSystem.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndOnBase.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActNNPath.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjSetLifeTime.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetLifeTime.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\LifeTimes.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActMark.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndLaunchComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInZone.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndBaseExit.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndJumpInComplete.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndInSpace.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="NpcCloaking.h" />
+    <ClInclude Include="missions\actions\ActCloak.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetDockState.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActDockInstant.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHasCargo.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerLootSpawning.h" />
+    <ClInclude Include="missions\actions\ActRemoveCargo.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndLeaveMsn.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndHealthInc.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="NameLimiter.h" />
+    <ClInclude Include="Insurance.h" />
+    <ClInclude Include="IFF.h" />
+    <ClInclude Include="Carrier.h" />
+    <ClInclude Include="Cloak.h" />
+    <ClInclude Include="Mark.h" />
+    <ClInclude Include="bugfixes\MissionAbortFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="Storage.h" />
+    <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\objectives\ObjUtils.h">
+      <Filter>Missions\Objectives</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="curl\Makefile.am" />
+    <None Include="curl\Makefile.in" />
+    <None Include="surdump.zip" />
+    <None Include="surupdate.au3" />
+    <None Include="surupdate.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Missions">
+      <UniqueIdentifier>{7bc4a4e5-8a28-4a2f-9032-0ff8ec4bfaba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Conditions">
+      <UniqueIdentifier>{8fe56897-eb60-49c2-930d-ab544a08a5ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Actions">
+      <UniqueIdentifier>{defee9a7-7d37-48cd-88c1-0c95c1fd8b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Missions\Objectives">
+      <UniqueIdentifier>{70fb0779-62c5-431f-b907-c667ee804cd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bugfixes">
+      <UniqueIdentifier>{99a19828-e408-49ee-a814-954a7bf2b111}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

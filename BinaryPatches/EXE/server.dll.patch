@@ -20,7 +20,7 @@ File: EXE\server.dll
 085530: 600d	[ 60d ]
 
 # Square of NPC disappear distance in MP. - Dev
-086AEC: 25000000f	[ 6250000f ]
+086AEC: 100000000f	[ 6250000f ]
 
 # Update objects once (fixes bug that causes solar guns reduce refire delay when multiple players are around). - adoxa
 02C057: 75 0B C7 84 8C 9C 00 00 00 00 00 00 00 41 83 C2 04 39 C1 7C E9 EB	[ 74 0A 41 83 C2 04 3B C8 7C F4 EB 0B C7 84 8C 9C 00 00 00 00 00 00 ]

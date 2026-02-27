@@ -1,8 +1,14 @@
 #pragma once
-#include <FLHook.h>
 
 namespace RandomMissions
 {
 	void ReadTradeCommoditiesData();
-	int GenerateMissionForBase(const uint baseId);
+
+	namespace Hooks
+	{
+		namespace TradeMissions
+		{
+			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
+		}
+	}
 }

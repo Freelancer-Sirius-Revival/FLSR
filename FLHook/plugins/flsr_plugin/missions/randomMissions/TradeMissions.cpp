@@ -1,5 +1,5 @@
+#include <FLHook.h>
 #include "TradeMissions.h"
-#include <random>
 #include "Offers.h"
 #include "Factions.h"
 #include "../Mission.h"
@@ -7,7 +7,6 @@
 #include "../conditions/CndDestroyed.h"
 #include "../conditions/CndLeaveMsn.h"
 #include "../conditions/CndBaseEnter.h"
-#include "../conditions/CndInSystem.h"
 #include "../actions/ActLeaveMsn.h"
 #include "../actions/ActTerminateMsn.h"
 #include "../actions/ActSetNNObj.h"
@@ -16,9 +15,13 @@
 #include "../actions/ActAdjAcct.h"
 #include "../actions/ActAddCargo.h"
 #include "../actions/ActRemoveCargo.h"
+#include "../../Plugin.h"
+#include <random>
 
 namespace RandomMissions
 {
+	const uint desiredMissionCount = 2;
+
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
 
@@ -37,6 +40,7 @@ namespace RandomMissions
 	std::vector<Commodity> commodities;
 	std::unordered_map<uint, std::vector<size_t>> commoditiesPerBase;
 	std::unordered_map<uint, std::unordered_map<uint, std::vector<uint>>> shortestSystemPathToTargets;
+	std::unordered_map<uint, std::unordered_set<uint>> missionIdsByBaseIds;
 
 	void ReadTradeCommoditiesData()
 	{
@@ -88,7 +92,10 @@ namespace RandomMissions
 					{
 						commodities.push_back(commodity);
 						for (const auto& baseId : commodity.offerBases)
+						{
 							commoditiesPerBase[baseId].push_back(commodities.size() - 1);
+							missionIdsByBaseIds.insert({ baseId, {} });
+						}
 					}
 				}
 			}
@@ -136,7 +143,6 @@ namespace RandomMissions
 			}
 			ini.close();
 		}
-
 	}
 
 	static std::pair<uint, uint> GetRandomTargetBaseIdAndDistance(const uint startSystemId, const uint startBaseId, const std::unordered_set<uint>& bases, const uint minJumpDistance, const std::unordered_set<uint>& hostileFactionIds)
@@ -214,7 +220,7 @@ namespace RandomMissions
 		return result;
 	}
 
-	int GenerateMissionForBase(const uint baseId)
+	static uint GenerateMissionForBase(const uint baseId)
 	{
 		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId[baseId]);
 		std::ranges::shuffle(shuffledBaseFactions, rd);
@@ -231,7 +237,10 @@ namespace RandomMissions
 			}
 		}
 		if (destination.commodityIndex < 0 || !destination.baseId)
-			return -1;
+			return 0;
+
+		if (factionById[factionId].groupId == 0)
+			return 0;
 
 		const Commodity& commodity = commodities[destination.commodityIndex];
 		const uint targetBaseId = destination.baseId;
@@ -241,7 +250,7 @@ namespace RandomMissions
 		const uint missionId = Missions::missions.size() + 1;
 		const auto& result = Missions::missions.try_emplace(missionId, "", missionId, false);
 		if (!result.second)
-			return -1;
+			return 0;
 
 		Missions::Mission& mission = result.first->second;
 
@@ -257,8 +266,7 @@ namespace RandomMissions
 
 		mission.offer.type = pub::GF::MissionType::RetrieveContraband;
 		mission.offer.system = startSystemId;
-		//uint groupName = 0;
-		//pub::Reputation::GetReputationGroup(mission.offer.group, groupName);
+		mission.offer.group = factionById[factionId].groupId;
 		mission.offer.title = 327757;
 		mission.offer.description = 327757;
 		mission.offer.reward = reward;
@@ -350,12 +358,12 @@ namespace RandomMissions
 			}
 
 			{
-				//Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
-				//adjRep->objNameOrLabel = CreateID("players");
-				//pub::Reputation::GetReputationGroup(adjRep->groupId, groupName);
-				//adjRep->change = 0.0f;
-				//adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
-				//trigger.actions.push_back(adjRep);
+				Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
+				adjRep->objNameOrLabel = CreateID("players");
+				adjRep->groupId = mission.offer.group;
+				adjRep->change = 0.0f;
+				adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
+				trigger.actions.push_back(adjRep);
 			}
 
 			{
@@ -399,14 +407,14 @@ namespace RandomMissions
 				trigger.actions.push_back(removeCargo);
 			}
 
-			//{
-			//	Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
-			//	adjRep->objNameOrLabel = CreateID("players");
-			//	pub::Reputation::GetReputationGroup(adjRep->groupId, groupName);
-			//	adjRep->change = 0.0f;
-			//	adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
-			//	trigger.actions.push_back(adjRep);
-			//}
+			{
+				Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
+				adjRep->objNameOrLabel = CreateID("players");
+				adjRep->groupId = mission.offer.group;
+				adjRep->change = 0.0f;
+				adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
+				trigger.actions.push_back(adjRep);
+			}
 
 			{
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
@@ -468,13 +476,13 @@ namespace RandomMissions
 				trigger.actions.push_back(removeCargo);
 			}
 
-			//{
-			//	Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
-			//	adjRep->objNameOrLabel = CreateID("players");
-			//	pub::Reputation::GetReputationGroup(adjRep->groupId, groupName);
-			//	adjRep->change = reputation;
-			//	trigger.actions.push_back(adjRep);
-			//}
+			{
+				Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
+				adjRep->objNameOrLabel = CreateID("players");
+				adjRep->groupId = mission.offer.group;
+				adjRep->change = reputation;
+				trigger.actions.push_back(adjRep);
+			}
 
 			{
 				Missions::ActAdjAcctPtr adjAcct(new Missions::ActAdjAcct());
@@ -504,7 +512,38 @@ namespace RandomMissions
 
 			{
 				Missions::ActTerminateMsnPtr endMsn(new Missions::ActTerminateMsn());
+				endMsn->deleteMission = true;
 				trigger.actions.push_back(endMsn);
+			}
+		}
+
+		return mission.id;
+	}
+
+	namespace Hooks
+	{
+		namespace TradeMissions
+		{
+			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
+			{
+				if (auto entry = missionIdsByBaseIds.find(baseId); entry != missionIdsByBaseIds.end())
+				{
+					// Remove all accepted missions from the saved missions-in-offer.
+					const std::unordered_set<uint> missionIds(entry->second);
+					for (const uint missionId : missionIds)
+						if (Missions::missions.at(missionId).IsActive())
+							entry->second.erase(missionId);
+
+
+					// Add new missions to the board until it reached the desired count.
+					for (size_t index = entry->second.size(); index < desiredMissionCount; index++)
+					{
+						const uint missionId = GenerateMissionForBase(entry->first);
+						if (missionId)
+							entry->second.insert(missionId);
+					}
+				}
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

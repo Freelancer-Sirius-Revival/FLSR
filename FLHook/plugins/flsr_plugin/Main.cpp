@@ -44,6 +44,7 @@
 #include "Missions/conditions/CndTimer.h"
 #include "Missions/objectives/Objectives.h"
 #include "Missions/randomMissions/RandomMissions.h"
+#include "Missions/randomMissions/TradeMissions.h"
 
 std::mutex m_Mutex;
 
@@ -369,6 +370,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BestPath::CollectJumpObjectsPerSystem, PLUGIN_HkTimerCheckKick, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Initialize, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
     
     return p_PI;
 }

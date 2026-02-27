@@ -33,9 +33,7 @@ namespace RandomMissions
 					}
 				}
 				if (factionId)
-				{
 					hostileFactionsByFactionId[factionId] = hostileFactions;
-				}
 			}
 		}
 		ini.close();
@@ -46,12 +44,13 @@ namespace RandomMissions
 		{
 			if (ini.is_header("FactionProps"))
 			{
-				Faction faction{};
+				Faction faction;
 				while (ini.read_value())
 				{
 					if (ini.is_value("affiliation"))
 					{
-						faction.id = CreateID(ini.get_value_string(0));
+						faction.name = ini.get_value_string(0);
+						faction.id = CreateID(faction.name.c_str());
 					}
 					else if (ini.is_value("mc_costume"))
 					{

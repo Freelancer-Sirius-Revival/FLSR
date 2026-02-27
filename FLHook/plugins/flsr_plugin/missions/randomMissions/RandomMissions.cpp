@@ -21,6 +21,7 @@ namespace RandomMissions
 			return;
 		initialized = true;
 
-		GenerateMissionForBase(CreateID("li01_01_base"));
+		for (auto& factionEntry : factionById)
+			pub::Reputation::GetReputationGroup(factionEntry.second.groupId, factionEntry.second.name.c_str());
 	}
 }

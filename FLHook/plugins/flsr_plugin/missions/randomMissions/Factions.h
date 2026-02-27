@@ -5,7 +5,9 @@ namespace RandomMissions
 {
 	struct Faction
 	{
-		uint id;
+		uint id = 0;
+		std::string name;
+		uint groupId = 0;
 		std::unordered_set<uint> hostileFactionIds;
 		Costume missionCommission;
 	};

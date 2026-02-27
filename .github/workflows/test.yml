@@ -28,7 +28,7 @@ jobs:
         - name: Merge latest FLSR files (from Freelancer folder) to clean vanilla (to freelancer_folder)
           run: fl-data-flsr -wd ${{ github.workspace }}/freelancer_folder
         - name: Sprinkle with FLSR recipes
-          run: cp -r FLHook/2.0/plugins/flsr_plugin ${{ github.workspace }}/freelancer_folder
+          run: cp Freelancer/EXE/flhook_plugins/FLSR-Crafting.cfg ${{ github.workspace }}/freelancer_folder/FLSR-Crafting.cfg
 
         - name: Install fl-darklint
           uses: darklab8/infra/.github/actions/install-darklint@master

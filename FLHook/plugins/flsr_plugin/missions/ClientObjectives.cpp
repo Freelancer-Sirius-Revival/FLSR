@@ -57,8 +57,7 @@ namespace Missions
 				computedObjectivesByClientId[clientId] = objectives;
 
 				FmtStr missionTitle(missionOffer.title, 0);
-				FmtStr missionDescription(missionOffer.description, 0);
-				pub::Player::SetMissionObjectives(clientId, missionId, objectives.data(), objectives.size(), missionTitle, 0, missionDescription);
+				pub::Player::SetMissionObjectives(clientId, missionId, objectives.data(), objectives.size(), missionTitle, 0, missionOffer.description);
 			}
 		}
 
@@ -156,7 +155,7 @@ namespace Missions
 				if (missionEntry != missions.end())
 				{
 					pub::Player::MissionObjective objective;
-					objective.message = FmtStr(objectiveEntry->second.message, 0);
+					objective.message = objectiveEntry->second.message;
 					objective.type = pub::Player::MissionObjectiveType::MissionText | pub::Player::MissionObjectiveType::SimpleEntry | pub::Player::MissionObjectiveType::ActiveLog;
 					SetObjectives(clientId, objectiveEntry->second.missionId, missionEntry->second.offer, std::vector<pub::Player::MissionObjective>({ objective }));
 				}
@@ -343,7 +342,7 @@ namespace Missions
 			{
 				auto& lastObjective = objectives[objectives.size() - 1];
 				lastObjective.type = lastObjectiveType;
-				lastObjective.message = FmtStr(playerObjective.message, 0);
+				lastObjective.message = playerObjective.message;
 			}
 
 			// Translate all "best path" waypoints to nav map markers the objectives.
@@ -362,7 +361,7 @@ namespace Missions
 			{
 				pub::Player::MissionObjective finalObjective;
 				finalObjective.type = lastObjectiveType;
-				finalObjective.message = FmtStr(playerObjective.message, 0);
+				finalObjective.message = playerObjective.message;
 				FmtStr::NavMarker marker;
 				marker.pos = playerObjective.position;
 				marker.system = playerObjective.systemId;

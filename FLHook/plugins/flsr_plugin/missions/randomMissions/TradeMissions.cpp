@@ -263,12 +263,50 @@ namespace RandomMissions
 				break;
 			}
 		}
+		if (!startSystemId)
+			return 0;
+
+		uint targetObjId = 0;
+		uint targetSystemId = 0;
+		for (const auto& base : lstBases)
+		{
+			if (base.iBaseID == destination.baseId)
+			{
+				targetSystemId = base.iSystemID;
+				targetObjId = base.iObjectID;
+				break;
+			}
+		}
+		if (!targetObjId || !targetSystemId)
+			return 0;
 
 		mission.offer.type = pub::GF::MissionType::RetrieveContraband;
-		mission.offer.system = startSystemId;
+		mission.offer.system = targetSystemId;
 		mission.offer.group = factionById[factionId].groupId;
-		mission.offer.title = 327757;
-		mission.offer.description = 327757;
+		mission.offer.title = 524391;
+		mission.offer.description = FmtStr(524392, 0);
+		mission.offer.description.append_good(commodity.id);
+		mission.offer.description.append_base(targetBaseId);
+		mission.offer.description.append_system(targetSystemId);
+		mission.offer.description.append_rep_group(mission.offer.group);
+		FmtStr ships(327681, 0);
+		const std::vector<uint> shipIds(commodity.allowedShips.begin(), commodity.allowedShips.end());
+		for (size_t index = 0, length = shipIds.size(); index < length; index++)
+		{
+			const auto shipArch = Archetype::GetShip(shipIds[index]);
+			if (shipArch)
+			{
+				if (index < 1)
+					ships.append_fmt_str(FmtStr(shipArch->iIdsName, 0));
+				else
+				{
+					FmtStr subStr(524393, 0);
+					subStr.append_string(shipArch->iIdsName);
+					ships.append_fmt_str(subStr);
+				}
+			}
+		}
+		mission.offer.description.append_fmt_str(ships);
 		mission.offer.reward = reward;
 		mission.offer.shipArchetypeIds = commodity.allowedShips;
 		mission.offer.baseIds = { baseId };
@@ -281,18 +319,7 @@ namespace RandomMissions
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			uint targetObjId = 0;
 			{
-				uint targetSystemId = 0;
-				for (const auto& base : lstBases)
-				{
-					if (base.iBaseID == destination.baseId)
-					{
-						targetSystemId = base.iSystemID;
-						targetObjId = base.iObjectID;
-						break;
-					}
-				}
 				IObjRW* inspect;
 				StarSystem* system;
 				if (GetShipInspect(targetObjId, inspect, system))
@@ -301,7 +328,9 @@ namespace RandomMissions
 					action->label = CreateID("players");
 					action->systemId = targetSystemId;
 					action->targetObjName = targetObjId;
-					action->message = 327757;
+					action->message = FmtStr(524394, 0);
+					action->message.append_good(commodity.id);
+					action->message.append_base(targetBaseId);
 					action->position = inspect->get_position();
 					action->bestRoute = true;
 					trigger.actions.push_back(action);
@@ -370,7 +399,7 @@ namespace RandomMissions
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
 				leaveMsn->label = CreateID("players");
 				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
-				leaveMsn->failureStringId = 13088;
+				leaveMsn->failureStringId = 13089;
 				trigger.actions.push_back(leaveMsn);
 			}
 
@@ -420,7 +449,7 @@ namespace RandomMissions
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
 				leaveMsn->label = CreateID("players");
 				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
-				leaveMsn->failureStringId = 13088;
+				leaveMsn->failureStringId = 13086;
 				trigger.actions.push_back(leaveMsn);
 			}
 

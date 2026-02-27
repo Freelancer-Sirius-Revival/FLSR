@@ -107,7 +107,7 @@ namespace Missions
 							else if (ini.is_value("offer_title_id"))
 								offer.title = ini.get_value_int(0);
 							else if (ini.is_value("offer_description_id"))
-								offer.description = ini.get_value_int(0);
+								offer.description = FmtStr(ini.get_value_int(0), 0);
 							else if (ini.is_value("offer_reward"))
 								offer.reward = ini.get_value_int(0);
 							else if (ini.is_value("offer_ship_restriction"))
@@ -757,7 +757,7 @@ namespace Missions
 							{
 								ActSetNNObjPtr action(new ActSetNNObj());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
-								action->message = ini.get_value_int(1);
+								action->message = FmtStr(ini.get_value_int(1), 0);
 								action->systemId = CreateIdOrNull(ini.get_value_string(2));
 								action->position.x = ini.get_value_float(3);
 								action->position.y = ini.get_value_float(4);

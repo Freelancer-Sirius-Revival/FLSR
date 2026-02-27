@@ -20,7 +20,7 @@
 
 namespace RandomMissions
 {
-	const uint desiredMissionCount = 2;
+	const uint desiredMissionCount = 3;
 
 	static std::random_device rd;
 	static std::mt19937 gen(rd());

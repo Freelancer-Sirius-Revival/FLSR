@@ -33,7 +33,8 @@ namespace Missions
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
 		offerId(0),
 		missionResult(MissionResult::Success),
-		reofferRemainingTime(0.0f)
+		reofferRemainingTime(0.0f),
+		markedForDeletion(false)
 	{}
 
 	Mission::~Mission()
@@ -43,7 +44,7 @@ namespace Missions
 		End();
 	}
 
-	void Mission::End()
+	void Mission::End(bool markForDeletion)
 	{
 		state = MissionState::Finished;
 
@@ -320,6 +321,11 @@ namespace Missions
 		return 0;
 	}
 
+	bool Mission::ToBeDeleted() const
+	{
+		return markedForDeletion;
+	}
+
 	static bool IsValidMissionForOffer(const Mission& mission)
 	{
 		return mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.baseIds.empty();
@@ -357,9 +363,16 @@ namespace Missions
 				}
 
 				const mstime thresholdTime = timeInMS() - 10000;
+				std::unordered_set<uint> missionIdsToDelete;
 				for (auto& missionEntry : missions)
 				{
 					auto& mission = missionEntry.second;
+
+					if (mission.ToBeDeleted())
+					{
+						missionIdsToDelete.insert(mission.id);
+						continue;
+					}
 
 					/* Reoffering missions to job board */
 					if (mission.CanBeStarted() && mission.offerId == 0 && IsValidMissionForOffer(mission))
@@ -386,6 +399,13 @@ namespace Missions
 							mission.ongoingComms.erase(entry.first);
 						// else: The CndCommComplete has erased the comm-entry itself.
 					}
+				}
+
+				for (const uint missionId : missionIdsToDelete)
+				{
+					const auto& mission = missions.at(missionId);
+					MissionBoard::DeleteMissionOffer(mission.offerId);
+					missions.erase(missionId);
 				}
 
 				elapsedTimeInSec = 0.0f;

@@ -307,6 +307,7 @@ namespace RandomMissions
 			}
 		}
 		mission.offer.description.append_fmt_str(ships);
+		mission.offer.description.append_int(reputation * 100);
 		mission.offer.reward = reward;
 		mission.offer.shipArchetypeIds = commodity.allowedShips;
 		mission.offer.baseIds = { baseId };

@@ -547,6 +547,8 @@ namespace RandomMissions
 			}
 		}
 
+		mission.TryAddToJobBoard();
+
 		return mission.id;
 	}
 

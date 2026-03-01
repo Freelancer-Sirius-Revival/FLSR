@@ -326,26 +326,29 @@ namespace Missions
 		return markedForDeletion;
 	}
 
-	static bool IsValidMissionForOffer(const Mission& mission)
+	bool Mission::TryAddToJobBoard()
 	{
-		return mission.offer.type != pub::GF::MissionType::Unknown && !mission.offer.baseIds.empty();
-	}
+		if (offer.type == pub::GF::MissionType::Unknown ||
+			offer.baseIds.empty() ||
+			!CanBeStarted() ||
+			reofferRemainingTime > 0.0f ||
+			offerId != 0)
+		{
+			return false;
+		}
 
-	static void RegisterMissionToJobBoard(Mission& mission)
-	{
-		if (!IsValidMissionForOffer(mission))
-			return;
-		
-		mission.reofferRemainingTime = 0.0f;
-		MissionBoard::MissionOffer offer;
-		offer.type = mission.offer.type;
-		offer.system = mission.offer.system;
-		offer.group = mission.offer.group;
-		offer.title = mission.offer.title;
-		offer.description = mission.offer.description;
-		offer.reward = mission.offer.reward;
-		offer.allowedShipArchetypeIds = mission.offer.shipArchetypeIds;
-		mission.offerId = MissionBoard::AddMissionOffer(offer, mission.offer.baseIds);
+		reofferRemainingTime = 0.0f;
+		MissionBoard::MissionOffer boardOffer;
+		boardOffer.type = offer.type;
+		boardOffer.system = offer.system;
+		boardOffer.group = offer.group;
+		boardOffer.title = offer.title;
+		boardOffer.description = offer.description;
+		boardOffer.reward = offer.reward;
+		boardOffer.allowedShipArchetypeIds = offer.shipArchetypeIds;
+		offerId = MissionBoard::AddMissionOffer(boardOffer, offer.baseIds);
+
+		return true;
 	}
 
 	namespace Hooks
@@ -375,13 +378,8 @@ namespace Missions
 					}
 
 					/* Reoffering missions to job board */
-					if (mission.CanBeStarted() && mission.offerId == 0 && IsValidMissionForOffer(mission))
-					{
-						if (mission.reofferRemainingTime > 0.0f)
-							mission.reofferRemainingTime -= elapsedTimeInSec;
-						if (mission.reofferRemainingTime <= 0.0f)
-							RegisterMissionToJobBoard(mission);
-					}
+					mission.reofferRemainingTime = max(0.0f, mission.reofferRemainingTime - elapsedTimeInSec);
+					mission.TryAddToJobBoard();
 
 					/* Comms timeouts */
 					std::vector<std::pair<uint, Missions::Mission::CommEntry>> entriesToRemove;

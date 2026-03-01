@@ -384,12 +384,16 @@ namespace Missions
 
 		void __stdcall PlayerLaunch_AFTER(unsigned int objId, unsigned int clientId)
 		{
+			// The player may have re-logged in with Character Menu. Erase the entry to make sure the objectives are sent again.
+			computedObjectivesByClientId.erase(clientId);
 			ComputeAndSendClientObjectives(clientId);
 			returncode = DEFAULT_RETURNCODE;
 		}
 
 		void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId)
 		{
+			// The player may have re-logged in with Character Menu. Erase the entry to make sure the objectives are sent again.
+			computedObjectivesByClientId.erase(clientId);
 			ComputeAndSendClientObjectives(clientId);
 			returncode = DEFAULT_RETURNCODE;
 		}

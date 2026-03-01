@@ -11,7 +11,7 @@ namespace Missions
 			uint missionId = 0;
 			Vector position;
 			uint systemId = 0;
-			uint message = 0;
+			FmtStr message = FmtStr(0, 0);
 			uint objId = 0;
 			bool bestPath = false;
 		};

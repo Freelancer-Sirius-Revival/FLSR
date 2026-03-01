@@ -443,7 +443,7 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 
 - `Cnd_InSystem` Only players. Checks whether the player is within a system. This can be either in space, or docked to a base. `Activator` will be the player.
     1. `STRING|Stranger` The players by label to expect to be in a system.
-    1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in.
+    1. `[STRING]` Multiple subsequent entries possible. The system nickname to expect the player in. If none is given, any system will count.
 
 - `Cnd_InZone` Checks if an object is within a zone. `Activator` will be the object in the zone.
     1. `STRING|Stranger` Object by name or label to expect in the zone.

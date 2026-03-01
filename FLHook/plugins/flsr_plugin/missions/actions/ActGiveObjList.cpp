@@ -25,7 +25,6 @@ namespace Missions
 		}
 		else
 		{
-			// Clients can only be addressed via Label.
 			if (const auto& objectByName = mission.objectIdsByName.find(objNameOrLabel); objectByName != mission.objectIdsByName.end())
 			{
 				SetObjectiveList(mission, objectivesId, objectByName->second);

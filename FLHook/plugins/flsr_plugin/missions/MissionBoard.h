@@ -5,12 +5,12 @@ namespace MissionBoard
 {
 	struct MissionOffer
 	{
-		pub::GF::MissionType type;
-		uint system;
-		uint group;
-		uint title;
-		uint description;
-		uint reward;
+		pub::GF::MissionType type = pub::GF::MissionType::Unknown;
+		uint system = 0;
+		uint group = 0;
+		uint title = 0;
+		FmtStr description = FmtStr(0, 0);
+		uint reward = 0;
 		std::unordered_set<uint> allowedShipArchetypeIds;
 	};
 

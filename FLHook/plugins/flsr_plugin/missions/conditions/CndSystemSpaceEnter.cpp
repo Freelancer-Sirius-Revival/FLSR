@@ -40,6 +40,9 @@ namespace Missions
 		uint currentSystemId;
 		pub::Player::GetSystem(clientId, currentSystemId);
 
+		if (!currentSystemId)
+			return false;
+
 		const auto& mission = missions.at(parent.missionId);
 		if (label == Stranger)
 		{

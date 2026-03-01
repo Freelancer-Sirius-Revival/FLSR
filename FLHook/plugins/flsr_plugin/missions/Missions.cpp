@@ -1076,7 +1076,7 @@ namespace Missions
 		{
 			if (missionEntry.second.name == missionName)
 			{
-				missionEntry.second.End();
+				missionEntry.second.End(false, true);
 				return true;
 			}
 		}

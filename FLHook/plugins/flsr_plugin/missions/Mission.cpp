@@ -44,9 +44,9 @@ namespace Missions
 		End();
 	}
 
-	void Mission::End(bool markForDeletion)
+	void Mission::End(bool markForDeletion, bool allowRestart)
 	{
-		state = MissionState::Finished;
+		state = allowRestart ? MissionState::Inactive : MissionState::Finished;
 
 		std::queue<std::pair<uint, MissionObject>> emptyQueue;
 		std::swap(triggerExecutionQueue, emptyQueue);

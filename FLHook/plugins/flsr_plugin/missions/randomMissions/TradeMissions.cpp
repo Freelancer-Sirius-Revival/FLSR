@@ -7,6 +7,7 @@
 #include "../conditions/CndDestroyed.h"
 #include "../conditions/CndLeaveMsn.h"
 #include "../conditions/CndBaseEnter.h"
+#include "../conditions/CndLaunchComplete.h"
 #include "../actions/ActLeaveMsn.h"
 #include "../actions/ActTerminateMsn.h"
 #include "../actions/ActSetNNObj.h"
@@ -341,6 +342,26 @@ namespace RandomMissions
 			{
 				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
 				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->id = CreateID("msnGoToTarget");
+				msnComms->senderVoiceId = CreateID("mc_leg_m01");
+				msnComms->senderIdsName = 13015;
+				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
+				trigger.actions.push_back(msnComms);
+			}
+		}
+
+		/* Launch from Any Base */
+		{
+			const uint triggerId = CreateID("launchFromAnyBase");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndLaunchComplete(Missions::ConditionParent(missionId, triggerId), CreateID("players"), {}));
+
+			{
+				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
+				msnComms->receiverObjNameOrLabel = Missions::Activator;
 				msnComms->id = CreateID("msnGoToTarget");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;

@@ -51,13 +51,20 @@ namespace Missions
 
 		void static SetObjectives(const uint clientId, const uint missionId, const MissionOffer& missionOffer, const std::vector<pub::Player::MissionObjective>& objectives)
 		{
-			if(!AreObjectivesEqual(computedObjectivesByClientId[clientId], objectives))
+			if (!AreObjectivesEqual(computedObjectivesByClientId[clientId], objectives))
 			{
 				// Save the current objectives for later comparison.
 				computedObjectivesByClientId[clientId] = objectives;
 
 				FmtStr missionTitle(missionOffer.title, 0);
-				pub::Player::SetMissionObjectives(clientId, missionId, objectives.data(), objectives.size(), missionTitle, 0, missionOffer.description);
+
+				FmtStr message(327681, 0);
+				FmtStr header(327682, 0);
+				header.append_int(missionOffer.reward);
+				message.append_fmt_str(header);
+				message.append_fmt_str(missionOffer.description);
+
+				pub::Player::SetMissionObjectives(clientId, missionId, objectives.data(), objectives.size(), missionTitle, 0, message);
 			}
 		}
 

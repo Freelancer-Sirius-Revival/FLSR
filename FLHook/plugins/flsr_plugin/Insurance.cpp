@@ -282,7 +282,9 @@ namespace Insurance
             // Equip with price=0 is fixed equipment and must always be restored
             if (IsEquipment(archetypeType) && (good->fPrice == 0.0f || (insurance.type & InsuranceType::Equipment)))
             {
-                totalCost += static_cast<int>(std::floor(good->fPrice));
+                // Equipment always is stored by its max repair cost.
+                // This way there will always be enough money deposited for full repair, or restoring the item based on full repair price.
+                totalCost += static_cast<int>(std::floor(good->fPrice * equipmentRepairCostFactor));
                 InsuredItem insured;
                 insured.archId = equip.get_arch_id();
                 insured.count = 1;
@@ -459,7 +461,7 @@ namespace Insurance
                     itemToAdds.push_back(insuredItem);
                     const GoodInfo* good = GoodList::find_by_id(insuredItem.archId);
                     if (good)
-                        restoreCost += good->fPrice;
+                        restoreCost += good->fPrice * equipmentRepairCostFactor;
                 }
             }
             else if (IsConsumable(equipment->get_class_type()))

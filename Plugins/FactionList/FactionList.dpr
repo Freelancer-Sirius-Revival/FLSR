@@ -87,9 +87,9 @@ PatchF($4A7A05,0.22);           //"STATS" Y
 PatchF($4A7A45,0.455);          //Info Card Width
 PatchF($4A7A40,0.35);           //Info Card Height
 PatchF($4A7A62,0.182);          //Info Card Y
-//InfoCard (RichEditWin Control)
-PatchF($474CE2,0.455);
-PatchF($474CFC,-0.374);
+//InfoCard (RichEditWin Control) Unclear why this should be patched?
+//PatchF($474CE2,0.455);
+//PatchF($474CFC,-0.374);
 
 //NEW_OFFSET := PUINT($4A911B)^;
 //FAddrWire := NEW_OFFSET - NUM_DISPLAY * 16;   //OK

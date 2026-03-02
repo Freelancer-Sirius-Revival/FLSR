@@ -164,6 +164,9 @@ File: EXE\Freelancer.exe
 # Items with "ids_name = 0" show up in repair list. - adoxa
 0B3C42: 00	[ E9 ]
 
+# Prevent bases with the following IDS Names to be excluded from Trade Routes: 0, 60223, 60225, 196690, 196764, 196765, 196799, 196842, 261159, 261160, 261166 - BC46
+06F78B: 00 00	[ 9C 02 ]
+
 # Scale ship to fill the preview. - adoxa
 1855C0: EB	[ 74 ]
 

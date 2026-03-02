@@ -632,6 +632,10 @@ bool UserCmd_Process(uint iClientID, const std::wstring& wscCmd) {
         }
     }
 
+    // These are inbuilt commands by FLServer
+    if (wscCmdLower.starts_with(L"/i") || wscCmdLower.starts_with(L"/invite"))
+        return false;
+
     if (wscCmd.starts_with('/'))
     {
         PrintUserCmdText(iClientID, L"No valid command: " + wscCmd);

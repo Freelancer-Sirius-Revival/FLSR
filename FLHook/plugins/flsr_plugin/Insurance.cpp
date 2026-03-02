@@ -744,21 +744,21 @@ namespace Insurance
             {
                 switch (insuranceByCharacterFileName[GetCharacterFileName(clientId)].type)
                 {
-                case InsuranceType::None:
-                    PrintUserCmdText(clientId, L"Insurance deactivated.");
-                    break;
+                    case InsuranceType::None:
+                        PrintUserCmdText(clientId, L"Insurance deactivated. Dock on a base and type /insurance to set up insurance.");
+                        break;
 
-                case InsuranceType::Equipment:
-                    PrintUserCmdText(clientId, L"Insurance activated for ship and equipment.");
-                    break;
+                    case InsuranceType::Equipment:
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and equipment. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        break;
 
-                case InsuranceType::Consumables:
-                    PrintUserCmdText(clientId, L"Insurance activated for ship and consumables.");
-                    break;
+                    case InsuranceType::Consumables:
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        break;
 
-                case InsuranceType::All:
-                    PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables.");
-                    break;
+                    case InsuranceType::All:
+                        PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        break;
                 }
             }
             else if (!baseId)

@@ -7,6 +7,7 @@ namespace Insurance
     std::string outputDirectory;
     float shipRepairCostFactor = 0.33f;
     float equipmentRepairCostFactor = 0.3f;
+    const std::string IniSectionHeading = "Insurance";
 
     bool initialized = false;
     void Initialize()
@@ -100,11 +101,10 @@ namespace Insurance
                 INI_Reader ini;
                 if (ini.open(filePath.c_str(), false))
                 {
-                    Insurance& insurance = insuranceByCharacterFileName[GetCharacterFileName(clientId)];
-
+                    Insurance insurance;
                     while (ini.read_header())
                     {
-                        if (ini.is_header("Insurance"))
+                        if (ini.is_header(IniSectionHeading.c_str()))
                         {
                             while (ini.read_value())
                             {
@@ -140,6 +140,7 @@ namespace Insurance
                                 }
                             }
                         }
+                        insuranceByCharacterFileName[GetCharacterFileName(clientId)] = insurance;
                     }
                     ini.close();
                 }
@@ -176,7 +177,7 @@ namespace Insurance
                 break;
         }
         std::filesystem::create_directory(outputDirectory);
-        IniWrite(filePath, "Insurance", "type", typeString.c_str());
+        IniWrite(filePath, IniSectionHeading, "type", typeString.c_str());
     }
 
     static void PersistInsuranceContents(const uint clientId, const int depositedMoney, const std::vector<InsuredItem>& entries)
@@ -187,7 +188,7 @@ namespace Insurance
 
         const auto& filePath = GetInsuranceFilePath(clientId);
         std::filesystem::create_directory(outputDirectory);
-        IniWrite(filePath, "Insurance", "deposit", std::to_string(depositedMoney));
+        IniWrite(filePath, IniSectionHeading, "deposit", std::to_string(depositedMoney));
         const size_t bufferSize = 65535;
         char* keyValues = static_cast<char*>(malloc(bufferSize));
         size_t bytesWritten = 0;
@@ -621,7 +622,7 @@ namespace Insurance
 
         returncode = DEFAULT_RETURNCODE;
     }
-
+    
     void __stdcall CharacterSelect_After(const CHARACTER_ID& cId, unsigned int clientId)
     {
         clientUndockedFromBase.erase(clientId);

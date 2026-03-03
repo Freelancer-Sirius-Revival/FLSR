@@ -39,6 +39,7 @@
 #include "Actions/ActSetDockState.h"
 #include "Actions/ActDockInstant.h"
 #include "Actions/ActDisplayMsg.h"
+#include "Actions/ActPlayNN.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -892,6 +893,14 @@ namespace Missions
 								ActDisplayMsgPtr action(new ActDisplayMsg());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->stringId = ini.get_value_int(1);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_PlayNN"))
+							{
+								ActPlayNNPtr action(new ActPlayNN());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								for (size_t index = 1, length = ini.get_num_parameters(); index < length; index++)
+									action->soundIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
 								actions.push_back(action);
 							}
 							else

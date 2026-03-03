@@ -327,6 +327,9 @@
     <ClCompile Include="missions\actions\ActDisplayMsg.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActPlayNN.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -666,6 +669,9 @@
     </ClInclude>
     <ClInclude Include="DeathPenalty.h" />
     <ClInclude Include="missions\actions\ActDisplayMsg.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlayNN.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

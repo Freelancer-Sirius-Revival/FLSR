@@ -638,6 +638,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The time in seconds it takes to transition music.
     1. `[True|False] :False` Whether to play the override music only once and then return to other music.
 
+- `Act_PlayNN` Only for players. Plays a sequence of neural net sounds.
+    1. `STRING|Activator` Players by label to play the sound effect for.
+    1. `STRING` The sound nickname to play. Multiple subsequent entries possible.
+
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
     1. `STRING|Activator` Players by label to play the sound effect for.
     1. `STRING` The sound nickname to play.

@@ -669,9 +669,9 @@ namespace Insurance
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (!oldCharacterFileName.empty())
+        const std::string& sOldCharacterFileName = wstos(oldCharacterFileName);
+        if (!oldCharacterFileName.empty() && insuranceByCharacterFileName.contains(sOldCharacterFileName))
         {
-            const std::string sOldCharacterFileName = wstos(oldCharacterFileName);
             if (onlyDelete)
             {
                 try
@@ -686,7 +686,7 @@ namespace Insurance
             }
             else if (std::wstring newCharacterFileName; HkGetCharFileName(newCharname, newCharacterFileName) == HKE_OK)
             {
-                const std::string sNewCharacterFileName = wstos(newCharacterFileName);
+                const std::string& sNewCharacterFileName = wstos(newCharacterFileName);
                 try
                 {
                     std::filesystem::rename(outputDirectory + sOldCharacterFileName + ".ini", outputDirectory + sNewCharacterFileName + ".ini");

@@ -1,6 +1,7 @@
 ﻿#include "Main.h"
 #include "Carrier.h"
 #include "Cloak.h"
+#include "DeathPenalty.h"
 #include "Empathies.h"
 #include "GroupRep.h"
 #include "IFF.h"
@@ -252,6 +253,17 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Insurance::HkRename, PLUGIN_HkCb_Rename, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Insurance::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Insurance::UserCmds, PLUGIN_UserCmd_Process, 0));
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::Initialize, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::CreateNewCharacter_After, PLUGIN_HkIServerImpl_CreateNewCharacter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::DestroyCharacter_After, PLUGIN_HkIServerImpl_DestroyCharacter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::BaseExit_After, PLUGIN_HkIServerImpl_BaseExit_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::HkRename, PLUGIN_HkCb_Rename, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::UserCmds, PLUGIN_UserCmd_Process, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LoadSettings, PLUGIN_LoadSettings, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));

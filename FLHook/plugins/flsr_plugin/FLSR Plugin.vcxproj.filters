@@ -323,6 +323,7 @@
     <ClCompile Include="missions\randomMissions\TradeMissions.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
+    <ClCompile Include="DeathPenalty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -660,6 +661,7 @@
     <ClInclude Include="missions\randomMissions\TradeMissions.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
+    <ClInclude Include="DeathPenalty.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

@@ -6,6 +6,6 @@ namespace Missions
 {
 	void ActTerminateMsn::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		mission.End(deleteMission);
+		mission.End(deleteMission, true);
 	}
 }

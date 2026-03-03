@@ -56,8 +56,13 @@ namespace DeathPenalty
                 {
                     while (ini.read_value())
                     {
-                        const std::string test = ini.get_value_ptr();
-                        deathPenaltyByCharacterFileName[""] = ini.get_value_int(1);
+                        const std::string line = ini.get_line_ptr();
+                        const auto pos = line.find('=');
+                        if (pos != std::string::npos)
+                        {
+                            const std::string& characterFileName = Trim(line.substr(0, pos - 1));
+                            deathPenaltyByCharacterFileName[characterFileName] = ini.get_value_int(1);
+                        }
                     }
                 }
             }

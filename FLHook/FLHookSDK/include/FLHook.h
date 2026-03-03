@@ -698,6 +698,8 @@ public:
 	void CmdRemoveCargo(const std::wstring& wscCharname, uint iID, uint iCount);
 	void CmdAddCargo(const std::wstring& wscCharname, const std::wstring& wscGood, uint iCount, uint iMission);
 
+	void CmdToggleNpcSpawns();
+
 	void CmdRename(const std::wstring& wscCharname, const std::wstring& wscNewCharname);
 	void CmdDeleteChar(const std::wstring& wscCharname);
 

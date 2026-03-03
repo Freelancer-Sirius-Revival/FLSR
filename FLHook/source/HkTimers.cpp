@@ -128,10 +128,13 @@ void HkTimerNPCAndF1Check() {
         }
 
         // npc
-        if (set_iDisableNPCSpawns && (g_iServerLoad >= set_iDisableNPCSpawns))
-            HkChangeNPCSpawn(true); // serverload too high, disable npcs
-        else
-            HkChangeNPCSpawn(false);
+        if (set_iDisableNPCSpawns)
+        {
+            if (g_iServerLoad >= set_iDisableNPCSpawns)
+                HkChangeNPCSpawn(true); // serverload too high, disable npcs
+            else
+                HkChangeNPCSpawn(false);
+        }
     }
     CATCH_HOOK({})
 }

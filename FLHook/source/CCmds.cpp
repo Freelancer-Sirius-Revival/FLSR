@@ -362,6 +362,17 @@ void CCmds::CmdRename(const std::wstring& wscCharname,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void CCmds::CmdToggleNpcSpawns() {
+    RIGHT_CHECK(RIGHT_SUPERADMIN);
+
+    if (HKSUCCESS(HkChangeNPCSpawn(!g_bNPCDisabled)))
+        Print(g_bNPCDisabled ? L"NPC spawns disabled\n" : L"NPC spawns enabled\n");
+    else
+        PrintError();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void CCmds::CmdDeleteChar(const std::wstring& wscCharname) {
     RIGHT_CHECK(RIGHT_CHARACTERS);
 
@@ -1084,6 +1095,9 @@ void CCmds::ExecuteCommandString(const std::wstring& wscCmdStr) {
             }
             else if (IS_CMD("addcargo")) {
                 CmdAddCargo(ArgCharname(1), ArgStr(2), ArgInt(3), ArgInt(4));
+            }
+            else if (IS_CMD("togglespawns")) {
+                CmdToggleNpcSpawns();
             }
             else if (IS_CMD("rename")) {
                 CmdRename(ArgCharname(1), ArgStr(2));

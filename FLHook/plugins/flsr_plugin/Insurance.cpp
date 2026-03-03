@@ -280,7 +280,7 @@ namespace Insurance
 
             const Archetype::AClassType archetypeType = archetype->get_class_type();
             // Equip with price=0 is fixed equipment and must always be restored
-            if (IsEquipment(archetypeType) && (good->fPrice == 0.0f || (insurance.type & InsuranceType::Equipment)))
+            if (equip.bMounted && IsEquipment(archetypeType) && (good->fPrice == 0.0f || (insurance.type & InsuranceType::Equipment)))
             {
                 // Equipment always is stored by its max repair cost.
                 // This way there will always be enough money deposited for full repair, or restoring the item based on full repair price.

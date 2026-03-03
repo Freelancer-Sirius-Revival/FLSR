@@ -324,6 +324,9 @@
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
     <ClCompile Include="DeathPenalty.cpp" />
+    <ClCompile Include="missions\actions\ActDisplayMsg.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -662,6 +665,9 @@
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="DeathPenalty.h" />
+    <ClInclude Include="missions\actions\ActDisplayMsg.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

@@ -38,6 +38,7 @@
 #include "Actions/ActCloak.h"
 #include "Actions/ActSetDockState.h"
 #include "Actions/ActDockInstant.h"
+#include "Actions/ActDisplayMsg.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -884,6 +885,13 @@ namespace Missions
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->targetObjName = CreateIdOrNull(ini.get_value_string(1));
 								action->dockHardpoint = ToLower(ini.get_value_string(2));
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_DisplayMsg"))
+							{
+								ActDisplayMsgPtr action(new ActDisplayMsg());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->stringId = ini.get_value_int(1);
 								actions.push_back(action);
 							}
 							else

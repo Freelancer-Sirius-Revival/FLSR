@@ -998,7 +998,7 @@ namespace Missions
 		auto it = missions.begin();
 		while (it != missions.end())
 		{
-			MissionBoard::DeleteMissionOffer(it->second.offerId);
+			MissionBoard::DeleteOffer(it->second.offerId);
 			it = missions.erase(it);
 		}
 	}

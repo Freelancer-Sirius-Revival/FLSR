@@ -284,30 +284,12 @@ namespace RandomMissions
 		mission.offer.type = pub::GF::MissionType::RetrieveContraband;
 		mission.offer.system = targetSystemId;
 		mission.offer.group = factionById[factionId].groupId;
-		mission.offer.title = 524391;
-		mission.offer.description = FmtStr(524392, 0);
+		mission.offer.title = 524390;
+		mission.offer.description = FmtStr(524391, 0);
 		mission.offer.description.append_good(commodity.id);
 		mission.offer.description.append_base(targetBaseId);
 		mission.offer.description.append_system(targetSystemId);
 		mission.offer.description.append_rep_group(mission.offer.group);
-		FmtStr ships(327681, 0);
-		const std::vector<uint> shipIds(commodity.allowedShips.begin(), commodity.allowedShips.end());
-		for (size_t index = 0, length = shipIds.size(); index < length; index++)
-		{
-			const auto shipArch = Archetype::GetShip(shipIds[index]);
-			if (shipArch)
-			{
-				if (index < 1)
-					ships.append_fmt_str(FmtStr(shipArch->iIdsName, 0));
-				else
-				{
-					FmtStr subStr(524393, 0);
-					subStr.append_string(shipArch->iIdsName);
-					ships.append_fmt_str(subStr);
-				}
-			}
-		}
-		mission.offer.description.append_fmt_str(ships);
 		mission.offer.description.append_int(reputation * 100.0f);
 		mission.offer.reward = reward;
 		mission.offer.shipArchetypeIds = commodity.allowedShips;
@@ -330,7 +312,7 @@ namespace RandomMissions
 					action->label = CreateID("players");
 					action->systemId = targetSystemId;
 					action->targetObjName = targetObjId;
-					action->message = FmtStr(524394, 0);
+					action->message = FmtStr(524392, 0);
 					action->message.append_good(commodity.id);
 					action->message.append_base(targetBaseId);
 					action->position = inspect->get_position();

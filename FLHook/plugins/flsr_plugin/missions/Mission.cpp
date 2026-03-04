@@ -91,7 +91,7 @@ namespace Missions
 		ongoingComms.clear();
 
 		if (offerId)
-			MissionBoard::DeleteMissionOffer(offerId);
+			MissionBoard::DeleteOffer(offerId);
 
 		offerId = 0;
 
@@ -338,7 +338,7 @@ namespace Missions
 		}
 
 		reofferRemainingTime = 0.0f;
-		MissionBoard::MissionOffer boardOffer;
+		MissionBoard::Offer boardOffer;
 		boardOffer.type = offer.type;
 		boardOffer.system = offer.system;
 		boardOffer.group = offer.group;
@@ -346,7 +346,7 @@ namespace Missions
 		boardOffer.description = offer.description;
 		boardOffer.reward = offer.reward;
 		boardOffer.allowedShipArchetypeIds = offer.shipArchetypeIds;
-		offerId = MissionBoard::AddMissionOffer(boardOffer, offer.baseIds);
+		offerId = MissionBoard::AddPublicOffer(boardOffer, offer.baseIds);
 
 		return true;
 	}
@@ -402,7 +402,7 @@ namespace Missions
 				for (const uint missionId : missionIdsToDelete)
 				{
 					const auto& mission = missions.at(missionId);
-					MissionBoard::DeleteMissionOffer(mission.offerId);
+					MissionBoard::DeleteOffer(mission.offerId);
 					missions.erase(missionId);
 				}
 

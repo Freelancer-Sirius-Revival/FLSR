@@ -288,7 +288,7 @@ namespace DeathPenalty
 
     bool UserCmds(const uint clientId, const std::wstring& argumentsWS)
     {
-        if (ToLower(argumentsWS).find(L"/deathpenalty") == 0)
+        if (ToLower(argumentsWS).find(L"/deathpenalty") == 0 || ToLower(argumentsWS).find(L"/dp") == 0)
         {
             const auto& characterFileName = GetCharacterFileName(clientId);
             if (!characterFileName.empty() && deathPenaltyByCharacterFileName.contains(characterFileName))

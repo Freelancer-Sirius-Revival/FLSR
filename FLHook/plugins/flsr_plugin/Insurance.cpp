@@ -253,6 +253,37 @@ namespace Insurance
         return repairCost;
     }
 
+    static int GetProjectedInsuranceCost(const uint clientId)
+    {
+        const Insurance& insurance = insuranceByCharacterFileName[GetCharacterFileName(clientId)];
+        int totalCost = 0;
+        if (insurance.type != InsuranceType::None)
+            totalCost = GetMaxShipHullAndCollGroupsRepairCost(clientId);
+
+        for (const auto& equip : Players[clientId].equipDescList.equip)
+        {
+            if (equip.bMission)
+                continue;
+
+            const Archetype::Equipment* archetype = Archetype::GetEquipment(equip.get_arch_id());
+            const GoodInfo* good = GoodList::find_by_id(equip.get_arch_id());
+            if (!archetype || !good)
+                continue;
+
+            const Archetype::AClassType archetypeType = archetype->get_class_type();
+            // Equip with price=0 is fixed equipment and must always be restored
+            if (equip.bMounted && IsEquipment(archetypeType) && (insurance.type & InsuranceType::Equipment))
+            {
+                // Equipment always is stored by its max repair cost.
+                // This way there will always be enough money deposited for full repair, or restoring the item based on full repair price.
+                totalCost += static_cast<int>(std::floor(good->fPrice * equipmentRepairCostFactor));
+            }
+            else if (IsConsumable(archetypeType) && (insurance.type & InsuranceType::Consumables))
+                totalCost += static_cast<int>(std::floor(good->fPrice)) * equip.get_count();
+        }
+        return totalCost;
+    }
+
     static std::wstring PrintMoney(const int64_t amount)
     {
         std::wstring result = std::to_wstring(amount);
@@ -743,6 +774,7 @@ namespace Insurance
 
             if (arguments.empty())
             {
+                const std::wstring money = baseId ? L"Projected deposit : " + PrintMoney(GetProjectedInsuranceCost(clientId)) : L"Current deposit : " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney);
                 switch (insuranceByCharacterFileName[GetCharacterFileName(clientId)].type)
                 {
                     case InsuranceType::None:
@@ -750,15 +782,15 @@ namespace Insurance
                         break;
 
                     case InsuranceType::Equipment:
-                        PrintUserCmdText(clientId, L"Insurance activated for ship and equipment. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and equipment. " + money);
                         break;
 
                     case InsuranceType::Consumables:
-                        PrintUserCmdText(clientId, L"Insurance activated for ship and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and consumables. " + money);
                         break;
 
                     case InsuranceType::All:
-                        PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables. " + money);
                         break;
                 }
             }

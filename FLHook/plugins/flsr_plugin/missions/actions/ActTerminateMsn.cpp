@@ -1,6 +1,4 @@
 #include "ActTerminateMsn.h"
-#include "../MissionBoard.h"
-#include "../Missions.h"
 
 namespace Missions
 {

@@ -44,9 +44,9 @@ namespace Missions
 		End();
 	}
 
-	void Mission::End(bool markForDeletion, bool allowRestart)
+	void Mission::End(bool markForDeletion)
 	{
-		state = allowRestart ? MissionState::Inactive : MissionState::Finished;
+		state = MissionState::Finished;
 
 		std::queue<std::pair<uint, MissionObject>> emptyQueue;
 		std::swap(triggerExecutionQueue, emptyQueue);
@@ -104,9 +104,9 @@ namespace Missions
 		}
 	}
 
-	void Mission::Start()
+	void Mission::Start(const bool allowRerun)
 	{
-		if (!CanBeStarted())
+		if (allowRerun ? IsActive() : !CanBeStarted())
 			return;
 
 		reofferRemainingTime = 0.0f;

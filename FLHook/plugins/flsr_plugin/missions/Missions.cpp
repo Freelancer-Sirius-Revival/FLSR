@@ -1078,9 +1078,9 @@ namespace Missions
 	{
 		for (auto& missionEntry : missions)
 		{
-			if (missionEntry.second.name == missionName && missionEntry.second.CanBeStarted())
+			if (missionEntry.second.name == missionName && !missionEntry.second.IsActive())
 			{
-				missionEntry.second.Start();
+				missionEntry.second.Start(true);	
 				return true;
 			}
 		}
@@ -1093,7 +1093,7 @@ namespace Missions
 		{
 			if (missionEntry.second.name == missionName)
 			{
-				missionEntry.second.End(false, true);
+				missionEntry.second.End(false);
 				return true;
 			}
 		}

@@ -73,8 +73,8 @@ namespace Missions
 		virtual ~Mission();
 		bool CanBeStarted() const;
 		bool IsActive() const;
-		void Start();
-		void End(bool markForDeletion = false, bool allowRestart = false);
+		void Start(const bool allowRerun = false);
+		void End(bool markForDeletion = false);
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
 		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);
 		void AddLabelToObject(const MissionObject& object, const uint label);

@@ -667,4 +667,69 @@ abort_lbl:
 /**************************************************************************************************************
 **************************************************************************************************************/
 
+#define CPlayerGroupAddMemberOffset 0x7B610
+
+unsigned char originalCPlayerGroupAddMemberData[5];
+
+bool __stdcall AddGroupMemberHook(CPlayerGroup* group, uint clientId)
+{
+	CALL_PLUGINS(PLUGIN_AddGroupMember, bool, __stdcall, (CPlayerGroup*, uint), (group, clientId));
+
+	UnDetour(SRV_ADDR(CPlayerGroupAddMemberOffset), originalCPlayerGroupAddMemberData);
+	const bool result = group->AddMember(clientId);
+	HookCPlayerGroupAddMember();
+
+	CALL_PLUGINS(PLUGIN_AddGroupMember_AFTER, bool, __stdcall, (CPlayerGroup*, uint), (group, clientId));
+
+	return result;
+}
+
+__declspec(naked) void AddGroupMemberHookNaked()
+{
+	__asm {
+		pop eax
+		push ecx
+		push eax
+		jmp [AddGroupMemberHook]
+	}
+}
+
+void HookCPlayerGroupAddMember()
+{
+	Detour(SRV_ADDR(CPlayerGroupAddMemberOffset), AddGroupMemberHookNaked, originalCPlayerGroupAddMemberData);
+}
+
+
+#define CPlayerGroupDelMemberOffset 0x7B920
+
+unsigned char originalCPlayerGroupDelMemberData[5];
+
+bool __stdcall DelGroupMemberHook(CPlayerGroup* group, uint clientId)
+{
+	CALL_PLUGINS(PLUGIN_DelGroupMember, bool, __stdcall, (CPlayerGroup*, uint), (group, clientId));
+
+	UnDetour(SRV_ADDR(CPlayerGroupDelMemberOffset), originalCPlayerGroupDelMemberData);
+	const bool result = group->DelMember(clientId);
+	HookCPlayerGroupDelMember();
+
+	CALL_PLUGINS(PLUGIN_DelGroupMember_AFTER, bool, __stdcall, (CPlayerGroup*, uint), (group, clientId));
+
+	return result;
+}
+
+__declspec(naked) void DelGroupMemberHookNaked()
+{
+	__asm {
+		pop eax
+		push ecx
+		push eax
+		jmp [DelGroupMemberHook]
+	}
+}
+
+void HookCPlayerGroupDelMember()
+{
+	Detour(SRV_ADDR(CPlayerGroupDelMemberOffset), DelGroupMemberHookNaked, originalCPlayerGroupDelMemberData);
+}
+
 } // namespace HkIEngine

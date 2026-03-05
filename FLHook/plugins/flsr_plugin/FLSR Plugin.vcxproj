@@ -138,6 +138,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActDockInstant.cpp" />
     <ClCompile Include="missions\conditions\CndHasCargo.cpp" />
     <ClCompile Include="missions\conditions\CndHealthInc.cpp" />
+    <ClCompile Include="missions\conditions\CndJoinGroup.cpp" />
+    <ClCompile Include="missions\conditions\CndLeaveGroup.cpp" />
     <ClCompile Include="missions\conditions\CndLeaveMsn.cpp" />
     <ClCompile Include="missions\MatrixMath.cpp" />
     <ClCompile Include="missions\objectives\ObjUtils.cpp" />
@@ -273,6 +275,8 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSetDockState.h" />
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="missions\conditions\CndHealthInc.h" />
+    <ClInclude Include="missions\conditions\CndJoinGroup.h" />
+    <ClInclude Include="missions\conditions\CndLeaveGroup.h" />
     <ClInclude Include="missions\conditions\CndLeaveMsn.h" />
     <ClInclude Include="missions\objectives\ObjUtils.h" />
     <ClInclude Include="missions\randomMissions\Meta.h" />

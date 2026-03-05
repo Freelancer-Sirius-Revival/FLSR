@@ -333,6 +333,12 @@
     <ClCompile Include="missions\randomMissions\Meta.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\conditions\CndJoinGroup.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndLeaveGroup.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -679,6 +685,12 @@
     </ClInclude>
     <ClInclude Include="missions\randomMissions\Meta.h">
       <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndJoinGroup.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndLeaveGroup.h">
+      <Filter>Missions\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

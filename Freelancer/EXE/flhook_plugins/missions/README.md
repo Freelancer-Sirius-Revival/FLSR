@@ -449,6 +449,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` Object by name or label to expect in the zone.
     1. `STRING` Multiple subsequent entries possible. The zone nickname to expect the object in.
 
+- `Cnd_JoinGroup` Only players. When a player joins a group. `Activator` will be the joined player.
+    1. `STRING|Any :Any` The joining player will be checked to be in a group with the labeled players. `Any` means any player in the mission.
+
 - `Cnd_JumpInComplete` Only players. When fully jumped into a system. `Activator` will be the jumped-in player.
     1. `STRING|Stranger` The players by label to await fully jumping into a system.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname the player jumped into. If none is given, any system will count.
@@ -456,6 +459,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
     1. `STRING|Stranger` The players by label to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.
+
+- `Cnd_LeaveGroup` Only players. When a player leaves a group. `Activator` will be the leaving player.
+    1. `STRING|Any :Any` The leaving player will be checked to have been in a group with the labeled players. `Any` means any player in the mission.
 
 - `Cnd_LeaveMsn` Only players. When leaving the mission by any means, including Mission Abort.
     1. `STRING|Any :Any` The players by label to await leaving. Matches any mission player if `Any` is given.

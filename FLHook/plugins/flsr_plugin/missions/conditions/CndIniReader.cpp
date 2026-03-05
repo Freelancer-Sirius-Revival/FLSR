@@ -13,8 +13,10 @@
 #include "CndInSpace.h"
 #include "CndInSystem.h"
 #include "CndInZone.h"
+#include "CndJoinGroup.h"
 #include "CndJumpInComplete.h"
 #include "CndLaunchComplete.h"
+#include "CndLeaveGroup.h"
 #include "CndLeaveMsn.h"
 #include "CndOnBase.h"
 #include "CndProjHitCount.h"
@@ -547,6 +549,23 @@ namespace Missions
 		return new CndInZone(conditionParent, label, zoneIds);
 	}
 
+	static CndJoinGroup* ReadCndJoinGroup(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+
+		const uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const std::string value = ToLower(ini.get_value_string(argNum));
+			if (value != "any")
+				label = CreateIdOrNull(value.c_str());
+		}
+		else
+			PrintErrorToConsole(L"Cnd_JoinGroup", conditionParent, argNum, L"No target label. Defaulting to ANY.");
+
+		return new CndJoinGroup(conditionParent, label);
+	}
+
 	static CndJumpInComplete* ReadCndJumpInComplete(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint label = 0;
@@ -595,6 +614,23 @@ namespace Missions
 		}
 
 		return new CndLaunchComplete(conditionParent, label, baseIds);
+	}
+
+	static CndLeaveGroup* ReadCndLeaveGroup(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint label = 0;
+
+		const uint argNum = 0;
+		if (ini.get_num_parameters() > argNum)
+		{
+			const std::string value = ToLower(ini.get_value_string(argNum));
+			if (value != "any")
+				label = CreateIdOrNull(value.c_str());
+		}
+		else
+			PrintErrorToConsole(L"Cnd_LeaveGroup", conditionParent, argNum, L"No target label. Defaulting to ANY.");
+
+		return new CndLeaveGroup(conditionParent, label);
 	}
 
 	static CndLeaveMsn* ReadCndLeaveMsn(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -865,11 +901,17 @@ namespace Missions
 		if (ini.is_value("Cnd_InZone"))
 			return ReadCndInZone(conditionParent, ini);
 
+		if (ini.is_value("Cnd_JoinGroup"))
+			return ReadCndJoinGroup(conditionParent, ini);
+
 		if (ini.is_value("Cnd_JumpInComplete"))
 			return ReadCndJumpInComplete(conditionParent, ini);
 
 		if (ini.is_value("Cnd_LaunchComplete"))
 			return ReadCndLaunchComplete(conditionParent, ini);
+
+		if (ini.is_value("Cnd_LeaveGroup"))
+			return ReadCndLeaveGroup(conditionParent, ini);
 
 		if (ini.is_value("Cnd_LeaveMsn"))
 			return ReadCndLeaveMsn(conditionParent, ini);

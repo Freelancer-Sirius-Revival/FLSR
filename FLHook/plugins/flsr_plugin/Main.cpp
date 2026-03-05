@@ -36,8 +36,10 @@
 #include "Missions/conditions/CndInSpace.h"
 #include "Missions/conditions/CndInSystem.h"
 #include "Missions/conditions/CndInZone.h"
+#include "Missions/conditions/CndJoinGroup.h"
 #include "Missions/conditions/CndJumpInComplete.h"
 #include "Missions/conditions/CndLaunchComplete.h"
+#include "Missions/conditions/CndLeaveGroup.h"
 #include "Missions/conditions/CndOnBase.h"
 #include "Missions/conditions/CndProjHitCount.h"
 #include "Missions/conditions/CndSystemSpaceEnter.h"
@@ -326,7 +328,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::PlayerLaunch_AFTER, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInSystem::SystemSwitchOutComplete_AFTER, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndInZone::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndJoinGroup::AddGroupMemberHook_After, PLUGIN_AddGroupMember_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndJumpInComplete::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndLeaveGroup::DelGroupMemberHook, PLUGIN_DelGroupMember, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndLaunchComplete::LaunchComplete_AFTER, PLUGIN_HkIServerImpl_LaunchComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndOnBase::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipAndSolarEquipDamage, PLUGIN_ShipEquipDmg, 0));

@@ -211,7 +211,7 @@ namespace RandomMissions
 			const auto& hostileFactionIds = factionById.at(faction.factionId).hostileFactionIds;
 			for (const auto& commodity : shuffledCommodities)
 			{
-				if (!commodity->allowedShips.contains(shipArchetypeId))
+				if (!commodity->allowedShips.empty() && !commodity->allowedShips.contains(shipArchetypeId))
 					continue;
 
 				std::vector<uint> shuffledBaseIds(commodity->receiverBases.begin(), commodity->receiverBases.end());

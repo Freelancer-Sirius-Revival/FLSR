@@ -337,7 +337,7 @@ namespace SolarSpawn
 		return true;
 	}
 
-	static uint GetShipMessageId(uint shipId)
+	static uint GetShipMessageId(const uint shipId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -349,7 +349,7 @@ namespace SolarSpawn
 		return CreateID(msgIdPrefix);
 	}
 
-	static bool SendLaunchWellWishes(uint shipId, uint solarObjId, uint dockId)
+	static bool SendLaunchWellWishes(const uint shipId, const uint solarObjId, const uint dockId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -440,8 +440,7 @@ namespace SolarSpawn
 
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		uint targetId = dockTargetId;
-		if (!GetShipInspect(targetId, inspect, starSystem))
+		if (!GetShipInspect(dockTargetId, inspect, starSystem))
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return 0;

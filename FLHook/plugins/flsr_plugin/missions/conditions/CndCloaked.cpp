@@ -31,7 +31,7 @@ namespace Missions
 			orderedCndCloaked.erase(it);
 	}
 
-	static bool IsCloaked(uint objId)
+	static bool IsCloaked(const uint objId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;

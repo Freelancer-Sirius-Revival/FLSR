@@ -2,7 +2,7 @@
 
 namespace Missions
 {
-	static void SetObjectiveList(Mission& mission, const uint objectivesId, uint objId)
+	static void SetObjectiveList(Mission& mission, const uint objectivesId, const uint objId)
 	{
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;

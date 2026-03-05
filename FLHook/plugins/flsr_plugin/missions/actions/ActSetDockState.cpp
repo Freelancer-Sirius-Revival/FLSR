@@ -2,7 +2,7 @@
 
 namespace Missions
 {
-	static void SetDockState(uint objId, const std::string& dockHardpoint, const bool active)
+	static void SetDockState(const uint objId, const std::string& dockHardpoint, const bool active)
 	{
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;

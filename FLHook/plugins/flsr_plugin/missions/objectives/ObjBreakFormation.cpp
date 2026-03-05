@@ -32,10 +32,9 @@ namespace Missions
 
 		Objective::Execute(state);
 
-		uint shipId = state.objId;
 		IObjRW* inspect;
 		StarSystem* system;
-		if (!GetShipInspect(shipId, inspect, system))
+		if (!GetShipInspect(state.objId, inspect, system))
 			return;
 		IObjRW* formationLeader;
 		inspect->get_formation_leader(formationLeader);

@@ -4,7 +4,7 @@
 
 namespace Missions
 {
-	static void SetObjectLifeTime(uint objId, const float lifeTime, Mission& mission)
+	static void SetObjectLifeTime(const uint objId, const float lifeTime, Mission& mission)
 	{
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;

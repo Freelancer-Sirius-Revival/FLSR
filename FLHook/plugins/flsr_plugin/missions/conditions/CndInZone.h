@@ -10,7 +10,7 @@ namespace Missions
 		const std::unordered_set<uint> zoneIds;
 		std::unordered_map<uint, uint> systemIdByZoneIds;
 
-		bool IsInZone(uint objId);
+		bool IsInZone(const uint objId);
 	public:
 		CndInZone(const ConditionParent& parent, const uint objNameOrLabel, const std::unordered_set<uint>& zoneIds);
 		~CndInZone();

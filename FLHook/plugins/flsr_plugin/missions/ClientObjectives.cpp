@@ -185,10 +185,9 @@ namespace Missions
 					objective.message = FmtStr(13081, 0);
 					objective.message.append_base(baseId);
 					FmtStr::NavMarker marker;
-					uint objId = base.iObjectID;
 					IObjRW* inspect;
 					StarSystem* starSystem;
-					if (GetShipInspect(objId, inspect, starSystem))
+					if (GetShipInspect(base.iObjectID, inspect, starSystem))
 					{
 						marker.pos = inspect->cobj->vPos;
 						marker.system = base.iSystemID;
@@ -217,8 +216,8 @@ namespace Missions
 			if (route.waypointCount > 1 && route.entries[0].objId && route.entries[1].objId && // There must be at least 2 waypoints with ObjIds to form a tradelane.
 				shipId && GetShipInspect(shipId, inspect, system) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
 			{
-				uint currentTLRId = route.entries[0].objId; // Potential start of the current TLR.
-				uint targetTLRId = route.entries[1].objId; // Potential end of the current TLR.
+				const uint currentTLRId = route.entries[0].objId; // Potential start of the current TLR.
+				const uint targetTLRId = route.entries[1].objId; // Potential end of the current TLR.
 				if (GetShipInspect(targetTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing &&
 					GetShipInspect(currentTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
 				{
@@ -308,7 +307,7 @@ namespace Missions
 			{
 				IObjRW* inspect;
 				StarSystem* system;
-				uint objId = data.entries[0].objId;
+				const uint objId = data.entries[0].objId;
 				if (GetShipInspect(objId, inspect, system))
 				{
 					nextObjective.type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;

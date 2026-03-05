@@ -185,7 +185,7 @@ namespace Cloak
 		return IsValidCloakableClient(clientId) && clientCloakStats[clientId].cloakState == CloakState::Uncloaked;
 	}
 
-	bool TryRegisterNoCloakSolar(const std::string& nickname, uint objectId)
+	bool TryRegisterNoCloakSolar(const std::string& nickname, const uint objectId)
 	{
 		const uint nicknameId = CreateID(nickname.c_str());
 		IObjRW* inspect;
@@ -1082,10 +1082,9 @@ namespace Cloak
 
 	void GuidedInit(CGuided* guided, CGuided::CreateParms& parms)
 	{
-		uint objId = parms.ownerId;
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		if (!GetShipInspect(objId, inspect, starSystem))
+		if (!GetShipInspect(parms.ownerId, inspect, starSystem))
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return;

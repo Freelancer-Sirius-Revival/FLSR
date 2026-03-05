@@ -241,14 +241,14 @@ namespace RandomMissions
 							continue;
 					}
 
-					result.targetObjId = base.iObjectID;
 					IObjRW* inspect = nullptr;
 					StarSystem* system;
-					if (GetShipInspect(result.targetObjId, inspect, system) && inspect)
+					if (GetShipInspect(base.iObjectID, inspect, system) && inspect)
 					{
 						result.commodity = commodity;
 						result.startSystemId = startSystemId;
 						result.targetSystemId = base.iSystemID;
+						result.targetObjId = base.iObjectID;
 						result.targetBaseId = targetBaseId;
 						result.targetObjId = base.iObjectID;
 						result.targetPosition = inspect->get_position();

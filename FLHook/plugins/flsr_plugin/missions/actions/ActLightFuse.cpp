@@ -2,7 +2,7 @@
 
 namespace Missions
 {
-	static void Fuse(const ActLightFuse& action, uint objId)
+	static void Fuse(const ActLightFuse& action, const uint objId)
 	{
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;

@@ -444,10 +444,9 @@ namespace Missions
 					auto& mission = missionEntry.second;
 					if (mission.objectIds.contains(shipId))
 					{
-						uint objId = shipId;
 						IObjRW* inspect;
 						StarSystem* system;
-						if (!GetShipInspect(objId, inspect, system))
+						if (!GetShipInspect(shipId, inspect, system))
 						{
 							returncode = DEFAULT_RETURNCODE;
 							return 0;
@@ -467,7 +466,7 @@ namespace Missions
 								ObjDock(ObjectiveParent(mission.id, 0), dockTargetId).Execute(ObjectiveState(followerObjId, 0, true));
 							}
 						}
-						OrderBreakFormation(objId);
+						OrderBreakFormation(shipId);
 					}
 				}
 				returncode = DEFAULT_RETURNCODE;

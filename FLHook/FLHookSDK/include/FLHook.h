@@ -94,7 +94,7 @@ typedef void(__stdcall* _RCSendChatMsg)(uint iId, uint iTo, uint iSize, void* pR
 typedef void(__stdcall* _CRCAntiCheat)();
 typedef void(__stdcall* _CreateChar)(const wchar_t* wszName);
 typedef int(__cdecl* _GetFLName)(char* szBuf, const wchar_t* wszStr);
-typedef bool(__cdecl* _GetShipInspect)(uint& iShip, IObjRW*& inspect, StarSystem*& starSystem);
+typedef bool(__cdecl* _GetShipInspect)(const uint& iShip, IObjRW*& inspect, StarSystem*& starSystem);
 
 extern IMPORT _GetShipInspect GetShipInspect;
 

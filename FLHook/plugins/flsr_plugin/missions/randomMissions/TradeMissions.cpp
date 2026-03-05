@@ -282,7 +282,7 @@ namespace RandomMissions
 			return 0;
 
 		const uint missionId = Missions::missions.size() + 1;
-		const auto& result = Missions::missions.try_emplace(missionId, "", missionId, false);
+		const auto& result = Missions::missions.try_emplace(missionId, "", missionId, false, false);
 		if (!result.second)
 			return 0;
 
@@ -550,7 +550,6 @@ namespace RandomMissions
 
 			{
 				Missions::ActTerminateMsnPtr endMsn(new Missions::ActTerminateMsn());
-				endMsn->deleteMission = true;
 				trigger.actions.push_back(endMsn);
 			}
 		}

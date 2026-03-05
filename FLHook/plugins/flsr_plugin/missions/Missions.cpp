@@ -144,7 +144,7 @@ namespace Missions
 						if (!name.empty())
 						{
 							lastMissionId++;
-							missions.try_emplace(lastMissionId, name, lastMissionId, initiallyActive);
+							missions.try_emplace(lastMissionId, name, lastMissionId, initiallyActive, true);
 							missions.at(lastMissionId).offer = offer;
 						}
 					}
@@ -1080,7 +1080,7 @@ namespace Missions
 		{
 			if (missionEntry.second.name == missionName && !missionEntry.second.IsActive())
 			{
-				missionEntry.second.Start(true);	
+				missionEntry.second.Start();	
 				return true;
 			}
 		}
@@ -1093,7 +1093,7 @@ namespace Missions
 		{
 			if (missionEntry.second.name == missionName)
 			{
-				missionEntry.second.End(false);
+				missionEntry.second.End();
 				return true;
 			}
 		}
@@ -1176,7 +1176,7 @@ namespace Missions
 			entry.triggerId = CreateIdOrNull(trigNickname.c_str());
 			action.triggers.push_back(entry);
 			action.activate = true;
-			Mission msn("", 0, false);
+			Mission msn("", 0, false, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -1201,7 +1201,7 @@ namespace Missions
 			entry.triggerId = CreateIdOrNull(trigNickname.c_str());
 			action.triggers.push_back(entry);
 			action.activate = true;
-			Mission msn("", 0, false);
+			Mission msn("", 0, false, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;

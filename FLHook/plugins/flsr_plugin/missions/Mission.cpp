@@ -26,15 +26,15 @@ namespace Missions
 		pub::Audio::SetMusic(clientId, music);
 	}
 
-	Mission::Mission(const std::string name, const uint id, const bool initiallyActive) :
+	Mission::Mission(const std::string name, const uint id, const bool initiallyActive, const bool manuallyCrafted) :
 		name(name),
 		id(id),
 		initiallyActive(initiallyActive),
+		manuallyCrafted(manuallyCrafted),
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
 		offerId(0),
 		missionResult(MissionResult::Success),
-		reofferRemainingTime(0.0f),
-		markedForDeletion(false)
+		reofferRemainingTime(0.0f)
 	{}
 
 	Mission::~Mission()
@@ -44,11 +44,9 @@ namespace Missions
 		End();
 	}
 
-	void Mission::End(bool markForDeletion)
+	void Mission::End()
 	{
 		state = MissionState::Finished;
-
-		markedForDeletion = markForDeletion;
 
 		std::queue<std::pair<uint, MissionObject>> emptyQueue;
 		std::swap(triggerExecutionQueue, emptyQueue);
@@ -104,11 +102,14 @@ namespace Missions
 			state = MissionState::Inactive;
 			reofferRemainingTime = offer.reofferDelay;
 		}
+
+		if (manuallyCrafted)
+			state = MissionState::Inactive;
 	}
 
-	void Mission::Start(const bool allowRerun)
+	void Mission::Start()
 	{
-		if (allowRerun ? IsActive() : !CanBeStarted())
+		if (!CanBeStarted())
 			return;
 
 		reofferRemainingTime = 0.0f;
@@ -135,6 +136,11 @@ namespace Missions
 	bool Mission::IsActive() const
 	{
 		return state == MissionState::Active;
+	}
+
+	bool Mission::IsFinished() const
+	{
+		return state == MissionState::Finished;
 	}
 
 	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
@@ -323,11 +329,6 @@ namespace Missions
 		return 0;
 	}
 
-	bool Mission::ToBeDeleted() const
-	{
-		return markedForDeletion;
-	}
-
 	bool Mission::TryAddToJobBoard(const uint clientId)
 	{
 		if (offer.type == pub::GF::MissionType::Unknown ||
@@ -376,7 +377,7 @@ namespace Missions
 				{
 					auto& mission = missionEntry.second;
 
-					if (mission.ToBeDeleted())
+					if (mission.IsFinished())
 					{
 						missionIdsToDelete.insert(mission.id);
 						continue;

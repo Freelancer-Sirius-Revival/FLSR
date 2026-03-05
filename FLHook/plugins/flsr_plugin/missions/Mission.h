@@ -62,19 +62,20 @@ namespace Missions
 		std::unordered_map<uint, CommEntry> ongoingComms;
 
 	private:
+		bool manuallyCrafted;
 		MissionState state;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
-		bool markedForDeletion;
 
 		void EvaluateCountConditions(const uint label) const;
 
 	public:
-		Mission(const std::string name, const uint id, const bool initiallyActive);
+		Mission(const std::string name, const uint id, const bool initiallyActive = false, const bool manuallyCrafted = false);
 		virtual ~Mission();
 		bool CanBeStarted() const;
 		bool IsActive() const;
-		void Start(const bool allowRerun = false);
-		void End(bool markForDeletion = false);
+		bool IsFinished() const;
+		void Start();
+		void End();
 		void QueueTriggerExecution(const uint triggerId, const MissionObject& activator);
 		void AddObject(const uint objId, const uint name, const std::unordered_set<uint> labels);
 		void AddLabelToObject(const MissionObject& object, const uint label);
@@ -82,7 +83,6 @@ namespace Missions
 		void RemoveObject(const uint objId);
 		void RemoveClient(const uint clientId);
 		uint FindObjNameByObjId(const uint objId) const;
-		bool ToBeDeleted() const;
 		bool TryAddToJobBoard(const uint clientId);
 	};
 

@@ -1,6 +1,7 @@
 #include "../Main.h"
 #include "MissionBoard.h"
 #include "Missions.h"
+#include "randomMissions/Meta.h"
 
 namespace MissionBoard
 {
@@ -77,6 +78,7 @@ namespace MissionBoard
 
 	std::unordered_map<uint, Offer> offers;
 	std::unordered_map<uint, std::unordered_set<uint>> offerIdsByBaseId; // List of public offers
+	std::unordered_map<uint, std::unordered_set<uint>> offerIdsByClientId; // List of private offers
 	struct BoardEntry
 	{
 		uint boardIndex;
@@ -115,11 +117,21 @@ namespace MissionBoard
 		return offerId--;
 	}
 
+	uint AddPrivateOffer(const Offer& offer, const uint clientId)
+	{
+		offers.insert({ offerId, offer });
+		offerIdsByClientId[clientId].insert(offerId);
+		// To avoid collisions with Freelancer's own mission offers. Count the custom mission offer IDs from high to low.
+		return offerId--;
+	}
+
 	void DeleteOffer(const uint offerId)
 	{
 		offers.erase(offerId);
-		for (auto& baseEntry : offerIdsByBaseId)
-			baseEntry.second.erase(offerId);
+		for (auto& entry : offerIdsByClientId)
+			entry.second.erase(offerId);
+		for (auto& entry : offerIdsByBaseId)
+			entry.second.erase(offerId);
 		SendDestroyOfferToAll(offerId);
 	}
 
@@ -227,20 +239,6 @@ namespace MissionBoard
 		return 0;
 	}
 
-	float minRequiredReputationForMissions = -0.2f;
-
-	bool initialized = false;
-	void Initialize()
-	{
-		if (initialized)
-			return;
-		initialized = true;
-		
-		const HMODULE contentHandle = LoadContentDll();
-		if (contentHandle)
-			minRequiredReputationForMissions = *(float*)(DWORD(contentHandle) + 0x1195BC);
-	}
-
 	std::unordered_map<uint, uint> boardLastIndexByClient;
 
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize)
@@ -261,7 +259,9 @@ namespace MissionBoard
 		int clientRep = 0;
 		pub::Player::GetRep(clientId, clientRep);
 
-		std::unordered_set<uint> offerIds;
+		// Add all private offers for the player
+		std::unordered_set<uint> offerIds(offerIdsByClientId[clientId]);
+		// And now add all public offers for the current base.
 		if (const auto& entry = offerIdsByBaseId.find(base); entry != offerIdsByBaseId.end())
 			offerIds.insert(entry->second.begin(), entry->second.end());
 
@@ -270,7 +270,7 @@ namespace MissionBoard
 			const auto& offer = offers.at(offerId);
 			float feelings;
 			pub::Reputation::GetGroupFeelingsTowards(clientRep, offer.group, feelings);
-			if (feelings <= minRequiredReputationForMissions)
+			if (feelings <= RandomMissions::minRequiredReputationForMissions)
 				continue;
 			if (!offer.allowedShipArchetypeIds.empty() && !offer.allowedShipArchetypeIds.contains(shipArchetypeId))
 				continue;

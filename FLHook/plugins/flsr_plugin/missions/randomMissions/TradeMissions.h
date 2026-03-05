@@ -9,6 +9,7 @@ namespace RandomMissions
 		namespace TradeMissions
 		{
 			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
+			void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
 		}
 	}
 }

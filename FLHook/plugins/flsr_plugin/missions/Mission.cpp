@@ -48,6 +48,8 @@ namespace Missions
 	{
 		state = MissionState::Finished;
 
+		markedForDeletion = markForDeletion;
+
 		std::queue<std::pair<uint, MissionObject>> emptyQueue;
 		std::swap(triggerExecutionQueue, emptyQueue);
 
@@ -326,10 +328,10 @@ namespace Missions
 		return markedForDeletion;
 	}
 
-	bool Mission::TryAddToJobBoard()
+	bool Mission::TryAddToJobBoard(const uint clientId)
 	{
 		if (offer.type == pub::GF::MissionType::Unknown ||
-			offer.baseIds.empty() ||
+			(!clientId && offer.baseIds.empty()) ||
 			!CanBeStarted() ||
 			reofferRemainingTime > 0.0f ||
 			offerId != 0)
@@ -346,7 +348,10 @@ namespace Missions
 		boardOffer.description = offer.description;
 		boardOffer.reward = offer.reward;
 		boardOffer.allowedShipArchetypeIds = offer.shipArchetypeIds;
-		offerId = MissionBoard::AddPublicOffer(boardOffer, offer.baseIds);
+		if (clientId)
+			offerId = MissionBoard::AddPrivateOffer(boardOffer, clientId);
+		else
+			offerId = MissionBoard::AddPublicOffer(boardOffer, offer.baseIds);
 
 		return true;
 	}
@@ -378,8 +383,8 @@ namespace Missions
 					}
 
 					/* Reoffering missions to job board */
-					mission.reofferRemainingTime = max(0.0f, mission.reofferRemainingTime - elapsedTimeInSec);
-					mission.TryAddToJobBoard();
+					mission.reofferRemainingTime = std::max<float>(0.0f, mission.reofferRemainingTime - elapsedTimeInSec);
+					mission.TryAddToJobBoard(0);
 
 					/* Comms timeouts */
 					std::vector<std::pair<uint, Missions::Mission::CommEntry>> entriesToRemove;

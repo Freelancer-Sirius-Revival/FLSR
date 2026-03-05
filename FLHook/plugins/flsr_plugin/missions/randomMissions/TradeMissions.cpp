@@ -2,6 +2,7 @@
 #include "TradeMissions.h"
 #include "Offers.h"
 #include "Factions.h"
+#include "Meta.h"
 #include "../Mission.h"
 #include "../conditions/CndTimer.h"
 #include "../conditions/CndDestroyed.h"
@@ -41,7 +42,7 @@ namespace RandomMissions
 	std::vector<Commodity> commodities;
 	std::unordered_map<uint, std::vector<size_t>> commoditiesPerBase;
 	std::unordered_map<uint, std::unordered_map<uint, std::vector<uint>>> shortestSystemPathToTargets;
-	std::unordered_map<uint, std::unordered_set<uint>> missionIdsByBaseIds;
+	std::unordered_map<uint, std::unordered_set<uint>> missionIdsByClientId;
 
 	void ReadTradeCommoditiesData()
 	{
@@ -93,10 +94,7 @@ namespace RandomMissions
 					{
 						commodities.push_back(commodity);
 						for (const auto& baseId : commodity.offerBases)
-						{
 							commoditiesPerBase[baseId].push_back(commodities.size() - 1);
-							missionIdsByBaseIds.insert({ baseId, {} });
-						}
 					}
 				}
 			}
@@ -146,45 +144,41 @@ namespace RandomMissions
 		}
 	}
 
-	static std::pair<uint, uint> GetRandomTargetBaseIdAndDistance(const uint startSystemId, const uint startBaseId, const std::unordered_set<uint>& bases, const uint minJumpDistance, const std::unordered_set<uint>& hostileFactionIds)
+	static bool FindBaseInfo(const uint baseId, BASE_INFO& baseInfo)
 	{
-		if (bases.empty())
-			return { 0, 0 };
-
-		std::vector<uint> shuffledBaseIds(bases.begin(), bases.end());
-		std::ranges::shuffle(shuffledBaseIds, rd);
-		for (uint targetBaseId : shuffledBaseIds)
+		for (const auto& base : lstBases)
 		{
-			if (startBaseId == targetBaseId)
-				continue;
-
-			for (const auto& base : lstBases)
+			if (base.iBaseID == baseId)
 			{
-				if (base.iBaseID == targetBaseId)
-				{
-					if (!hostileFactionIds.contains(owningFactionByBaseId[base.iBaseID]) &&
-						((startSystemId == base.iSystemID && minJumpDistance == 0) ||
-						(shortestSystemPathToTargets[startSystemId][base.iSystemID].size() > minJumpDistance))
-					   )
-						return { base.iBaseID, shortestSystemPathToTargets[startSystemId][base.iSystemID].size() };
-					break;
-				}
+				baseInfo = base;
+				return true;
 			}
 		}
-		return { 0, 0 };
+		return false;
 	}
 
 	struct RandomDestination
 	{
-		int commodityIndex = -1;
-		uint baseId = 0;
-		uint jumpDistance = 0;
+		Commodity* commodity = nullptr;
+		uint startSystemId;
+		uint targetSystemId;
+		uint targetBaseId;
+		uint targetObjId;
+		Vector targetPosition;
+		uint jumpDistance;
+		uint offerFactionId;
 	};
 
-	static RandomDestination GetRandomCommodityAndTargetBase(const uint startBaseId, const uint offeringFaction, const std::unordered_set<uint>& hostileFactionIds)
+	static RandomDestination GetRandomDestination(const uint clientId, const uint startBaseId, const uint shipArchetypeId)
 	{
 		RandomDestination result = {};
-		if (!commoditiesPerBase.contains(startBaseId) || commoditiesPerBase[startBaseId].empty())
+
+		int clientRep = 0;
+		pub::Player::GetRep(clientId, clientRep);
+		if (!clientRep)
+			return result;
+
+		if (!commoditiesPerBase.contains(startBaseId) || commoditiesPerBase.at(startBaseId).empty())
 			return result;
 
 		uint startSystemId = 0;
@@ -201,99 +195,115 @@ namespace RandomMissions
 
 		std::vector<size_t> shuffledCommodityIndices = commoditiesPerBase[startBaseId];
 		std::ranges::shuffle(shuffledCommodityIndices, rd);
-		for (size_t commodityIndex : shuffledCommodityIndices)
+		std::vector<Commodity*> shuffledCommodities;
+		for (const auto& commodityIndex : shuffledCommodityIndices)
+			shuffledCommodities.push_back(&commodities.at(commodityIndex));
+
+		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId.at(startBaseId));
+		std::ranges::shuffle(shuffledBaseFactions, rd);
+		for (const auto& faction : shuffledBaseFactions)
 		{
-			const Commodity& commodity = commodities[commodityIndex];
-			if (commodity.receiverBases.empty() || !commodity.offerFactions.contains(offeringFaction))
+			float feelings = -1.0f;
+			pub::Reputation::GetGroupFeelingsTowards(clientRep, factionById.at(faction.factionId).groupId, feelings);
+			if (feelings <= RandomMissions::minRequiredReputationForMissions)
 				continue;
 
-			std::vector<uint> shuffledBaseIds(commodity.receiverBases.begin(), commodity.receiverBases.end());
-			std::ranges::shuffle(shuffledBaseIds, rd);
-			const auto& base = GetRandomTargetBaseIdAndDistance(startSystemId, startBaseId, commodity.receiverBases, commodity.minJumpDistance, hostileFactionIds);
-			if (base.first)
+			const auto& hostileFactionIds = factionById.at(faction.factionId).hostileFactionIds;
+			for (const auto& commodity : shuffledCommodities)
 			{
-				result.commodityIndex = commodityIndex;
-				result.baseId = base.first;
-				result.jumpDistance = base.second;
-				break;
+				if (!commodity->allowedShips.contains(shipArchetypeId))
+					continue;
+
+				std::vector<uint> shuffledBaseIds(commodity->receiverBases.begin(), commodity->receiverBases.end());
+				std::ranges::shuffle(shuffledBaseIds, rd);
+				for (const uint targetBaseId : shuffledBaseIds)
+				{
+					if (startBaseId == targetBaseId)
+						continue;
+
+					BASE_INFO base;
+					if (!FindBaseInfo(targetBaseId, base))
+						continue;
+
+					if (hostileFactionIds.contains(owningFactionByBaseId[base.iBaseID]))
+						continue;
+
+					if (shortestSystemPathToTargets.at(startSystemId).at(base.iSystemID).size() - 1 < commodity->minJumpDistance)
+						continue;
+
+					uint affiliationId;
+					pub::Reputation::GetAffiliation(base.iObjectID, affiliationId);
+					if (affiliationId)
+					{
+						float feelings = -1.0f;
+						pub::Reputation::GetGroupFeelingsTowards(clientRep, affiliationId, feelings);
+						if (feelings <= hostileDockingThreshold)
+							continue;
+					}
+
+					result.targetObjId = base.iObjectID;
+					IObjRW* inspect = nullptr;
+					StarSystem* system;
+					if (GetShipInspect(result.targetObjId, inspect, system) && inspect)
+					{
+						result.commodity = commodity;
+						result.startSystemId = startSystemId;
+						result.targetSystemId = base.iSystemID;
+						result.targetBaseId = targetBaseId;
+						result.targetObjId = base.iObjectID;
+						result.targetPosition = inspect->get_position();
+						result.jumpDistance = shortestSystemPathToTargets.at(startSystemId).at(base.iSystemID).size();
+						result.offerFactionId = faction.factionId;
+					}
+					return result;
+				}
 			}
 		}
 		return result;
 	}
 
-	static uint GenerateMissionForBase(const uint baseId)
+	static uint GenerateMissionForClient(const uint clientId)
 	{
-		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId[baseId]);
+		uint startBaseId = 0;
+		pub::Player::GetBase(clientId, startBaseId);
+		if (!startBaseId)
+			return 0;
+
+		uint shipArchetypeId = 0;
+		pub::Player::GetShipID(clientId, shipArchetypeId);
+		if (!shipArchetypeId)
+			return 0;
+
+		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId.at(startBaseId));
 		std::ranges::shuffle(shuffledBaseFactions, rd);
 
-		RandomDestination destination = {};
-		uint factionId = 0;
-		for (const auto& faction : shuffledBaseFactions)
-		{
-			destination = GetRandomCommodityAndTargetBase(baseId, faction.factionId, factionById[faction.factionId].hostileFactionIds);
-			if (destination.commodityIndex >= 0 && destination.baseId)
-			{
-				factionId = faction.factionId;
-				break;
-			}
-		}
-		if (destination.commodityIndex < 0 || !destination.baseId)
+		const RandomDestination& destination = GetRandomDestination(clientId, startBaseId, shipArchetypeId);
+		if (!destination.commodity)
 			return 0;
-
-		if (factionById[factionId].groupId == 0)
-			return 0;
-
-		const Commodity& commodity = commodities[destination.commodityIndex];
-		const uint targetBaseId = destination.baseId;
-		const uint reward = destination.jumpDistance * commodity.moneyPerJump + commodity.moneyPerJump;
-		const float reputation = destination.jumpDistance * commodity.reputationPerJump + commodity.reputationPerJump;
 
 		const uint missionId = Missions::missions.size() + 1;
 		const auto& result = Missions::missions.try_emplace(missionId, "", missionId, false);
 		if (!result.second)
 			return 0;
 
+		const Commodity& commodity = *destination.commodity;
+		const auto& offerFaction = factionById.at(destination.offerFactionId);
+		const float reputation = destination.jumpDistance * commodity.reputationPerJump + commodity.reputationPerJump;
+
 		Missions::Mission& mission = result.first->second;
-
-		uint startSystemId = 0;
-		for (const auto& base : lstBases)
-		{
-			if (base.iBaseID == baseId)
-			{
-				startSystemId = base.iSystemID;
-				break;
-			}
-		}
-		if (!startSystemId)
-			return 0;
-
-		uint targetObjId = 0;
-		uint targetSystemId = 0;
-		for (const auto& base : lstBases)
-		{
-			if (base.iBaseID == destination.baseId)
-			{
-				targetSystemId = base.iSystemID;
-				targetObjId = base.iObjectID;
-				break;
-			}
-		}
-		if (!targetObjId || !targetSystemId)
-			return 0;
-
 		mission.offer.type = pub::GF::MissionType::RetrieveContraband;
-		mission.offer.system = targetSystemId;
-		mission.offer.group = factionById[factionId].groupId;
+		mission.offer.system = destination.targetSystemId;
+		mission.offer.group = offerFaction.groupId;
 		mission.offer.title = 524390;
 		mission.offer.description = FmtStr(524391, 0);
 		mission.offer.description.append_good(commodity.id);
-		mission.offer.description.append_base(targetBaseId);
-		mission.offer.description.append_system(targetSystemId);
+		mission.offer.description.append_base(destination.targetBaseId);
+		mission.offer.description.append_system(destination.targetSystemId);
 		mission.offer.description.append_rep_group(mission.offer.group);
 		mission.offer.description.append_int(reputation * 100.0f);
-		mission.offer.reward = reward;
+		mission.offer.reward = destination.jumpDistance * commodity.moneyPerJump + commodity.moneyPerJump;
 		mission.offer.shipArchetypeIds = commodity.allowedShips;
-		mission.offer.baseIds = { baseId };
+		mission.offer.baseIds = {};
 		mission.offer.reofferCondition = Missions::MissionReofferCondition::Never;
 		mission.offer.reofferDelay = 0.0f;
 
@@ -304,21 +314,16 @@ namespace RandomMissions
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			{
-				IObjRW* inspect;
-				StarSystem* system;
-				if (GetShipInspect(targetObjId, inspect, system))
-				{
-					Missions::ActSetNNObjPtr action(new Missions::ActSetNNObj());
-					action->label = CreateID("players");
-					action->systemId = targetSystemId;
-					action->targetObjName = targetObjId;
-					action->message = FmtStr(524392, 0);
-					action->message.append_good(commodity.id);
-					action->message.append_base(targetBaseId);
-					action->position = inspect->get_position();
-					action->bestRoute = true;
-					trigger.actions.push_back(action);
-				}
+				Missions::ActSetNNObjPtr action(new Missions::ActSetNNObj());
+				action->label = CreateID("players");
+				action->systemId = destination.targetSystemId;
+				action->targetObjName = destination.targetObjId;
+				action->message = FmtStr(524392, 0);
+				action->message.append_good(commodity.id);
+				action->message.append_base(destination.targetBaseId);
+				action->position = destination.targetPosition;
+				action->bestRoute = true;
+				trigger.actions.push_back(action);
 			}
 
 			{
@@ -327,7 +332,7 @@ namespace RandomMissions
 				msnComms->id = CreateID("msnGoToTarget");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
-				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->costume = offerFaction.missionCommission;
 				msnComms->lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
 				trigger.actions.push_back(msnComms);
 			}
@@ -347,7 +352,7 @@ namespace RandomMissions
 				msnComms->id = CreateID("msnGoToTarget");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
-				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->costume = offerFaction.missionCommission;
 				msnComms->lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
 				trigger.actions.push_back(msnComms);
 			}
@@ -385,7 +390,7 @@ namespace RandomMissions
 				msnComms->id = CreateID("msnLostLoot");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
-				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->costume = offerFaction.missionCommission;
 				msnComms->lines = std::vector<uint>({ CreateID("rmb_fail_destroyedloot_02-") });
 				trigger.actions.push_back(msnComms);
 			}
@@ -427,7 +432,7 @@ namespace RandomMissions
 				msnComms->id = CreateID("msnLeftLoot");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
-				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->costume = offerFaction.missionCommission;
 				msnComms->lines = std::vector<uint>({ CreateID("rmb_fail_destroyedloot_02-") });
 				trigger.actions.push_back(msnComms);
 			}
@@ -498,7 +503,7 @@ namespace RandomMissions
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), { targetBaseId }));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), { destination.targetBaseId }));
 			// No check follows if we actually have the cargo in bay. If it would be lost before, the mission would've failed anyway.
 
 			{
@@ -520,7 +525,7 @@ namespace RandomMissions
 			{
 				Missions::ActAdjAcctPtr adjAcct(new Missions::ActAdjAcct());
 				adjAcct->label = CreateID("players");
-				adjAcct->cash = reward;
+				adjAcct->cash = mission.offer.reward;
 				adjAcct->splitBetweenPlayers = true;
 				trigger.actions.push_back(adjAcct);
 			}
@@ -531,7 +536,7 @@ namespace RandomMissions
 				msnComms->id = CreateID("msnCargoDelivered");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
-				msnComms->costume = factionById[factionId].missionCommission;
+				msnComms->costume = offerFaction.missionCommission;
 				msnComms->lines = std::vector<uint>({ CreateID("rmb_success_returnloot_01-") });
 				trigger.actions.push_back(msnComms);
 			}
@@ -550,7 +555,7 @@ namespace RandomMissions
 			}
 		}
 
-		mission.TryAddToJobBoard();
+		mission.TryAddToJobBoard(clientId);
 
 		return mission.id;
 	}
@@ -561,23 +566,35 @@ namespace RandomMissions
 		{
 			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 			{
-				if (auto entry = missionIdsByBaseIds.find(baseId); entry != missionIdsByBaseIds.end())
+				// Add new missions to the client's mission board. By vanilla FL behaviour this also happens even if the player is already in a mission.
+				for (size_t index = 0; index < desiredMissionCount; index++)
 				{
-					// Remove all accepted missions from the saved missions-in-offer.
-					const std::unordered_set<uint> missionIds(entry->second);
-					for (const uint missionId : missionIds)
-						if (Missions::missions.at(missionId).IsActive())
-							entry->second.erase(missionId);
-
-
-					// Add new missions to the board until it reached the desired count.
-					for (size_t index = entry->second.size(); index < desiredMissionCount; index++)
-					{
-						const uint missionId = GenerateMissionForBase(entry->first);
-						if (missionId)
-							entry->second.insert(missionId);
-					}
+					const uint missionId = GenerateMissionForClient(clientId);
+					if (missionId)
+						missionIdsByClientId[clientId].insert(missionId);
 				}
+
+				returncode = DEFAULT_RETURNCODE;
+			}
+
+			void __stdcall BaseExit(unsigned int baseId, unsigned int clientId)
+			{
+				// Delete all generated missions the client hasn't activated.
+				for (const uint missionId : missionIdsByClientId[clientId])
+				{
+					const auto& missionEntry = Missions::missions.find(missionId);
+					if (missionEntry == Missions::missions.end())
+						continue;
+
+					if (missionEntry->second.IsActive())
+						continue;
+
+					Missions::missions.erase(missionEntry);
+				}
+
+				// Clear the mission board for the client. Any active missions will run until they are properly finished.
+				missionIdsByClientId.erase(clientId);
+
 				returncode = DEFAULT_RETURNCODE;
 			}
 		}

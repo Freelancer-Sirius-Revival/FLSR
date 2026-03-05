@@ -83,7 +83,7 @@ namespace Missions
 		void RemoveClient(const uint clientId);
 		uint FindObjNameByObjId(const uint objId) const;
 		bool ToBeDeleted() const;
-		bool TryAddToJobBoard();
+		bool TryAddToJobBoard(const uint clientId);
 	};
 
 	extern std::unordered_map<uint, Mission> missions;

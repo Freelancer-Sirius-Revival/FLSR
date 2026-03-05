@@ -15,9 +15,9 @@ namespace MissionBoard
 	};
 
 	uint AddPublicOffer(const Offer& offer, const std::unordered_set<uint>& baseIds);
+	uint AddPrivateOffer(const Offer& offer, const uint clientId);
 	void DeleteOffer(const uint offerId);
 
-	void Initialize();
 	void __stdcall MissionResponse(uint boardIndex, uint origin, bool accepted, uint clientId);
 	void __stdcall AbortMission(uint clientId, uint missionId);
 	bool __stdcall Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER(uint clientId, void* data, uint dataSize);

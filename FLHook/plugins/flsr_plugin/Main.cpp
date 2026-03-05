@@ -366,7 +366,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::StopTradelane_AFTER, PLUGIN_HkIServerImpl_StopTradelane_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::ClientObjectives::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::MissionResponse, PLUGIN_HkIServerImpl_MissionResponse, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::AbortMission, PLUGIN_HkIServerImpl_AbortMission, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionBoard::Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_GFUPDATEMISSIONCOMPUTER, 0));
@@ -382,6 +381,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
     
     return p_PI;
 }

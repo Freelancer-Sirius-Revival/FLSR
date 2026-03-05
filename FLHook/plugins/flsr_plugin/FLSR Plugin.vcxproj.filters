@@ -330,6 +330,9 @@
     <ClCompile Include="missions\actions\ActPlayNN.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\randomMissions\Meta.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -673,6 +676,9 @@
     </ClInclude>
     <ClInclude Include="missions\actions\ActPlayNN.h">
       <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Meta.h">
+      <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

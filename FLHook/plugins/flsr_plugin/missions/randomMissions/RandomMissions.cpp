@@ -2,6 +2,7 @@
 #include "TradeMissions.h"
 #include "Costumes.h"
 #include "Factions.h"
+#include "Meta.h"
 #include "Offers.h"
 
 namespace RandomMissions
@@ -12,6 +13,7 @@ namespace RandomMissions
 
 		ReadCostumeData(); // Must be called before faction data
 		ReadFactionData();
+		ReadMetadata();
 		ReadOfferData();
 		ReadTradeCommoditiesData();
 

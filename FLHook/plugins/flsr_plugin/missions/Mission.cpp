@@ -183,11 +183,14 @@ namespace Missions
 		if (object.id == 0)
 			return;
 
-		if (object.type == MissionObjectType::Client)
+		if (object.type == MissionObjectType::Client && !clientIds.contains(object.id))
 		{
 			if (!HkIsValidClientID(object.id) || HkIsInCharSelectMenu(object.id))
 				return;
-			// Clients are made known to the mission by giving them a label.
+
+			if (offerId)
+				pub::Player::SetMsnID(object.id, offerId, object.id, false, 0);
+
 			clientIds.insert(object.id);
 		}
 

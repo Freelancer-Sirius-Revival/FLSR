@@ -178,14 +178,7 @@ namespace MissionBoard
 					if (const auto& offerEntry = offers.find(boardEntry.offerId); offerEntry != offers.end())
 					{
 						SendOfferAcceptance(clientId, boardIndex, base);
-						std::vector<uint> groupMemberIds;
-						for (const auto memberId : groupMembers)
-						{
-							// SetMsnID makes sure: 1. the player cannot be invited to groups ("Is in a Mission") and 2. it sets the same MsnId to late group-joining players.
-							pub::Player::SetMsnID(memberId, boardEntry.offerId, clientId, false, 0);
-							groupMemberIds.push_back(memberId);
-						}
-						Missions::StartMissionByOfferId(boardEntry.offerId, clientId, groupMemberIds);
+						Missions::StartMissionByOfferId(boardEntry.offerId, clientId, std::vector<uint>(groupMembers.begin(), groupMembers.end()));
 						DeleteOffer(boardEntry.offerId);
 					}
 					// Someone already removed it from the pool

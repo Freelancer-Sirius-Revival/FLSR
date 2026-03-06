@@ -938,10 +938,10 @@ namespace Missions
 			if (missionEntry.second.offerId == offerId && missionEntry.second.CanBeStarted())
 			{
 				auto& mission = missionEntry.second;
+				mission.AddLabelToObject(MissionObject(MissionObjectType::Client, startingClientId), CreateID("initial_player"));
 				const uint labelId = CreateID("players");
 				for (const auto clientId : clientIds)
 					mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), labelId);
-				mission.AddLabelToObject(MissionObject(MissionObjectType::Client, startingClientId), CreateID("initial_player"));
 				mission.Start();
 				return;
 			}

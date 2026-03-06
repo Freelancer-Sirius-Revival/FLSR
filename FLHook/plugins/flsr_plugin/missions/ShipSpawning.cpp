@@ -478,11 +478,6 @@ namespace ShipSpawning
 	static bool GetLaunchPositionAndDock(const uint shipArchetypeId, const uint launchObjId, Vector& startPos, Matrix& startOrientation, int& dockIndex)
 	{
 		dockIndex = 0;
-		_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
-		st6::vector<uint> missionProps;
-		if (!GetMissionProperties(shipArchetypeId, missionProps))
-			return false;
-
 		IObjRW* inspect;
 		StarSystem* starSystem;
 		if (!GetShipInspect(launchObjId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))

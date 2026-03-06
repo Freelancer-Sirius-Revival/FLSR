@@ -16,7 +16,9 @@ namespace Missions
 		state(initiallyActive ? TriggerState::AwaitingInitialActivation : TriggerState::Inactive),
 		repeatable(repeatable),
 		condition(ConditionPtr(new CndTrue({ missionId, id })))
-	{}
+	{
+		sortPosition = missions.at(missionId).triggers.size();
+	}
 
 	Trigger::~Trigger()
 	{

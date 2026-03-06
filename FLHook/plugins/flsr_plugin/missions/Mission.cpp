@@ -5,9 +5,9 @@
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
 #include "conditions/CndLeaveMsn.h"
+#include "objectives/ObjDock.h"
 #include "ShipSpawning.h"
 #include "LifeTimes.h"
-#include "objectives/ObjDock.h"
 #include "../Plugin.h"
 
 namespace Missions
@@ -121,10 +121,14 @@ namespace Missions
 			trigger.second.Reset();
 
 		// Only now execute those that should be initially active. With e.g. Cnd_True they might instantly activate other triggers while we are still looping here.
+		std::vector<Trigger*> sortedTriggers(triggers.size());
 		for (auto& trigger : triggers)
+			sortedTriggers[trigger.second.sortPosition] = &trigger.second;
+		
+		for (auto& trigger : sortedTriggers)
 		{
-			if (trigger.second.IsAwaitingInitialActivation())
-				trigger.second.Activate();
+			if (trigger->IsAwaitingInitialActivation())
+				trigger->Activate();
 		}
 	}
 

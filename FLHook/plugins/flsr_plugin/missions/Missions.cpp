@@ -32,6 +32,7 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
+#include "Actions/ActLeaveGroup.h"
 #include "Actions/ActLeaveMsn.h"
 #include "Actions/ActSetLifeTime.h"
 #include "Actions/ActMark.h"
@@ -464,6 +465,12 @@ namespace Missions
 							{
 								ActSetMsnResultPtr action(new ActSetMsnResult());
 								action->result = ToLower(ini.get_value_string(0)) == "success" ? Mission::MissionResult::Success : Mission::MissionResult::Failure;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_LeaveGroup"))
+							{
+								ActLeaveGroupPtr action(new ActLeaveGroup());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_LeaveMsn"))

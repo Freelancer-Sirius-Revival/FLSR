@@ -609,6 +609,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether to prevent player damage or not.
     1. `[FLOAT] :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
 
+- `Act_LeaveGroup` Only for players. Removes members of the label from their current group.
+    1. `STRING|Activator` Players by label to remove from their group.
+
 - `Act_LeaveMsn` Only for players. Removes members of the label from the mission.
     1. `STRING|Activator` Players by label to remove from the mission.
     1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.

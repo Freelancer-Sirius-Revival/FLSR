@@ -37,7 +37,7 @@ namespace Missions
 		{
 			for (const uint otherClientId : mission.clientIds)
 			{
-				if (group.IsMember(otherClientId))
+				if (otherClientId != clientId && group.IsMember(otherClientId))
 				{
 					activator = MissionObject(MissionObjectType::Client, clientId);
 					return true;
@@ -48,7 +48,7 @@ namespace Missions
 		{
 			for (const auto& object : objectsByLabel->second)
 			{
-				if (object.type == MissionObjectType::Client && group.IsMember(object.id))
+				if (object.type == MissionObjectType::Client && object.id != clientId && group.IsMember(object.id))
 				{
 					activator = MissionObject(MissionObjectType::Client, clientId);
 					return true;

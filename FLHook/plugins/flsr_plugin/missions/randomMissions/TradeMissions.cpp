@@ -143,18 +143,18 @@ namespace RandomMissions
 			ini.close();
 		}
 	}
+	
+	std::unordered_map<uint, std::unordered_set<CSolar*>> dockablesByBaseId;
 
-	static bool FindBaseInfo(const uint baseId, BASE_INFO& baseInfo)
+	void CacheDockableSolars()
 	{
-		for (const auto& base : lstBases)
+		CSolar* solar = static_cast<CSolar*>(CObject::FindFirst(CObject::CSOLAR_OBJECT));
+		while (solar != nullptr)
 		{
-			if (base.iBaseID == baseId)
-			{
-				baseInfo = base;
-				return true;
-			}
+			if ((solar->get_type() == ObjectType::Station || solar->get_type() == ObjectType::DockingRing) && solar->dockWithBaseId)
+				dockablesByBaseId[solar->dockWithBaseId].insert(solar);
+			solar = static_cast<CSolar*>(solar->FindNext());
 		}
-		return false;
 	}
 
 	struct RandomDestination
@@ -168,6 +168,47 @@ namespace RandomMissions
 		uint jumpDistance;
 		uint offerFactionId;
 	};
+
+	#define ADDR_CONTENT_GETMISSIONPROPERTIES 0xB87D0
+	typedef bool(__cdecl* _GetMissionProperties)(uint shipId, st6::vector<uint>& missionProps);
+
+	static bool CanDock(const st6::vector<Archetype::EqObj::DockHardpointInfo>& dockInfos, const std::unordered_set<uint>& missionProperties)
+	{
+		for (const auto& dockInfo : dockInfos)
+		{
+			bool result;
+			switch (dockInfo.dockType)
+			{
+				case Archetype::DockType::Berth:
+				case Archetype::DockType::Ring:
+					result = missionProperties.contains(0x87309f87); // CRC of 'can_use_berths'
+					break;
+
+				//case Archetype::DockType::MoorSmall:
+					//result = missionProperties.contains(CreateID("can_use_small_moors")); // Not read from mission properties in shiparch
+					//break;
+
+				case Archetype::DockType::MoorMedium:
+					result = missionProperties.contains(0xa2424943); // CRC of 'can_use_medium_moors' which is 'can_use_med_moors' in shiparch
+					break;
+
+				case Archetype::DockType::MoorLarge:
+					result = missionProperties.contains(0xa6cc80c2); // CRC of 'can_use_large_moors'
+					break;
+
+				case Archetype::DockType::Jump:
+				case Archetype::DockType::Airlock:
+					result = true;
+					break;
+
+				default:
+					result = false;
+			}
+			if (result)
+				return true;
+		}
+		return false;
+	}
 
 	static RandomDestination GetRandomDestination(const uint clientId, const uint startBaseId, const uint shipArchetypeId)
 	{
@@ -192,6 +233,12 @@ namespace RandomMissions
 		}
 		if (!startSystemId)
 			return result;
+
+		_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
+		st6::vector<uint> missionPropsResult;
+		if (!GetMissionProperties(shipArchetypeId, missionPropsResult) || missionPropsResult.empty())
+			return result;
+		const std::unordered_set<uint> missionProps(missionPropsResult.begin(), missionPropsResult.end());
 
 		std::vector<size_t> shuffledCommodityIndices = commoditiesPerBase[startBaseId];
 		std::ranges::shuffle(shuffledCommodityIndices, rd);
@@ -221,18 +268,30 @@ namespace RandomMissions
 					if (startBaseId == targetBaseId)
 						continue;
 
-					BASE_INFO base;
-					if (!FindBaseInfo(targetBaseId, base))
+					const auto& dockablesEntry = dockablesByBaseId.find(targetBaseId);
+					if (dockablesEntry == dockablesByBaseId.end())
 						continue;
 
-					if (hostileFactionIds.contains(owningFactionByBaseId[base.iBaseID]))
+					CSolar* dockable = nullptr;
+					for (const auto& dockableObj : dockablesEntry->second)
+					{
+						if (CanDock(static_cast<Archetype::Solar*>(dockableObj->archetype)->dockInfo, missionProps))
+						{
+							dockable = dockableObj;
+							break;
+						}
+					}
+					if (!dockable)
+						continue;
+					
+					if (hostileFactionIds.contains(owningFactionByBaseId[targetBaseId]))
 						continue;
 
-					if (shortestSystemPathToTargets.at(startSystemId).at(base.iSystemID).size() - 1 < commodity->minJumpDistance)
+					if (shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size() - 1 < commodity->minJumpDistance)
 						continue;
 
 					uint affiliationId;
-					pub::Reputation::GetAffiliation(base.iObjectID, affiliationId);
+					pub::Reputation::GetAffiliation(dockable->id, affiliationId);
 					if (affiliationId)
 					{
 						float feelings = -1.0f;
@@ -241,20 +300,14 @@ namespace RandomMissions
 							continue;
 					}
 
-					IObjRW* inspect = nullptr;
-					StarSystem* system;
-					if (GetShipInspect(base.iObjectID, inspect, system) && inspect)
-					{
-						result.commodity = commodity;
-						result.startSystemId = startSystemId;
-						result.targetSystemId = base.iSystemID;
-						result.targetObjId = base.iObjectID;
-						result.targetBaseId = targetBaseId;
-						result.targetObjId = base.iObjectID;
-						result.targetPosition = inspect->get_position();
-						result.jumpDistance = shortestSystemPathToTargets.at(startSystemId).at(base.iSystemID).size();
-						result.offerFactionId = faction.factionId;
-					}
+					result.commodity = commodity;
+					result.startSystemId = startSystemId;
+					result.targetSystemId = dockable->system;
+					result.targetObjId = dockable->id;
+					result.targetBaseId = targetBaseId;
+					result.targetPosition = dockable->get_position();
+					result.jumpDistance = shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size();
+					result.offerFactionId = faction.factionId;
 					return result;
 				}
 			}

@@ -29,6 +29,8 @@ namespace RandomMissions
 
 		ConPrint(L"Initializing Random Missions... ");
 
+		CacheDockableSolars();
+
 		for (auto& factionEntry : factionById)
 			pub::Reputation::GetReputationGroup(factionEntry.second.groupId, factionEntry.second.name.c_str());
 

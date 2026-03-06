@@ -3,6 +3,7 @@
 namespace RandomMissions
 {
 	void ReadTradeCommoditiesData();
+	void CacheDockableSolars();
 
 	namespace Hooks
 	{

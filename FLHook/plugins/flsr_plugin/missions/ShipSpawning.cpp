@@ -2,7 +2,6 @@
 #include "NpcAppearances.h"
 #include "../Pilots.h"
 #include "../Plugin.h"
-#include "MatrixMath.h"
 
 namespace ShipSpawning
 {

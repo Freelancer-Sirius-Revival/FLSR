@@ -4,19 +4,24 @@
 #include "Factions.h"
 #include "Meta.h"
 #include "../Mission.h"
-#include "../conditions/CndTimer.h"
-#include "../conditions/CndDestroyed.h"
-#include "../conditions/CndLeaveMsn.h"
 #include "../conditions/CndBaseEnter.h"
+#include "../conditions/CndDestroyed.h"
+#include "../conditions/CndJoinGroup.h"
 #include "../conditions/CndLaunchComplete.h"
-#include "../actions/ActLeaveMsn.h"
-#include "../actions/ActTerminateMsn.h"
-#include "../actions/ActSetNNObj.h"
-#include "../actions/ActEtherComm.h"
-#include "../actions/ActAdjRep.h"
-#include "../actions/ActAdjAcct.h"
+#include "../conditions/CndLeaveMsn.h"
+#include "../conditions/CndLeaveGroup.h"
+#include "../conditions/CndTimer.h"
 #include "../actions/ActAddCargo.h"
+#include "../actions/ActAddLabel.h"
+#include "../actions/ActAdjAcct.h"
+#include "../actions/ActAdjRep.h"
+#include "../actions/ActEtherComm.h"
+#include "../actions/ActLeaveGroup.h"
+#include "../actions/ActLeaveMsn.h"
+#include "../actions/ActPlayNN.h"
 #include "../actions/ActRemoveCargo.h"
+#include "../actions/ActSetNNObj.h"
+#include "../actions/ActTerminateMsn.h"
 #include "../../Plugin.h"
 #include <random>
 
@@ -315,6 +320,9 @@ namespace RandomMissions
 		return result;
 	}
 
+	const uint InitialPlayer = CreateID("initial_player");
+	const uint Players = CreateID("players");
+
 	static uint GenerateMissionForClient(const uint clientId)
 	{
 		uint startBaseId = 0;
@@ -368,7 +376,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActSetNNObjPtr action(new Missions::ActSetNNObj());
-				action->label = CreateID("players");
+				action->label = Players;
 				action->systemId = destination.targetSystemId;
 				action->targetObjName = destination.targetObjId;
 				action->message = FmtStr(524392, 0);
@@ -381,7 +389,54 @@ namespace RandomMissions
 
 			{
 				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
-				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->receiverObjNameOrLabel = Players;
+				msnComms->id = CreateID("msnGoToTarget");
+				msnComms->senderVoiceId = CreateID("mc_leg_m01");
+				msnComms->senderIdsName = 13015;
+				msnComms->costume = offerFaction.missionCommission;
+				msnComms->lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
+				trigger.actions.push_back(msnComms);
+			}
+
+			{
+				Missions::ActPlayNNPtr msnComms(new Missions::ActPlayNN());
+				msnComms->label = InitialPlayer;
+				msnComms->soundIds = std::vector<uint>({ CreateID("cmsn_accepted") });
+				trigger.actions.push_back(msnComms);
+			}
+		}
+
+		/* Joining the Group of the Mission Players */
+		{
+			const uint triggerId = CreateID("joinGroup");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndJoinGroup(Missions::ConditionParent(missionId, triggerId), 0));
+
+			{
+				Missions::ActAddLabelPtr addLabel(new Missions::ActAddLabel());
+				addLabel->objNameOrLabel = Missions::Activator;
+				addLabel->label = Players;
+				trigger.actions.push_back(addLabel);
+			}
+
+			{
+				Missions::ActSetNNObjPtr action(new Missions::ActSetNNObj());
+				action->label = Missions::Activator;
+				action->systemId = destination.targetSystemId;
+				action->targetObjName = destination.targetObjId;
+				action->message = FmtStr(524392, 0);
+				action->message.append_good(commodity.id);
+				action->message.append_base(destination.targetBaseId);
+				action->position = destination.targetPosition;
+				action->bestRoute = true;
+				trigger.actions.push_back(action);
+			}
+
+			{
+				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
+				msnComms->receiverObjNameOrLabel = Missions::Activator;
 				msnComms->id = CreateID("msnGoToTarget");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
@@ -391,13 +446,30 @@ namespace RandomMissions
 			}
 		}
 
+		/* Leaving the Group of the Mission Players */
+		{
+			const uint triggerId = CreateID("leaveGroup");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveGroup(Missions::ConditionParent(missionId, triggerId), 0));
+
+			{
+				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
+				leaveMsn->label = Missions::Activator;
+				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
+				leaveMsn->failureStringId = 13086;
+				trigger.actions.push_back(leaveMsn);
+			}
+		}
+
 		/* Launch from Any Base */
 		{
 			const uint triggerId = CreateID("launchFromAnyBase");
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndLaunchComplete(Missions::ConditionParent(missionId, triggerId), CreateID("players"), {}));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndLaunchComplete(Missions::ConditionParent(missionId, triggerId), Players, {}));
 
 			{
 				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
@@ -421,7 +493,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActAddCargoPtr action(new Missions::ActAddCargo());
-				action->label = CreateID("initial_player");
+				action->label = InitialPlayer;
 				action->itemId = commodity.id;
 				action->count = 1;
 				action->missionFlagged = true;
@@ -435,11 +507,11 @@ namespace RandomMissions
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndDestroyed(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), Missions::CndDestroyed::DestroyCondition::Explode, 0, 1, false));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndDestroyed(Missions::ConditionParent(missionId, triggerId), InitialPlayer, Missions::CndDestroyed::DestroyCondition::Explode, 0, 1, false));
 
 			{
 				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
-				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->receiverObjNameOrLabel = Players;
 				msnComms->id = CreateID("msnLostLoot");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
@@ -450,7 +522,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
-				adjRep->objNameOrLabel = CreateID("players");
+				adjRep->objNameOrLabel = Players;
 				adjRep->groupId = mission.offer.group;
 				adjRep->change = 0.0f;
 				adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
@@ -459,7 +531,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
-				leaveMsn->label = CreateID("players");
+				leaveMsn->label = Players;
 				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
 				leaveMsn->failureStringId = 13089;
 				trigger.actions.push_back(leaveMsn);
@@ -473,15 +545,15 @@ namespace RandomMissions
 
 		/* Initial Player Leaves */
 		{
-			const uint triggerId = CreateID("leavingMsn");
+			const uint triggerId = CreateID("leavingMsnInitialPlayer");
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveMsn(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player")));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveMsn(Missions::ConditionParent(missionId, triggerId), InitialPlayer));
 
 			{
 				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
-				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->receiverObjNameOrLabel = Players;
 				msnComms->id = CreateID("msnLeftLoot");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
@@ -492,7 +564,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
-				removeCargo->label = CreateID("initial_player");
+				removeCargo->label = InitialPlayer;
 				removeCargo->itemId = commodity.id;
 				removeCargo->count = 1;
 				trigger.actions.push_back(removeCargo);
@@ -500,7 +572,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
-				adjRep->objNameOrLabel = CreateID("players");
+				adjRep->objNameOrLabel = Players;
 				adjRep->groupId = mission.offer.group;
 				adjRep->change = 0.0f;
 				adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
@@ -509,7 +581,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
-				leaveMsn->label = CreateID("players");
+				leaveMsn->label = Players;
 				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
 				leaveMsn->failureStringId = 13086;
 				trigger.actions.push_back(leaveMsn);
@@ -521,6 +593,28 @@ namespace RandomMissions
 			}
 		}
 
+		/* Any Player Leaves */
+		{
+			const uint triggerId = CreateID("leavingMsnPlayers");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveMsn(Missions::ConditionParent(missionId, triggerId), Players));
+
+			{
+				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
+				leaveMsn->label = Missions::Activator;
+				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
+				leaveMsn->failureStringId = 13086;
+				trigger.actions.push_back(leaveMsn);
+			}
+
+			{
+				Missions::ActLeaveGroupPtr leaveGroup(new Missions::ActLeaveGroup());
+				leaveGroup->label = Missions::Activator;
+				trigger.actions.push_back(leaveGroup);
+			}
+		}
 
 		/* Land on Any Base */
 		{
@@ -528,12 +622,12 @@ namespace RandomMissions
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), {}));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), InitialPlayer, {}));
 
 			// Remove cargo because Freelancer does not transfer MISSION CARGO flag
 			{
 				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
-				removeCargo->label = CreateID("initial_player");
+				removeCargo->label = InitialPlayer;
 				removeCargo->itemId = commodity.id;
 				removeCargo->count = 1;
 				trigger.actions.push_back(removeCargo);
@@ -542,7 +636,7 @@ namespace RandomMissions
 			// Re-add cargo to keep it visible as MISSION CARGO flagged item
 			{
 				Missions::ActAddCargoPtr action(new Missions::ActAddCargo());
-				action->label = CreateID("initial_player");
+				action->label = InitialPlayer;
 				action->itemId = commodity.id;
 				action->count = 1;
 				action->missionFlagged = true;
@@ -556,12 +650,12 @@ namespace RandomMissions
 			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), CreateID("initial_player"), { destination.targetBaseId }));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), InitialPlayer, { destination.targetBaseId }));
 			// No check follows if we actually have the cargo in bay. If it would be lost before, the mission would've failed anyway.
 
 			{
 				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
-				removeCargo->label = CreateID("initial_player");
+				removeCargo->label = InitialPlayer;
 				removeCargo->itemId = commodity.id;
 				removeCargo->count = 1;
 				trigger.actions.push_back(removeCargo);
@@ -569,7 +663,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActAdjRepPtr adjRep(new Missions::ActAdjRep());
-				adjRep->objNameOrLabel = CreateID("players");
+				adjRep->objNameOrLabel = Players;
 				adjRep->groupId = mission.offer.group;
 				adjRep->change = reputation;
 				trigger.actions.push_back(adjRep);
@@ -577,7 +671,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActAdjAcctPtr adjAcct(new Missions::ActAdjAcct());
-				adjAcct->label = CreateID("players");
+				adjAcct->label = Players;
 				adjAcct->cash = mission.offer.reward;
 				adjAcct->splitBetweenPlayers = true;
 				trigger.actions.push_back(adjAcct);
@@ -585,7 +679,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActEtherCommPtr msnComms(new Missions::ActEtherComm());
-				msnComms->receiverObjNameOrLabel = CreateID("players");
+				msnComms->receiverObjNameOrLabel = Players;
 				msnComms->id = CreateID("msnCargoDelivered");
 				msnComms->senderVoiceId = CreateID("mc_leg_m01");
 				msnComms->senderIdsName = 13015;
@@ -596,7 +690,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
-				leaveMsn->label = CreateID("players");
+				leaveMsn->label = Players;
 				leaveMsn->leaveType = Missions::LeaveMsnType::Success;
 				trigger.actions.push_back(leaveMsn);
 			}

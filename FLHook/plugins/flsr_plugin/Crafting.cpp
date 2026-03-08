@@ -107,6 +107,14 @@ namespace Crafting
 		ConPrint(L"Done\n");
 	}
 
+	static std::wstring PrintMoney(const int64_t amount)
+	{
+		std::wstring result = std::to_wstring(amount);
+		for (int pos = result.size() - 3; pos > 0; pos = pos - 3)
+			result = result.insert(pos, L",");
+		return L"$" + result;
+	}
+
     static std::vector<CARGO_INFO> GetUnmountedCargoList(const uint clientId)
     {
         int remainingHoldSize;
@@ -180,7 +188,7 @@ namespace Crafting
 			if (cashDiff < 0)
 			{
 				pub::Player::SendNNMessage(clientId, NOT_ENOUGH_MONEY);
-				PrintUserCmdText(clientId, L"$" + ToMoneyStr(-cashDiff) + L" missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+				PrintUserCmdText(clientId, PrintMoney(-cashDiff) + L" missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 				return false;
 			}
 		}
@@ -282,7 +290,10 @@ namespace Crafting
 			if (soundId)
 				pub::Audio::PlaySoundEffect(clientId, soundId);
 			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
-			PrintUserCmdText(clientId, L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'.");
+			std::wstring message = L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'";
+			if (recipe.cost)
+				message += L" for " + PrintMoney(recipe.cost * batchCount);
+			PrintUserCmdText(clientId, message + L".");
 			return true;
 		}
 		return false;

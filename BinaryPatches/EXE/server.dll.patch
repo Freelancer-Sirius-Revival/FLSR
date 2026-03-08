@@ -74,3 +74,14 @@ File: EXE\server.dll
 
 # Need reputation to buy ships/equipment in MP. - adoxa
 0112A3: 00	[ 1D ]
+
+
+##########################################
+# Anti-Cheat
+##########################################
+
+# Disable "Ship and Equipment not Sold on Base" anti cheat. - BC46
+#06CD56: EB	[ 74 ]
+
+# Disable "Ship related" anti cheat. - BC46
+#06CD6C: EB	[ 7E ]

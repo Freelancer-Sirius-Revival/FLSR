@@ -184,7 +184,7 @@ namespace MissionBoard
 					// Someone already removed it from the pool
 					else
 					{
-						SendOfferRejection(clientId, boardIndex, base, 524389); // From FLSR Dialogs resources
+						SendOfferRejection(clientId, boardIndex, base, 902);
 					}
 
 					returncode = SKIPPLUGINS_NOFUNCTIONCALL;

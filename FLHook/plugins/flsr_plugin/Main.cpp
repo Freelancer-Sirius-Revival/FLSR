@@ -386,6 +386,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::ReqShipArch_After, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
     
     return p_PI;
 }

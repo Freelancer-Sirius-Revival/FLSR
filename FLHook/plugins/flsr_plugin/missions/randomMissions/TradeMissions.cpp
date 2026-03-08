@@ -4,6 +4,7 @@
 #include "Factions.h"
 #include "Meta.h"
 #include "../Mission.h"
+#include "../MissionBoard.h"
 #include "../conditions/CndBaseEnter.h"
 #include "../conditions/CndDestroyed.h"
 #include "../conditions/CndJoinGroup.h"
@@ -743,6 +744,25 @@ namespace RandomMissions
 
 				// Clear the mission board for the client. Any active missions will run until they are properly finished.
 				missionIdsByClientId.erase(clientId);
+
+				returncode = DEFAULT_RETURNCODE;
+			}
+
+			void __stdcall ReqShipArch_After(unsigned int shiparchId, unsigned int clientId)
+			{
+				const auto missionIds(missionIdsByClientId[clientId]);
+				for (const uint missionId : missionIds)
+				{
+					const auto& missionEntry = Missions::missions.find(missionId);
+					const auto& allowedShipArchetypeIds = missionEntry->second.offer.shipArchetypeIds;
+					if (!allowedShipArchetypeIds.empty() && !allowedShipArchetypeIds.contains(shiparchId))
+					{
+						Missions::missions.erase(missionEntry);
+						missionIdsByClientId.at(clientId).erase(missionId);
+					}
+				}
+				if (missionIdsByClientId.at(clientId).empty())
+					missionIdsByClientId.erase(clientId);
 
 				returncode = DEFAULT_RETURNCODE;
 			}

@@ -574,7 +574,7 @@ namespace RandomMissions
 				adjRep->objNameOrLabel = Players;
 				adjRep->groupId = mission.offer.group;
 				adjRep->change = 0.0f;
-				adjRep->reason = Empathies::ReputationChangeReason::MissionFailure;
+				adjRep->reason = Empathies::ReputationChangeReason::MissionAbortion;
 				trigger.actions.push_back(adjRep);
 			}
 

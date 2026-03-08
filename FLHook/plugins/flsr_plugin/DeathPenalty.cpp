@@ -290,9 +290,27 @@ namespace DeathPenalty
     {
         if (ToLower(argumentsWS).find(L"/deathpenalty") == 0 || ToLower(argumentsWS).find(L"/dp") == 0)
         {
-            const auto& characterFileName = GetCharacterFileName(clientId);
-            if (!characterFileName.empty() && deathPenaltyByCharacterFileName.contains(characterFileName))
-                PrintUserCmdText(clientId, L"Upon death you will be charged " + PrintMoney(deathPenaltyByCharacterFileName[characterFileName]) + L".");
+            std::wstring message = L"";
+            uint baseId = 0;
+            pub::Player::GetBase(clientId, baseId);
+            if (baseId)
+            {
+                message = L"Projected death penalty: " + PrintMoney(CalculateDeathPenalty(clientId));
+            }
+            else
+            {
+                const auto& characterFileName = GetCharacterFileName(clientId);
+                if (!characterFileName.empty() && deathPenaltyByCharacterFileName.contains(characterFileName))
+                     message = L"Upon death you will be charged " + PrintMoney(deathPenaltyByCharacterFileName[characterFileName]) + L".";
+                else
+                    message = L"You won't be charged money upon death.";
+            }
+
+            uint systemId = 0;
+            pub::Player::GetSystem(clientId, systemId);
+            if (systemId && excludedSystemIds.contains(systemId))
+                message += L" This star system is excluded from death penalty.";
+            PrintUserCmdText(clientId, message);
 
             returncode = SKIPPLUGINS_NOFUNCTIONCALL;
             return true;

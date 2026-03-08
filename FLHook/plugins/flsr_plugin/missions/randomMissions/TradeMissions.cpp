@@ -4,7 +4,6 @@
 #include "Factions.h"
 #include "Meta.h"
 #include "../Mission.h"
-#include "../MissionBoard.h"
 #include "../conditions/CndBaseEnter.h"
 #include "../conditions/CndDestroyed.h"
 #include "../conditions/CndJoinGroup.h"
@@ -456,8 +455,7 @@ namespace RandomMissions
 			{
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
 				leaveMsn->label = Missions::Activator;
-				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
-				leaveMsn->failureStringId = 13086;
+				leaveMsn->leaveType = Missions::LeaveMsnType::Silent;
 				trigger.actions.push_back(leaveMsn);
 			}
 		}
@@ -563,7 +561,7 @@ namespace RandomMissions
 
 			{
 				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
-				removeCargo->label = InitialPlayer;
+				removeCargo->label = Missions::Activator;
 				removeCargo->itemId = commodity.id;
 				removeCargo->count = 1;
 				trigger.actions.push_back(removeCargo);
@@ -576,6 +574,14 @@ namespace RandomMissions
 				adjRep->change = 0.0f;
 				adjRep->reason = Empathies::ReputationChangeReason::MissionAbortion;
 				trigger.actions.push_back(adjRep);
+			}
+
+			{   // The initial player might be entirely removed from the mission at this point. Use Activator instead.
+				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
+				leaveMsn->label = Missions::Activator;
+				leaveMsn->leaveType = Missions::LeaveMsnType::Failure;
+				leaveMsn->failureStringId = 13086;
+				trigger.actions.push_back(leaveMsn);
 			}
 
 			{
@@ -612,34 +618,6 @@ namespace RandomMissions
 				Missions::ActLeaveGroupPtr leaveGroup(new Missions::ActLeaveGroup());
 				leaveGroup->label = Missions::Activator;
 				trigger.actions.push_back(leaveGroup);
-			}
-		}
-
-		/* Land on Any Base */
-		{
-			const uint triggerId = CreateID("landOnAnyBase");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
-			Missions::Trigger& trigger = mission.triggers.at(triggerId);
-
-			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), InitialPlayer, {}));
-
-			// Remove cargo because Freelancer does not transfer MISSION CARGO flag
-			{
-				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
-				removeCargo->label = InitialPlayer;
-				removeCargo->itemId = commodity.id;
-				removeCargo->count = 1;
-				trigger.actions.push_back(removeCargo);
-			}
-
-			// Re-add cargo to keep it visible as MISSION CARGO flagged item
-			{
-				Missions::ActAddCargoPtr action(new Missions::ActAddCargo());
-				action->label = InitialPlayer;
-				action->itemId = commodity.id;
-				action->count = 1;
-				action->missionFlagged = true;
-				trigger.actions.push_back(action);
 			}
 		}
 
@@ -688,6 +666,13 @@ namespace RandomMissions
 			}
 
 			{
+				Missions::ActPlayNNPtr msnComms(new Missions::ActPlayNN());
+				msnComms->label = InitialPlayer;
+				msnComms->soundIds = std::vector<uint>({ CreateID("mission_complete") });
+				trigger.actions.push_back(msnComms);
+			}
+
+			{
 				Missions::ActLeaveMsnPtr leaveMsn(new Missions::ActLeaveMsn());
 				leaveMsn->label = Players;
 				leaveMsn->leaveType = Missions::LeaveMsnType::Success;
@@ -697,6 +682,34 @@ namespace RandomMissions
 			{
 				Missions::ActTerminateMsnPtr endMsn(new Missions::ActTerminateMsn());
 				trigger.actions.push_back(endMsn);
+			}
+		}
+
+		/* Land on Any Base */
+		{
+			const uint triggerId = CreateID("landOnAnyBase");
+			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), InitialPlayer, {}));
+
+			// Remove cargo because Freelancer does not transfer MISSION CARGO flag
+			{
+				Missions::ActRemoveCargoPtr removeCargo(new Missions::ActRemoveCargo());
+				removeCargo->label = InitialPlayer;
+				removeCargo->itemId = commodity.id;
+				removeCargo->count = 1;
+				trigger.actions.push_back(removeCargo);
+			}
+
+			// Re-add cargo to keep it visible as MISSION CARGO flagged item
+			{
+				Missions::ActAddCargoPtr action(new Missions::ActAddCargo());
+				action->label = InitialPlayer;
+				action->itemId = commodity.id;
+				action->count = 1;
+				action->missionFlagged = true;
+				trigger.actions.push_back(action);
 			}
 		}
 

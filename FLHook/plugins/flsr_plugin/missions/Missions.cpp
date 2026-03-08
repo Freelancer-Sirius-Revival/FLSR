@@ -5,6 +5,7 @@
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndIniReader.h"
 #include "Actions/ActDebugMsg.h"
+#include "Actions/ActSetShipAndLoadout.h"
 #include "Actions/ActActTrig.h"
 #include "Actions/ActActMsn.h"
 #include "Actions/ActActMsnTrig.h"
@@ -908,6 +909,14 @@ namespace Missions
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								for (size_t index = 1, length = ini.get_num_parameters(); index < length; index++)
 									action->soundIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_SetShipAndLoadout"))
+							{
+								ActSetShipAndLoadoutPtr action(new ActSetShipAndLoadout());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->shipArchetypeId = CreateIdOrNull(ini.get_value_string(1));
+								action->loadoutId = CreateIdOrNull(ini.get_value_string(2));
 								actions.push_back(action);
 							}
 							else

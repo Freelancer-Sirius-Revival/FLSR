@@ -703,6 +703,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether this should generate a best-path route or just a direct waypoint at the target. For players not in the target system, best-path route will always be used until reaching the target system.
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 
+- `Act_SetShipAndLoadout` Sets the ship and loadout.
+    1. `STRING|Activator` Players by label to set the ship and loadout.
+    1. `STRING` Ship archetype to set.
+    1. `STRING` Loadout name to apply.
+
 - `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
     1. `STRING|Activator` Object by name or label whose vibe will be set. Can also be a static world solar. For players this only works if the target is another player.
     1. `STRING|Activator` Object by name or label to change the vibe toward. Can also be a static world solar. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.

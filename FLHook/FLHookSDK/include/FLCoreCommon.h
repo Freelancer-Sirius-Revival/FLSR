@@ -5925,21 +5925,25 @@ namespace Loadout
 {
 	struct IMPORT Map
 	{
-		Map(struct Map const&);
-		Map(void);
-		~Map(void);
-		struct Map& operator=(struct Map const&);
+		Map(const Map&);
+		Map();
+		~Map();
+		Map& operator=(const Map&);
 
 	public:
-		unsigned char data[OBJECT_DATA_SIZE];
+		uint id;
+		char cdunno; // -1
+		EquipDesc* first;
+		EquipDesc* last;
+		EquipDesc* end;
 	};
 
-	IMPORT  void  Free(void);
-	IMPORT  struct Map const* Get(unsigned int);
-	IMPORT  unsigned int  GetID(char const*);
-	IMPORT  int  Load(char const*, bool);
-	IMPORT  bool  ReadCargoLine(class INI_Reader&, struct EquipDesc&);
-	IMPORT  bool  ReadEquipLine(class INI_Reader&, struct EquipDesc&);
+	IMPORT void Free();
+	IMPORT const Map* Get(unsigned int);
+	IMPORT unsigned int GetID(const char*);
+	IMPORT int Load(const char*, bool);
+	IMPORT bool ReadCargoLine(INI_Reader&, EquipDesc&);
+	IMPORT bool ReadEquipLine(INI_Reader&, EquipDesc&);
 };
 
 //

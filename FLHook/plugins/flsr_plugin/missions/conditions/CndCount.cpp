@@ -3,7 +3,7 @@
 
 namespace Missions
 {
-	std::unordered_map<uint, std::unordered_set<CndCount*>> observedCndCountByMissionId;
+	std::unordered_set<CndCount*> observedCndCount;
 	std::unordered_map<uint, std::vector<CndCount*>> orderedCndCountByMissionId;
 
 	CndCount::CndCount(const ConditionParent& parent, const uint label, const uint targetCount, const CountComparator comparator) :
@@ -20,7 +20,7 @@ namespace Missions
 
 	void CndCount::Register()
 	{
-		if (observedCndCountByMissionId[parent.missionId].insert(this).second)
+		if (observedCndCount.insert(this).second)
 		{
 			orderedCndCountByMissionId[parent.missionId].push_back(this);
 			Hooks::CndCount::EvaluateCountConditions(parent.missionId, missions.at(parent.missionId).objectsByLabel, label);
@@ -29,16 +29,13 @@ namespace Missions
 
 	void CndCount::Unregister()
 	{
-		observedCndCountByMissionId[parent.missionId].erase(this);
+		observedCndCount.erase(this);
 		auto& orderedCndCount = orderedCndCountByMissionId[parent.missionId];
 		if (const auto it = std::find(orderedCndCount.begin(), orderedCndCount.end(), this); it != orderedCndCount.end())
 			orderedCndCount.erase(it);
 
-		if (observedCndCountByMissionId[parent.missionId].empty())
-		{
-			observedCndCountByMissionId.erase(parent.missionId);
+		if (orderedCndCountByMissionId[parent.missionId].empty())
 			orderedCndCountByMissionId.erase(parent.missionId);
-		}
 	}
 
 	bool CndCount::Matches(const uint currentLabel, const uint currentCount) const
@@ -68,10 +65,6 @@ namespace Missions
 		{
 			void EvaluateCountConditions(const uint missionId, const std::unordered_map<uint, std::vector<MissionObject>>& objectsByLabel, const uint label)
 			{
-				const auto& observedCndCountEntry = observedCndCountByMissionId.find(missionId);
-				if (observedCndCountEntry == observedCndCountByMissionId.end() || observedCndCountEntry->second.size() == 0)
-					return;
-
 				const auto& orderedCndCountEntry = orderedCndCountByMissionId.find(missionId);
 				if (orderedCndCountEntry == orderedCndCountByMissionId.end() || orderedCndCountEntry->second.size() == 0)
 					return;
@@ -79,7 +72,6 @@ namespace Missions
 				const auto& labelEntries = objectsByLabel.find(label);
 				const uint count = labelEntries == objectsByLabel.end() ? 0 : labelEntries->second.size();
 
-				const auto& observedCndCount = observedCndCountEntry->second;
 				const auto currentConditions(orderedCndCountEntry->second);
 				for (const auto& condition : currentConditions)
 				{

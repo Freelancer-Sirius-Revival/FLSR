@@ -967,7 +967,7 @@ namespace pub
 		IMPORT  int AddCargo(unsigned int const&, unsigned int const&, unsigned int, float, bool);
 		IMPORT  int AdjustCash(unsigned int const&, int);
 		IMPORT  int CfgInterfaceNotification(unsigned int, unsigned int, bool, int);
-		IMPORT  int DisplayMissionMessage(unsigned int const&, struct FmtStr const&, enum MissionMessageType, bool);
+		IMPORT  int DisplayMissionMessage(unsigned int const& clientId, struct FmtStr const& message, enum MissionMessageType type, bool sendToEntireGroup);
 		IMPORT  int EnumerateCargo(unsigned int const&, struct pub::CargoEnumerator&);
 		IMPORT  int ForceLand(unsigned int, unsigned int);
 		IMPORT  int GetAssetValue(unsigned int const&, float&);

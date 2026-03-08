@@ -18,7 +18,7 @@ namespace Missions
 			music.overrideMusic = victoryMusicId;
 			if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId))
 			{
-				pub::Player::DisplayMissionMessage(clientId, successText, MissionMessageType::MissionMessageType_Success, true);
+				pub::Player::DisplayMissionMessage(clientId, successText, MissionMessageType::MissionMessageType_Success, false);
 				pub::Audio::SetMusic(clientId, music);
 			}
 		}
@@ -29,7 +29,7 @@ namespace Missions
 			music.overrideMusic = failureMusicId;
 			if (HkIsValidClientID(clientId) && !HkIsInCharSelectMenu(clientId))
 			{
-				pub::Player::DisplayMissionMessage(clientId, failText, MissionMessageType::MissionMessageType_Type1, true);
+				pub::Player::DisplayMissionMessage(clientId, failText, MissionMessageType::MissionMessageType_Type1, false);
 				pub::Audio::SetMusic(clientId, music);
 			}
 		}

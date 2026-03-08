@@ -8,7 +8,7 @@ namespace Missions
 		{
 			if (activator.type == MissionObjectType::Client)
 			{
-				pub::Player::DisplayMissionMessage(activator.id, FmtStr(stringId, 0), MissionMessageType::MissionMessageType_Type1, true);
+				pub::Player::DisplayMissionMessage(activator.id, FmtStr(stringId, 0), MissionMessageType::MissionMessageType_Type1, false);
 			}
 		}
 		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
@@ -17,7 +17,7 @@ namespace Missions
 			{
 				if (object.type == MissionObjectType::Client)
 				{
-					pub::Player::DisplayMissionMessage(object.id, FmtStr(stringId, 0), MissionMessageType::MissionMessageType_Type1, true);
+					pub::Player::DisplayMissionMessage(object.id, FmtStr(stringId, 0), MissionMessageType::MissionMessageType_Type1, false);
 				}
 			}
 		}

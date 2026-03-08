@@ -327,13 +327,8 @@ namespace RandomMissions
 	const uint InitialPlayer = CreateID("initial_player");
 	const uint Players = CreateID("players");
 
-	static uint GenerateMissionForClient(const uint clientId)
+	static uint GenerateMissionForClient(const uint clientId, const uint startBaseId)
 	{
-		uint startBaseId = 0;
-		pub::Player::GetBase(clientId, startBaseId);
-		if (!startBaseId)
-			return 0;
-
 		uint shipArchetypeId = 0;
 		pub::Player::GetShipID(clientId, shipArchetypeId);
 		if (!shipArchetypeId)
@@ -719,7 +714,7 @@ namespace RandomMissions
 				// Add new missions to the client's mission board. By vanilla FL behaviour this also happens even if the player is already in a mission.
 				for (size_t index = 0; index < desiredMissionCount; index++)
 				{
-					const uint missionId = GenerateMissionForClient(clientId);
+					const uint missionId = GenerateMissionForClient(clientId, baseId);
 					if (missionId)
 						missionIdsByClientId[clientId].insert(missionId);
 				}

@@ -263,6 +263,9 @@ namespace RandomMissions
 			const auto& hostileFactionIds = factionById.at(faction.factionId).hostileFactionIds;
 			for (const auto& commodity : shuffledCommodities)
 			{
+				if (!commodity->offerFactions.contains(faction.factionId))
+					continue;
+
 				if (!commodity->allowedShips.empty() && !commodity->allowedShips.contains(shipArchetypeId))
 					continue;
 

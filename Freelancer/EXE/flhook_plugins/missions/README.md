@@ -703,7 +703,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether this should generate a best-path route or just a direct waypoint at the target. For players not in the target system, best-path route will always be used until reaching the target system.
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 
-- `Act_SetShipAndLoadout` Sets the ship and loadout.
+- `Act_SetShipAndLoadout` Sets the ship and loadout. Only works when the player is docked to a base.
     1. `STRING|Activator` Players by label to set the ship and loadout.
     1. `STRING` Ship archetype to set.
     1. `STRING` Loadout name to apply.

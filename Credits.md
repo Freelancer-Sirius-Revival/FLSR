@@ -90,7 +90,7 @@
 - [Jeider](https://github.com/Jeider) & RenderG
   - [HD Station textures from Freelancer: The Nomad Legacy](https://www.moddb.com/mods/freelancer-nomad-legacy)
 
-- [Jeider](https://github.com/Jeider) & Whiskas T-Mech
+- [Jeider](https://github.com/Jeider) & [Might_Impress/Whiskas T-Mech](https://www.moddb.com/members/might-impress)
   - [Freelancer Advanced Widescreen HUD](https://www.moddb.com/mods/freelacer-advanced-widescreen-hud)
 
 - [Laz](https://github.com/Lazrius)
@@ -103,8 +103,9 @@
   - [Freelancer Patch 1.1](https://www.moddb.com/games/freelancer/downloads/freelancer-patch-11)
   - Freelancer Beta sounds
 
-- [Might_Impress](https://www.moddb.com/members/might-impress)
-  - [Compact Factions Display](https://www.moddb.com/games/freelancer/addons/compact-factions-display), modified by Skotty
+- [Might_Impress/Whiskas T-Mech](https://www.moddb.com/members/might-impress)
+  - [Compact Factions Display](https://www.moddb.com/games/freelancer/addons/compact-factions-display) plugin, modified by Skotty
+  - HudInventory plugin
   
 - [M0tah](https://the-starport.com/forums/user/m0tah)
   - DelayDisplay plugin

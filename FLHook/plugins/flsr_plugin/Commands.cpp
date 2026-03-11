@@ -534,6 +534,13 @@ namespace Commands
         }
     }
 
+    static void UserCMD_Time(uint clientId, const std::wstring& wscParam)
+    {
+        const auto& now = std::chrono::utc_clock::now();
+        const auto& fmt = std::format("{0:%F} {0:%T} {0:%Z}", std::chrono::floor<std::chrono::seconds>(now));
+        PrintUserCmdText(clientId, stows(fmt));
+    }
+
     USERCMD UserCmds[] = {
         {L"/uv", UserCmd_UV},
         {L"/sendcash", UserCMD_SendCash},
@@ -560,6 +567,7 @@ namespace Commands
         {L"/friend", IFF::UserCmd_Allied},
         {L"/iff", IFF::UserCmd_Attitude},
         {L"/rename", UserCMD_Rename},
+        {L"/time", UserCMD_Time},
     };
 
     // User command processing

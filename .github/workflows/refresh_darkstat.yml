@@ -9,13 +9,6 @@ jobs:
     name: Github Pages Production
     runs-on: ubuntu-22.04
     steps:
-    # - name: Repository Dispatch for FLSR
-    #   uses: peter-evans/repository-dispatch@v3
-    #   with:
-    #     token: ${{ secrets.FLSR_DARKSTAT_REFRESH_KEY }}
-    #     repository: darklab8/fl-data-flsr
-    #     event-type: publish
-
     - uses: darklab8/infra/.github/actions/trigger-workflow@master
       with:
         token: ${{ secrets.FLSR_DARKSTAT_REFRESH_KEY }}

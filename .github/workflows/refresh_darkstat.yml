@@ -1,4 +1,4 @@
-name: Trigger refresh of darkstat in production
+name: Darkstat refresh prod
 'on':
   push:
     tags:

@@ -20,4 +20,4 @@ jobs:
       with:
         token: ${{ secrets.FLSR_DARKSTAT_REFRESH_KEY }}
         repository: darklab8/fl-data-flsr
-        workflow-file: publish.yaml2
+        workflow-file: publish.yaml

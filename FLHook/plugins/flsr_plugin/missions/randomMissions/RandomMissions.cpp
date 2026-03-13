@@ -13,7 +13,6 @@ namespace RandomMissions
 
 		ReadCostumeData(); // Must be called before faction data
 		ReadFactionData();
-		ReadMetadata();
 		ReadOfferData();
 		ReadTradeCommoditiesData();
 
@@ -29,6 +28,7 @@ namespace RandomMissions
 
 		ConPrint(L"Initializing Random Missions... ");
 
+		ReadMetadata();
 		CacheDockableSolars();
 
 		for (auto& factionEntry : factionById)

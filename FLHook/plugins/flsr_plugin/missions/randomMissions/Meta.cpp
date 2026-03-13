@@ -11,25 +11,27 @@ namespace RandomMissions
 	static HMODULE LoadContentDll()
 	{
 		INI_Reader ini;
-		if (!ini.open("freelancer.ini", false))
-			return 0;
-
-		while (ini.read_header())
+		if (ini.open("freelancer.ini", false))
 		{
-			if (!ini.is_header("Initial MP DLLs")) continue;
-			while (ini.read_value())
+			while (ini.read_header())
 			{
-				if (ini.is_value("path"))
+				if (ini.is_header("Initial MP DLLs"))
 				{
-					const std::string dataPath = ini.get_value_string(0);
-					ini.close();
-					return GetModuleHandle((dataPath + "\\Content.dll").c_str());
+					while (ini.read_value())
+					{
+						if (ini.is_value("path"))
+						{
+							const std::string dataPath = ini.get_value_string(0);
+							ini.close();
+							return GetModuleHandle((dataPath + "\\Content.dll").c_str());
+						}
+					}
+					break;
 				}
 			}
-			break;
+			ini.close();
 		}
-		ini.close();
-		return nullptr;
+		return 0;
 	}
 
 	void ReadMetadata()

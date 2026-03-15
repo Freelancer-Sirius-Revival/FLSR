@@ -38,7 +38,7 @@ namespace PopUp {
                     WelcomeMessage.begin_mad_lib(PopUp::iWMsg_Body);
                     WelcomeMessage.end_mad_lib();
 
-                    pub::Player::PopUpDialog(iClientID, WelcomeCaption, WelcomeMessage, POPUPDIALOG_BUTTONS_CENTER_OK);
+                    pub::Player::PopUpDialog(iClientID, WelcomeCaption, WelcomeMessage, PopupDialogButton::CENTER_OK);
                 }
                 IniWrite(scUserFile, "Settings", "WelcomePopup", "yes");
             }
@@ -92,7 +92,7 @@ namespace PopUp {
             if (NewPopUpBox.iPage < NewPopUpBox.iMaxPage)
             {
 				//Show Page 2 if POPUPDIALOG_BUTTONS_RIGHT_LATER is clicked
-                if (NewPopUpBox.iPage == 1 && buttonClicked == POPUPDIALOG_BUTTONS_RIGHT_LATER)
+                if (NewPopUpBox.iPage == 1 && buttonClicked == PopupDialogButton::RIGHT_LATER)
                 {
                     //Count iPage
                     uint iPage = NewPopUpBox.iPage;
@@ -105,7 +105,7 @@ namespace PopUp {
                     NewPopUpBoxNext.iBody = PopUp::iWMsg_Body;
                     NewPopUpBoxNext.iPage = iPage;
                     NewPopUpBoxNext.iMaxPage = NewPopUpBox.iMaxPage;
-                    NewPopUpBoxNext.iButton = POPUPDIALOG_BUTTONS_CENTER_OK;
+                    NewPopUpBoxNext.iButton = PopupDialogButton::CENTER_OK;
 
                     //Setup New Popup
                     PopUp::mPopUpBox[wscCharFileName] = NewPopUpBoxNext;

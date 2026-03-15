@@ -42,6 +42,7 @@
 #include "Actions/ActDockInstant.h"
 #include "Actions/ActDisplayMsg.h"
 #include "Actions/ActPlayNN.h"
+#include "Actions/ActPopUpDialog.h"
 #include "Objectives/ObjIniReader.h"
 #include "Dialog.h"
 #include "MissionBoard.h"
@@ -909,6 +910,29 @@ namespace Missions
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								for (size_t index = 1, length = ini.get_num_parameters(); index < length; index++)
 									action->soundIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_PopUpDialog"))
+							{
+								ActPopUpDialogPtr action(new ActPopUpDialog());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->headingId = ini.get_value_int(1);
+								action->messageId = ini.get_value_int(2);
+								action->buttons = 0;
+								for (size_t index = 3, length = ini.get_num_parameters(); index < length; index++)
+								{
+									const auto& button = ToLower(ini.get_value_string(index));
+									if (button == "close")
+										action->buttons = action->buttons | PopupDialogButton::CENTER_OK;
+									else if (button == "yes")
+										action->buttons = action->buttons | PopupDialogButton::LEFT_YES;
+									else if (button == "no")
+										action->buttons = action->buttons | PopupDialogButton::CENTER_NO;
+									else if (button == "later")
+										action->buttons = action->buttons | PopupDialogButton::RIGHT_LATER;
+								}
+								if (!action->buttons)
+									action->buttons = PopupDialogButton::CENTER_OK;
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_SetShipAndLoadout"))

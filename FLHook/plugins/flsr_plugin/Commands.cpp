@@ -17,7 +17,7 @@ namespace Commands
         NewPopUpBox.iBody = 524292;
         NewPopUpBox.iPage = 1;
         NewPopUpBox.iMaxPage = 1;
-        NewPopUpBox.iButton = POPUPDIALOG_BUTTONS_CENTER_OK;
+        NewPopUpBox.iButton = PopupDialogButton::CENTER_OK;
 
         std::wstring wscCharFileName;
         HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
@@ -509,7 +509,7 @@ namespace Commands
         message.begin_mad_lib(PopUp::iContributor_Body);
         message.end_mad_lib();
 
-        pub::Player::PopUpDialog(iClientID, caption, message, POPUPDIALOG_BUTTONS_CENTER_OK);
+        pub::Player::PopUpDialog(iClientID, caption, message, PopupDialogButton::CENTER_OK);
         return;
     }
 

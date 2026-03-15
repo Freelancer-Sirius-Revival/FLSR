@@ -346,6 +346,9 @@
       <Filter>Missions\Actions</Filter>
     </ClCompile>
     <ClCompile Include="Duel.cpp" />
+    <ClCompile Include="missions\actions\ActPopUpDialog.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -706,6 +709,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="Duel.h" />
+    <ClInclude Include="missions\actions\ActPopUpDialog.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

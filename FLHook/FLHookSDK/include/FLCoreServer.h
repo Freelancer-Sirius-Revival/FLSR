@@ -26,10 +26,13 @@
 
 #pragma comment( lib, "FLCoreServer.lib" )
 
-#define POPUPDIALOG_BUTTONS_LEFT_YES 1
-#define POPUPDIALOG_BUTTONS_CENTER_NO 2
-#define POPUPDIALOG_BUTTONS_RIGHT_LATER 4
-#define POPUPDIALOG_BUTTONS_CENTER_OK 8
+enum PopupDialogButton
+{
+	LEFT_YES = 1,
+	CENTER_NO = 2,
+	RIGHT_LATER = 4,
+	CENTER_OK = 8 // Also adds a X button to the window
+};
 
 
 struct CHAT_ID

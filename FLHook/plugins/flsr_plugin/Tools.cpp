@@ -6,7 +6,6 @@ namespace Tools {
     void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId) {
 
         //Valid ID
-        HK_ERROR err;
         if (iClientID < 1 || iClientID > MAX_CLIENT_ID)
             return;
 

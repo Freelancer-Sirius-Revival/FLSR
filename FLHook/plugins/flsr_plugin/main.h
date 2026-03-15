@@ -75,7 +75,6 @@ namespace Timers {
 }
 
 namespace Commands {
-    void UserCMD_Contributor(uint iClientID, const std::wstring &wscParam);
     bool UserCmd_Process(uint iClientID, const std::wstring &wscCmd);
     void UserCMD_SendCash$(uint iClientID, const std::wstring &wscParam);
     void UserCMD_SendCash(uint iClientID, const std::wstring &wscParam);

@@ -14,7 +14,6 @@
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
-    <ClCompile Include="Modules.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />

@@ -68,17 +68,11 @@ void LoadSettings() {
     std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
     ConnectionLimiter::maxParallelConnectionsPerIpAddress = IniGetI(scPluginCfgFile, "ConnectionLimiter", "MaxParallelIpAddressConnections", 2);
-    
-    //Load Module-Settings
-    Modules::LoadModules();
-
     SolarSpawn::LoadSettings();
-
     // POPUP-Module #############################################################################
     //Welcome Message - First Char on ID
     PopUp::iWMsg_Head = IniGetI(scPluginCfgFile, "WelcomePopUp", "Head", 520002);
     PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
-
     ConPrint(L"Module loaded: WelcomeMSG\n");
 
     EquipWhiteList::LoadEquipWhiteList();
@@ -86,33 +80,26 @@ void LoadSettings() {
     Crafting::LoadSettings();
 
     //DiscordBot     #############################################################################
-    if (Modules::GetModuleState("DiscordBot"))
-    {
-        //Load DiscordBot
-        if (Discord::LoadSettings())
-        {           
-            try {
-                HANDLE hDiscordBotThread;
+    //Load DiscordBot
+    if (Discord::LoadSettings())
+    {           
+        try {
+            HANDLE hDiscordBotThread;
           
-                DWORD id;
-                DWORD dwParam;
-                hDiscordBotThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Discord::StartUp, &dwParam, 0, &id);
+            DWORD id;
+            DWORD dwParam;
+            hDiscordBotThread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Discord::StartUp, &dwParam, 0, &id);
 
-                ConPrint(L"Module loaded: DiscordBot\n");
-
-            }
-            catch (const char* e) {
-				ConPrint(L"Module failed to load: DiscordBot\n");
-				Modules::SetModuleState("DiscordBot", false);
-			}
-
+            ConPrint(L"Module loaded: DiscordBot\n");
 
         }
-        else
-        {
-            ConPrint(L"Module failed to load: DiscordBot\n");
-            Modules::SetModuleState("DiscordBot", false);
-        }
+        catch (const char* e) {
+			ConPrint(L"Module failed to load: DiscordBot\n");
+		}
+    }
+    else
+    {
+        ConPrint(L"Module failed to load: DiscordBot\n");
     }
 
     RandomMissions::ReadData();

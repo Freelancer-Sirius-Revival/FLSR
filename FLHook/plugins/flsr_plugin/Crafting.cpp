@@ -301,26 +301,23 @@ namespace Crafting
 
 	bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS)
 	{
-		if (Modules::GetModuleState("Crafting"))
+		if (ToLower(argumentsWS).find(L"/craft") == 0)
 		{
-			if (ToLower(argumentsWS).find(L"/craft") == 0)
+			const std::wstring& arguments = Trim(GetParamToEnd(argumentsWS, ' ', 1));
+			const size_t lastWhiteSpace = arguments.find_last_of(' ');
+			int count = ToInt(arguments.substr(lastWhiteSpace + 1));
+			std::wstring recipeName = arguments;
+			if (count != 0)
 			{
-				const std::wstring& arguments = Trim(GetParamToEnd(argumentsWS, ' ', 1));
-				const size_t lastWhiteSpace = arguments.find_last_of(' ');
-				int count = ToInt(arguments.substr(lastWhiteSpace + 1));
-				std::wstring recipeName = arguments;
-				if (count != 0)
-				{
-					recipeName = Trim(arguments.substr(0, lastWhiteSpace));
-				}
-				if (!Craft(clientId, wstos(recipeName), std::min(1000, std::max(1, count))))
-				{
-					if (failSoundId)
-						pub::Audio::PlaySoundEffect(clientId, failSoundId);
-				}
-				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
-				return true;
+				recipeName = Trim(arguments.substr(0, lastWhiteSpace));
 			}
+			if (!Craft(clientId, wstos(recipeName), std::min(1000, std::max(1, count))))
+			{
+				if (failSoundId)
+					pub::Audio::PlaySoundEffect(clientId, failSoundId);
+			}
+			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+			return true;
 		}
 		returncode = DEFAULT_RETURNCODE;
 		return false;

@@ -82,15 +82,8 @@ void LoadSettings() {
     ConPrint(L"Module loaded: WelcomeMSG\n");
 
     EquipWhiteList::LoadEquipWhiteList();
-    ConPrint(L"Module loaded: EquipWhiteList\n");
-
     SpawnProtection::LoadSettings();
-
-    if (Modules::GetModuleState("Crafting"))
-    {
-        Crafting::LoadSettings();
-        ConPrint(L"Module loaded: Crafting\n");
-    }
+    Crafting::LoadSettings();
 
     //DiscordBot     #############################################################################
     if (Modules::GetModuleState("DiscordBot"))

@@ -10,6 +10,7 @@ namespace Duel
 	const mstime DuelTimeOutMs = 30000;
 
 	std::unordered_map<uint, std::pair<uint, Vector>> systemIdAndPositionByBaseId;
+	std::unordered_map<uint, bool> outOfRangeFromLastBaseByClientId;
 
 	void CacheDockableSolars()
 	{
@@ -34,30 +35,6 @@ namespace Duel
 		CacheDockableSolars();
 
 		ConPrint(L"Done\n");
-	}
-
-	static float GetPlayerDistanceToLastBase(const uint clientId)
-	{
-		const uint baseId = Players[clientId].iLastBaseID;
-		if (!baseId)
-			return -1.0f;
-
-		if (const auto& entry = systemIdAndPositionByBaseId.find(baseId); entry != systemIdAndPositionByBaseId.end())
-		{
-			uint systemId = 0;
-			pub::Player::GetSystem(clientId, systemId);
-			if (systemId != entry->second.first)
-				return -1.0f;
-
-			uint shipId = 0;
-			pub::Player::GetShip(clientId, shipId);
-			IObjRW* inspect;
-			StarSystem* system;
-			if (shipId && GetShipInspect(shipId, inspect, system))
-				return HkDistance3D(entry->second.second, inspect->get_position());
-		}
-
-		return -1.0f;
 	}
 
 	static std::wstring GetCharacterName(const uint clientId)
@@ -148,10 +125,16 @@ namespace Duel
 		return true;
 	}
 
-	static bool IsTooFarAwayFromBase(const uint clientId)
+	static bool IsInNoPvpSystem(const uint clientId)
 	{
-		const float distanceToBase = GetPlayerDistanceToLastBase(clientId);
-		return distanceToBase < 0.0f || distanceToBase > MaxDistanceToLastBase;
+		uint systemId;
+		pub::Player::GetSystem(clientId, systemId);
+		for (const auto& noPvPSystem : map_mapNoPVPSystems)
+		{
+			if (noPvPSystem.second == systemId)
+				return true;
+		}
+		return false;
 	}
 
 	static void SendGo(const uint clientIdA, const uint clientIdB)
@@ -166,6 +149,44 @@ namespace Duel
 			return;
 		pub::SpaceObj::SendComm(shipIdA, shipIdB, CreateID("announcer"), nullptr, 0, std::vector<uint>({ CreateID("DX_M06_0220_ANNOUNCER") }).data(), 1, 0, 0.5f, false);
 		pub::SpaceObj::SendComm(shipIdB, shipIdA, CreateID("announcer"), nullptr, 0, std::vector<uint>({ CreateID("DX_M06_0220_ANNOUNCER") }).data(), 1, 0, 0.5f, false);
+	}
+
+	static float GetPlayerDistanceToLastBase(const uint clientId)
+	{
+		const uint baseId = Players[clientId].iLastBaseID;
+		if (!baseId)
+			return -1.0f;
+
+		if (const auto& entry = systemIdAndPositionByBaseId.find(baseId); entry != systemIdAndPositionByBaseId.end())
+		{
+			uint systemId = 0;
+			pub::Player::GetSystem(clientId, systemId);
+			if (systemId != entry->second.first)
+				return -1.0f;
+
+			uint shipId = 0;
+			pub::Player::GetShip(clientId, shipId);
+			IObjRW* inspect;
+			StarSystem* system;
+			if (shipId && GetShipInspect(shipId, inspect, system))
+				return HkDistance3D(entry->second.second, inspect->get_position());
+		}
+
+		return -1.0f;
+	}
+
+	static bool MovedTooFarAwayFromLastBase(const uint clientId)
+	{
+		const auto& entry = outOfRangeFromLastBaseByClientId.find(clientId);
+		if (entry == outOfRangeFromLastBaseByClientId.end())
+		{
+			const bool outOfRange = GetPlayerDistanceToLastBase(clientId) > MaxDistanceToLastBase;
+			outOfRangeFromLastBaseByClientId.insert({ clientId, outOfRange });
+			return outOfRange;
+		}
+		else if (!entry->second)
+			entry->second = GetPlayerDistanceToLastBase(clientId) > MaxDistanceToLastBase;
+		return entry->second;
 	}
 
 	bool UserCmds(const uint clientId, const std::wstring& arguments)
@@ -186,7 +207,7 @@ namespace Duel
 
 			if (!HkIsValidClientID(targetClientId))
 			{
-				PrintUserCmdText(clientId, L"You must select a duelling partner. Either click on the ship, or type /duel <player name>.");
+				PrintUserCmdText(clientId, L"You must select a duel partner. Either click on the ship, or type /duel <player name>.");
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}
@@ -196,7 +217,7 @@ namespace Duel
 			{
 				if (duel->ongoing)
 				{
-					// Duel is already running
+					PrintUserCmdText(clientId, L"You are already in a duel with " + targetCharacterName + L".");
 					returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 					return true;
 				}
@@ -220,6 +241,13 @@ namespace Duel
 				return true;
 			}
 
+			if (IsInNoPvpSystem(clientId))
+			{
+				PrintUserCmdText(clientId, L"PvP is disabled in this system. Duels are not possible.");
+				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
+				return true;
+			}
+
 			uint missionId;
 			pub::Player::GetMsnID(clientId, missionId);
 			if (missionId)
@@ -229,9 +257,9 @@ namespace Duel
 				return true;
 			}
 
-			if (IsTooFarAwayFromBase(clientId))
+			if (MovedTooFarAwayFromLastBase(clientId))
 			{
-				PrintUserCmdText(clientId, L"You must be closer than " + std::to_wstring((int)(MaxDistanceToLastBase / 1000.0f)) + L"k to your last docked base for a duel.");
+				PrintUserCmdText(clientId, L"You moved more than " + std::to_wstring((int)(MaxDistanceToLastBase / 1000.0f)) + L"K away from your last docked base. Re-dock with it or another base to duel.");
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}
@@ -239,7 +267,7 @@ namespace Duel
 			pub::Player::GetShip(targetClientId, shipId);
 			if (!shipId)
 			{
-				PrintUserCmdText(clientId, L"Your duelling partner is not ready.");
+				PrintUserCmdText(clientId, L"Your chosen partner cannot accept duels right now.");
 				PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" wishes to duel with you. But you must be in space.");
 
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -249,17 +277,17 @@ namespace Duel
 			pub::Player::GetMsnID(targetClientId, missionId);
 			if (missionId)
 			{
-				PrintUserCmdText(clientId, L"Your duelling partner is not ready.");
+				PrintUserCmdText(clientId, L"Your chosen partner cannot accept duels right now.");
 				PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" wishes to duel with you. But you are still in a mission.");
 
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
 			}
 
-			if (IsTooFarAwayFromBase(targetClientId))
+			if (MovedTooFarAwayFromLastBase(targetClientId))
 			{
-				PrintUserCmdText(clientId, L"Your duelling partner is not ready.");
-				PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" wishes to duel with you. But you are more than " + std::to_wstring((int)(MaxDistanceToLastBase / 1000.0f)) + L"k away from your last docked base.");
+				PrintUserCmdText(clientId, L"Your chosen partner cannot accept duels right now.");
+				PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" wishes to duel with you. But you were already more than " + std::to_wstring((int)(MaxDistanceToLastBase / 1000.0f)) + L"K away from your last docked base. Re-dock with it or another base.");
 				
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return true;
@@ -270,9 +298,10 @@ namespace Duel
 				if (!duel->ongoing && clientId != duel->hostClientId)
 				{
 					duel->ongoing = true;
+					duel->initialAttitude = IFF::GetAttitudeTowards({ GetCharacterName(clientId), targetCharacterName });
 					DeathPenalty::AddPvPExclusion(duel->hostClientId, duel->guestClientId);
-					PrintUserCmdText(duel->hostClientId, L"Duel accepted.");
-					PrintUserCmdText(duel->guestClientId, L"Duel accepted.");
+					PrintUserCmdText(duel->hostClientId, L"Duel accepted with " + GetCharacterName(duel->guestClientId) + L". Start!");
+					PrintUserCmdText(duel->guestClientId, L"Duel accepted with " + GetCharacterName(duel->hostClientId) + L". Start!");
 					SendGo(duel->hostClientId, duel->guestClientId);
 
 					IFF::SetAttitude(duel->hostClientId, duel->guestClientId, IFF::Attitude::Hostile);
@@ -297,7 +326,6 @@ namespace Duel
 			newDuel.guestClientId = targetClientId;
 			newDuel.invitationTime = timeInMS();
 			newDuel.ongoing = false;
-			newDuel.initialAttitude = IFF::GetAttitudeTowards({ GetCharacterName(clientId), targetCharacterName });
 			duels.push_back(newDuel);
 			PrintUserCmdText(clientId, L"Duel invitation sent to " + GetCharacterName(targetClientId) + L".");
 			PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" wishes to duel with you. Select their ship or type /duel " + GetCharacterName(clientId) + L" to accept.");
@@ -315,6 +343,7 @@ namespace Duel
 		if (killedObject->is_player())
 		{
 			const uint clientId = killedObject->cobj->ownerPlayer;
+			outOfRangeFromLastBaseByClientId.erase(clientId);
 			for (auto it = duels.begin(); it < duels.end();)
 			{
 				if (IsPartOfDuel(clientId, *it))
@@ -347,19 +376,26 @@ namespace Duel
 		}
 		elapsedTimeInSec = 0.0f;
 
+		PlayerData* playerData = nullptr;
+		while (playerData = Players.traverse_active(playerData))
+		{
+			if (playerData->iShipID)
+				MovedTooFarAwayFromLastBase(playerData->iOnlineID);
+		}
+
 		const mstime now = timeInMS();
 		for (auto it = duels.begin(); it < duels.end();)
 		{
 			if (it->ongoing)
 			{
-				if (IsTooFarAwayFromBase(it->hostClientId))
+				if (MovedTooFarAwayFromLastBase(it->hostClientId))
 				{
 					PrintUserCmdText(it->hostClientId, L"Duel ended, because you are too far away from your last base.");
 					PrintUserCmdText(it->guestClientId, L"Duel with " + GetCharacterName(it->hostClientId) + L" ended, because they are too far away from their last base.");
 					DeathPenalty::RemovePvPExclusion(it->hostClientId, it->guestClientId);
 					it = RemoveDuel(it);
 				}
-				else if (IsTooFarAwayFromBase(it->guestClientId))
+				else if (MovedTooFarAwayFromLastBase(it->guestClientId))
 				{
 					PrintUserCmdText(it->guestClientId, L"Duel ended, because you are too far away from your last base.");
 					PrintUserCmdText(it->hostClientId, L"Duel with " + GetCharacterName(it->guestClientId) + L" ended, because they are too far away from their last base.");
@@ -379,6 +415,34 @@ namespace Duel
 				it++;
 		}
 
+		returncode = DEFAULT_RETURNCODE;
+	}
+
+	std::unordered_set<uint> clientUndockedFromBase;
+
+	void __stdcall DisConnect_After(unsigned int clientId, enum EFLConnection p2)
+	{
+		clientUndockedFromBase.erase(clientId);
+		returncode = DEFAULT_RETURNCODE;
+	}
+
+	void __stdcall CharacterSelect_After(const CHARACTER_ID& cId, unsigned int clientId)
+	{
+		clientUndockedFromBase.erase(clientId);
+		returncode = DEFAULT_RETURNCODE;
+	}
+
+	void __stdcall BaseExit_After(unsigned int baseId, unsigned int clientId)
+	{
+		clientUndockedFromBase.insert(clientId);
+		returncode = DEFAULT_RETURNCODE;
+	}
+
+	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
+	{
+		if (!clientUndockedFromBase.contains(clientId))
+			outOfRangeFromLastBaseByClientId.insert({ clientId, true });
+		clientUndockedFromBase.erase(clientId);
 		returncode = DEFAULT_RETURNCODE;
 	}
 }

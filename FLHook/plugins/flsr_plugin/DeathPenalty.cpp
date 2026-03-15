@@ -193,6 +193,10 @@ namespace DeathPenalty
             else
                 PrintUserCmdText(clientId, L"ERR Add cash failed err=" + HkErrGetText(error));
         }
+        else
+        {
+            PrintUserCmdText(clientId, L"You were charged " + PrintMoney(0) + L" for dying.");
+        }
     }
 
     void AddPvPExclusion(const uint clientIdA, const uint clientIdB)

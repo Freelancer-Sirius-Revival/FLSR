@@ -8,6 +8,7 @@ namespace DeathPenalty
     float shipRepairCostFactor = 0.33f;
     float equipmentRepairCostFactor = 0.3f;
     const std::string IniSectionHeading  = "DeathPenalties";
+    std::vector<std::pair<uint, uint>> excludedPvPClientIdPairs;
 
     static std::string GetDeathPenaltyMapFilePath()
     {
@@ -194,6 +195,27 @@ namespace DeathPenalty
         }
     }
 
+    void AddPvPExclusion(const uint clientIdA, const uint clientIdB)
+    {
+        for (auto it = excludedPvPClientIdPairs.begin(); it != excludedPvPClientIdPairs.end(); it++)
+        {
+            if ((it->first == clientIdA && it->second == clientIdB) || (it->first == clientIdB && it->second == clientIdA))
+                return;
+        }
+        excludedPvPClientIdPairs.push_back({ clientIdA, clientIdB });
+    }
+
+    void RemovePvPExclusion(const uint clientIdA, const uint clientIdB)
+    {
+        for (auto it = excludedPvPClientIdPairs.begin(); it != excludedPvPClientIdPairs.end();)
+        {
+            if ((it->first == clientIdA && it->second == clientIdB) || (it->first == clientIdB && it->second == clientIdA))
+                it = excludedPvPClientIdPairs.erase(it);
+            else
+                it++;
+        }
+    }
+
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
         std::wstring characterFileName;
@@ -238,15 +260,41 @@ namespace DeathPenalty
         returncode = DEFAULT_RETURNCODE;
     }
 
+    static bool IsExcludedFromPvP(const uint clientIdA, const uint clientIdB)
+    {
+        if (!clientIdA || !clientIdB)
+            return false;
+
+        for (const auto& entry : excludedPvPClientIdPairs)
+        {
+            if ((entry.first == clientIdA && entry.second == clientIdB) || (entry.first == clientIdB && entry.second == clientIdA))
+                return true;
+        }
+        return false;
+    }
+
     void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerId)
     {
         if (killed && killedObject->is_player())
         {
             const uint clientId = killedObject->cobj->ownerPlayer;
-            if (!excludedSystemIds.contains(killedObject->cobj->system))
-                ApplyDeathPenalty(clientId);
-            else
+
+            bool applyPenalty = true;
+
+            if (excludedSystemIds.contains(killedObject->cobj->system))
+            {
                 PrintUserCmdText(clientId, L"No money has been charged for dying in this star system.");
+                applyPenalty = false;
+            }
+            else if (IsExcludedFromPvP(clientId, HkGetClientIDByShip(killerId)))
+            {
+                PrintUserCmdText(clientId, L"No money has been charged for dying in PvP.");
+                applyPenalty = false;
+            }
+            
+            if (applyPenalty)
+                ApplyDeathPenalty(clientId);
+
             const std::string& characterFileName = GetCharacterFileName(clientId);
             if (!characterFileName.empty())
                 ClearDeathPenalty(characterFileName);

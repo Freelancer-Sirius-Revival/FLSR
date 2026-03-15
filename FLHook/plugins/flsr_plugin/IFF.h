@@ -3,7 +3,16 @@
 
 namespace IFF
 {
+    enum class Attitude
+    {
+        Neutral,
+        Hostile,
+        Allied
+    };
+
     void ReadCharacterData();
+    std::pair<Attitude, Attitude> GetAttitudeTowards(const std::pair<std::wstring, std::wstring>& characterNames);
+    void SetAttitude(const uint clientId, const uint targetClientId, const Attitude attitude);
     void UserCmd_Hostile(const uint clientId, const std::wstring& arguments);
     void UserCmd_Neutral(const uint clientId, const std::wstring& arguments);
     void UserCmd_Allied(const uint clientId, const std::wstring& arguments);

@@ -2,6 +2,7 @@
 #include "Carrier.h"
 #include "Cloak.h"
 #include "DeathPenalty.h"
+#include "Duel.h"
 #include "Empathies.h"
 #include "GroupRep.h"
 #include "IFF.h"
@@ -266,6 +267,11 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::UserCmds, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&DeathPenalty::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Duel::Initialize, PLUGIN_HkTimerCheckKick, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Duel::UserCmds, PLUGIN_UserCmd_Process, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Duel::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Duel::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LoadSettings, PLUGIN_LoadSettings, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));

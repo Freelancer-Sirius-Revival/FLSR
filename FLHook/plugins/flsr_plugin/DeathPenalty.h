@@ -4,6 +4,8 @@
 namespace DeathPenalty
 {
 	void Initialize();
+	void AddPvPExclusion(const uint clientIdA, const uint clientIdB);
+	void RemovePvPExclusion(const uint clientIdA, const uint clientIdB);
 	void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId);
 	void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId);
 	void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId);

@@ -345,6 +345,7 @@
     <ClCompile Include="missions\actions\ActSetShipAndLoadout.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="Duel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -704,6 +705,7 @@
     <ClInclude Include="missions\actions\ActSetShipAndLoadout.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
+    <ClInclude Include="Duel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

@@ -84,17 +84,6 @@ void LoadSettings() {
     EquipWhiteList::LoadEquipWhiteList();
     ConPrint(L"Module loaded: EquipWhiteList\n");
 
-    //CMPDUMPS     #############################################################################
-    if (Modules::GetModuleState("UpdateCMP"))
-    {
-        //Get Exceptions
-        Tools::get_cmpExceptions();
-        
-        //Update CMPFiles
-        Tools::get_cmpfiles(Globals::DATADIR + std::string("\\SHIPS"));
-		ConPrint(L"Module loaded: CMPUpdate with " + std::to_wstring(Tools::lCMPUpdateExceptions.size()) + L" Exceptions\n");
-    }
-
     SpawnProtection::LoadSettings();
 
     if (Modules::GetModuleState("Crafting"))

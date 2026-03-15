@@ -266,13 +266,22 @@ namespace DeathPenalty
 
     static bool IsExcludedFromPvP(const uint clientIdA, const uint clientIdB)
     {
-        if (!clientIdA || !clientIdB)
-            return false;
-
-        for (const auto& entry : excludedPvPClientIdPairs)
+        // Suicide by own weapons, or radiation damage should also not charge you in a PvP moment.
+        if (clientIdA == clientIdB || clientIdB == 0)
         {
-            if ((entry.first == clientIdA && entry.second == clientIdB) || (entry.first == clientIdB && entry.second == clientIdA))
-                return true;
+            for (const auto& entry : excludedPvPClientIdPairs)
+            {
+                if (entry.first == clientIdA || entry.second == clientIdA)
+                    return true;
+            }
+        }
+        else
+        {
+            for (const auto& entry : excludedPvPClientIdPairs)
+            {
+                if ((entry.first == clientIdA && entry.second == clientIdB) || (entry.first == clientIdB && entry.second == clientIdA))
+                    return true;
+            }
         }
         return false;
     }

@@ -2,13 +2,6 @@
 
 namespace Hooks
 {
-    //PopUpDialog
-    void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked)
-    {
-        PopUp::HandleButtonClick(iClientID, buttonClicked);
-        returncode = DEFAULT_RETURNCODE;
-    }
-
     //CharacterSelect
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID)
     {
@@ -22,16 +15,11 @@ namespace Hooks
     {
         //Get ClientID
         uint iClientID = HkGetClientIDByShip(iShip);
-        if (!iClientID)
-        {
-            returncode = DEFAULT_RETURNCODE;
-            return;
-        }
-
-        //Show WelcomePopUp
-        if (Modules::GetModuleState("WelcomeMSG"))
+        if (iClientID)
         {
             PopUp::WelcomeBox(iClientID);
+            returncode = DEFAULT_RETURNCODE;
+            return;
         }
         returncode = DEFAULT_RETURNCODE;
 	}

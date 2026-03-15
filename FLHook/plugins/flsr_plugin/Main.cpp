@@ -75,18 +75,11 @@ void LoadSettings() {
     SolarSpawn::LoadSettings();
 
     // POPUP-Module #############################################################################
-    if (Modules::GetModuleState("WelcomeMSG"))
-    {
-        //Welcome Message - First Char on ID
-        PopUp::iWMsg_Head = IniGetI(scPluginCfgFile, "WelcomePopUp", "Head", 520002);
-        PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
+    //Welcome Message - First Char on ID
+    PopUp::iWMsg_Head = IniGetI(scPluginCfgFile, "WelcomePopUp", "Head", 520002);
+    PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
 
-        ConPrint(L"Module loaded: WelcomeMSG\n");
-    }
-
-    //Load always Contributor 
-    PopUp::iContributor_Head = IniGetI(scPluginCfgFile, "ContributorPopUp", "Head", 520000);
-    PopUp::iContributor_Body = IniGetI(scPluginCfgFile, "ContributorPopUp", "Body", 520001);
+    ConPrint(L"Module loaded: WelcomeMSG\n");
 
     EquipWhiteList::LoadEquipWhiteList();
     ConPrint(L"Module loaded: EquipWhiteList\n");
@@ -281,7 +274,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::UserCmd_Process, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Empathies::Initialize, PLUGIN_HkTimerCheckKick, 0));

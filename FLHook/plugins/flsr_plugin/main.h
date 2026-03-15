@@ -103,17 +103,11 @@ namespace Chat {
 }
 
 namespace PopUp {
-    // Contributor
-    extern uint iContributor_Head;
-    extern uint iContributor_Body;
-
     // Welcome Message - First Char on ID
     extern uint iWMsg_Head;
     extern uint iWMsg_Body;
 
     void WelcomeBox(uint iClientID);
-    void OpenPopUp(uint iClientID);
-    void HandleButtonClick(uint iClientID, uint buttonClicked);
 
     enum PopUpType {
 		PopUpType_Help
@@ -129,11 +123,7 @@ namespace PopUp {
         uint iButton;
 		PopUpType iType;
     };
-	
-    extern std::map<std::wstring, PopUpBox> mPopUpBox;
-    //extern std::list<PopUpBox> lPOPUPBox;
 }
-
 
 namespace Tools {
 

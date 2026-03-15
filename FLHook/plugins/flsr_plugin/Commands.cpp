@@ -8,26 +8,7 @@
 namespace Commands
 {
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
-
-
-        //Create Popup struct
-        PopUp::PopUpBox NewPopUpBox;
-        NewPopUpBox.iClientID = iClientID;
-        NewPopUpBox.iHead = 524291;
-        NewPopUpBox.iBody = 524292;
-        NewPopUpBox.iPage = 1;
-        NewPopUpBox.iMaxPage = 1;
-        NewPopUpBox.iButton = PopupDialogButton::CENTER_OK;
-
-        std::wstring wscCharFileName;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-
-        //Setup New Popup
-        PopUp::mPopUpBox[wscCharFileName] = NewPopUpBox;
-
-        //OpenPopup
-        PopUp::OpenPopUp(iClientID);
-
+        pub::Player::PopUpDialog(iClientID, FmtStr(524291, 0), FmtStr(524292, 0), PopupDialogButton::CENTER_OK);
     }
 
     void UserCmd_UV(uint iClientID, const std::wstring& wscParam) {
@@ -499,20 +480,6 @@ namespace Commands
         return;
     }
 
-    // Contributor TextBox
-    void UserCMD_Contributor(uint iClientID, const std::wstring& wscParam) {
-        FmtStr caption(0, 0);
-        caption.begin_mad_lib(PopUp::iContributor_Head);
-        caption.end_mad_lib();
-
-        FmtStr message(0, 0);
-        message.begin_mad_lib(PopUp::iContributor_Body);
-        message.end_mad_lib();
-
-        pub::Player::PopUpDialog(iClientID, caption, message, PopupDialogButton::CENTER_OK);
-        return;
-    }
-
     static void UserCMD_Rename(uint clientId, const std::wstring& wscParam)
     {
         const std::wstring trimmedName = Trim(wscParam);
@@ -545,7 +512,6 @@ namespace Commands
         {L"/uv", UserCmd_UV},
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
-        {L"/contributor", UserCMD_Contributor},
         {L"/help", UserCmd_HELP},
         {L"/cloak", Cloak::UserCmd_CLOAK},
         {L"/c", Cloak::UserCmd_CLOAK},

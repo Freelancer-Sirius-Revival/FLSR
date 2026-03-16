@@ -301,7 +301,7 @@ namespace DeathPenalty
             }
             else if (IsExcludedFromPvP(clientId, HkGetClientIDByShip(killerId)))
             {
-                PrintUserCmdText(clientId, L"No money has been charged for dying in PvP.");
+                PrintUserCmdText(clientId, L"No money has been charged for dying in a duel.");
                 applyPenalty = false;
             }
             

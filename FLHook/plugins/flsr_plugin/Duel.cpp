@@ -392,14 +392,12 @@ namespace Duel
 				{
 					PrintUserCmdText(it->hostClientId, L"Duel ended, because you are too far away from your last base.");
 					PrintUserCmdText(it->guestClientId, L"Duel with " + GetCharacterName(it->hostClientId) + L" ended, because they are too far away from their last base.");
-					DeathPenalty::RemovePvPExclusion(it->hostClientId, it->guestClientId);
 					it = RemoveDuel(it);
 				}
 				else if (MovedTooFarAwayFromLastBase(it->guestClientId))
 				{
 					PrintUserCmdText(it->guestClientId, L"Duel ended, because you are too far away from your last base.");
 					PrintUserCmdText(it->hostClientId, L"Duel with " + GetCharacterName(it->guestClientId) + L" ended, because they are too far away from their last base.");
-					DeathPenalty::RemovePvPExclusion(it->hostClientId, it->guestClientId);
 					it = RemoveDuel(it);
 				}
 				else
@@ -409,6 +407,18 @@ namespace Duel
 			{
 				PrintUserCmdText(it->hostClientId, L"Duel invitation with " + GetCharacterName(it->guestClientId) + L" timed out.");
 				PrintUserCmdText(it->guestClientId, L"Duel invitation with " + GetCharacterName(it->hostClientId) + L" timed out.");
+				it = RemoveDuel(it);
+			}
+			else if (MovedTooFarAwayFromLastBase(it->hostClientId))
+			{
+				PrintUserCmdText(it->hostClientId, L"Duel invitation aborted. You are too far away from your last base.");
+				PrintUserCmdText(it->guestClientId, L"Duel invitation from " + GetCharacterName(it->hostClientId) + L" aborted. They cannot invite to duels right now.");
+				it = RemoveDuel(it);
+			}
+			else if (MovedTooFarAwayFromLastBase(it->guestClientId))
+			{
+				PrintUserCmdText(it->guestClientId, L"Duel invitation from " + GetCharacterName(it->hostClientId) + L" declined. You are too far away from your last base.");
+				PrintUserCmdText(it->hostClientId, L"Duel invitation declined by " + GetCharacterName(it->guestClientId) + L". They cannot accept duels right now.");
 				it = RemoveDuel(it);
 			}
 			else

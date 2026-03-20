@@ -340,7 +340,9 @@ namespace RandomMissions
 		if (!destination.commodity)
 			return 0;
 
-		const uint missionId = Missions::missions.size() + 1;
+		uint missionId = 1;
+		for (const auto& mission : Missions::missions)
+			missionId = max(missionId, mission.second.id + 1);
 		const auto& result = Missions::missions.try_emplace(missionId, "", missionId, false, false);
 		if (!result.second)
 			return 0;

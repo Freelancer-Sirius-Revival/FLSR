@@ -13,6 +13,7 @@
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuse.h"
+#include "Actions/ActUnlightFuse.h"
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActSpawnShip.h"
 #include "Actions/ActSpawnFormation.h"
@@ -599,6 +600,13 @@ namespace Missions
 								action->lifetimeOverride = ini.get_value_float(3);
 								actions.push_back(action);
 							}
+							else if (ini.is_value("Act_UnlightFuse"))
+							{
+								ActUnlightFusePtr action(new ActUnlightFuse());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->fuse = CreateIdOrNull(ini.get_value_string(1));
+								actions.push_back(action);
+								}
 							else if (ini.is_value("Act_SetLifeTime"))
 							{
 								ActSetLifeTimePtr action(new ActSetLifeTime());

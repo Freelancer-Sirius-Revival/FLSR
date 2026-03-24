@@ -140,6 +140,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActSetDockState.cpp" />
     <ClCompile Include="missions\actions\ActDockInstant.cpp" />
     <ClCompile Include="missions\actions\ActSetShipAndLoadout.cpp" />
+    <ClCompile Include="missions\actions\ActUnlightFuse.cpp" />
     <ClCompile Include="missions\conditions\CndHasCargo.cpp" />
     <ClCompile Include="missions\conditions\CndHealthInc.cpp" />
     <ClCompile Include="missions\conditions\CndJoinGroup.cpp" />
@@ -280,6 +281,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActRemoveCargo.h" />
     <ClInclude Include="missions\actions\ActSetDockState.h" />
     <ClInclude Include="missions\actions\ActSetShipAndLoadout.h" />
+    <ClInclude Include="missions\actions\ActUnlightFuse.h" />
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="missions\conditions\CndHealthInc.h" />
     <ClInclude Include="missions\conditions\CndJoinGroup.h" />

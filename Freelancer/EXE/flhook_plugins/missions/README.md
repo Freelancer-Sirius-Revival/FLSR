@@ -617,7 +617,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.
     1. `[INTEGER] :0` Only for `Failure`: The text ID to display.
 
-- `Act_LightFuse` Executes an arbitary fuse.
+- `Act_LightFuse` Executes an arbitrary fuse.
     1. `STRING|Activator` Object by name or label to refer.
     1. `STRING` Fuse nickname to execute on the objects.
     1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
@@ -747,3 +747,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
 
 - `Act_TerminateMsn` Terminates the mission and cleans up all spawned objects with infinite life time, waypoints, and music. Evaluates whether the mission is being reoffered to the mission board, depending on `Act_SetMsnResult`.
+
+- `Act_UnlightFuse` Unlights an arbitrary fuse.
+    1. `STRING|Activator` Object by name or label to refer.
+    1. `STRING` Fuse nickname to unlight on the objects.

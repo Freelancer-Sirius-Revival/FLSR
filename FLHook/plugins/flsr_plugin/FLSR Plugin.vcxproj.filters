@@ -348,6 +348,9 @@
     <ClCompile Include="missions\actions\ActPopUpDialog.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActUnlightFuse.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -709,6 +712,9 @@
     </ClInclude>
     <ClInclude Include="Duel.h" />
     <ClInclude Include="missions\actions\ActPopUpDialog.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActUnlightFuse.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
   </ItemGroup>

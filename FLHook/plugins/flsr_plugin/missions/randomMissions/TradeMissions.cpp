@@ -333,6 +333,9 @@ namespace RandomMissions
 		if (!shipArchetypeId)
 			return 0;
 
+		const auto& baseOffers = offersByBaseId.find(startBaseId);
+		if (baseOffers == offersByBaseId.end())
+			return 0;
 		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId.at(startBaseId));
 		std::ranges::shuffle(shuffledBaseFactions, rd);
 

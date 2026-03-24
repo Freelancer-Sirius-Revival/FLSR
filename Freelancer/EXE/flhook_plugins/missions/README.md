@@ -670,8 +670,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to remove.
 
-- `Act_Relocate` Relocates an object.
+- `Act_Relocate` Relocates an object. Does not work for solars.
     1. `STRING|Activator` Object by name to relocate.
+    1. `STRING` Target system nickname to move the object into. Only works for NPCs.
     1. `FLOAT :0` Position on x-axis.
     1. `FLOAT :0` Position on y-axis.
     1. `FLOAT :0` Position on z-axis.

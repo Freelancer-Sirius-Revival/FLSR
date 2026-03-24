@@ -26,13 +26,13 @@ namespace Missions
 		}
 		else
 		{
-			ConPrint(L"ERROR: Act_ActTrig has no target trigger\n");
+			ConPrint(L"ERROR: Msn " + stows(mission.name) + L": Act_ActTrig has no target trigger!\n");
 			return;
 		}
 
 		if (const auto& triggerEntry = mission.triggers.find(targetTriggerId); triggerEntry != mission.triggers.end())
 			activate ? triggerEntry->second.Activate() : triggerEntry->second.Deactivate();
 		else
-			ConPrint(L"ERROR: Act_ActTrig could not find trigger " + std::to_wstring(targetTriggerId) + L"\n");
+			ConPrint(L"ERROR: Msn " + stows(mission.name) + L": Act_ActTrig could not find trigger " + std::to_wstring(targetTriggerId) + L"!\n");
 	}
 }

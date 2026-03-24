@@ -868,15 +868,16 @@ namespace Missions
 							{
 								ActRelocatePtr action(new ActRelocate());
 								action->objName = CreateIdOrNull(ini.get_value_string(0));
-								action->position.x = ini.get_value_float(1);
-								action->position.y = ini.get_value_float(2);
-								action->position.z = ini.get_value_float(3);
-								if (ini.get_num_parameters() > 6)
+								action->systemId = CreateIdOrNull(ini.get_value_string(1));
+								action->position.x = ini.get_value_float(2);
+								action->position.y = ini.get_value_float(3);
+								action->position.z = ini.get_value_float(4);
+								if (ini.get_num_parameters() > 7)
 								{
 									Vector rotation;
-									rotation.x = ini.get_value_float(4);
-									rotation.y = ini.get_value_float(5);
-									rotation.z = ini.get_value_float(6);
+									rotation.x = ini.get_value_float(5);
+									rotation.y = ini.get_value_float(6);
+									rotation.z = ini.get_value_float(7);
 									action->orientation = EulerMatrix(rotation);
 								}
 								actions.push_back(action);

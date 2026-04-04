@@ -1396,7 +1396,7 @@ struct ObjectTreeSubObj
 struct ObjectTreeNode
 {
 	ObjectTreeNodeType type;
-	ObjectTreeSubObj* subObj; // if type OBJECT it is the same as obj
+	void* subObj; // type VIRTUAL = ObjectTreeSubObj, type OBJECT = CObject
 	void* data2;
 	void* data3;
 	ObjectTreeNode* parent;
@@ -1405,8 +1405,9 @@ struct ObjectTreeNode
 	ObjectTreeNode* firstChild;
 	ObjectTreeNode* lastChild;
 	uint childCount;
-	struct EngineObject* obj; // main object
+	struct CObject* obj; // main object
 	Matrix rot;
+	// possibly more
 };
 
 class IMPORT CArchGroup

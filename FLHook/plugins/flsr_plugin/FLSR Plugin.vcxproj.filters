@@ -720,6 +720,7 @@
     <ClInclude Include="EquipWhiteList.h" />
     <ClInclude Include="SpawnProtection.h" />
     <ClInclude Include="LootBoxes.h" />
+    <ClInclude Include="ConnectionLimiter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

@@ -43,8 +43,8 @@ namespace Globals {
     const std::string DATADIR = "..\\DATA";
 }
 
-namespace Timers {
-	
+namespace Timers
+{
     typedef void (*_TimerFunc)();
 
     struct TIMER {
@@ -54,7 +54,6 @@ namespace Timers {
     };
 
     int __stdcall Update();
-
 }
 
 namespace Commands {
@@ -118,31 +117,10 @@ namespace Tools {
         HASDIED
     };
 
-    struct HashMap {
-        std::string scNickname;
-        uint iResID;
-    };
-
-	struct CMPDump_Exception {
-		std::string scData;
-	};
-
-    struct CMPDump_Entry {
-        bool bisCollGroup;
-		std::string scData;
-        bool bhasParent;
-		std::string scParent;
-        
-    };
-    void get_cmpExceptions();
-    void get_cmpfiles(const std::filesystem::path& path);
-    extern std::list <CMPDump_Exception> lCMPUpdateExceptions;
     void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId);
- 
 }
 
 namespace Hooks {
-    void __stdcall PopUpDialog(unsigned int iClientID, unsigned int buttonClicked);
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
     void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
@@ -251,12 +229,5 @@ namespace Discord {
     void GetServerstatus(const T& event);
 
 } // namespace DiscordBot
-
-namespace ConnectionLimiter
-{
-    extern uint maxParallelConnectionsPerIpAddress;
-    void __stdcall Login_After(struct SLoginInfo const& li, unsigned int clientId);
-    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection p2);
-}
 
 #endif

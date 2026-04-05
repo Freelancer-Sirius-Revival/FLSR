@@ -1,6 +1,7 @@
 ﻿#include "Main.h"
 #include "Carrier.h"
 #include "Cloak.h"
+#include "ConnectionLimiter.h"
 #include "DeathPenalty.h"
 #include "Duel.h"
 #include "Empathies.h"

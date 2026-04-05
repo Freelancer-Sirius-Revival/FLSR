@@ -5,7 +5,7 @@
 
 namespace Missions
 {
-	struct Condition;
+	class Condition;
 	typedef std::shared_ptr<Condition> ConditionPtr;
 
 	struct Action;

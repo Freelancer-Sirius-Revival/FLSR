@@ -30,6 +30,7 @@ namespace Missions
 						const int targetCount,
 						const bool destroyedIsActivator);
 		~CndDestroyed();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const IObjRW* killedObject, const bool killed, const uint killerId);

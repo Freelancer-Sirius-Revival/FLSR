@@ -10,10 +10,10 @@ namespace Missions
 	std::vector<CndHealthInc*> orderedCndHealthInc;
 
 	CndHealthInc::CndHealthInc(const ConditionParent& parent,
-		const uint objNameOrLabel,
-		const float relativeHitpointsThreshold,
-		const std::unordered_set<uint> colGrpIds,
-		const bool repairedIsActivator) :
+								const uint objNameOrLabel,
+								const float relativeHitpointsThreshold,
+								const std::unordered_set<uint> colGrpIds,
+								const bool repairedIsActivator) :
 		Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		relativeHitpointsThreshold(relativeHitpointsThreshold),
@@ -24,6 +24,11 @@ namespace Missions
 	CndHealthInc::~CndHealthInc()
 	{
 		Unregister();
+	}
+
+	ConditionPtr CndHealthInc::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndHealthInc(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel, relativeHitpointsThreshold, colGrpIds, repairedIsActivator));
 	}
 
 	void CndHealthInc::Register()

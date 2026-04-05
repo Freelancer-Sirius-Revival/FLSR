@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndCount::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndCount(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, targetCount, comparator));
+	}
+
 	void CndCount::Register()
 	{
 		if (observedCndCount.insert(this).second)

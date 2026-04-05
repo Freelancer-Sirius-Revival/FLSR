@@ -39,6 +39,7 @@ namespace Missions
 						const uint inflictorObjNameOrLabel,
 						const bool damagedIsActivator);
 		~CndProjHitCount();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const IObjRW* damagedObject, const DamageList* damageList, const DamagedSurface damagedSurface);

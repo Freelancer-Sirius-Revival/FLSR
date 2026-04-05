@@ -8,12 +8,12 @@ namespace Missions
 	std::vector<CndProjHitCount*> orderedCndProjHitCount;
 
 	CndProjHitCount::CndProjHitCount(const ConditionParent& parent,
-							const uint damagedObjNameOrLabel,
-							const DamagedSurface targetSurface,
-							const DamageType damageType,
-							const uint targetHitCount,
-							const uint inflictorObjNameOrLabel,
-							const bool damagedIsActivator) :
+									const uint damagedObjNameOrLabel,
+									const DamagedSurface targetSurface,
+									const DamageType damageType,
+									const uint targetHitCount,
+									const uint inflictorObjNameOrLabel,
+									const bool damagedIsActivator) :
 		Condition(parent),
 		damagedObjNameOrLabel(damagedObjNameOrLabel),
 		targetSurface(targetSurface),
@@ -27,6 +27,13 @@ namespace Missions
 	CndProjHitCount::~CndProjHitCount()
 	{
 		Unregister();
+	}
+
+	ConditionPtr CndProjHitCount::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		const uint newDamagedObjNameOrLabel = damagedIsActivator && overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : damagedObjNameOrLabel;
+		const uint newInflictorObjNameOrLabel = !damagedIsActivator && overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : inflictorObjNameOrLabel;
+		return ConditionPtr(new CndProjHitCount(newParent, newDamagedObjNameOrLabel, targetSurface, damageType, targetHitCount, newInflictorObjNameOrLabel, damagedIsActivator));
 	}
 
 	void CndProjHitCount::Register()

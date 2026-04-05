@@ -7,14 +7,20 @@ namespace Missions
 	std::unordered_set<CndCommComplete*> observedCndCommComplete;
 	std::vector<CndCommComplete*> orderedCndCommComplete;
 
-	CndCommComplete::CndCommComplete(const ConditionParent& parent, const uint commName) :
+	CndCommComplete::CndCommComplete(const ConditionParent& parent, const uint commName, const uint activatorLabel) :
 		Condition(parent),
-		commName(commName)
+		commName(commName),
+		activatorLabel(activatorLabel)
 	{}
 
 	CndCommComplete::~CndCommComplete()
 	{
 		Unregister();
+	}
+
+	ConditionPtr CndCommComplete::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndCommComplete(newParent, commName, overrideObjNameOrLabel));
 	}
 
 	void CndCommComplete::Register()
@@ -37,6 +43,13 @@ namespace Missions
 		if (commEntry != mission.ongoingComms.end() && commEntry->second.voiceLineId == capturedVoiceLineId && commEntry->second.receiverObjIds.contains(capturedReceiverObjId))
 		{
 			activator = commEntry->second.sender;
+			if (activatorLabel != 0)
+			{
+				const auto& mission = missions.at(parent.missionId);
+				const auto& objectsByLabel = mission.objectsByLabel.find(activatorLabel);
+				if (objectsByLabel != mission.objectsByLabel.end() && !objectsByLabel->second.empty())
+					activator = objectsByLabel->second.at(0);
+			}
 			mission.ongoingComms.erase(commEntry);
 			return true;
 		}

@@ -17,6 +17,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndLeaveGroup::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndLeaveGroup(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label));
+	}
+
 	void CndLeaveGroup::Register()
 	{
 		if (observedCndLeaveGroup.insert(this).second)

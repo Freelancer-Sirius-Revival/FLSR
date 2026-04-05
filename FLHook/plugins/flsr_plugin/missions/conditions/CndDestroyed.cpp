@@ -27,6 +27,13 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndDestroyed::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		const uint newObjNameOrLabel = destroyedIsActivator && overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel;
+		const uint newKillerNameOrLabel = !destroyedIsActivator && overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : killerNameOrLabel;
+		return ConditionPtr(new CndDestroyed(newParent, newObjNameOrLabel, condition, newKillerNameOrLabel, targetCount, destroyedIsActivator));
+	}
+
 	void CndDestroyed::Register()
 	{
 		currentCount = 0;

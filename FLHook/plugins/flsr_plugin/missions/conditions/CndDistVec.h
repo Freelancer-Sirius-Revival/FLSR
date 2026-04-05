@@ -31,6 +31,7 @@ namespace Missions
 					const uint systemId,
 					const std::string hardpoint);
 		~CndDistVec();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const MissionObject& object);

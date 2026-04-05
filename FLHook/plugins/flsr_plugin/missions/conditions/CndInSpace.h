@@ -12,6 +12,7 @@ namespace Missions
 	public:
 		CndInSpace(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds);
 		~CndInSpace();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId);

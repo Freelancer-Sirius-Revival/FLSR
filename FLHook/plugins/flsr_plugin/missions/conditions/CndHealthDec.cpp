@@ -26,6 +26,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndHealthDec::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndHealthDec(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel, relativeHitpointsThreshold, colGrpIds, damagedIsActivator));
+	}
+
 	void CndHealthDec::Register()
 	{
 		if (observedCndHealthDec.insert(this).second)

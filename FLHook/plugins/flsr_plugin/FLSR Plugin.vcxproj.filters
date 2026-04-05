@@ -719,6 +719,7 @@
     </ClInclude>
     <ClInclude Include="EquipWhiteList.h" />
     <ClInclude Include="SpawnProtection.h" />
+    <ClInclude Include="LootBoxes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

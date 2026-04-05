@@ -8,6 +8,7 @@
 #include "GroupRep.h"
 #include "IFF.h"
 #include "Insurance.h"
+#include "LootBoxes.h"
 #include "Mark.h"
 #include "NameLimiter.h"
 #include "NpcCloaking.h"

@@ -273,6 +273,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="EquipWhiteList.h" />
     <ClInclude Include="IFF.h" />
     <ClInclude Include="Insurance.h" />
+    <ClInclude Include="LootBoxes.h" />
     <ClInclude Include="Mark.h" />
     <ClInclude Include="missions\actions\ActDisplayMsg.h" />
     <ClInclude Include="missions\actions\ActDockInstant.h" />

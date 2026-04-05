@@ -1,4 +1,5 @@
-#include "Main.h"
+#include "ConnectionLimiter.h"
+#include "Plugin.h"
 
 namespace ConnectionLimiter
 {
@@ -77,7 +78,7 @@ namespace ConnectionLimiter
 	{
 		std::wstring ipAddress = ipAddressByClientId[clientId];
 		if (ipAddress != L"")
-			ipAddressesCounter[ipAddress] = static_cast<ushort>(std::max(ipAddressesCounter[ipAddress] - 1, 0));
+			ipAddressesCounter[ipAddress] = std::max<ushort>(ipAddressesCounter[ipAddress] - 1, 0);
 		ipAddressByClientId.erase(clientId);
 		returncode = DEFAULT_RETURNCODE;
 	}

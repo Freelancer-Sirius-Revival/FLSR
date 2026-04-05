@@ -1,4 +1,5 @@
-#include "main.h"
+#include "Crafting.h"
+#include "Plugin.h"
 
 /**
 * [General]
@@ -45,7 +46,7 @@ namespace Crafting
 
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-		const std::string configFilePath = std::string(currentDirectory) + Globals::CRAFTING_CONFIG_FILE;
+		const std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-Crafting.cfg";
 
 		INI_Reader ini;
 		if (ini.open(configFilePath.c_str(), false))
@@ -209,7 +210,7 @@ namespace Crafting
 				if (cargo.iArchID == ingredientWithCount.first)
 				{
 					uint oldRequiredCount = ingredientWithCount.second;
-					ingredientWithCount.second = std::max(ingredientWithCount.second - cargo.iCount, 0);
+					ingredientWithCount.second = std::max<int>(ingredientWithCount.second - cargo.iCount, 0);
 					foundIngredientIdsWithCountByArchetypeId[cargo.iArchID].push_back({ cargo.iID, oldRequiredCount - ingredientWithCount.second });
 				}
 				if (ingredientWithCount.second <= 0)
@@ -311,7 +312,7 @@ namespace Crafting
 			{
 				recipeName = Trim(arguments.substr(0, lastWhiteSpace));
 			}
-			if (!Craft(clientId, wstos(recipeName), std::min(1000, std::max(1, count))))
+			if (!Craft(clientId, wstos(recipeName), std::min<int>(1000, std::max<int>(1, count))))
 			{
 				if (failSoundId)
 					pub::Audio::PlaySoundEffect(clientId, failSoundId);

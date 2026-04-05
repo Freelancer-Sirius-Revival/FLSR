@@ -2,6 +2,7 @@
 #include "Carrier.h"
 #include "Cloak.h"
 #include "ConnectionLimiter.h"
+#include "Crafting.h"
 #include "DeathPenalty.h"
 #include "Duel.h"
 #include "Empathies.h"
@@ -67,6 +68,7 @@ void LoadSettings() {
     NpcCloaking::ReadFiles();
     EquipWhiteList::ReadFiles();
     SpawnProtection::LoadSettings();
+    Crafting::LoadSettings();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];
@@ -81,7 +83,6 @@ void LoadSettings() {
     PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
     ConPrint(L"Module loaded: WelcomeMSG\n");
 
-    Crafting::LoadSettings();
 
     //DiscordBot     #############################################################################
     //Load DiscordBot

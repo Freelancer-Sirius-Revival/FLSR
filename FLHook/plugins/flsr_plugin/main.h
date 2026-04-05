@@ -41,8 +41,6 @@ namespace Globals {
     const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
     const std::string LOOTBOXES_CONFIG_FILE = "\\flhook_plugins\\FLSR-LootBoxes.cfg";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
-    const std::string LIBRELANCER_SDK = "\\flhook_plugins\\librelancer-sdk\\";
-    const std::string CMP_DUMP_FOLDER = "\\flhook_plugins\\flsr-cmpdumps\\";
     const std::string DATADIR = "..\\DATA";
 }
 
@@ -260,18 +258,6 @@ namespace Discord {
     void GetServerstatus(const T& event);
 
 } // namespace DiscordBot
-
-
-namespace SpawnProtection
-{
-    extern const mstime TIMER_INTERVAL;
-    void LoadSettings();
-    void UpdateSpawnProtectionValidity();
-    void __stdcall SystemSwitchOutComplete_AFTER(unsigned int shipId, unsigned int clientId);
-    void __stdcall PlayerLaunch_AFTER(unsigned int shipId, unsigned int clientId);
-    void __stdcall LaunchComplete_AFTER(unsigned int baseId, unsigned int shipId);
-    void __stdcall JumpInComplete_AFTER(unsigned int systemId, unsigned int shipId);
-}
 
 namespace ConnectionLimiter
 {

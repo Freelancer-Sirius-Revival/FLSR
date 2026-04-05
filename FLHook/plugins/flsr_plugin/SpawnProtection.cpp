@@ -1,4 +1,6 @@
-#include "main.h"
+#include <FLHook.h>
+#include "SpawnProtection.h"
+#include "Plugin.h"
 
 namespace SpawnProtection
 {

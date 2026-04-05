@@ -718,6 +718,7 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="EquipWhiteList.h" />
+    <ClInclude Include="SpawnProtection.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

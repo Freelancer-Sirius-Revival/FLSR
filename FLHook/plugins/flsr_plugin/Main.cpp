@@ -13,6 +13,7 @@
 #include "NpcCloaking.h"
 #include "Pilots.h"
 #include "PlayerLootSpawning.h"
+#include "SpawnProtection.h"
 #include "Storage.h"
 #include "bugfixes/BatsBotsShipTransferFix.h"
 #include "bugfixes/MissionAbortFix.h"
@@ -63,6 +64,7 @@ void LoadSettings() {
     BestPath::ReadFiles();
     NpcCloaking::ReadFiles();
     EquipWhiteList::ReadFiles();
+    SpawnProtection::LoadSettings();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];
@@ -77,7 +79,6 @@ void LoadSettings() {
     PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
     ConPrint(L"Module loaded: WelcomeMSG\n");
 
-    SpawnProtection::LoadSettings();
     Crafting::LoadSettings();
 
     //DiscordBot     #############################################################################

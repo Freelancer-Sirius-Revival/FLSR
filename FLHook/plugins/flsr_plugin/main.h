@@ -43,21 +43,7 @@ namespace Globals {
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
     const std::string LIBRELANCER_SDK = "\\flhook_plugins\\librelancer-sdk\\";
     const std::string CMP_DUMP_FOLDER = "\\flhook_plugins\\flsr-cmpdumps\\";
-    const std::string Equip_WHITELIST_FILE = "\\flhook_plugins\\FLSR-EquipWhiteList.cfg";
     const std::string DATADIR = "..\\DATA";
-}
-
-namespace Modules {
-    struct Module {
-        std::string scModuleName;
-        bool bModulestate;
-    };
-
-    void LoadModules();
-    bool GetModuleState(std::string scModuleName);
-    bool SetModuleState(const std::string& scModuleName, bool bModuleState);
-	
-    extern std::list<Module> lModules;
 }
 
 namespace Timers {
@@ -211,16 +197,6 @@ namespace SolarSpawn
     bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd);
     uint SpawnSolarByName(std::string name);
     bool DestroySolar(const uint spaceObjId, const DestroyType destroyType);
-}
-
-namespace EquipWhiteList
-{
-    void LoadEquipWhiteList();
-    void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
-    void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
-    void __stdcall GFGoodBuy(const SGFGoodBuyInfo& gbi, unsigned int clientId);
-    void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId);
-    void __stdcall ReqAddItem(unsigned int& goodArchetypeId, char* hardpoint, int& count, float& status, bool& mounted, uint clientId);
 }
 
 namespace Discord {

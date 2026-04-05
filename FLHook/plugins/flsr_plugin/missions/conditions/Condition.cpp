@@ -12,11 +12,16 @@ namespace Missions
 	Condition::~Condition()
 	{}
 
+	ConditionPtr Condition::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		throw "Not Implemented";
+	}
+
 	void Condition::Register()
-	{};
+	{}
 
 	void Condition::Unregister()
-	{};
+	{}
 
 	void Condition::ExecuteTrigger()
 	{

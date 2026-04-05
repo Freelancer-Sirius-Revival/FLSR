@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndHasCargo::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndHasCargo(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, countPerCargo));
+	}
+
 	void CndHasCargo::Register()
 	{
 		struct PlayerData* playerData = 0;

@@ -6,6 +6,7 @@ namespace Missions
 	class CndTimer : public Condition
 	{
 	private:
+		const uint activatorLabel;
 		const float lowerTimeInS;
 		const float upperTimeInS;
 
@@ -13,8 +14,9 @@ namespace Missions
 		float passedTimeInS;
 
 	public:
-		CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS);
+		CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS, const uint activatorLabel = 0);
 		~CndTimer();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const float elapsedTimeInS);

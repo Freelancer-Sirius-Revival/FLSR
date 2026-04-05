@@ -22,6 +22,7 @@ namespace Missions
 	public:
 		CndSystemSpaceEnter(const ConditionParent& parent, const uint label, const SystemEnterCondition condition, const std::unordered_set<uint>& systemIds);
 		~CndSystemSpaceEnter();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const SystemEnterCondition reason);

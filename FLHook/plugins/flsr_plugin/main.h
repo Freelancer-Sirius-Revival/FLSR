@@ -39,7 +39,6 @@ namespace Globals {
     //FilePaths
     const std::string PLUGIN_CONFIG_FILE = "\\flhook_plugins\\flsr.cfg";
     const std::string CRAFTING_CONFIG_FILE = "\\flhook_plugins\\FLSR-Crafting.cfg";
-    const std::string LOOTBOXES_CONFIG_FILE = "\\flhook_plugins\\FLSR-LootBoxes.cfg";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
     const std::string DATADIR = "..\\DATA";
 }
@@ -153,12 +152,6 @@ namespace Crafting
 {
     void LoadSettings();
     bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS);
-}
-
-namespace LootBoxes
-{
-    void ReadInitialData();
-    bool UserCmd_Open(const uint clientId, const std::wstring& argumentsWS);
 }
 
 namespace SolarSpawn

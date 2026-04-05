@@ -4,6 +4,7 @@
 #include "DeathPenalty.h"
 #include "Duel.h"
 #include "Empathies.h"
+#include "EquipWhiteList.h"
 #include "GroupRep.h"
 #include "IFF.h"
 #include "Insurance.h"
@@ -61,6 +62,7 @@ void LoadSettings() {
     Formations::ReadFiles();
     BestPath::ReadFiles();
     NpcCloaking::ReadFiles();
+    EquipWhiteList::ReadFiles();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];
@@ -75,7 +77,6 @@ void LoadSettings() {
     PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
     ConPrint(L"Module loaded: WelcomeMSG\n");
 
-    EquipWhiteList::LoadEquipWhiteList();
     SpawnProtection::LoadSettings();
     Crafting::LoadSettings();
 

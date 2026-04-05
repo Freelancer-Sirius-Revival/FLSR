@@ -270,6 +270,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Cloak.h" />
     <ClInclude Include="DeathPenalty.h" />
     <ClInclude Include="Duel.h" />
+    <ClInclude Include="EquipWhiteList.h" />
     <ClInclude Include="IFF.h" />
     <ClInclude Include="Insurance.h" />
     <ClInclude Include="Mark.h" />

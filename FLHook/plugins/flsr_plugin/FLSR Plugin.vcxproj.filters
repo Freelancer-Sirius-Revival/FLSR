@@ -721,6 +721,7 @@
     <ClInclude Include="SpawnProtection.h" />
     <ClInclude Include="LootBoxes.h" />
     <ClInclude Include="ConnectionLimiter.h" />
+    <ClInclude Include="Crafting.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

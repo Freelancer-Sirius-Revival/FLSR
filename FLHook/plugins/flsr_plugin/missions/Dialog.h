@@ -5,7 +5,7 @@ namespace Missions
 {
 	struct DialogEtherSender
 	{
-		uint id;
+		uint id = 0;
 		uint voiceId = 0;
 		uint idsName = 0;
 		Costume costume;
@@ -13,7 +13,7 @@ namespace Missions
 
 	struct DialogLine
 	{
-		uint id;
+		uint id = 0;
 		uint senderEtherSenderOrObjName = 0;
 		uint receiverObjNameOrLabel = 0;
 		std::vector<uint> lines;
@@ -23,7 +23,7 @@ namespace Missions
 
 	struct Dialog
 	{
-		uint id;
+		uint id = 0;
 		std::unordered_map<uint, DialogEtherSender> etherSenders;
 		std::vector<DialogLine> lines;
 	};

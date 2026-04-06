@@ -351,6 +351,9 @@
     <ClCompile Include="missions\actions\ActUnlightFuse.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\MissionIniReader.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -724,6 +727,9 @@
     <ClInclude Include="Crafting.h" />
     <ClInclude Include="Discord.h" />
     <ClInclude Include="SolarSpawn.h" />
+    <ClInclude Include="missions\MissionIniReader.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

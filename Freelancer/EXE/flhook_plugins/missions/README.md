@@ -137,16 +137,16 @@ This is the definition for a NPC archetype which again can be used by multiple `
 - `archetype` Defines the archetype.
     1. `STRING` The solar archetype nickname.
 
-- `[loadout]` Defines the equipment loadout.
+- `loadout` Defines the equipment loadout.
     1. `STRING` The loadout nickname.
 
-- `[state_graph]` Basic behaviour of the ship.
+- `state_graph` Basic behaviour of the ship.
     1. `STRING` The state graph to use.
 
-- `[faction]` If left empty, this object is not affiliated with anyone.
+- `faction` If left empty, this object is not affiliated with anyone.
     1. `STRING` The faction nickname used.
 
-- `[pilot]` The AI for the pilot.
+- `pilot` The AI for the pilot.
     1. `STRING` The pilot nickname used.
 
 - `[level]` Sets the displayed level.

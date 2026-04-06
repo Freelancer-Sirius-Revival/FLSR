@@ -271,6 +271,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="ConnectionLimiter.h" />
     <ClInclude Include="Crafting.h" />
     <ClInclude Include="DeathPenalty.h" />
+    <ClInclude Include="Discord.h" />
     <ClInclude Include="Duel.h" />
     <ClInclude Include="EquipWhiteList.h" />
     <ClInclude Include="IFF.h" />
@@ -408,6 +409,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Chat.h" />
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
     <None Include="surdump.zip" />

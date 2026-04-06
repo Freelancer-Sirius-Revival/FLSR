@@ -1,8 +1,9 @@
-#include "Main.h"
+#include "Chat.h"
 
-namespace Chat {
-    HK_ERROR HkSendUChat(std::wstring wscCharname, std::wstring wscText) {
-
+namespace Chat
+{
+    HK_ERROR HkSendUChat(std::wstring wscCharname, std::wstring wscText)
+    {
         // only for players with matching setting
         struct PlayerData *pPD = 0;
         while (pPD = Players.traverse_active(pPD)) {
@@ -58,4 +59,4 @@ namespace Chat {
 
         return HKE_OK;
     }
-} // namespace Chat
+}

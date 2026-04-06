@@ -4,6 +4,8 @@
 #include "Carrier.h"
 #include "Cloak.h"
 #include "Mark.h"
+#include "Chat.h"
+#include "Discord.h"
 
 namespace Commands
 {
@@ -24,13 +26,9 @@ namespace Commands
 
         {
             // Mutex sperren
-            std::lock_guard<std::mutex> lock(m_Mutex);
-
-            // Chat-Nachricht zur Liste hinzuf�gen
+            std::lock_guard<std::mutex> lock(Discord::m_Mutex);
             Discord::lChatMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
-
-
     }
 
     /** Process a give cash command */

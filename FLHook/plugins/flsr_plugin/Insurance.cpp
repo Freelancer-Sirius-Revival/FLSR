@@ -395,8 +395,8 @@ namespace Insurance
             // Calculate repair cost and repair it
             if (archCollGroup)
             {
-                const float collisionGroupMaxHitpoints = archCollGroup->hitPts;
-                repairCost += static_cast<int>(std::round((1.0f - collGroup.health) * collisionGroupMaxHitpoints * shipRepairCostFactor));
+                const auto collisionGroupMaxHitpoints = archCollGroup->hitPts;
+                repairCost += static_cast<int>(std::round((1.0f - collGroup.health) * static_cast<float>(collisionGroupMaxHitpoints) * shipRepairCostFactor));
             }
 
             CollisionGroupDesc repairedGroup;

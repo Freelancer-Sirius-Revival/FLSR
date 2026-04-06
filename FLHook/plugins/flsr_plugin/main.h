@@ -1,21 +1,11 @@
 ﻿#pragma once
-#ifndef __MAIN_H__
-#define __MAIN_H__ 1
+//#ifndef __MAIN_H__
+//#define __MAIN_H__ 1
 
-#define _CRT_SECURE_NO_WARNINGS
-#define _CRT_NON_CONFORMING_SWPRINTFS
 
-//Disable Warnings
-#pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
-
-//DISCORD Includes
-#include <dpp/dpp.h>
-
-//FLHOOK Includes
 #include <FLHook.h>
 #include "Plugin.h"
 
-//Includes
 #include <list>
 #include <string>
 #include <Windows.h>
@@ -24,15 +14,6 @@
 #include <sstream>
 #include <numeric>
 #include <unordered_map>
-
-//Offsets
-#define ADDR_CLIENT_NEWPLAYER 0x8010
-
-// Mutex-Objekt deklarieren
-extern std::mutex m_Mutex;
-
-
-//Namespaces
 
 namespace Globals {
 
@@ -76,10 +57,6 @@ namespace SendCash {
     static int set_iMinTransfer = 0;
 
     void LogTransfer(std::wstring wscToCharname, std::wstring msg);
-}
-
-namespace Chat {
-    HK_ERROR HkSendUChat(std::wstring wscCharname, std::wstring wscText);
 }
 
 namespace PopUp {
@@ -161,66 +138,4 @@ namespace SolarSpawn
     bool DestroySolar(const uint spaceObjId, const DestroyType destroyType);
 }
 
-namespace Discord {
-    struct ChatMessage {
-        std::wstring wscCharname;
-        std::wstring wscChatMessage;
-
-    };
-
-    struct DMMessage {
-        std::string DiscordUserID;
-        dpp::message DiscordMessage;
-
-    };
-
-    struct LastSelectClick {
-        dpp::user User;
-        dpp::select_click_t event;
-
-        LastSelectClick(const dpp::user& user, const dpp::select_click_t& clickEvent)
-            : User(user), event(clickEvent)
-        {
-        }
-    };
-
-    struct MessageListEntry {
-        dpp::message Message;
-
-    };
-
-
-    struct DiscordUser {
-        std::string scServerUsername;
-        std::string scDiscordUsername;
-        std::string scDiscordDisplayName;
-        std::string scDiscordID;
-    };
-
-
-    //extern
-    extern std::list<ChatMessage> lChatMessages;
-    extern std::list <LastSelectClick> lLastSelectClick;
-    extern std::map<std::string, DiscordUser> userDataMap;
-    extern int iOnlinePlayers;
-
-    //Konfig
-    extern std::string scDiscordBotToken;
-	extern std::string scDiscordServerID;
-    extern std::string scUVChatChannelID;
-    extern std::string scModRequestChannelID;
-    extern std::string scModGroupID;
-    extern std::string scNewsChannelID;
-    extern std::string scEventChannelID;
-
-    bool LoadSettings();
-    void StartUp();
-    std::string wstring_to_utf8(const std::wstring& wstr);
-    std::wstring Utf8ToWString(const std::string& utf8Str);
-
-    template<typename T>
-    void GetServerstatus(const T& event);
-
-} // namespace DiscordBot
-
-#endif
+//#endif

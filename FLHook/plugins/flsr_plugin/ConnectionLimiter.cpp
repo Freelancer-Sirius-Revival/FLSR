@@ -8,7 +8,7 @@ namespace ConnectionLimiter
 	static std::unordered_map<uint, std::wstring> ipAddressByClientId;
 	static std::unordered_map<std::wstring, ushort> ipAddressesCounter;
 
-	static bool canHaveUnlimitedCharacters(const uint clientId)
+	static bool CanHaveUnlimitedCharacters(const uint clientId)
 	{
 		CAccount* account = Players.FindAccountFromClientID(clientId);
 		if (!account)
@@ -39,7 +39,7 @@ namespace ConnectionLimiter
 		return false;
 	}
 
-	static void kickPlayer(const uint clientId)
+	static void KickPlayer(const uint clientId)
 	{
 		if (clientId > 0 && clientId <= MAX_CLIENT_ID)
 		{
@@ -55,12 +55,12 @@ namespace ConnectionLimiter
 		HkGetPlayerIP(clientId, ipAddress);
 		if (ipAddress == L"")
 		{
-			kickPlayer(clientId);
+			KickPlayer(clientId);
 			returncode = DEFAULT_RETURNCODE;
 			return;
 		}
 		
-		if (canHaveUnlimitedCharacters(clientId))
+		if (CanHaveUnlimitedCharacters(clientId))
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return;
@@ -69,7 +69,7 @@ namespace ConnectionLimiter
 		ipAddressByClientId[clientId] = ipAddress;
 		ipAddressesCounter[ipAddress]++;
 		if (ipAddressesCounter[ipAddress] > maxParallelConnectionsPerIpAddress)
-			kickPlayer(clientId);
+			KickPlayer(clientId);
 
 		returncode = DEFAULT_RETURNCODE;
 	}

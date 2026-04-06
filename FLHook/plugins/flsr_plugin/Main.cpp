@@ -54,11 +54,9 @@
 #include "Missions/objectives/Objectives.h"
 #include "Missions/randomMissions/RandomMissions.h"
 #include "Missions/randomMissions/TradeMissions.h"
-
-std::mutex m_Mutex;
+#include "Discord.h"
 
 PLUGIN_RETURNCODE returncode;
-
 
 void LoadSettings() {
     Pilots::ReadFiles();
@@ -83,9 +81,6 @@ void LoadSettings() {
     PopUp::iWMsg_Body = IniGetI(scPluginCfgFile, "WelcomePopUp", "Body", 520003);
     ConPrint(L"Module loaded: WelcomeMSG\n");
 
-
-    //DiscordBot     #############################################################################
-    //Load DiscordBot
     if (Discord::LoadSettings())
     {           
         try {

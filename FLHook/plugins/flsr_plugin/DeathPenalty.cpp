@@ -1,6 +1,5 @@
 #include "Main.h"
 #include "DeathPenalty.h"
-#include "Plugin.h"
 
 namespace DeathPenalty
 {
@@ -185,7 +184,7 @@ namespace DeathPenalty
             return;
         }
 
-        const int remainingCost = std::min(playerCash, deathPenaltyByCharacterFileName[characterFileName]);
+        const int remainingCost = std::min<int>(playerCash, deathPenaltyByCharacterFileName[characterFileName]);
         if (remainingCost > 0)
         {
             if (HK_ERROR error = HkAddCash(ARG_CLIENTID(clientId), remainingCost * -1); error == HKE_OK)

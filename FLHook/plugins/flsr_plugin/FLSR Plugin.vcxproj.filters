@@ -722,6 +722,7 @@
     <ClInclude Include="LootBoxes.h" />
     <ClInclude Include="ConnectionLimiter.h" />
     <ClInclude Include="Crafting.h" />
+    <ClInclude Include="Discord.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />
@@ -729,6 +730,7 @@
     <None Include="surdump.zip" />
     <None Include="surupdate.au3" />
     <None Include="surupdate.exe" />
+    <None Include="Chat.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Missions">

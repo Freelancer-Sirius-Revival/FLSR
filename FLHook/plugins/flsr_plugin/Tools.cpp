@@ -1,5 +1,6 @@
 #include "Main.h"
 
+#define ADDR_CLIENT_NEWPLAYER 0x8010
 
 namespace Tools {
     std::wstring CS_wscCharBefore;

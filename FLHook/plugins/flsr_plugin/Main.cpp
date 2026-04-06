@@ -17,6 +17,7 @@
 #include "Pilots.h"
 #include "PlayerLootSpawning.h"
 #include "SpawnProtection.h"
+#include "SolarSpawn.h"
 #include "Storage.h"
 #include "bugfixes/BatsBotsShipTransferFix.h"
 #include "bugfixes/MissionAbortFix.h"

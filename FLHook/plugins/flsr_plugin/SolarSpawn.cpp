@@ -1,4 +1,5 @@
-#include "Main.h"
+#include "SolarSpawn.h"
+#include "Plugin.h"
 #include "Pilots.h"
 #include "Cloak.h"
 #include <random>
@@ -680,6 +681,8 @@ namespace SolarSpawn
 		dockQueues.erase(objId);
 		returncode = DEFAULT_RETURNCODE;
 	}
+
+	#define IS_CMD(a) !wscCmd.compare(L##a)
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
 	{

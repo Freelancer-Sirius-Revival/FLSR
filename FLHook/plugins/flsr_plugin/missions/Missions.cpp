@@ -1,5 +1,6 @@
 #include <regex>
-#include "../Main.h"
+#include <filesystem>
+#include "../SolarSpawn.h"
 #include "../Empathies.h"
 #include "Missions.h"
 #include "Conditions/CndTrue.h"
@@ -1148,6 +1149,8 @@ namespace Missions
 		}
 		return false;
 	}
+
+	#define IS_CMD(a) !wscCmd.compare(L##a)
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
 	{

@@ -20,9 +20,9 @@ namespace Missions
 		return strlen(str) > 0 ? CreateID(str) : 0;
 	}
 
-	static void PrintErrorToConsole(const std::wstring& entryName, const ObjectiveParent& objectiveParent, const uint argNum, const std::wstring& error)
+	static void PrintErrorToConsole(const INI_Reader& ini, const uint argNum, const std::wstring& error)
 	{
-		ConPrint(L"ERROR: " + entryName + L" of Msn:" + std::to_wstring(objectiveParent.missionId) + L" Obj:" + std::to_wstring(objectiveParent.objectivesId) + L" Arg " + std::to_wstring(argNum + 1) + L" " + error + L"\n");
+		ConPrint(L"ERROR: " + stows(ini.get_file_name()) + L", Line " + std::to_wstring(ini.get_line_num()) + L", Arg " + std::to_wstring(argNum + 1) + L": " + error + L"\n");
 	}
 
 	static ObjDelay* ReadObjDelay(const ObjectiveParent& objectiveParent, INI_Reader& ini)
@@ -32,7 +32,7 @@ namespace Missions
 		uint argNum = 0;
 		const auto& value = ini.get_value_float(argNum);
 		if (value < 0)
-			PrintErrorToConsole(L"Delay", objectiveParent, argNum, L"Time below 0. Defaulting to " + std::to_wstring(timeInS) + L".");
+			PrintErrorToConsole(ini, argNum, L"Time below 0. Defaulting to " + std::to_wstring(timeInS) + L".");
 		else
 			timeInS = value;
 
@@ -45,7 +45,7 @@ namespace Missions
 		const uint targetObjNameOrId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (targetObjNameOrId == 0)
 		{
-			PrintErrorToConsole(L"Dock", objectiveParent, argNum, L"No target obj name. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No target obj name. Aborting!");
 			return nullptr;
 		}
 
@@ -62,7 +62,7 @@ namespace Missions
 		targetObjName = CreateIdOrNull(ini.get_value_string(argNum));
 		if (targetObjName == 0)
 		{
-			PrintErrorToConsole(L"Follow", objectiveParent, argNum, L"No target obj name. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No target obj name. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -75,7 +75,7 @@ namespace Missions
 		}
 		else
 		{
-			PrintErrorToConsole(L"Follow", objectiveParent, argNum, L"No position vector. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No position vector. Aborting!");
 			return nullptr;
 		}
 		argNum += 3;
@@ -84,7 +84,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"Follow", objectiveParent, argNum, L"Max distance below 1. Defaulting to " + std::to_wstring(maxDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Max distance below 1. Defaulting to " + std::to_wstring(maxDistance) + L".");
 			else
 				maxDistance = value;
 		}
@@ -109,14 +109,14 @@ namespace Missions
 			if (value == "goto_no_cruise")
 				noCruise = true;
 			else if (value != "goto_cruise")
-				PrintErrorToConsole(L"GotoObj", objectiveParent, argNum, L"Invalid cruise setting. Must be GOTO_CRUISE, or GOTO_NO_CRUISE. Defaulting to GOTO_CRUISE.");
+				PrintErrorToConsole(ini, argNum, L"Invalid cruise setting. Must be GOTO_CRUISE, or GOTO_NO_CRUISE. Defaulting to GOTO_CRUISE.");
 		}
 		argNum++;
 
 		targetObjNameOrId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (targetObjNameOrId == 0)
 		{
-			PrintErrorToConsole(L"GotoObj", objectiveParent, argNum, L"No target obj name. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No target obj name. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -125,7 +125,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoObj", objectiveParent, argNum, L"Target range below 1. Defaulting to " + std::to_wstring(range) + L".");
+				PrintErrorToConsole(ini, argNum, L"Target range below 1. Defaulting to " + std::to_wstring(range) + L".");
 			else
 				range = value;
 		}
@@ -141,7 +141,7 @@ namespace Missions
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value == 0)
-				PrintErrorToConsole(L"GotoObj", objectiveParent, argNum, L"Obj name to wait for is undefined. Defaulting to none.");
+				PrintErrorToConsole(ini, argNum, L"Obj name to wait for is undefined. Defaulting to none.");
 			else
 				objNameToWaitFor = value;
 		}
@@ -151,7 +151,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoObj", objectiveParent, argNum, L"Distance to start waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(startWaitDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to start waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(startWaitDistance) + L".");
 			else
 				startWaitDistance = value;
 		}
@@ -161,7 +161,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoObj", objectiveParent, argNum, L"Distance to end waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(endWaitDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to end waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(endWaitDistance) + L".");
 			else
 				endWaitDistance = value;
 		}
@@ -186,7 +186,7 @@ namespace Missions
 			if (value == "goto_no_cruise")
 				noCruise = true;
 			else if (value != "goto_cruise")
-				PrintErrorToConsole(L"GotoSpline", objectiveParent, argNum, L"Invalid cruise setting. Must be GOTO_CRUISE, or GOTO_NO_CRUISE. Defaulting to GOTO_CRUISE.");
+				PrintErrorToConsole(ini, argNum, L"Invalid cruise setting. Must be GOTO_CRUISE, or GOTO_NO_CRUISE. Defaulting to GOTO_CRUISE.");
 		}
 		argNum++;
 
@@ -207,7 +207,7 @@ namespace Missions
 		}
 		else
 		{
-			PrintErrorToConsole(L"GotoSpline", objectiveParent, argNum, L"No spline vectors. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No spline vectors. Aborting!");
 			return nullptr;
 		}
 		argNum += 12;
@@ -216,7 +216,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoSpline", objectiveParent, argNum, L"Target range below 1. Defaulting to " + std::to_wstring(range) + L".");
+				PrintErrorToConsole(ini, argNum, L"Target range below 1. Defaulting to " + std::to_wstring(range) + L".");
 			else
 				range = value;
 		}
@@ -232,7 +232,7 @@ namespace Missions
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value == 0)
-				PrintErrorToConsole(L"GotoSpline", objectiveParent, argNum, L"Obj name to wait for is undefined. Defaulting to none.");
+				PrintErrorToConsole(ini, argNum, L"Obj name to wait for is undefined. Defaulting to none.");
 			else
 				objNameToWaitFor = value;
 		}
@@ -242,7 +242,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoSpline", objectiveParent, argNum, L"Distance to start waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(startWaitDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to start waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(startWaitDistance) + L".");
 			else
 				startWaitDistance = value;
 		}
@@ -252,7 +252,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoSpline", objectiveParent, argNum, L"Distance to end waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(endWaitDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to end waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(endWaitDistance) + L".");
 			else
 				endWaitDistance = value;
 		}
@@ -277,7 +277,7 @@ namespace Missions
 			if (value == "goto_no_cruise")
 				noCruise = true;
 			else if (value != "goto_cruise")
-				PrintErrorToConsole(L"GotoVec", objectiveParent, argNum, L"Invalid cruise setting. Must be GOTO_CRUISE, or GOTO_NO_CRUISE. Defaulting to GOTO_CRUISE.");
+				PrintErrorToConsole(ini, argNum, L"Invalid cruise setting. Must be GOTO_CRUISE, or GOTO_NO_CRUISE. Defaulting to GOTO_CRUISE.");
 		}
 		argNum++;
 
@@ -289,7 +289,7 @@ namespace Missions
 		}
 		else
 		{
-			PrintErrorToConsole(L"GotoVec", objectiveParent, argNum, L"No target position. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No target position. Aborting!");
 			return nullptr;
 		}
 		argNum += 3;
@@ -298,7 +298,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoVec", objectiveParent, argNum, L"Target range below 1. Defaulting to " + std::to_wstring(range) + L".");
+				PrintErrorToConsole(ini, argNum, L"Target range below 1. Defaulting to " + std::to_wstring(range) + L".");
 			else
 				range = value;
 		}
@@ -314,7 +314,7 @@ namespace Missions
 		{
 			const auto& value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value == 0)
-				PrintErrorToConsole(L"GotoVec", objectiveParent, argNum, L"Obj name to wait for is undefined. Defaulting to none.");
+				PrintErrorToConsole(ini, argNum, L"Obj name to wait for is undefined. Defaulting to none.");
 			else
 				objNameToWaitFor = value;
 		}
@@ -324,7 +324,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoVec", objectiveParent, argNum, L"Distance to start waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(startWaitDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to start waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(startWaitDistance) + L".");
 			else
 				startWaitDistance = value;
 		}
@@ -334,7 +334,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"GotoVec", objectiveParent, argNum, L"Distance to end waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(endWaitDistance) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to end waiting for obj " + std::to_wstring(objNameToWaitFor) + L" is below 1. Defaulting to " + std::to_wstring(endWaitDistance) + L".");
 			else
 				endWaitDistance = value;
 		}
@@ -351,7 +351,7 @@ namespace Missions
 		formationId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (formationId == 0)
 		{
-			PrintErrorToConsole(L"MakeNewFormation", objectiveParent, argNum, L"No formation name. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No formation name. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -360,7 +360,7 @@ namespace Missions
 		{
 			const uint value = CreateIdOrNull(ini.get_value_string(argNum));
 			if (value == 0)
-				PrintErrorToConsole(L"MakeNewFormation", objectiveParent, argNum, L"Formation member name undefined. Ignoring.");
+				PrintErrorToConsole(ini, argNum, L"Formation member name undefined. Ignoring.");
 			else
 				objNames.push_back(value);
 		}
@@ -377,7 +377,7 @@ namespace Missions
 		if (priority == "always_execute")
 			enforceObjectives = true;
 		else if (priority != "normal")
-			PrintErrorToConsole(L"SetPriority", objectiveParent, argNum, L"Invalid priority. Defaulting to Normal!");
+			PrintErrorToConsole(ini, argNum, L"Invalid priority. Defaulting to Normal!");
 
 		return new ObjSetPriority(objectiveParent, enforceObjectives);
 	}
@@ -407,7 +407,7 @@ namespace Missions
 		}
 		else
 		{
-			PrintErrorToConsole(L"StayInRange", objectiveParent, argNum, L"No target position. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No target position. Aborting!");
 			return nullptr;
 		}
 
@@ -415,7 +415,7 @@ namespace Missions
 		{
 			const auto& value = ini.get_value_float(argNum);
 			if (value < 1.0f)
-				PrintErrorToConsole(L"StayInRange", objectiveParent, argNum, L"Distance to stay in range is below 1. Defaulting to " + std::to_wstring(range) + L".");
+				PrintErrorToConsole(ini, argNum, L"Distance to stay in range is below 1. Defaulting to " + std::to_wstring(range) + L".");
 			else
 				range = value;
 		}

@@ -9,17 +9,18 @@ namespace Missions
 		return strlen(str) > 0 ? CreateID(str) : 0;
 	}
 
-	static void PrintMissionErrorToConsole(const std::wstring& entryName, const std::string missionName, const std::wstring& error)
+	static void PrintErrorToConsole(const INI_Reader& ini, const std::wstring& error, const size_t headerLineNumber = -1)
 	{
-		ConPrint(L"ERROR: " + entryName + L" of Msn:" + stows(missionName) + L" " + error + L"\n");
+		ConPrint(L"ERROR: " + stows(ini.get_file_name()) + L", Line " + std::to_wstring(headerLineNumber == -1 ? ini.get_line_num() : headerLineNumber) + L": " + error + L"\n");
 	}
 
 	bool TryReadMissionHeadFromIni(const uint nextMissionId, INI_Reader& ini)
 	{
 		if (!ini.is_header("Mission"))
 			return false;
-		
-		const uint beginning = ini.tell();
+
+		const size_t headerLineNumber = ini.get_line_num();
+		const size_t beginning = ini.tell();
 		std::string name = "";
 		while (ini.read_value())
 		{
@@ -31,7 +32,7 @@ namespace Missions
 		}
 		if (name.empty())
 		{
-			ConPrint(L"ERROR: Mission without nickname. Aborting!\n");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 
@@ -59,7 +60,7 @@ namespace Missions
 					offer.type = pub::GF::MissionType::RetrieveContraband;
 				else
 				{
-					PrintMissionErrorToConsole(L"Mission", name, L"Invalid offer type. Defaulting to NONE.");
+					PrintErrorToConsole(ini, L"Invalid offer type. Defaulting to NONE.");
 					offer.type = pub::GF::MissionType::Unknown;
 				}
 			}
@@ -94,7 +95,7 @@ namespace Missions
 					offer.reofferCondition = MissionReofferCondition::OnSuccess;
 				else
 				{
-					PrintMissionErrorToConsole(L"Mission", name, L"Invalid offer reoffer type. Defaulting to NEVER.");
+					PrintErrorToConsole(ini, L"Invalid offer reoffer type. Defaulting to NEVER.");
 					offer.reofferCondition = MissionReofferCondition::Never;
 				}
 			}
@@ -108,38 +109,33 @@ namespace Missions
 
 			if (!offer.system)
 			{
-				PrintMissionErrorToConsole(L"Mission", name, L"No offer target system. Aborting!");
+				PrintErrorToConsole(ini, L"No offer target system. Aborting!", headerLineNumber);
 				return false;
 			}
 			if (!offer.group)
 			{
-				PrintMissionErrorToConsole(L"Mission", name, L"Invalid offer faction. Aborting!");
+				PrintErrorToConsole(ini, L"Invalid offer faction. Aborting!", headerLineNumber);
 				return false;
 			}
 			if (!offer.title)
 			{
-				PrintMissionErrorToConsole(L"Mission", name, L"No offer title. Aborting!");
+				PrintErrorToConsole(ini, L"No offer title. Aborting!", headerLineNumber);
 				return false;
 			}
 			if (!offer.baseIds.empty())
 			{
-				PrintMissionErrorToConsole(L"Mission", name, L"No offer bases. Aborting!");
+				PrintErrorToConsole(ini, L"No offer bases. Aborting!", headerLineNumber);
 				return false;
 			}
 		}
 
 		if (!missions.try_emplace(nextMissionId, name, nextMissionId, initiallyActive, true).second)
 		{
-			PrintMissionErrorToConsole(L"Mission", name, L"ID already existing. Aborting!");
+			PrintErrorToConsole(ini, L"ID already existing. Aborting!", headerLineNumber);
 			return false;
 		}
 		missions.at(nextMissionId).offer = offer;
 		return true;
-	}
-
-	static void PrintErrorToConsole(const std::wstring& entryName, const Mission& mission, const std::wstring& error)
-	{
-		ConPrint(L"ERROR: " + entryName + L" of Msn:" + stows(mission.name) + L" " + error + L"\n");
 	}
 
 	bool TryReadMsnFormationFromIni(Mission& mission, INI_Reader& ini)
@@ -147,6 +143,7 @@ namespace Missions
 		if (!ini.is_header("MsnFormation"))
 			return false;
 
+		const size_t headerLineNumber = ini.get_line_num();
 		MsnFormation formation;
 		while (ini.read_value())
 		{
@@ -164,22 +161,22 @@ namespace Missions
 
 		if (!formation.id)
 		{
-			PrintErrorToConsole(L"MsnFormation", mission, L"No nickname. Aborting!");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!formation.formationId)
 		{
-			PrintErrorToConsole(L"MsnFormation", mission, L"No formation. Aborting!");
+			PrintErrorToConsole(ini, L"No formation. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (formation.msnShipIds.empty())
 		{
-			PrintErrorToConsole(L"MsnFormation", mission, L"No ships. Aborting!");
+			PrintErrorToConsole(ini, L"No ships. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!mission.formations.insert({ formation.id, formation }).second)
 		{
-			PrintErrorToConsole(L"MsnFormation", mission, L"Nickname already existing. Aborting!");
+			PrintErrorToConsole(ini, L"Nickname already existing. Aborting!", headerLineNumber);
 			return false;
 		}
 		return true;
@@ -190,6 +187,7 @@ namespace Missions
 		if (!ini.is_header("MsnSolar"))
 			return false;
 
+		const size_t headerLineNumber = ini.get_line_num();
 		MsnSolar solar;
 		while (ini.read_value())
 		{
@@ -235,17 +233,17 @@ namespace Missions
 
 		if (solar.name.empty())
 		{
-			PrintErrorToConsole(L"MsnSolar", mission, L"No nickname. Aborting!");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!solar.archetypeId)
 		{
-			PrintErrorToConsole(L"MsnSolar", mission, L"No archetype. Aborting!");
+			PrintErrorToConsole(ini, L"No archetype. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!solar.systemId)
 		{
-			PrintErrorToConsole(L"MsnSolar", mission, L"No system. Aborting!");
+			PrintErrorToConsole(ini, L"No system. Aborting!", headerLineNumber);
 			return false;
 		}
 
@@ -275,6 +273,7 @@ namespace Missions
 		if (!ini.is_header("Npc"))
 			return false;
 
+		const size_t headerLineNumber = ini.get_line_num();
 		Npc npc;
 		while (ini.read_value())
 		{
@@ -296,37 +295,37 @@ namespace Missions
 
 		if (!npc.id)
 		{
-			PrintErrorToConsole(L"Npc", mission, L"No nickname. Aborting!");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!npc.archetypeId)
 		{
-			PrintErrorToConsole(L"Npc", mission, L"No archetype. Aborting!");
+			PrintErrorToConsole(ini, L"No archetype. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!npc.loadoutId)
 		{
-			PrintErrorToConsole(L"Npc", mission, L"No loadout. Aborting!");
+			PrintErrorToConsole(ini, L"No loadout. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (npc.stateGraph.empty())
 		{
-			PrintErrorToConsole(L"Npc", mission, L"No state graph. Aborting!");
+			PrintErrorToConsole(ini, L"No state graph. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!npc.pilotId)
 		{
-			PrintErrorToConsole(L"Npc", mission, L"No pilot. Aborting!");
+			PrintErrorToConsole(ini, L"No pilot. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (npc.faction.empty())
 		{
-			PrintErrorToConsole(L"Npc", mission, L"No faction. Aborting!");
+			PrintErrorToConsole(ini, L"No faction. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!mission.npcs.insert({ npc.id, npc }).second)
 		{
-			PrintErrorToConsole(L"Npc", mission, L"Nickname already existing. Aborting!");
+			PrintErrorToConsole(ini, L"Nickname already existing. Aborting!", headerLineNumber);
 			return false;
 		}
 		return true;
@@ -337,6 +336,7 @@ namespace Missions
 		if (!ini.is_header("MsnNpc"))
 			return false;
 
+		const size_t headerLineNumber = ini.get_line_num();
 		MsnNpc npc;
 		while (ini.read_value())
 		{
@@ -382,22 +382,22 @@ namespace Missions
 
 		if (!npc.id)
 		{
-			PrintErrorToConsole(L"MsnNpc", mission, L"No nickname. Aborting!");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!npc.npcId)
 		{
-			PrintErrorToConsole(L"MsnNpc", mission, L"No NPC. Aborting!");
+			PrintErrorToConsole(ini, L"No NPC. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!npc.systemId)
 		{
-			PrintErrorToConsole(L"MsnNpc", mission, L"No system. Aborting!");
+			PrintErrorToConsole(ini, L"No system. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!mission.msnNpcs.insert({ npc.id, npc }).second)
 		{
-			PrintErrorToConsole(L"MsnNpc", mission, L"Nickname already existing. Aborting!");
+			PrintErrorToConsole(ini, L"Nickname already existing. Aborting!", headerLineNumber);
 			return false;
 		}
 		return true;
@@ -408,7 +408,8 @@ namespace Missions
 		if (!ini.is_header("ObjList"))
 			return false;
 
-		const uint beginning = ini.tell();
+		const size_t headerLineNumber = ini.get_line_num();
+		const size_t beginning = ini.tell();
 		uint nickname = 0;
 		while (ini.read_value())
 		{
@@ -420,7 +421,7 @@ namespace Missions
 		}
 		if (!nickname)
 		{
-			ConPrint(L"ERROR: ObjList of Msn:" + std::to_wstring(mission.id) + L" No nickname. Aborting!\n");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 
@@ -436,7 +437,7 @@ namespace Missions
 
 		if (!mission.objectives.insert({ objectives.id, objectives }).second)
 		{
-			ConPrint(L"ERROR: ObjList of Msn:" + std::to_wstring(mission.id) + L" Nickname already existing. Aborting!\n");
+			PrintErrorToConsole(ini, L"Nickname already existing. Aborting!", headerLineNumber);
 			return false;
 		}
 		return true;
@@ -447,6 +448,7 @@ namespace Missions
 		if (!ini.is_header("Dialog"))
 			return false;
 
+		const size_t headerLineNumber = ini.get_line_num();
 		Dialog dialog;
 		while (ini.read_value())
 		{
@@ -474,17 +476,17 @@ namespace Missions
 
 				if (!sender.id)
 				{
-					PrintErrorToConsole(L"Dialog", mission, L"EtherSender " + std::to_wstring(dialog.etherSenders.size() + 1) + L" without nickname. Aborting!");
+					PrintErrorToConsole(ini, L"EtherSender " + std::to_wstring(dialog.etherSenders.size() + 1) + L" without nickname. Aborting!");
 					return false;
 				}
 				if (!sender.voiceId)
 				{
-					PrintErrorToConsole(L"Dialog", mission, L"EtherSender " + std::to_wstring(dialog.etherSenders.size() + 1) + L" without voice. Aborting!");
+					PrintErrorToConsole(ini, L"EtherSender " + std::to_wstring(dialog.etherSenders.size() + 1) + L" without voice. Aborting!");
 					return false;
 				}
 				if (!dialog.etherSenders.insert({ sender.id, sender }).second)
 				{
-					PrintErrorToConsole(L"Dialog", mission, L"EtherSender " + std::to_wstring(dialog.etherSenders.size() + 1) + L" nickname already existing. Aborting!");
+					PrintErrorToConsole(ini, L"EtherSender " + std::to_wstring(dialog.etherSenders.size() + 1) + L" nickname already existing. Aborting!");
 					return false;
 				}
 			}
@@ -513,17 +515,17 @@ namespace Missions
 
 				if (!line.id)
 				{
-					PrintErrorToConsole(L"Dialog", mission, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without nickname. Aborting!");
+					PrintErrorToConsole(ini, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without nickname. Aborting!");
 					return false;
 				}
 				if (!line.senderEtherSenderOrObjName)
 				{
-					PrintErrorToConsole(L"Dialog", mission, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without sender. Aborting!");
+					PrintErrorToConsole(ini, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without sender. Aborting!");
 					return false;
 				}
 				if (line.lines.empty())
 				{
-					PrintErrorToConsole(L"Dialog", mission, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without lines. Aborting!");
+					PrintErrorToConsole(ini, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without lines. Aborting!");
 					return false;
 				}
 				dialog.lines.push_back(line);
@@ -532,12 +534,12 @@ namespace Missions
 
 		if (!dialog.id)
 		{
-			PrintErrorToConsole(L"Dialog", mission, L"No nickname. Aborting!");
+			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (dialog.lines.empty())
 		{
-			PrintErrorToConsole(L"Dialog", mission, L"No lines. Aborting!");
+			PrintErrorToConsole(ini, L"No lines. Aborting!", headerLineNumber);
 			return false;
 		}
 		for (const auto& etherSender : dialog.etherSenders)
@@ -552,11 +554,11 @@ namespace Missions
 				}
 			}
 			if (!found)
-				PrintErrorToConsole(L"Dialog", mission, L"EitherSender " + std::to_wstring(etherSender.second.id) + L" not used.");
+				PrintErrorToConsole(ini, L"EtherSender " + std::to_wstring(etherSender.second.id) + L" not used.", headerLineNumber);
 		}
 		if (!mission.dialogs.insert({ dialog.id, dialog }).second)
 		{
-			PrintErrorToConsole(L"Dialog", mission, L"Nickname already existing. Aborting!");
+			PrintErrorToConsole(ini, L"Nickname already existing. Aborting!", headerLineNumber);
 			return false;
 		}
 		return true;

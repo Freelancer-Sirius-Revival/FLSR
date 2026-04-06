@@ -723,13 +723,11 @@
     <ClInclude Include="ConnectionLimiter.h" />
     <ClInclude Include="Crafting.h" />
     <ClInclude Include="Discord.h" />
+    <ClInclude Include="SolarSpawn.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
-    <None Include="surdump.zip" />
-    <None Include="surupdate.au3" />
-    <None Include="surupdate.exe" />
     <None Include="Chat.h" />
   </ItemGroup>
   <ItemGroup>

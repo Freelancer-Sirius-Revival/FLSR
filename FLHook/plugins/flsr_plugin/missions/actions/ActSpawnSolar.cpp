@@ -1,4 +1,4 @@
-#include "../../Main.h"
+#include "../../SolarSpawn.h"
 #include "ActSpawnSolar.h"
 #include "../../NpcCloaking.h"
 

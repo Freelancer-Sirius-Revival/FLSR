@@ -191,15 +191,15 @@ namespace Insurance
         IniWrite(filePath, IniSectionHeading, "deposit", std::to_string(depositedMoney));
         const size_t bufferSize = 65535;
         char* keyValues = static_cast<char*>(malloc(bufferSize));
+        keyValues[0] = '\0';
         size_t bytesWritten = 0;
-        keyValues[bytesWritten] = '\0';
         for (const auto& equip : entries)
         {
             const std::string str = "item = " + std::to_string(equip.archId) + ", " + std::to_string(equip.count) + ", " + equip.hardpoint;
             const size_t strLength = str.length() + 1; // +1 for \0
             if (bytesWritten + strLength > bufferSize)
                 break;
-            std::strncpy(&keyValues[bytesWritten], str.c_str(), strLength);
+            strncpy_s(&keyValues[bytesWritten], bufferSize - bytesWritten, str.c_str(), strLength);
             bytesWritten += strLength;
         }
         if (bytesWritten < bufferSize)

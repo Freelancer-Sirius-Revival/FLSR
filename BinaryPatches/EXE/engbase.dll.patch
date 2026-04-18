@@ -1,0 +1,5 @@
+File: EXE\engbase.dll
+
+
+# Fix unhandled nullpointer exception in GetAnimationProgress() - BC46
+0029F3: 85 C0 74 04 D9 40 1C C3 D9 EE C3	[ D9 40 1C C3 90 90 90 90 90 90 90 ]

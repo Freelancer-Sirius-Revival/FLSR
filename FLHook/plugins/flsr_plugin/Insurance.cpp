@@ -419,7 +419,7 @@ namespace Insurance
         for (EquipDesc equip : Players[clientId].equipDescList.equip)
         {
             const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
-            if (equipment != nullptr && IsEquipment(equipment->get_class_type()))
+            if (equipment && equip.bMounted && IsEquipment(equipment->get_class_type()))
             {
                 const auto& good = GoodList::find_by_id(equip.iArchID);
                 repairCost += static_cast<int>(std::round((1 - equip.fHealth) * good->fPrice * equipmentRepairCostFactor));

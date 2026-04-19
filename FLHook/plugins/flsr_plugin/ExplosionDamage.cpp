@@ -144,7 +144,10 @@ namespace ExplosionDamage
 				closestDistanceSquared = std::min<float>(closestDistanceSquared, FindClosestSquareDistanceToObjectSurface(iobj->cobj, explosion->explosionPosition, explosionSpreadTargets));
 			damage = maxDamage * CalculateDamageFractionByDistance(explosion->explosionArchetype->fRadius, minFullDamageDistance, closestDistanceSquared != FLT_MAX ? sqrtf(closestDistanceSquared) : FLT_MAX);
 			if (damage != 0.0f)
+			{
 				iobj->damage_shield_direct(shield, damage, dmg);
+				ConPrint(L"Shield: " + std::to_wstring(damage) + L"\n");
+			}
 		}
 		return true;
 	}
@@ -356,6 +359,7 @@ namespace ExplosionDamage
 				const bool originalFlag = modifiableColGrp->colGrp->rootHealthProxy;
 				modifiableColGrp->colGrp->rootHealthProxy = false;
 				iobj->damage_col_grp(modifiableColGrp, damage, dmg);
+				ConPrint(stows(colGrp->colGrp->name.value) + L": " + std::to_wstring(damage) + L"\n");
 				modifiableColGrp->colGrp->rootHealthProxy = originalFlag;
 			}
 
@@ -370,11 +374,17 @@ namespace ExplosionDamage
 		// 'damage' might be between singular damages if exotic explosion resistances (e.g. negative ones) are used.
 		// Limit the actual damage by the lower and upper clamp to be sure there's no damage multiplication done by collision groups. The most single dealt damage sets the bar.
 		iobj->damage_hull(std::ranges::clamp(damageToRoot, minSingleRootDamage, maxSingleRootDamage), dmg);
+		ConPrint(L"Root: " + std::to_wstring(std::ranges::clamp(damageToRoot, minSingleRootDamage, maxSingleRootDamage)) + L"\n");
 	}
 
 	bool __stdcall ExplosionHit(IObjRW* iobj, ExplosionDamageEvent* explosion, DamageList* dmg)
 	{
+		ConPrint(L"\nShip: " + std::to_wstring(iobj->cobj->archetype->iArchID) + L"\n");
+		ConPrint(L"Max Explosion HullDmg: " + std::to_wstring(explosion->explosionArchetype->fHullDamage) + L"\n");
+		ConPrint(L"Explosion Radius: " + std::to_wstring(explosion->explosionArchetype->fRadius) + L"\n");
+
 		const float detonationDistance = FindDetonationDistance(explosion->projectileId) * 1.5f; // 1.5 multiplier to make sure the inner max-damage area covers some space beyond the detonation distance.
+		ConPrint(L"Min Full Damage Radius: " + std::to_wstring(detonationDistance) + L"\n");
 		if (DealShieldDamage(iobj, explosion, detonationDistance, dmg))
 		{
 			returncode = NOFUNCTIONCALL;

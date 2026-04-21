@@ -133,6 +133,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="CargoPods.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
+    <ClCompile Include="CounterMeasureRecharge.cpp" />
     <ClCompile Include="DeathPenalty.cpp" />
     <ClCompile Include="Duel.cpp" />
     <ClCompile Include="EventLeaderInvincibility.cpp" />
@@ -277,6 +278,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Carrier.h" />
     <ClInclude Include="Cloak.h" />
     <ClInclude Include="ConnectionLimiter.h" />
+    <ClInclude Include="CounterMeasureRecharge.h" />
     <ClInclude Include="Crafting.h" />
     <ClInclude Include="DeathPenalty.h" />
     <ClInclude Include="Discord.h" />

@@ -5,6 +5,7 @@ namespace CounterMeasuresRecharge
 {
 	void Initialize();
 	void __stdcall FireWeapon(uint clientId, const XFireWeaponInfo& weapon);
+	void __stdcall ActivateEquip(unsigned int clientId, const XActivateEquip& activateEquip);
 	void __stdcall ActivateCruise(unsigned int clientId, const XActivateCruise& activateCruise);
 	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
 	void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList);

@@ -2,6 +2,7 @@
 #include "Carrier.h"
 #include "Cloak.h"
 #include "ConnectionLimiter.h"
+#include "CounterMeasureRecharge.h"
 #include "Crafting.h"
 #include "DeathPenalty.h"
 #include "Duel.h"
@@ -169,6 +170,14 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Send_FLPACKET_SERVER_CREATESOLAR_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, 0));
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::FireWeapon, PLUGIN_HkIServerImpl_FireWeapon, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::ActivateCruise, PLUGIN_HkIServerImpl_ActivateCruise, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::ShipEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::Elapse_Time_After, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::SystemSwitchOutComplete_After, PLUGIN_HkIServerImpl_SystemSwitchOutComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Mark::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));

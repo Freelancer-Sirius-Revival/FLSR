@@ -362,6 +362,7 @@
     <ClCompile Include="bugfixes\JumpDockCruiseFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
+    <ClCompile Include="CounterMeasureRecharge.cpp" />
     <ClCompile Include="EventLeaderInvincibility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -747,6 +748,7 @@
     <ClInclude Include="bugfixes\JumpDockCruiseFix.h">
       <Filter>Bugfixes</Filter>
     </ClInclude>
+    <ClInclude Include="CounterMeasureRecharge.h" />
     <ClInclude Include="EventLeaderInvincibility.h" />
   </ItemGroup>
   <ItemGroup>

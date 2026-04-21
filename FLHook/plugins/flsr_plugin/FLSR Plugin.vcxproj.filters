@@ -354,6 +354,9 @@
     <ClCompile Include="missions\MissionIniReader.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="bugfixes\EngineThrottleSyncFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -729,6 +732,9 @@
     <ClInclude Include="SolarSpawn.h" />
     <ClInclude Include="missions\MissionIniReader.h">
       <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="bugfixes\EngineThrottleSyncFix.h">
+      <Filter>Bugfixes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

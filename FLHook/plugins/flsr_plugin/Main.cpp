@@ -20,6 +20,7 @@
 #include "SolarSpawn.h"
 #include "Storage.h"
 #include "bugfixes/BatsBotsShipTransferFix.h"
+#include "bugfixes/EngineThrottleSyncFix.h"
 #include "bugfixes/MissionAbortFix.h"
 #include "Missions/ShipSpawning.h"
 #include "Missions/Formations.h"
@@ -160,7 +161,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GuidedInit, PLUGIN_HkIEngine_CGuided_init, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ActivateCruise, PLUGIN_HkIServerImpl_ActivateCruise, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::ShipAndSolarDestroyed, PLUGIN_ShipDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::ShipAndSolarEquipDestroyedHook, PLUGIN_ShipEquipDestroyed, 0));
@@ -190,6 +190,11 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BatsBotsShipTransferFix::GFGoodBuy, PLUGIN_HkIServerImpl_GFGoodBuy, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BatsBotsShipTransferFix::ReqEquipment, PLUGIN_HkIServerImpl_ReqEquipment, 0));
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EngineThrottleSyncFix::ActivateEquip, PLUGIN_HkIServerImpl_ActivateEquip, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EngineThrottleSyncFix::ActivateCruise, PLUGIN_HkIServerImpl_ActivateCruise, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EngineThrottleSyncFix::SPObjUpdate, PLUGIN_HkIServerImpl_SPObjUpdate, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EngineThrottleSyncFix::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Carrier::ReqShipArch_After, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));

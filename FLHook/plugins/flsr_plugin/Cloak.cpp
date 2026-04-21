@@ -115,8 +115,6 @@ namespace Cloak
 		std::string activatorHardpoint = "";
 		uint cloakCargoId = 0;
 		uint instantCloakCargoId = 0;
-		uint engineCargoId = 0;
-		bool engineKillActive = false;
 		std::vector<uint> powerCargoIds;
 		bool shieldPresent = false;
 		CloakState cloakState = CloakState::Cloaked;
@@ -550,8 +548,6 @@ namespace Cloak
 
 				if (equipment->get_class_type() == Archetype::AClassType::POWER)
 					clientStats.powerCargoIds.push_back(cargo.iID);
-				else if (equipment->get_class_type() == Archetype::AClassType::ENGINE)
-					clientStats.engineCargoId = cargo.iID;
 			}
 		}
 
@@ -929,9 +925,6 @@ namespace Cloak
 		{
 			if (clientCloakStats[clientId].activatorCargoId == activateEquip.sID)
 				ToggleClientCloakActivator(clientId, activateEquip.bActivate);
-
-			if (clientCloakStats[clientId].engineCargoId == activateEquip.sID)
-				clientCloakStats[clientId].engineKillActive = !activateEquip.bActivate;
 		}
 		returncode = DEFAULT_RETURNCODE;
 	}
@@ -997,39 +990,9 @@ namespace Cloak
 		returncode = DEFAULT_RETURNCODE;
 	}
 
-	static void SetServerSideEngineState(const uint clientId, const bool active)
-	{
-		if (IsValidCloakableClient(clientId) && clientCloakStats[clientId].engineCargoId)
-		{
-			XActivateEquip activateEquipment;
-			activateEquipment.bActivate = active;
-			activateEquipment.iSpaceID = clientCloakStats[clientId].shipId;
-			activateEquipment.sID = clientCloakStats[clientId].engineCargoId;
-			Server.ActivateEquip(clientId, activateEquipment);
-			clientCloakStats[clientId].engineKillActive = !active;
-		}
-	}
-
 	void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId)
 	{
 		AttemptInitialUncloak(clientId);
-
-		// Fix bug of Throttle on server not being correctly set.
-		if (IsValidCloakableClient(clientId))
-		{
-			// When saving the CShip result via CObject::Find permanently it always crashed the server
-			// when a player with Cloak + Energy-using Engine docked to a base on zero energy.
-			// Instead get it via the InspectionObj in the hope this is more performant than Find on each invokation.
-			CShip* ship = (CShip*)(clientCloakStats[clientId].shipInspect->cobj);
-			if (ship)
-			{
-				ship->set_throttle(updateInfo.throttle);
-
-				// Setting Throttle on the ship makes the server think that engine was turned on again.
-				if (clientCloakStats[clientId].engineKillActive)
-					SetServerSideEngineState(clientId, false);
-			}
-		}
 		returncode = DEFAULT_RETURNCODE;
 	}
 
@@ -1119,19 +1082,5 @@ namespace Cloak
 	{
 		if (IsValidCloakableClient(clientId))
 			ToggleClientCloakActivator(clientId, false);
-	}
-
-	/**
-	 * This fixes a Vanilla Server Bug.
-	 * The Server is not receiving an information about Engine Kill being disabled when Cruise is activated by the Client.
-	 * So while Engine Kill is active, and Cruise gets activated, the Server thinks the Engine is off and does not draw any Cruise Power.
-	 * This makes Server-Side power state of the Client's ship become asynchronous with the Client's own power state.
-	 * To fix this, the Server enables the Engine again once Cruise goes online. The Client does this anyway.
-	 */
-	void __stdcall ActivateCruise(unsigned int clientId, struct XActivateCruise const& activateCruise)
-	{
-		if (activateCruise.bActivate)
-			SetServerSideEngineState(clientId, true);
-		returncode = DEFAULT_RETURNCODE;
 	}
 }

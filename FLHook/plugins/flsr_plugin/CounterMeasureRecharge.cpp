@@ -3,28 +3,114 @@
 
 namespace CounterMeasuresRecharge
 {
-	const mstime RechargeDelayInMs = 5000;
-	const uint TargetAmmoCount = 5;
+	struct CounterMeasureData
+	{
+		int ammoLimit = 0;
+		mstime rechargeDelay = 1000;
+	};
+	std::unordered_map<uint, CounterMeasureData> counterMeasureDataByArchId;
 
 	struct PlayerCounterMeasureData
 	{
 		std::unordered_set<CECounterMeasureDropper*> droppers;
-		mstime nextRechargeTime = timeInMS() + RechargeDelayInMs;
+		std::unordered_map<CECounterMeasureDropper*, mstime> nextRechargeByDropper;
 		bool cruising = false;
 	};
+	std::unordered_map<uint, PlayerCounterMeasureData> playerDataByClientId;
 
-	std::unordered_map<uint, PlayerCounterMeasureData> dataByClientId;
+	void ReadFiles()
+	{
+		std::string dataPath = "..\\data";;
+		std::vector<std::string> equipmentPaths;
+		INI_Reader ini;
+		if (ini.open("freelancer.ini", false))
+		{
+			while (ini.read_header())
+			{
+				if (ini.is_header("Freelancer"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("data path"))
+						{
+							dataPath = ini.get_value_string(0);
+							break;
+						}
+					}
+				}
+
+				if (ini.is_header("Data"))
+				{
+					while (ini.read_value())
+					{
+						if (ini.is_value("equipment"))
+							equipmentPaths.push_back(ini.get_value_string(0));
+					}
+				}
+			}
+			ini.close();
+		}
+
+		for (const auto& equipPath : equipmentPaths)
+		{
+			if (ini.open((dataPath + "\\" + equipPath).c_str(), false))
+			{
+				while (ini.read_header())
+				{
+					if (ini.is_header("CounterMeasure"))
+					{
+						uint id = 0;
+						int ammoLimit = MAX_PLAYER_AMMO;
+						mstime ammoRefillDelay = 1000;
+						bool ammoRequired = false;
+						while (ini.read_value())
+						{
+							if (ini.is_value("nickname"))
+								id = CreateID(ini.get_value_string(0));
+
+							if (ini.is_value("ammo_limit"))
+								ammoLimit = ini.get_value_int(0);
+
+							if (ini.is_value("ammo_refill_delay"))
+								ammoRefillDelay = static_cast<mstime>(ini.get_value_float(0) * 1000);
+
+							if (ini.is_value("requires_ammo"))
+								ammoRequired = ini.get_value_bool(0);
+						}
+
+						if (ammoRequired && id && ammoLimit > 0 && ammoRefillDelay >= 0)
+							counterMeasureDataByArchId.insert({ id, { ammoLimit, ammoRefillDelay } });
+					}
+				}
+				ini.close();
+			}
+		}
+	}
+
+	bool initialized = false;
+	void Initialize()
+	{
+		if (initialized)
+			return;
+		initialized = true;
+
+		ConPrint(L"Initializing Counter Measure Recharges... ");
+		
+		ReadFiles();
+		
+		ConPrint(L"Done\n");
+	}
 
 	void __stdcall FireWeapon(uint clientId, const XFireWeaponInfo& weapon)
 	{
-		if (auto dataEntry = dataByClientId.find(clientId); dataEntry != dataByClientId.end())
+		if (auto dataEntry = playerDataByClientId.find(clientId); dataEntry != playerDataByClientId.end())
 		{
 			for (const auto& firedSubObjId : weapon.hpIds)
 				for (const auto& dropper : dataEntry->second.droppers)
 				{
 					if (dropper->iSubObjId == firedSubObjId && dropper->CanFire(weapon.target) == FireResult::Success)
 					{
-						dataEntry->second.nextRechargeTime = timeInMS() + RechargeDelayInMs;
+						dataEntry->second.nextRechargeByDropper.at(dropper) = timeInMS() + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
 						returncode = DEFAULT_RETURNCODE;
 						return;
 					}
@@ -36,11 +122,14 @@ namespace CounterMeasuresRecharge
 
 	void __stdcall ActivateCruise(unsigned int clientId, const XActivateCruise& activateCruise)
 	{
-		if (auto dataEntry = dataByClientId.find(clientId); dataEntry != dataByClientId.end())
+		if (auto dataEntry = playerDataByClientId.find(clientId); dataEntry != playerDataByClientId.end())
 		{
 			dataEntry->second.cruising = activateCruise.bActivate;
 			if (!activateCruise.bActivate)
-				dataEntry->second.nextRechargeTime = timeInMS() + RechargeDelayInMs;
+			{
+				for (const auto& dropper : dataEntry->second.droppers)
+					dataEntry->second.nextRechargeByDropper.at(dropper) = timeInMS() + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
+			}
 		}
 
 		returncode = DEFAULT_RETURNCODE;
@@ -57,8 +146,11 @@ namespace CounterMeasuresRecharge
 			CECounterMeasureDropper* equip;
 			while (equip = reinterpret_cast<CECounterMeasureDropper*>(equipManager.Traverse(traverser)))
 			{
-				if (equip->IsConnected() && !equip->IsDestroyed())
-					dataByClientId[clientId].droppers.insert(equip);
+				if (equip->IsConnected() && !equip->IsDestroyed() && counterMeasureDataByArchId.contains(equip->CounterMeasureArch()->iArchID))
+				{
+					playerDataByClientId[clientId].droppers.insert(equip);
+					playerDataByClientId[clientId].nextRechargeByDropper.insert({ equip, counterMeasureDataByArchId.at(equip->CounterMeasureArch()->iArchID).rechargeDelay });
+				}
 			}
 		}
 
@@ -70,14 +162,15 @@ namespace CounterMeasuresRecharge
 		const uint clientId = object->cobj->ownerPlayer;
 		if (clientId)
 		{
-			if (auto dataEntry = dataByClientId.find(clientId); dataEntry != dataByClientId.end())
+			if (auto dataEntry = playerDataByClientId.find(clientId); dataEntry != playerDataByClientId.end())
 			{
 				auto& droppers = dataEntry->second.droppers;
-				if (const auto dropperEntry = droppers.find((CECounterMeasureDropper*)equip); dropperEntry != droppers.end())
+				if (const auto& dropperEntry = droppers.find((CECounterMeasureDropper*)equip); dropperEntry != droppers.end())
 				{
+					dataEntry->second.nextRechargeByDropper.erase(*dropperEntry);
 					droppers.erase(dropperEntry);
 					if (droppers.empty())
-						dataByClientId.erase(dataEntry);
+						playerDataByClientId.erase(dataEntry);
 				}
 			}
 		}
@@ -89,7 +182,7 @@ namespace CounterMeasuresRecharge
 	{
 		const uint clientId = killedObject->cobj->ownerPlayer;
 		if (clientId)
-			dataByClientId.erase(clientId);
+			playerDataByClientId.erase(clientId);
 
 		returncode = DEFAULT_RETURNCODE;
 	}
@@ -122,9 +215,19 @@ namespace CounterMeasuresRecharge
 
 		const mstime now = timeInMS();
 
-		for (auto& dataEntry : dataByClientId)
+		for (auto& dataEntry : playerDataByClientId)
 		{
-			if (dataEntry.second.cruising || dataEntry.second.nextRechargeTime > now)
+			if (dataEntry.second.cruising)
+				continue;
+
+			bool needsUpdate = false;
+			for (const auto& rechargeEntry : dataEntry.second.nextRechargeByDropper)
+				if (rechargeEntry.second <= now)
+				{
+					needsUpdate = true;
+					break;
+				}
+			if (!needsUpdate)
 				continue;
 			
 			uint shipId = 0;
@@ -137,6 +240,9 @@ namespace CounterMeasuresRecharge
 			CEquipManager& equipManager = reinterpret_cast<CEqObj*>(inspect->cobj)->equip_manager;
 			for (const auto& dropper : dataEntry.second.droppers)
 			{
+				if (dataEntry.second.nextRechargeByDropper.at(dropper) > now)
+					continue;
+
 				const uint ammoArchId = dropper->CounterMeasureArch()->iArchID;
 				bool ammoNeedsRefill = true;
 				CEquipTraverser traverser(EquipmentClass::Cargo);
@@ -145,7 +251,7 @@ namespace CounterMeasuresRecharge
 				{
 					if (equip->EquipArch()->iArchID == ammoArchId)
 					{
-						if (equip->count >= TargetAmmoCount)
+						if (equip->count >= counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).ammoLimit)
 							ammoNeedsRefill = false;
 						break;
 					}
@@ -153,7 +259,7 @@ namespace CounterMeasuresRecharge
 				if (ammoNeedsRefill)
 				{
 					HkAddCargo(ARG_CLIENTID(dataEntry.first), ammoArchId, 1, false);
-					dataEntry.second.nextRechargeTime = timeInMS() + RechargeDelayInMs;
+					dataEntry.second.nextRechargeByDropper.at(dropper) = now + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
 				}
 			}
 		}

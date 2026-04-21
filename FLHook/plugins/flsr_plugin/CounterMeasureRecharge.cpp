@@ -15,6 +15,7 @@ namespace CounterMeasuresRecharge
 		std::unordered_set<CECounterMeasureDropper*> droppers;
 		std::unordered_map<CECounterMeasureDropper*, mstime> nextRechargeByDropper;
 		bool cruising = false;
+		ushort engineObjId = 0;
 	};
 	std::unordered_map<uint, PlayerCounterMeasureData> playerDataByClientId;
 
@@ -120,6 +121,26 @@ namespace CounterMeasuresRecharge
 		returncode = DEFAULT_RETURNCODE;
 	}
 
+	void __stdcall ActivateEquip(unsigned int clientId, const XActivateEquip& activateEquip)
+	{
+		// Only catch the case when engine gets deactivated.
+		if (activateEquip.bActivate)
+		{
+			returncode = DEFAULT_RETURNCODE;
+			return;
+		}
+
+		if (auto dataEntry = playerDataByClientId.find(clientId); dataEntry != playerDataByClientId.end() && dataEntry->second.engineObjId == activateEquip.sID && dataEntry->second.cruising)
+		{
+			dataEntry->second.cruising = false;
+			const mstime now = timeInMS();
+			for (const auto& dropper : dataEntry->second.droppers)
+				dataEntry->second.nextRechargeByDropper.at(dropper) = now + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
+		}
+
+		returncode = DEFAULT_RETURNCODE;
+	}
+
 	void __stdcall ActivateCruise(unsigned int clientId, const XActivateCruise& activateCruise)
 	{
 		if (auto dataEntry = playerDataByClientId.find(clientId); dataEntry != playerDataByClientId.end())
@@ -127,8 +148,9 @@ namespace CounterMeasuresRecharge
 			dataEntry->second.cruising = activateCruise.bActivate;
 			if (!activateCruise.bActivate)
 			{
+				const mstime now = timeInMS();
 				for (const auto& dropper : dataEntry->second.droppers)
-					dataEntry->second.nextRechargeByDropper.at(dropper) = timeInMS() + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
+					dataEntry->second.nextRechargeByDropper.at(dropper) = now + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
 			}
 		}
 
@@ -146,11 +168,19 @@ namespace CounterMeasuresRecharge
 			CECounterMeasureDropper* equip;
 			while (equip = reinterpret_cast<CECounterMeasureDropper*>(equipManager.Traverse(traverser)))
 			{
-				if (equip->IsConnected() && !equip->IsDestroyed() && counterMeasureDataByArchId.contains(equip->CounterMeasureArch()->iArchID))
+				const uint ammoArchId = equip->CounterMeasureArch()->iArchID;
+				if (equip->IsConnected() && !equip->IsDestroyed() && counterMeasureDataByArchId.contains(ammoArchId))
 				{
 					playerDataByClientId[clientId].droppers.insert(equip);
-					playerDataByClientId[clientId].nextRechargeByDropper.insert({ equip, counterMeasureDataByArchId.at(equip->CounterMeasureArch()->iArchID).rechargeDelay });
+					playerDataByClientId[clientId].nextRechargeByDropper.insert({ equip, counterMeasureDataByArchId.at(ammoArchId).rechargeDelay });
 				}
+			}
+
+			if (auto dataEntry = playerDataByClientId.find(clientId); dataEntry != playerDataByClientId.end())
+			{
+				const auto& equip = equipManager.FindFirst(EquipmentClass::Engine);
+				if (equip)
+					dataEntry->second.engineObjId = equip->iSubObjId;
 			}
 		}
 
@@ -251,7 +281,7 @@ namespace CounterMeasuresRecharge
 				{
 					if (equip->EquipArch()->iArchID == ammoArchId)
 					{
-						if (equip->count >= counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).ammoLimit)
+						if (equip->count >= counterMeasureDataByArchId.at(ammoArchId).ammoLimit)
 							ammoNeedsRefill = false;
 						break;
 					}
@@ -259,7 +289,7 @@ namespace CounterMeasuresRecharge
 				if (ammoNeedsRefill)
 				{
 					HkAddCargo(ARG_CLIENTID(dataEntry.first), ammoArchId, 1, false);
-					dataEntry.second.nextRechargeByDropper.at(dropper) = now + counterMeasureDataByArchId.at(dropper->CounterMeasureArch()->iArchID).rechargeDelay;
+					dataEntry.second.nextRechargeByDropper.at(dropper) = now + counterMeasureDataByArchId.at(ammoArchId).rechargeDelay;
 				}
 			}
 		}

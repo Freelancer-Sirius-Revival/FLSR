@@ -178,6 +178,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::FireWeapon, PLUGIN_HkIServerImpl_FireWeapon, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::ActivateEquip, PLUGIN_HkIServerImpl_ActivateEquip, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::ActivateCruise, PLUGIN_HkIServerImpl_ActivateCruise, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::ShipEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));

@@ -7,6 +7,7 @@
 #include "Duel.h"
 #include "Empathies.h"
 #include "EquipWhiteList.h"
+#include "EventLeaderInvincibility.h"
 #include "GroupRep.h"
 #include "IFF.h"
 #include "Insurance.h"
@@ -368,6 +369,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&RandomMissions::Hooks::TradeMissions::ReqShipArch_After, PLUGIN_HkIServerImpl_ReqShipArch_AFTER, 0));
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EventLeaderInvincibility::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EventLeaderInvincibility::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EventLeaderInvincibility::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
     
     return p_PI;
 }

@@ -159,13 +159,15 @@ namespace CounterMeasuresRecharge
 
 	void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
 	{
+		/* Make sure there is no possible garbage data left from unhandled cases of player leaving space before. */
+		playerDataByClientId.erase(clientId);
 		IObjRW* inspect;
 		StarSystem* system;
 		if (GetShipInspect(shipId, inspect, system))
 		{
 			CEquipManager& equipManager = reinterpret_cast<CEqObj*>(inspect->cobj)->equip_manager;
 			CEquipTraverser traverser(EquipmentClass::CM);
-			CECounterMeasureDropper* equip;
+			CECounterMeasureDropper* equip = nullptr;
 			while (equip = reinterpret_cast<CECounterMeasureDropper*>(equipManager.Traverse(traverser)))
 			{
 				const uint ammoArchId = equip->CounterMeasureArch()->iArchID;
@@ -210,6 +212,7 @@ namespace CounterMeasuresRecharge
 
 	void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
 	{
+		/* If a player gets beamed back to base while being in loading screen after Undock, this code is skipped. No ship exists to be despawned. */
 		const uint clientId = killedObject->cobj->ownerPlayer;
 		if (clientId)
 			playerDataByClientId.erase(clientId);
@@ -219,6 +222,8 @@ namespace CounterMeasuresRecharge
 
 	void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
 	{
+		/* Make sure the data is always cleared, even if no ship was destroyed in special cases. */
+		playerDataByClientId.erase(clientId);
 		std::unordered_set<ushort> ammoObjIds;
 		for (const auto& equip : Players[clientId].equipDescList.equip)
 		{

@@ -360,6 +360,7 @@
     <ClCompile Include="bugfixes\JumpDockCruiseFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
+    <ClCompile Include="EventLeaderInvincibility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -742,6 +743,7 @@
     <ClInclude Include="bugfixes\JumpDockCruiseFix.h">
       <Filter>Bugfixes</Filter>
     </ClInclude>
+    <ClInclude Include="EventLeaderInvincibility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

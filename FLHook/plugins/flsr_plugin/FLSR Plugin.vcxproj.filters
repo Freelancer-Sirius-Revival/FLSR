@@ -357,6 +357,9 @@
     <ClCompile Include="bugfixes\EngineThrottleSyncFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
+    <ClCompile Include="bugfixes\JumpDockCruiseFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -734,6 +737,9 @@
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="bugfixes\EngineThrottleSyncFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="bugfixes\JumpDockCruiseFix.h">
       <Filter>Bugfixes</Filter>
     </ClInclude>
   </ItemGroup>

@@ -21,6 +21,7 @@
 #include "Storage.h"
 #include "bugfixes/BatsBotsShipTransferFix.h"
 #include "bugfixes/EngineThrottleSyncFix.h"
+#include "bugfixes/JumpDockCruiseFix.h"
 #include "bugfixes/MissionAbortFix.h"
 #include "Missions/ShipSpawning.h"
 #include "Missions/Formations.h"
@@ -357,6 +358,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::CharacterSelect_AFTER, PLUGIN_HkIServerImpl_CharacterSelect_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&MissionAbortFix::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&JumpDockCruiseFix::Dock_Call_After, PLUGIN_HkCb_Dock_Call_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&JumpDockCruiseFix::JumpInComplete_After, PLUGIN_HkIServerImpl_JumpInComplete_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&BestPath::CollectJumpObjectsPerSystem, PLUGIN_HkTimerCheckKick, 0));
 

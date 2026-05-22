@@ -128,6 +128,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
   <ItemGroup>
     <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="bugfixes\EngineThrottleSyncFix.cpp" />
+    <ClCompile Include="bugfixes\JumpDockCruiseFix.cpp" />
     <ClCompile Include="bugfixes\MissionAbortFix.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="Cloak.cpp" />
@@ -268,6 +269,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
   <ItemGroup>
     <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h" />
     <ClInclude Include="bugfixes\EngineThrottleSyncFix.h" />
+    <ClInclude Include="bugfixes\JumpDockCruiseFix.h" />
     <ClInclude Include="bugfixes\MissionAbortFix.h" />
     <ClInclude Include="Carrier.h" />
     <ClInclude Include="Cloak.h" />

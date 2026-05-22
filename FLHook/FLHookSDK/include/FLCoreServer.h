@@ -147,14 +147,14 @@ struct XSetTarget
 	ushort iSubObjID;
 };
 
-struct SSPObjUpdateInfoSimple
+struct SSPObjUpdateInfoClient
 {
 	uint iShip;
 	Quaternion vDir;
 	Vector vPos;
 	float fTimestamp;
 	float throttle;
-	char state;
+	byte state;
 };
 
 struct SSPObjUpdateInfo
@@ -164,7 +164,7 @@ struct SSPObjUpdateInfo
 	Vector vPos;
 	double fTimestamp;
 	float throttle;
-	char cState;
+	byte cState;
 };
 
 struct XJettisonCargo

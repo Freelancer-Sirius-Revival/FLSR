@@ -287,12 +287,12 @@ bool HkIClientImpl::Send_FLPACKET_COMMON_STOPTRADELANE(uint iClientID, uint iShi
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-int HkIClientImpl::Send_FLPACKET_COMMON_UPDATEOBJECT(uint iClientID, SSPObjUpdateInfoSimple& pUpdate)
+int HkIClientImpl::Send_FLPACKET_COMMON_UPDATEOBJECT(uint iClientID, SSPObjUpdateInfoClient& pUpdate)
 {
 	//ISERVER_LOG();
 	//ISERVER_LOGARG_UI(iClientID);
 
-	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_UPDATEOBJECT, bool, __stdcall, (uint, SSPObjUpdateInfoSimple&), (iClientID, pUpdate));
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_UPDATEOBJECT, bool, __stdcall, (uint, SSPObjUpdateInfoClient&), (iClientID, pUpdate));
 
 	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_UPDATEOBJECT(iClientID, pUpdate));
 	return reinterpret_cast<int>(vRet);

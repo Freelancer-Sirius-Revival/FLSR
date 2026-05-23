@@ -195,6 +195,8 @@ namespace PhyArch
 
 enum HpAttachmentType
 {
+	EXTERNAL = 0, /* Lights, Contrails, Effects, Cloaking Device, ... */
+	INTERNAL = 2, /* Engines, Power, Scanners, ... */
 	WEAPON = 3,
 	hp_countermeasure_dropper = 9,
 	hp_mine_dropper = 12,
@@ -989,7 +991,7 @@ namespace Archetype
 		/* 39 */ float fRebuildPowerDraw;
 		/* 40 */ float fOfflineThreshold;
 		float fOfflineRebuildTime;
-		/* 41 */ uint stdVectorHpShieldType[3];
+		/* 41 */ st6::vector<uint> hpTypes;
 	};
 
 	struct IMPORT ShieldLink

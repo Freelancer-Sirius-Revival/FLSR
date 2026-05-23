@@ -126,6 +126,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="antiCheat\Equipment.cpp" />
     <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp" />
     <ClCompile Include="bugfixes\EngineThrottleSyncFix.cpp" />
     <ClCompile Include="bugfixes\JumpDockCruiseFix.cpp" />
@@ -268,6 +269,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="antiCheat\Equipment.h" />
     <ClInclude Include="bugfixes\BatsBotsShipTransferFix.h" />
     <ClInclude Include="bugfixes\EngineThrottleSyncFix.h" />
     <ClInclude Include="bugfixes\JumpDockCruiseFix.h" />

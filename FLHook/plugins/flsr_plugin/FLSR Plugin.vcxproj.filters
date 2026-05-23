@@ -361,6 +361,9 @@
       <Filter>Bugfixes</Filter>
     </ClCompile>
     <ClCompile Include="EventLeaderInvincibility.cpp" />
+    <ClCompile Include="antiCheat\Equipment.cpp">
+      <Filter>AntiCheat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -744,6 +747,9 @@
       <Filter>Bugfixes</Filter>
     </ClInclude>
     <ClInclude Include="EventLeaderInvincibility.h" />
+    <ClInclude Include="antiCheat\Equipment.h">
+      <Filter>AntiCheat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />
@@ -768,6 +774,9 @@
     </Filter>
     <Filter Include="Bugfixes">
       <UniqueIdentifier>{99a19828-e408-49ee-a814-954a7bf2b111}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AntiCheat">
+      <UniqueIdentifier>{3d950c55-24e2-49e0-b18a-63afb4def9db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

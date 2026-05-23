@@ -59,6 +59,7 @@
 #include "Missions/randomMissions/RandomMissions.h"
 #include "Missions/randomMissions/TradeMissions.h"
 #include "Discord.h"
+#include "antiCheat/Equipment.h"
 
 PLUGIN_RETURNCODE returncode;
 
@@ -373,6 +374,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EventLeaderInvincibility::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EventLeaderInvincibility::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&EventLeaderInvincibility::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&AntiCheat::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
     
     return p_PI;
 }

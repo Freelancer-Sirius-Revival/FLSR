@@ -85,14 +85,14 @@ namespace EquipWhiteList
 	{
 		boughtShipArchByClientId.erase(clientId);
 		const GoodInfo* goodInfo = GoodList::find_by_id(gbi.iGoodID);
-		if (!goodInfo || goodInfo->iType != 3)
+		if (!goodInfo || goodInfo->type != GoodInfo::GoodType::Ship)
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return;
 		}
 		const GoodInfo* hullGoodInfo = GoodList::find_by_id(goodInfo->iHullGoodID);
-		if (hullGoodInfo && hullGoodInfo->iType == 2)
-			boughtShipArchByClientId[clientId] = hullGoodInfo->iShipGoodID;
+		if (hullGoodInfo && hullGoodInfo->type == GoodInfo::GoodType::Hull)
+			boughtShipArchByClientId[clientId] = hullGoodInfo->shipArchId;
 		returncode = DEFAULT_RETURNCODE;
 	}
 

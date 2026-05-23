@@ -1,6 +1,5 @@
 #pragma once
 #include <FLHook.h>
-#include "../Plugin.h"
 
 namespace MissionAbortFix
 {

@@ -1,4 +1,5 @@
 #include "MissionAbortFix.h"
+#include "../Plugin.h"
 
 namespace MissionAbortFix
 {

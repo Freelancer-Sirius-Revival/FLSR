@@ -1,5 +1,5 @@
-#pragma once
 #include "JumpDockCruiseFix.h"
+#include "../Plugin.h"
 
 namespace JumpDockCruiseFix
 {

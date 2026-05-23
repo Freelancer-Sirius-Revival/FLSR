@@ -89,7 +89,7 @@ File: EXE\server.dll
 ##########################################
 
 # Disable "Ship and Equipment not Sold on Base" anti cheat. - BC46
-#06CD56: EB	[ 74 ]
+06CD56: EB	[ 74 ]
 
 # Disable "Ship related" anti cheat. - BC46
-#06CD6C: EB	[ 7E ]
+06CD6C: EB	[ 7E ]

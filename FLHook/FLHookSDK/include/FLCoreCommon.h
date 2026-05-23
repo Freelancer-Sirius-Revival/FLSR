@@ -4455,18 +4455,21 @@ public:
 struct GoodInfo
 {
 public:
-#define GOODINFO_TYPE_COMMODITY 0
-#define GOODINFO_TYPE_EQUIPMENT 1
-#define GOODINFO_TYPE_HULL 2
-#define GOODINFO_TYPE_SHIP 3
+	enum class GoodType
+	{
+		Commodity = 0,
+		Equipmet = 1,
+		Hull = 2,
+		Ship = 3
+	};
 
 	uint i1;
 	uint iLen;
 	uint iDunno1[16];
 	/* 72 */ uint iArchID;
-	/* 76 */ uint iType; // 0=commodity, 2=hull, 3=ship
+	/* 76 */ GoodType type;
 	/* 80 */ uint equipmentId;
-	/* 84 */ uint iShipGoodID; // if type = GOODINFO_TYPE_HULL
+	/* 84 */ uint shipArchId; // if type = GOODINFO_TYPE_HULL
 	/* 88 */ float fPrice;
 	/* 92 */ float fGoodSellPrice;
 	/* 96 */ float fBadBuyPrice;

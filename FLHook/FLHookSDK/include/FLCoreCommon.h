@@ -1379,6 +1379,37 @@ public:
 	bool unk;
 };
 
+enum ObjectTreeNodeType : DWORD
+{
+	Object = 0,
+	Virtual = 2,
+};
+
+struct ObjectTreeSubObj
+{
+	void* ptr;
+	Matrix rot;
+	Vector pos;
+	// possibly more
+};
+
+struct ObjectTreeNode
+{
+	ObjectTreeNodeType type;
+	void* subObj; // type VIRTUAL = ObjectTreeSubObj, type OBJECT = CObject
+	void* data2;
+	void* data3;
+	ObjectTreeNode* parent;
+	ObjectTreeNode* nextSibling;
+	ObjectTreeNode* previousSibling;
+	ObjectTreeNode* firstChild;
+	ObjectTreeNode* lastChild;
+	uint childCount;
+	struct CObject* obj; // main object
+	Matrix rot;
+	// possibly more
+};
+
 class IMPORT CArchGroup
 {
 public:
@@ -1428,7 +1459,7 @@ protected:
 public:
 	/* 0  */ CEqObj* owner;
 	/* 1  */ Archetype::CollisionGroup* colGrp;
-	/* 2  */ int rootIndex;
+	/* 2  */ ObjectTreeNode* objNode;
 	/* 3  */ float hitPts;
 	/* 4  */ uint dunno;
 	/* 5  */ uint state;
@@ -1876,39 +1907,39 @@ namespace PhySys
 
 	struct RayHit
 	{
-		struct CSimple* cobj;
+		::CObject* cobj;
 		Vector position;
 		Vector normalizedVelocity;
-		uint unknown;
+		uint hitPartOrHardpointCrc; // This is the Dacom CRC32, not the usual ID crc.
 	};
 
 	IMPORT  float  ANOM_LIMITS_MAX_ANGULAR_VELOCITY_PER_PSI;
 	IMPORT  float  ANOM_LIMITS_MAX_VELOCITY;
-	IMPORT  void  AddImpulseAtPoint(struct CObject*, class Vector const&, class Vector const&);
+	IMPORT  void  AddImpulseAtPoint(::CObject*, class Vector const&, class Vector const&);
 	IMPORT  void  AddToAngularVelocityOS(::CObject*, class Vector const&);
 	IMPORT  void  AddToVelocity(::CObject*, class Vector const&);
-	IMPORT  void  AngularImpulse(struct CObject*, class Vector const&, float);
-	IMPORT  void  AngularImpulseOS(struct CObject*, class Vector const&, float);
+	IMPORT  void  AngularImpulse(::CObject*, class Vector const&, float);
+	IMPORT  void  AngularImpulseOS(::CObject*, class Vector const&, float);
 	IMPORT  bool  AnyActive(void);
-	IMPORT  void  Attach(struct CObject*, struct CObject*);
-	IMPORT  int  AttachPhantom(struct CObject*, void*);
+	IMPORT  void  Attach(::CObject*, ::CObject*);
+	IMPORT  int  AttachPhantom(::CObject*, void*);
 	IMPORT  float  BULLET_LENGTH_FUDGE;
-	IMPORT  void  BeamR(struct CObject*, class Vector const&, class Matrix const&, bool);
-	IMPORT  void  BuildIVP_Real(struct CObject*, struct CreateParms const&);
-	IMPORT  void  BuildIVP_Sphere(struct CObject*, float, struct CreateParms const&);
+	IMPORT  void  BeamR(::CObject*, class Vector const&, class Matrix const&, bool);
+	IMPORT  void  BuildIVP_Real(::CObject*, struct CreateParms const&);
+	IMPORT  void  BuildIVP_Sphere(::CObject*, float, struct CreateParms const&);
 	IMPORT  int  CreatePhantom(struct PhantomParms const&, struct PhyArch::Part const&, void*&);
 	IMPORT  int  CreatePhantom(struct PhantomParms const&, class Vector const&, void*&);
 	IMPORT  int  CreatePhantom(struct PhantomParms const&, float, void*&);
 	IMPORT  class Vector  DEFAULT_ANGULAR_DAMPING;
 	IMPORT  float  DEFAULT_LINEAR_DAMPING;
-	IMPORT  void  DeactivatePhysics(struct CObject*);
-	IMPORT  void  DeactivatePhysicsR(struct CObject*);
+	IMPORT  void  DeactivatePhysics(::CObject*);
+	IMPORT  void  DeactivatePhysicsR(::CObject*);
 	IMPORT  void  DestroyPhantom(void*);
-	IMPORT  void  Detach(struct CObject*, struct DetachParms const&);
+	IMPORT  void  Detach(::CObject*, struct DetachParms const&);
 	IMPORT  int  DetachPhantom(void*);
-	IMPORT  int  FindRayCollisions(unsigned int, class Vector const&, class Vector const&, struct RayHit*, int);
-	IMPORT  int  FindRayIntersect(struct CObject*, class Vector const&, class Vector const&, struct RayHit*, int);
-	IMPORT  int  FindSphereCollisions(unsigned int, class Vector const&, float, struct CObject**, int);
+	IMPORT  int  FindRayCollisions(unsigned int, class Vector const&, class Vector const&, RayHit*, int);
+	IMPORT  int  FindRayIntersect(::CObject*, class Vector const&, class Vector const&, RayHit*, int);
+	IMPORT  int  FindSphereCollisions(unsigned int, class Vector const&, float, ::CObject**, int);
 	IMPORT  float  GOLEM_ANGULAR_DAMP_FACTOR;
 	IMPORT  class Vector  GOLEM_CHILD_ANGULAR_DAMP;
 	IMPORT  float  GOLEM_CHILD_LINEAR_DAMP;
@@ -2014,7 +2045,7 @@ public:
 	void set_transform(class Transform const&);
 	void update_tree(void)const;
 
-	void* index;
+	ObjectTreeNode* objNode;
 	Matrix mRot;
 	Vector vPos;
 	float fRadius;
@@ -4455,18 +4486,21 @@ public:
 struct GoodInfo
 {
 public:
-#define GOODINFO_TYPE_COMMODITY 0
-#define GOODINFO_TYPE_EQUIPMENT 1
-#define GOODINFO_TYPE_HULL 2
-#define GOODINFO_TYPE_SHIP 3
+	enum class GoodType
+	{
+		Commodity = 0,
+		Equipmet = 1,
+		Hull = 2,
+		Ship = 3
+	};
 
 	uint i1;
 	uint iLen;
 	uint iDunno1[16];
 	/* 72 */ uint iArchID;
-	/* 76 */ uint iType; // 0=commodity, 2=hull, 3=ship
+	/* 76 */ GoodType type;
 	/* 80 */ uint equipmentId;
-	/* 84 */ uint iShipGoodID; // if type = GOODINFO_TYPE_HULL
+	/* 84 */ uint shipArchId; // if type = GOODINFO_TYPE_HULL
 	/* 88 */ float fPrice;
 	/* 92 */ float fGoodSellPrice;
 	/* 96 */ float fBadBuyPrice;

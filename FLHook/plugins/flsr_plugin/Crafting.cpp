@@ -36,6 +36,7 @@ namespace Crafting
 	const uint NOT_ENOUGH_MONEY = pub::GetNicknameId("not_enough_money");
 	const uint INSUFFICIENT_CARGO_SPACE_ID = pub::GetNicknameId("insufficient_cargo_space");
 	const uint LOADED_INTO_CARGO_HOLD_ID = pub::GetNicknameId("loaded_into_cargo_hold");
+	const uint ALL_SYSTEMS_NORMAL_ID = pub::GetNicknameId("all_systems_normal");
 	const uint NONE_AVAILABLE_ID = pub::GetNicknameId("none_available");
 
 	void LoadSettings()
@@ -77,7 +78,10 @@ namespace Crafting
 						if (ini.is_value("product"))
 						{
 							recipe.archetypeId = CreateID(ini.get_value_string(0));
-							recipe.count = ini.get_value_int(1);
+							if (ini.get_num_parameters() > 1)
+								recipe.count = ini.get_value_int(1);
+							else
+								recipe.count = 1;
 						}
 						else if (ini.is_value("cost"))
 						{
@@ -155,6 +159,18 @@ namespace Crafting
 			return false;
 		}
 		const Recipe& recipe = recipes[recipeNameLower];
+
+		const GoodInfo* productGoodInfo = GoodList::find_by_id(recipe.archetypeId);
+		if (productGoodInfo->type == GoodInfo::GoodType::Hull)
+		{
+			PrintUserCmdText(clientId, recipe.originalName + L" is a ship hull and cannot be crafted. Contact an admin!");
+			return false;
+		}
+
+		if (productGoodInfo->type == GoodInfo::GoodType::Ship)
+		{
+			batchCount = 1;
+		}
 
 		// Check if the player is docked on the requested base.
 		uint shipId;
@@ -248,25 +264,28 @@ namespace Crafting
 		}
 
 		// Check if there's enough cargo hold to add the produced item.
-		const Archetype::Equipment* equipment = Archetype::GetEquipment(recipe.archetypeId);
-		if (!equipment)
-			return false;
-		float totalVolumeNeeded = equipment->fVolume * recipe.count * batchCount;
-		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
+		if (productGoodInfo->type != GoodInfo::GoodType::Ship)
 		{
-			const Archetype::Equipment* equipment = Archetype::GetEquipment(ingredientWithCount.first);
+			const Archetype::Equipment* equipment = Archetype::GetEquipment(recipe.archetypeId);
 			if (!equipment)
 				return false;
-			totalVolumeNeeded -= equipment->fVolume * ingredientWithCount.second * batchCount;
-		}
-		float remainingHoldSize;
-		pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-		float cargoHoldDiff = remainingHoldSize - totalVolumeNeeded;
-		if (cargoHoldDiff < 0.0f)
-		{
-			pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
-			PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
-			return false;
+			float totalVolumeNeeded = equipment->fVolume * recipe.count * batchCount;
+			for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
+			{
+				const Archetype::Equipment* equipment = Archetype::GetEquipment(ingredientWithCount.first);
+				if (!equipment)
+					return false;
+				totalVolumeNeeded -= equipment->fVolume * ingredientWithCount.second * batchCount;
+			}
+			float remainingHoldSize;
+			pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
+			float cargoHoldDiff = remainingHoldSize - totalVolumeNeeded;
+			if (cargoHoldDiff < 0.0f)
+			{
+				pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
+				PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+				return false;
+			}
 		}
 
 		// Exchange the items in the cargo hold.
@@ -285,18 +304,65 @@ namespace Crafting
 			if (HkAddCash(characterNameWS, -recipe.cost * batchCount) != HKE_OK)
 				return false;
 
-		if (HkAddCargo(ARG_CLIENTID(clientId), recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
+		if (productGoodInfo->type != GoodInfo::GoodType::Ship)
 		{
+			if (HkAddCargo(ARG_CLIENTID(clientId), recipe.archetypeId, recipe.count * batchCount, false) == HKE_OK)
+			{
+				const uint soundId = recipe.successSoundId ? recipe.successSoundId : defaultSuccessSoundId;
+				if (soundId)
+					pub::Audio::PlaySoundEffect(clientId, soundId);
+				pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
+				std::wstring message = L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'";
+				if (recipe.cost)
+					message += L" for " + PrintMoney(recipe.cost * batchCount);
+				PrintUserCmdText(clientId, message + L".");
+				return true;
+			}
+		}
+		else
+		{
+			const GoodInfo* hullGood = GoodList::find_by_id(productGoodInfo->iHullGoodID);
+			if (!hullGood)
+				return false;
+
+			EquipDescVector newEquip(productGoodInfo->edl);
+
+			for (const auto& equip : Players[clientId].equipDescList.equip)
+			{
+				switch (Archetype::GetEquipment(equip.iArchID)->get_class_type())
+				{
+					case Archetype::COMMODITY:
+					case Archetype::POWER:
+					case Archetype::ENGINE:
+					case Archetype::SHIELD_GENERATOR:
+					case Archetype::THRUSTER:
+					case Archetype::LAUNCHER:
+					case Archetype::GUN:
+					case Archetype::MINE_DROPPER:
+					case Archetype::MINE:
+					case Archetype::COUNTER_MEASURE_DROPPER:
+					case Archetype::COUNTER_MEASURE:
+					case Archetype::REPAIR_KIT:
+					case Archetype::SHIELD_BATTERY:
+					case Archetype::MUNITION:
+					{
+						EquipDesc equipCopy(equip);
+						equipCopy.bMounted = false;
+						equipCopy.szHardPoint.value = EquipDesc::CARGO_BAY_HP_NAME.value;
+						newEquip.equip.push_back(equipCopy);
+					}
+				}
+			}
+
+			pub::Player::SetShipAndLoadout(clientId, hullGood->shipArchId, newEquip);
 			const uint soundId = recipe.successSoundId ? recipe.successSoundId : defaultSuccessSoundId;
 			if (soundId)
 				pub::Audio::PlaySoundEffect(clientId, soundId);
-			pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
-			std::wstring message = L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'";
-			if (recipe.cost)
-				message += L" for " + PrintMoney(recipe.cost * batchCount);
-			PrintUserCmdText(clientId, message + L".");
+			pub::Player::SendNNMessage(clientId, ALL_SYSTEMS_NORMAL_ID);
+			std::wstring message = L"Successfully crafted '" + recipe.originalName + L"'";
 			return true;
 		}
+
 		return false;
 	}
 

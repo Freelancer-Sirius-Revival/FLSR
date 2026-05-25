@@ -298,6 +298,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="NameLimiter.cpp" />
+    <ClCompile Include="ExplosionDamage.cpp" />
     <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
@@ -681,6 +682,7 @@
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="NameLimiter.h" />
+    <ClInclude Include="ExplosionDamage.h" />
     <ClInclude Include="Insurance.h" />
     <ClInclude Include="IFF.h" />
     <ClInclude Include="Carrier.h" />

@@ -156,6 +156,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\randomMissions\Meta.cpp" />
     <ClCompile Include="missions\randomMissions\TradeMissions.cpp" />
     <ClCompile Include="NameLimiter.cpp" />
+    <ClCompile Include="ExplosionDamage.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Crafting.cpp" />
@@ -307,6 +308,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\randomMissions\TradeMissions.h" />
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="NpcCloaking.h" />
+    <ClInclude Include="ExplosionDamage.h" />
     <ClInclude Include="Empathies.h" />
     <ClInclude Include="GroupRep.h" />
     <ClInclude Include="Main.h" />

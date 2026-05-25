@@ -13,9 +13,6 @@ File: EXE\server.dll
 # Weapons
 ##########################################
 
-# Fix explosion damage not causing full damage (or no damage) on large ships and bases. - M0tah
-00960C: 00	[ 0C ]
-
 # Energy weapons don't damage power. - adoxa
 00AFC0: C2 08 00	[ D9 44 24 ]
 
@@ -89,7 +86,7 @@ File: EXE\server.dll
 ##########################################
 
 # Disable "Ship and Equipment not Sold on Base" anti cheat. - BC46
-#06CD56: EB	[ 74 ]
+06CD56: EB	[ 74 ]
 
 # Disable "Ship related" anti cheat. - BC46
-#06CD6C: EB	[ 7E ]
+06CD6C: EB	[ 7E ]

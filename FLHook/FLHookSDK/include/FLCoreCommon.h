@@ -855,7 +855,7 @@ namespace Archetype
 		/* 38 */ float fSeekerRange;
 		/* 39 */ float fSeekerFovDeg;
 		/* 40 */ float fMaxAngularVelocity;
-		/* 41 */ float fDetonationDist;
+		/* 41 */ float fDetonationDistSquare;
 		/* 42 */ uint iHpType;
 		/* 43 */ bool bCruiseDisruptor;
 	};

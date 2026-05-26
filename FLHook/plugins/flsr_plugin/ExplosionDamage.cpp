@@ -64,7 +64,7 @@ namespace ExplosionDamage
 	{
 		CProjectile* projectile = static_cast<CProjectile*>(CObject::Find(projectileId, CObject::CGUIDED_OBJECT));
 		if (projectile)
-			return static_cast<Archetype::Munition*>(projectile->archetype)->fDetonationDist;
+			return sqrtf(static_cast<Archetype::Munition*>(projectile->archetype)->fDetonationDistSquare);
 
 		projectile = static_cast<CProjectile*>(CObject::Find(projectileId, CObject::CMINE_OBJECT));
 		if (projectile)

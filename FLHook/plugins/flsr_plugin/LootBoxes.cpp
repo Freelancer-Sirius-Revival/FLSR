@@ -1,4 +1,5 @@
-#include "Main.h"
+#include "LootBoxes.h"
+#include "Plugin.h"
 #include <random>
 
 namespace LootBoxes
@@ -60,7 +61,7 @@ namespace LootBoxes
 
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-		const std::string configFilePath = std::string(currentDirectory) + Globals::LOOTBOXES_CONFIG_FILE;
+		const std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-LootBoxes.cfg";
 
 		INI_Reader ini;
 		if (ini.open(configFilePath.c_str(), false))
@@ -107,7 +108,7 @@ namespace LootBoxes
 								lootArchetypeCombinable[archetypeId] = goodInfo->multiCount;
 							lootBox.lootArchetypeIds.push_back(archetypeId);
 							lootBox.lootArchetypeNames.push_back(GetEquipmentName(archetypeId));
-							lootBox.highestLootArchetypeVolume = std::max(lootBox.highestLootArchetypeVolume, GetEquipmentVolume(archetypeId));
+							lootBox.highestLootArchetypeVolume = std::max<float>(lootBox.highestLootArchetypeVolume, GetEquipmentVolume(archetypeId));
 							probabilities.push_back(ini.get_value_int(1));
 						}
 					}
@@ -172,7 +173,7 @@ namespace LootBoxes
 			if (cargo.iArchID == lootBox.boxArchetypeId)
 			{
 				// Limit the boxes to open by how many there actually are in the cargo.
-				openCount = std::min(openCount, cargo.iCount);
+				openCount = std::min<int>(openCount, cargo.iCount);
 				lootBoxItemId = cargo.iID;
 				break;
 			}
@@ -205,7 +206,7 @@ namespace LootBoxes
 		// Check if there's enough cargo hold to add the looted item.
 		float remainingHoldSize = 0.0f;
 		pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-		const float requiredHoldSize = std::max(0.0f, (-lootBox.boxArchetypeVolume - lootBox.keyArchetypeVolume + lootBox.highestLootArchetypeVolume) * openCount);
+		const float requiredHoldSize = std::max<float>(0.0f, (-lootBox.boxArchetypeVolume - lootBox.keyArchetypeVolume + lootBox.highestLootArchetypeVolume) * openCount);
 		const float holdSizeDifference = remainingHoldSize - requiredHoldSize;
 		if (holdSizeDifference < 0.0f)
 		{
@@ -279,7 +280,7 @@ namespace LootBoxes
 				lootBoxName = Trim(arguments.substr(0, lastWhiteSpace));
 			}
 			// Limit the opening of crates to 100 to prevent possible lag issues when sending packages.
-			if (!Open(clientId, wstos(lootBoxName), std::min(100, std::max(1, count))))
+			if (!Open(clientId, wstos(lootBoxName), std::min<int>(100, std::max<int>(1, count))))
 			{
 				if (failSoundId)
 					pub::Audio::PlaySoundEffect(clientId, failSoundId);

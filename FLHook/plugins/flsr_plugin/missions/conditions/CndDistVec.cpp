@@ -41,7 +41,7 @@ namespace Missions
 			orderedCndDistVec.erase(it);
 	}
 	
-	bool CndDistVec::IsDistanceMatching(uint objId) const
+	bool CndDistVec::IsDistanceMatching(const uint objId) const
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;

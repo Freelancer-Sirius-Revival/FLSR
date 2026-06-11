@@ -14,7 +14,6 @@
     <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
-    <ClCompile Include="Modules.cpp" />
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
@@ -323,6 +322,45 @@
     <ClCompile Include="missions\randomMissions\TradeMissions.cpp">
       <Filter>Missions\RandomMissions</Filter>
     </ClCompile>
+    <ClCompile Include="DeathPenalty.cpp" />
+    <ClCompile Include="missions\actions\ActDisplayMsg.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActPlayNN.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\randomMissions\Meta.cpp">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndJoinGroup.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\conditions\CndLeaveGroup.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActLeaveGroup.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActSetShipAndLoadout.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Duel.cpp" />
+    <ClCompile Include="missions\actions\ActPopUpDialog.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\actions\ActUnlightFuse.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="missions\MissionIniReader.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
+    <ClCompile Include="bugfixes\EngineThrottleSyncFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="bugfixes\JumpDockCruiseFix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="EventLeaderInvincibility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -660,13 +698,57 @@
     <ClInclude Include="missions\randomMissions\TradeMissions.h">
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
+    <ClInclude Include="DeathPenalty.h" />
+    <ClInclude Include="missions\actions\ActDisplayMsg.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActPlayNN.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\randomMissions\Meta.h">
+      <Filter>Missions\RandomMissions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndJoinGroup.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\conditions\CndLeaveGroup.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActLeaveGroup.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActSetShipAndLoadout.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="Duel.h" />
+    <ClInclude Include="missions\actions\ActPopUpDialog.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActUnlightFuse.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="EquipWhiteList.h" />
+    <ClInclude Include="SpawnProtection.h" />
+    <ClInclude Include="LootBoxes.h" />
+    <ClInclude Include="ConnectionLimiter.h" />
+    <ClInclude Include="Crafting.h" />
+    <ClInclude Include="Discord.h" />
+    <ClInclude Include="SolarSpawn.h" />
+    <ClInclude Include="missions\MissionIniReader.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="bugfixes\EngineThrottleSyncFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="bugfixes\JumpDockCruiseFix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="EventLeaderInvincibility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />
     <None Include="curl\Makefile.in" />
-    <None Include="surdump.zip" />
-    <None Include="surupdate.au3" />
-    <None Include="surupdate.exe" />
+    <None Include="Chat.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Missions">

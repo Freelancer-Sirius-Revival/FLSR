@@ -6,6 +6,7 @@ namespace Missions
 	struct ActRelocate : Action
 	{
 		uint objName = 0;
+		uint systemId = 0;
 		Vector position;
 		Matrix orientation = { { std::numeric_limits<float>::infinity(), 0, 0 } };
 

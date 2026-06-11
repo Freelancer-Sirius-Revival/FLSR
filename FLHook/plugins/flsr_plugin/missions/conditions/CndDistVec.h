@@ -20,7 +20,7 @@ namespace Missions
 		const uint systemId;
 		const std::string hardpoint;
 
-		bool IsDistanceMatching(uint objId) const;
+		bool IsDistanceMatching(const uint objId) const;
 
 	public:
 		CndDistVec(const ConditionParent& parent,

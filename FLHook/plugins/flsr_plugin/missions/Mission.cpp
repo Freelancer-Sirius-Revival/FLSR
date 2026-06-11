@@ -5,9 +5,9 @@
 #include "conditions/CndCommComplete.h"
 #include "conditions/CndCount.h"
 #include "conditions/CndLeaveMsn.h"
+#include "objectives/ObjDock.h"
 #include "ShipSpawning.h"
 #include "LifeTimes.h"
-#include "objectives/ObjDock.h"
 #include "../Plugin.h"
 
 namespace Missions
@@ -26,15 +26,15 @@ namespace Missions
 		pub::Audio::SetMusic(clientId, music);
 	}
 
-	Mission::Mission(const std::string name, const uint id, const bool initiallyActive) :
+	Mission::Mission(const std::string name, const uint id, const bool initiallyActive, const bool manuallyCrafted) :
 		name(name),
 		id(id),
 		initiallyActive(initiallyActive),
+		manuallyCrafted(manuallyCrafted),
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
 		offerId(0),
 		missionResult(MissionResult::Success),
-		reofferRemainingTime(0.0f),
-		markedForDeletion(false)
+		reofferRemainingTime(0.0f)
 	{}
 
 	Mission::~Mission()
@@ -44,9 +44,9 @@ namespace Missions
 		End();
 	}
 
-	void Mission::End(bool markForDeletion, bool allowRestart)
+	void Mission::End()
 	{
-		state = allowRestart ? MissionState::Inactive : MissionState::Finished;
+		state = MissionState::Finished;
 
 		std::queue<std::pair<uint, MissionObject>> emptyQueue;
 		std::swap(triggerExecutionQueue, emptyQueue);
@@ -91,7 +91,7 @@ namespace Missions
 		ongoingComms.clear();
 
 		if (offerId)
-			MissionBoard::DeleteMissionOffer(offerId);
+			MissionBoard::DeleteOffer(offerId);
 
 		offerId = 0;
 
@@ -102,6 +102,9 @@ namespace Missions
 			state = MissionState::Inactive;
 			reofferRemainingTime = offer.reofferDelay;
 		}
+
+		if (manuallyCrafted)
+			state = MissionState::Inactive;
 	}
 
 	void Mission::Start()
@@ -118,10 +121,14 @@ namespace Missions
 			trigger.second.Reset();
 
 		// Only now execute those that should be initially active. With e.g. Cnd_True they might instantly activate other triggers while we are still looping here.
+		std::vector<Trigger*> sortedTriggers(triggers.size());
 		for (auto& trigger : triggers)
+			sortedTriggers[trigger.second.sortPosition] = &trigger.second;
+		
+		for (auto& trigger : sortedTriggers)
 		{
-			if (trigger.second.IsAwaitingInitialActivation())
-				trigger.second.Activate();
+			if (trigger->IsAwaitingInitialActivation())
+				trigger->Activate();
 		}
 	}
 
@@ -133,6 +140,11 @@ namespace Missions
 	bool Mission::IsActive() const
 	{
 		return state == MissionState::Active;
+	}
+
+	bool Mission::IsFinished() const
+	{
+		return state == MissionState::Finished;
 	}
 
 	void Mission::QueueTriggerExecution(const uint triggerId, const MissionObject& activator)
@@ -175,11 +187,14 @@ namespace Missions
 		if (object.id == 0)
 			return;
 
-		if (object.type == MissionObjectType::Client)
+		if (object.type == MissionObjectType::Client && !clientIds.contains(object.id))
 		{
 			if (!HkIsValidClientID(object.id) || HkIsInCharSelectMenu(object.id))
 				return;
-			// Clients are made known to the mission by giving them a label.
+
+			if (offerId)
+				pub::Player::SetMsnID(object.id, offerId, object.id, false, 0);
+
 			clientIds.insert(object.id);
 		}
 
@@ -321,15 +336,10 @@ namespace Missions
 		return 0;
 	}
 
-	bool Mission::ToBeDeleted() const
-	{
-		return markedForDeletion;
-	}
-
-	bool Mission::TryAddToJobBoard()
+	bool Mission::TryAddToJobBoard(const uint clientId)
 	{
 		if (offer.type == pub::GF::MissionType::Unknown ||
-			offer.baseIds.empty() ||
+			(!clientId && offer.baseIds.empty()) ||
 			!CanBeStarted() ||
 			reofferRemainingTime > 0.0f ||
 			offerId != 0)
@@ -338,7 +348,7 @@ namespace Missions
 		}
 
 		reofferRemainingTime = 0.0f;
-		MissionBoard::MissionOffer boardOffer;
+		MissionBoard::Offer boardOffer;
 		boardOffer.type = offer.type;
 		boardOffer.system = offer.system;
 		boardOffer.group = offer.group;
@@ -346,7 +356,10 @@ namespace Missions
 		boardOffer.description = offer.description;
 		boardOffer.reward = offer.reward;
 		boardOffer.allowedShipArchetypeIds = offer.shipArchetypeIds;
-		offerId = MissionBoard::AddMissionOffer(boardOffer, offer.baseIds);
+		if (clientId)
+			offerId = MissionBoard::AddPrivateOffer(boardOffer, clientId);
+		else
+			offerId = MissionBoard::AddPublicOffer(boardOffer, offer.baseIds);
 
 		return true;
 	}
@@ -371,15 +384,15 @@ namespace Missions
 				{
 					auto& mission = missionEntry.second;
 
-					if (mission.ToBeDeleted())
+					if (mission.IsFinished())
 					{
 						missionIdsToDelete.insert(mission.id);
 						continue;
 					}
 
 					/* Reoffering missions to job board */
-					mission.reofferRemainingTime = max(0.0f, mission.reofferRemainingTime - elapsedTimeInSec);
-					mission.TryAddToJobBoard();
+					mission.reofferRemainingTime = std::max<float>(0.0f, mission.reofferRemainingTime - elapsedTimeInSec);
+					mission.TryAddToJobBoard(0);
 
 					/* Comms timeouts */
 					std::vector<std::pair<uint, Missions::Mission::CommEntry>> entriesToRemove;
@@ -402,7 +415,7 @@ namespace Missions
 				for (const uint missionId : missionIdsToDelete)
 				{
 					const auto& mission = missions.at(missionId);
-					MissionBoard::DeleteMissionOffer(mission.offerId);
+					MissionBoard::DeleteOffer(mission.offerId);
 					missions.erase(missionId);
 				}
 
@@ -438,10 +451,9 @@ namespace Missions
 					auto& mission = missionEntry.second;
 					if (mission.objectIds.contains(shipId))
 					{
-						uint objId = shipId;
 						IObjRW* inspect;
 						StarSystem* system;
-						if (!GetShipInspect(objId, inspect, system))
+						if (!GetShipInspect(shipId, inspect, system))
 						{
 							returncode = DEFAULT_RETURNCODE;
 							return 0;
@@ -461,7 +473,7 @@ namespace Missions
 								ObjDock(ObjectiveParent(mission.id, 0), dockTargetId).Execute(ObjectiveState(followerObjId, 0, true));
 							}
 						}
-						OrderBreakFormation(objId);
+						OrderBreakFormation(shipId);
 					}
 				}
 				returncode = DEFAULT_RETURNCODE;

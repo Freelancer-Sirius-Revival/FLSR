@@ -2,7 +2,6 @@
 #include "NpcAppearances.h"
 #include "../Pilots.h"
 #include "../Plugin.h"
-#include "MatrixMath.h"
 
 namespace ShipSpawning
 {
@@ -475,14 +474,9 @@ namespace ShipSpawning
 		pub::AI::SubmitState(shipId, &personality);
 	}
 
-	static bool GetLaunchPositionAndDock(const uint shipArchetypeId, uint launchObjId, Vector& startPos, Matrix& startOrientation, int& dockIndex)
+	static bool GetLaunchPositionAndDock(const uint shipArchetypeId, const uint launchObjId, Vector& startPos, Matrix& startOrientation, int& dockIndex)
 	{
 		dockIndex = 0;
-		_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
-		st6::vector<uint> missionProps;
-		if (!GetMissionProperties(shipArchetypeId, missionProps))
-			return false;
-
 		IObjRW* inspect;
 		StarSystem* starSystem;
 		if (!GetShipInspect(launchObjId, inspect, starSystem) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
@@ -510,7 +504,7 @@ namespace ShipSpawning
 		return false;
 	}
 
-	static bool LaunchNpcFromObject(uint shipId, uint launchObjId, int dockIndex)
+	static bool LaunchNpcFromObject(const uint shipId, const uint launchObjId, const int dockIndex)
 	{
 		IObjRW* launchObjInspect;
 		StarSystem* starSystem;

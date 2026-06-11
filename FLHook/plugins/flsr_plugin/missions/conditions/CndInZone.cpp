@@ -34,7 +34,7 @@ namespace Missions
 			orderedCndInZone.erase(it);
 	}
 
-	bool CndInZone::IsInZone(uint objId)
+	bool CndInZone::IsInZone(const uint objId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;

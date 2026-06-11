@@ -137,16 +137,16 @@ This is the definition for a NPC archetype which again can be used by multiple `
 - `archetype` Defines the archetype.
     1. `STRING` The solar archetype nickname.
 
-- `[loadout]` Defines the equipment loadout.
+- `loadout` Defines the equipment loadout.
     1. `STRING` The loadout nickname.
 
-- `[state_graph]` Basic behaviour of the ship.
+- `state_graph` Basic behaviour of the ship.
     1. `STRING` The state graph to use.
 
-- `[faction]` If left empty, this object is not affiliated with anyone.
+- `faction` If left empty, this object is not affiliated with anyone.
     1. `STRING` The faction nickname used.
 
-- `[pilot]` The AI for the pilot.
+- `pilot` The AI for the pilot.
     1. `STRING` The pilot nickname used.
 
 - `[level]` Sets the displayed level.
@@ -449,6 +449,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` Object by name or label to expect in the zone.
     1. `STRING` Multiple subsequent entries possible. The zone nickname to expect the object in.
 
+- `Cnd_JoinGroup` Only players. When a player joins a group. `Activator` will be the joined player.
+    1. `STRING|Any :Any` The joining player will be checked to be in a group with the labeled players. `Any` means any player in the mission.
+
 - `Cnd_JumpInComplete` Only players. When fully jumped into a system. `Activator` will be the jumped-in player.
     1. `STRING|Stranger` The players by label to await fully jumping into a system.
     1. `[STRING]` Multiple subsequent entries possible. The system nickname the player jumped into. If none is given, any system will count.
@@ -456,6 +459,9 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
 - `Cnd_LaunchComplete` Only players. When fully launched from a base. `Activator` will be the launched player.
     1. `STRING|Stranger` The players by label to await fully landing on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player launched from. If none is given, any base will count.
+
+- `Cnd_LeaveGroup` Only players. When a player leaves a group. `Activator` will be the leaving player.
+    1. `STRING|Any :Any` The leaving player will be checked to have been in a group with the labeled players. `Any` means any player in the mission.
 
 - `Cnd_LeaveMsn` Only players. When leaving the mission by any means, including Mission Abort.
     1. `STRING|Any :Any` The players by label to await leaving. Matches any mission player if `Any` is given.
@@ -565,6 +571,10 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to destroy.
     1. `[Explode|Silent] :Silent` Whether to explode the object or despawn it. Explosion does *not* trigger the death fuse.
 
+- `Act_DisplayMsg` Only for players. Shows a mission text on the screen.
+    1. `STRING|Activator` Players by label to display the message to.
+    1. `INTEGER :0` The text ID to display.
+
 - `Act_DockInstant` Only for players. Forces docking instantly with the given target.
     1. `STRING|Activator` Players by label to be force-docked instantly.
     1. `STRING` Target object name or static solar to dock with.
@@ -599,12 +609,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether to prevent player damage or not.
     1. `[FLOAT] :0` The percentage of hitpoints the target must lose before the damage prevention kicks in.
 
+- `Act_LeaveGroup` Only for players. Removes members of the label from their current group.
+    1. `STRING|Activator` Players by label to remove from their group.
+
 - `Act_LeaveMsn` Only for players. Removes members of the label from the mission.
     1. `STRING|Activator` Players by label to remove from the mission.
     1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.
     1. `[INTEGER] :0` Only for `Failure`: The text ID to display.
 
-- `Act_LightFuse` Executes an arbitary fuse.
+- `Act_LightFuse` Executes an arbitrary fuse.
     1. `STRING|Activator` Object by name or label to refer.
     1. `STRING` Fuse nickname to execute on the objects.
     1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
@@ -634,9 +647,19 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` The time in seconds it takes to transition music.
     1. `[True|False] :False` Whether to play the override music only once and then return to other music.
 
+- `Act_PlayNN` Only for players. Plays a sequence of neural net sounds.
+    1. `STRING|Activator` Players by label to play the sound effect for.
+    1. `STRING` The sound nickname to play. Multiple subsequent entries possible.
+
 - `Act_PlaySoundEffect` Only for players. Plays a single sound effect. This is *not* audible for other players.
     1. `STRING|Activator` Players by label to play the sound effect for.
     1. `STRING` The sound nickname to play.
+
+- `Act_PopUpDialog` Only for players. Pops up a dialog window.
+    1. `STRING|Activator` Players by label to pop up the dialog for.
+    1. `INTEGER` The text resource ID for the header.
+    1. `INTEGER` The text resource ID for the content.
+    1. `[Close|Yes|No|Later] :Close` The text resource ID for the header.
 
 - `Act_RemoveCargo` Only for players. Removes cargo.
     1. `STRING|Activator` Players by label to have the cargo removed from.
@@ -647,8 +670,9 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Object by name or label to manipulate.
     1. `STRING` The label to remove.
 
-- `Act_Relocate` Relocates an object.
+- `Act_Relocate` Relocates an object. Does not work for solars.
     1. `STRING|Activator` Object by name to relocate.
+    1. `STRING` Target system nickname to move the object into. Only works for NPCs.
     1. `FLOAT :0` Position on x-axis.
     1. `FLOAT :0` Position on y-axis.
     1. `FLOAT :0` Position on z-axis.
@@ -686,6 +710,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[True|False] :False` Whether this should generate a best-path route or just a direct waypoint at the target. For players not in the target system, best-path route will always be used until reaching the target system.
     1. `[STRING]` The optional object nickname to specify as waypoint destination. Not limited to the mission; this can be any static world solar.
 
+- `Act_SetShipAndLoadout` Sets the ship and loadout. Only works when the player is docked to a base.
+    1. `STRING|Activator` Players by label to set the ship and loadout.
+    1. `STRING` Ship archetype to set.
+    1. `STRING` Loadout name to apply.
+
 - `Act_SetVibe` Sets the vibe/attitude uni-directional between two targets. For label members that join later this action must be invoked again.
     1. `STRING|Activator` Object by name or label whose vibe will be set. Can also be a static world solar. For players this only works if the target is another player.
     1. `STRING|Activator` Object by name or label to change the vibe toward. Can also be a static world solar. For players it will automatically change their vibe in turn, too. If both arguments are players, it will stay uni-directional.
@@ -718,3 +747,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Name of the `Dialog` to play. `Activator` is forwarded to it.
 
 - `Act_TerminateMsn` Terminates the mission and cleans up all spawned objects with infinite life time, waypoints, and music. Evaluates whether the mission is being reoffered to the mission board, depending on `Act_SetMsnResult`.
+
+- `Act_UnlightFuse` Unlights an arbitrary fuse.
+    1. `STRING|Activator` Object by name or label to refer.
+    1. `STRING` Fuse nickname to unlight on the objects.

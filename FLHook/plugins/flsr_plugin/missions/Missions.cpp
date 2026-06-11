@@ -1,10 +1,12 @@
 #include <regex>
-#include "../Main.h"
+#include <filesystem>
 #include "../Empathies.h"
 #include "Missions.h"
+#include "MissionIniReader.h"
 #include "Conditions/CndTrue.h"
 #include "Conditions/CndIniReader.h"
 #include "Actions/ActDebugMsg.h"
+#include "Actions/ActSetShipAndLoadout.h"
 #include "Actions/ActActTrig.h"
 #include "Actions/ActActMsn.h"
 #include "Actions/ActActMsnTrig.h"
@@ -12,6 +14,7 @@
 #include "Actions/ActAddLabel.h"
 #include "Actions/ActRemoveLabel.h"
 #include "Actions/ActLightFuse.h"
+#include "Actions/ActUnlightFuse.h"
 #include "Actions/ActSpawnSolar.h"
 #include "Actions/ActSpawnShip.h"
 #include "Actions/ActSpawnFormation.h"
@@ -32,14 +35,16 @@
 #include "Actions/ActGiveObjList.h"
 #include "Actions/ActSetVibe.h"
 #include "Actions/ActInvulnerable.h"
+#include "Actions/ActLeaveGroup.h"
 #include "Actions/ActLeaveMsn.h"
 #include "Actions/ActSetLifeTime.h"
 #include "Actions/ActMark.h"
 #include "Actions/ActCloak.h"
 #include "Actions/ActSetDockState.h"
 #include "Actions/ActDockInstant.h"
-#include "Objectives/ObjIniReader.h"
-#include "Dialog.h"
+#include "Actions/ActDisplayMsg.h"
+#include "Actions/ActPlayNN.h"
+#include "Actions/ActPopUpDialog.h"
 #include "MissionBoard.h"
 #include "ClientObjectives.h"
 
@@ -59,7 +64,7 @@ namespace Missions
 			return;
 
 		// Read all mission files
-		uint lastMissionId = 0;
+		uint nextMissionId = 0;
 
 		const std::regex filePattern(".+\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(missionDirectory))
@@ -68,351 +73,27 @@ namespace Missions
 			INI_Reader ini;
 			if (std::regex_match(fileName, filePattern) && ini.open((missionDirectory + fileName).c_str(), false))
 			{
+				uint missionId = 0;
 				while (ini.read_header())
 				{
-					if (ini.is_header("Mission"))
+					if (TryReadMissionHeadFromIni(nextMissionId, ini))
 					{
-						std::string name = "";
-						bool initiallyActive = false;
-						MissionOffer offer;
-
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-								name = ToLower(ini.get_value_string(0));
-							else if (ini.is_value("InitState"))
-								initiallyActive = ToLower(ini.get_value_string(0)) == "active";
-							else if (ini.is_value("offer_type"))
-							{
-								const auto value = ToLower(ini.get_value_string(0));
-								if (value == "destroyships")
-									offer.type = pub::GF::MissionType::DestroyShips;
-								else if (value == "destroyinstallation")
-									offer.type = pub::GF::MissionType::DestroyInstallation;
-								else if (value == "assassinate")
-									offer.type = pub::GF::MissionType::Assassinate;
-								else if (value == "destroycontraband")
-									offer.type = pub::GF::MissionType::DestroyContraband;
-								else if (value == "captureprisoner")
-									offer.type = pub::GF::MissionType::CapturePrisoner;
-								else if (value == "retrievecontraband")
-									offer.type = pub::GF::MissionType::RetrieveContraband;
-								else
-									offer.type = pub::GF::MissionType::Unknown;
-							}
-							else if (ini.is_value("offer_target_system"))
-								offer.system = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("offer_faction"))
-								pub::Reputation::GetReputationGroup(offer.group, ini.get_value_string(0));
-							else if (ini.is_value("offer_title_id"))
-								offer.title = ini.get_value_int(0);
-							else if (ini.is_value("offer_description_id"))
-								offer.description = FmtStr(ini.get_value_int(0), 0);
-							else if (ini.is_value("offer_reward"))
-								offer.reward = ini.get_value_int(0);
-							else if (ini.is_value("offer_ship_restriction"))
-							{
-								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
-									offer.shipArchetypeIds.insert(CreateIdOrNull(ini.get_value_string(index)));
-							}
-							else if (ini.is_value("offer_bases"))
-							{
-								for (int index = 0, len = ini.get_num_parameters(); index < len; index++)
-									offer.baseIds.insert(CreateIdOrNull(ini.get_value_string(index)));
-							}
-							else if (ini.is_value("reoffer"))
-							{
-								const auto value = ToLower(ini.get_value_string(0));
-								if (value == "always")
-									offer.reofferCondition = MissionReofferCondition::Always;
-								else if (value == "onfail")
-									offer.reofferCondition = MissionReofferCondition::OnFail;
-								else if (value == "onsuccess")
-									offer.reofferCondition = MissionReofferCondition::OnSuccess;
-								else
-									offer.reofferCondition = MissionReofferCondition::Never;
-							}
-							else if (ini.is_value("reoffer_delay"))
-								offer.reofferDelay = ini.get_value_float(0);
-						}
-						// Never automatically start missions which are offered on the mission board.
-						if (offer.type != pub::GF::MissionType::Unknown)
-							initiallyActive = false;
-
-						if (!name.empty())
-						{
-							lastMissionId++;
-							missions.try_emplace(lastMissionId, name, lastMissionId, initiallyActive);
-							missions.at(lastMissionId).offer = offer;
-						}
+						missionId = nextMissionId;
+						nextMissionId++;
 					}
-
 					if (missions.empty())
 						continue;
-
-					if (ini.is_header("MsnFormation"))
-					{
-						MsnFormation formation;
-						formation.position = { 0, 0, 0 };
-						formation.rotation = { 0, 0, 0 };
-
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-								formation.id = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("position"))
-								formation.position = ini.get_vector();
-							else if (ini.is_value("rotate"))
-								formation.rotation = ini.get_vector();
-							else if (ini.is_value("formation"))
-								formation.formationId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("ship"))
-								formation.msnShipIds.push_back(CreateIdOrNull(ini.get_value_string(0)));
-						}
-						if (formation.id && formation.formationId && !formation.msnShipIds.empty())
-							missions.at(lastMissionId).formations.insert({ formation.id, formation });
-					}
-
-					if (ini.is_header("Npc"))
-					{
-						Npc npc;
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-								npc.id = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("archetype"))
-								npc.archetypeId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("loadout"))
-								npc.loadoutId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("state_graph"))
-								npc.stateGraph = ToLower(ini.get_value_string(0));
-							else if (ini.is_value("faction"))
-								npc.faction = ini.get_value_string(0);
-							else if (ini.is_value("pilot"))
-								npc.pilotId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("level"))
-								npc.level = ini.get_value_int(0);
-						}
-						if (npc.id && npc.archetypeId && !npc.stateGraph.empty())
-							missions.at(lastMissionId).npcs.insert({ npc.id, npc });
-					}
-
-					if (ini.is_header("MsnNpc"))
-					{
-						MsnNpc npc;
-						npc.position = { 0, 0, 0 };
-						npc.orientation = EulerMatrix({ 0, 0, 0 });
-
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-								npc.id = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("string_id"))
-								npc.idsName = ini.get_value_int(0);
-							else if (ini.is_value("use_ship_ids"))
-								npc.shipNameDisplayed = ini.get_value_bool(0);
-							else if (ini.is_value("system"))
-								npc.systemId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("position"))
-								npc.position = ini.get_vector();
-							else if (ini.is_value("rotate"))
-								npc.orientation = EulerMatrix(ini.get_vector());
-							else if (ini.is_value("npc"))
-								npc.npcId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("hitpoints"))
-								npc.hitpoints = ini.get_value_int(0);
-							else if (ini.is_value("voice"))
-								npc.voiceId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("space_costume"))
-							{
-								npc.costume.head = CreateIdOrNull(ini.get_value_string(0));
-								npc.costume.body = CreateIdOrNull(ini.get_value_string(1));
-								npc.costume.accessories = 0;
-								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
-								{
-									const char* accessoryNickname = ini.get_value_string(index + 2);
-									if (strlen(accessoryNickname) == 0)
-										break;
-									npc.costume.accessory[index] = CreateID(accessoryNickname);
-									npc.costume.accessories++;
-								}
-							}
-							else if (ini.is_value("pilot_job"))
-								npc.pilotJobId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("arrival_obj"))
-								npc.startingObjId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("label"))
-								npc.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
-						}
-						if (npc.id && npc.npcId && npc.systemId)
-							missions.at(lastMissionId).msnNpcs.insert({ npc.id, npc });
-					}
-
-					if (ini.is_header("MsnSolar"))
-					{
-						MsnSolar solar;
-						solar.position = { 0, 0, 0 };
-						solar.orientation = EulerMatrix({ 0, 0, 0 });
-
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-								solar.name = ToLower(ini.get_value_string(0));
-							else if (ini.is_value("string_id"))
-								solar.idsName = ini.get_value_int(0);
-							else if (ini.is_value("system"))
-								solar.systemId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("position"))
-								solar.position = ini.get_vector();
-							else if (ini.is_value("rotate"))
-								solar.orientation = EulerMatrix(ini.get_vector());
-							else if (ini.is_value("archetype"))
-								solar.archetypeId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("loadout"))
-								solar.loadoutId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("hitpoints"))
-								solar.hitpoints = ini.get_value_int(0);
-							else if (ini.is_value("base"))
-								solar.baseId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("faction"))
-								solar.faction = ini.get_value_string(0);
-							else if (ini.is_value("pilot"))
-								solar.pilotId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("voice"))
-								solar.voiceId = CreateIdOrNull(ini.get_value_string(0));
-							else if (ini.is_value("space_costume"))
-							{
-								solar.costume.headId = CreateIdOrNull(ini.get_value_string(0));
-								solar.costume.bodyId = CreateIdOrNull(ini.get_value_string(1));
-								for (int index = 0; index < 8; index++) // The game supports up to 8 accessories
-								{
-									const char* accessoryNickname = ini.get_value_string(index + 2);
-									if (strlen(accessoryNickname) == 0)
-										break;
-									solar.costume.accessoryIds.push_back(CreateID(accessoryNickname));
-								}
-							}
-							else if (ini.is_value("label"))
-								solar.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
-						}
-
-						if (solar.archetypeId && !solar.name.empty() && solar.systemId)
-						{
-							missions.at(lastMissionId).solars.push_back(solar);
-							SolarSpawn::SolarArchetype solarArch;
-							solarArch.archetypeId = solar.archetypeId;
-							solarArch.loadoutId = solar.loadoutId;
-							solarArch.nickname = missions.at(lastMissionId).name + ":" + solar.name;
-							solarArch.idsName = solar.idsName;
-							solarArch.position = solar.position;
-							solarArch.orientation = solar.orientation;
-							solarArch.systemId = solar.systemId;
-							solarArch.baseId = solar.baseId;
-							solarArch.affiliation = solar.faction;
-							solarArch.pilotId = solar.pilotId;
-							solarArch.hitpoints = solar.hitpoints;
-							solarArch.voiceId = solar.voiceId;
-							solarArch.headId = solar.costume.headId;
-							solarArch.bodyId = solar.costume.bodyId;
-							solarArch.accessoryIds = std::vector(solar.costume.accessoryIds);
-							SolarSpawn::AppendSolarArchetype(solarArch);
-						}
-					}
-
-					if (ini.is_header("Dialog"))
-					{
-						Dialog dialog;
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-							{
-								dialog.id = CreateIdOrNull(ini.get_value_string(0));
-							}
-							else if (ini.is_value("etherSender"))
-							{
-								DialogEtherSender sender;
-								sender.id = CreateIdOrNull(ini.get_value_string(0));
-								sender.voiceId = CreateIdOrNull(ini.get_value_string(1));
-								sender.idsName = ini.get_value_int(2);
-								sender.costume.head = CreateIdOrNull(ini.get_value_string(3));
-								sender.costume.body = CreateIdOrNull(ini.get_value_string(4));
-								int count = 0;
-								while (count < 8)
-								{
-									const auto val = ini.get_value_string(5 + count);
-									if (strlen(val) == 0)
-										break;
-									sender.costume.accessory[count++] = CreateIdOrNull(val);
-								}
-								sender.costume.accessories = count;
-								if (sender.id && sender.voiceId)
-									dialog.etherSenders.insert({ sender.id, sender });
-							}
-							else if (ini.is_value("line"))
-							{
-								DialogLine line;
-								line.id = CreateIdOrNull(ini.get_value_string(0));
-								line.receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
-								line.senderEtherSenderOrObjName = CreateIdOrNull(ini.get_value_string(2));
-								uint pos = 3;
-								while (!ini.is_value_empty(pos))
-								{
-									const char* val = ini.get_value_string(pos);
-									// Make sure we do not go beyond the following numeric value.
-									char* end;
-									strtol(val, &end, 10);
-									if (end != val)
-										break;
-									line.lines.push_back(CreateIdOrNull(val));
-									pos++;
-								}
-								if (!ini.is_value_empty(pos++))
-									line.delay = ini.get_value_float(pos - 1);
-								if (ini.get_num_parameters() > pos)
-									line.global = ini.get_value_bool(pos);
-
-								if (line.id && line.senderEtherSenderOrObjName && !line.lines.empty())
-									dialog.lines.push_back(line);
-							}
-						}
-
-						if (dialog.id && !dialog.lines.empty())
-							missions.at(lastMissionId).dialogs.insert({ dialog.id, dialog });
-					}
-					
-					if (ini.is_header("ObjList"))
-					{
-						uint nickname = 0;
-
-						const uint beginning = ini.tell();
-						while (ini.read_value())
-						{
-							if (ini.is_value("nickname"))
-							{
-								nickname = CreateIdOrNull(ini.get_value_string(0));
-								break;
-							}
-						}
-
-						if (nickname != 0)
-						{
-							ini.seek(beginning);
-							const ObjectiveParent objParent(lastMissionId, nickname);
-							Objectives objectives(objParent.objectivesId, objParent.missionId);
-							while (ini.read_value())
-							{
-								const auto& obj = TryReadObjectiveFromIni(objParent, ini);
-								if (obj != nullptr)
-									objectives.objectives.push_back(ObjectivePtr(obj));
-							}
-							missions.at(lastMissionId).objectives.insert({ objectives.id, objectives });
-						}
-					}
+					Mission& mission = missions.at(missionId);
+					TryReadMsnFormationFromIni(mission, ini);
+					TryReadNpcFromIni(mission, ini);
+					TryReadMsnNpcFromIni(mission, ini);
+					TryReadMsnSolarFromIni(mission, ini);
+					TryReadDialogFromIni(mission, ini);
+					TryReadObjectiveListFromIni(mission, ini);
 
 					if (ini.is_header("Trigger"))
 					{
 						uint id = 0;
-						const uint missionId = lastMissionId;
 						bool initiallyActive = false;
 						Trigger::TriggerRepeatable repeatable = Trigger::TriggerRepeatable::Off;
 						ConditionPtr condition = nullptr;
@@ -462,6 +143,12 @@ namespace Missions
 							{
 								ActSetMsnResultPtr action(new ActSetMsnResult());
 								action->result = ToLower(ini.get_value_string(0)) == "success" ? Mission::MissionResult::Success : Mission::MissionResult::Failure;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_LeaveGroup"))
+							{
+								ActLeaveGroupPtr action(new ActLeaveGroup());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_LeaveMsn"))
@@ -588,6 +275,13 @@ namespace Missions
 								action->lifetimeOverride = ini.get_value_float(3);
 								actions.push_back(action);
 							}
+							else if (ini.is_value("Act_UnlightFuse"))
+							{
+								ActUnlightFusePtr action(new ActUnlightFuse());
+								action->objNameOrLabel = CreateIdOrNull(ini.get_value_string(0));
+								action->fuse = CreateIdOrNull(ini.get_value_string(1));
+								actions.push_back(action);
+								}
 							else if (ini.is_value("Act_SetLifeTime"))
 							{
 								ActSetLifeTimePtr action(new ActSetLifeTime());
@@ -813,7 +507,7 @@ namespace Missions
 								ActAddCargoPtr action(new ActAddCargo());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->itemId = CreateIdOrNull(ini.get_value_string(1));
-								action->count = std::max(0, ini.get_value_int(2));
+								action->count = std::max<uint>(0, ini.get_value_int(2));
 								if (ini.get_num_parameters() > 3)
 									action->missionFlagged = ini.get_value_bool(3);
 								actions.push_back(action);
@@ -823,7 +517,7 @@ namespace Missions
 								ActRemoveCargoPtr action(new ActRemoveCargo());
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->itemId = CreateIdOrNull(ini.get_value_string(1));
-								action->count = std::max(0, ini.get_value_int(2));
+								action->count = std::max<uint>(0, ini.get_value_int(2));
 								actions.push_back(action);
 							}
 							else if (ini.is_value("Act_GiveObjList"))
@@ -857,15 +551,16 @@ namespace Missions
 							{
 								ActRelocatePtr action(new ActRelocate());
 								action->objName = CreateIdOrNull(ini.get_value_string(0));
-								action->position.x = ini.get_value_float(1);
-								action->position.y = ini.get_value_float(2);
-								action->position.z = ini.get_value_float(3);
-								if (ini.get_num_parameters() > 6)
+								action->systemId = CreateIdOrNull(ini.get_value_string(1));
+								action->position.x = ini.get_value_float(2);
+								action->position.y = ini.get_value_float(3);
+								action->position.z = ini.get_value_float(4);
+								if (ini.get_num_parameters() > 7)
 								{
 									Vector rotation;
-									rotation.x = ini.get_value_float(4);
-									rotation.y = ini.get_value_float(5);
-									rotation.z = ini.get_value_float(6);
+									rotation.x = ini.get_value_float(5);
+									rotation.y = ini.get_value_float(6);
+									rotation.z = ini.get_value_float(7);
 									action->orientation = EulerMatrix(rotation);
 								}
 								actions.push_back(action);
@@ -884,6 +579,52 @@ namespace Missions
 								action->label = CreateIdOrNull(ini.get_value_string(0));
 								action->targetObjName = CreateIdOrNull(ini.get_value_string(1));
 								action->dockHardpoint = ToLower(ini.get_value_string(2));
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_DisplayMsg"))
+							{
+								ActDisplayMsgPtr action(new ActDisplayMsg());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->stringId = ini.get_value_int(1);
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_PlayNN"))
+							{
+								ActPlayNNPtr action(new ActPlayNN());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								for (size_t index = 1, length = ini.get_num_parameters(); index < length; index++)
+									action->soundIds.push_back(CreateIdOrNull(ini.get_value_string(index)));
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_PopUpDialog"))
+							{
+								ActPopUpDialogPtr action(new ActPopUpDialog());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->headingId = ini.get_value_int(1);
+								action->messageId = ini.get_value_int(2);
+								action->buttons = 0;
+								for (size_t index = 3, length = ini.get_num_parameters(); index < length; index++)
+								{
+									const auto& button = ToLower(ini.get_value_string(index));
+									if (button == "close")
+										action->buttons = action->buttons | PopupDialogButton::CENTER_OK;
+									else if (button == "yes")
+										action->buttons = action->buttons | PopupDialogButton::LEFT_YES;
+									else if (button == "no")
+										action->buttons = action->buttons | PopupDialogButton::CENTER_NO;
+									else if (button == "later")
+										action->buttons = action->buttons | PopupDialogButton::RIGHT_LATER;
+								}
+								if (!action->buttons)
+									action->buttons = PopupDialogButton::CENTER_OK;
+								actions.push_back(action);
+							}
+							else if (ini.is_value("Act_SetShipAndLoadout"))
+							{
+								ActSetShipAndLoadoutPtr action(new ActSetShipAndLoadout());
+								action->label = CreateIdOrNull(ini.get_value_string(0));
+								action->shipArchetypeId = CreateIdOrNull(ini.get_value_string(1));
+								action->loadoutId = CreateIdOrNull(ini.get_value_string(2));
 								actions.push_back(action);
 							}
 							else
@@ -921,10 +662,10 @@ namespace Missions
 			if (missionEntry.second.offerId == offerId && missionEntry.second.CanBeStarted())
 			{
 				auto& mission = missionEntry.second;
+				mission.AddLabelToObject(MissionObject(MissionObjectType::Client, startingClientId), CreateID("initial_player"));
 				const uint labelId = CreateID("players");
 				for (const auto clientId : clientIds)
 					mission.AddLabelToObject(MissionObject(MissionObjectType::Client, clientId), labelId);
-				mission.AddLabelToObject(MissionObject(MissionObjectType::Client, startingClientId), CreateID("initial_player"));
 				mission.Start();
 				return;
 			}
@@ -960,12 +701,11 @@ namespace Missions
 			return;
 		initialized = true;
 
-		ConPrint(L"Initializing Missions... ");
+		ConPrint(L"Initializing Missions...\n");
 
 		LoadSettings();
 
-
-		ConPrint(L"Starting initial missions... \n");
+		ConPrint(L"Starting initial missions...\n");
 
 		for (auto& missionEntry : missions)
 		{
@@ -981,7 +721,7 @@ namespace Missions
 		auto it = missions.begin();
 		while (it != missions.end())
 		{
-			MissionBoard::DeleteMissionOffer(it->second.offerId);
+			MissionBoard::DeleteOffer(it->second.offerId);
 			it = missions.erase(it);
 		}
 	}
@@ -1061,9 +801,9 @@ namespace Missions
 	{
 		for (auto& missionEntry : missions)
 		{
-			if (missionEntry.second.name == missionName && missionEntry.second.CanBeStarted())
+			if (missionEntry.second.name == missionName && !missionEntry.second.IsActive())
 			{
-				missionEntry.second.Start();
+				missionEntry.second.Start();	
 				return true;
 			}
 		}
@@ -1076,12 +816,14 @@ namespace Missions
 		{
 			if (missionEntry.second.name == missionName)
 			{
-				missionEntry.second.End(false, true);
+				missionEntry.second.End();
 				return true;
 			}
 		}
 		return false;
 	}
+
+	#define IS_CMD(a) !wscCmd.compare(L##a)
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
 	{
@@ -1159,7 +901,7 @@ namespace Missions
 			entry.triggerId = CreateIdOrNull(trigNickname.c_str());
 			action.triggers.push_back(entry);
 			action.activate = true;
-			Mission msn("", 0, false);
+			Mission msn("", 0, false, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -1184,7 +926,7 @@ namespace Missions
 			entry.triggerId = CreateIdOrNull(trigNickname.c_str());
 			action.triggers.push_back(entry);
 			action.activate = true;
-			Mission msn("", 0, false);
+			Mission msn("", 0, false, false);
 			action.Execute(msn, MissionObject(MissionObjectType::Client, clientId));
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;

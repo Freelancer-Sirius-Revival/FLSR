@@ -26,10 +26,13 @@
 
 #pragma comment( lib, "FLCoreServer.lib" )
 
-#define POPUPDIALOG_BUTTONS_LEFT_YES 1
-#define POPUPDIALOG_BUTTONS_CENTER_NO 2
-#define POPUPDIALOG_BUTTONS_RIGHT_LATER 4
-#define POPUPDIALOG_BUTTONS_CENTER_OK 8
+enum PopupDialogButton
+{
+	LEFT_YES = 1,
+	CENTER_NO = 2,
+	RIGHT_LATER = 4,
+	CENTER_OK = 8 // Also adds a X button to the window
+};
 
 
 struct CHAT_ID
@@ -144,14 +147,14 @@ struct XSetTarget
 	ushort iSubObjID;
 };
 
-struct SSPObjUpdateInfoSimple
+struct SSPObjUpdateInfoClient
 {
 	uint iShip;
 	Quaternion vDir;
 	Vector vPos;
 	float fTimestamp;
 	float throttle;
-	char state;
+	byte state;
 };
 
 struct SSPObjUpdateInfo
@@ -161,7 +164,7 @@ struct SSPObjUpdateInfo
 	Vector vPos;
 	double fTimestamp;
 	float throttle;
-	char cState;
+	byte cState;
 };
 
 struct XJettisonCargo
@@ -967,7 +970,7 @@ namespace pub
 		IMPORT  int AddCargo(unsigned int const&, unsigned int const&, unsigned int, float, bool);
 		IMPORT  int AdjustCash(unsigned int const&, int);
 		IMPORT  int CfgInterfaceNotification(unsigned int, unsigned int, bool, int);
-		IMPORT  int DisplayMissionMessage(unsigned int const&, struct FmtStr const&, enum MissionMessageType, bool);
+		IMPORT  int DisplayMissionMessage(unsigned int const& clientId, struct FmtStr const& message, enum MissionMessageType type, bool sendToEntireGroup);
 		IMPORT  int EnumerateCargo(unsigned int const&, struct pub::CargoEnumerator&);
 		IMPORT  int ForceLand(unsigned int, unsigned int);
 		IMPORT  int GetAssetValue(unsigned int const&, float&);

@@ -17,8 +17,8 @@ namespace Missions
 		uint loadoutId = 0;
 		uint idsName = 0;
 		uint systemId = 0;
-		Vector position;
-		Matrix orientation;
+		Vector position = { 0, 0, 0 };
+		Matrix orientation = EulerMatrix({ 0, 0, 0 });
 		uint baseId = 0;
 		std::string faction = "";
 		uint pilotId = 0;

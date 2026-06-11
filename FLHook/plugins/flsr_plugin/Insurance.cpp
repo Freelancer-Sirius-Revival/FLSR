@@ -7,6 +7,7 @@ namespace Insurance
     std::string outputDirectory;
     float shipRepairCostFactor = 0.33f;
     float equipmentRepairCostFactor = 0.3f;
+    const std::string IniSectionHeading = "Insurance";
 
     bool initialized = false;
     void Initialize()
@@ -100,11 +101,10 @@ namespace Insurance
                 INI_Reader ini;
                 if (ini.open(filePath.c_str(), false))
                 {
-                    Insurance& insurance = insuranceByCharacterFileName[GetCharacterFileName(clientId)];
-
+                    Insurance insurance;
                     while (ini.read_header())
                     {
-                        if (ini.is_header("Insurance"))
+                        if (ini.is_header(IniSectionHeading.c_str()))
                         {
                             while (ini.read_value())
                             {
@@ -140,6 +140,7 @@ namespace Insurance
                                 }
                             }
                         }
+                        insuranceByCharacterFileName[GetCharacterFileName(clientId)] = insurance;
                     }
                     ini.close();
                 }
@@ -176,7 +177,7 @@ namespace Insurance
                 break;
         }
         std::filesystem::create_directory(outputDirectory);
-        IniWrite(filePath, "Insurance", "type", typeString.c_str());
+        IniWrite(filePath, IniSectionHeading, "type", typeString.c_str());
     }
 
     static void PersistInsuranceContents(const uint clientId, const int depositedMoney, const std::vector<InsuredItem>& entries)
@@ -187,18 +188,18 @@ namespace Insurance
 
         const auto& filePath = GetInsuranceFilePath(clientId);
         std::filesystem::create_directory(outputDirectory);
-        IniWrite(filePath, "Insurance", "deposit", std::to_string(depositedMoney));
+        IniWrite(filePath, IniSectionHeading, "deposit", std::to_string(depositedMoney));
         const size_t bufferSize = 65535;
         char* keyValues = static_cast<char*>(malloc(bufferSize));
+        keyValues[0] = '\0';
         size_t bytesWritten = 0;
-        keyValues[bytesWritten] = '\0';
         for (const auto& equip : entries)
         {
             const std::string str = "item = " + std::to_string(equip.archId) + ", " + std::to_string(equip.count) + ", " + equip.hardpoint;
             const size_t strLength = str.length() + 1; // +1 for \0
             if (bytesWritten + strLength > bufferSize)
                 break;
-            std::strncpy(&keyValues[bytesWritten], str.c_str(), strLength);
+            strncpy_s(&keyValues[bytesWritten], bufferSize - bytesWritten, str.c_str(), strLength);
             bytesWritten += strLength;
         }
         if (bytesWritten < bufferSize)
@@ -252,6 +253,37 @@ namespace Insurance
         return repairCost;
     }
 
+    static int GetProjectedInsuranceCost(const uint clientId)
+    {
+        const Insurance& insurance = insuranceByCharacterFileName[GetCharacterFileName(clientId)];
+        int totalCost = 0;
+        if (insurance.type != InsuranceType::None)
+            totalCost = GetMaxShipHullAndCollGroupsRepairCost(clientId);
+
+        for (const auto& equip : Players[clientId].equipDescList.equip)
+        {
+            if (equip.bMission)
+                continue;
+
+            const Archetype::Equipment* archetype = Archetype::GetEquipment(equip.get_arch_id());
+            const GoodInfo* good = GoodList::find_by_id(equip.get_arch_id());
+            if (!archetype || !good)
+                continue;
+
+            const Archetype::AClassType archetypeType = archetype->get_class_type();
+            // Equip with price=0 is fixed equipment and must always be restored
+            if (equip.bMounted && IsEquipment(archetypeType) && (insurance.type & InsuranceType::Equipment))
+            {
+                // Equipment always is stored by its max repair cost.
+                // This way there will always be enough money deposited for full repair, or restoring the item based on full repair price.
+                totalCost += static_cast<int>(std::floor(good->fPrice * equipmentRepairCostFactor));
+            }
+            else if (IsConsumable(archetypeType) && (insurance.type & InsuranceType::Consumables))
+                totalCost += static_cast<int>(std::floor(good->fPrice)) * equip.get_count();
+        }
+        return totalCost;
+    }
+
     static std::wstring PrintMoney(const int64_t amount)
     {
         std::wstring result = std::to_wstring(amount);
@@ -280,7 +312,7 @@ namespace Insurance
 
             const Archetype::AClassType archetypeType = archetype->get_class_type();
             // Equip with price=0 is fixed equipment and must always be restored
-            if (IsEquipment(archetypeType) && (good->fPrice == 0.0f || (insurance.type & InsuranceType::Equipment)))
+            if (equip.bMounted && IsEquipment(archetypeType) && (good->fPrice == 0.0f || (insurance.type & InsuranceType::Equipment)))
             {
                 // Equipment always is stored by its max repair cost.
                 // This way there will always be enough money deposited for full repair, or restoring the item based on full repair price.
@@ -363,8 +395,8 @@ namespace Insurance
             // Calculate repair cost and repair it
             if (archCollGroup)
             {
-                const float collisionGroupMaxHitpoints = archCollGroup->hitPts;
-                repairCost += static_cast<int>(std::round((1.0f - collGroup.health) * collisionGroupMaxHitpoints * shipRepairCostFactor));
+                const auto collisionGroupMaxHitpoints = archCollGroup->hitPts;
+                repairCost += static_cast<int>(std::round((1.0f - collGroup.health) * static_cast<float>(collisionGroupMaxHitpoints) * shipRepairCostFactor));
             }
 
             CollisionGroupDesc repairedGroup;
@@ -387,7 +419,7 @@ namespace Insurance
         for (EquipDesc equip : Players[clientId].equipDescList.equip)
         {
             const Archetype::Equipment* equipment = Archetype::GetEquipment(equip.iArchID);
-            if (equipment != nullptr && IsEquipment(equipment->get_class_type()))
+            if (equipment && equip.bMounted && IsEquipment(equipment->get_class_type()))
             {
                 const auto& good = GoodList::find_by_id(equip.iArchID);
                 repairCost += static_cast<int>(std::round((1 - equip.fHealth) * good->fPrice * equipmentRepairCostFactor));
@@ -621,7 +653,7 @@ namespace Insurance
 
         returncode = DEFAULT_RETURNCODE;
     }
-
+    
     void __stdcall CharacterSelect_After(const CHARACTER_ID& cId, unsigned int clientId)
     {
         clientUndockedFromBase.erase(clientId);
@@ -669,9 +701,9 @@ namespace Insurance
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (!oldCharacterFileName.empty())
+        const std::string& sOldCharacterFileName = wstos(oldCharacterFileName);
+        if (!oldCharacterFileName.empty() && insuranceByCharacterFileName.contains(sOldCharacterFileName))
         {
-            const std::string sOldCharacterFileName = wstos(oldCharacterFileName);
             if (onlyDelete)
             {
                 try
@@ -686,7 +718,7 @@ namespace Insurance
             }
             else if (std::wstring newCharacterFileName; HkGetCharFileName(newCharname, newCharacterFileName) == HKE_OK)
             {
-                const std::string sNewCharacterFileName = wstos(newCharacterFileName);
+                const std::string& sNewCharacterFileName = wstos(newCharacterFileName);
                 try
                 {
                     std::filesystem::rename(outputDirectory + sOldCharacterFileName + ".ini", outputDirectory + sNewCharacterFileName + ".ini");
@@ -742,6 +774,7 @@ namespace Insurance
 
             if (arguments.empty())
             {
+                const std::wstring money = baseId ? L"Projected deposit : " + PrintMoney(GetProjectedInsuranceCost(clientId)) : L"Current deposit : " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney);
                 switch (insuranceByCharacterFileName[GetCharacterFileName(clientId)].type)
                 {
                     case InsuranceType::None:
@@ -749,15 +782,15 @@ namespace Insurance
                         break;
 
                     case InsuranceType::Equipment:
-                        PrintUserCmdText(clientId, L"Insurance activated for ship and equipment. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and equipment. " + money);
                         break;
 
                     case InsuranceType::Consumables:
-                        PrintUserCmdText(clientId, L"Insurance activated for ship and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        PrintUserCmdText(clientId, L"Insurance activated for ship and consumables. " + money);
                         break;
 
                     case InsuranceType::All:
-                        PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables. Current deposit: " + PrintMoney(insuranceByCharacterFileName[GetCharacterFileName(clientId)].depositedMoney));
+                        PrintUserCmdText(clientId, L"Insurance activated for ship, equipment and consumables. " + money);
                         break;
                 }
             }

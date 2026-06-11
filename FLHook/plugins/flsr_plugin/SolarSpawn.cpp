@@ -1,4 +1,5 @@
-#include "Main.h"
+#include "SolarSpawn.h"
+#include "Plugin.h"
 #include "Pilots.h"
 #include "Cloak.h"
 #include <random>
@@ -337,7 +338,7 @@ namespace SolarSpawn
 		return true;
 	}
 
-	static uint GetShipMessageId(uint shipId)
+	static uint GetShipMessageId(const uint shipId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -349,7 +350,7 @@ namespace SolarSpawn
 		return CreateID(msgIdPrefix);
 	}
 
-	static bool SendLaunchWellWishes(uint shipId, uint solarObjId, uint dockId)
+	static bool SendLaunchWellWishes(const uint shipId, const uint solarObjId, const uint dockId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -440,8 +441,7 @@ namespace SolarSpawn
 
 		IObjRW* inspect;
 		StarSystem* starSystem;
-		uint targetId = dockTargetId;
-		if (!GetShipInspect(targetId, inspect, starSystem))
+		if (!GetShipInspect(dockTargetId, inspect, starSystem))
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return 0;
@@ -681,6 +681,8 @@ namespace SolarSpawn
 		dockQueues.erase(objId);
 		returncode = DEFAULT_RETURNCODE;
 	}
+
+	#define IS_CMD(a) !wscCmd.compare(L##a)
 
 	bool ExecuteCommandString(CCmds* cmds, const std::wstring& wscCmd)
 	{

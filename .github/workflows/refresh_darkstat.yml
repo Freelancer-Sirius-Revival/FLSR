@@ -1,0 +1,16 @@
+name: Darkstat refresh prod
+'on':
+  push:
+    tags:
+      - "*"
+  workflow_dispatch: {}
+jobs:
+  job:
+    name: Github Pages Production
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: darklab8/infra/.github/actions/trigger-workflow@master
+      with:
+        token: ${{ secrets.FLSR_DARKSTAT_REFRESH_KEY }}
+        repository: darklab8/fl-data-flsr
+        workflow-file: publish.yaml

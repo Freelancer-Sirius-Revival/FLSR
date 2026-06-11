@@ -21,6 +21,7 @@ namespace Missions
 			Manual
 		};
 
+		uint sortPosition;
 		const uint id;
 		const uint missionId;
 		const bool initiallyActive;

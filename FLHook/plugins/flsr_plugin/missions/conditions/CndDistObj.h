@@ -18,8 +18,8 @@ namespace Missions
 		const float distance;
 		const uint otherObjNameOrLabel;
 
-		bool IsDistanceMatching(const CObject* objA, uint objIdB) const;
-		bool IsDistanceMatchingToOthers(uint objId);
+		bool IsDistanceMatching(const CObject* objA, const uint objIdB) const;
+		bool IsDistanceMatchingToOthers(const uint objId);
 
 	public:
 		CndDistObj(const ConditionParent& parent,

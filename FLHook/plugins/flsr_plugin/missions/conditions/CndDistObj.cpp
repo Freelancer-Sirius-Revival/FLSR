@@ -37,7 +37,7 @@ namespace Missions
 			orderedCndDistObj.erase(it);
 	}
 
-	bool CndDistObj::IsDistanceMatching(const CObject* objA, uint objIdB) const
+	bool CndDistObj::IsDistanceMatching(const CObject* objA, const uint objIdB) const
 	{
 		IObjRW* inspectB;
 		StarSystem* starSystem;
@@ -49,7 +49,7 @@ namespace Missions
 		return (condition == CndDistObj::DistanceCondition::Inside && inside) || (condition == CndDistObj::DistanceCondition::Outside && !inside);
 	}
 
-	bool CndDistObj::IsDistanceMatchingToOthers(uint objId)
+	bool CndDistObj::IsDistanceMatchingToOthers(const uint objId)
 	{
 		IObjRW* inspectA;
 		StarSystem* starSystem;

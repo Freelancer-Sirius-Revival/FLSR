@@ -3,7 +3,7 @@
 
 namespace Missions
 {
-	std::unordered_map<uint, std::unordered_set<CndLeaveMsn*>> observedCndLeaveMsnByMissionId;
+	std::unordered_set<CndLeaveMsn*> observedCndLeaveMsn;
 	std::unordered_map<uint, std::vector<CndLeaveMsn*>> orderedCndLeaveMsnByMissionId;
 
 	CndLeaveMsn::CndLeaveMsn(const ConditionParent& parent, const uint label) :
@@ -18,22 +18,19 @@ namespace Missions
 
 	void CndLeaveMsn::Register()
 	{
-		if (observedCndLeaveMsnByMissionId[parent.missionId].insert(this).second)
+		if (observedCndLeaveMsn.insert(this).second)
 			orderedCndLeaveMsnByMissionId[parent.missionId].push_back(this);
 	}
 
 	void CndLeaveMsn::Unregister()
 	{
-		observedCndLeaveMsnByMissionId[parent.missionId].erase(this);
+		observedCndLeaveMsn.erase(this);
 		auto& orderedCndLeaveMsn = orderedCndLeaveMsnByMissionId[parent.missionId];
 		if (const auto it = std::find(orderedCndLeaveMsn.begin(), orderedCndLeaveMsn.end(), this); it != orderedCndLeaveMsn.end())
 			orderedCndLeaveMsn.erase(it);
 
-		if (observedCndLeaveMsnByMissionId[parent.missionId].empty())
-		{
-			observedCndLeaveMsnByMissionId.erase(parent.missionId);
+		if (orderedCndLeaveMsnByMissionId[parent.missionId].empty())
 			orderedCndLeaveMsnByMissionId.erase(parent.missionId);
-		}
 	}
 
 	bool CndLeaveMsn::Matches(const uint clientId)
@@ -66,15 +63,10 @@ namespace Missions
 		{
 			void EvaluateLeaveMission(const uint missionId, const uint clientId)
 			{
-				const auto& observedCndLeaveMsnEntry = observedCndLeaveMsnByMissionId.find(missionId);
-				if (observedCndLeaveMsnEntry == observedCndLeaveMsnByMissionId.end() || observedCndLeaveMsnEntry->second.size() == 0)
-					return;
-
 				const auto& orderedCndLeaveMsnEntry = orderedCndLeaveMsnByMissionId.find(missionId);
 				if (orderedCndLeaveMsnEntry == orderedCndLeaveMsnByMissionId.end() || orderedCndLeaveMsnEntry->second.size() == 0)
 					return;
 
-				const auto& observedCndLeaveMsn = observedCndLeaveMsnEntry->second;
 				const auto currentConditions(orderedCndLeaveMsnEntry->second);
 				for (const auto& condition : currentConditions)
 				{

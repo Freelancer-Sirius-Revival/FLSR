@@ -282,7 +282,7 @@ typedef void(__stdcall *_RCSendChatMsg)(uint iId, uint iTo, uint iSize,
 typedef void(__stdcall *_CRCAntiCheat)();
 typedef void(__stdcall *_CreateChar)(const wchar_t *wszName);
 typedef int(__cdecl *_GetFLName)(char *szBuf, const wchar_t *wszStr);
-typedef bool(__cdecl* _GetShipInspect)(uint& iShip, IObjRW*& inspect, StarSystem*& starSystem);
+typedef bool(__cdecl* _GetShipInspect)(const uint& iShip, IObjRW*& inspect, StarSystem*& starSystem);
 
 EXPORT extern _GetShipInspect GetShipInspect;
 
@@ -806,8 +806,7 @@ namespace HkIEngine {
     int __cdecl FreeReputationVibe(int const &p1);
     void __cdecl Update_Time(double);
     void __stdcall Elapse_Time(float p1);
-    int __cdecl Dock_Call(unsigned int const &, unsigned int const &, int,
-                          enum DOCK_HOST_RESPONSE);
+    int __cdecl Dock_Call(unsigned int const &, unsigned int const &, int, enum DOCK_HOST_RESPONSE);
     void _LaunchPos();
     void CGuidedInitNaked();
     void _CShip_init();
@@ -829,7 +828,12 @@ namespace HkIEngine {
     void CObjDestrOrgNaked();
     CObject* __cdecl CObjectFindDetour(const uint& spaceObjId, CObject::Class objClass);
     CObject* __cdecl CObjAllocDetour(CObject::Class objClass);
+    void HookCPlayerGroupAddMember();
+    void HookCPlayerGroupDelMember();
 } // namespace HkIEngine
+
+void UnDetour(void* pOFunc, unsigned char* originalData);
+void Detour(void* pOFunc, void* pHkFunc, unsigned char* originalData);
 
 // HkTimers
 void HkTimerCheckKick();

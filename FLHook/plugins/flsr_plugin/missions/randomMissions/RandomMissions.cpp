@@ -2,6 +2,7 @@
 #include "TradeMissions.h"
 #include "Costumes.h"
 #include "Factions.h"
+#include "Meta.h"
 #include "Offers.h"
 
 namespace RandomMissions
@@ -26,6 +27,9 @@ namespace RandomMissions
 		initialized = true;
 
 		ConPrint(L"Initializing Random Missions... ");
+
+		ReadMetadata();
+		CacheDockableSolars();
 
 		for (auto& factionEntry : factionById)
 			pub::Reputation::GetReputationGroup(factionEntry.second.groupId, factionEntry.second.name.c_str());

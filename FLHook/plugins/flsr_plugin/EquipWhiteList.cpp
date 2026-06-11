@@ -1,4 +1,5 @@
-#include "Main.h"
+#include "EquipWhiteList.h"
+#include "Plugin.h"
 
 namespace EquipWhiteList
 {
@@ -7,13 +8,13 @@ namespace EquipWhiteList
 
 	std::unordered_map<uint, std::unordered_set<uint>> allowedEquipmentArchetypeIdsPerShipArchetypeId;
 
-	void LoadEquipWhiteList()
+	void ReadFiles()
 	{
 		ConPrint(L"Initializing Equip Whitelist... ");
 
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-		std::string configFilePath = std::string(currentDirectory) + Globals::Equip_WHITELIST_FILE;
+		std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-EquipWhiteList.cfg";
 
 		allowedEquipmentArchetypeIdsPerShipArchetypeId.clear();
 		INI_Reader ini;
@@ -84,14 +85,14 @@ namespace EquipWhiteList
 	{
 		boughtShipArchByClientId.erase(clientId);
 		const GoodInfo* goodInfo = GoodList::find_by_id(gbi.iGoodID);
-		if (!goodInfo || goodInfo->iType != 3)
+		if (!goodInfo || goodInfo->type != GoodInfo::GoodType::Ship)
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return;
 		}
 		const GoodInfo* hullGoodInfo = GoodList::find_by_id(goodInfo->iHullGoodID);
-		if (hullGoodInfo && hullGoodInfo->iType == 2)
-			boughtShipArchByClientId[clientId] = hullGoodInfo->iShipGoodID;
+		if (hullGoodInfo && hullGoodInfo->type == GoodInfo::GoodType::Hull)
+			boughtShipArchByClientId[clientId] = hullGoodInfo->shipArchId;
 		returncode = DEFAULT_RETURNCODE;
 	}
 
@@ -118,7 +119,7 @@ namespace EquipWhiteList
 		)
 		{
 			mounted = false;
-			strcpy(hardpoint, EquipDesc::CARGO_BAY_HP_NAME.value);
+			strcpy_s(hardpoint, strlen(hardpoint), EquipDesc::CARGO_BAY_HP_NAME.value);
 			SendNNMessages(clientId);
 		}
 		returncode = DEFAULT_RETURNCODE;

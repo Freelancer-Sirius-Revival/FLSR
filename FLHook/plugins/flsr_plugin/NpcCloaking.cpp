@@ -86,7 +86,7 @@ namespace NpcCloaking
 
 	std::unordered_map<uint, ObjectData> objData;
 
-	void RegisterObject(uint objId)
+	void RegisterObject(const uint objId)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;
@@ -198,10 +198,9 @@ namespace NpcCloaking
 			// Full cloak desired but just reached full uncloak
 			if (cloakedStateTargetted && currentCloakPercentage == 0.0f)
 			{
-				uint objId = objEntry->first;
 				IObjRW* inspect;
 				StarSystem* starSystem;
-				if (GetShipInspect(objId, inspect, starSystem))
+				if (GetShipInspect(objEntry->first, inspect, starSystem))
 				{
 					uint cloakFuseId = cloakForObjArchDefinitions.at(inspect->cobj->archetype->iArchID).cloakFuseId;
 					inspect->unlight_fuse_unk(&cloakFuseId, 0, 0.0f);
@@ -218,10 +217,9 @@ namespace NpcCloaking
 			// Full uncloak desired but just reached full cloak
 			else if (!cloakedStateTargetted && currentCloakPercentage == 1.0f)
 			{
-				uint objId = objEntry->first;
 				IObjRW* inspect;
 				StarSystem* starSystem;
-				if (GetShipInspect(objId, inspect, starSystem))
+				if (GetShipInspect(objEntry->first, inspect, starSystem))
 				{
 					uint uncloakFuseId = cloakForObjArchDefinitions.at(inspect->cobj->archetype->iArchID).uncloakFuseId;
 					inspect->unlight_fuse_unk(&uncloakFuseId, 0, 0.0f);
@@ -277,7 +275,7 @@ namespace NpcCloaking
 		GetClientInterface()->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
 	}
 
-	static void SendCloakingDeviceState(const uint clientId, uint objId, const EquipDescVector& equipList)
+	static void SendCloakingDeviceState(const uint clientId, const uint objId, const EquipDescVector& equipList)
 	{
 		IObjRW* inspect;
 		StarSystem* system;
@@ -296,7 +294,7 @@ namespace NpcCloaking
 		}
 	}
 
-	static void SendShieldState(const uint clientId, uint objId)
+	static void SendShieldState(const uint clientId, const uint objId)
 	{
 		float currentShieldCapacity;
 		float maxShieldCapacity;

@@ -4,30 +4,13 @@
 #include "Carrier.h"
 #include "Cloak.h"
 #include "Mark.h"
+#include "Chat.h"
+#include "Discord.h"
 
 namespace Commands
 {
     void UserCmd_HELP(uint iClientID, const std::wstring& wscParam) {
-
-
-        //Create Popup struct
-        PopUp::PopUpBox NewPopUpBox;
-        NewPopUpBox.iClientID = iClientID;
-        NewPopUpBox.iHead = 524291;
-        NewPopUpBox.iBody = 524292;
-        NewPopUpBox.iPage = 1;
-        NewPopUpBox.iMaxPage = 1;
-        NewPopUpBox.iButton = POPUPDIALOG_BUTTONS_CENTER_OK;
-
-        std::wstring wscCharFileName;
-        HkGetCharFileName(ARG_CLIENTID(iClientID), wscCharFileName);
-
-        //Setup New Popup
-        PopUp::mPopUpBox[wscCharFileName] = NewPopUpBox;
-
-        //OpenPopup
-        PopUp::OpenPopUp(iClientID);
-
+        pub::Player::PopUpDialog(iClientID, FmtStr(524291, 0), FmtStr(524292, 0), PopupDialogButton::CENTER_OK);
     }
 
     void UserCmd_UV(uint iClientID, const std::wstring& wscParam) {
@@ -43,13 +26,9 @@ namespace Commands
 
         {
             // Mutex sperren
-            std::lock_guard<std::mutex> lock(m_Mutex);
-
-            // Chat-Nachricht zur Liste hinzuf�gen
+            std::lock_guard<std::mutex> lock(Discord::m_Mutex);
             Discord::lChatMessages.push_back(ChatMsg);
         } // Mutex wird hier automatisch freigegeben
-
-
     }
 
     /** Process a give cash command */
@@ -499,20 +478,6 @@ namespace Commands
         return;
     }
 
-    // Contributor TextBox
-    void UserCMD_Contributor(uint iClientID, const std::wstring& wscParam) {
-        FmtStr caption(0, 0);
-        caption.begin_mad_lib(PopUp::iContributor_Head);
-        caption.end_mad_lib();
-
-        FmtStr message(0, 0);
-        message.begin_mad_lib(PopUp::iContributor_Body);
-        message.end_mad_lib();
-
-        pub::Player::PopUpDialog(iClientID, caption, message, POPUPDIALOG_BUTTONS_CENTER_OK);
-        return;
-    }
-
     static void UserCMD_Rename(uint clientId, const std::wstring& wscParam)
     {
         const std::wstring trimmedName = Trim(wscParam);
@@ -534,11 +499,17 @@ namespace Commands
         }
     }
 
+    static void UserCMD_Time(uint clientId, const std::wstring& wscParam)
+    {
+        const auto& now = std::chrono::utc_clock::now();
+        const auto& fmt = std::format("{0:%F} {0:%T} {0:%Z}", std::chrono::floor<std::chrono::seconds>(now));
+        PrintUserCmdText(clientId, stows(fmt));
+    }
+
     USERCMD UserCmds[] = {
         {L"/uv", UserCmd_UV},
         {L"/sendcash", UserCMD_SendCash},
         {L"/sendcash$", UserCMD_SendCash$},
-        {L"/contributor", UserCMD_Contributor},
         {L"/help", UserCmd_HELP},
         {L"/cloak", Cloak::UserCmd_CLOAK},
         {L"/c", Cloak::UserCmd_CLOAK},
@@ -560,6 +531,7 @@ namespace Commands
         {L"/friend", IFF::UserCmd_Allied},
         {L"/iff", IFF::UserCmd_Attitude},
         {L"/rename", UserCMD_Rename},
+        {L"/time", UserCMD_Time},
     };
 
     // User command processing

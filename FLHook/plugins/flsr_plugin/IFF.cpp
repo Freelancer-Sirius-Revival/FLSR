@@ -19,13 +19,6 @@ namespace IFF
     const std::string HOSTILE_VALUE = "hostile";
     const std::string ALLIED_VALUE = "allied";
 
-    enum class Attitude
-    {
-        Neutral,
-        Hostile,
-        Allied
-    };
-
     std::unordered_map<std::string, std::unordered_map<std::string, Attitude>> characterFileNamesToCharacterFileNameAttitudes;
 
     static void ApplyAttitude(const std::pair<uint, uint>& clientIds, const Attitude attitude)
@@ -62,7 +55,7 @@ namespace IFF
         return wstos(characterFileName);
     }
 
-    static std::pair<Attitude, Attitude> GetAttitudeTowards(const std::pair<std::wstring, std::wstring>& characterNames)
+    std::pair<Attitude, Attitude> GetAttitudeTowards(const std::pair<std::wstring, std::wstring>& characterNames)
     {
         const std::string& firstCharacterFileName = GetCharacterFileName(characterNames.first);
         const std::string& secondCharacterFileName = GetCharacterFileName(characterNames.second);
@@ -190,7 +183,17 @@ namespace IFF
         return L"";
     }
 
-    static std::pair<Attitude, Attitude> TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring targetCharacterName, const Attitude attitude)
+    void SetAttitude(const uint clientId, const uint targetClientId, const Attitude attitude)
+    {
+        const std::wstring& currentCharacterName = GetCharacterName(clientId);
+        const std::wstring& targetCharacterName = GetCharacterName(targetClientId);
+        if (currentCharacterName.empty() || targetCharacterName.empty())
+            return;
+        WriteCharacterAttitude(currentCharacterName, targetCharacterName, attitude);
+        ApplyAttitude({ clientId, targetClientId }, attitude);
+    }
+
+    static std::pair<Attitude, Attitude> TrySetAttitudeTowardsTarget(const uint currentClientId, const std::wstring& targetCharacterName, const Attitude attitude)
     {
         std::pair<Attitude, Attitude> attitudeChange = { attitude, attitude };
 
@@ -207,7 +210,7 @@ namespace IFF
             return attitudeChange;
         }
 
-        const std::wstring currentCharacterName = GetCharacterName(currentClientId);
+        const std::wstring& currentCharacterName = GetCharacterName(currentClientId);
         if (currentCharacterName == targetCharacterName)
             return attitudeChange;
 

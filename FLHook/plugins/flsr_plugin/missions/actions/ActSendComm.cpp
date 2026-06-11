@@ -2,7 +2,7 @@
 
 namespace Missions
 {
-	static void SendComm(const uint receiverObjId, uint senderObjId, const ActSendComm& action, const MissionObject& senderObject, Mission& mission)
+	static void SendComm(const uint receiverObjId, const uint senderObjId, const ActSendComm& action, const MissionObject& senderObject, Mission& mission)
 	{
 		IObjRW* inspect;
 		StarSystem* starSystem;

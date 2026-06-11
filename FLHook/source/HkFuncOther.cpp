@@ -216,9 +216,7 @@ HK_ERROR HkDelAdmin(const std::wstring &wscCharname) {
 bool g_bNPCDisabled = false;
 
 HK_ERROR HkChangeNPCSpawn(bool bDisable) {
-    if (g_bNPCDisabled && bDisable)
-        return HKE_OK;
-    else if (!g_bNPCDisabled && !bDisable)
+    if (g_bNPCDisabled == bDisable)
         return HKE_OK;
 
     char szJump[1];

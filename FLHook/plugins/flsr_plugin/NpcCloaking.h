@@ -4,7 +4,7 @@
 namespace NpcCloaking
 {
 	void ReadFiles();
-	void RegisterObject(uint objId);
+	void RegisterObject(const uint objId);
 	void SetTargetCloakState(const uint objId, const bool cloaked);
 	void __stdcall Elapse_Time_AFTER(float seconds);
 	void __stdcall ShipAndSolarDestroyed(IObjRW* killedObj, bool killed, uint killerObjId);

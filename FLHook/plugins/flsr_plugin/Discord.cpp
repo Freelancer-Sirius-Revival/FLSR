@@ -1,25 +1,158 @@
-﻿#include "main.h"
+﻿//Disable Warnings
+#pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
+
+#include <dpp/dpp.h>
+#include "Discord.h"
+#include "Chat.h"
 #include <codecvt>
 #include <regex>
 
-namespace Discord {
+namespace Discord
+{
+	struct DMMessage
+	{
+		std::string DiscordUserID;
+		dpp::message DiscordMessage;
+	};
+
+	struct LastSelectClick
+	{
+		dpp::user User;
+		dpp::select_click_t event;
+
+		LastSelectClick(const dpp::user& user, const dpp::select_click_t& clickEvent)
+			: User(user), event(clickEvent)
+		{}
+	};
+
+	struct MessageListEntry
+	{
+		dpp::message Message;
+	};
+
+	struct DiscordUser
+	{
+		std::string scServerUsername;
+		std::string scDiscordUsername;
+		std::string scDiscordDisplayName;
+		std::string scDiscordID;
+	};
+
+	std::mutex m_Mutex;
 
 	std::string scDiscordBotToken;
 	std::string scDiscordServerID;
 	std::string scUVChatChannelID;
-
 
 	std::list<ChatMessage> lChatMessages;
 	std::list <LastSelectClick> lLastSelectClick;
 	std::map<std::string, DiscordUser> userDataMap;
 	int iOnlinePlayers;
 
+	std::string wstring_to_utf8(const std::wstring& wstr) {
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		return converter.to_bytes(wstr);
+	}
+
+	std::wstring Utf8ToWString(const std::string& utf8Str) {
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.from_bytes(utf8Str);
+	}
+
+	//Embeds
+	template<typename T>
+	void GetServerstatus(const T& event)
+	{
+		if (iOnlinePlayers > 0)
+		{
+			std::vector<std::string> charnames;
+			std::vector<std::string> ships;
+			std::vector<std::string> pings;
+
+			{
+				// Mutex sperren
+				std::lock_guard<std::mutex> lock(m_Mutex);
+
+				struct PlayerData* pPD = 0;
+
+				while (pPD = Players.traverse_active(pPD))
+				{
+					if (!HkIsInCharSelectMenu(pPD->iOnlineID)) {
+						int iRank = pPD->iRank;
+						uint iShipArch = pPD->iShipArchetype;
+						//Charname
+						std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(pPD->iOnlineID);
+						std::string scCharname = wstring_to_utf8(wscCharname);
+						//Ping
+						HKPLAYERINFO pi;
+						HkGetPlayerInfo(wscCharname, pi, false);
+						auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
+
+
+						charnames.push_back(scCharname);
+						ships.push_back(std::to_string(iShipArch));
+						pings.push_back(std::to_string(ping));
+					}
+
+				}
+
+			} // Mutex wird hier automatisch freigegeben
+
+			dpp::message msg("");
+			dpp::embed embed = dpp::embed().
+				set_title("Serverstatus").
+				set_description("Online Players: " + std::to_string(iOnlinePlayers)).
+				set_color(0x00FFFF);
+
+			std::string charnamesLine;
+			for (size_t i = 0; i < charnames.size(); ++i)
+			{
+				if (i > 0)
+					charnamesLine += "\n";
+				charnamesLine += charnames[i];
+			}
+
+			HkLoadStringDLLs();
+			std::string shipsLine;
+			for (size_t i = 0; i < ships.size(); ++i)
+			{
+				if (i > 0)
+					shipsLine += "\n";
+
+				Archetype::Ship* ship = Archetype::GetShip(std::stoul(ships[i]));
+				std::wstring wscShipName = HkGetWStringFromIDS(ship->iIdsName).c_str();
+
+				shipsLine += wstring_to_utf8(wscShipName);
+			}
+
+			std::string pingsLine;
+			for (size_t i = 0; i < pings.size(); ++i)
+			{
+				if (i > 0)
+					pingsLine += "\n";
+				pingsLine += pings[i] + " ms";
+			}
+
+			embed.add_field("Charname", charnamesLine, true)
+				.add_field("Ship", shipsLine, true)
+				.add_field("Ping", pingsLine, true);
+
+			msg.add_embed(embed);
+
+			event.reply(msg);
+		}
+		else
+		{
+			event.reply("Currently there are no players online.");
+		}
+	}
+
 	bool LoadSettings()
 	{
 		// Konfigpfad
 		char szCurDir[MAX_PATH];
 		GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-		std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
+		std::string scPluginCfgFile = std::string(szCurDir) + "\\flhook_plugins\\flsr.cfg";
 
 		scDiscordBotToken = IniGetS(scPluginCfgFile, "Discord", "BotToken", "");
 		if (scDiscordBotToken.empty()) {
@@ -41,7 +174,8 @@ namespace Discord {
 		return true;
 	}
 
-	void StartUp() { //Discord Bot
+	void StartUp()
+	{
 
 		dpp::cluster DiscordBot(scDiscordBotToken);
 
@@ -189,107 +323,5 @@ namespace Discord {
 
 		DiscordBot.start(dpp::st_wait);
 		
-	} //Discord Bot END
-	
-
-	//Embeds
-	template<typename T>
-	void GetServerstatus(const T& event)
-	{
-		if (iOnlinePlayers > 0)
-		{
-			std::vector<std::string> charnames;
-			std::vector<std::string> ships;
-			std::vector<std::string> pings;
-
-			{
-				// Mutex sperren
-				std::lock_guard<std::mutex> lock(m_Mutex);
-
-				struct PlayerData* pPD = 0;
-
-				while (pPD = Players.traverse_active(pPD))
-				{
-					if (!HkIsInCharSelectMenu(pPD->iOnlineID)) {
-						int iRank = pPD->iRank;
-						uint iShipArch = pPD->iShipArchetype;
-						//Charname
-						std::wstring wscCharname = (wchar_t*)Players.GetActiveCharacterName(pPD->iOnlineID);
-						std::string scCharname = wstring_to_utf8(wscCharname);
-						//Ping
-						HKPLAYERINFO pi;
-						HkGetPlayerInfo(wscCharname, pi, false);
-						auto ping = static_cast<int>(pi.ci.dwRoundTripLatencyMS);
-
-
-						charnames.push_back(scCharname);
-						ships.push_back(std::to_string(iShipArch));
-						pings.push_back(std::to_string(ping));
-					}
-
-				}
-
-			} // Mutex wird hier automatisch freigegeben
-
-			dpp::message msg("");
-			dpp::embed embed = dpp::embed().
-				set_title("Serverstatus").
-				set_description("Online Players: " + std::to_string(iOnlinePlayers)).
-				set_color(0x00FFFF);
-
-			std::string charnamesLine;
-			for (size_t i = 0; i < charnames.size(); ++i)
-			{
-				if (i > 0)
-					charnamesLine += "\n";
-				charnamesLine += charnames[i];
-			}
-
-			HkLoadStringDLLs();
-			std::string shipsLine;
-			for (size_t i = 0; i < ships.size(); ++i)
-			{
-				if (i > 0)
-					shipsLine += "\n";
-
-				Archetype::Ship* ship = Archetype::GetShip(std::stoul(ships[i]));
-				std::wstring wscShipName = HkGetWStringFromIDS(ship->iIdsName).c_str();
-
-				shipsLine += wstring_to_utf8(wscShipName);
-			}
-
-			std::string pingsLine;
-			for (size_t i = 0; i < pings.size(); ++i)
-			{
-				if (i > 0)
-					pingsLine += "\n";
-				pingsLine += pings[i] + " ms";
-			}
-
-			embed.add_field("Charname", charnamesLine, true)
-				.add_field("Ship", shipsLine, true)
-				.add_field("Ping", pingsLine, true);
-
-			msg.add_embed(embed);
-
-			event.reply(msg);
-		}
-		else
-		{
-			event.reply("Currently there are no players online.");
-		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//Helper
-
-	std::string wstring_to_utf8(const std::wstring& wstr) {
-		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		return converter.to_bytes(wstr);
-	}
-
-	std::wstring Utf8ToWString(const std::string& utf8Str) {
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-		return converter.from_bytes(utf8Str);
 	}
 }

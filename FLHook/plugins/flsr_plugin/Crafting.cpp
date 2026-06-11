@@ -7,11 +7,13 @@
 * fail_sound_nickname = 
 * 
 * [Foo Bar]
-* product = item_nickname, count
+* product = good_nickname, count
 * cost = money
-* ingredient = item_nickname, count
+* ingredient = good_nickname, count
 * ...
 * base_nickname = base_name
+* ...
+* ship_nickname = shiparch_name
 * ...
 */
 
@@ -25,6 +27,7 @@ namespace Crafting
 		int cost = 0;
 		std::vector<std::pair<uint, int>> ingredientArchetypeIdsWithCount;
 		std::set<uint> validBaseIds;
+		std::set<uint> validShipIds;
 		uint successSoundId = 0;
 	};
 
@@ -94,6 +97,10 @@ namespace Crafting
 						else if (ini.is_value("base_nickname"))
 						{
 							recipe.validBaseIds.insert(CreateID(ini.get_value_string(0)));
+						}
+						else if (ini.is_value("ship_nickname"))
+						{
+							recipe.validShipIds.insert(CreateID(ini.get_value_string(0)));
 						}
 						else if (ini.is_value("success_sound_nickname"))
 						{
@@ -192,6 +199,18 @@ namespace Crafting
 		{
 			PrintUserCmdText(clientId, L"You must be docked to craft items!");
 			return false;
+		}
+
+		// Check if the player has a valid ship.
+		if (!recipe.validShipIds.empty())
+		{
+			uint shipArchetypeId;
+			pub::Player::GetShipID(clientId, shipArchetypeId);
+			if (!recipe.validShipIds.contains(shipArchetypeId))
+			{
+				PrintUserCmdText(clientId, L"You must own a specific ship to craft '" + recipe.originalName + L"'!");
+				return false;
+			}
 		}
 
 		const std::wstring& characterNameWS = (wchar_t*)Players.GetActiveCharacterName(clientId);

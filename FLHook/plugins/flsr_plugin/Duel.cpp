@@ -155,14 +155,14 @@ namespace Duel
 	{
 		const uint baseId = Players[clientId].iLastBaseID;
 		if (!baseId)
-			return -1.0f;
+			return FLT_MAX;
 
 		if (const auto& entry = systemIdAndPositionByBaseId.find(baseId); entry != systemIdAndPositionByBaseId.end())
 		{
 			uint systemId = 0;
 			pub::Player::GetSystem(clientId, systemId);
 			if (systemId != entry->second.first)
-				return -1.0f;
+				return FLT_MAX;
 
 			uint shipId = 0;
 			pub::Player::GetShip(clientId, shipId);
@@ -172,7 +172,7 @@ namespace Duel
 				return HkDistance3D(entry->second.second, inspect->get_position());
 		}
 
-		return -1.0f;
+		return FLT_MAX;
 	}
 
 	static bool MovedTooFarAwayFromLastBase(const uint clientId)

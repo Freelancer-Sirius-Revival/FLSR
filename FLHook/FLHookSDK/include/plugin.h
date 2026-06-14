@@ -98,9 +98,8 @@ enum PLUGIN_CALLBACKS
 	PLUGIN_HkIServerImpl_LocationInfoRequest_AFTER,
 	PLUGIN_HkIServerImpl_MissionResponse,
 	PLUGIN_HkIServerImpl_MissionResponse_AFTER,
-	//Added - FLSR
 	PLUGIN_HkIServerImpl_PopUpDialog,
-	
+	PLUGIN_HkIServerImpl_PopUpDialog_AFTER,
 	PLUGIN_HkIServerImpl_ReqAddItem,
 	PLUGIN_HkIServerImpl_ReqAddItem_AFTER,
 	PLUGIN_HkIServerImpl_ReqChangeCash,

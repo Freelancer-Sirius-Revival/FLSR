@@ -1689,6 +1689,8 @@ if (set_bLogConnects)
         CALL_PLUGINS_V(PLUGIN_HkIServerImpl_PopUpDialog, __stdcall, (unsigned int iClientID, unsigned int buttonClicked), (iClientID, buttonClicked));
 
         EXECUTE_SERVER_CALL(Server.PopUpDialog(iClientID, buttonClicked));
+
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_PopUpDialog_AFTER, __stdcall, (unsigned int iClientID, unsigned int buttonClicked), (iClientID, buttonClicked));
     }
 
 

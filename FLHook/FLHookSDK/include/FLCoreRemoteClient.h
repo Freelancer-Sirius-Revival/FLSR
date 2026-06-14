@@ -277,7 +277,7 @@ public:
 	virtual bool Send_FLPACKET_COMMON_SET_VISITED_STATE(uint iClientID, unsigned char* p2, int p3);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint iClientID, XRequestBestPath const& bestPath, int p3);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_PLAYER_STATS(uint iClientID, unsigned char* p2, int p3);
-	virtual void unknown_96(uint iClientID, uint iDunno, uint iDunno2, uint iDunno3);
+	virtual void Send_FLPACKET_COMMON_POP_UP_DIALOG(uint iClientID, FmtStr* heading, FmtStr* text, uint buttons);
 	virtual bool Send_FLPACKET_COMMON_REQUEST_GROUP_POSITIONS(uint iClientID, unsigned char* p2, int p3);
 	virtual bool Send_FLPACKET_COMMON_SET_MISSION_LOG(uint iClientID, unsigned char* p2, int p3);
 	virtual bool Send_FLPACKET_COMMON_SET_INTERFACE_STATE(uint iClientID, unsigned char* p2, int p3);

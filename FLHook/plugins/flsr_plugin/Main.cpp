@@ -259,6 +259,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ObjectDestroyed, PLUGIN_ShipDestroyed, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::UserCmd_Craft, PLUGIN_UserCmd_Process, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LootBoxes::UserCmd_Open, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&LootBoxes::ReadInitialData, PLUGIN_HkTimerCheckKick, 0));

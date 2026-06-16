@@ -36,7 +36,9 @@ namespace Missions
 
 	static void PrintErrorToConsole(const INI_Reader& ini, const uint argNum, const std::wstring& error)
 	{
-		ConPrint(L"ERROR: " + stows(ini.get_file_name()) + L", Line " + std::to_wstring(ini.get_line_num()) + L", Arg " + std::to_wstring(argNum + 1) + L": " + error + L"\n");
+		// Using ini.get_line_num is inaccurate at times. That is why the offset is used.
+		// -2 to the offset to compensate LR+CR which we have already passed most of the time.
+		ConPrint(L"ERROR: " + stows(ini.get_file_name()) + L", Offset " + std::to_wstring(ini.tell() - 2) + L", Arg " + std::to_wstring(argNum + 1) + L": " + error + L"\n");
 	}
 
 	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)

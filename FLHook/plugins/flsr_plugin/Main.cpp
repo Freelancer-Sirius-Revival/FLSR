@@ -72,7 +72,6 @@ void LoadSettings() {
     NpcCloaking::ReadFiles();
     EquipWhiteList::ReadFiles();
     SpawnProtection::LoadSettings();
-    Crafting::LoadSettings();
 
     // Konfigpfad
     char szCurDir[MAX_PATH];
@@ -269,7 +268,8 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ObjectDestroyed, PLUGIN_SolarDestroyed, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&GroupReputation::ObjectDestroyed, PLUGIN_ShipDestroyed, 0));
-
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::ReadInitialData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::UserCmd_Craft, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Crafting::PopUpDialog, PLUGIN_HkIServerImpl_PopUpDialog, 0));
 

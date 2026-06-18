@@ -1,13 +1,20 @@
 #include "Crafting.h"
 #include "Plugin.h"
+#include <filesystem>
+#include <regex>
 #include <random>
 
 /**
+* Reads all files in \flhook_plugins\crafting\
+* 
+* Commands by type: /craft, /dismantle, /loot
+* 
 * [General]
 * success_sound_nickname = 
 * fail_sound_nickname = 
 * 
 * [Foo Bar]
+* type = produce/dismantle/loot
 * product = good_nickname, minCount, maxCount, weightedChance
 * ...
 * cost = money
@@ -37,8 +44,17 @@ namespace Crafting
 		int count = 1;
 	};
 
+	enum class RecipeType
+	{
+		Any,
+		Produce,
+		Dismantle,
+		Loot
+	};
+
 	struct Recipe
 	{
+		RecipeType type = RecipeType::Any;
 		std::wstring originalName = L"";
 		std::vector<Product> products;
 		std::discrete_distribution<int> productDistribution;
@@ -101,97 +117,113 @@ namespace Crafting
 
 		char currentDirectory[MAX_PATH];
 		GetCurrentDirectory(sizeof(currentDirectory), currentDirectory);
-		const std::string configFilePath = std::string(currentDirectory) + "\\flhook_plugins\\FLSR-Crafting.cfg";
+		const std::string craftingDirectory = std::string(currentDirectory) + "\\flhook_plugins\\crafting\\";
+		if (!std::filesystem::is_directory(craftingDirectory))
+			return;
 
-		INI_Reader ini;
-		if (ini.open(configFilePath.c_str(), false))
+		const std::regex filePattern(".+\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(craftingDirectory))
 		{
-			while (ini.read_header())
+			const std::string fileName = wstos(entry.path().filename());
+			INI_Reader ini;
+			if (std::regex_match(fileName, filePattern) && ini.open((craftingDirectory + fileName).c_str(), false))
 			{
-				if (ini.is_header("General"))
+				while (ini.read_header())
 				{
-					while (ini.read_value())
+					if (ini.is_header("General"))
 					{
-						if (ini.is_value("success_sound_nickname"))
+						while (ini.read_value())
 						{
-							defaultSuccessSoundId = CreateID(ini.get_value_string(0));
-						}
-						else if (ini.is_value("fail_sound_nickname"))
-						{
-							failSoundId = CreateID(ini.get_value_string(0));
-						}
-					}
-				}
-				else
-				{
-					Recipe recipe;
-					std::vector<int> weights;
-					recipe.originalName = stows(ini.get_header_ptr());
-					std::string recipeNameLower = ToLower(wstos(recipe.originalName));
-					while (ini.read_value())
-					{
-						if (ini.is_value("product"))
-						{
-							Product product;
-							product.archetypeId = CreateID(ini.get_value_string(0));
-							if (ini.get_num_parameters() > 1)
+							if (ini.is_value("success_sound_nickname"))
 							{
-								product.minCount = std::max<int>(1, ini.get_value_int(1));
-								product.maxCount = product.minCount;
+								defaultSuccessSoundId = CreateID(ini.get_value_string(0));
 							}
-							if (ini.get_num_parameters() > 2)
-								product.maxCount = std::max<int>(product.minCount, ini.get_value_int(2));
-							if (ini.get_num_parameters() > 3)
-								weights.push_back(std::max<int>(0, ini.get_value_int(3)));
-
-							product.ship = IsShip(product.archetypeId);
-							if (product.ship)
-								recipe.shipPresent = true;
-							else
-								recipe.highestProductVolumeWithMaxCount = std::max<float>(recipe.highestProductVolumeWithMaxCount, GetEquipmentVolume(product.archetypeId) * product.maxCount);
-							productNamesByArchetypeId.insert({ product.archetypeId, GetEquipmentName(product.archetypeId) });
-							const GoodInfo* goodInfo = GoodList::find_by_id(product.archetypeId);
-							if (goodInfo && goodInfo->multiCount)
-								productArchetypeCombinable.insert(product.archetypeId);
-
-							recipe.products.push_back(product);
-						}
-						else if (ini.is_value("cost"))
-						{
-							recipe.cost = ini.get_value_int(0);
-						}
-						else if (ini.is_value("ingredient"))
-						{
-							Ingredient ingredient;
-							ingredient.archetypeId = CreateID(ini.get_value_string(0));
-							if (ini.get_num_parameters() > 1)
-								ingredient.count = std::max<int>(1, ini.get_value_int(1));
-							recipe.ingredients.push_back(ingredient);
-							recipe.totalIngredientsVolume += GetEquipmentVolume(ingredient.archetypeId) * ingredient.count;
-						}
-						else if (ini.is_value("base_nickname"))
-						{
-							recipe.validBaseIds.insert(CreateID(ini.get_value_string(0)));
-						}
-						else if (ini.is_value("ship_nickname"))
-						{
-							recipe.validShipIds.insert(CreateID(ini.get_value_string(0)));
-						}
-						else if (ini.is_value("success_sound_nickname"))
-						{
-							recipe.successSoundId = CreateID(ini.get_value_string(0));
+							else if (ini.is_value("fail_sound_nickname"))
+							{
+								failSoundId = CreateID(ini.get_value_string(0));
+							}
 						}
 					}
-					if (!recipe.products.empty() && !recipe.ingredients.empty())
+					else
 					{
-						recipe.productDistribution = std::discrete_distribution<int>({ weights.begin(), weights.end() });
-						recipes[recipeNameLower] = recipe;
+						Recipe recipe;
+						std::vector<int> weights;
+						recipe.originalName = stows(ini.get_header_ptr());
+						std::string recipeNameLower = ToLower(wstos(recipe.originalName));
+						while (ini.read_value())
+						{
+							if (ini.is_value("type"))
+							{
+								const auto& value = ToLower(std::string(ini.get_value_string(0)));
+								if (value == "produce")
+									recipe.type = RecipeType::Produce;
+								else if (value == "dismantle")
+									recipe.type = RecipeType::Dismantle;
+								else if (value == "loot")
+									recipe.type = RecipeType::Loot;
+							}
+							else if (ini.is_value("product"))
+							{
+								Product product;
+								product.archetypeId = CreateID(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+								{
+									product.minCount = std::max<int>(1, ini.get_value_int(1));
+									product.maxCount = product.minCount;
+								}
+								if (ini.get_num_parameters() > 2)
+									product.maxCount = std::max<int>(product.minCount, ini.get_value_int(2));
+								if (ini.get_num_parameters() > 3)
+									weights.push_back(std::max<int>(0, ini.get_value_int(3)));
+
+								product.ship = IsShip(product.archetypeId);
+								if (product.ship)
+									recipe.shipPresent = true;
+								else
+									recipe.highestProductVolumeWithMaxCount = std::max<float>(recipe.highestProductVolumeWithMaxCount, GetEquipmentVolume(product.archetypeId) * product.maxCount);
+								productNamesByArchetypeId.insert({ product.archetypeId, GetEquipmentName(product.archetypeId) });
+								const GoodInfo* goodInfo = GoodList::find_by_id(product.archetypeId);
+								if (goodInfo && goodInfo->multiCount)
+									productArchetypeCombinable.insert(product.archetypeId);
+
+								recipe.products.push_back(product);
+							}
+							else if (ini.is_value("cost"))
+							{
+								recipe.cost = ini.get_value_int(0);
+							}
+							else if (ini.is_value("ingredient"))
+							{
+								Ingredient ingredient;
+								ingredient.archetypeId = CreateID(ini.get_value_string(0));
+								if (ini.get_num_parameters() > 1)
+									ingredient.count = std::max<int>(1, ini.get_value_int(1));
+								recipe.ingredients.push_back(ingredient);
+								recipe.totalIngredientsVolume += GetEquipmentVolume(ingredient.archetypeId) * ingredient.count;
+							}
+							else if (ini.is_value("base_nickname"))
+							{
+								recipe.validBaseIds.insert(CreateID(ini.get_value_string(0)));
+							}
+							else if (ini.is_value("ship_nickname"))
+							{
+								recipe.validShipIds.insert(CreateID(ini.get_value_string(0)));
+							}
+							else if (ini.is_value("success_sound_nickname"))
+							{
+								recipe.successSoundId = CreateID(ini.get_value_string(0));
+							}
+						}
+						if (!recipe.products.empty() && !recipe.ingredients.empty())
+						{
+							recipe.productDistribution = std::discrete_distribution<int>({ weights.begin(), weights.end() });
+							recipes[recipeNameLower] = recipe;
+						}
 					}
 				}
 			}
 			ini.close();
 		}
-
 		ConPrint(L"Done\n");
 	}
 
@@ -225,14 +257,14 @@ namespace Crafting
 		// Check if the recipe exists.
 		if (recipeName.empty())
 		{
-			PrintUserCmdText(clientId, L"Schematic name must be given to craft it!");
+			PrintUserCmdText(clientId, L"Scheme name must be given to use it!");
 			return nullptr;
 		}
 
 		const std::string recipeNameLower = ToLower(recipeName);
 		if (!recipes.contains(recipeNameLower))
 		{
-			PrintUserCmdText(clientId, L"Schematic '" + stows(recipeName) + L"' does not exist!");
+			PrintUserCmdText(clientId, L"Scheme '" + stows(recipeName) + L"' does not exist!");
 			return nullptr;
 		}
 		return &recipes[recipeNameLower];
@@ -250,14 +282,14 @@ namespace Crafting
 				pub::Player::GetBase(clientId, baseId);
 				if (!recipe.validBaseIds.contains(baseId))
 				{
-					PrintUserCmdText(clientId, L"You must be docked on a specific base to craft '" + recipe.originalName + L"'!");
+					PrintUserCmdText(clientId, L"You must be docked on a specific base to use '" + recipe.originalName + L"'!");
 					return false;
 				}
 			}
 		}
 		else
 		{
-			PrintUserCmdText(clientId, L"You must be docked to craft items!");
+			PrintUserCmdText(clientId, L"You must be docked to use '" + recipe.originalName + L"'!");
 			return false;
 		}
 		return true;
@@ -271,7 +303,7 @@ namespace Crafting
 			pub::Player::GetShipID(clientId, shipArchetypeId);
 			if (!recipe.validShipIds.contains(shipArchetypeId))
 			{
-				PrintUserCmdText(clientId, L"You must own a specific ship to craft '" + recipe.originalName + L"'!");
+				PrintUserCmdText(clientId, L"You must own a specific ship to use '" + recipe.originalName + L"'!");
 				return false;
 			}
 		}
@@ -302,7 +334,7 @@ namespace Crafting
 			if (cashDiff < 0)
 			{
 				pub::Player::SendNNMessage(clientId, NOT_ENOUGH_MONEY);
-				PrintUserCmdText(clientId, PrintMoney(-cashDiff) + L" missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+				PrintUserCmdText(clientId, PrintMoney(-cashDiff) + L" missing to use " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 				return false;
 			}
 		}
@@ -318,7 +350,7 @@ namespace Crafting
 		if (cargoHoldDiff < 0.0f)
 		{
 			pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
-			PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+			PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to use " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 			return false;
 		}
 		return true;
@@ -371,7 +403,7 @@ namespace Crafting
 				if (index + 1 < length)
 					joinedMissingPartsText += L", ";
 			}
-			PrintUserCmdText(clientId, joinedMissingPartsText + L" missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+			PrintUserCmdText(clientId, joinedMissingPartsText + L" missing to use " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
 			return false;
 		}
 
@@ -556,7 +588,7 @@ namespace Crafting
 		return true;
 	}
 
-	static bool Craft(const uint clientId, const std::string& recipeName, int batchCount)
+	static bool Craft(const uint clientId, const std::string& recipeName, const RecipeType type, int batchCount)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
@@ -564,6 +596,12 @@ namespace Crafting
 		const Recipe* recipe = FindRecipe(clientId, recipeName);
 		if (!recipe)
 			return false;
+
+		if (type != RecipeType::Any && recipe->type != type)
+		{
+			PrintUserCmdText(clientId, L"Scheme '" + stows(recipeName) + L"' cannot be used for this!");
+			return false;
+		}
 
 		batchCount = CorrectBatchCount(clientId, *recipe, batchCount);
 		if (batchCount == 0)
@@ -602,7 +640,10 @@ namespace Crafting
 
 	bool UserCmd_Craft(const uint clientId, const std::wstring& argumentsWS)
 	{
-		if (ToLower(argumentsWS).find(L"/craft") == 0)
+		bool craft = ToLower(argumentsWS).find(L"/craft") == 0;
+		bool loot = ToLower(argumentsWS).find(L"/loot") == 0;
+		bool dismantle = ToLower(argumentsWS).find(L"/dismantle") == 0;
+		if (craft || loot || dismantle)
 		{
 			const std::wstring& arguments = Trim(GetParamToEnd(argumentsWS, ' ', 1));
 			const size_t lastWhiteSpace = arguments.find_last_of(' ');
@@ -611,7 +652,14 @@ namespace Crafting
 			if (count != 0)
 				recipeName = Trim(arguments.substr(0, lastWhiteSpace));
 			currentShipCraftingPopups.erase(clientId); // Make sure to not skip the popup this way.
-			Craft(clientId, ToLower(wstos(recipeName)), std::min<int>(1000, std::max<int>(1, count)));
+			RecipeType type;
+			if (craft)
+				type = RecipeType::Produce;
+			else if (loot)
+				type = RecipeType::Loot;
+			else if (dismantle)
+				type = RecipeType::Dismantle;
+			Craft(clientId, ToLower(wstos(recipeName)), type, std::min<int>(1000, std::max<int>(1, count)));
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;
 		}
@@ -624,7 +672,7 @@ namespace Crafting
 		if (const auto& entry = currentShipCraftingPopups.find(clientId); entry != currentShipCraftingPopups.end())
 		{
 			if (buttonClicked == PopupDialogButton::LEFT_YES)
-				Craft(clientId, ToLower(wstos(entry->second)), 1);
+				Craft(clientId, ToLower(wstos(entry->second)), RecipeType::Any, 1);
 			else
 				currentShipCraftingPopups.erase(entry);
 			returncode = SKIPPLUGINS;

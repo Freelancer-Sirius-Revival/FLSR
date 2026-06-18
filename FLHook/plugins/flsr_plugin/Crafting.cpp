@@ -1,5 +1,6 @@
 #include "Crafting.h"
 #include "Plugin.h"
+#include <random>
 
 /**
 * [General]
@@ -7,7 +8,8 @@
 * fail_sound_nickname = 
 * 
 * [Foo Bar]
-* product = good_nickname, count
+* product = good_nickname, minCount, maxCount, weightedChance
+* ...
 * cost = money
 * ingredient = good_nickname, count
 * ...
@@ -19,19 +21,40 @@
 
 namespace Crafting
 {
+	std::mt19937 randomizer(std::random_device{}());
+
+	struct Product
+	{
+		uint archetypeId = 0;
+		bool ship = false;
+		int minCount = 1;
+		int maxCount = 1;
+	};
+
+	struct Ingredient
+	{
+		uint archetypeId = 0;
+		int count = 1;
+	};
+
 	struct Recipe
 	{
 		std::wstring originalName = L"";
-		uint archetypeId = 0;
-		int count = 0;
+		std::vector<Product> products;
+		std::discrete_distribution<int> productDistribution;
+		float highestProductVolumeWithMaxCount = 0.0f;
+		bool shipPresent = false;
 		int cost = 0;
-		std::vector<std::pair<uint, int>> ingredientArchetypeIdsWithCount;
+		std::vector<Ingredient> ingredients;
+		float totalIngredientsVolume = 0.0f;
 		std::set<uint> validBaseIds;
 		std::set<uint> validShipIds;
 		uint successSoundId = 0;
 	};
 
 	std::unordered_map<std::string, Recipe> recipes;
+	std::unordered_set<uint> productArchetypeCombinable;
+	std::unordered_map<uint, std::wstring> productNamesByArchetypeId;
 	std::unordered_map<uint, std::wstring> currentShipCraftingPopups;
 
 	uint defaultSuccessSoundId = 0;
@@ -43,8 +66,35 @@ namespace Crafting
 	const uint ALL_SYSTEMS_NORMAL_ID = pub::GetNicknameId("all_systems_normal");
 	const uint NONE_AVAILABLE_ID = pub::GetNicknameId("none_available");
 
-	void LoadSettings()
+	static float GetEquipmentVolume(const uint archetypeId)
 	{
+		const Archetype::Equipment* equipment = Archetype::GetEquipment(archetypeId);
+		if (equipment)
+			return equipment->fVolume;
+		return 0.0f;
+	}
+
+	static std::wstring GetEquipmentName(const uint archetypeId)
+	{
+		const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
+		if (goodInfo)
+			return HkGetWStringFromIDS(goodInfo->iIDSName);
+		return L"";
+	}
+
+	static bool IsShip(const uint archetypeId)
+	{
+		const GoodInfo* productGoodInfo = GoodList::find_by_id(archetypeId);
+		return productGoodInfo && productGoodInfo->type == GoodInfo::GoodType::Ship;
+	}
+
+	bool initialized = false;
+	void ReadInitialData()
+	{
+		if (initialized)
+			return;
+		initialized = true;
+
 		ConPrint(L"Initializing Crafting... ");
 
 		HkLoadStringDLLs();
@@ -75,17 +125,36 @@ namespace Crafting
 				else
 				{
 					Recipe recipe;
+					std::vector<int> weights;
 					recipe.originalName = stows(ini.get_header_ptr());
 					std::string recipeNameLower = ToLower(wstos(recipe.originalName));
 					while (ini.read_value())
 					{
 						if (ini.is_value("product"))
 						{
-							recipe.archetypeId = CreateID(ini.get_value_string(0));
+							Product product;
+							product.archetypeId = CreateID(ini.get_value_string(0));
 							if (ini.get_num_parameters() > 1)
-								recipe.count = ini.get_value_int(1);
+							{
+								product.minCount = std::max<int>(1, ini.get_value_int(1));
+								product.maxCount = product.minCount;
+							}
+							if (ini.get_num_parameters() > 2)
+								product.maxCount = std::max<int>(product.minCount, ini.get_value_int(2));
+							if (ini.get_num_parameters() > 3)
+								weights.push_back(std::max<int>(0, ini.get_value_int(3)));
+
+							product.ship = IsShip(product.archetypeId);
+							if (product.ship)
+								recipe.shipPresent = true;
 							else
-								recipe.count = 1;
+								recipe.highestProductVolumeWithMaxCount = std::max<float>(recipe.highestProductVolumeWithMaxCount, GetEquipmentVolume(product.archetypeId) * product.maxCount);
+							productNamesByArchetypeId.insert({ product.archetypeId, GetEquipmentName(product.archetypeId) });
+							const GoodInfo* goodInfo = GoodList::find_by_id(product.archetypeId);
+							if (goodInfo && goodInfo->multiCount)
+								productArchetypeCombinable.insert(product.archetypeId);
+
+							recipe.products.push_back(product);
 						}
 						else if (ini.is_value("cost"))
 						{
@@ -93,7 +162,12 @@ namespace Crafting
 						}
 						else if (ini.is_value("ingredient"))
 						{
-							recipe.ingredientArchetypeIdsWithCount.push_back({ CreateID(ini.get_value_string(0)), ini.get_value_int(1) });
+							Ingredient ingredient;
+							ingredient.archetypeId = CreateID(ini.get_value_string(0));
+							if (ini.get_num_parameters() > 1)
+								ingredient.count = std::max<int>(1, ini.get_value_int(1));
+							recipe.ingredients.push_back(ingredient);
+							recipe.totalIngredientsVolume += GetEquipmentVolume(ingredient.archetypeId) * ingredient.count;
 						}
 						else if (ini.is_value("base_nickname"))
 						{
@@ -108,8 +182,9 @@ namespace Crafting
 							recipe.successSoundId = CreateID(ini.get_value_string(0));
 						}
 					}
-					if (recipe.archetypeId && recipe.count && !recipe.ingredientArchetypeIdsWithCount.empty())
+					if (!recipe.products.empty() && !recipe.ingredients.empty())
 					{
+						recipe.productDistribution = std::discrete_distribution<int>({ weights.begin(), weights.end() });
 						recipes[recipeNameLower] = recipe;
 					}
 				}
@@ -163,32 +238,6 @@ namespace Crafting
 		return &recipes[recipeNameLower];
 	}
 
-	static int CorrectBatchCount(const uint clientId, const Recipe& recipe, int batchCount)
-	{
-		if (batchCount < 1)
-			batchCount = 1;
-
-		const GoodInfo* productGoodInfo = GoodList::find_by_id(recipe.archetypeId);
-		if (!productGoodInfo)
-		{
-			PrintUserCmdText(clientId, L"Internal Good Nickname not found for '" + recipe.originalName + L"'!");
-			return 0;
-		}
-
-		if (productGoodInfo->type == GoodInfo::GoodType::Hull)
-		{
-			PrintUserCmdText(clientId, recipe.originalName + L" is a ship hull and cannot be crafted. Contact an admin!");
-			return 0;
-		}
-
-		if (productGoodInfo->type == GoodInfo::GoodType::Ship)
-		{
-			return 1;
-		}
-		
-		return batchCount;
-	}
-
 	static bool TestBaseRequirements(const uint clientId, const Recipe& recipe)
 	{
 		uint shipId;
@@ -229,6 +278,17 @@ namespace Crafting
 		return true;
 	}
 
+	static int CorrectBatchCount(const uint clientId, const Recipe& recipe, int batchCount)
+	{
+		if (recipe.shipPresent)
+		{
+			if (batchCount > 1)
+				PrintUserCmdText(clientId, L"Batching does not work when there is a possibility to obtain a ship.");
+			return 1;
+		}
+		return batchCount < 1 ? 1 : batchCount;
+	}
+
 	static bool TestCashRequirements(const uint clientId, const Recipe& recipe, const int batchCount)
 	{
 		if (recipe.cost)
@@ -251,34 +311,16 @@ namespace Crafting
 
 	static bool TestCargoSpaceRequirements(const uint clientId, const Recipe& recipe, const int batchCount)
 	{
-		const GoodInfo* productGoodInfo = GoodList::find_by_id(recipe.archetypeId);
-		if (!productGoodInfo)
-			return false;
-
-		if (productGoodInfo->type != GoodInfo::GoodType::Ship)
+		const float requiredHoldSize = std::max<float>(0.0f, (recipe.highestProductVolumeWithMaxCount - recipe.totalIngredientsVolume) * batchCount);
+		float remainingHoldSize;
+		pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
+		float cargoHoldDiff = remainingHoldSize - requiredHoldSize;
+		if (cargoHoldDiff < 0.0f)
 		{
-			const Archetype::Equipment* equipment = Archetype::GetEquipment(recipe.archetypeId);
-			if (!equipment)
-				return false;
-			float totalVolumeNeeded = equipment->fVolume * recipe.count * batchCount;
-			for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
-			{
-				const Archetype::Equipment* equipment = Archetype::GetEquipment(ingredientWithCount.first);
-				if (!equipment)
-					return false;
-				totalVolumeNeeded -= equipment->fVolume * ingredientWithCount.second * batchCount;
-			}
-			float remainingHoldSize;
-			pub::Player::GetRemainingHoldSize(clientId, remainingHoldSize);
-			float cargoHoldDiff = remainingHoldSize - totalVolumeNeeded;
-			if (cargoHoldDiff < 0.0f)
-			{
-				pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
-				PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
-				return false;
-			}
+			pub::Player::SendNNMessage(clientId, INSUFFICIENT_CARGO_SPACE_ID);
+			PrintUserCmdText(clientId, std::to_wstring(-cargoHoldDiff) + L" units of cargo space missing to craft " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'!");
+			return false;
 		}
-
 		return true;
 	}
 
@@ -287,8 +329,8 @@ namespace Crafting
 		const auto& cargoList = GetUnmountedCargoList(clientId);
 		std::vector<std::pair<uint, int>> missingIngredientArchetypeIdsWithCount;
 		// Copy the ingredients and their count.
-		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
-			missingIngredientArchetypeIdsWithCount.push_back({ ingredientWithCount.first, ingredientWithCount.second * batchCount });
+		for (const auto& ingredient : recipe.ingredients)
+			missingIngredientArchetypeIdsWithCount.push_back({ ingredient.archetypeId, ingredient.count * batchCount });
 
 		for (auto& ingredientWithCount : missingIngredientArchetypeIdsWithCount)
 		{
@@ -350,8 +392,8 @@ namespace Crafting
 		const auto& cargoList = GetUnmountedCargoList(clientId);
 		// Copy the ingredients and their count.
 		std::vector<std::pair<uint, int>> missingIngredientArchetypeIdsWithCount;
-		for (const auto& ingredientWithCount : recipe.ingredientArchetypeIdsWithCount)
-			missingIngredientArchetypeIdsWithCount.push_back({ ingredientWithCount.first, ingredientWithCount.second * batchCount });
+		for (const auto& ingredient : recipe.ingredients)
+			missingIngredientArchetypeIdsWithCount.push_back({ ingredient.archetypeId, ingredient.count * batchCount });
 
 		// Collect individual cargo IDs and the count of their actual cargo. If multiple of a single equipment arch are needed, it will be split across multiple cargo items.
 		std::unordered_map<uint, std::vector<std::pair<uint, uint>>> foundIngredientIdsWithCountByArchetypeId;
@@ -393,24 +435,12 @@ namespace Crafting
 		return true;
 	}
 
-	static bool ProduceItems(const uint clientId, const Recipe& recipe, const int batchCount)
+	static bool ProduceShip(const uint clientId, const Recipe& recipe, const uint shipGoodId)
 	{
-		if (HkAddCargo(ARG_CLIENTID(clientId), recipe.archetypeId, recipe.count * batchCount, false) != HKE_OK)
+		const GoodInfo* shipGood = GoodList::find_by_id(shipGoodId);
+		if (!shipGood)
 			return false;
 
-		const uint soundId = recipe.successSoundId ? recipe.successSoundId : defaultSuccessSoundId;
-		if (soundId)
-			pub::Audio::PlaySoundEffect(clientId, soundId);
-		pub::Player::SendNNMessage(clientId, LOADED_INTO_CARGO_HOLD_ID);
-		std::wstring message = L"Successfully crafted " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'";
-		if (recipe.cost)
-			message += L" for " + PrintMoney(recipe.cost * batchCount);
-		PrintUserCmdText(clientId, message + L".");
-		return true;
-	}
-
-	static bool ProduceShip(const uint clientId, const Recipe& recipe, const GoodInfo* shipGood)
-	{
 		const GoodInfo* hullGood = GoodList::find_by_id(shipGood->iHullGoodID);
 		if (!hullGood)
 			return false;
@@ -444,11 +474,85 @@ namespace Crafting
 		}
 
 		pub::Player::SetShipAndLoadout(clientId, hullGood->shipArchId, newEquip);
+		return true;
+	}
+
+	static bool ProduceItems(const uint clientId, const Recipe& recipe, const int batchCount)
+	{
+		// Finally roll the dice to get the actual crafted item.
+		// First collect all items to add to cargo. Otherwise too many packages are sent and cause lags!
+		std::map<uint, uint> producedArchetypeIds;
+		uint shipGoodId = 0;
+		for (int producedCount = 0; producedCount < batchCount; producedCount++)
+		{
+			const Product& product = recipe.products.at(recipe.productDistribution(randomizer));
+			if (product.ship)
+			{
+				shipGoodId = product.archetypeId;
+				ProduceShip(clientId, recipe, product.archetypeId);
+				break; // Whenever a ship is crafted, the batch count must be exactly 1.
+			}
+			if (!producedArchetypeIds.contains(product.archetypeId))
+				producedArchetypeIds[product.archetypeId] = 0;
+			producedArchetypeIds[product.archetypeId] += std::uniform_int_distribution<>(product.minCount, product.maxCount)(randomizer);
+		}
+		// Now add cargo for the amount of items we need.
+		for (const auto& craftedItemArchetypeIdCount : producedArchetypeIds)
+		{
+			// Items that cannot be stacked must be sent singular. This causes a lot of package traffic!
+			if (!productArchetypeCombinable.contains(craftedItemArchetypeIdCount.first))
+			{
+				for (uint count = 0; count < craftedItemArchetypeIdCount.second; count++)
+					HkAddCargo(ARG_CLIENTID(clientId), craftedItemArchetypeIdCount.first, 1, false);
+			}
+			// Stackable items will be sent as a batch to reduce package traffic.
+			else
+			{
+				HkAddCargo(ARG_CLIENTID(clientId), craftedItemArchetypeIdCount.first, craftedItemArchetypeIdCount.second, false);
+			}
+		}
+
+		std::wstring message = L"Obtained";
+		if (shipGoodId != 0)
+		{
+			const GoodInfo* shipGood = GoodList::find_by_id(shipGoodId);
+			if (shipGood)
+			{
+				const GoodInfo* hullGood = GoodList::find_by_id(shipGood->iHullGoodID);
+				if (hullGood)
+				{
+					const auto shipArch = Archetype::GetShip(hullGood->shipArchId);
+					if (shipArch)
+						message += L" a " + HkGetWStringFromIDS(shipArch->iIdsName);
+				}
+			}
+		}
+		else if (producedArchetypeIds.size() > 5)
+		{
+			message += L" many items";
+		}
+		else
+		{
+			size_t count = 1;
+			for (const auto& producedItemArchetypeIdCount : producedArchetypeIds)
+			{
+				message += L" " + std::to_wstring(producedItemArchetypeIdCount.second) + L" '" + productNamesByArchetypeId.at(producedItemArchetypeIdCount.first) + L"'";
+				if (count < producedArchetypeIds.size())
+					message += L",";
+				count++;
+			}
+		}
+
+		message += L" from " + std::to_wstring(batchCount) + L" '" + recipe.originalName + L"'";
+		if (recipe.cost)
+			message += L" for " + PrintMoney(recipe.cost * batchCount);
+		PrintUserCmdText(clientId, message + L".");
+
 		const uint soundId = recipe.successSoundId ? recipe.successSoundId : defaultSuccessSoundId;
 		if (soundId)
 			pub::Audio::PlaySoundEffect(clientId, soundId);
-		pub::Player::SendNNMessage(clientId, ALL_SYSTEMS_NORMAL_ID);
-		std::wstring message = L"Successfully crafted '" + recipe.originalName + L"'";
+		pub::Player::SendNNMessage(clientId, shipGoodId ? ALL_SYSTEMS_NORMAL_ID : LOADED_INTO_CARGO_HOLD_ID);
+
 		return true;
 	}
 
@@ -465,35 +569,26 @@ namespace Crafting
 		if (batchCount == 0)
 			return false;
 
-		const GoodInfo* good = GoodList::find_by_id(recipe->archetypeId);
-		if (!good)
-			return false;
-
 		bool result = TestAllRequirements(clientId, *recipe, batchCount);
 		if (result)
 		{
-			if (good->type != GoodInfo::GoodType::Ship)
-			{
-				result = ConsumeAllIngredients(clientId, *recipe, batchCount) && ProduceItems(clientId, *recipe, batchCount);
-			}
-			else
+			if (recipe->shipPresent)
 			{
 				if (const auto& entry = currentShipCraftingPopups.find(clientId); entry != currentShipCraftingPopups.end() && entry->second == recipe->originalName)
 				{
 					currentShipCraftingPopups.erase(entry);
-					result = ConsumeAllIngredients(clientId, *recipe, batchCount) && ProduceShip(clientId, *recipe, good);
+					result = ConsumeAllIngredients(clientId, *recipe, batchCount) && ProduceItems(clientId, *recipe, batchCount);
 				}
 				else
 				{
 					currentShipCraftingPopups.erase(clientId);
-
-					const GoodInfo* hullGood = GoodList::find_by_id(good->iHullGoodID);
-					if (!hullGood || !hullGood->shipArchId)
-						return false;
-
 					currentShipCraftingPopups.insert({ clientId, recipe->originalName });
 					pub::Player::PopUpDialog(clientId, FmtStr(524393, 0), FmtStr(524394, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
 				}
+			}
+			else
+			{
+				result = ConsumeAllIngredients(clientId, *recipe, batchCount) && ProduceItems(clientId, *recipe, batchCount);
 			}
 		}
 

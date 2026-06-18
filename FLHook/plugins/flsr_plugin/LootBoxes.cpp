@@ -42,7 +42,7 @@ namespace LootBoxes
 		if (goodInfo)
 		{
 			std::wstring name = HkGetWStringFromIDS(goodInfo->iIDSName);
-			std::replace<std::wstring::iterator, wchar_t>(name.begin(), name.end(), 0x2019 /* ’ */, '\'');
+			std::replace<std::wstring::iterator, wchar_t>(name.begin(), name.end(), 0x2019 /* ï¿½ */, '\'');
 			return name;
 		}
 		return L"";
@@ -243,7 +243,7 @@ namespace LootBoxes
 		for (const auto& lootedItemArchetypeIdCount : lootedArchetypeIds)
 		{
 			// Items that cannot be stacked must be sent singular. This causes a lot of package traffic!
-			if (lootArchetypeCombinable[lootedItemArchetypeIdCount.first])
+			if (!lootArchetypeCombinable[lootedItemArchetypeIdCount.first])
 			{
 				for (uint count = 0; count < lootedItemArchetypeIdCount.second; count++)
 					HkAddCargo(ARG_CLIENTID(clientId), lootedItemArchetypeIdCount.first, 1, false);

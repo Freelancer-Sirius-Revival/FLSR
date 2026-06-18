@@ -16,12 +16,12 @@ namespace LootBoxes
 		std::wstring keyArchetypeName = L"";
 		std::discrete_distribution<int> lootArchetypeIdsDistribution;
 		std::vector<uint> lootArchetypeIds;
-		std::unordered_map<uint, std::wstring> lootNamesByArchetypeId;
 		float highestLootArchetypeVolume = 0.0f;
 	};
 
 	std::unordered_map<std::string, LootBox> lootBoxes;
-	std::unordered_map<uint, bool> lootArchetypeCombinable;
+	std::unordered_set<uint> lootArchetypeCombinable;
+	std::unordered_map<uint, std::wstring> lootNamesByArchetypeId;
 
 	uint successSoundId = 0;
 	uint failSoundId = 0;
@@ -104,10 +104,10 @@ namespace LootBoxes
 						{
 							const uint archetypeId = CreateID(ini.get_value_string(0));
 							const GoodInfo* goodInfo = GoodList::find_by_id(archetypeId);
-							if (goodInfo)
-								lootArchetypeCombinable[archetypeId] = goodInfo->multiCount;
+							if (goodInfo && goodInfo->multiCount)
+								lootArchetypeCombinable.insert(archetypeId);
 							lootBox.lootArchetypeIds.push_back(archetypeId);
-							lootBox.lootNamesByArchetypeId.insert({ archetypeId, GetEquipmentName(archetypeId) });
+							lootNamesByArchetypeId.insert({ archetypeId, GetEquipmentName(archetypeId) });
 							lootBox.highestLootArchetypeVolume = std::max<float>(lootBox.highestLootArchetypeVolume, GetEquipmentVolume(archetypeId));
 							weights.push_back(std::max<int>(0, ini.get_value_int(1)));
 						}
@@ -241,7 +241,7 @@ namespace LootBoxes
 		for (const auto& lootedItemArchetypeIdCount : lootedArchetypeIds)
 		{
 			// Items that cannot be stacked must be sent singular. This causes a lot of package traffic!
-			if (!lootArchetypeCombinable[lootedItemArchetypeIdCount.first])
+			if (!lootArchetypeCombinable.contains(lootedItemArchetypeIdCount.first))
 			{
 				for (uint count = 0; count < lootedItemArchetypeIdCount.second; count++)
 					HkAddCargo(ARG_CLIENTID(clientId), lootedItemArchetypeIdCount.first, 1, false);
@@ -263,7 +263,7 @@ namespace LootBoxes
 			size_t count = 1;
 			for (const auto& lootedItemArchetypeIdCount : lootedArchetypeIds)
 			{
-				message += lootedItemArchetypeIdCount.second + L" '" + lootBox.lootNamesByArchetypeId.at(lootedItemArchetypeIdCount.first) + L"'";
+				message += lootedItemArchetypeIdCount.second + L" '" + lootNamesByArchetypeId.at(lootedItemArchetypeIdCount.first) + L"'";
 				if (count < lootedArchetypeIds.size())
 					message += L", ";
 				count++;

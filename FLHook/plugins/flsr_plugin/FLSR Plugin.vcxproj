@@ -165,7 +165,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="GroupRep.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="IFF.cpp" />
-    <ClCompile Include="LootBoxes.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mark.cpp" />
     <ClCompile Include="missions\actions\ActActMsn.cpp" />
@@ -283,7 +282,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="EventLeaderInvincibility.h" />
     <ClInclude Include="IFF.h" />
     <ClInclude Include="Insurance.h" />
-    <ClInclude Include="LootBoxes.h" />
     <ClInclude Include="Mark.h" />
     <ClInclude Include="missions\actions\ActDisplayMsg.h" />
     <ClInclude Include="missions\actions\ActDockInstant.h" />

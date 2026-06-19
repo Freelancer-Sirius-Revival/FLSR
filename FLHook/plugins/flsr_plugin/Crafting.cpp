@@ -59,7 +59,7 @@ namespace Crafting
 		std::vector<Product> products;
 		std::discrete_distribution<int> productDistribution;
 		float highestProductVolumeWithMaxCount = 0.0f;
-		bool shipPresent = false;
+		int shipsCount = 0;
 		int cost = 0;
 		std::vector<Ingredient> ingredients;
 		float totalIngredientsVolume = 0.0f;
@@ -178,7 +178,7 @@ namespace Crafting
 
 								product.ship = IsShip(product.archetypeId);
 								if (product.ship)
-									recipe.shipPresent = true;
+									recipe.shipsCount++;
 								else
 									recipe.highestProductVolumeWithMaxCount = std::max<float>(recipe.highestProductVolumeWithMaxCount, GetEquipmentVolume(product.archetypeId) * product.maxCount);
 								productNamesByArchetypeId.insert({ product.archetypeId, GetEquipmentName(product.archetypeId) });
@@ -312,7 +312,7 @@ namespace Crafting
 
 	static int CorrectBatchCount(const uint clientId, const Recipe& recipe, int batchCount)
 	{
-		if (recipe.shipPresent)
+		if (recipe.shipsCount > 0)
 		{
 			if (batchCount > 1)
 				PrintUserCmdText(clientId, L"Batching does not work when there is a possibility to obtain a ship.");
@@ -610,7 +610,7 @@ namespace Crafting
 		bool result = TestAllRequirements(clientId, *recipe, batchCount);
 		if (result)
 		{
-			if (recipe->shipPresent)
+			if (recipe->shipsCount > 0)
 			{
 				if (const auto& entry = currentShipCraftingPopups.find(clientId); entry != currentShipCraftingPopups.end() && entry->second == recipe->originalName)
 				{
@@ -621,7 +621,8 @@ namespace Crafting
 				{
 					currentShipCraftingPopups.erase(clientId);
 					currentShipCraftingPopups.insert({ clientId, recipe->originalName });
-					pub::Player::PopUpDialog(clientId, FmtStr(524393, 0), FmtStr(524394, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
+					const bool allShips = recipe->shipsCount == recipe->products.size();
+					pub::Player::PopUpDialog(clientId, FmtStr(allShips ? 524393 : 524395, 0), FmtStr(allShips ? 524394 : 524396, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
 				}
 			}
 			else

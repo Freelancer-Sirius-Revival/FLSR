@@ -65,6 +65,7 @@ namespace Crafting
 		float totalIngredientsVolume = 0.0f;
 		std::set<uint> validBaseIds;
 		std::set<uint> validShipIds;
+		std::wstring validShipNames = L"";
 		uint successSoundId = 0;
 	};
 
@@ -207,7 +208,11 @@ namespace Crafting
 							}
 							else if (ini.is_value("ship_nickname"))
 							{
-								recipe.validShipIds.insert(CreateID(ini.get_value_string(0)));
+								const uint shipArchId = CreateID(ini.get_value_string(0));
+								recipe.validShipIds.insert(shipArchId);
+								const auto& shipArch = Archetype::GetShip(shipArchId);
+								if (shipArch)
+									recipe.validShipNames += (recipe.validShipNames.empty() ? L"" : L", ") + HkGetWStringFromIDS(shipArch->iIdsName);
 							}
 							else if (ini.is_value("success_sound_nickname"))
 							{
@@ -303,7 +308,7 @@ namespace Crafting
 			pub::Player::GetShipID(clientId, shipArchetypeId);
 			if (!recipe.validShipIds.contains(shipArchetypeId))
 			{
-				PrintUserCmdText(clientId, L"You must own a specific ship to use '" + recipe.originalName + L"'!");
+				PrintUserCmdText(clientId, L"You must own a " + recipe.validShipNames + L" to use '" + recipe.originalName + L"'!");
 				return false;
 			}
 		}

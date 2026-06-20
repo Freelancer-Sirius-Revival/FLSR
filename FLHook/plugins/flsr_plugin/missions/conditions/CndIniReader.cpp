@@ -221,7 +221,7 @@ namespace Missions
 	{
 		uint objNameOrLabel = 0;
 		CndDistObj::DistanceCondition reason = CndDistObj::DistanceCondition::Inside;
-		float distance = 0;
+		float distance = 0.0f;
 		uint otherObjNameOrLabel = 0;
 
 		uint argNum = 0;
@@ -244,13 +244,18 @@ namespace Missions
 		if (ini.get_num_parameters() > argNum)
 		{
 			distance = ini.get_value_float(argNum);
-			argNum++;
+			if (distance < 0.0f)
+			{
+				PrintErrorToConsole(ini, argNum, L"Distance is negative. Aborting!");
+				return nullptr;
+			}
 		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No distance. Aborting!");
 			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
@@ -269,7 +274,7 @@ namespace Missions
 		uint objNameOrLabel = 0;
 		CndDistVec::DistanceCondition reason = CndDistVec::DistanceCondition::Inside;
 		Vector position = { 0, 0, 0 };
-		float distance = 0;
+		float distance = 0.0f;
 		uint systemId = 0;
 		std::string hardpoint = "";
 
@@ -298,13 +303,18 @@ namespace Missions
 		if (ini.get_num_parameters() > argNum)
 		{
 			distance = ini.get_value_float(argNum);
-			argNum++;
+			if (distance < 0.0f)
+			{
+				PrintErrorToConsole(ini, argNum, L"Distance is negative. Aborting!");
+				return nullptr;
+			}
 		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No distance. Aborting!");
 			return nullptr;
 		}
+		argNum++;
 
 		systemId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (systemId == 0)
@@ -369,7 +379,7 @@ namespace Missions
 	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
-		float relativeHitpointsThreshold = 0;
+		float relativeHitpointsThreshold = 0.0f;
 		std::unordered_set<uint> colGrpIds;
 		bool damagedIsActivator = false;
 
@@ -383,7 +393,13 @@ namespace Missions
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
-			relativeHitpointsThreshold = ini.get_value_float(argNum);
+		{
+			const float value = ini.get_value_float(argNum);
+			if (value < 0.0f)
+				PrintErrorToConsole(ini, argNum, L"Lost hitpoints threshold is below 0. Defaulting to " + std::to_wstring(relativeHitpointsThreshold) + L".");
+			else
+				relativeHitpointsThreshold = value;
+		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No lost hitpoints threshold. Aborting!");
@@ -418,7 +434,7 @@ namespace Missions
 	static CndHealthInc* ReadCndHealthInc(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
-		float relativeHitpointsThreshold = 0;
+		float relativeHitpointsThreshold = 0.0f;
 		std::unordered_set<uint> colGrpIds;
 		bool repairedIsActivator = false;
 
@@ -432,7 +448,13 @@ namespace Missions
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
-			relativeHitpointsThreshold = ini.get_value_float(argNum);
+		{
+			const float value = ini.get_value_float(argNum);
+			if (value < 0.0f)
+				PrintErrorToConsole(ini, argNum, L"Lost hitpoints threshold is below 0. Defaulting to " + std::to_wstring(relativeHitpointsThreshold) + L".");
+			else
+				relativeHitpointsThreshold = value;
+		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No gained hitpoints threshold. Aborting!");

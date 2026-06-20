@@ -497,10 +497,15 @@ namespace Crafting
 				case Archetype::SHIELD_BATTERY:
 				case Archetype::MUNITION:
 				{
-					EquipDesc equipCopy(equip);
-					equipCopy.bMounted = false;
-					equipCopy.szHardPoint.value = EquipDesc::CARGO_BAY_HP_NAME.value;
-					newEquip.equip.push_back(equipCopy);
+					const GoodInfo* equipGood = GoodList::find_by_id(equip.iArchID);
+					// Equipment with price = 0 is considered fixed and should never be kept.
+					if (equipGood && equipGood->fPrice != 0.0f)
+					{
+						EquipDesc equipCopy(equip);
+						equipCopy.bMounted = false;
+						equipCopy.szHardPoint.value = EquipDesc::CARGO_BAY_HP_NAME.value;
+						newEquip.equip.push_back(equipCopy);
+					}
 				}
 			}
 		}

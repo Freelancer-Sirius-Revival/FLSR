@@ -472,6 +472,33 @@ namespace Crafting
 		return true;
 	}
 
+	static bool IsPlayerUsableEquip(const EquipDesc& equip)
+	{
+		const auto& archetype = Archetype::GetEquipment(equip.iArchID);
+		if (archetype == nullptr)
+			return false;
+
+		switch (archetype->get_class_type())
+		{
+			case Archetype::COMMODITY:
+			case Archetype::POWER:
+			case Archetype::ENGINE:
+			case Archetype::SHIELD_GENERATOR:
+			case Archetype::THRUSTER:
+			case Archetype::LAUNCHER:
+			case Archetype::GUN:
+			case Archetype::MINE_DROPPER:
+			case Archetype::MINE:
+			case Archetype::COUNTER_MEASURE_DROPPER:
+			case Archetype::COUNTER_MEASURE:
+			case Archetype::REPAIR_KIT:
+			case Archetype::SHIELD_BATTERY:
+			case Archetype::MUNITION:
+				return true;
+		}
+		return false;
+	}
+
 	static bool ProduceShip(const uint clientId, const Recipe& recipe, const uint shipGoodId)
 	{
 		const GoodInfo* shipGood = GoodList::find_by_id(shipGoodId);
@@ -482,37 +509,45 @@ namespace Crafting
 		if (!hullGood)
 			return false;
 
+		uint playerShipArchetypeId;
+		pub::Player::GetShipID(clientId, playerShipArchetypeId);
+		const bool sameShipArch = hullGood->shipArchId == playerShipArchetypeId;
+
 		EquipDescVector newEquip(shipGood->edl);
 		for (const auto& equip : Players[clientId].equipDescList.equip)
 		{
-			switch (Archetype::GetEquipment(equip.iArchID)->get_class_type())
+			if (!IsPlayerUsableEquip(equip))
+				continue;
+
+			const GoodInfo* equipGood = GoodList::find_by_id(equip.iArchID);
+			// Equipment with price = 0 is considered fixed and should never be kept.
+			if (!equipGood || equipGood->fPrice == 0.0f)
+				continue;
+
+			bool equipSlotReplaced = false;
+			// If the same shiparch was crafted, make sure to only move player-usable equipment to the cargo hold that was directly replaced.
+			// This allows partial replacement of equipment (e.g. lights or effects) without having to re-arrange all other stuff.
+			if (sameShipArch)
 			{
-				case Archetype::COMMODITY:
-				case Archetype::POWER:
-				case Archetype::ENGINE:
-				case Archetype::SHIELD_GENERATOR:
-				case Archetype::THRUSTER:
-				case Archetype::LAUNCHER:
-				case Archetype::GUN:
-				case Archetype::MINE_DROPPER:
-				case Archetype::MINE:
-				case Archetype::COUNTER_MEASURE_DROPPER:
-				case Archetype::COUNTER_MEASURE:
-				case Archetype::REPAIR_KIT:
-				case Archetype::SHIELD_BATTERY:
-				case Archetype::MUNITION:
+				for (const auto& newEquip : shipGood->edl.equip)
 				{
-					const GoodInfo* equipGood = GoodList::find_by_id(equip.iArchID);
-					// Equipment with price = 0 is considered fixed and should never be kept.
-					if (equipGood && equipGood->fPrice != 0.0f)
+					if (newEquip.bMounted && std::string(newEquip.szHardPoint.value) == std::string(equip.szHardPoint.value) && IsPlayerUsableEquip(newEquip))
 					{
-						EquipDesc equipCopy(equip);
-						equipCopy.bMounted = false;
-						equipCopy.szHardPoint.value = EquipDesc::CARGO_BAY_HP_NAME.value;
-						newEquip.equip.push_back(equipCopy);
+						equipSlotReplaced = true;
+						break;
 					}
 				}
 			}
+			else
+				equipSlotReplaced = true;
+
+			EquipDesc equipCopy(equip);
+			if (equipSlotReplaced)
+			{
+				equipCopy.bMounted = false;
+				equipCopy.szHardPoint.value = EquipDesc::CARGO_BAY_HP_NAME.value;
+			}
+			newEquip.equip.push_back(equipCopy);
 		}
 
 		pub::Player::SetShipAndLoadout(clientId, hullGood->shipArchId, newEquip);

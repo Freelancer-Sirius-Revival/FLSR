@@ -14,5 +14,4 @@ namespace Missions
 
 		void Execute(Mission& mission, const MissionObject& activator) const;
 	};
-	typedef std::shared_ptr<ActSetNNObj> ActSetNNObjPtr;
 }

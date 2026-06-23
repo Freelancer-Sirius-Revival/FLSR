@@ -36,7 +36,9 @@ namespace Missions
 
 	static void PrintErrorToConsole(const INI_Reader& ini, const uint argNum, const std::wstring& error)
 	{
-		ConPrint(L"ERROR: " + stows(ini.get_file_name()) + L", Line " + std::to_wstring(ini.get_line_num()) + L", Arg " + std::to_wstring(argNum + 1) + L": " + error + L"\n");
+		// Using ini.get_line_num is inaccurate at times. That is why the offset is used.
+		// -2 to the offset to compensate LR+CR which we have already passed most of the time.
+		ConPrint(L"ERROR: " + stows(ini.get_file_name()) + L", Offset " + std::to_wstring(ini.tell() - 2) + L", Arg " + std::to_wstring(argNum + 1) + L": " + error + L"\n");
 	}
 
 	static CndBaseEnter* ReadCndBaseEnter(const ConditionParent& conditionParent, INI_Reader& ini)
@@ -219,7 +221,7 @@ namespace Missions
 	{
 		uint objNameOrLabel = 0;
 		CndDistObj::DistanceCondition reason = CndDistObj::DistanceCondition::Inside;
-		float distance = 0;
+		float distance = 0.0f;
 		uint otherObjNameOrLabel = 0;
 
 		uint argNum = 0;
@@ -242,13 +244,18 @@ namespace Missions
 		if (ini.get_num_parameters() > argNum)
 		{
 			distance = ini.get_value_float(argNum);
-			argNum++;
+			if (distance < 0.0f)
+			{
+				PrintErrorToConsole(ini, argNum, L"Distance is negative. Aborting!");
+				return nullptr;
+			}
 		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No distance. Aborting!");
 			return nullptr;
 		}
+		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
 		{
@@ -267,7 +274,7 @@ namespace Missions
 		uint objNameOrLabel = 0;
 		CndDistVec::DistanceCondition reason = CndDistVec::DistanceCondition::Inside;
 		Vector position = { 0, 0, 0 };
-		float distance = 0;
+		float distance = 0.0f;
 		uint systemId = 0;
 		std::string hardpoint = "";
 
@@ -296,13 +303,18 @@ namespace Missions
 		if (ini.get_num_parameters() > argNum)
 		{
 			distance = ini.get_value_float(argNum);
-			argNum++;
+			if (distance < 0.0f)
+			{
+				PrintErrorToConsole(ini, argNum, L"Distance is negative. Aborting!");
+				return nullptr;
+			}
 		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No distance. Aborting!");
 			return nullptr;
 		}
+		argNum++;
 
 		systemId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (systemId == 0)
@@ -367,7 +379,7 @@ namespace Missions
 	static CndHealthDec* ReadCndHealthDec(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
-		float relativeHitpointsThreshold = 0;
+		float relativeHitpointsThreshold = 0.0f;
 		std::unordered_set<uint> colGrpIds;
 		bool damagedIsActivator = false;
 
@@ -381,7 +393,13 @@ namespace Missions
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
-			relativeHitpointsThreshold = ini.get_value_float(argNum);
+		{
+			const float value = ini.get_value_float(argNum);
+			if (value < 0.0f)
+				PrintErrorToConsole(ini, argNum, L"Lost hitpoints threshold is below 0. Defaulting to " + std::to_wstring(relativeHitpointsThreshold) + L".");
+			else
+				relativeHitpointsThreshold = value;
+		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No lost hitpoints threshold. Aborting!");
@@ -416,7 +434,7 @@ namespace Missions
 	static CndHealthInc* ReadCndHealthInc(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint objNameOrLabel = 0;
-		float relativeHitpointsThreshold = 0;
+		float relativeHitpointsThreshold = 0.0f;
 		std::unordered_set<uint> colGrpIds;
 		bool repairedIsActivator = false;
 
@@ -430,7 +448,13 @@ namespace Missions
 		argNum++;
 
 		if (ini.get_num_parameters() > argNum)
-			relativeHitpointsThreshold = ini.get_value_float(argNum);
+		{
+			const float value = ini.get_value_float(argNum);
+			if (value < 0.0f)
+				PrintErrorToConsole(ini, argNum, L"Lost hitpoints threshold is below 0. Defaulting to " + std::to_wstring(relativeHitpointsThreshold) + L".");
+			else
+				relativeHitpointsThreshold = value;
+		}
 		else
 		{
 			PrintErrorToConsole(ini, argNum, L"No gained hitpoints threshold. Aborting!");

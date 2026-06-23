@@ -4,7 +4,7 @@ namespace Missions
 {
 	void ActAdjRep::Execute(Mission& mission, const MissionObject& activator) const
 	{
-		if (objNameOrLabel == Activator)
+		if (label == Activator)
 		{
 			if (activator.type == MissionObjectType::Client)
 			{
@@ -14,7 +14,7 @@ namespace Missions
 					Empathies::ChangeReputationsByValue(activator.id, groupId, change);
 			}
 		}
-		else if (const auto& objectsByLabel = mission.objectsByLabel.find(objNameOrLabel); objectsByLabel != mission.objectsByLabel.end())
+		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
 		{
 			std::vector<uint> clientIds;
 			for (const auto& object : objectsByLabel->second)

@@ -580,12 +580,12 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Target object name or static solar to dock with.
     1. `STRING` Dock hardpoint name to dock at.
 
-- `Act_Ethercomm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
+- `Act_EtherComm` Sends communication from no specific source to others. A sender without proper space costume will not display a comms window.
     1. `STRING` The name of this comm. Referred to by `Cnd_CommComplete`.
     1. `STRING|Activator` Object by name or label to receive this comm.
     1. `STRING` The voice nickname to use for the sender.
     1. `STRING` Multiple subsequent entries possible. Voice line to play. Must be defined for the voice.
-    1. `[FLOAT] :0` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
+    1. `[FLOAT] :0.5` The additional delay after this comm has ended before any other comm can reach the receiver. Also influences when the comm is considered complete.
     1. `[True|False] :False` Whether this comm can be heard by bystanders in space.
     1. `[INTEGER] :0` The sender’s resource ID to display as name below the comms window.
     1. `[STRING]` The head nickname used for the sender.

@@ -351,6 +351,9 @@
     <ClCompile Include="missions\actions\ActUnlightFuse.cpp">
       <Filter>Missions\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActIniReader.cpp">
+      <Filter>Missions\Actions</Filter>
+    </ClCompile>
     <ClCompile Include="missions\MissionIniReader.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
@@ -727,6 +730,9 @@
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActUnlightFuse.h">
+      <Filter>Missions\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\actions\ActIniReader.h">
       <Filter>Missions\Actions</Filter>
     </ClInclude>
     <ClInclude Include="EquipWhiteList.h" />

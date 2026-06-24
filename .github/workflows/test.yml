@@ -29,7 +29,7 @@ jobs:
           run: fl-data-flsr -wd ${{ github.workspace }}/freelancer_folder
         - name: Sprinkle with FLSR recipes
           run: |
-            mkdir -r ${{ github.workspace }}/freelancer_folder/EXE/flhook_plugins/crafting
+            mkdir -p ${{ github.workspace }}/freelancer_folder/EXE/flhook_plugins/crafting
             cp Freelancer/EXE/flhook_plugins/crafting/* ${{ github.workspace }}/freelancer_folder/EXE/flhook_plugins/crafting/
         - name: Install fl-darklint
           uses: darklab8/infra/.github/actions/install-darklint@master

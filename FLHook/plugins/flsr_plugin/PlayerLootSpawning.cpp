@@ -13,6 +13,7 @@ namespace PlayerLootSpawning
 
 		CShip* ship = reinterpret_cast<CShip*>(killedObject->cobj);
 		const int maxSpawnRadius = std::max<int>(2, std::ceil(ship->radiusCentered / 4.0f));
+		const Vector shipVelocity = ship->get_velocity();
 
 		pub::SpaceObj::LootInfo loot;
 		loot.systemId = ship->system;
@@ -47,7 +48,7 @@ namespace PlayerLootSpawning
 					loot.pos.y = ship->vPos.y + randomPos.y;
 					loot.pos.z = ship->vPos.z + randomPos.z;
 					const Vector randomVelocity = RandomVector(std::min<float>(randomSpawnFactor * 4.0f, 100.0f));
-					loot.initialVelocity = ship->get_velocity();
+					loot.initialVelocity = shipVelocity;
 					loot.initialVelocity.x += randomVelocity.x;
 					loot.initialVelocity.y += randomVelocity.y;
 					loot.initialVelocity.z += randomVelocity.z;

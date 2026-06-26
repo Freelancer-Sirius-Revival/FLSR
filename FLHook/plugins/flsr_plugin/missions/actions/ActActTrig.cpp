@@ -31,7 +31,21 @@ namespace Missions
 		}
 
 		if (const auto& triggerEntry = mission.triggers.find(targetTriggerId); triggerEntry != mission.triggers.end())
-			activate ? triggerEntry->second.Activate() : triggerEntry->second.Deactivate();
+		{
+			if (activate)
+			{
+				if (branching)
+				{
+					activator.id != 0
+						? triggerEntry->second.CreateBranch(activator).Activate()
+						: ConPrint(L"ERROR: Msn " + stows(mission.name) + L": Act_ActTrig has no set Activator for branching " + std::to_wstring(targetTriggerId) + L"!\n");
+				}
+				else
+					triggerEntry->second.Activate();
+			}
+			else
+				triggerEntry->second.Deactivate();
+		}
 		else
 			ConPrint(L"ERROR: Msn " + stows(mission.name) + L": Act_ActTrig could not find trigger " + std::to_wstring(targetTriggerId) + L"!\n");
 	}

@@ -4,6 +4,7 @@
 #include "Factions.h"
 #include "Meta.h"
 #include "../Mission.h"
+#include "../conditions/CndInSpace.h"
 #include "../conditions/CndBaseEnter.h"
 #include "../conditions/CndDestroyed.h"
 #include "../conditions/CndJoinGroup.h"
@@ -11,8 +12,10 @@
 #include "../conditions/CndLeaveMsn.h"
 #include "../conditions/CndLeaveGroup.h"
 #include "../conditions/CndTimer.h"
+#include "../actions/ActActTrig.h"
 #include "../actions/ActAddCargo.h"
 #include "../actions/ActAddLabel.h"
+#include "../actions/ActRemoveLabel.h"
 #include "../actions/ActAdjAcct.h"
 #include "../actions/ActAdjRep.h"
 #include "../actions/ActEtherComm.h"
@@ -323,9 +326,6 @@ namespace RandomMissions
 		return result;
 	}
 
-	const uint InitialPlayer = CreateID("initial_player");
-	const uint Players = CreateID("players");
-
 	static uint GenerateMissionForClient(const uint clientId, const uint startBaseId)
 	{
 		uint shipArchetypeId = 0;
@@ -371,10 +371,61 @@ namespace RandomMissions
 		mission.offer.reofferCondition = Missions::MissionReofferCondition::Never;
 		mission.offer.reofferDelay = 0.0f;
 
+		const uint InitialPlayer = CreateID("initial_player");
+		const uint Players = CreateID("players");
+
+		const std::string commsGotoWayPointTriggerName = "commsGotoWaypoint";
+		const uint commsGotoWayPointTriggerId = CreateID(commsGotoWayPointTriggerName.c_str());
+		/* Comms Goto Waypoint */
+		{
+			mission.triggers.try_emplace(commsGotoWayPointTriggerId, commsGotoWayPointTriggerName, commsGotoWayPointTriggerId, missionId, false, Missions::Trigger::TriggerRepeatable::Off);
+			Missions::Trigger& trigger = mission.triggers.at(commsGotoWayPointTriggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndTimer(Missions::ConditionParent(missionId, commsGotoWayPointTriggerId), 10.0f, 0.0f));
+
+			{
+				Missions::ActEtherComm action;
+				action.receiverObjNameOrLabel = Missions::Activator;
+				action.id = CreateID("msnGoToTarget");
+				action.senderVoiceId = CreateID("mc_leg_m01");
+				action.senderIdsName = 13015;
+				action.costume = offerFaction.missionCommission;
+				action.lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActEtherComm(action)));
+			}
+		}
+
+		const uint NeedGotoWayPointComms = CreateID("NeedInitialComms");
+		const std::string inSpaceForCommsTriggerName = "inSpaceForMsnComms";
+		const uint inSpaceForCommsTriggerId = CreateID(inSpaceForCommsTriggerName.c_str());
+		/* In Space check for initial comms */
+		{
+			mission.triggers.try_emplace(inSpaceForCommsTriggerId, inSpaceForCommsTriggerName, inSpaceForCommsTriggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(inSpaceForCommsTriggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndInSpace(Missions::ConditionParent(missionId, inSpaceForCommsTriggerId), NeedGotoWayPointComms, {}));
+
+			{
+				Missions::ActRemoveLabel action;
+				action.objNameOrLabel = Missions::Activator;
+				action.label = NeedGotoWayPointComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActRemoveLabel(action)));
+			}
+
+			{
+				Missions::ActActTrig action;
+				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
+				action.activate = true;
+				action.branching = true;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
+			}
+		}
+
 		/* Set Objective */
 		{
-			const uint triggerId = CreateID("setObjective");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			const std::string triggerName = "setObjective";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			{
@@ -391,28 +442,25 @@ namespace RandomMissions
 			}
 
 			{
-				Missions::ActEtherComm action;
-				action.receiverObjNameOrLabel = Players;
-				action.id = CreateID("msnGoToTarget");
-				action.senderVoiceId = CreateID("mc_leg_m01");
-				action.senderIdsName = 13015;
-				action.costume = offerFaction.missionCommission;
-				action.lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActEtherComm(action)));
-			}
-
-			{
 				Missions::ActPlayNN action;
 				action.label = InitialPlayer;
 				action.soundIds = std::vector<uint>({ CreateID("cmsn_accepted") });
 				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActPlayNN(action)));
 			}
+
+			{
+				Missions::ActAddLabel action;
+				action.objNameOrLabel = Players;
+				action.label = NeedGotoWayPointComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
+			}
 		}
 
 		/* Joining the Group of the Mission Players */
 		{
-			const uint triggerId = CreateID("joinGroup");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			const std::string triggerName = "joinGroup";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndJoinGroup(Missions::ConditionParent(missionId, triggerId), 0));
@@ -438,21 +486,18 @@ namespace RandomMissions
 			}
 
 			{
-				Missions::ActEtherComm action;
-				action.receiverObjNameOrLabel = Missions::Activator;
-				action.id = CreateID("msnGoToTarget");
-				action.senderVoiceId = CreateID("mc_leg_m01");
-				action.senderIdsName = 13015;
-				action.costume = offerFaction.missionCommission;
-				action.lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActEtherComm(action)));
+				Missions::ActAddLabel action;
+				action.objNameOrLabel = Missions::Activator;
+				action.label = NeedGotoWayPointComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
 			}
 		}
 
 		/* Leaving the Group of the Mission Players */
 		{
-			const uint triggerId = CreateID("leaveGroup");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			const std::string triggerName = "leaveGroup";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveGroup(Missions::ConditionParent(missionId, triggerId), 0));
@@ -467,28 +512,26 @@ namespace RandomMissions
 
 		/* Launch from Any Base */
 		{
-			const uint triggerId = CreateID("launchFromAnyBase");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			const std::string triggerName = "launchFromAnyBase";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndLaunchComplete(Missions::ConditionParent(missionId, triggerId), Players, {}));
 
 			{
-				Missions::ActEtherComm action;
-				action.receiverObjNameOrLabel = Missions::Activator;
-				action.id = CreateID("msnGoToTarget");
-				action.senderVoiceId = CreateID("mc_leg_m01");
-				action.senderIdsName = 13015;
-				action.costume = offerFaction.missionCommission;
-				action.lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActEtherComm(action)));
+				Missions::ActAddLabel action;
+				action.objNameOrLabel = Missions::Activator;
+				action.label = NeedGotoWayPointComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
 			}
 		}
 
 		/* Add Cargo */
 		{
-			const uint triggerId = CreateID("addCargo");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			const std::string triggerName = "addCargo";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndTimer(Missions::ConditionParent(missionId, triggerId), 1.0f, 0.0f));
@@ -505,8 +548,9 @@ namespace RandomMissions
 
 		/* Initial Player Death */
 		{
-			const uint triggerId = CreateID("death");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			const std::string triggerName = "death";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndDestroyed(Missions::ConditionParent(missionId, triggerId), InitialPlayer, Missions::CndDestroyed::DestroyCondition::Explode, 0, 1, false));
@@ -546,8 +590,9 @@ namespace RandomMissions
 
 		/* Initial Player Leaves */
 		{
-			const uint triggerId = CreateID("leavingMsnInitialPlayer");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			const std::string triggerName = "leavingMsnInitialPlayer";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveMsn(Missions::ConditionParent(missionId, triggerId), InitialPlayer));
@@ -603,8 +648,9 @@ namespace RandomMissions
 
 		/* Any Player Leaves */
 		{
-			const uint triggerId = CreateID("leavingMsnPlayers");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			const std::string triggerName = "leavingMsnPlayers";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndLeaveMsn(Missions::ConditionParent(missionId, triggerId), Players));
@@ -626,8 +672,9 @@ namespace RandomMissions
 
 		/* Land on Target Base */
 		{
-			const uint triggerId = CreateID("landOnTargetBase");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
+			const std::string triggerName = "landOnTargetBase";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), InitialPlayer, { destination.targetBaseId }));
@@ -689,8 +736,9 @@ namespace RandomMissions
 
 		/* Land on Any Base */
 		{
-			const uint triggerId = CreateID("landOnAnyBase");
-			mission.triggers.try_emplace(triggerId, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			const std::string triggerName = "landOnAnyBase";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
 			Missions::Trigger& trigger = mission.triggers.at(triggerId);
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseEnter(Missions::ConditionParent(missionId, triggerId), InitialPlayer, {}));

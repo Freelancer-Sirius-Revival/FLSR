@@ -365,6 +365,7 @@
     </ClCompile>
     <ClCompile Include="CounterMeasureRecharge.cpp" />
     <ClCompile Include="EventLeaderInvincibility.cpp" />
+    <ClCompile Include="CargoPods.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -752,6 +753,7 @@
     </ClInclude>
     <ClInclude Include="CounterMeasureRecharge.h" />
     <ClInclude Include="EventLeaderInvincibility.h" />
+    <ClInclude Include="CargoPods.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

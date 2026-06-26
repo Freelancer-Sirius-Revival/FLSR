@@ -198,6 +198,7 @@ enum HpAttachmentType
 	WEAPON = 3,
 	hp_countermeasure_dropper = 9,
 	hp_mine_dropper = 12,
+	hp_cargo_pod = 14,
 	hp_gun_special_1 = 15,
 	hp_gun_special_2 = 16,
 	hp_gun_special_3 = 17,
@@ -563,8 +564,8 @@ namespace Archetype
 
 	public:
 		/* 28 */ float fDecayPerSecond;
-		/* 29 */ uint iLootAppearanceID;
-		/* 30 */ uint iPodAppearanceID;
+		/* 29 */ struct Equipment* lootAppearance;
+		/* 30 */ struct CargoPod* podAppearance;
 	};
 
 	struct IMPORT DamageObjInfo

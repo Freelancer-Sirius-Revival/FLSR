@@ -34,7 +34,8 @@ namespace Missions
 		state(initiallyActive ? MissionState::AwaitingInitialActivation : MissionState::Inactive),
 		offerId(0),
 		missionResult(MissionResult::Success),
-		reofferRemainingTime(0.0f)
+		reofferRemainingTime(0.0f),
+		nextBranchId(0)
 	{}
 
 	Mission::~Mission()
@@ -362,6 +363,11 @@ namespace Missions
 			offerId = MissionBoard::AddPublicOffer(boardOffer, offer.baseIds);
 
 		return true;
+	}
+
+	uint Mission::GetNextBranchId()
+	{
+		return ++nextBranchId;
 	}
 
 	namespace Hooks

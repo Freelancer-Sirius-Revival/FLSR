@@ -158,6 +158,39 @@ namespace Missions
 		return new ActActTrig(action);
 	}
 
+	static ActActTrig* ReadActActTrigBranch(INI_Reader& ini)
+	{
+		ActActTrig action;
+		action.branching = true;
+		action.activate = false;
+
+		uint argNum = 0;
+		for (const auto maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
+		{
+			if (argNum % 2 == 0)
+			{
+				ActActTrigEntry entry;
+				entry.triggerId = CreateIdOrNull(ini.get_value_string(argNum));
+				if (entry.triggerId == 0)
+				{
+					PrintErrorToConsole(ini, argNum, L"Invalid trigger nickname. Ignoring.");
+					argNum++; // Skip reading the probability after.
+				}
+				else
+					action.triggers.push_back(entry);
+			}
+			else
+			{
+				const float value = ini.get_value_float(argNum);
+				if (value <= 0.0f)
+					PrintErrorToConsole(ini, argNum, L"Probability is 0 or negative. Ignoring.");
+				action.triggers.back().probability = std::max<float>(0.0f, value);
+			}
+		}
+
+		return new ActActTrig(action);
+	}
+
 	static ActAddCargo* ReadActAddCargo(INI_Reader& ini)
 	{
 		ActAddCargo action;
@@ -1335,6 +1368,9 @@ namespace Missions
 		
 		if (ini.is_value("Act_ActTrig"))
 			return ReadActActTrig(ini, true);
+
+		if (ini.is_value("Act_ActTrigBranch"))
+			return ReadActActTrigBranch(ini);
 
 		if (ini.is_value("Act_AddCargo"))
 			return ReadActAddCargo(ini);

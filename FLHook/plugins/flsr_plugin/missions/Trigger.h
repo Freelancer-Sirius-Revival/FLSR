@@ -22,6 +22,7 @@ namespace Missions
 		};
 
 		uint sortPosition;
+		const std::string name;
 		const uint id;
 		const uint missionId;
 		const bool initiallyActive;
@@ -36,16 +37,20 @@ namespace Missions
 			Finished
 		};
 		TriggerState state;
+		std::unordered_set<uint> branchIds;
+		uint originId;
 
 	public:
 		ConditionPtr condition;
 		std::vector<ActionPtr> actions;
 
-		Trigger(const uint id,
+		Trigger(const std::string& name,
+				const uint id,
 				const uint missionId,
 				const bool initiallyActive,
 				const TriggerRepeatable repeatable);
 		virtual ~Trigger();
+		Trigger& CreateBranch(const MissionObject activator);
 		bool IsAwaitingInitialActivation() const;
 		void Reset();
 		void Activate();

@@ -1,4 +1,5 @@
 ﻿#include "Main.h"
+#include "CargoPods.h"
 #include "Carrier.h"
 #include "Cloak.h"
 #include "ConnectionLimiter.h"
@@ -127,6 +128,10 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->bMayUnload = true;
     p_PI->ePluginReturnCode = &returncode;
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Timers::Update,PLUGIN_HkIServerImpl_Update, 0));
+    
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CargoPods::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CargoPods::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CargoPods::ShipEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::Send_FLPACKET_SERVER_LAUNCH, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH, 0));

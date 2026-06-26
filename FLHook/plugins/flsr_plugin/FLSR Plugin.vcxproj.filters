@@ -363,6 +363,7 @@
       <Filter>Bugfixes</Filter>
     </ClCompile>
     <ClCompile Include="EventLeaderInvincibility.cpp" />
+    <ClCompile Include="CargoPods.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -748,6 +749,7 @@
       <Filter>Bugfixes</Filter>
     </ClInclude>
     <ClInclude Include="EventLeaderInvincibility.h" />
+    <ClInclude Include="CargoPods.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

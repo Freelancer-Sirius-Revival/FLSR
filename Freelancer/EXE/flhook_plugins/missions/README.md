@@ -522,7 +522,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
-- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set (no `Cnd_True`, `Cnd_Timer` etc.) and it will be transfered over to the branched trigger’s Condition, overwriting it’ target label. The branched trigger will always be non-repeatable. The arguments work in two exclusive modes:
+- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set by the current condition. This `Activator` will be used as target obj for the branched trigger’s own condition. The branched trigger is `repeatable = Off`. The arguments work in two exclusive modes:
     - A single trigger with optional probability to be activated:
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.

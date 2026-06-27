@@ -1,15 +1,18 @@
-name: Test
+name: Publish Dev version
 
 on:
   push:
     branches: [ main ]
-  pull_request: {}
   workflow_dispatch: {}
 
 jobs:
   test:
     name: test
     runs-on: ubuntu-22.04
+    permissions:
+        contents: read
+        pages: write
+        id-token: write
     steps:
         - name: Check out source repository
           uses: actions/checkout@v2

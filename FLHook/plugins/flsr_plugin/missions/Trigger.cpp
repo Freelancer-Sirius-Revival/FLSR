@@ -41,18 +41,21 @@ namespace Missions
 		}
 	}
 
-	Trigger& Trigger::CreateBranch(const MissionObject activator)
+	uint Trigger::CreateBranch(const MissionObject activator)
 	{
 		auto& mission = missions.at(missionId);
-		const uint nextBranchId = mission.GetNextBranchId();
-		const std::string newTriggerName = name + ":branch_" + std::to_string(nextBranchId);
+		const std::string newTriggerName = name + " for " + (activator.type == MissionObjectType::Object ? "object" : "client") + ":" + std::to_string(activator.id);
+		const uint triggerId = CreateID(newTriggerName.c_str());
+
+		// Do not allow multiple branches for the very same activator.
+		if (mission.triggers.contains(triggerId))
+			return 0;
 
 		ActAddLabel addLabel;
 		addLabel.objNameOrLabel = Activator;
 		addLabel.label = CreateID(newTriggerName.c_str());
 		addLabel.Execute(mission, activator);
 
-		const uint triggerId = CreateID(newTriggerName.c_str());
 		mission.triggers.try_emplace(triggerId, newTriggerName, triggerId, missionId, false, TriggerRepeatable::Off);
 
 		// Register to the origin trigger, or this one.
@@ -67,7 +70,8 @@ namespace Missions
 		clonedTrigger.condition = condition != nullptr ? condition->Copy(cloneParent, addLabel.label) : ConditionPtr(new CndTrue(cloneParent, addLabel.label));
 		clonedTrigger.actions = actions;
 		clonedTrigger.Activate();
-		return clonedTrigger;
+
+		return clonedTrigger.id;
 	}
 
 	bool Trigger::IsAwaitingInitialActivation() const

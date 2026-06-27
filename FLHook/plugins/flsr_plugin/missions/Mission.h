@@ -65,7 +65,6 @@ namespace Missions
 		bool manuallyCrafted;
 		MissionState state;
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
-		uint nextBranchId;
 
 		void EvaluateCountConditions(const uint label) const;
 
@@ -85,7 +84,6 @@ namespace Missions
 		void RemoveClient(const uint clientId);
 		uint FindObjNameByObjId(const uint objId) const;
 		bool TryAddToJobBoard(const uint clientId);
-		uint GetNextBranchId();
 	};
 
 	extern std::unordered_map<uint, Mission> missions;

@@ -31,10 +31,25 @@ jobs:
           run: |
             mkdir -p ${{ github.workspace }}/freelancer_folder/EXE/flhook_plugins/crafting
             cp Freelancer/EXE/flhook_plugins/crafting/* ${{ github.workspace }}/freelancer_folder/EXE/flhook_plugins/crafting/
-        - name: Install fl-darklint
-          uses: darklab8/infra/.github/actions/install-darklint@master
-        - name: Run darklint checks
-          run: fl-darklint validate
-          env:
-            FREELANCER_FOLDER: ${{ github.workspace }}/freelancer_folder
-            FREELANCER_FOLDER_FAILBACK: ${{ github.workspace }}/Freelancer
+
+        - uses: darklab8/fl-darkstat/.github/actions/build@master
+          with:
+            site-root: "/FLSR/"
+            freelancer-folder: ${{ github.workspace }}/freelancer_folder
+            heading: <a href="https://github.com/darklab8/fl-darkstat">Darkstat</a> from <a href="https://darklab8.github.io/blog/pet_projects.html#Freelancercommunity">DarkTools</a> for <a href="https://github.com/darklab8/fl-data-flsr">FLSR</a> of <a href="https://github.com/Freelancer-Sirius-Revival/FLSR/commit/${{ github.sha }}">PREVIEW ${{ github.sha }}</a>
+            command: --stat-deals-on build
+            map-on: "true"
+            map-index-url: map.html
+            disable-dev-mode: "false"
+
+        - uses: actions/upload-pages-artifact@v3
+          with:
+            name: github-pages
+            path: ./build
+        
+        # Turn on ability to deploy to pages in repository settings, Pages tab
+        # choose "Github Actions" deployment method to Pages
+        - name: Deploy to pages
+          uses: actions/deploy-pages@v4
+          id: deployment
+          continue-on-error: true

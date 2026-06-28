@@ -23,6 +23,7 @@ namespace Missions
 	public:
 		CndSystemSpaceExit(const ConditionParent& parent, const uint label, const SystemExitCondition condition, const std::unordered_set<uint>& systemIds);
 		~CndSystemSpaceExit();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const SystemExitCondition reason);

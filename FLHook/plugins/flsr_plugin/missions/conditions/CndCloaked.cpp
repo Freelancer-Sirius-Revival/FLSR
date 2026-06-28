@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndCloaked::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndCloaked(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel, cloaked));
+	}
+
 	void CndCloaked::Register()
 	{
 		if (observedCndCloaked.insert(this).second)

@@ -12,6 +12,7 @@ namespace Missions
 	public:
 		CndLaunchComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& baseIds);
 		~CndLaunchComplete();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint currentBaseId);

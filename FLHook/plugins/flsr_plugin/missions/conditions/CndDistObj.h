@@ -23,11 +23,12 @@ namespace Missions
 
 	public:
 		CndDistObj(const ConditionParent& parent,
-			const uint objNameOrLabel,
-			const DistanceCondition condition,
-			const float distance,
-			const uint otherObjNameOrLabel);
+					const uint objNameOrLabel,
+					const DistanceCondition condition,
+					const float distance,
+					const uint otherObjNameOrLabel);
 		~CndDistObj();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const MissionObject& object);

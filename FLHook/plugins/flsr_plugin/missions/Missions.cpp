@@ -55,6 +55,7 @@ namespace Missions
 
 					if (ini.is_header("Trigger"))
 					{
+						std::string name = "";
 						uint id = 0;
 						bool initiallyActive = false;
 						Trigger::TriggerRepeatable repeatable = Trigger::TriggerRepeatable::Off;
@@ -66,7 +67,8 @@ namespace Missions
 						{
 							if (ini.is_value("nickname"))
 							{
-								id = CreateIdOrNull(ini.get_value_string(0));
+								name = ini.get_value_string(0);
+								id = CreateIdOrNull(name.c_str());
 								break;
 							}
 						}
@@ -107,7 +109,7 @@ namespace Missions
 
 						if (id)
 						{
-							missions.at(missionId).triggers.try_emplace(id, id, missionId, initiallyActive, repeatable);
+							missions.at(missionId).triggers.try_emplace(id, name, id, missionId, initiallyActive, repeatable);
 							Trigger& trigger = missions.at(missionId).triggers.at(id);
 							if (condition == nullptr)
 								ConPrint(L"Trigger " + std::to_wstring(id) + L" has no condition! Falling back to Cnd_True\n");

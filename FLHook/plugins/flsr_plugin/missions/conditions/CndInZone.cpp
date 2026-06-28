@@ -21,6 +21,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndInZone::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndInZone(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel, zoneIds));
+	}
+
 	void CndInZone::Register()
 	{
 		if (observedCndInZone.insert(this).second)

@@ -19,6 +19,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndSystemSpaceExit::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndSystemSpaceExit(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, condition, systemIds));
+	}
+
 	void CndSystemSpaceExit::Register()
 	{
 		if (observedCndSystemSpaceExit.insert(this).second)

@@ -13,6 +13,7 @@ namespace Missions
 	{
 		std::vector<ActActTrigEntry> triggers;
 		bool activate = false;
+		bool branching = false;
 
 		void Execute(Mission& mission, const MissionObject& activator) const;
 	};

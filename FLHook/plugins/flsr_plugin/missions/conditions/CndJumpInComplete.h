@@ -12,6 +12,7 @@ namespace Missions
 	public:
 		CndJumpInComplete(const ConditionParent& parent, const uint label, const std::unordered_set<uint>& systemIds);
 		~CndJumpInComplete();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint currentSystemId);

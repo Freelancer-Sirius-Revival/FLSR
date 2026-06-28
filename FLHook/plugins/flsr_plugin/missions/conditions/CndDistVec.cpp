@@ -14,7 +14,7 @@ namespace Missions
 							const float distance,
 							const uint systemId,
 							const std::string hardpoint) :
-							Condition(parent),
+		Condition(parent),
 		objNameOrLabel(objNameOrLabel),
 		condition(condition),
 		position(position),
@@ -26,6 +26,11 @@ namespace Missions
 	CndDistVec::~CndDistVec()
 	{
 		Unregister();
+	}
+
+	ConditionPtr CndDistVec::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndDistVec(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel, condition, position, distance, systemId, hardpoint));
 	}
 
 	void CndDistVec::Register()

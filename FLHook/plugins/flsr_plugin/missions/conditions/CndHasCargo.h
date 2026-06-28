@@ -14,6 +14,7 @@ namespace Missions
 	public:
 		CndHasCargo(const ConditionParent& parent, const uint label, const std::unordered_map<uint, uint>& countPerCargo);
 		~CndHasCargo();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId);

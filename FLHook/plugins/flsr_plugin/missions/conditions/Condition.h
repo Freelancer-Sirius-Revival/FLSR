@@ -14,6 +14,9 @@ namespace Missions
 		ConditionParent(const uint missionId, const uint triggerId) : missionId(missionId), triggerId(triggerId) {}
 	};
 
+	class Condition;
+	typedef std::shared_ptr<Condition> ConditionPtr;
+
 	class Condition
 	{
 	public:
@@ -22,9 +25,9 @@ namespace Missions
 
 		Condition(const ConditionParent& parent);
 		virtual ~Condition();
+		virtual ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		virtual void Register();
 		virtual void Unregister();
 		virtual void ExecuteTrigger();
 	};
-	typedef std::shared_ptr<Condition> ConditionPtr;
 }

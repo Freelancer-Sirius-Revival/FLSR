@@ -21,6 +21,7 @@ namespace Missions
 	public:
 		CndCount(const ConditionParent& parent, const uint label, const uint targetCount, const CountComparator comparator);
 		~CndCount();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const uint clientId, const uint baseId) const;

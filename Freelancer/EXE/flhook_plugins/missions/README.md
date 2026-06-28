@@ -514,7 +514,15 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
-- `Act_ActTrig` Activates a trigger. This works in two exclusive modes:
+- `Act_ActTrig` Activates a trigger. The arguments work in two exclusive modes:
+    - A single trigger with optional probability to be activated:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
+
+- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set by the current condition. This `Activator` will be used as target obj for the branched trigger’s own condition. The branched trigger is `repeatable = Off`. There is never more than one branch per `Activator`. The arguments work in two exclusive modes:
     - A single trigger with optional probability to be activated:
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
@@ -556,13 +564,21 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for deactivation.
 
-- `Act_DeactTrig` Deactivates a trigger. This works in two exclusive modes:
+- `Act_DeactTrig` Deactivates a trigger and kills all it’s direct branched triggers. The arguments work in two exclusive modes:
     - A single trigger with optional probability to be deactivated:
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be deactivated.
     - A list of triggers, each with a weight, to be picked randomly:
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for deactivation.
+
+- `Act_DeactTrigBranch` Deactivates a branch of the trigger. The current `Activator` must be set by the current condition. This `Activator` will be used to find the relevant branch of the trigger. The arguments work in two exclusive modes:
+    - A single trigger with optional probability to be activated:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
+    - A list of triggers, each with a weight, to be picked randomly:
+    1. `STRING` Trigger nickname to refer.
+    1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
 - `Act_DebugMsg` Prints a message into Hook console and to all players registered to the mission.
     1. `STRING` Arbitrary text to print.

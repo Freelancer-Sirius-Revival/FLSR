@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndJumpInComplete::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndJumpInComplete(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, systemIds));
+	}
+
 	void CndJumpInComplete::Register()
 	{
 		if (observedCndJumpInComplete.insert(this).second)

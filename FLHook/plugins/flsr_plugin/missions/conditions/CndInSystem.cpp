@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndInSystem::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndInSystem(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, systemIds));
+	}
+
 	void CndInSystem::Register()
 	{
 		struct PlayerData* playerData = 0;

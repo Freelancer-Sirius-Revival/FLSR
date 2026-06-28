@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndBaseEnter::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndBaseEnter(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, baseIds));
+	}
+
 	void CndBaseEnter::Register()
 	{
 		if (observedCndBaseEnter.insert(this).second)

@@ -19,6 +19,7 @@ namespace Missions
 						const std::unordered_set<uint> colGrpIds,
 						const bool repairedIsActivator);
 		~CndHealthInc();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const IObjRW* damagedObject, const float incomingDamage, const DamageList* damageList, const CArchGroup* hitColGrp);

@@ -12,6 +12,7 @@ namespace Missions
 	public:
 		CndCloaked(const ConditionParent& parent, const uint objNameOrLabel, const bool cloaked);
 		~CndCloaked();
+		ConditionPtr Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const;
 		void Register();
 		void Unregister();
 		bool Matches(const MissionObject& object);

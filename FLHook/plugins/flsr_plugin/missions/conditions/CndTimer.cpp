@@ -11,17 +11,23 @@ namespace Missions
 	std::unordered_set<CndTimer*> observedCndTimer;
 	std::vector<CndTimer*> orderedCndTimer;
 
-	CndTimer::CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS) :
+	CndTimer::CndTimer(const ConditionParent& parent, const float lowerTimeInS, const float upperTimeInS, const uint activatorLabel) :
 		Condition(parent),
 		lowerTimeInS(lowerTimeInS),
 		upperTimeInS(upperTimeInS),
 		targetTimeInS(0.0f),
-		passedTimeInS(0.0f)
+		passedTimeInS(0.0f),
+		activatorLabel(activatorLabel)
 	{}
 
 	CndTimer::~CndTimer()
 	{
 		Unregister();
+	}
+
+	ConditionPtr CndTimer::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndTimer(newParent, lowerTimeInS, upperTimeInS, overrideObjNameOrLabel));
 	}
 
 	void CndTimer::Register()
@@ -49,8 +55,14 @@ namespace Missions
 		passedTimeInS += elapsedTimeInS;
 		if (passedTimeInS >= targetTimeInS)
 		{
-			activator.type = MissionObjectType::Client;
-			activator.id = 0;
+			activator = MissionObject(MissionObjectType::Client, 0);
+			if (activatorLabel != 0)
+			{
+				const auto& mission = missions.at(parent.missionId);
+				const auto& objectsByLabel = mission.objectsByLabel.find(activatorLabel);
+				if (objectsByLabel != mission.objectsByLabel.end() && !objectsByLabel->second.empty())
+					activator = objectsByLabel->second.at(0);
+			}
 			return true;
 		}
 		return false;

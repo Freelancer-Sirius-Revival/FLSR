@@ -24,6 +24,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndDistObj::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndDistObj(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : objNameOrLabel, condition, distance, otherObjNameOrLabel));
+	}
+
 	void CndDistObj::Register()
 	{
 		if (observedCndDistObj.insert(this).second)

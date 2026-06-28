@@ -18,6 +18,11 @@ namespace Missions
 		Unregister();
 	}
 
+	ConditionPtr CndLaunchComplete::Copy(const ConditionParent& newParent, const uint overrideObjNameOrLabel) const
+	{
+		return ConditionPtr(new CndLaunchComplete(newParent, overrideObjNameOrLabel != 0 ? overrideObjNameOrLabel : label, baseIds));
+	}
+
 	void CndLaunchComplete::Register()
 	{
 		if (observedCndLaunchComplete.insert(this).second)

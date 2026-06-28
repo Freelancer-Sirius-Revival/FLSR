@@ -158,11 +158,11 @@ namespace Missions
 		return new ActActTrig(action);
 	}
 
-	static ActActTrig* ReadActActTrigBranch(INI_Reader& ini)
+	static ActActTrig* ReadActActTrigBranch(INI_Reader& ini, const bool activate)
 	{
 		ActActTrig action;
 		action.branching = true;
-		action.activate = false;
+		action.activate = activate;
 
 		uint argNum = 0;
 		for (const auto maxArgs = ini.get_num_parameters(); argNum < maxArgs; argNum++)
@@ -1370,7 +1370,7 @@ namespace Missions
 			return ReadActActTrig(ini, true);
 
 		if (ini.is_value("Act_ActTrigBranch"))
-			return ReadActActTrigBranch(ini);
+			return ReadActActTrigBranch(ini, true);
 
 		if (ini.is_value("Act_AddCargo"))
 			return ReadActAddCargo(ini);
@@ -1392,6 +1392,9 @@ namespace Missions
 
 		if (ini.is_value("Act_DeactTrig"))
 			return ReadActActTrig(ini, false);
+
+		if (ini.is_value("Act_DeactTrigBranch"))
+			return ReadActActTrigBranch(ini, false);
 
 		if (ini.is_value("Act_DebugMsg"))
 			return ReadActDebugMsg(ini);

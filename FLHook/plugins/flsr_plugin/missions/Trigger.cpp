@@ -41,11 +41,21 @@ namespace Missions
 		}
 	}
 
-	uint Trigger::CreateBranch(const MissionObject activator)
+	std::string GetBranchName(const std::string& name, const MissionObject& activator)
+	{
+		return name + " for " + (activator.type == MissionObjectType::Object ? "object" : "client") + ":" + std::to_string(activator.id);
+	}
+
+	uint Trigger::GetBranchId(const MissionObject& activator) const
+	{
+		return CreateID(GetBranchName(name, activator).c_str());
+	}
+
+	uint Trigger::CreateBranch(const MissionObject& activator)
 	{
 		auto& mission = missions.at(missionId);
-		const std::string newTriggerName = name + " for " + (activator.type == MissionObjectType::Object ? "object" : "client") + ":" + std::to_string(activator.id);
-		const uint triggerId = CreateID(newTriggerName.c_str());
+		const std::string newTriggerName = GetBranchName(name, activator);
+		const uint triggerId = GetBranchId(activator);
 
 		// Do not allow multiple branches for the very same activator.
 		if (mission.triggers.contains(triggerId))
@@ -53,7 +63,7 @@ namespace Missions
 
 		ActAddLabel addLabel;
 		addLabel.objNameOrLabel = Activator;
-		addLabel.label = CreateID(newTriggerName.c_str());
+		addLabel.label = triggerId;
 		addLabel.Execute(mission, activator);
 
 		mission.triggers.try_emplace(triggerId, newTriggerName, triggerId, missionId, false, TriggerRepeatable::Off);

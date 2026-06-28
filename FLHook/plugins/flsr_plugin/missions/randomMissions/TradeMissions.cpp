@@ -6,6 +6,7 @@
 #include "../Mission.h"
 #include "../conditions/CndInSpace.h"
 #include "../conditions/CndBaseEnter.h"
+#include "../conditions/CndBaseExit.h"
 #include "../conditions/CndDestroyed.h"
 #include "../conditions/CndJoinGroup.h"
 #include "../conditions/CndLaunchComplete.h"
@@ -381,7 +382,7 @@ namespace RandomMissions
 			mission.triggers.try_emplace(commsGotoWayPointTriggerId, commsGotoWayPointTriggerName, commsGotoWayPointTriggerId, missionId, false, Missions::Trigger::TriggerRepeatable::Off);
 			Missions::Trigger& trigger = mission.triggers.at(commsGotoWayPointTriggerId);
 
-			trigger.condition = Missions::ConditionPtr(new Missions::CndTimer(Missions::ConditionParent(missionId, commsGotoWayPointTriggerId), 10.0f, 0.0f));
+			trigger.condition = Missions::ConditionPtr(new Missions::CndTimer(Missions::ConditionParent(missionId, commsGotoWayPointTriggerId), 5.0f, 0.0f));
 
 			{
 				Missions::ActEtherComm action;
@@ -392,32 +393,6 @@ namespace RandomMissions
 				action.costume = offerFaction.missionCommission;
 				action.lines = std::vector<uint>({ CreateID("rmb_targetatwaypoint_01-") });
 				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActEtherComm(action)));
-			}
-		}
-
-		const uint NeedGotoWayPointComms = CreateID("NeedInitialComms");
-		const std::string inSpaceForCommsTriggerName = "inSpaceForMsnComms";
-		const uint inSpaceForCommsTriggerId = CreateID(inSpaceForCommsTriggerName.c_str());
-		/* In Space check for initial comms */
-		{
-			mission.triggers.try_emplace(inSpaceForCommsTriggerId, inSpaceForCommsTriggerName, inSpaceForCommsTriggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
-			Missions::Trigger& trigger = mission.triggers.at(inSpaceForCommsTriggerId);
-
-			trigger.condition = Missions::ConditionPtr(new Missions::CndInSpace(Missions::ConditionParent(missionId, inSpaceForCommsTriggerId), NeedGotoWayPointComms, {}));
-
-			{
-				Missions::ActRemoveLabel action;
-				action.objNameOrLabel = Missions::Activator;
-				action.label = NeedGotoWayPointComms;
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActRemoveLabel(action)));
-			}
-
-			{
-				Missions::ActActTrig action;
-				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
-				action.activate = true;
-				action.branching = true;
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
 			}
 		}
 
@@ -449,10 +424,11 @@ namespace RandomMissions
 			}
 
 			{
-				Missions::ActAddLabel action;
-				action.objNameOrLabel = Players;
-				action.label = NeedGotoWayPointComms;
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
+				Missions::ActActTrig action;
+				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
+				action.activate = true;
+				action.branching = true;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
 			}
 		}
 
@@ -486,10 +462,11 @@ namespace RandomMissions
 			}
 
 			{
-				Missions::ActAddLabel action;
-				action.objNameOrLabel = Missions::Activator;
-				action.label = NeedGotoWayPointComms;
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
+				Missions::ActActTrig action;
+				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
+				action.branching = true;
+				action.activate = true;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
 			}
 		}
 
@@ -520,10 +497,19 @@ namespace RandomMissions
 			trigger.condition = Missions::ConditionPtr(new Missions::CndLaunchComplete(Missions::ConditionParent(missionId, triggerId), Players, {}));
 
 			{
-				Missions::ActAddLabel action;
-				action.objNameOrLabel = Missions::Activator;
-				action.label = NeedGotoWayPointComms;
-				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
+				Missions::ActActTrig action;
+				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
+				action.branching = true;
+				action.activate = false;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
+			}
+
+			{
+				Missions::ActActTrig action;
+				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
+				action.activate = true;
+				action.branching = true;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
 			}
 		}
 

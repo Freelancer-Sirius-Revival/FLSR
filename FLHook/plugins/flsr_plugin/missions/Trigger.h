@@ -50,7 +50,8 @@ namespace Missions
 				const bool initiallyActive,
 				const TriggerRepeatable repeatable);
 		virtual ~Trigger();
-		uint CreateBranch(const MissionObject activator);
+		uint GetBranchId(const MissionObject& activator) const;
+		uint CreateBranch(const MissionObject& activator);
 		bool IsAwaitingInitialActivation() const;
 		void Reset();
 		void Activate();

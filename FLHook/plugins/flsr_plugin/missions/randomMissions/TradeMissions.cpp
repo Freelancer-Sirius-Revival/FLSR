@@ -396,6 +396,7 @@ namespace RandomMissions
 			}
 		}
 
+		const uint checkForInitialInSpaceComms = CreateID("checkForInitialInSpaceComms");
 		/* Set Objective */
 		{
 			const std::string triggerName = "setObjective";
@@ -424,11 +425,52 @@ namespace RandomMissions
 			}
 
 			{
+				Missions::ActAddLabel action;
+				action.objNameOrLabel = Players;
+				action.label = checkForInitialInSpaceComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActAddLabel(action)));
+			}
+		}
+
+		/* Cause initial comms for players already in space */
+		{
+			const std::string triggerName = "initialCommsInSpace";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndInSpace(Missions::ConditionParent(missionId, triggerId), checkForInitialInSpaceComms, {}));
+
+			{
+				Missions::ActRemoveLabel action;
+				action.objNameOrLabel = Missions::Activator;
+				action.label = checkForInitialInSpaceComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActRemoveLabel(action)));
+			}
+
+			{
 				Missions::ActActTrig action;
 				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
 				action.activate = true;
 				action.branching = true;
 				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
+			}
+		}
+
+		/* Remove initial comms label for any player who was on a base and is just launching. */
+		{
+			const std::string triggerName = "initialCommsBaseExitLabelRemoval";
+			const uint triggerId = CreateID(triggerName.c_str());
+			mission.triggers.try_emplace(triggerId, triggerName, triggerId, missionId, true, Missions::Trigger::TriggerRepeatable::Auto);
+			Missions::Trigger& trigger = mission.triggers.at(triggerId);
+
+			trigger.condition = Missions::ConditionPtr(new Missions::CndBaseExit(Missions::ConditionParent(missionId, triggerId), checkForInitialInSpaceComms, {}));
+
+			{
+				Missions::ActRemoveLabel action;
+				action.objNameOrLabel = Missions::Activator;
+				action.label = checkForInitialInSpaceComms;
+				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActRemoveLabel(action)));
 			}
 		}
 
@@ -496,6 +538,7 @@ namespace RandomMissions
 
 			trigger.condition = Missions::ConditionPtr(new Missions::CndLaunchComplete(Missions::ConditionParent(missionId, triggerId), Players, {}));
 
+			// First cancel the branch in case it wasn't yet executed.
 			{
 				Missions::ActActTrig action;
 				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });
@@ -503,7 +546,7 @@ namespace RandomMissions
 				action.activate = false;
 				trigger.actions.push_back(Missions::ActionPtr(new Missions::ActActTrig(action)));
 			}
-
+			// Re-add the branch to restart it.
 			{
 				Missions::ActActTrig action;
 				action.triggers.push_back({ commsGotoWayPointTriggerId, 1.0f });

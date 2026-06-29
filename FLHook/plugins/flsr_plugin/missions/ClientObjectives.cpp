@@ -15,7 +15,7 @@ namespace Missions
 			{
 				if (const auto& entry = objectiveByClientId.find(clientId); entry == objectiveByClientId.end() || entry->second.missionId != missionId)
 					return;
-				pub::Player::SetMissionObjectives(clientId, missionId, nullptr, 0, FmtStr(0, 0), 0, FmtStr(0, 0));
+				pub::Player::SetMissionObjectives(clientId, missionId, nullptr, 0, FmtStr(1, 0), 0, FmtStr(1, 0));
 			}
 
 			objectiveByClientId.erase(clientId);
@@ -80,31 +80,33 @@ namespace Missions
 			if (objectiveEntry == objectiveByClientId.end())
 				return;
 
+			const auto& mainObjective = objectiveEntry->second;
+
 			intermediateDestination.systemId = 0;
 
-			if (objectiveEntry->second.systemId)
+			if (mainObjective.systemId)
 			{
 				// Define destination location
 				XRequestBestPathEntry destination;
 				uint playerSystemId;
 				pub::Player::GetSystem(clientId, playerSystemId);
-				const bool playerNotInDestinationSystem = playerSystemId != objectiveEntry->second.systemId;
+				const bool playerNotInDestinationSystem = playerSystemId != mainObjective.systemId;
 				if (playerNotInDestinationSystem)
 				{
-					destination = BestPath::GetJumpObjectToNextSystem(clientId, objectiveEntry->second.systemId);
+					destination = BestPath::GetJumpObjectToNextSystem(clientId, mainObjective.systemId);
 				}
 				else
 				{
-					destination.systemId = objectiveEntry->second.systemId;
-					destination.position = objectiveEntry->second.position;
-					destination.objId = objectiveEntry->second.objId;
+					destination.systemId = mainObjective.systemId;
+					destination.position = mainObjective.position;
+					destination.objId = mainObjective.objId;
 				}
 
 				// Tell the server to compute the best path
 				XRequestBestPath bestPath;
 				bestPath.noPathFound = false;
 				bestPath.repId = 0;
-				if (playerNotInDestinationSystem || objectiveEntry->second.bestPath)
+				if (playerNotInDestinationSystem || mainObjective.bestPath)
 				{
 					// Define start location
 					XRequestBestPathEntry start;
@@ -158,13 +160,12 @@ namespace Missions
 			else
 			{
 				// Just to display messages without waypoints
-				const auto& missionEntry = missions.find(objectiveByClientId[clientId].missionId);
-				if (missionEntry != missions.end())
+				if (const auto& missionEntry = missions.find(mainObjective.missionId); missionEntry != missions.end())
 				{
 					pub::Player::MissionObjective objective;
-					objective.message = objectiveEntry->second.message;
+					objective.message = mainObjective.message;
 					objective.type = pub::Player::MissionObjectiveType::MissionText | pub::Player::MissionObjectiveType::SimpleEntry | pub::Player::MissionObjectiveType::ActiveLog;
-					SetObjectives(clientId, objectiveEntry->second.missionId, missionEntry->second.offer, std::vector<pub::Player::MissionObjective>({ objective }));
+					SetObjectives(clientId, mainObjective.missionId, missionEntry->second.offer, std::vector<pub::Player::MissionObjective>({ objective }));
 				}
 			}
 		}
@@ -207,68 +208,106 @@ namespace Missions
 			return false;
 		}
 
-		static bool HasPlayerPassedEntranceTradelaneRing(const uint clientId, const XRequestBestPath& route)
-		{
-			IObjRW* inspect;
-			StarSystem* system;
-			uint shipId;
-			pub::Player::GetShip(clientId, shipId);
-			if (route.waypointCount > 1 && route.entries[0].objId && route.entries[1].objId && // There must be at least 2 waypoints with ObjIds to form a tradelane.
-				shipId && GetShipInspect(shipId, inspect, system) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT && static_cast<CShip*>(inspect->cobj)->is_using_tradelane())
-			{
-				const uint currentTLRId = route.entries[0].objId; // Potential start of the current TLR.
-				const uint targetTLRId = route.entries[1].objId; // Potential end of the current TLR.
-				if (GetShipInspect(targetTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing &&
-					GetShipInspect(currentTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
-				{
-					const CSolar* currentTLR = static_cast<CSolar*>(inspect->cobj);
-					uint nextTLRId = currentTLR->get_next_trade_ring();
-					while (nextTLRId)
-					{
-						if (nextTLRId == targetTLRId)
-							return true;
-						else if (GetShipInspect(nextTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
-							nextTLRId = static_cast<CSolar*>(inspect->cobj)->get_next_trade_ring();
-						else
-							break;
-					}
-					uint previousTLRId = currentTLR->get_prev_trade_ring();
-					while (previousTLRId)
-					{
-						if (previousTLRId == targetTLRId)
-							return true;
-						else if (GetShipInspect(previousTLRId, inspect, system) && inspect->cobj->type & ObjectType::TradelaneRing)
-							previousTLRId = static_cast<CSolar*>(inspect->cobj)->get_prev_trade_ring();
-						else
-							break;
-					}
-				}
-			}
-			return false;
-		}
-
 		static bool IsJumpObject(const IObjRW* inspect)
 		{
 			return (inspect->cobj->type & ObjectType::JumpGate) || (inspect->cobj->type & ObjectType::JumpHole) || (inspect->cobj->type & ObjectType::AirlockGate);
 		}
 
+		static bool IsPlayerInTradelane(const uint clientId)
+		{
+			IObjRW* inspect;
+			StarSystem* system;
+			uint shipId;
+			pub::Player::GetShip(clientId, shipId);
+			return shipId && GetShipInspect(shipId, inspect, system) && inspect->cobj->objectClass == CObject::CSHIP_OBJECT && static_cast<CShip*>(inspect->cobj)->is_using_tradelane();
+		}
+
+		static bool CreateIntermediateObjective(const XRequestBestPath& route, pub::Player::MissionObjective& objective, const bool playerInTLR, const bool noMissionText)
+		{
+			if (route.waypointCount == 0)
+				return false;
+
+			const auto& waypoint = route.entries[0];
+			const uint objId = waypoint.objId;
+			if (objId == 0)
+				return false;
+
+			IObjRW* inspect;
+			StarSystem* system;
+			if (!GetShipInspect(objId, inspect, system))
+				return false;
+
+			if (playerInTLR)
+				objective.type = pub::Player::MissionObjectiveType::SimpleEntry;
+			else
+				objective.type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
+			if (!noMissionText)
+				objective.type |= pub::Player::MissionObjectiveType::MissionText;
+
+			const auto& obj = inspect->cobj;
+			bool result = false;
+			if (obj->type & ObjectType::TradelaneRing)
+			{
+				const uint lastObjId = route.entries[route.waypointCount - 1].objId;
+				if (lastObjId && GetShipInspect(lastObjId, inspect, system) && IsJumpObject(inspect))
+				{
+					objective.message = FmtStr(13071, 0);
+					objective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
+					result = true;
+				}
+				else
+				{
+					objective.message = FmtStr(13060, 0);
+					result = true;
+				}
+			}
+			else if (IsJumpObject(inspect))
+			{
+				objective.message = FmtStr(13080, 0);
+				objective.message.append_system(reinterpret_cast<CSolar*>(obj)->jumpDestSystem);
+				result = true;
+			}
+
+			if (result && !playerInTLR)
+			{
+				FmtStr::NavMarker marker;
+				marker.pos = waypoint.position;
+				marker.system = waypoint.systemId;
+				objective.message.append_nav_marker(marker);
+				objective.message.append_rep_instance(objId);
+			}
+
+			return result;
+		}
+
+		bool static IsObjectiveWaypoint(const Missions::ClientObjectives::Objective& objective, const XRequestBestPathEntry& waypoint)
+		{
+			return	waypoint.systemId   == objective.systemId &&
+					waypoint.position.x == objective.position.x &&
+					waypoint.position.y == objective.position.y &&
+					waypoint.position.z == objective.position.z;
+		}
+
 		bool __stdcall Send_FLPACKET_COMMON_REQUEST_BEST_PATH(uint clientId, const XRequestBestPath& data, int size)
 		{
+			const auto& objectiveByClientEntry = objectiveByClientId.find(clientId);
 			// Players can have player-waypoints only when NOT in a mission. So we can safely assume this works as intended.
-			if (!objectiveByClientId.contains(clientId))
+			if (objectiveByClientEntry == objectiveByClientId.end())
 			{
 				returncode = DEFAULT_RETURNCODE;
 				return true;
 			}
+			const auto& mainObjective = objectiveByClientEntry->second;
 
-			// Early exit if no "best path" was generated or the character has somehow left by now.
-			if (data.waypointCount == 0 || !HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
+			// Early exit the character has somehow left by now.
+			if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			{
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 				return false;
 			}
 
-			const auto& missionEntry = missions.find(objectiveByClientId[clientId].missionId);
+			// If there is no more mission existing behind this objective, ignore it.
+			const auto& missionEntry = missions.find(mainObjective.missionId);
 			if (missionEntry == missions.end())
 			{
 				returncode = SKIPPLUGINS_NOFUNCTIONCALL;
@@ -276,106 +315,63 @@ namespace Missions
 			}
 
 			// Apply object ID for last waypoint because FL drops that on computed paths.
-			auto& lastWaypoint = ((XRequestBestPathEntry*)data.entries)[data.waypointCount - 1];
-			if (lastWaypoint.systemId == intermediateDestination.systemId &&
-				lastWaypoint.position.x == intermediateDestination.position.x &&
-				lastWaypoint.position.y == intermediateDestination.position.y &&
-				lastWaypoint.position.z == intermediateDestination.position.z)
+			if (data.waypointCount > 0)
 			{
-				lastWaypoint.objId = intermediateDestination.objId;
-			}
-
-			bool preventSendingMissionMessage = false;
-			if (HasPlayerPassedEntranceTradelaneRing(clientId, data))
-			{
-				preventSendingMissionMessage = true;
-				// Remove the first TLR from the waypoints list because it was just entered.
-				XRequestBestPath& temp = (XRequestBestPath&)data;
-				temp.waypointCount--;
-				for (int index = 0; index < temp.waypointCount; index++)
-					temp.entries[index] = temp.entries[index + 1];
-			}
-
-			std::vector<pub::Player::MissionObjective> objectives;
-			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for potential MAIN objective.
-			const size_t objectiveIndexOffset = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives) ? 1 : 0;
-			objectives.resize(data.waypointCount + objectiveIndexOffset);
-
-			// The first "best path" waypoint is being treated as objective to reach the actual destination.
-			auto& nextObjective = objectives[objectiveIndexOffset];
-			if (data.entries[0].objId != 0)
-			{
-				IObjRW* inspect;
-				StarSystem* system;
-				const uint objId = data.entries[0].objId;
-				if (GetShipInspect(objId, inspect, system))
+				auto& lastWaypoint = ((XRequestBestPathEntry*)data.entries)[data.waypointCount - 1];
+				if (lastWaypoint.systemId == intermediateDestination.systemId &&
+					lastWaypoint.position.x == intermediateDestination.position.x &&
+					lastWaypoint.position.y == intermediateDestination.position.y &&
+					lastWaypoint.position.z == intermediateDestination.position.z)
 				{
-					nextObjective.type = pub::Player::MissionObjectiveType::ObjectiveWaypoint;
-					if (!preventSendingMissionMessage)
-						nextObjective.type = nextObjective.type | pub::Player::MissionObjectiveType::MissionText;
-
-					if (inspect->cobj->type & ObjectType::TradelaneRing)
-					{
-						if (data.entries[data.waypointCount - 1].objId > 0 && GetShipInspect(objId, inspect, system) && IsJumpObject(inspect))
-						{
-							nextObjective.message = FmtStr(13071, 0);
-							nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
-						}
-						else
-						{
-							nextObjective.message = FmtStr(13060, 0);
-						}
-					}
-					else if (IsJumpObject(inspect))
-					{
-						nextObjective.message = FmtStr(13080, 0);
-						nextObjective.message.append_system(reinterpret_cast<CSolar*>(inspect->cobj)->jumpDestSystem);
-					}
+					lastWaypoint.objId = intermediateDestination.objId;
 				}
 			}
+			
+			const bool playerInTLR = IsPlayerInTradelane(clientId);
 
-			const auto& playerObjective = objectiveByClientId[clientId];
-			const bool lastObjectiveIsMainObjective = lastWaypoint.systemId == playerObjective.systemId && 
-													  lastWaypoint.position.x == playerObjective.position.x &&
-													  lastWaypoint.position.y == playerObjective.position.y &&
-													  lastWaypoint.position.z == playerObjective.position.z;
+			std::vector<pub::Player::MissionObjective> objectives;
+			objectives.reserve(data.waypointCount + 2); // +1 for potential LAUNCH objective; +1 for MAIN objective.
 
-			uint lastObjectiveType = pub::Player::MissionObjectiveType::ObjectiveWaypoint | pub::Player::MissionObjectiveType::ActiveLog;
-			if (!preventSendingMissionMessage)
-				lastObjectiveType= lastObjectiveType | pub::Player::MissionObjectiveType::MissionText;
+			const bool launchFromBaseObjectivePresent = AppendLaunchToSpaceObjectiveIfNecessary(clientId, objectives);
 
-			if (lastObjectiveIsMainObjective)
-			{
-				auto& lastObjective = objectives[objectives.size() - 1];
-				lastObjective.type = lastObjectiveType;
-				lastObjective.message = playerObjective.message;
-			}
+			pub::Player::MissionObjective intermediateObjective;
+			const bool intermediateWaypointPresent = CreateIntermediateObjective(data, intermediateObjective, playerInTLR, playerInTLR || launchFromBaseObjectivePresent);
+			// If the player is not in a TLR, we have a normal main objective. Put it as next target.
+			if (intermediateWaypointPresent && !playerInTLR)
+				objectives.push_back(intermediateObjective);
 
-			// Translate all "best path" waypoints to nav map markers the objectives.
-			for (size_t waypointIndex = 0, objectiveIndex = objectiveIndexOffset; waypointIndex < data.waypointCount; waypointIndex++, objectiveIndex++)
+			// Set navigation points for each waypoint
+			for (size_t waypointIndex = intermediateWaypointPresent ? 1 : 0; waypointIndex < data.waypointCount; waypointIndex++)
 			{
 				const auto& waypoint = data.entries[waypointIndex];
 				FmtStr::NavMarker marker;
 				marker.pos = waypoint.position;
 				marker.system = waypoint.systemId;
-				objectives[objectiveIndex].message.append_nav_marker(marker);
+				auto& objective = objectives.emplace_back(pub::Player::MissionObjectiveType::IntermediateWaypoint, FmtStr(1, 0));
+				objective.message.append_nav_marker(marker);
 				if (waypoint.objId)
-					objectives[objectiveIndex].message.append_rep_instance(waypoint.objId);
+					objective.message.append_rep_instance(waypoint.objId);
 			}
 
-			if (!lastObjectiveIsMainObjective)
-			{
-				pub::Player::MissionObjective finalObjective;
-				finalObjective.type = lastObjectiveType;
-				finalObjective.message = playerObjective.message;
-				FmtStr::NavMarker marker;
-				marker.pos = playerObjective.position;
-				marker.system = playerObjective.systemId;
-				finalObjective.message.append_nav_marker(marker);
-				objectives.push_back(finalObjective);
-			}
+			// If the player is in a TLR, a simple entry without navigation point will be created. This must be put after all navigation points.
+			if (intermediateWaypointPresent && playerInTLR)
+				objectives.push_back(intermediateObjective);
 
-			SetObjectives(clientId, playerObjective.missionId, missionEntry->second.offer, objectives);
+			// Always append the Main Objective as extra objective.
+			// Freelancer has a bug where it requires always to have one more intermediate waypoint before the last objective,
+			// or it will not draw lines correctly on the map, or not allow clicking the target object and properly connecting it to the real object for the player.
+			uint lastObjectiveType = pub::Player::MissionObjectiveType::ObjectiveWaypoint | pub::Player::MissionObjectiveType::ActiveLog;
+			if (!playerInTLR && (!intermediateWaypointPresent || launchFromBaseObjectivePresent))
+				lastObjectiveType |= pub::Player::MissionObjectiveType::MissionText;
+			auto& lastObjective = objectives.emplace_back(lastObjectiveType, mainObjective.message);
+			FmtStr::NavMarker marker;
+			marker.pos = mainObjective.position;
+			marker.system = mainObjective.systemId;
+			lastObjective.message.append_nav_marker(marker);
+			if (mainObjective.objId)
+				lastObjective.message.append_rep_instance(mainObjective.objId);
+
+			SetObjectives(clientId, mainObjective.missionId, missionEntry->second.offer, objectives);
 
 			returncode = SKIPPLUGINS_NOFUNCTIONCALL;
 			return true;

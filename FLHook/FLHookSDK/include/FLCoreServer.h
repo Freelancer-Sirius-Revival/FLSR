@@ -964,7 +964,7 @@ namespace pub
 		struct MissionObjective
 		{
 			uint type = MissionObjectiveType::IntermediateWaypoint;
-			FmtStr message = FmtStr(0, 0);
+			FmtStr message = FmtStr(1, 0);
 		};
 
 		IMPORT  int AddCargo(unsigned int const&, unsigned int const&, unsigned int, float, bool);

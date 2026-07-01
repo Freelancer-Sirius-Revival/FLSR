@@ -19,7 +19,6 @@
 #include "Pilots.h"
 #include "PlayerLootSpawning.h"
 #include "SpawnProtection.h"
-#include "SolarSpawn.h"
 #include "Storage.h"
 #include "bugfixes/BatsBotsShipTransferFix.h"
 #include "bugfixes/EngineThrottleSyncFix.h"
@@ -34,6 +33,7 @@
 #include "Missions/Missions.h"
 #include "Missions/MissionBoard.h"
 #include "Missions/Mission.h"
+#include "Missions/SolarDocking.h"
 #include "Missions/conditions/CndBaseEnter.h"
 #include "Missions/conditions/CndBaseExit.h"
 #include "Missions/conditions/CndCloaked.h"
@@ -78,7 +78,6 @@ void LoadSettings() {
     std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
 
     ConnectionLimiter::maxParallelConnectionsPerIpAddress = IniGetI(scPluginCfgFile, "ConnectionLimiter", "MaxParallelIpAddressConnections", 2);
-    SolarSpawn::LoadSettings();
     // POPUP-Module #############################################################################
     //Welcome Message - First Char on ID
     PopUp::iWMsg_Head = IniGetI(scPluginCfgFile, "WelcomePopUp", "Head", 520002);
@@ -133,13 +132,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CargoPods::BaseEnter_After, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CargoPods::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CargoPods::ShipEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));
-
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::Initialize, PLUGIN_HkTimerCheckKick, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::Send_FLPACKET_SERVER_LAUNCH, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::Dock_Call_After, PLUGIN_HkCb_Dock_Call_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&SolarSpawn::ExecuteCommandString, PLUGIN_ExecuteCommandString_Callback, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::ReadCharacterData, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
@@ -345,6 +337,11 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::LifeTimes::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::Send_FLPACKET_SERVER_LAUNCH, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::PlayerLaunch, PLUGIN_HkIServerImpl_PlayerLaunch, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::Dock_Call_After, PLUGIN_HkCb_Dock_Call_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
 
     // Must be after the mission conditions to prevent de-registering any stuff that may be required for the conditions to still exist on missions.
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Initialize, PLUGIN_HkTimerCheckKick, 0));

@@ -1223,7 +1223,7 @@ namespace Missions
 		action.msnFormationId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (action.msnFormationId == 0)
 		{
-			PrintErrorToConsole(ini, argNum, L"No msn formation. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No MSN Formation. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -1267,7 +1267,7 @@ namespace Missions
 		action.msnNpcId = CreateIdOrNull(ini.get_value_string(argNum));
 		if (action.msnNpcId == 0)
 		{
-			PrintErrorToConsole(ini, argNum, L"No msn npc. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No MSN NPC. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -1310,11 +1310,38 @@ namespace Missions
 		ActSpawnSolar action;
 
 		uint argNum = 0;
-		action.solarName = ToLower(ini.get_value_string(argNum));
-		if (action.solarName.empty())
+		action.solarId = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.solarId == 0)
 		{
-			PrintErrorToConsole(ini, argNum, L"No msn solar. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No MSN Solar. Aborting!");
 			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			if (argNum + 3 < ini.get_num_parameters())
+			{
+				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
+				return nullptr;
+			}
+			action.position.x = ini.get_value_float(argNum++);
+			action.position.y = ini.get_value_float(argNum++);
+			action.position.z = ini.get_value_float(argNum++);
+		}
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			if (argNum + 3 < ini.get_num_parameters())
+			{
+				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+				return nullptr;
+			}
+			Vector rotation;
+			rotation.x = ini.get_value_float(argNum++);
+			rotation.y = ini.get_value_float(argNum++);
+			rotation.z = ini.get_value_float(argNum++);
+			action.orientation = EulerMatrix(rotation);
 		}
 
 		return new ActSpawnSolar(action);

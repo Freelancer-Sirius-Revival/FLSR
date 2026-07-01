@@ -34,7 +34,7 @@ namespace Missions
 		uint offerId;
 
 		std::unordered_map<uint, Trigger> triggers;
-		std::vector<MsnSolar> solars;
+		std::unordered_map<uint, MsnSolar> msnSolars;
 		std::unordered_map<uint, Npc> npcs;
 		std::unordered_map<uint, MsnNpc> msnNpcs;
 		std::unordered_map<uint, MsnFormation> formations;

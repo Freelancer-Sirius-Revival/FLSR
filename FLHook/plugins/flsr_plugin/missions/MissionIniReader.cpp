@@ -1,6 +1,5 @@
 #include "MissionIniReader.h"
 #include "objectives/ObjIniReader.h"
-#include "../SolarSpawn.h"
 
 namespace Missions
 {
@@ -192,7 +191,10 @@ namespace Missions
 		while (ini.read_value())
 		{
 			if (ini.is_value("nickname"))
+			{
 				solar.name = ToLower(ini.get_value_string(0));
+				solar.id = CreateIdOrNull(solar.name.c_str());
+			}
 			else if (ini.is_value("string_id"))
 				solar.idsName = ini.get_value_int(0);
 			else if (ini.is_value("system"))
@@ -231,7 +233,7 @@ namespace Missions
 				solar.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
 		}
 
-		if (solar.name.empty())
+		if (solar.name.empty() || solar.id == 0)
 		{
 			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
@@ -247,24 +249,7 @@ namespace Missions
 			return false;
 		}
 
-		mission.solars.push_back(solar);
-		SolarSpawn::SolarArchetype solarArch;
-		solarArch.archetypeId = solar.archetypeId;
-		solarArch.loadoutId = solar.loadoutId;
-		solarArch.nickname = mission.name + ":" + solar.name;
-		solarArch.idsName = solar.idsName;
-		solarArch.position = solar.position;
-		solarArch.orientation = solar.orientation;
-		solarArch.systemId = solar.systemId;
-		solarArch.baseId = solar.baseId;
-		solarArch.affiliation = solar.faction;
-		solarArch.pilotId = solar.pilotId;
-		solarArch.hitpoints = solar.hitpoints;
-		solarArch.voiceId = solar.voiceId;
-		solarArch.headId = solar.costume.headId;
-		solarArch.bodyId = solar.costume.bodyId;
-		solarArch.accessoryIds = std::vector(solar.costume.accessoryIds);
-		SolarSpawn::AppendSolarArchetype(solarArch);
+		mission.msnSolars.insert({ solar.id, solar });
 		return true;
 	}
 

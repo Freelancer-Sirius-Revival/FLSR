@@ -157,6 +157,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\objectives\ObjUtils.cpp" />
     <ClCompile Include="missions\randomMissions\Meta.cpp" />
     <ClCompile Include="missions\randomMissions\TradeMissions.cpp" />
+    <ClCompile Include="missions\SolarDocking.cpp" />
     <ClCompile Include="NameLimiter.cpp" />
     <ClCompile Include="NpcCloaking.cpp" />
     <ClCompile Include="Commands.cpp" />
@@ -263,7 +264,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="PopUp.cpp" />
     <ClCompile Include="Insurance.cpp" />
     <ClCompile Include="SendCash.cpp" />
-    <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="SpawnProtection.cpp" />
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
@@ -307,6 +307,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\objectives\ObjUtils.h" />
     <ClInclude Include="missions\randomMissions\Meta.h" />
     <ClInclude Include="missions\randomMissions\TradeMissions.h" />
+    <ClInclude Include="missions\SolarDocking.h" />
     <ClInclude Include="NameLimiter.h" />
     <ClInclude Include="NpcCloaking.h" />
     <ClInclude Include="Empathies.h" />
@@ -412,7 +413,6 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="Pilots.h" />
     <ClInclude Include="PlayerLootSpawning.h" />
     <ClInclude Include="Plugin.h" />
-    <ClInclude Include="SolarSpawn.h" />
     <ClInclude Include="SpawnProtection.h" />
     <ClInclude Include="Storage.h" />
   </ItemGroup>

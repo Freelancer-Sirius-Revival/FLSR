@@ -127,7 +127,7 @@ The hitpoints defined in the archetype will always apply, even if not set as `de
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
 
-## `Npc`
+## `NpcShipArch`
 
 This is the definition for a NPC archetype which again can be used by multiple `MsnNpc`. Multiple entries of this can exist.
 
@@ -142,9 +142,6 @@ This is the definition for a NPC archetype which again can be used by multiple `
 
 - `state_graph` Basic behaviour of the ship.
     1. `STRING` The state graph to use.
-
-- `faction` If left empty, this object is not affiliated with anyone.
-    1. `STRING` The faction nickname used.
 
 - `pilot` The AI for the pilot.
     1. `STRING` The pilot nickname used.
@@ -180,8 +177,11 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
     1. `FLOAT :0` The y-axis.
     1. `FLOAT :0` The z-axis.
 
-- `npc` Defines the NPC archetype.
-    1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
+- `npc_ship` Defines the NPC archetype.
+    1. `STRING` The `NpcShipArch` nickname defined in this mission. See previous section.
+
+- `faction` The faction the NPC is affiliated with.
+    1. `STRING` The faction nickname used.
 
 - `[voice]` Required to allow comms sent from this base. Takes a random one by the NPC faction if empty.
     1. `STRING` The voice nickname used.

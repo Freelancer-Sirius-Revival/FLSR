@@ -32,7 +32,7 @@ namespace Missions
 		for (const auto& name : memberNames)
 		{
 			if (const auto& msnNpcEntry = mission.msnNpcs.find(name); msnNpcEntry != mission.msnNpcs.end())
-				if (const auto& npcEntry = mission.npcs.find(msnNpcEntry->second.npcId); npcEntry != mission.npcs.end())
+				if (const auto& npcEntry = mission.npcShipArchetypes.find(msnNpcEntry->second.npcShipArchId); npcEntry != mission.npcShipArchetypes.end())
 					stateGraphByMemberName.insert({ name, npcEntry->second.stateGraph });
 		}
 

@@ -3,21 +3,21 @@
 
 namespace Missions
 {
-	struct Npc
+	struct MsnNpcShipArch
 	{
 		uint id = 0;
 		uint archetypeId = 0;
 		uint loadoutId = 0;
 		std::string stateGraph = "";
 		uint pilotId = 0;
-		std::string faction = "";
 		byte level = 0;
 	};
 
 	struct MsnNpc
 	{
 		uint id = 0;
-		uint npcId = 0;
+		uint npcShipArchId = 0;
+		std::string faction = "";
 		uint idsName = 0;
 		bool shipNameDisplayed = false;
 		uint voiceId = 0;

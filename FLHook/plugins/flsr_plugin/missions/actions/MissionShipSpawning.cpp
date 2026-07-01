@@ -17,8 +17,8 @@ namespace Missions
 			return objId;
 		}
 
-		const auto& npcEntry = mission.npcs.find(msnNpcEntry->second.npcId);
-		if (npcEntry == mission.npcs.end())
+		const auto& npcEntry = mission.npcShipArchetypes.find(msnNpcEntry->second.npcShipArchId);
+		if (npcEntry == mission.npcShipArchetypes.end())
 		{
 			ConPrint(L"ERROR: NPC " + std::to_wstring(msnNpcId) + L" not found.\n");
 			return objId;
@@ -39,7 +39,7 @@ namespace Missions
 		params.costume = msnNpc.costume;
 		params.idsName = msnNpc.idsName;
 		params.shipNameDisplayed = msnNpc.shipNameDisplayed;
-		params.faction = npc.faction;
+		params.faction = msnNpc.faction;
 		params.stateGraphName = npc.stateGraph;
 		params.pilotId = npc.pilotId;
 		params.pilotJobId = msnNpc.pilotJobId;

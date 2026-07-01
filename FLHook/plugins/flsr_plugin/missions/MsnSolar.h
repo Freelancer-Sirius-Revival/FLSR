@@ -13,6 +13,7 @@ namespace Missions
 	struct MsnSolar
 	{
 		std::string name = "";
+		uint id = 0;
 		uint archetypeId = 0;
 		uint loadoutId = 0;
 		uint idsName = 0;

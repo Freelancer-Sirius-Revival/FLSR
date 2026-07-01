@@ -20,7 +20,6 @@
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Timers.cpp" />
     <ClCompile Include="Tools.cpp" />
-    <ClCompile Include="SolarSpawn.cpp" />
     <ClCompile Include="ConnectionLimiter.cpp" />
     <ClCompile Include="missions\actions\ActActTrig.cpp">
       <Filter>Missions\Actions</Filter>
@@ -365,6 +364,9 @@
     <ClCompile Include="CounterMeasureRecharge.cpp" />
     <ClCompile Include="EventLeaderInvincibility.cpp" />
     <ClCompile Include="CargoPods.cpp" />
+    <ClCompile Include="missions\SolarDocking.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -739,7 +741,6 @@
     <ClInclude Include="ConnectionLimiter.h" />
     <ClInclude Include="Crafting.h" />
     <ClInclude Include="Discord.h" />
-    <ClInclude Include="SolarSpawn.h" />
     <ClInclude Include="missions\MissionIniReader.h">
       <Filter>Missions</Filter>
     </ClInclude>
@@ -752,6 +753,9 @@
     <ClInclude Include="CounterMeasureRecharge.h" />
     <ClInclude Include="EventLeaderInvincibility.h" />
     <ClInclude Include="CargoPods.h" />
+    <ClInclude Include="missions\SolarDocking.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

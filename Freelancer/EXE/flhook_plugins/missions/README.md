@@ -101,7 +101,7 @@ The hitpoints defined in the archetype will always apply, even if not set as `de
     1. `[INTEGER|-1] :-1` The hitpoints. `-1` for full hitpoints, regardless the amount.
 
 - `[base]` Only required for stations.
-    1. `STRING` The base nickname the docks of this object will be connected with.
+    1. `STRING` The base nickname the docks of this object will be connected with. If there is no spawned solar existing with the associated base, the player will be set on coordinate `0, 20000, 0` in the base’s system after launching.
 
 - `[faction]` If left empty, this object is not affiliated with anyone.
     1. `STRING` The faction nickname used.
@@ -127,7 +127,7 @@ The hitpoints defined in the archetype will always apply, even if not set as `de
 - `[label]` Can be defined multiple times. Places this object into a group with other likewise labeled objects.
     1. `STRING` Name of the group to be linked with.
 
-## `Npc`
+## `NpcShipArch`
 
 This is the definition for a NPC archetype which again can be used by multiple `MsnNpc`. Multiple entries of this can exist.
 
@@ -142,9 +142,6 @@ This is the definition for a NPC archetype which again can be used by multiple `
 
 - `state_graph` Basic behaviour of the ship.
     1. `STRING` The state graph to use.
-
-- `faction` If left empty, this object is not affiliated with anyone.
-    1. `STRING` The faction nickname used.
 
 - `pilot` The AI for the pilot.
     1. `STRING` The pilot nickname used.
@@ -180,8 +177,11 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
     1. `FLOAT :0` The y-axis.
     1. `FLOAT :0` The z-axis.
 
-- `npc` Defines the NPC archetype.
-    1. `STRING` The `NPC` archetype nickname defined in this mission. See previous section.
+- `npc_ship` Defines the NPC archetype.
+    1. `STRING` The `NpcShipArch` nickname defined in this mission _or_ in `DATA/MISSIONS/npcships.ini`. See previous section.
+
+- `faction` The faction the NPC is affiliated with.
+    1. `STRING` The faction nickname used.
 
 - `[voice]` Required to allow comms sent from this base. Takes a random one by the NPC faction if empty.
     1. `STRING` The voice nickname used.
@@ -522,7 +522,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
-- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set by the current condition. This `Activator` will be used as target obj for the branched trigger’s own condition. The branched trigger is `repeatable = Off`. There is never more than one branch per `Activator`. The arguments work in two exclusive modes:
+- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set by the current condition. This `Activator` will be used as target obj for the branched trigger’s own condition. The branched trigger is `repeatable = Off`. There is never more than one branch per `Activator`. A branch will be automatically deleted when the `Activator` is removed from the mission. The arguments work in two exclusive modes:
     - A single trigger with optional probability to be activated:
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
@@ -746,12 +746,18 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT] :0` Override for initial y-axis rotation.
     1. `[FLOAT] :0` Override for initial z-axis rotation.
 
-- `Act_SpawnSolar` Spawns a solar. Only one instance of it can exist at the same time.
-    1. `STRING` The `MsnSolar` nickname to spawn.
-
 - `Act_SpawnShip` Spawns a ship. Only one instance of it can exist at the same time.
     1. `STRING` The `MsnNpc` nickname to spawn.
     1. `[STRING|no_ol] :no_ol` The initial `ObjList` to spawn with. `no_ol` for none.
+    1. `[FLOAT] :0` Override for initial x-axis position.
+    1. `[FLOAT] :0` Override for initial y-axis position.
+    1. `[FLOAT] :0` Override for initial z-axis position.
+    1. `[FLOAT] :0` Override for initial x-axis rotation.
+    1. `[FLOAT] :0` Override for initial y-axis rotation.
+    1. `[FLOAT] :0` Override for initial z-axis rotation.
+
+- `Act_SpawnSolar` Spawns a solar. Only one instance of it can exist at the same time.
+    1. `STRING` The `MsnSolar` nickname to spawn.
     1. `[FLOAT] :0` Override for initial x-axis position.
     1. `[FLOAT] :0` Override for initial y-axis position.
     1. `[FLOAT] :0` Override for initial z-axis position.

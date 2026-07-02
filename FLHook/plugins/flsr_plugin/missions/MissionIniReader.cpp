@@ -1,6 +1,5 @@
 #include "MissionIniReader.h"
 #include "objectives/ObjIniReader.h"
-#include "../SolarSpawn.h"
 
 namespace Missions
 {
@@ -192,7 +191,10 @@ namespace Missions
 		while (ini.read_value())
 		{
 			if (ini.is_value("nickname"))
+			{
 				solar.name = ToLower(ini.get_value_string(0));
+				solar.id = CreateIdOrNull(solar.name.c_str());
+			}
 			else if (ini.is_value("string_id"))
 				solar.idsName = ini.get_value_int(0);
 			else if (ini.is_value("system"))
@@ -231,7 +233,7 @@ namespace Missions
 				solar.labels.insert(CreateIdOrNull(ini.get_value_string(0)));
 		}
 
-		if (solar.name.empty())
+		if (solar.name.empty() || solar.id == 0)
 		{
 			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
@@ -247,83 +249,59 @@ namespace Missions
 			return false;
 		}
 
-		mission.solars.push_back(solar);
-		SolarSpawn::SolarArchetype solarArch;
-		solarArch.archetypeId = solar.archetypeId;
-		solarArch.loadoutId = solar.loadoutId;
-		solarArch.nickname = mission.name + ":" + solar.name;
-		solarArch.idsName = solar.idsName;
-		solarArch.position = solar.position;
-		solarArch.orientation = solar.orientation;
-		solarArch.systemId = solar.systemId;
-		solarArch.baseId = solar.baseId;
-		solarArch.affiliation = solar.faction;
-		solarArch.pilotId = solar.pilotId;
-		solarArch.hitpoints = solar.hitpoints;
-		solarArch.voiceId = solar.voiceId;
-		solarArch.headId = solar.costume.headId;
-		solarArch.bodyId = solar.costume.bodyId;
-		solarArch.accessoryIds = std::vector(solar.costume.accessoryIds);
-		SolarSpawn::AppendSolarArchetype(solarArch);
+		mission.msnSolars.insert({ solar.id, solar });
 		return true;
 	}
 
 	bool TryReadNpcFromIni(Mission& mission, INI_Reader& ini)
 	{
-		if (!ini.is_header("Npc"))
+		if (!ini.is_header("NpcShipArch"))
 			return false;
 
 		const size_t headerLineNumber = ini.get_line_num();
-		Npc npc;
+		NpcShipArchetypes::NpcShipArch npcShipArch;
 		while (ini.read_value())
 		{
 			if (ini.is_value("nickname"))
-				npc.id = CreateIdOrNull(ini.get_value_string(0));
+				npcShipArch.id = CreateIdOrNull(ini.get_value_string(0));
 			else if (ini.is_value("archetype"))
-				npc.archetypeId = CreateIdOrNull(ini.get_value_string(0));
+				npcShipArch.archetypeId = CreateIdOrNull(ini.get_value_string(0));
 			else if (ini.is_value("loadout"))
-				npc.loadoutId = CreateIdOrNull(ini.get_value_string(0));
+				npcShipArch.loadoutId = CreateIdOrNull(ini.get_value_string(0));
 			else if (ini.is_value("state_graph"))
-				npc.stateGraph = ToLower(ini.get_value_string(0));
-			else if (ini.is_value("faction"))
-				npc.faction = ini.get_value_string(0);
+				npcShipArch.stateGraph = ToLower(ini.get_value_string(0));
 			else if (ini.is_value("pilot"))
-				npc.pilotId = CreateIdOrNull(ini.get_value_string(0));
+				npcShipArch.pilotId = CreateIdOrNull(ini.get_value_string(0));
 			else if (ini.is_value("level"))
-				npc.level = ini.get_value_int(0);
+				npcShipArch.level = ini.get_value_int(0);
 		}
 
-		if (!npc.id)
+		if (!npcShipArch.id)
 		{
 			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
-		if (!npc.archetypeId)
+		if (!npcShipArch.archetypeId)
 		{
 			PrintErrorToConsole(ini, L"No archetype. Aborting!", headerLineNumber);
 			return false;
 		}
-		if (!npc.loadoutId)
+		if (!npcShipArch.loadoutId)
 		{
 			PrintErrorToConsole(ini, L"No loadout. Aborting!", headerLineNumber);
 			return false;
 		}
-		if (npc.stateGraph.empty())
+		if (npcShipArch.stateGraph.empty())
 		{
 			PrintErrorToConsole(ini, L"No state graph. Aborting!", headerLineNumber);
 			return false;
 		}
-		if (!npc.pilotId)
+		if (!npcShipArch.pilotId)
 		{
 			PrintErrorToConsole(ini, L"No pilot. Aborting!", headerLineNumber);
 			return false;
 		}
-		if (npc.faction.empty())
-		{
-			PrintErrorToConsole(ini, L"No faction. Aborting!", headerLineNumber);
-			return false;
-		}
-		if (!mission.npcs.insert({ npc.id, npc }).second)
+		if (!mission.npcShipArchetypes.insert({ npcShipArch.id, npcShipArch }).second)
 		{
 			PrintErrorToConsole(ini, L"Nickname already existing. Aborting!", headerLineNumber);
 			return false;
@@ -344,6 +322,8 @@ namespace Missions
 				npc.id = CreateIdOrNull(ini.get_value_string(0));
 			else if (ini.is_value("string_id"))
 				npc.idsName = ini.get_value_int(0);
+			else if (ini.is_value("faction"))
+				npc.faction = ini.get_value_string(0);
 			else if (ini.is_value("use_ship_ids"))
 				npc.shipNameDisplayed = ini.get_value_bool(0);
 			else if (ini.is_value("system"))
@@ -352,8 +332,8 @@ namespace Missions
 				npc.position = ini.get_vector();
 			else if (ini.is_value("rotate") && ini.get_num_parameters() == 3)
 				npc.orientation = EulerMatrix(ini.get_vector());
-			else if (ini.is_value("npc"))
-				npc.npcId = CreateIdOrNull(ini.get_value_string(0));
+			else if (ini.is_value("npc_ship"))
+				npc.npcShipArchId = CreateIdOrNull(ini.get_value_string(0));
 			else if (ini.is_value("hitpoints"))
 				npc.hitpoints = ini.get_value_int(0);
 			else if (ini.is_value("voice"))
@@ -385,9 +365,14 @@ namespace Missions
 			PrintErrorToConsole(ini, L"No nickname. Aborting!", headerLineNumber);
 			return false;
 		}
-		if (!npc.npcId)
+		if (!npc.npcShipArchId)
 		{
 			PrintErrorToConsole(ini, L"No NPC. Aborting!", headerLineNumber);
+			return false;
+		}
+		if (npc.faction.empty())
+		{
+			PrintErrorToConsole(ini, L"No faction. Aborting!", headerLineNumber);
 			return false;
 		}
 		if (!npc.systemId)

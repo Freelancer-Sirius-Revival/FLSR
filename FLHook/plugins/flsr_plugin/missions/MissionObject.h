@@ -10,8 +10,8 @@ namespace Missions
 
 	struct MissionObject
 	{
-		MissionObjectType type = MissionObjectType::Client;
-		unsigned int id = 0;
+		MissionObjectType type;
+		unsigned int id;
 		MissionObject(const MissionObjectType type, unsigned int id) :
 			type(type),
 			id(id)

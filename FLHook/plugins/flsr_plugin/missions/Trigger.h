@@ -39,6 +39,7 @@ namespace Missions
 		TriggerState state;
 		std::unordered_set<uint> branchIds;
 		uint originId;
+		MissionObject branchActivator;
 
 	public:
 		ConditionPtr condition;
@@ -52,6 +53,7 @@ namespace Missions
 		virtual ~Trigger();
 		uint GetBranchId(const MissionObject& activator) const;
 		uint CreateBranch(const MissionObject& activator);
+		bool IsBranchFor(const MissionObject& activator) const;
 		bool IsAwaitingInitialActivation() const;
 		void Reset();
 		void Activate();

@@ -131,8 +131,7 @@ namespace CargoPods
 	};
 
 	const uint NNComponentDestroyedId = CreateID("component_destroyed");
-	const uint NNWarningId = CreateID("warning");
-	const uint NNCargoJettisoned = CreateID("cargo_jettisoned");
+	const uint NNCargoLostId = CreateID("cargo_lost");
 
 	void __stdcall ShipEquipDestroyed(const IObjRW* iobj, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* dmgList)
 	{
@@ -173,13 +172,7 @@ namespace CargoPods
 			}
 
 			// Inform the player about the cargo pod and potential contents lost.
-			if (!lootableItems.empty())
-			{
-				pub::Player::SendNNMessage(clientId, NNWarningId);
-				pub::Player::SendNNMessage(clientId, NNCargoJettisoned);
-			}
-			else
-				pub::Player::SendNNMessage(clientId, NNComponentDestroyedId);
+			pub::Player::SendNNMessage(clientId, lootableItems.empty() ? NNComponentDestroyedId : NNCargoLostId);
 
 			// If there is more than one cargo pod, calculate the relative loot count. Otherwise, the entire rest of the items must be dropped anyway.
 			if (existingCargoPodCount > 1)

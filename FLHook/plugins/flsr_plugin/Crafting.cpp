@@ -83,11 +83,12 @@ namespace Crafting
 	const uint ALL_SYSTEMS_NORMAL_ID = pub::GetNicknameId("all_systems_normal");
 	const uint NONE_AVAILABLE_ID = pub::GetNicknameId("none_available");
 
-	static float GetEquipmentVolume(const uint archetypeId)
+	static float GetEquipmentVolume(const uint archetypeId, const std::string nickname)
 	{
 		const Archetype::Equipment* equipment = Archetype::GetEquipment(archetypeId);
 		if (equipment)
 			return equipment->fVolume;
+		ConPrint(L"ERROR: Crafting Product or Ingredient archetype not found: " + stows(nickname) + L"\n");
 		return 0.0f;
 	}
 
@@ -166,7 +167,8 @@ namespace Crafting
 							else if (ini.is_value("product"))
 							{
 								Product product;
-								product.archetypeId = CreateID(ini.get_value_string(0));
+								std::string nickname = ini.get_value_string(0);
+								product.archetypeId = CreateID(nickname.c_str());
 								if (ini.get_num_parameters() > 1)
 								{
 									product.minCount = std::max<int>(1, ini.get_value_int(1));
@@ -181,7 +183,7 @@ namespace Crafting
 								if (product.ship)
 									recipe.shipsCount++;
 								else
-									recipe.highestProductVolumeWithMaxCount = std::max<float>(recipe.highestProductVolumeWithMaxCount, GetEquipmentVolume(product.archetypeId) * product.maxCount);
+									recipe.highestProductVolumeWithMaxCount = std::max<float>(recipe.highestProductVolumeWithMaxCount, GetEquipmentVolume(product.archetypeId, nickname) * product.maxCount);
 								productNamesByArchetypeId.insert({ product.archetypeId, GetEquipmentName(product.archetypeId) });
 								const GoodInfo* goodInfo = GoodList::find_by_id(product.archetypeId);
 								if (goodInfo && goodInfo->multiCount)
@@ -196,11 +198,12 @@ namespace Crafting
 							else if (ini.is_value("ingredient"))
 							{
 								Ingredient ingredient;
-								ingredient.archetypeId = CreateID(ini.get_value_string(0));
+								std::string nickname = ini.get_value_string(0);
+								ingredient.archetypeId = CreateID(nickname.c_str());
 								if (ini.get_num_parameters() > 1)
 									ingredient.count = std::max<int>(1, ini.get_value_int(1));
 								recipe.ingredients.push_back(ingredient);
-								recipe.totalIngredientsVolume += GetEquipmentVolume(ingredient.archetypeId) * ingredient.count;
+								recipe.totalIngredientsVolume += GetEquipmentVolume(ingredient.archetypeId, nickname) * ingredient.count;
 							}
 							else if (ini.is_value("base_nickname"))
 							{
@@ -666,8 +669,44 @@ namespace Crafting
 				{
 					currentShipCraftingPopups.erase(clientId);
 					currentShipCraftingPopups.insert({ clientId, recipe->originalName });
-					const bool allShips = recipe->shipsCount == recipe->products.size();
-					pub::Player::PopUpDialog(clientId, FmtStr(allShips ? 524393 : 524395, 0), FmtStr(allShips ? 524394 : 524396, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
+					uint headerIds;
+					uint textIds;
+					if (recipe->shipsCount == recipe->products.size())
+					{
+						uint playerShipArchetypeId;
+						pub::Player::GetShipID(clientId, playerShipArchetypeId);
+						bool allSameShipArchetypeAsPlayer = true;
+						for (const auto& product : recipe->products)
+						{
+							const GoodInfo* shipGood = GoodList::find_by_id(product.archetypeId);
+							if (!shipGood)
+								break;
+							const GoodInfo* hullGood = GoodList::find_by_id(shipGood->iHullGoodID);
+							if (!hullGood)
+								break;
+							if (hullGood->shipArchId != playerShipArchetypeId)
+							{
+								allSameShipArchetypeAsPlayer = false;
+								break;
+							}
+						}
+						if (allSameShipArchetypeAsPlayer)
+						{
+							headerIds = 524397;
+							textIds = 524398;
+						}
+						else
+						{
+							headerIds = 524393;
+							textIds = 524394;
+						}
+					}
+					else
+					{
+						headerIds = 524395;
+						textIds = 524396;
+					}
+					pub::Player::PopUpDialog(clientId, FmtStr(headerIds, 0), FmtStr(textIds, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
 				}
 			}
 			else

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -147,6 +147,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\actions\ActDockInstant.cpp" />
     <ClCompile Include="missions\actions\ActSetShipAndLoadout.cpp" />
     <ClCompile Include="missions\actions\ActUnlightFuse.cpp" />
+    <ClCompile Include="missions\actions\ActLockDock.cpp" />
     <ClCompile Include="missions\conditions\CndHasCargo.cpp" />
     <ClCompile Include="missions\conditions\CndHealthInc.cpp" />
     <ClCompile Include="missions\conditions\CndJoinGroup.cpp" />
@@ -299,6 +300,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\actions\ActSetDockState.h" />
     <ClInclude Include="missions\actions\ActSetShipAndLoadout.h" />
     <ClInclude Include="missions\actions\ActUnlightFuse.h" />
+    <ClInclude Include="missions\actions\ActLockDock.h" />
     <ClInclude Include="missions\conditions\CndHasCargo.h" />
     <ClInclude Include="missions\conditions\CndHealthInc.h" />
     <ClInclude Include="missions\conditions\CndJoinGroup.h" />

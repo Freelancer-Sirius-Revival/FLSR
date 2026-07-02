@@ -17,6 +17,7 @@
 #include "ActLeaveGroup.h"
 #include "ActLeaveMsn.h"
 #include "ActLightFuse.h"
+#include "ActLockDock.h"
 #include "ActMark.h"
 #include "ActNNPath.h"
 #include "ActPlayMusic.h"
@@ -661,6 +662,41 @@ namespace Missions
 			action.lifetimeOverride = ini.get_value_float(argNum);
 
 		return new ActLightFuse(action);
+	}
+
+	static ActLockDock* ReadActLockDock(INI_Reader& ini)
+	{
+		ActLockDock action;
+
+		uint argNum = 0;
+		action.label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.label == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		action.solarId = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.solarId == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No solar name. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& val = ToLower(ini.get_value_string(argNum));
+			if (val == "lock")
+				action.lock = true;
+			else if (val == "unlock")
+				action.lock = false;
+			else
+				PrintErrorToConsole(ini, argNum, L"Invalid lock type. Defaulting to Unlock.");
+		}
+
+		return new ActLockDock(action);
 	}
 
 	static ActMark* ReadActMark(INI_Reader& ini)
@@ -1452,6 +1488,9 @@ namespace Missions
 
 		if (ini.is_value("Act_LightFuse"))
 			return ReadActLightFuse(ini);
+
+		if (ini.is_value("Act_LockDock"))
+			return ReadActLockDock(ini);
 
 		if (ini.is_value("Act_Mark"))
 			return ReadActMark(ini);

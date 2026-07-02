@@ -334,7 +334,7 @@ namespace Missions
 				Mark::UnmarkObject(markEntry->first, objId);
 		}
 		markedObjIdsByClientId.erase(clientId);
-
+		lockedDocksByClientId.erase(clientId);
 		clientIds.erase(clientId);
 
 		for (const auto& label : labels)
@@ -453,14 +453,46 @@ namespace Missions
 				ShipSpawning::UnassignFromWing(objId);
 			}
 
+			const uint NNAccessDeniedId = CreateID("info_access_denied");
+
 			int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response)
 			{
-				if (HkGetClientIDByShip(shipId) || response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
+				if (response == DOCK_HOST_RESPONSE::ACCESS_DENIED || response == DOCK_HOST_RESPONSE::DOCK_DENIED)
 				{
 					returncode = DEFAULT_RETURNCODE;
 					return 0;
 				}
 
+				// Check whether the player is actually allowed to dock to these places.
+				const uint clientId = HkGetClientIDByShip(shipId);
+				if (clientId)
+				{
+					for (const auto& missionEntry : missions)
+					{
+						if (const auto& lockedDockEntry = missionEntry.second.lockedDocksByClientId.find(clientId); lockedDockEntry != missionEntry.second.lockedDocksByClientId.end())
+						{
+							// Static world dock targets
+							if (lockedDockEntry->second.contains(dockTargetId))
+							{
+								pub::Player::SendNNMessage(clientId, NNAccessDeniedId);
+								returncode = NOFUNCTIONCALL;
+								return 0;
+							}
+							// Mission dock target
+							else if (const auto& objEntry = missionEntry.second.objectIdsByName.find(dockTargetId); objEntry != missionEntry.second.objectIdsByName.end())
+							{
+								pub::Player::SendNNMessage(clientId, NNAccessDeniedId);
+								returncode = NOFUNCTIONCALL;
+								return 0;
+							}
+						}
+					}
+
+					returncode = DEFAULT_RETURNCODE;
+					return 0;
+				}
+
+				// In this loop all NPCs of a formation will be removed from the formation if they are docking somewhere.
 				for (auto& missionEntry : missions)
 				{
 					auto& mission = missionEntry.second;
@@ -491,6 +523,7 @@ namespace Missions
 						OrderBreakFormation(shipId);
 					}
 				}
+
 				returncode = DEFAULT_RETURNCODE;
 				return 0;
 			}

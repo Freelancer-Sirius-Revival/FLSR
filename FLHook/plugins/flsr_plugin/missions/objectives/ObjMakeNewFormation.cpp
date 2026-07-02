@@ -32,8 +32,12 @@ namespace Missions
 		for (const auto& name : memberNames)
 		{
 			if (const auto& msnNpcEntry = mission.msnNpcs.find(name); msnNpcEntry != mission.msnNpcs.end())
+			{
 				if (const auto& npcEntry = mission.npcShipArchetypes.find(msnNpcEntry->second.npcShipArchId); npcEntry != mission.npcShipArchetypes.end())
 					stateGraphByMemberName.insert({ name, npcEntry->second.stateGraph });
+				else if (NpcShipArchetypes::NpcShipArch arch; NpcShipArchetypes::GetNpcShipArch(msnNpcEntry->second.npcShipArchId, arch))
+					stateGraphByMemberName.insert({ name, arch.stateGraph });
+			}
 		}
 
 		for (int index = 0, length = min(formation.size(), memberNames.size()); index < length; index++)

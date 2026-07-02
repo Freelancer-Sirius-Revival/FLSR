@@ -259,7 +259,7 @@ namespace Missions
 			return false;
 
 		const size_t headerLineNumber = ini.get_line_num();
-		MsnNpcShipArch npcShipArch;
+		NpcShipArchetypes::NpcShipArch npcShipArch;
 		while (ini.read_value())
 		{
 			if (ini.is_value("nickname"))

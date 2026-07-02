@@ -17,31 +17,32 @@ namespace Missions
 			return objId;
 		}
 
-		const auto& npcEntry = mission.npcShipArchetypes.find(msnNpcEntry->second.npcShipArchId);
-		if (npcEntry == mission.npcShipArchetypes.end())
+		NpcShipArchetypes::NpcShipArch npcShipArch;
+		if (const auto& npcEntry = mission.npcShipArchetypes.find(msnNpcEntry->second.npcShipArchId); npcEntry != mission.npcShipArchetypes.end())
+			npcShipArch = npcEntry->second;
+		else if(!NpcShipArchetypes::GetNpcShipArch(msnNpcEntry->second.npcShipArchId, npcShipArch))
 		{
-			ConPrint(L"ERROR: NPC " + std::to_wstring(msnNpcId) + L" not found.\n");
+			ConPrint(L"ERROR: NpcShipArch " + std::to_wstring(msnNpcId) + L" not found.\n");
 			return objId;
 		}
 
 		const auto& msnNpc = msnNpcEntry->second;
-		const auto& npc = npcEntry->second;
 
 		ShipSpawning::NpcCreationParams params;
-		params.archetypeId = npc.archetypeId;
-		params.loadoutId = npc.loadoutId;
+		params.archetypeId = npcShipArch.archetypeId;
+		params.loadoutId = npcShipArch.loadoutId;
 		params.position = positionOverride != nullptr ? *positionOverride : msnNpc.position;
 		params.orientation = orientationOverride != nullptr ? *orientationOverride : msnNpc.orientation;
 		params.systemId = msnNpc.systemId;
 		params.hitpoints = msnNpc.hitpoints;
-		params.level = npc.level;
+		params.level = npcShipArch.level;
 		params.voiceId = msnNpc.voiceId;
 		params.costume = msnNpc.costume;
 		params.idsName = msnNpc.idsName;
 		params.shipNameDisplayed = msnNpc.shipNameDisplayed;
 		params.faction = msnNpc.faction;
-		params.stateGraphName = npc.stateGraph;
-		params.pilotId = npc.pilotId;
+		params.stateGraphName = npcShipArch.stateGraph;
+		params.pilotId = npcShipArch.pilotId;
 		params.pilotJobId = msnNpc.pilotJobId;
 		if (positionOverride == nullptr && orientationOverride == nullptr)
 		{

@@ -3,16 +3,6 @@
 
 namespace Missions
 {
-	struct MsnNpcShipArch
-	{
-		uint id = 0;
-		uint archetypeId = 0;
-		uint loadoutId = 0;
-		std::string stateGraph = "";
-		uint pilotId = 0;
-		byte level = 0;
-	};
-
 	struct MsnNpc
 	{
 		uint id = 0;

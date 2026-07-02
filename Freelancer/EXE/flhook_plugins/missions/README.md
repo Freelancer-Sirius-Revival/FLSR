@@ -178,7 +178,7 @@ This is the definition for a single NPC for the mission. Multiple `MsnNpc` can b
     1. `FLOAT :0` The z-axis.
 
 - `npc_ship` Defines the NPC archetype.
-    1. `STRING` The `NpcShipArch` nickname defined in this mission. See previous section.
+    1. `STRING` The `NpcShipArch` nickname defined in this mission _or_ in `DATA/MISSIONS/npcships.ini`. See previous section.
 
 - `faction` The faction the NPC is affiliated with.
     1. `STRING` The faction nickname used.

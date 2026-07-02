@@ -4,7 +4,8 @@
 #include "MissionOffer.h"
 #include "MsnSolar.h"
 #include "MsnFormation.h"
-#include "Npc.h"
+#include "NpcShipArchetypes.h"
+#include "MsnNpc.h"
 #include "Dialog.h"
 #include <queue>
 #include "Objectives/Objectives.h"
@@ -35,7 +36,7 @@ namespace Missions
 
 		std::unordered_map<uint, Trigger> triggers;
 		std::unordered_map<uint, MsnSolar> msnSolars;
-		std::unordered_map<uint, MsnNpcShipArch> npcShipArchetypes;
+		std::unordered_map<uint, NpcShipArchetypes::NpcShipArch> npcShipArchetypes;
 		std::unordered_map<uint, MsnNpc> msnNpcs;
 		std::unordered_map<uint, MsnFormation> formations;
 		std::unordered_map<uint, Objectives> objectives;

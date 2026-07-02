@@ -367,6 +367,9 @@
     <ClCompile Include="missions\SolarDocking.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\NpcShipArchetypes.cpp">
+      <Filter>Missions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -448,7 +451,7 @@
     <ClInclude Include="missions\conditions\CndTimer.h">
       <Filter>Missions\Conditions</Filter>
     </ClInclude>
-    <ClInclude Include="missions\Npc.h">
+    <ClInclude Include="missions\MsnNpc.h">
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActSpawnShip.h">
@@ -754,6 +757,9 @@
     <ClInclude Include="EventLeaderInvincibility.h" />
     <ClInclude Include="CargoPods.h" />
     <ClInclude Include="missions\SolarDocking.h">
+      <Filter>Missions</Filter>
+    </ClInclude>
+    <ClInclude Include="missions\NpcShipArchetypes.h">
       <Filter>Missions</Filter>
     </ClInclude>
   </ItemGroup>

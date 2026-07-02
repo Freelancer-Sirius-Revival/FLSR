@@ -27,6 +27,7 @@
 #include "Missions/ShipSpawning.h"
 #include "Missions/Formations.h"
 #include "Missions/NpcAppearances.h"
+#include "Missions/NpcShipArchetypes.h"
 #include "Missions/BestPath.h"
 #include "Missions/ClientObjectives.h"
 #include "Missions/LifeTimes.h"
@@ -67,6 +68,7 @@ void LoadSettings() {
     Pilots::ReadFiles();
     NpcAppearances::ReadFiles();
     Formations::ReadFiles();
+    NpcShipArchetypes::ReadFiles();
     BestPath::ReadFiles();
     NpcCloaking::ReadFiles();
     EquipWhiteList::ReadFiles();

@@ -669,8 +669,44 @@ namespace Crafting
 				{
 					currentShipCraftingPopups.erase(clientId);
 					currentShipCraftingPopups.insert({ clientId, recipe->originalName });
-					const bool allShips = recipe->shipsCount == recipe->products.size();
-					pub::Player::PopUpDialog(clientId, FmtStr(allShips ? 524393 : 524395, 0), FmtStr(allShips ? 524394 : 524396, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
+					uint headerIds;
+					uint textIds;
+					if (recipe->shipsCount == recipe->products.size())
+					{
+						uint playerShipArchetypeId;
+						pub::Player::GetShipID(clientId, playerShipArchetypeId);
+						bool allSameShipArchetypeAsPlayer = true;
+						for (const auto& product : recipe->products)
+						{
+							const GoodInfo* shipGood = GoodList::find_by_id(product.archetypeId);
+							if (!shipGood)
+								break;
+							const GoodInfo* hullGood = GoodList::find_by_id(shipGood->iHullGoodID);
+							if (!hullGood)
+								break;
+							if (hullGood->shipArchId != playerShipArchetypeId)
+							{
+								allSameShipArchetypeAsPlayer = false;
+								break;
+							}
+						}
+						if (allSameShipArchetypeAsPlayer)
+						{
+							headerIds = 524397;
+							textIds = 524398;
+						}
+						else
+						{
+							headerIds = 524393;
+							textIds = 524394;
+						}
+					}
+					else
+					{
+						headerIds = 524395;
+						textIds = 524396;
+					}
+					pub::Player::PopUpDialog(clientId, FmtStr(headerIds, 0), FmtStr(textIds, 0), PopupDialogButton::LEFT_YES | PopupDialogButton::RIGHT_LATER);
 				}
 			}
 			else

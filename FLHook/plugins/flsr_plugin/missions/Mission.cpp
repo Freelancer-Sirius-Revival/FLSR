@@ -243,10 +243,23 @@ namespace Missions
 		}
 	}
 
+	void Mission::DeleteTriggerBranch(const MissionObject& activator)
+	{
+		for (auto it = triggers.begin(); it != triggers.end();)
+		{
+			if (it->second.IsBranchFor(activator))
+				it = triggers.erase(it);
+			else
+				it++;
+		}
+	}
+
 	void Mission::RemoveObject(const uint objId)
 	{
 		if (!objectIds.contains(objId))
 			return;
+
+		DeleteTriggerBranch(MissionObject(MissionObjectType::Object, objId));
 
 		for (auto it = objectIdsByName.begin(); it != objectIdsByName.end();)
 		{
@@ -284,6 +297,8 @@ namespace Missions
 	{
 		if (!clientIds.contains(clientId))
 			return;
+
+		DeleteTriggerBranch(MissionObject(MissionObjectType::Client, clientId));
 
 		Hooks::CndLeaveMsn::EvaluateLeaveMission(id, clientId);
 

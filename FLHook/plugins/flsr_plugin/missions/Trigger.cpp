@@ -20,7 +20,8 @@ namespace Missions
 		state(initiallyActive ? TriggerState::AwaitingInitialActivation : TriggerState::Inactive),
 		repeatable(repeatable),
 		condition(ConditionPtr(new CndTrue({ missionId, id }))),
-		originId(0)
+		originId(0),
+		branchActivator(MissionObject(MissionObjectType::Client, 0))
 	{
 		sortPosition = missions.at(missionId).triggers.size();
 	}
@@ -61,6 +62,7 @@ namespace Missions
 		if (mission.triggers.contains(triggerId))
 			return 0;
 
+		// This also registers a client to the mission.
 		ActAddLabel addLabel;
 		addLabel.objNameOrLabel = Activator;
 		addLabel.label = triggerId;
@@ -76,12 +78,18 @@ namespace Missions
 
 		Trigger& clonedTrigger = mission.triggers.at(triggerId);
 		clonedTrigger.originId = originId != 0 ? originId : id;
+		clonedTrigger.branchActivator = activator;
 		const ConditionParent cloneParent({ clonedTrigger.missionId, clonedTrigger.id });
 		clonedTrigger.condition = condition != nullptr ? condition->Copy(cloneParent, addLabel.label) : ConditionPtr(new CndTrue(cloneParent, addLabel.label));
 		clonedTrigger.actions = actions;
 		clonedTrigger.Activate();
 
 		return clonedTrigger.id;
+	}
+
+	bool Trigger::IsBranchFor(const MissionObject& activator) const
+	{
+		return branchActivator == activator;
 	}
 
 	bool Trigger::IsAwaitingInitialActivation() const

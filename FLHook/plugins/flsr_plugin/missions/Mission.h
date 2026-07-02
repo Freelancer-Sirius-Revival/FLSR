@@ -68,6 +68,7 @@ namespace Missions
 		std::queue<std::pair<uint, MissionObject>> triggerExecutionQueue;
 
 		void EvaluateCountConditions(const uint label) const;
+		void DeleteTriggerBranch(const MissionObject& activator);
 
 	public:
 		Mission(const std::string name, const uint id, const bool initiallyActive = false, const bool manuallyCrafted = false);

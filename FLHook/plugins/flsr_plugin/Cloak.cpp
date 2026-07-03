@@ -110,7 +110,7 @@ namespace Cloak
 	{
 		uint shipId = 0;
 		IObjRW* shipInspect = 0;
-		uint activatorCargoId = 0;
+		ushort activatorCargoId = 0;
 		uint activatorArchetypeId = 0;
 		std::string activatorHardpoint = "";
 		uint cloakCargoId = 0;
@@ -810,7 +810,7 @@ namespace Cloak
 		{
 			XFireWeaponInfo info;
 			info.object = clientCloakStats[clientId].shipId;
-			info.hpIds.push_back(static_cast<ushort>(clientCloakStats[clientId].activatorCargoId));
+			info.hpIds.push_back(clientCloakStats[clientId].activatorCargoId);
 			info.target.x = 1;
 			info.target.y = 0;
 			info.target.z = 0;

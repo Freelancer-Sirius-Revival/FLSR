@@ -944,16 +944,18 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
 			}
-			Vector rotation;
-			rotation.x = ini.get_value_float(argNum++);
-			rotation.y = ini.get_value_float(argNum++);
-			rotation.z = ini.get_value_float(argNum++);
-			action.orientation = EulerMatrix(rotation);
+			else
+			{
+				Vector rotation;
+				rotation.x = ini.get_value_float(argNum++);
+				rotation.y = ini.get_value_float(argNum++);
+				rotation.z = ini.get_value_float(argNum++);
+				action.orientation = EulerMatrix(rotation);
+			}
 		}
 
 		return new ActRelocate(action);
@@ -1270,26 +1272,30 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
-				return nullptr;
 			}
-			action.position.x = ini.get_value_float(argNum++);
-			action.position.y = ini.get_value_float(argNum++);
-			action.position.z = ini.get_value_float(argNum++);
-		}
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			if (argNum + 3 < ini.get_num_parameters())
+			else
 			{
-				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
+				action.position.x = ini.get_value_float(argNum++);
+				action.position.y = ini.get_value_float(argNum++);
+				action.position.z = ini.get_value_float(argNum++);
+
+				if (ini.get_num_parameters() > argNum)
+				{
+					if (ini.get_num_parameters() < argNum + 3)
+					{
+						PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+					}
+					else
+					{
+						action.rotation.x = ini.get_value_float(argNum++);
+						action.rotation.y = ini.get_value_float(argNum++);
+						action.rotation.z = ini.get_value_float(argNum++);
+					}
+				}
 			}
-			action.rotation.x = ini.get_value_float(argNum++);
-			action.rotation.y = ini.get_value_float(argNum++);
-			action.rotation.z = ini.get_value_float(argNum++);
 		}
 
 		return new ActSpawnFormation(action);
@@ -1314,28 +1320,32 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
-				return nullptr;
 			}
-			action.position.x = ini.get_value_float(argNum++);
-			action.position.y = ini.get_value_float(argNum++);
-			action.position.z = ini.get_value_float(argNum++);
-		}
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			if (argNum + 3 < ini.get_num_parameters())
+			else
 			{
-				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
+				action.position.x = ini.get_value_float(argNum++);
+				action.position.y = ini.get_value_float(argNum++);
+				action.position.z = ini.get_value_float(argNum++);
+
+				if (ini.get_num_parameters() > argNum)
+				{
+					if (ini.get_num_parameters() < argNum + 3)
+					{
+						PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+					}
+					else
+					{
+						Vector rotation;
+						rotation.x = ini.get_value_float(argNum++);
+						rotation.y = ini.get_value_float(argNum++);
+						rotation.z = ini.get_value_float(argNum++);
+						action.orientation = EulerMatrix(rotation);
+					}
+				}
 			}
-			Vector rotation;
-			rotation.x = ini.get_value_float(argNum++);
-			rotation.y = ini.get_value_float(argNum++);
-			rotation.z = ini.get_value_float(argNum++);
-			action.orientation = EulerMatrix(rotation);
 		}
 
 		return new ActSpawnShip(action);
@@ -1356,28 +1366,32 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
-				return nullptr;
 			}
-			action.position.x = ini.get_value_float(argNum++);
-			action.position.y = ini.get_value_float(argNum++);
-			action.position.z = ini.get_value_float(argNum++);
-		}
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			if (argNum + 3 < ini.get_num_parameters())
+			else
 			{
-				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
+				action.position.x = ini.get_value_float(argNum++);
+				action.position.y = ini.get_value_float(argNum++);
+				action.position.z = ini.get_value_float(argNum++);
+
+				if (ini.get_num_parameters() > argNum)
+				{
+					if (ini.get_num_parameters() < argNum + 3)
+					{
+						PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+					}
+					else
+					{
+						Vector rotation;
+						rotation.x = ini.get_value_float(argNum++);
+						rotation.y = ini.get_value_float(argNum++);
+						rotation.z = ini.get_value_float(argNum++);
+						action.orientation = EulerMatrix(rotation);
+					}
+				}
 			}
-			Vector rotation;
-			rotation.x = ini.get_value_float(argNum++);
-			rotation.y = ini.get_value_float(argNum++);
-			rotation.z = ini.get_value_float(argNum++);
-			action.orientation = EulerMatrix(rotation);
 		}
 
 		return new ActSpawnSolar(action);

@@ -370,6 +370,7 @@
     <ClCompile Include="missions\NpcShipArchetypes.cpp">
       <Filter>Missions</Filter>
     </ClCompile>
+    <ClCompile Include="missions\actions\ActLockDock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -762,6 +763,7 @@
     <ClInclude Include="missions\NpcShipArchetypes.h">
       <Filter>Missions</Filter>
     </ClInclude>
+    <ClInclude Include="missions\actions\ActLockDock.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

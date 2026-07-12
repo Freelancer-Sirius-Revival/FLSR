@@ -135,9 +135,10 @@ namespace MissionBoard
 		SendDestroyOfferToAll(offerId);
 	}
 
+	// origin 1 = NPCs, origin 2 = Mission Board
 	void __stdcall MissionResponse(uint boardIndex, uint origin, bool accepted, uint clientId)
 	{
-		if (!accepted)
+		if (!accepted || origin != 2)
 		{
 			returncode = DEFAULT_RETURNCODE;
 			return;
@@ -244,7 +245,7 @@ namespace MissionBoard
 
 	bool __stdcall Send_FLPACKET_SERVER_GFCOMPLETEMISSIONCOMPUTERLIST(uint clientId, uint base)
 	{
-		// Before the Complete Packet it sent, add the custom missions to the list.
+		// Before the Complete Packet is sent, add the custom missions to the list.
 
 		uint shipArchetypeId = 0;
 		pub::Player::GetShipID(clientId, shipArchetypeId);
@@ -269,6 +270,7 @@ namespace MissionBoard
 				continue;
 
 			const uint index = ++boardLastIndexByClient[clientId];
+			boardIndicesByClientId.erase(clientId);
 			boardIndicesByClientId[clientId].push_back({ index, offerId });
 			SendOfferToClient(clientId, offerId, offer, base, index);
 		}

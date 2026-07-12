@@ -17,6 +17,7 @@
 #include "ActLeaveGroup.h"
 #include "ActLeaveMsn.h"
 #include "ActLightFuse.h"
+#include "ActLockDock.h"
 #include "ActMark.h"
 #include "ActNNPath.h"
 #include "ActPlayMusic.h"
@@ -663,6 +664,41 @@ namespace Missions
 		return new ActLightFuse(action);
 	}
 
+	static ActLockDock* ReadActLockDock(INI_Reader& ini)
+	{
+		ActLockDock action;
+
+		uint argNum = 0;
+		action.label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.label == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		action.solarId = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.solarId == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No solar name. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		if (ini.get_num_parameters() > argNum)
+		{
+			const auto& val = ToLower(ini.get_value_string(argNum));
+			if (val == "lock")
+				action.lock = true;
+			else if (val == "unlock")
+				action.lock = false;
+			else
+				PrintErrorToConsole(ini, argNum, L"Invalid lock type. Defaulting to Unlock.");
+		}
+
+		return new ActLockDock(action);
+	}
+
 	static ActMark* ReadActMark(INI_Reader& ini)
 	{
 		ActMark action;
@@ -908,16 +944,18 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
 			}
-			Vector rotation;
-			rotation.x = ini.get_value_float(argNum++);
-			rotation.y = ini.get_value_float(argNum++);
-			rotation.z = ini.get_value_float(argNum++);
-			action.orientation = EulerMatrix(rotation);
+			else
+			{
+				Vector rotation;
+				rotation.x = ini.get_value_float(argNum++);
+				rotation.y = ini.get_value_float(argNum++);
+				rotation.z = ini.get_value_float(argNum++);
+				action.orientation = EulerMatrix(rotation);
+			}
 		}
 
 		return new ActRelocate(action);
@@ -1234,26 +1272,30 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
-				return nullptr;
 			}
-			action.position.x = ini.get_value_float(argNum++);
-			action.position.y = ini.get_value_float(argNum++);
-			action.position.z = ini.get_value_float(argNum++);
-		}
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			if (argNum + 3 < ini.get_num_parameters())
+			else
 			{
-				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
+				action.position.x = ini.get_value_float(argNum++);
+				action.position.y = ini.get_value_float(argNum++);
+				action.position.z = ini.get_value_float(argNum++);
+
+				if (ini.get_num_parameters() > argNum)
+				{
+					if (ini.get_num_parameters() < argNum + 3)
+					{
+						PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+					}
+					else
+					{
+						action.rotation.x = ini.get_value_float(argNum++);
+						action.rotation.y = ini.get_value_float(argNum++);
+						action.rotation.z = ini.get_value_float(argNum++);
+					}
+				}
 			}
-			action.rotation.x = ini.get_value_float(argNum++);
-			action.rotation.y = ini.get_value_float(argNum++);
-			action.rotation.z = ini.get_value_float(argNum++);
 		}
 
 		return new ActSpawnFormation(action);
@@ -1278,28 +1320,32 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
-				return nullptr;
 			}
-			action.position.x = ini.get_value_float(argNum++);
-			action.position.y = ini.get_value_float(argNum++);
-			action.position.z = ini.get_value_float(argNum++);
-		}
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			if (argNum + 3 < ini.get_num_parameters())
+			else
 			{
-				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
+				action.position.x = ini.get_value_float(argNum++);
+				action.position.y = ini.get_value_float(argNum++);
+				action.position.z = ini.get_value_float(argNum++);
+
+				if (ini.get_num_parameters() > argNum)
+				{
+					if (ini.get_num_parameters() < argNum + 3)
+					{
+						PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+					}
+					else
+					{
+						Vector rotation;
+						rotation.x = ini.get_value_float(argNum++);
+						rotation.y = ini.get_value_float(argNum++);
+						rotation.z = ini.get_value_float(argNum++);
+						action.orientation = EulerMatrix(rotation);
+					}
+				}
 			}
-			Vector rotation;
-			rotation.x = ini.get_value_float(argNum++);
-			rotation.y = ini.get_value_float(argNum++);
-			rotation.z = ini.get_value_float(argNum++);
-			action.orientation = EulerMatrix(rotation);
 		}
 
 		return new ActSpawnShip(action);
@@ -1320,28 +1366,32 @@ namespace Missions
 
 		if (ini.get_num_parameters() > argNum)
 		{
-			if (argNum + 3 < ini.get_num_parameters())
+			if (ini.get_num_parameters() < argNum + 3)
 			{
 				PrintErrorToConsole(ini, argNum, L"Position values are incomplete. Skipping!");
-				return nullptr;
 			}
-			action.position.x = ini.get_value_float(argNum++);
-			action.position.y = ini.get_value_float(argNum++);
-			action.position.z = ini.get_value_float(argNum++);
-		}
-
-		if (ini.get_num_parameters() > argNum)
-		{
-			if (argNum + 3 < ini.get_num_parameters())
+			else
 			{
-				PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
-				return nullptr;
+				action.position.x = ini.get_value_float(argNum++);
+				action.position.y = ini.get_value_float(argNum++);
+				action.position.z = ini.get_value_float(argNum++);
+
+				if (ini.get_num_parameters() > argNum)
+				{
+					if (ini.get_num_parameters() < argNum + 3)
+					{
+						PrintErrorToConsole(ini, argNum, L"Rotation values are incomplete. Skipping!");
+					}
+					else
+					{
+						Vector rotation;
+						rotation.x = ini.get_value_float(argNum++);
+						rotation.y = ini.get_value_float(argNum++);
+						rotation.z = ini.get_value_float(argNum++);
+						action.orientation = EulerMatrix(rotation);
+					}
+				}
 			}
-			Vector rotation;
-			rotation.x = ini.get_value_float(argNum++);
-			rotation.y = ini.get_value_float(argNum++);
-			rotation.z = ini.get_value_float(argNum++);
-			action.orientation = EulerMatrix(rotation);
 		}
 
 		return new ActSpawnSolar(action);
@@ -1452,6 +1502,9 @@ namespace Missions
 
 		if (ini.is_value("Act_LightFuse"))
 			return ReadActLightFuse(ini);
+
+		if (ini.is_value("Act_LockDock"))
+			return ReadActLockDock(ini);
 
 		if (ini.is_value("Act_Mark"))
 			return ReadActMark(ini);

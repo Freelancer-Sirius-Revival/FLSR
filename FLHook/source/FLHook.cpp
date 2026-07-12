@@ -163,9 +163,9 @@ void FLHookInit_Pre() {
     // Get direct pointers to malloc and free for st6 to prevent debug heap
     // issues
     {
-        auto msvcrt = GetModuleHandle(TEXT("msvcrt.dll"));
-        st6_malloc = (st6_malloc_t)GetProcAddress(msvcrt, "malloc");
-        st6_free = (st6_free_t)GetProcAddress(msvcrt, "free");
+        const auto dll = GetModuleHandle(TEXT("msvcrt.dll"));
+        st6_malloc = reinterpret_cast<st6_malloc_t>(GetProcAddress(dll, "malloc"));
+        st6_free = reinterpret_cast<st6_free_t>(GetProcAddress(dll, "free"));
     }
 
     // start console

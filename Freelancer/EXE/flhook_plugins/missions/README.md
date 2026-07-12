@@ -639,6 +639,11 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `[FLOAT]` The time-offset between `0` and `1` to start the fuse from.
     1. `[FLOAT]` Overrides the fuse lifetime by this value.
 
+- `Act_LockDock` Only for players. Locks or unlocks all docks of a dockable object.
+    1. `STRING|Activator` Players by label to allow or disallow docking for.
+    1. `STRING` Dockable object (solar) from mission or static world to change dock behaviour of.
+    1. `Lock|Unlock: Unlock` Locks or unlocks the docks.
+
 - `Act_Mark` Only for players. Marks another object.
     1. `STRING|Activator` Players by label to mark/unmark the target for.
     1. `STRING` Object by name or label to mark or unmark.
@@ -675,7 +680,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Players by label to pop up the dialog for.
     1. `INTEGER` The text resource ID for the header.
     1. `INTEGER` The text resource ID for the content.
-    1. `[Close|Yes|No|Later] :Close` The text resource ID for the header.
+    1. `[Close|Yes|No|Later] :Close` The button to offer. Multiple subsequent entries possible.
 
 - `Act_RemoveCargo` Only for players. Removes cargo.
     1. `STRING|Activator` Players by label to have the cargo removed from.

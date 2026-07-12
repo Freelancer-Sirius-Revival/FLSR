@@ -581,14 +581,13 @@ namespace Insurance
             return result;
         }
 
-        const std::wstring clientWS = ARG_CLIENTID(clientId);
         // Add all items as cargo or equipment
         for (const auto& equipToRestore : itemToAdds)
         {
             if (!equipToRestore.hardpoint.empty())
-                HkAddEquip(clientWS, equipToRestore.archId, equipToRestore.hardpoint, equipToRestore.count, true);
+                HkAddEquip(ARG_CLIENTID(clientId), equipToRestore.archId, equipToRestore.hardpoint, equipToRestore.count, true);
             else
-                HkAddCargo(clientWS, equipToRestore.archId, equipToRestore.count, false);
+                pub::Player::AddCargo(clientId, equipToRestore.archId, equipToRestore.count, 1.0f, false);
         }
 
         RestoreOutput result;

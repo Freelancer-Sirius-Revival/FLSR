@@ -1240,35 +1240,6 @@ HK_ERROR HkAntiCheat(uint iClientID) {
     return HKE_OK;
 }
 
-HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint)
-{
-    HK_GET_CLIENTID(clientId, wscCharname);
-
-    if ((clientId == -1) || HkIsInCharSelectMenu(clientId))
-        return HKE_NO_CHAR_SELECTED;
-
-    if (!Players[clientId].enteredBase)
-    {
-        Players[clientId].enteredBase = Players[clientId].iBaseID;
-        Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true, clientId);
-        Players[clientId].enteredBase = 0;
-    }
-    else
-    {
-        Server.ReqAddItem(iGoodID, scHardpoint.c_str(), 1, 1.0f, true, clientId);
-    }
-
-    // Add to check-list which is being compared to the users equip-list when
-    // saving char to fix "Ship or Equipment not sold on base" kick
-    EquipDesc ed;
-    ed.sID = Players[clientId].lastEquipId++;
-    ed.iCount = 1;
-    ed.iArchID = iGoodID;
-    Players[clientId].lShadowEquipDescList.add_equipment_item(ed, false);
-
-    return HKE_OK;
-}
-
 HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint, int iNumItems, bool bMounted)
 {
     typedef bool(__stdcall* _AddCargoDocked)(uint iGoodID, CacheString*& hardpoint, int iNumItems, float fHealth, int bMounted, int bMission, uint iOne);
@@ -1280,21 +1251,6 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::st
 
     if (clientId == -1 || HkIsInCharSelectMenu(clientId))
         return HKE_PLAYER_NOT_LOGGED_IN;
-
-    uint base = 0;
-    uint location = 0;
-    pub::Player::GetBase(clientId, base);
-    pub::Player::GetLocation(clientId, location);
-    // trick cheat detection
-    if (base)
-    {
-        if (location)
-            Server.LocationExit(location, clientId);
-        Server.BaseExit(base, clientId);
-
-        if (!clientId)
-            return HKE_PLAYER_NOT_LOGGED_IN;
-    }
 
     CacheString hardpoint;
     hardpoint.value = StringAlloc(scHardpoint.c_str(), false);
@@ -1314,19 +1270,6 @@ HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::st
         push iGoodID
         mov ecx, playerData
         call AddCargoDocked
-    }
-
-    if (base)
-    {
-        // player docked on base
-        ///////////////////////////////////////////////////
-        // fix, else we get anti-cheat msg when undocking
-        // this DOES NOT disable anti-cheat-detection, we're
-        // just making some adjustments so that we dont get kicked
-
-        Server.BaseEnter(base, clientId);
-        if (location)
-            Server.LocationEnter(location, clientId);
     }
 
     return HKE_OK;

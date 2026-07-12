@@ -557,7 +557,7 @@ namespace Crafting
 		return true;
 	}
 
-	static bool ProduceItems(const uint clientId, const Recipe& recipe, const int batchCount)
+	static bool ProduceItems(const uint clientId, Recipe& recipe, const int batchCount)
 	{
 		// Finally roll the dice to get the actual crafted item.
 		// First collect all items to add to cargo. Otherwise too many packages are sent and cause lags!
@@ -583,12 +583,12 @@ namespace Crafting
 			if (!productArchetypeCombinable.contains(craftedItemArchetypeIdCount.first))
 			{
 				for (uint count = 0; count < craftedItemArchetypeIdCount.second; count++)
-					HkAddCargo(ARG_CLIENTID(clientId), craftedItemArchetypeIdCount.first, 1, false);
+					pub::Player::AddCargo(clientId, craftedItemArchetypeIdCount.first, 1, 1.0f, false);
 			}
 			// Stackable items will be sent as a batch to reduce package traffic.
 			else
 			{
-				HkAddCargo(ARG_CLIENTID(clientId), craftedItemArchetypeIdCount.first, craftedItemArchetypeIdCount.second, false);
+				pub::Player::AddCargo(clientId, craftedItemArchetypeIdCount.first, craftedItemArchetypeIdCount.second, 1.0f, false);
 			}
 		}
 
@@ -641,7 +641,7 @@ namespace Crafting
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return false;
 
-		const Recipe* recipe = FindRecipe(clientId, recipeName);
+		Recipe* recipe = FindRecipe(clientId, recipeName);
 		if (!recipe)
 			return false;
 

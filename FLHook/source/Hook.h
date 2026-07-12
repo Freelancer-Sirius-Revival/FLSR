@@ -692,7 +692,6 @@ EXPORT HK_ERROR HkPlayerRecalculateCRC(uint iClientID);
 EXPORT std::string HkGetPlayerSystemS(uint iClientID);
 EXPORT bool IsInRange(uint iClientID, float fDistance);
 EXPORT std::wstring GetLocation(unsigned int iClientID);
-EXPORT HK_ERROR HkAddEquip(const std::wstring &wscCharname, uint iGoodID, const std::string &scHardpoint);
 EXPORT HK_ERROR HkAddEquip(const std::wstring& wscCharname, uint iGoodID, const std::string& scHardpoint, int iNumItems, bool bMounted);
 EXPORT HK_ERROR HkAntiCheat(uint iClientID);
 EXPORT void HkDelayedKick(uint iClientID, uint secs);

@@ -293,7 +293,7 @@ namespace CounterMeasuresRecharge
 				}
 				if (ammoNeedsRefill)
 				{
-					HkAddCargo(ARG_CLIENTID(dataEntry.first), ammoArchId, 1, false);
+					pub::Player::AddCargo(dataEntry.first, ammoArchId, 1, 1.0f, false);
 					dataEntry.second.nextRechargeByDropper.at(dropper) = now + counterMeasureDataByArchId.at(ammoArchId).rechargeDelay;
 				}
 			}

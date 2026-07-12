@@ -114,7 +114,7 @@ namespace CargoPods
 
 		// At this point there MUST always be a cargo pod, even if just a fallback if no relevant cargo is present.
 		for (const auto& hpName : hpNames)
-			HkAddEquip(ARG_CLIENTID(clientId), mostUsedCargoPodId.first, hpName);
+			HkAddEquip(ARG_CLIENTID(clientId), mostUsedCargoPodId.first, hpName, 1, true);
 
 		returncode = DEFAULT_RETURNCODE;
 	}

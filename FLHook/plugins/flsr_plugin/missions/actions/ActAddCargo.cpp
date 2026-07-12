@@ -8,8 +8,16 @@ namespace Missions
 		pub::Player::GetRemainingHoldSize(clientId, remainingHold);
 		const auto& item = Archetype::GetEquipment(action.itemId);
 		if (item && (remainingHold >= item->fVolume * action.count))
-			// This being triggered directly after buying/selling may cause cheat-detection because the CASH change packet hasn't come through yet.
-			HkAddCargo(ARG_CLIENTID(clientId), action.itemId, action.count, action.missionFlagged);
+		{
+			const GoodInfo* good = GoodList::find_by_id(action.itemId);
+			if (!good)
+				return;
+			if (good->multiCount)
+				pub::Player::AddCargo(clientId, action.itemId, action.count, 1.0f, action.missionFlagged);
+			else
+				for (uint index = 0; index < action.count; index++)
+					pub::Player::AddCargo(clientId, action.itemId, 1, 1.0f, action.missionFlagged);
+		}
 	}
 
 	void ActAddCargo::Execute(Mission& mission, const MissionObject& activator) const

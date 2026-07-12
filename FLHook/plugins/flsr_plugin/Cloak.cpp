@@ -379,7 +379,7 @@ namespace Cloak
 
 	static bool EquipEquipment(const uint clientId, const uint archetypeId, const std::string& hardpoint)
 	{
-		return HkAddEquip(ARG_CLIENTID(clientId), archetypeId, hardpoint) == HKE_OK;
+		return HkAddEquip(ARG_CLIENTID(clientId), archetypeId, hardpoint, 1, true) == HKE_OK;
 	}
 
 	static bool EquipCloakingDevices(const uint clientId)

@@ -680,7 +680,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING|Activator` Players by label to pop up the dialog for.
     1. `INTEGER` The text resource ID for the header.
     1. `INTEGER` The text resource ID for the content.
-    1. `[Close|Yes|No|Later] :Close` The text resource ID for the header.
+    1. `[Close|Yes|No|Later] :Close` The button to offer. Multiple subsequent entries possible.
 
 - `Act_RemoveCargo` Only for players. Removes cargo.
     1. `STRING|Activator` Players by label to have the cargo removed from.

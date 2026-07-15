@@ -49,3 +49,10 @@
 - Weapons do not wait out their refire cooldown when they fail to fire
 - The filter for friendly/neutral/hostile for zones and patrol paths works in multiplayer now
 - Stations properly wish you well on your way in multiplayer again (*"Freelancer Alpha 1-2, this is Newark Station; you are cleared for launch - good luck out there!"*)
+
+## Local Play/Hosting a Server
+
+FL:SR is a pure multiplayer mod. To play it locally or with friends you have to host your own server (`EXE\FLServer.exe`). FL:SR by default comes with all necessary data to have the full experience without the need of the official server (seasonal events are not active by default, you have to do this yourself).
+The only requirement to properly start the server is to have `Visual C++ Redistributable 2022 (v14) for x86` installed. If the console window upon starting FLServer.exe does not show up, or shows some plugin not being loaded, then this most likely is the reason.
+
+To start up seasonal events, check the `\EXE\flhook_plugins\missions` directory and look for files starting with `event_season_`. Open them and check for the `[Mission]` block at the very top. You can either remove the `;` in front of the `initstate = ACTIVE` line, or go to the FLHook console window and type `start_mission ` and then the `nickname` of that mission.

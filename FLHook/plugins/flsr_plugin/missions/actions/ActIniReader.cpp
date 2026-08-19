@@ -444,10 +444,10 @@ namespace Missions
 		ActEtherComm action;
 
 		uint argNum = 0;
-		action.id = CreateIdOrNull(ini.get_value_string(argNum));
-		if (action.id == 0)
+		action.commName = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.commName == 0)
 		{
-			PrintErrorToConsole(ini, argNum, L"No comm id. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No comm name. Aborting!");
 			return nullptr;
 		}
 		argNum++;
@@ -1022,10 +1022,10 @@ namespace Missions
 		ActSendComm action;
 
 		uint argNum = 0;
-		action.id = CreateIdOrNull(ini.get_value_string(argNum));
-		if (action.id == 0)
+		action.commName = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.commName == 0)
 		{
-			PrintErrorToConsole(ini, argNum, L"No comm id. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No comm name. Aborting!");
 			return nullptr;
 		}
 		argNum++;

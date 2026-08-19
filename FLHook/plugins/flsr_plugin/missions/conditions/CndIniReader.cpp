@@ -119,7 +119,7 @@ namespace Missions
 		commName = CreateIdOrNull(ini.get_value_string(argNum));
 		if (commName == 0)
 		{
-			PrintErrorToConsole(ini, argNum, L"No comm label. Aborting!");
+			PrintErrorToConsole(ini, argNum, L"No comm name. Aborting!");
 			return nullptr;
 		}
 

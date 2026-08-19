@@ -371,6 +371,9 @@
       <Filter>Missions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActLockDock.cpp" />
+    <ClCompile Include="missions\conditions\CndPopUpDialog.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -764,6 +767,9 @@
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActLockDock.h" />
+    <ClInclude Include="missions\conditions\CndPopUpDialog.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

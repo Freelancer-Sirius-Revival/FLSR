@@ -470,6 +470,11 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players by label to expect on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player must be on. If none is given, any base will count.
 
+- `Cnd_PopUpDialog` Only for players. Checks if a specific popup dialog was closed. `Activator` will be the player. Popups can be closed in unexpected ways and this condition may never trigger.
+    1. `STRING|Activator` Players by label to wait the popup dialog to be closed by.
+    1. `STRING` The name of the popup to wait for. See `Act_PopUpDialog`.
+    1. `[Close|Yes|No|Later] :Close` The button to expect.
+
 - `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
     1. `STRING` Object by name or label to count projectile hits on.
     1. `[INTEGER] :1` The count of projectile hits that must have happened.
@@ -677,6 +682,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The sound nickname to play.
 
 - `Act_PopUpDialog` Only for players. Pops up a dialog window.
+    1. `STRING` The name of this popup. Referred to by `Cnd_PopUpDialog`.
     1. `STRING|Activator` Players by label to pop up the dialog for.
     1. `INTEGER` The text resource ID for the header.
     1. `INTEGER` The text resource ID for the content.

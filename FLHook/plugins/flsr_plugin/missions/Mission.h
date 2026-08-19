@@ -50,6 +50,7 @@ namespace Missions
 		std::unordered_map<uint, ConditionPtr> objectiveConditionByObjectId;
 		std::unordered_map<uint, std::unordered_set<uint>> markedObjIdsByClientId;
 		std::unordered_map<uint, std::unordered_set<uint>> lockedDocksByClientId;
+		std::unordered_map<uint, uint> lastOpenedPopUpNameByClientId;
 
 		MissionResult missionResult;
 		float reofferRemainingTime;
@@ -97,6 +98,7 @@ namespace Missions
 		{
 			void __stdcall Elapse_Time_AFTER(float seconds);
 			int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
+			void __stdcall Send_FLPACKET_COMMON_POP_UP_DIALOG(uint clientId, FmtStr* heading, FmtStr* text, uint buttons);
 		}
 	}
 }

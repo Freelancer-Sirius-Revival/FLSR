@@ -53,6 +53,7 @@
 #include "Missions/conditions/CndLaunchComplete.h"
 #include "Missions/conditions/CndLeaveGroup.h"
 #include "Missions/conditions/CndOnBase.h"
+#include "Missions/conditions/CndPopUpDialog.h"
 #include "Missions/conditions/CndProjHitCount.h"
 #include "Missions/conditions/CndSystemSpaceEnter.h"
 #include "Missions/conditions/CndSystemSpaceExit.h"
@@ -319,6 +320,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndLeaveGroup::DelGroupMemberHook, PLUGIN_DelGroupMember, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndLaunchComplete::LaunchComplete_AFTER, PLUGIN_HkIServerImpl_LaunchComplete_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndOnBase::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndPopUpDialog::PopUpDialog_AFTER, PLUGIN_HkIServerImpl_PopUpDialog_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipAndSolarEquipDamage, PLUGIN_ShipEquipDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipAndSolarColGrpDamage, PLUGIN_ShipColGrpDmg, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndProjHitCount::ShipAndSolarHullDamage, PLUGIN_ShipHullDmg, 0));
@@ -338,6 +340,7 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::CndTimer::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::Mission::Send_FLPACKET_COMMON_POP_UP_DIALOG, PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_POP_UP_DIALOG, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::LifeTimes::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::Send_FLPACKET_SERVER_LAUNCH, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_LAUNCH, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Missions::Hooks::SolarDocking::PlayerLaunch, PLUGIN_HkIServerImpl_PlayerLaunch, 0));

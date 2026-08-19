@@ -865,6 +865,14 @@ namespace Missions
 		ActPopUpDialog action;
 
 		uint argNum = 0;
+		action.popupName = CreateIdOrNull(ini.get_value_string(argNum));
+		if (action.popupName == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No popup name. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
 		action.label = CreateIdOrNull(ini.get_value_string(argNum));
 		if (action.label == 0)
 		{
@@ -873,7 +881,7 @@ namespace Missions
 		}
 		argNum++;
 
-		action.headingId = CreateIdOrNull(ini.get_value_string(argNum));
+		action.headingId = ini.get_value_int(argNum);
 		if (action.headingId == 0)
 		{
 			PrintErrorToConsole(ini, argNum, L"No heading resource ID. Aborting!");
@@ -881,7 +889,7 @@ namespace Missions
 		}
 		argNum++;
 
-		action.messageId = CreateIdOrNull(ini.get_value_string(argNum));
+		action.messageId = ini.get_value_int(argNum);
 		if (action.messageId == 0)
 		{
 			PrintErrorToConsole(ini, argNum, L"No message resource ID. Aborting!");
@@ -889,23 +897,26 @@ namespace Missions
 		}
 		argNum++;
 
+		uint buttons = 0;
 		while (argNum < ini.get_num_parameters())
 		{
 			const auto& button = ToLower(ini.get_value_string(argNum));
 			if (button == "close")
-				action.buttons |= PopupDialogButton::CENTER_OK;
+				buttons |= PopupDialogButton::CENTER_OK;
 			else if (button == "yes")
-				action.buttons |= PopupDialogButton::LEFT_YES;
+				buttons |= PopupDialogButton::LEFT_YES;
 			else if (button == "no")
-				action.buttons |= PopupDialogButton::CENTER_NO;
+				buttons |= PopupDialogButton::CENTER_NO;
 			else if (button == "later")
-				action.buttons |= PopupDialogButton::RIGHT_LATER;
+				buttons |= PopupDialogButton::RIGHT_LATER;
 			else
 				PrintErrorToConsole(ini, argNum, L"No valid button type. Skipping.");
 			argNum++;
 		}		
-		if (action.buttons == 0)
-			PrintErrorToConsole(ini, argNum, L"No button types given. Defaulting to OK.");
+		if (buttons == 0)
+			PrintErrorToConsole(ini, argNum, L"No button types given. Defaulting to Close.");
+		else
+			action.buttons = buttons;
 
 		return new ActPopUpDialog(action);
 	}

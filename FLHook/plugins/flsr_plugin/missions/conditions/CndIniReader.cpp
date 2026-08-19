@@ -19,6 +19,7 @@
 #include "CndLeaveGroup.h"
 #include "CndLeaveMsn.h"
 #include "CndOnBase.h"
+#include "CndPopUpDialog.h"
 #include "CndProjHitCount.h"
 #include "CndSystemSpaceEnter.h"
 #include "CndSystemSpaceExit.h"
@@ -699,6 +700,44 @@ namespace Missions
 		return new CndOnBase(conditionParent, label, baseIds);
 	}
 
+	static CndPopUpDialog* ReadCndPopUpDialog(const ConditionParent& conditionParent, INI_Reader& ini)
+	{
+		uint argNum = 0;
+		const uint label = CreateIdOrNull(ini.get_value_string(argNum));
+		if (label == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No target label. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		const uint popupName = CreateIdOrNull(ini.get_value_string(argNum));
+		if (popupName == 0)
+		{
+			PrintErrorToConsole(ini, argNum, L"No popup name. Aborting!");
+			return nullptr;
+		}
+		argNum++;
+
+		uint targetButton = 0;
+		const auto& button = ToLower(ini.get_value_string(argNum));
+		if (button == "close")
+			targetButton = PopupDialogButton::CENTER_OK;
+		else if (button == "yes")
+			targetButton = PopupDialogButton::LEFT_YES;
+		else if (button == "no")
+			targetButton = PopupDialogButton::CENTER_NO;
+		else if (button == "later")
+			targetButton = PopupDialogButton::RIGHT_LATER;
+		else
+		{
+			PrintErrorToConsole(ini, argNum, L"No valid button type. Aborting!");
+			return nullptr;
+		}
+
+		return new CndPopUpDialog(conditionParent, label, popupName, targetButton);
+	}
+
 	static CndProjHitCount* ReadCndProjHit(const ConditionParent& conditionParent, INI_Reader& ini)
 	{
 		uint damagedObjNameOrLabel = 0;
@@ -942,6 +981,9 @@ namespace Missions
 
 		if (ini.is_value("Cnd_OnBase"))
 			return ReadCndOnBase(conditionParent, ini);
+
+		if (ini.is_value("Cnd_PopUpDialog"))
+			return ReadCndPopUpDialog(conditionParent, ini);
 
 		if (ini.is_value("Cnd_ProjHitCount"))
 			return ReadCndProjHit(conditionParent, ini);

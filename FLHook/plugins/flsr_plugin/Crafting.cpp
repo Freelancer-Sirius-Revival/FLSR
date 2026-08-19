@@ -126,9 +126,9 @@ namespace Crafting
 		const std::regex filePattern(".+\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(craftingDirectory))
 		{
-			const std::string fileName = wstos(entry.path().filename());
+			const std::string filePath = entry.path().string();
 			INI_Reader ini;
-			if (std::regex_match(fileName, filePattern) && ini.open((craftingDirectory + fileName).c_str(), false))
+			if (std::regex_match(filePath, filePattern) && ini.open(filePath.c_str(), false))
 			{
 				while (ini.read_header())
 				{

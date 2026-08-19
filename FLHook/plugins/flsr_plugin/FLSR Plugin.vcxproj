@@ -153,6 +153,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClCompile Include="missions\conditions\CndJoinGroup.cpp" />
     <ClCompile Include="missions\conditions\CndLeaveGroup.cpp" />
     <ClCompile Include="missions\conditions\CndLeaveMsn.cpp" />
+    <ClCompile Include="missions\conditions\CndPopUpDialog.cpp" />
     <ClCompile Include="missions\MatrixMath.cpp" />
     <ClCompile Include="missions\MissionIniReader.cpp" />
     <ClCompile Include="missions\NpcShipArchetypes.cpp" />
@@ -307,6 +308,7 @@ xcopy /y  "$(OutDir)$(TargetName).pdb" "$(FLHOOK_COPY_PATH)\flhook_plugins\"
     <ClInclude Include="missions\conditions\CndJoinGroup.h" />
     <ClInclude Include="missions\conditions\CndLeaveGroup.h" />
     <ClInclude Include="missions\conditions\CndLeaveMsn.h" />
+    <ClInclude Include="missions\conditions\CndPopUpDialog.h" />
     <ClInclude Include="missions\MissionIniReader.h" />
     <ClInclude Include="missions\NpcShipArchetypes.h" />
     <ClInclude Include="missions\objectives\ObjUtils.h" />

@@ -1641,11 +1641,13 @@ void HkIClientImpl::unknown_91(uint iClientID, uint iDunno)
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-void HkIClientImpl::Send_FLPACKET_COMMON_POP_UP_DIALOG(uint iClientID, FmtStr* heading, FmtStr* text, uint buttons)
+void HkIClientImpl::Send_FLPACKET_COMMON_POP_UP_DIALOG(uint clientId, FmtStr* heading, FmtStr* text, uint buttons)
 {
 	ISERVER_LOG();
-	ISERVER_LOGARG_UI(iClientID);
+	ISERVER_LOGARG_UI(clientId);
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_POP_UP_DIALOG(iClientID, heading, text, buttons));
+	CALL_PLUGINS_V(PLUGIN_HkIClientImpl_Send_FLPACKET_COMMON_POP_UP_DIALOG, __stdcall, (uint, FmtStr*, FmtStr*, uint), (clientId, heading, text, buttons));
+
+	CALL_CLIENT_METHOD(Send_FLPACKET_COMMON_POP_UP_DIALOG(clientId, heading, text, buttons));
 	return;
 }

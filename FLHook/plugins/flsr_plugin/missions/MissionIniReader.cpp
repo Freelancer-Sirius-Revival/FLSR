@@ -478,7 +478,7 @@ namespace Missions
 			else if (ini.is_value("line"))
 			{
 				DialogLine line;
-				line.id = CreateIdOrNull(ini.get_value_string(0));
+				line.commName = CreateIdOrNull(ini.get_value_string(0));
 				line.receiverObjNameOrLabel = CreateIdOrNull(ini.get_value_string(1));
 				line.senderEtherSenderOrObjName = CreateIdOrNull(ini.get_value_string(2));
 				uint pos = 3;
@@ -498,9 +498,9 @@ namespace Missions
 				if (ini.get_num_parameters() > pos)
 					line.global = ini.get_value_bool(pos);
 
-				if (!line.id)
+				if (!line.commName)
 				{
-					PrintErrorToConsole(ini, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without nickname. Aborting!");
+					PrintErrorToConsole(ini, L"Line " + std::to_wstring(dialog.lines.size() + 1) + L" without comm name. Aborting!");
 					return false;
 				}
 				if (!line.senderEtherSenderOrObjName)

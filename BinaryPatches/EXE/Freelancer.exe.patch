@@ -270,9 +270,6 @@ File: EXE\Freelancer.exe
 # Display sun spines within asteroid fields. - adoxa
 111C80: EB	[ 74 ]
 
-# Activate [light] lightsource_cone entries. - adoxa
-131D2B: B0 01 90	[ 0F 94 C0 ]
-
 
 ##########################################
 # Reputation

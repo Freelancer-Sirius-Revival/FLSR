@@ -156,6 +156,9 @@ File: EXE\Freelancer.exe
 # Enable post-cloak engine flickering effect for player trails. - BC46
 128A8D: 18	[ 1C ]
 
+# Make target view of selected SHIPS always assumed to be CAPITAL for the purpose of displaying the previous and next sub-target buttons - BC46
+0E241E: EB [ 75 ]
+
 
 ##############
 # On Base

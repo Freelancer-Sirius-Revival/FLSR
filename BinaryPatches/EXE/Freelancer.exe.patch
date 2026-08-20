@@ -157,6 +157,9 @@ File: EXE\Freelancer.exe
 128A8D: 18	[ 1C ]
 
 
+# TEST: check if this makes the previous and next sub-target buttons show up for regular ships without introducing issues?
+0E241E: EB [ 75 ]
+
 ##############
 # On Base
 ##############

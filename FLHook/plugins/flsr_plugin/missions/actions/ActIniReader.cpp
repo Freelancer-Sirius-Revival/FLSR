@@ -1103,7 +1103,7 @@ namespace Missions
 		}
 		argNum++;
 
-		action.dockHardpoint = ToLower(ini.get_value_string(argNum));
+		action.dockHardpoint = ini.get_value_string(argNum);
 		if (action.dockHardpoint.empty())
 		{
 			PrintErrorToConsole(ini, argNum, L"No hardpoint. Aborting!");

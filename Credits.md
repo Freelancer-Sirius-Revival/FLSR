@@ -14,6 +14,7 @@
   - [HD Ships](https://github.com/FLHDE/freelancer-hd-edition)
   - [HD Starspheres](https://github.com/FLHDE/freelancer-hd-edition)
   - [HD System Map](https://github.com/FLHDE/freelancer-hd-edition)
+  - [HD Station textures from Freelancer: The Nomad Legacy](https://github.com/FLHDE/freelancer-hd-edition)
   - [Many general HD and effect additions](https://github.com/FLHDE/freelancer-hd-edition)
   - [Many misc fixes](https://github.com/FLHDE/freelancer-hd-edition)
   - [Many misc improvements](https://github.com/FLHDE/freelancer-hd-edition)
@@ -86,9 +87,6 @@
   - [Unit Repair plugin](http://adoxa.altervista.org/freelancer/plugins.html#unitrepair)
   - [Wheel Scroll plugin](http://adoxa.altervista.org/freelancer/plugins.html#wheelscroll)
   - [Zone plugin](http://adoxa.altervista.org/freelancer/plugins.html#zone)
-
-- [Jeider](https://github.com/Jeider) & RenderG
-  - [HD Station textures from Freelancer: The Nomad Legacy](https://www.moddb.com/mods/freelancer-nomad-legacy)
 
 - [Jeider](https://github.com/Jeider) & [Might_Impress/Whiskas T-Mech](https://www.moddb.com/members/might-impress)
   - [Freelancer Advanced Widescreen HUD](https://www.moddb.com/mods/freelacer-advanced-widescreen-hud)

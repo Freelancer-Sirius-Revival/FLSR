@@ -2,7 +2,7 @@
 
 namespace Missions
 {
-	static void DockInstant(const uint clientId, const uint targetIdOrName, const std::string& dockHardpoint, const Mission& mission)
+	static void DockInstant(const uint clientId, const uint targetIdOrName, std::string dockHardpoint, const Mission& mission)
 	{
 		if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId))
 			return;
@@ -34,6 +34,7 @@ namespace Missions
 			return;
 
 		const auto archetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
+		dockHardpoint = ToLower(dockHardpoint);
 		for (int index = 0, length = archetype->dockInfo.size(); index < length; index++)
 		{
 			if (std::string(archetype->dockInfo[index].hardpoint) == dockHardpoint)

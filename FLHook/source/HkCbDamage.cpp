@@ -1,21 +1,43 @@
 ﻿#include "hook.h"
 
-FARPROC fpOldExplosionHit;
+FARPROC ShipExplosionHitOrigFunc;
 
-bool __stdcall ExplosionHit(IObjRW* iobj, ExplosionDamageEvent* explosion, DamageList* dmg)
+bool __stdcall ShipExplosionHit(IObjRW* iobj, ExplosionDamageEvent* explosion, DamageList* dmg)
 {
-	CALL_PLUGINS(PLUGIN_ExplosionHit, bool, __stdcall, (IObjRW * iobj, ExplosionDamageEvent * explosion, DamageList * dmg), (iobj, explosion, dmg));
+	CALL_PLUGINS(PLUGIN_ShipExplosionHit, bool, __stdcall, (IObjRW * iobj, ExplosionDamageEvent * explosion, DamageList * dmg), (iobj, explosion, dmg));
 	return true;
 }
 
-__declspec(naked) void HookExplosionHitNaked()
+__declspec(naked) void ShipExplosionHitNaked()
 {
 	__asm {
 		push ecx
 		push[esp + 0xC]
 		push[esp + 0xC]
 		push ecx
-		call ExplosionHit
+		call ShipExplosionHit
+		pop ecx
+		ret 0x8
+	}
+}
+
+
+FARPROC SolarExplosionHitOrigFunc;
+
+bool __stdcall SolarExplosionHit(IObjRW* iobj, ExplosionDamageEvent* explosion, DamageList* dmg)
+{
+	CALL_PLUGINS(PLUGIN_SolarExplosionHit, bool, __stdcall, (IObjRW * iobj, ExplosionDamageEvent * explosion, DamageList * dmg), (iobj, explosion, dmg));
+	return true;
+}
+
+__declspec(naked) void SolarExplosionHitNaked()
+{
+	__asm {
+		push ecx
+		push[esp + 0xC]
+		push[esp + 0xC]
+		push ecx
+		call SolarExplosionHit
 		pop ecx
 		ret 0x8
 	}

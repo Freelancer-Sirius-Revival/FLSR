@@ -15,7 +15,7 @@
 * 
 * [Foo Bar]
 * type = produce/dismantle/loot
-* product = good_nickname, minCount, maxCount, weightedChance
+* product = good_nickname, minCount, maxCount, weightedChance, shipArchetype
 * ...
 * cost = money
 * ingredient = good_nickname, count
@@ -36,6 +36,8 @@ namespace Crafting
 		bool ship = false;
 		int minCount = 1;
 		int maxCount = 1;
+		int weight = 0;
+		int shipArchetypeId = 0;
 	};
 
 	struct Ingredient
@@ -57,7 +59,6 @@ namespace Crafting
 		RecipeType type = RecipeType::Any;
 		std::wstring originalName = L"";
 		std::vector<Product> products;
-		std::discrete_distribution<int> productDistribution;
 		float highestProductVolumeWithMaxCount = 0.0f;
 		int shipsCount = 0;
 		int cost = 0;
@@ -149,7 +150,6 @@ namespace Crafting
 					else
 					{
 						Recipe recipe;
-						std::vector<int> weights;
 						recipe.originalName = stows(ini.get_header_ptr());
 						std::string recipeNameLower = ToLower(wstos(recipe.originalName));
 						while (ini.read_value())
@@ -177,7 +177,9 @@ namespace Crafting
 								if (ini.get_num_parameters() > 2)
 									product.maxCount = std::max<int>(product.minCount, ini.get_value_int(2));
 								if (ini.get_num_parameters() > 3)
-									weights.push_back(std::max<int>(0, ini.get_value_int(3)));
+									product.weight = ini.get_value_int(3);
+								if (ini.get_num_parameters() > 4)
+									product.shipArchetypeId = CreateID(ini.get_value_string(4));
 
 								product.ship = IsShip(product.archetypeId);
 								if (product.ship)
@@ -223,10 +225,7 @@ namespace Crafting
 							}
 						}
 						if (!recipe.products.empty() && !recipe.ingredients.empty())
-						{
-							recipe.productDistribution = std::discrete_distribution<int>({ weights.begin(), weights.end() });
 							recipes[recipeNameLower] = recipe;
-						}
 					}
 				}
 			}
@@ -502,7 +501,7 @@ namespace Crafting
 		return false;
 	}
 
-	static bool ProduceShip(const uint clientId, const Recipe& recipe, const uint shipGoodId)
+	static bool ProduceShip(const uint clientId, const uint shipGoodId)
 	{
 		const GoodInfo* shipGood = GoodList::find_by_id(shipGoodId);
 		if (!shipGood)
@@ -559,17 +558,35 @@ namespace Crafting
 
 	static bool ProduceItems(const uint clientId, Recipe& recipe, const int batchCount)
 	{
+		uint shipArchetypeId = 0;
+		pub::Player::GetShipID(clientId, shipArchetypeId);
+		if (shipArchetypeId == 0)
+			return false;
+		// Instead of using the original vector, make a new one. This is to be entirely sure weights with any numbers will not suddenly allow products that should never be chosen.
+		std::vector<int> eligibleProductIndices;
+		std::vector<int> productWeights;
+		for (int index = 0, length = recipe.products.size(); index < length; index++)
+		{
+			const Product& product = recipe.products.at(index);
+			if (product.shipArchetypeId == 0 || product.shipArchetypeId == shipArchetypeId)
+			{
+				eligibleProductIndices.push_back(index);
+				productWeights.push_back(product.weight);
+			}
+		}
+		std::discrete_distribution<int> productDistribution({ productWeights.begin(), productWeights.end() });
+
 		// Finally roll the dice to get the actual crafted item.
 		// First collect all items to add to cargo. Otherwise too many packages are sent and cause lags!
 		std::map<uint, uint> producedArchetypeIds;
 		uint shipGoodId = 0;
 		for (int producedCount = 0; producedCount < batchCount; producedCount++)
 		{
-			const Product& product = recipe.products.at(recipe.productDistribution(randomizer));
+			const Product& product = recipe.products.at(eligibleProductIndices.at(productDistribution(randomizer)));
 			if (product.ship)
 			{
 				shipGoodId = product.archetypeId;
-				ProduceShip(clientId, recipe, product.archetypeId);
+				ProduceShip(clientId, product.archetypeId);
 				break; // Whenever a ship is crafted, the batch count must be exactly 1.
 			}
 			if (!producedArchetypeIds.contains(product.archetypeId))
@@ -678,6 +695,8 @@ namespace Crafting
 						bool allSameShipArchetypeAsPlayer = true;
 						for (const auto& product : recipe->products)
 						{
+							if (product.shipArchetypeId != 0 && product.shipArchetypeId != playerShipArchetypeId)
+								continue;
 							const GoodInfo* shipGood = GoodList::find_by_id(product.archetypeId);
 							if (!shipGood)
 								break;

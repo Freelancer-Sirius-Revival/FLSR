@@ -296,6 +296,7 @@
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
     <ClCompile Include="NameLimiter.cpp" />
+    <ClCompile Include="ExplosionDamage.cpp" />
     <ClCompile Include="bugfixes\BatsBotsShipTransferFix.cpp">
       <Filter>Bugfixes</Filter>
     </ClCompile>
@@ -371,6 +372,9 @@
       <Filter>Missions</Filter>
     </ClCompile>
     <ClCompile Include="missions\actions\ActLockDock.cpp" />
+    <ClCompile Include="missions\conditions\CndPopUpDialog.cpp">
+      <Filter>Missions\Conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -690,6 +694,7 @@
       <Filter>Missions\RandomMissions</Filter>
     </ClInclude>
     <ClInclude Include="NameLimiter.h" />
+    <ClInclude Include="ExplosionDamage.h" />
     <ClInclude Include="Insurance.h" />
     <ClInclude Include="IFF.h" />
     <ClInclude Include="Carrier.h" />
@@ -764,6 +769,9 @@
       <Filter>Missions</Filter>
     </ClInclude>
     <ClInclude Include="missions\actions\ActLockDock.h" />
+    <ClInclude Include="missions\conditions\CndPopUpDialog.h">
+      <Filter>Missions\Conditions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="curl\Makefile.am" />

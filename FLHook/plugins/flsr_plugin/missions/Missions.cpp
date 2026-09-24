@@ -31,9 +31,9 @@ namespace Missions
 		const std::regex filePattern(".+\\.ini", std::regex_constants::ECMAScript | std::regex_constants::icase);
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(missionDirectory))
 		{
-			const std::string fileName = wstos(entry.path().filename());
+			const std::string filePath = entry.path().string();
 			INI_Reader ini;
-			if (std::regex_match(fileName, filePattern) && ini.open((missionDirectory + fileName).c_str(), false))
+			if (std::regex_match(filePath, filePattern) && ini.open(filePath.c_str(), false))
 			{
 				uint missionId = 0;
 				while (ini.read_header())

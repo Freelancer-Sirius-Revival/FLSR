@@ -2,7 +2,7 @@
 
 namespace Missions
 {
-	static void SetDockState(const uint objId, const std::string& dockHardpoint, const bool active)
+	static void SetDockState(const uint objId, std::string dockHardpoint, const bool active)
 	{
 		if (pub::SpaceObj::ExistsAndAlive(objId) != 0)
 			return;
@@ -13,6 +13,7 @@ namespace Missions
 			return;
 
 		const auto archetype = static_cast<Archetype::EqObj*>(inspect->cobj->archetype);
+		dockHardpoint = ToLower(dockHardpoint);
 		for (int index = 0, length = archetype->dockInfo.size(); index < length; index++)
 		{
 			if (std::string(archetype->dockInfo[index].hardpoint) == dockHardpoint)

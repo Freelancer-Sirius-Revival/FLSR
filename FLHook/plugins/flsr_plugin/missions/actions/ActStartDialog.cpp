@@ -18,7 +18,7 @@ namespace Missions
 		if (senderEntry != dialog.etherSenders.end())
 		{
 			ActEtherComm comm;
-			comm.id = line.id;
+			comm.commName = line.commName;
 			comm.senderVoiceId = senderEntry->second.voiceId;
 			comm.senderIdsName = senderEntry->second.idsName;
 			comm.receiverObjNameOrLabel = line.receiverObjNameOrLabel;
@@ -31,7 +31,7 @@ namespace Missions
 		else
 		{
 			ActSendComm comm;
-			comm.id = line.id;
+			comm.commName = line.commName;
 			comm.senderObjName = line.senderEtherSenderOrObjName;
 			comm.receiverObjNameOrLabel = line.receiverObjNameOrLabel;
 			comm.lines = line.lines;
@@ -42,7 +42,7 @@ namespace Missions
 	}
 
 	ActDialogCndCommComplete::ActDialogCndCommComplete(Mission& mission, const MissionObject& originalActivator, const Dialog& dialog, const int lineIndex) :
-		CndCommComplete(ConditionParent(mission.id, 0), dialog.lines[lineIndex].id),
+		CndCommComplete(ConditionParent(mission.id, 0), dialog.lines[lineIndex].commName),
 		mission(mission),
 		originalActivator(originalActivator),
 		dialog(dialog),

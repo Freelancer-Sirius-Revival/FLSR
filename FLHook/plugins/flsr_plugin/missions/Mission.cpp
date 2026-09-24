@@ -335,6 +335,7 @@ namespace Missions
 		}
 		markedObjIdsByClientId.erase(clientId);
 		lockedDocksByClientId.erase(clientId);
+		lastOpenedPopUpNameByClientId.erase(clientId);
 		clientIds.erase(clientId);
 
 		for (const auto& label : labels)
@@ -526,6 +527,15 @@ namespace Missions
 
 				returncode = DEFAULT_RETURNCODE;
 				return 0;
+			}
+
+			void __stdcall Send_FLPACKET_COMMON_POP_UP_DIALOG(uint clientId, FmtStr* heading, FmtStr* text, uint buttons)
+			{
+				// Always clear the popup id of a client once a packet was sent from any origin (e.g. another plugin/piece of code).
+				// The popup id for this client must be set manually directly by the responsible feature after this packet was sent.
+				for (auto& missionEntry : missions)
+					missionEntry.second.lastOpenedPopUpNameByClientId.erase(clientId);
+				returncode = DEFAULT_RETURNCODE;
 			}
 		}
 	}

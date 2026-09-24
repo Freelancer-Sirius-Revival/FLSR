@@ -150,8 +150,8 @@ namespace MissionBoard
 		for (const auto memberId : groupMembers)
 		{
 			uint missionId;
-			pub::Player::GetMsnID(clientId, missionId);
-			if (missionId > 0 || Missions::IsPartOfOfferedJob(clientId))
+			pub::Player::GetMsnID(memberId, missionId);
+			if (missionId > 0 || Missions::IsPartOfOfferedJob(memberId))
 			{
 				uint base;
 				pub::Player::GetBase(clientId, base);

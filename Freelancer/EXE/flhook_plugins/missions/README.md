@@ -470,6 +470,11 @@ The keyword `Stranger` is used to refer explicitely to all players not having a 
     1. `STRING|Stranger` The players by label to expect on a base.
     1. `[STRING]` Multiple subsequent entries possible. The base nickname the player must be on. If none is given, any base will count.
 
+- `Cnd_PopUpDialog` Only for players. Checks if a specific popup dialog was closed. `Activator` will be the player. Popups can be closed in unexpected ways and this condition may never trigger.
+    1. `STRING|Activator` Players by label to wait the popup dialog to be closed by.
+    1. `STRING` The name of the popup to wait for. See `Act_PopUpDialog`.
+    1. `[Close|Yes|No|Later] :Close` The button to expect.
+
 - `Cnd_ProjHitCount` Counts projectile hits to the target. `Activator` can be defined via the last argument.
     1. `STRING` Object by name or label to count projectile hits on.
     1. `[INTEGER] :1` The count of projectile hits that must have happened.
@@ -522,7 +527,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` The weighted chance for this trigger to be picked for activation.
 
-- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set by the current condition. This `Activator` will be used as target obj for the branched trigger’s own condition. The branched trigger is `repeatable = Off`. There is never more than one branch per `Activator`. A branch will be automatically deleted when the `Activator` is removed from the mission. The arguments work in two exclusive modes:
+- `Act_ActTrigBranch` Activates a trigger as parallel branch. The current `Activator` must be set by the current condition. This `Activator` will be used as target obj for the branched trigger’s own condition. If that condition does not use targets, the `Activator` will be passed through. The branched trigger is `repeatable = Off`. There is never more than one branch per `Activator`. A branch will be automatically deleted when the `Activator` is removed from the mission. The arguments work in two exclusive modes:
     - A single trigger with optional probability to be activated:
     1. `STRING` Trigger nickname to refer.
     1. `[FLOAT] :1` A probability between `0` and `1` the trigger will be activated.
@@ -677,6 +682,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
     1. `STRING` The sound nickname to play.
 
 - `Act_PopUpDialog` Only for players. Pops up a dialog window.
+    1. `STRING` The name of this popup. Referred to by `Cnd_PopUpDialog`.
     1. `STRING|Activator` Players by label to pop up the dialog for.
     1. `INTEGER` The text resource ID for the header.
     1. `INTEGER` The text resource ID for the content.

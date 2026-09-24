@@ -6,7 +6,8 @@ namespace Missions
 	{
 		const std::wstring text = stows(mission.name) + L": " + stows(message);
 		ConPrint(text + L"\n");
-		for (const auto& clientId : mission.clientIds)
-			PrintUserCmdText(clientId, text);
+		struct PlayerData* playerData = 0;
+		while (playerData = Players.traverse_active(playerData))
+			PrintUserCmdText(playerData->iOnlineID, text);
 	}
 }

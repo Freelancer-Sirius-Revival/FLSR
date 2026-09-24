@@ -6,6 +6,7 @@ namespace Missions
 {
 	struct ActPopUpDialog : Action
 	{
+		uint popupName = 0;
 		uint label = 0;
 		uint headingId = 0;
 		uint messageId = 0;

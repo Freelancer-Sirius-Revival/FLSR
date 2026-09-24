@@ -128,7 +128,7 @@ namespace Missions
 		const uint objId = CreateSolar(solarInfo);
 		if (objId == 0)
 		{
-			ConPrint(L"ERROR: Msn " + stows(mission.name) + L": Spawning solar " + stows(solarInfo.cNickName) + L" in " + std::to_wstring(solarInfo.iSystemID) + L" at " + std::to_wstring(solarInfo.vPos.x) + L", " + std::to_wstring(solarInfo.vPos.y) + L", " + std::to_wstring(solarInfo.vPos.z) + L" failed!");
+			ConPrint(L"ERROR: Msn " + stows(mission.name) + L": Spawning solar " + stows(solarInfo.cNickName) + L" in " + std::to_wstring(solarInfo.iSystemID) + L" at " + std::to_wstring(solarInfo.vPos.x) + L", " + std::to_wstring(solarInfo.vPos.y) + L", " + std::to_wstring(solarInfo.vPos.z) + L" failed!\n");
 			return;
 		}
 

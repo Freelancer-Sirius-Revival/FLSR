@@ -9,6 +9,7 @@ namespace Missions
 			if (activator.type == MissionObjectType::Client)
 			{
 				pub::Player::PopUpDialog(activator.id, FmtStr(headingId, 0), FmtStr(messageId, 0), buttons);
+				mission.lastOpenedPopUpNameByClientId[activator.id] = popupName;
 			}
 		}
 		else if (const auto& objectsByLabel = mission.objectsByLabel.find(label); objectsByLabel != mission.objectsByLabel.end())
@@ -18,6 +19,7 @@ namespace Missions
 				if (object.type == MissionObjectType::Client)
 				{
 					pub::Player::PopUpDialog(object.id, FmtStr(headingId, 0), FmtStr(messageId, 0), buttons);
+					mission.lastOpenedPopUpNameByClientId[object.id] = popupName;
 				}
 			}
 		}

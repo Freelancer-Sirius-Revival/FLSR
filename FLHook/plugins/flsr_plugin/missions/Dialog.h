@@ -13,7 +13,7 @@ namespace Missions
 
 	struct DialogLine
 	{
-		uint id = 0;
+		uint commName = 0;
 		uint senderEtherSenderOrObjName = 0;
 		uint receiverObjNameOrLabel = 0;
 		std::vector<uint> lines;

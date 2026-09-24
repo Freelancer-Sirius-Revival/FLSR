@@ -387,7 +387,7 @@ namespace RandomMissions
 			{
 				Missions::ActEtherComm action;
 				action.receiverObjNameOrLabel = Missions::Activator;
-				action.id = CreateID("msnGoToTarget");
+				action.commName = CreateID("msnGoToTarget");
 				action.senderVoiceId = CreateID("mc_leg_m01");
 				action.senderIdsName = 13015;
 				action.costume = offerFaction.missionCommission;
@@ -587,7 +587,7 @@ namespace RandomMissions
 			{
 				Missions::ActEtherComm action;
 				action.receiverObjNameOrLabel = Players;
-				action.id = CreateID("msnLostLoot");
+				action.commName = CreateID("msnLostLoot");
 				action.senderVoiceId = CreateID("mc_leg_m01");
 				action.senderIdsName = 13015;
 				action.costume = offerFaction.missionCommission;
@@ -629,7 +629,7 @@ namespace RandomMissions
 			{
 				Missions::ActEtherComm action;
 				action.receiverObjNameOrLabel = Players;
-				action.id = CreateID("msnLeftLoot");
+				action.commName = CreateID("msnLeftLoot");
 				action.senderVoiceId = CreateID("mc_leg_m01");
 				action.senderIdsName = 13015;
 				action.costume = offerFaction.missionCommission;
@@ -736,7 +736,7 @@ namespace RandomMissions
 			{
 				Missions::ActEtherComm action;
 				action.receiverObjNameOrLabel = Players;
-				action.id = CreateID("msnCargoDelivered");
+				action.commName = CreateID("msnCargoDelivered");
 				action.senderVoiceId = CreateID("mc_leg_m01");
 				action.senderIdsName = 13015;
 				action.costume = offerFaction.missionCommission;

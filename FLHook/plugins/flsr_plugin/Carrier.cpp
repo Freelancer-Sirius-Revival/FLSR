@@ -130,8 +130,8 @@ namespace Carrier
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         if (carrierAssignmentByCharacterFileNameId.contains(characterFileNameId))
         {
-            carrierAssignmentByCharacterFileNameId[characterFileNameId].assigned = false;
-            IniWrite(GetCarrierMapFilePath(), characterFileName, "assignment", carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName + ", false");
+            carrierAssignmentByCharacterFileNameId.at(characterFileNameId).assigned = false;
+            IniWrite(GetCarrierMapFilePath(), characterFileName, "assignment", carrierAssignmentByCharacterFileNameId.at(characterFileNameId).carrierFileName + ", false");
         }
     }
 
@@ -152,7 +152,7 @@ namespace Carrier
 
     static bool IsLinkedToCarrier(const uint characterFileNameId)
     {
-        return carrierAssignmentByCharacterFileNameId.contains(characterFileNameId) && !carrierAssignmentByCharacterFileNameId[characterFileNameId].carrierFileName.empty();
+        return carrierAssignmentByCharacterFileNameId.contains(characterFileNameId) && !carrierAssignmentByCharacterFileNameId.at(characterFileNameId).carrierFileName.empty();
     }
 
     static bool IsCarrierBase(const uint baseId)
@@ -398,7 +398,7 @@ namespace Carrier
             {
                 for (const auto& jumpObject : jumpObjects)
                 {
-                    if (jumpObject->system == systemPath.second[index - 1] && jumpObject->get_dest_system() == systemPath.second[index])
+                    if (jumpObject->system == systemPath.second.at(index - 1) && jumpObject->get_dest_system() == systemPath.second.at(index))
                     {
                         foundJumpObjectIds.push_back(jumpObject->get_id());
                         break;
@@ -445,7 +445,7 @@ namespace Carrier
         if (!shiparchId)
             return false;
 
-        return carrierDefinitionByShipArchetypeId.contains(shiparchId) && carrierDefinitionByShipArchetypeId[shiparchId].slots > 0;
+        return carrierDefinitionByShipArchetypeId.contains(shiparchId) && carrierDefinitionByShipArchetypeId.at(shiparchId).slots > 0;
     }
 
     static void TryDock(const uint clientId)
@@ -502,8 +502,6 @@ namespace Carrier
             return;
         }
 
-        const auto& carrierDefinition = carrierDefinitionByShipArchetypeId[targetShiparchId];
-
         if (!AreInSameGroup(clientId, targetClientId))
         {
             PrintUserCmdText(clientId, L"The carrier must be in the same group as yours!");
@@ -524,6 +522,8 @@ namespace Carrier
         //    if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == targetFileNameId)
         //        filledSlots++;
         //}
+
+        const auto& carrierDefinition = carrierDefinitionByShipArchetypeId.at(targetShiparchId);
 
         //if (filledSlots >= carrierDefinition.slots)
         //{
@@ -568,19 +568,19 @@ namespace Carrier
         while (playerData = Players.traverse_active(playerData))
         {
             const uint clientId = HkGetClientIdFromPD(playerData);
-            if (strcmp(carrierAssignmentByCharacterFileNameId[fileNameId].carrierFileName.c_str(), GetCharacterFileName(clientId).c_str()) == 0)
+            if (strcmp(carrierAssignmentByCharacterFileNameId.at(fileNameId).carrierFileName.c_str(), GetCharacterFileName(clientId).c_str()) == 0)
                 return clientId;
         }
         return 0;
     }
 
-    static bool IsCarrierReachable(const uint clientId, const uint carrierId)
+    static bool IsCarrierBusy(const uint clientId, const uint carrierId)
     {
         if (!HkIsValidClientID(carrierId))
-            return false;
+            return true;
 
         if (HkIsInCharSelectMenu(carrierId))
-            return false;
+            return true;
 
         uint carrierShipId;
         pub::Player::GetShip(carrierId, carrierShipId);
@@ -591,7 +591,7 @@ namespace Carrier
                 PrintUserCmdText(clientId, L"Carrier is cloaked. Cannot undock.");
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
-                return false;
+                return true;
             }
 
             if (carrierClientIdInJump.contains(carrierId))
@@ -599,7 +599,7 @@ namespace Carrier
                 PrintUserCmdText(clientId, L"Carrier is jumping. Cannot undock.");
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
-                return false;
+                return true;
             }
 
             const CShip* carrierShip = (CShip*)CObject::Find(carrierShipId, CObject::CSHIP_OBJECT);
@@ -608,12 +608,11 @@ namespace Carrier
                 PrintUserCmdText(clientId, L"Carrier is in Trade Lane. Cannot undock.");
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cancelled"));
-                return false;
+                return true;
             }
         }
 
-        // This means the carrier should be docked on a base.
-        return true;
+        return false;
     }
 
     const enum JumpState
@@ -626,18 +625,19 @@ namespace Carrier
 
     static JumpState TryJumpToNextSystem(const uint clientId)
     {
-        if (!undockPathByClientId.contains(clientId))
+        const auto& foundEntry = undockPathByClientId.find(clientId);
+        if (foundEntry == undockPathByClientId.end())
             return JumpState::NoJumpPath;
 
-        if (undockPathByClientId[clientId].remainingJumpPath.size() == 0)
+        if (foundEntry->second.remainingJumpPath.size() == 0)
             return JumpState::DestinationReached;
 
         uint shipId;
         pub::Player::GetShip(clientId, shipId);
         if (shipId)
         {
-            pub::SpaceObj::InstantDock(shipId, undockPathByClientId[clientId].remainingJumpPath.back(), 1);
-            undockPathByClientId[clientId].remainingJumpPath.pop_back();
+            pub::SpaceObj::InstantDock(shipId, foundEntry->second.remainingJumpPath.back(), 1);
+            foundEntry->second.remainingJumpPath.pop_back();
             return JumpState::Jumping;
         }
         return JumpState::Error;
@@ -653,7 +653,7 @@ namespace Carrier
             return;
         const uint clientFileNameId = CreateID(clientFileName.c_str());
 
-        if (undockPathByClientId.contains(clientId) && undockPathByClientId[clientId].lastDockLocation.systemId)
+        if (undockPathByClientId.contains(clientId) && undockPathByClientId.at(clientId).lastDockLocation.systemId)
         {
             // Try to jump to the carrier.
             switch (TryJumpToNextSystem(clientId))
@@ -661,7 +661,7 @@ namespace Carrier
                 // The player reached the destination system and should now be moved to the last docking location.
                 case JumpState::DestinationReached:
                 {
-                    const Location& location = undockPathByClientId[clientId].lastDockLocation;
+                    const Location& location = undockPathByClientId.at(clientId).lastDockLocation;
                     HkRelocateClient(clientId, location.position, location.orientation);
                     undockPathByClientId.erase(clientId);
                     RemoveCharacterFromCarrier(clientFileName);
@@ -681,13 +681,13 @@ namespace Carrier
             return;
 
         const uint carrierId = FindCarrierClientIdBySlottedClientId(clientId);
-        // Check if the carrier is currently reachable by jumps or base-docking.
-        if (!IsCarrierReachable(clientId, carrierId) || !undockPathByClientId.contains(clientId))
+        // Check if the carrier is currently busy.
+        if (IsCarrierBusy(clientId, carrierId) || !undockPathByClientId.contains(clientId))
         {
             // Beam back to where the player came from.
-            const uint shiparchId = carrierAssignmentByCharacterFileNameId[clientFileNameId].carrierShiparchId;
+            const uint shiparchId = carrierAssignmentByCharacterFileNameId.at(clientFileNameId).carrierShiparchId;
             if (carrierDefinitionByShipArchetypeId.contains(shiparchId))
-                HkBeam(ARG_CLIENTID(clientId), carrierDefinitionByShipArchetypeId[shiparchId].baseNickname);
+                HkBeam(ARG_CLIENTID(clientId), carrierDefinitionByShipArchetypeId.at(shiparchId).baseNickname);
             return;
         }
 
@@ -726,13 +726,13 @@ namespace Carrier
                 Vector carrierVector;
                 Matrix carrierRotation;
                 pub::SpaceObj::GetLocation(carrierShipId, carrierVector, carrierRotation);
-                const auto& dockOffset = carrierDefinitionByShipArchetypeId[carrierShiparchId].dockOffset;
+                const auto& dockOffset = carrierDefinitionByShipArchetypeId.at(carrierShiparchId).dockOffset;
                 TranslateY(carrierVector, carrierRotation, dockOffset[0]);
                 TranslateZ(carrierVector, carrierRotation, dockOffset[1]);
                 TranslateX(carrierVector, carrierRotation, dockOffset[2]);
                 HkRelocateClient(clientId, carrierVector, carrierRotation);
                 undockPathByClientId.erase(clientId);
-                if (carrierAssignmentByCharacterFileNameId[clientFileNameId].assigned)
+                if (carrierAssignmentByCharacterFileNameId.at(clientFileNameId).assigned)
                     SaveCharacterDockState(clientFileName, DockState::Undocked);
                 else
                 {
@@ -796,14 +796,14 @@ namespace Carrier
         if (!targetSystemId && dockLocationByCharacterFileNameIds.contains(fileNameId))
         {
             // Target the location where the player docked to the carrier.
-            undockPathByClientId[clientId].lastDockLocation = dockLocationByCharacterFileNameIds[fileNameId];
-            targetSystemId = undockPathByClientId[clientId].lastDockLocation.systemId;
+            undockPathByClientId.at(clientId).lastDockLocation = dockLocationByCharacterFileNameIds.at(fileNameId);
+            targetSystemId = undockPathByClientId.at(clientId).lastDockLocation.systemId;
         }
 
         // If still no target location was found then directly beam back to the last regular base.
         if (!targetSystemId && lastRegularBaseNameByCharacterFileNameId.contains(fileNameId))
         {
-            if (HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId[fileNameId]) == HKE_OK)
+            if (HkBeam(ARG_CLIENTID(clientId), lastRegularBaseNameByCharacterFileNameId.at(fileNameId)) == HKE_OK)
             {
                 undockPathByClientId.erase(clientId);
                 returncode = DEFAULT_RETURNCODE;
@@ -814,7 +814,7 @@ namespace Carrier
         // Check if a path to the target system exists.
         if (shortestJumpObjectPathToTargets.contains(targetSystemId))
         {
-            undockPathByClientId[clientId].remainingJumpPath = shortestJumpObjectPathToTargets[targetSystemId];
+            undockPathByClientId.at(clientId).remainingJumpPath = shortestJumpObjectPathToTargets.at(targetSystemId);
         }
         else
         {
@@ -889,7 +889,7 @@ namespace Carrier
         const uint characterFileNameId = CreateID(characterFileName.c_str());
         if (IsLinkedToCarrier(characterFileNameId))
         {
-            const auto& assignment = carrierAssignmentByCharacterFileNameId[characterFileNameId];
+            const auto& assignment = carrierAssignmentByCharacterFileNameId.at(characterFileNameId);
             // Do nothing if fully undocked.
             if (assignment.dockState == DockState::Undocked)
             {
@@ -1017,7 +1017,7 @@ namespace Carrier
 
         if (carrierAssignmentByCharacterFileNameId.contains(oldCharacterFileNameId))
         {
-            carrierAssignmentByCharacterFileNameId[newCharacterFileNameId] = carrierAssignmentByCharacterFileNameId[oldCharacterFileNameId];
+            carrierAssignmentByCharacterFileNameId[newCharacterFileNameId] = carrierAssignmentByCharacterFileNameId.at(oldCharacterFileNameId);
             carrierAssignmentByCharacterFileNameId[newCharacterFileNameId].characterFileName = newCharacterFileName;
             carrierAssignmentByCharacterFileNameId.erase(oldCharacterFileNameId);
         }

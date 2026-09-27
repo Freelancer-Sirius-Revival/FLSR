@@ -135,157 +135,156 @@ namespace HkIServerImpl {
 
             // ConPrint(L"cId:%u cIdTo:%u lP1:%u iP2:%i \n", cId.iID ,cIdTo.iID ,lP1, iP2);
 
-         if (cIdTo.iID > 0x10004 || cIdTo.iID > 249 && cIdTo.iID < 0x10000)
-             return;
+             if (cIdTo.iID > 0x10004 || cIdTo.iID > 249 && cIdTo.iID < 0x10000)
+                 return;
 
-        // Group join/leave commands
-        if (cIdTo.iID == 0x10004) {
-            g_bInSubmitChat = true;
-            EXECUTE_SERVER_CALL(
-                Server.SubmitChat(cId, lP1, rdlReader, cIdTo, iP2));
-            g_bInSubmitChat = false;
-            return;
+            // Group join/leave commands
+            if (cIdTo.iID == 0x10004) {
+                g_bInSubmitChat = true;
+                EXECUTE_SERVER_CALL(
+                    Server.SubmitChat(cId, lP1, rdlReader, cIdTo, iP2));
+                g_bInSubmitChat = false;
+                return;
+            }
+
+            // extract text from rdlReader
+            BinaryRDLReader rdl;
+            //wchar_t wszBuf[1024] = L"";
+            std::wstring wszBuf;
+            wszBuf.resize(lP1);
+            uint iRet1;
+            rdl.extract_text_from_buffer((unsigned short*)wszBuf.data(), wszBuf.size(),
+                                         iRet1, (const char*)rdlReader, lP1);
+            wszBuf.erase(std::find(wszBuf.begin(), wszBuf.end(), '\0'), wszBuf.end());
+            std::wstring wscBuf = wszBuf;
+            uint iClientID = cId.iID;
+
+            // if this is a message in system chat then convert it to local unless
+            // explicitly overriden by the player using /s.
+            if (set_bDefaultLocalChat && cIdTo.iID == 0x10001) {
+                cIdTo.iID = 0x10002;
+            }
+
+            // fix flserver commands and change chat to id so that event logging is
+            // accurate.
+            g_iTextLen = (uint)wscBuf.length();
+            if (!wscBuf.find(L"/g ")) {
+                cIdTo.iID = 0x10003;
+                g_iTextLen -= 3;
+            }
+            else if (!wscBuf.find(L"/l ")) {
+              cIdTo.iID = 0x10002;
+              g_iTextLen -= 3;
+            }
+            else if (!wscBuf.find(L"/s ")) {
+             cIdTo.iID = 0x10001;
+             g_iTextLen -= 3;
+            }
+            else if (!wscBuf.find(L"/u ")) {
+             cIdTo.iID = 0x10000;
+             g_iTextLen -= 3;
+            }
+            else if (!wscBuf.find(L"/group ")) {
+             cIdTo.iID = 0x10003;
+             g_iTextLen -= 7;
+            }
+            else if (!wscBuf.find(L"/local ")) {
+             cIdTo.iID = 0x10002;
+             g_iTextLen -= 7;
+            }
+            else if (!wscBuf.find(L"/system ")) {
+             cIdTo.iID = 0x10001;
+             g_iTextLen -= 8;
+            }
+            else if (!wscBuf.find(L"/universe ")) {
+             cIdTo.iID = 0x10000;
+             g_iTextLen -= 10;
+            }
+
+            ISERVER_LOGARG_WS(wszBuf.data());
+            ISERVER_LOGARG_I(g_iTextLen);
+
+            // check for user cmds
+            if (UserCmd_Process(iClientID, wscBuf))
+                return;
+
+            if (wszBuf[0] == '.') { // flhook admin command
+                CAccount* acc = Players.FindAccountFromClientID(iClientID);
+                std::wstring wscAccDirname;
+
+                HkGetAccountDirName(acc, wscAccDirname);
+                std::string scAdminFile =
+                    scAcctPath + wstos(wscAccDirname) + "\\flhookadmin.ini";
+                WIN32_FIND_DATA fd;
+                HANDLE hFind = FindFirstFile(scAdminFile.c_str(), &fd);
+                if (hFind != INVALID_HANDLE_VALUE) { // is admin
+                    FindClose(hFind);
+                    admin.ReadRights(scAdminFile);
+                    admin.iClientID = iClientID;
+                    admin.wscAdminName = (wchar_t*)Players.GetActiveCharacterName(iClientID);
+                    admin.ExecuteCommandString(wszBuf.data() + 1);
+                    return;
+                }
+            }
+
+            // process chat event
+            std::wstring wscEvent;
+            wscEvent.reserve(256);
+            wscEvent = L"chat";
+            wscEvent += L" from=";
+            const wchar_t* wszFrom =
+                (const wchar_t*)Players.GetActiveCharacterName(cId.iID);
+            if (!cId.iID)
+                wscEvent += L"console";
+            else if (!wszFrom)
+                wscEvent += L"unknown";
+            else
+                wscEvent += wszFrom;
+
+            wscEvent += L" id=";
+            wscEvent += std::to_wstring(cId.iID);
+
+            wscEvent += L" type=";
+            if (cIdTo.iID == 0x00010000)
+                wscEvent += L"universe";
+            else if (cIdTo.iID == 0x10003) {
+                wscEvent += L"group";
+                wscEvent += L" grpidto=";
+                wscEvent += std::to_wstring(Players.GetGroupID(cId.iID));
+            }
+            else if (cIdTo.iID & 0x00010000)
+             wscEvent += L"system";
+            else {
+                wscEvent += L"player";
+                wscEvent += L" to=";
+
+                const wchar_t* wszTo =
+                    (const wchar_t*)Players.GetActiveCharacterName(cIdTo.iID);
+                if (!cIdTo.iID)
+                    wscEvent += L"console";
+                else if (!wszTo)
+                    wscEvent += L"unknown";
+                else
+                    wscEvent += wszTo;
+
+                wscEvent += L" idto=";
+                wscEvent += std::to_wstring(cIdTo.iID);
+            }
+
+            wscEvent += L" text=";
+            wscEvent += wscBuf;
+            ProcessEvent(L"%s", wscEvent.c_str());
+
+            // check if chat should be suppressed
+            for (auto& chat : set_setChatSuppress) {
+                if ((ToLower(wscBuf)).find(ToLower(chat)) == 0)
+                    return;
+            }
         }
+        CATCH_HOOK({})
 
-        // extract text from rdlReader
-        BinaryRDLReader rdl;
-        //wchar_t wszBuf[1024] = L"";
-        std::wstring wszBuf;
-        wszBuf.resize(lP1);
-        uint iRet1;
-        rdl.extract_text_from_buffer((unsigned short*)wszBuf.data(), wszBuf.size(),
-                                     iRet1, (const char*)rdlReader, lP1);
-        wszBuf.erase(std::find(wszBuf.begin(), wszBuf.end(), '\0'), wszBuf.end());
-        std::wstring wscBuf = wszBuf;
-        uint iClientID = cId.iID;
-
-        // if this is a message in system chat then convert it to local unless
-        // explicitly overriden by the player using /s.
-        if (set_bDefaultLocalChat && cIdTo.iID == 0x10001) {
-            cIdTo.iID = 0x10002;
-        }
-
-        // fix flserver commands and change chat to id so that event logging is
-        // accurate.
-        g_iTextLen = (uint)wscBuf.length();
-        if (!wscBuf.find(L"/g ")) {
-            cIdTo.iID = 0x10003;
-            g_iTextLen -= 3;
-        }
- else if (!wscBuf.find(L"/l ")) {
-  cIdTo.iID = 0x10002;
-  g_iTextLen -= 3;
-}
-else if (!wscBuf.find(L"/s ")) {
- cIdTo.iID = 0x10001;
- g_iTextLen -= 3;
-}
-else if (!wscBuf.find(L"/u ")) {
- cIdTo.iID = 0x10000;
- g_iTextLen -= 3;
-}
-else if (!wscBuf.find(L"/group ")) {
- cIdTo.iID = 0x10003;
- g_iTextLen -= 7;
-}
-else if (!wscBuf.find(L"/local ")) {
- cIdTo.iID = 0x10002;
- g_iTextLen -= 7;
-}
-else if (!wscBuf.find(L"/system ")) {
- cIdTo.iID = 0x10001;
- g_iTextLen -= 8;
-}
-else if (!wscBuf.find(L"/universe ")) {
- cIdTo.iID = 0x10000;
- g_iTextLen -= 10;
-}
-
-ISERVER_LOGARG_WS(wszBuf.data());
-ISERVER_LOGARG_I(g_iTextLen);
-
-// check for user cmds
-if (UserCmd_Process(iClientID, wscBuf))
-    return;
-
-if (wszBuf[0] == '.') { // flhook admin command
-    CAccount* acc = Players.FindAccountFromClientID(iClientID);
-    std::wstring wscAccDirname;
-
-    HkGetAccountDirName(acc, wscAccDirname);
-    std::string scAdminFile =
-        scAcctPath + wstos(wscAccDirname) + "\\flhookadmin.ini";
-    WIN32_FIND_DATA fd;
-    HANDLE hFind = FindFirstFile(scAdminFile.c_str(), &fd);
-    if (hFind != INVALID_HANDLE_VALUE) { // is admin
-        FindClose(hFind);
-        admin.ReadRights(scAdminFile);
-        admin.iClientID = iClientID;
-        admin.wscAdminName =
-            (wchar_t*)Players.GetActiveCharacterName(iClientID);
-        admin.ExecuteCommandString(wszBuf.data() + 1);
-        return;
-    }
-}
-
-// process chat event
-std::wstring wscEvent;
-wscEvent.reserve(256);
-wscEvent = L"chat";
-wscEvent += L" from=";
-const wchar_t* wszFrom =
-    (const wchar_t*)Players.GetActiveCharacterName(cId.iID);
-if (!cId.iID)
-    wscEvent += L"console";
-else if (!wszFrom)
-    wscEvent += L"unknown";
-else
-    wscEvent += wszFrom;
-
-wscEvent += L" id=";
-wscEvent += std::to_wstring(cId.iID);
-
-wscEvent += L" type=";
-if (cIdTo.iID == 0x00010000)
-    wscEvent += L"universe";
-else if (cIdTo.iID == 0x10003) {
-    wscEvent += L"group";
-    wscEvent += L" grpidto=";
-    wscEvent += std::to_wstring(Players.GetGroupID(cId.iID));
-}
-else if (cIdTo.iID & 0x00010000)
- wscEvent += L"system";
-else {
-    wscEvent += L"player";
-    wscEvent += L" to=";
-
-    const wchar_t* wszTo =
-        (const wchar_t*)Players.GetActiveCharacterName(cIdTo.iID);
-    if (!cIdTo.iID)
-        wscEvent += L"console";
-    else if (!wszTo)
-        wscEvent += L"unknown";
-    else
-        wscEvent += wszTo;
-
-    wscEvent += L" idto=";
-    wscEvent += std::to_wstring(cIdTo.iID);
-}
-
-wscEvent += L" text=";
-wscEvent += wscBuf;
-ProcessEvent(L"%s", wscEvent.c_str());
-
-// check if chat should be suppressed
-for (auto& chat : set_setChatSuppress) {
-    if ((ToLower(wscBuf)).find(ToLower(chat)) == 0)
-        return;
-}
-        }
-            CATCH_HOOK({})
-
-            // send
-            g_bInSubmitChat = true;
+        // send
+        g_bInSubmitChat = true;
         EXECUTE_SERVER_CALL(Server.SubmitChat(cId, lP1, rdlReader, cIdTo, iP2));
         g_bInSubmitChat = false;
 

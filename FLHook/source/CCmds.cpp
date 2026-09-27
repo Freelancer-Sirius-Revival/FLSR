@@ -1196,16 +1196,16 @@ void CCmds::ExecuteCommandString(const std::wstring& wscCmdStr) {
         if (bSocket) {
             if (bLocalSocket) {
                 if (set_bLogLocalSocketCmds)
-                    HkAddSocketCmdLog("finnished");
+                    HkAddSocketCmdLog("finished");
             }
             else {
                 if (set_bLogSocketCmds)
-                    HkAddSocketCmdLog("finnished");
+                    HkAddSocketCmdLog("finished");
             }
         }
         else {
             if (set_bLogAdminCmds)
-                HkAddAdminCmdLog("finnished");
+                HkAddAdminCmdLog("finished");
         }
     }
     catch (...) {

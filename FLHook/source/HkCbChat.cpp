@@ -94,47 +94,47 @@ void __stdcall HkCb_SendChat(uint iClientID, uint iTo, uint iSize, void* pRDL) {
                 //				wscTRADataSenderColor = L"00FF00";
                 wscTRADataColor = L"19BD3A"; // pm chatcolor
             }
- else if (g_bMsgS) {
-  wscTRADataSenderColor = L"00FF00";
-  wscTRADataColor = L"E6C684"; // system chatcolor
-}
-else if (g_bMsgU) {
- wscTRADataSenderColor = L"00FF00";
- wscTRADataColor = L"FFFFFF"; // universe chatcolor
-}
-else if (iTo == 0x10000)
- wscTRADataColor = L"FFFFFF"; // universe chatcolor
-else if (iTo == 0)
-    wscTRADataColor = L"FFFFFF"; // console
-else if (iTo == 0x10003)
-    wscTRADataColor = L"FF7BFF"; // group chat
-else if (iTo == 0x10002)
-    wscTRADataColor = L"FF8F40"; // local chatcolor
-else if (iTo & 0x10000)
-    wscTRADataColor = L"E6C684"; // system chatcolor
-else
-    wscTRADataColor = L"19BD3A"; // pm chatcolor
+            else if (g_bMsgS) {
+              wscTRADataSenderColor = L"00FF00";
+              wscTRADataColor = L"E6C684"; // system chatcolor
+            }
+            else if (g_bMsgU) {
+             wscTRADataSenderColor = L"00FF00";
+             wscTRADataColor = L"FFFFFF"; // universe chatcolor
+            }
+            else if (iTo == 0x10000)
+             wscTRADataColor = L"FFFFFF"; // universe chatcolor
+            else if (iTo == 0)
+                wscTRADataColor = L"FFFFFF"; // console
+            else if (iTo == 0x10003)
+                wscTRADataColor = L"FF7BFF"; // group chat
+            else if (iTo == 0x10002)
+                wscTRADataColor = L"FF8F40"; // local chatcolor
+            else if (iTo & 0x10000)
+                wscTRADataColor = L"E6C684"; // system chatcolor
+            else
+                wscTRADataColor = L"19BD3A"; // pm chatcolor
 
-std::wstring wscXML =
-    L"<TRA data=\"0x" + wscTRADataSenderColor + wscTRADataFormat +
-    L"\" mask=\"-1\"/><TEXT>" + XMLText(wscSender) + L": </TEXT>" +
-    L"<TRA data=\"0x" + wscTRADataColor + wscTRADataFormat +
-    L"\" mask=\"-1\"/><TEXT>" + XMLText(wscText) + L"</TEXT>";
-HkFMsg(iClientID, wscXML);
-}
-else {
- __asm {
-     pushad
-     push[pRDL]
-     push[iSize]
-     push[iTo]
-     push[iClientID]
-     mov ecx,[Client]
-     add ecx, 4
-     call[RCSendChatMsg]
-     popad
- }
-}
+            std::wstring wscXML =
+                L"<TRA data=\"0x" + wscTRADataSenderColor + wscTRADataFormat +
+                L"\" mask=\"-1\"/><TEXT>" + XMLText(wscSender) + L": </TEXT>" +
+                L"<TRA data=\"0x" + wscTRADataColor + wscTRADataFormat +
+                L"\" mask=\"-1\"/><TEXT>" + XMLText(wscText) + L"</TEXT>";
+            HkFMsg(iClientID, wscXML);
+        }
+        else {
+            __asm {
+                pushad
+                push[pRDL]
+                push[iSize]
+                push[iTo]
+                push[iClientID]
+                mov ecx,[Client]
+                add ecx, 4
+                call[RCSendChatMsg]
+                popad
+            }
+        }
     }
         CATCH_HOOK({})
 }

@@ -492,8 +492,9 @@ void UserCmd_InviteID(uint iClientID, const std::wstring &wscParam) {
     CHAT_ID cID;
     cID.iID = iClientID;
     CHAT_ID cIDTo;
-    cIDTo.iID = 0x00010001;
-    Server.SubmitChat(cID, iRet, szBuf, cIDTo, -1);
+    cIDTo.iID = 0x10001;
+    // Must be looped back through the hooked function. Using Server.SubmitChat does only work in Debug build. Unclear why.
+    HkIServerImpl::SubmitChat(cID, iRet, szBuf, cIDTo, -1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

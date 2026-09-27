@@ -305,7 +305,13 @@ struct StarSystemMock
 
 namespace SysDB
 {
-	IMPORT st6::map<uint, StarSystem, st6::less<uint>, st6::allocator<StarSystem>> SysMap;
+	//IMPORT st6::map<uint, StarSystem, st6::less<uint>, st6::allocator<StarSystem>> SysMap;
+	inline static st6::map<uint, StarSystem>* GetSysMap()
+	{
+		static auto SysMap =
+			reinterpret_cast<st6::map<uint, StarSystem>*>(uint(GetModuleHandleA("server")) + 0xADA2C);
+		return SysMap;
+	}
 };
 
 class IMPORT CPlayerGroup

@@ -144,7 +144,8 @@ namespace Missions
 			pub::SpaceObj::SetInvincible2(objId, true, true, 0.999f);
 
 		mission.AddObject(objId, solar.id, solar.labels);
-		RegisterDockableSolar(objId, solarInfo.baseId);
+		if (solarInfo.baseId)
+			RegisterDockableSolar(objId, solarInfo.baseId);
 		Cloak::TryRegisterNoCloakSolar(mission.name + ':' + solar.name, objId);
 		NpcCloaking::RegisterObject(objId);
 	}

@@ -79,7 +79,7 @@ void LoadSettings() {
     // Konfigpfad
     char szCurDir[MAX_PATH];
     GetCurrentDirectory(sizeof(szCurDir), szCurDir);
-    std::string scPluginCfgFile = std::string(szCurDir) + Globals::PLUGIN_CONFIG_FILE;
+    std::string scPluginCfgFile = std::string(szCurDir) + "\\flhook_plugins\\flsr.cfg";
 
     ConnectionLimiter::maxParallelConnectionsPerIpAddress = IniGetI(scPluginCfgFile, "ConnectionLimiter", "MaxParallelIpAddressConnections", 2);
     // POPUP-Module #############################################################################
@@ -261,7 +261,6 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::LaunchComplete, PLUGIN_HkIServerImpl_LaunchComplete, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Commands::UserCmd_Process, PLUGIN_UserCmd_Process, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::CharacterSelect, PLUGIN_HkIServerImpl_CharacterSelect, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Hooks::SendDeathMsg, PLUGIN_SendDeathMsg, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Empathies::Initialize, PLUGIN_HkTimerCheckKick, 0));
 

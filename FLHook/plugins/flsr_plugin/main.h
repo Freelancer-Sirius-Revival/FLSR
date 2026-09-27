@@ -15,9 +15,7 @@
 namespace Globals {
 
     //FilePaths
-    const std::string PLUGIN_CONFIG_FILE = "\\flhook_plugins\\flsr.cfg";
     const std::string SENDCASHLOG_FILE = "-givecashlog.txt";
-    const std::string DATADIR = "..\\DATA";
 }
 
 namespace Timers
@@ -80,21 +78,10 @@ namespace PopUp {
 }
 
 namespace Tools {
-
-    enum eDeathTypes {
-        PVP,
-        SUICIDE,
-        PVE,
-        KILLEDHIMSELF,
-        ADMIN,
-        HASDIED
-    };
-
     void HkNewPlayerMessage(uint iClientID, struct CHARACTER_ID const &cId);
 }
 
 namespace Hooks {
     void __stdcall CharacterSelect(struct CHARACTER_ID const &cId, unsigned int iClientID);
     void __stdcall LaunchComplete(unsigned int iBaseID, unsigned int iShip);
-    void SendDeathMsg(const std::wstring& wscMsg, uint iSystemID, uint iClientIDVictim, uint iClientIDKiller);
     }

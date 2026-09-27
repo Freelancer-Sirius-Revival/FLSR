@@ -48,9 +48,10 @@ namespace Missions
 				// In here the player will be moved to open space above the center of the system in case there is no existing dock for the base.
 				// Otherwise the server will crash because the player is tried to be undocking from a non-existing dock.
 				auto& playerData = Players[clientId];
-				for (const auto& base : lstBases)
+				if (playerData.exitedBase)
 				{
-					if (base.iBaseID == playerData.exitedBase && pub::SpaceObj::ExistsAndAlive(base.iObjectID) != 0) // 0 -> true
+					const Universe::IBase* base = Universe::get_base(playerData.exitedBase);
+					if (!base->lSpaceObjID || pub::SpaceObj::ExistsAndAlive(base->lSpaceObjID) != 0) // 0 -> true
 					{
 						bool solarFound = false;
 						for (const auto& dockable : dockableSolars)
@@ -66,7 +67,6 @@ namespace Missions
 							playerData.exitedBase = 0;
 							playerData.vPosition.y = 20000.0f;
 						}
-						break;
 					}
 				}
 				returncode = DEFAULT_RETURNCODE;

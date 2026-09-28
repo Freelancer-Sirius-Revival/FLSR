@@ -797,6 +797,16 @@ namespace RandomMissions
 		return mission.id;
 	}
 
+	static void FillUpMissionsForClient(const uint clientId, const uint baseId)
+	{
+		for (size_t index = missionIdsByClientId[clientId].size(); index < desiredMissionCount; index++)
+		{
+			const uint missionId = GenerateMissionForClient(clientId, baseId);
+			if (missionId)
+				missionIdsByClientId[clientId].insert(missionId);
+		}
+	}
+
 	namespace Hooks
 	{
 		namespace TradeMissions
@@ -804,13 +814,7 @@ namespace RandomMissions
 			void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId)
 			{
 				// Add new missions to the client's mission board. By vanilla FL behaviour this also happens even if the player is already in a mission.
-				for (size_t index = 0; index < desiredMissionCount; index++)
-				{
-					const uint missionId = GenerateMissionForClient(clientId, baseId);
-					if (missionId)
-						missionIdsByClientId[clientId].insert(missionId);
-				}
-
+				FillUpMissionsForClient(clientId, baseId);
 				returncode = DEFAULT_RETURNCODE;
 			}
 
@@ -845,13 +849,13 @@ namespace RandomMissions
 
 			void __stdcall ReqShipArch_After(unsigned int shiparchId, unsigned int clientId)
 			{
-				if (previousShipArchId == shiparchId)
+				if (previousShipArchId == shiparchId || !missionIdsByClientId.contains(clientId))
 				{
 					returncode = DEFAULT_RETURNCODE;
 					return;
 				}
 
-				const auto missionIds(missionIdsByClientId[clientId]);
+				const auto missionIds(missionIdsByClientId.at(clientId));
 				for (const uint missionId : missionIds)
 				{
 					const auto& missionEntry = Missions::missions.find(missionId);
@@ -862,6 +866,12 @@ namespace RandomMissions
 						missionIdsByClientId.at(clientId).erase(missionId);
 					}
 				}
+
+				uint baseId = 0;
+				pub::Player::GetBase(baseId, clientId);
+				// Add new missions to the client's mission board. By vanilla FL behaviour this also happens even if the player is already in a mission.
+				FillUpMissionsForClient(clientId, baseId);
+
 				if (missionIdsByClientId.at(clientId).empty())
 					missionIdsByClientId.erase(clientId);
 

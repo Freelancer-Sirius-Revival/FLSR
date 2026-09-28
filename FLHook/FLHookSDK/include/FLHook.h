@@ -771,6 +771,8 @@ public:
 // namespaces
 namespace HkIServerImpl
 {
+	IMPORT void __stdcall ReqShipArch(unsigned int shipArchetypeId, unsigned int clientId);
+	IMPORT void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId);
 	IMPORT extern bool g_bInSubmitChat;
 	IMPORT extern uint g_iTextLen;
 }

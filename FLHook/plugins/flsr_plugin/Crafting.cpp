@@ -553,6 +553,8 @@ namespace Crafting
 		}
 
 		pub::Player::SetShipAndLoadout(clientId, hullGood->shipArchId, newEquip);
+		HkIServerImpl::ReqShipArch(hullGood->shipArchId, clientId);
+		HkIServerImpl::ReqEquipment(newEquip, clientId);
 		return true;
 	}
 

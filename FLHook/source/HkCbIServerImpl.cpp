@@ -1780,20 +1780,16 @@ if (set_bLogConnects)
     /**************************************************************************************************************
     **************************************************************************************************************/
 
-    void __stdcall ReqEquipment(class EquipDescList const& edl,
-        unsigned int iClientID) {
+    void __stdcall ReqEquipment(const EquipDescList& equipDescriptorList, unsigned int clientId)
+    {
         ISERVER_LOG();
-        ISERVER_LOGARG_UI(iClientID);
+        ISERVER_LOGARG_UI(clientId);
 
-        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqEquipment, __stdcall,
-            (class EquipDescList const& edl, unsigned int iClientID),
-            (edl, iClientID));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqEquipment, __stdcall, (class EquipDescList const& edl, unsigned int iClientID), (equipDescriptorList, clientId));
 
-        EXECUTE_SERVER_CALL(Server.ReqEquipment(edl, iClientID));
+        EXECUTE_SERVER_CALL(Server.ReqEquipment(equipDescriptorList, clientId));
 
-        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqEquipment_AFTER, __stdcall,
-            (class EquipDescList const& edl, unsigned int iClientID),
-            (edl, iClientID));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqEquipment_AFTER, __stdcall, (class EquipDescList const& edl, unsigned int iClientID), (equipDescriptorList, clientId));
     }
 
     /**************************************************************************************************************
@@ -1880,18 +1876,17 @@ if (set_bLogConnects)
     /**************************************************************************************************************
     **************************************************************************************************************/
 
-    void __stdcall ReqShipArch(unsigned int p1, unsigned int p2) {
+    void __stdcall ReqShipArch(unsigned int shipArchetypeId, unsigned int clientId)
+    {
         ISERVER_LOG();
-        ISERVER_LOGARG_UI(p1);
-        ISERVER_LOGARG_UI(p2);
+        ISERVER_LOGARG_UI(shipArchetypeId);
+        ISERVER_LOGARG_UI(clientId);
 
-        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqShipArch, __stdcall,
-            (unsigned int p1, unsigned int p2), (p1, p2));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqShipArch, __stdcall, (unsigned int p1, unsigned int p2), (shipArchetypeId, clientId));
 
-        EXECUTE_SERVER_CALL(Server.ReqShipArch(p1, p2));
+        EXECUTE_SERVER_CALL(Server.ReqShipArch(shipArchetypeId, clientId));
 
-        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqShipArch_AFTER, __stdcall,
-            (unsigned int p1, unsigned int p2), (p1, p2));
+        CALL_PLUGINS_V(PLUGIN_HkIServerImpl_ReqShipArch_AFTER, __stdcall, (unsigned int p1, unsigned int p2), (shipArchetypeId, clientId));
     }
 
     /**************************************************************************************************************

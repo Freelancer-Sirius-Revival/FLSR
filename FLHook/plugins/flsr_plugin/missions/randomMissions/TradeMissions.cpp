@@ -835,8 +835,22 @@ namespace RandomMissions
 				returncode = DEFAULT_RETURNCODE;
 			}
 
+			uint previousShipArchId = 0;
+
+			void __stdcall ReqShipArch(unsigned int shiparchId, unsigned int clientId)
+			{
+				pub::Player::GetShipID(clientId, previousShipArchId);
+				returncode = DEFAULT_RETURNCODE;
+			}
+
 			void __stdcall ReqShipArch_After(unsigned int shiparchId, unsigned int clientId)
 			{
+				if (previousShipArchId == shiparchId)
+				{
+					returncode = DEFAULT_RETURNCODE;
+					return;
+				}
+
 				const auto missionIds(missionIdsByClientId[clientId]);
 				for (const uint missionId : missionIds)
 				{

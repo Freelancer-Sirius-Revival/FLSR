@@ -594,7 +594,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_DisplayMsg` Only for players. Shows a mission text on the screen.
     1. `STRING|Activator` Players by label to display the message to.
-    1. `INTEGER :0` The text ID to display.
+    1. `INTEGER :0` The resource ID to display.
 
 - `Act_DockInstant` Only for players. Forces docking instantly with the given target.
     1. `STRING|Activator` Players by label to be force-docked instantly.
@@ -636,7 +636,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_LeaveMsn` Only for players. Removes members of the label from the mission.
     1. `STRING|Activator` Players by label to remove from the mission.
     1. `[Silent|Success|Failure] :Silent` The way the players leave the mission. `Success` and `Failure` will show respective texts and play music.
-    1. `[INTEGER] :0` Only for `Failure`: The text ID to display.
+    1. `[INTEGER] :0` Only for `Failure`: The resource ID to display.
 
 - `Act_LightFuse` Executes an arbitrary fuse.
     1. `STRING|Activator` Object by name or label to refer.
@@ -656,7 +656,7 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 
 - `Act_NNPath` Only for players. Sets their normal player waypoint route. For a waypoint the system and position must be given. It will clear all waypoints if the system is not specified.
     1. `STRING|Activator` Players by label to set the message or waypoint.
-    1. `[INTEGER] :0` Resource ID to display as message to the players. `0` shows no message.
+    1. `[INTEGER] :0` The resource ID to display as message to the players. `0` shows no message.
     1. `[STRING]` The system nickname for the waypoint.
     1. `[FLOAT] :0` The x-axis position for the waypoint.
     1. `[FLOAT] :0` The y-axis position for the waypoint.
@@ -684,8 +684,8 @@ The keyword `Activator` is used to refer explicitely to the object/player that f
 - `Act_PopUpDialog` Only for players. Pops up a dialog window.
     1. `STRING` The name of this popup. Referred to by `Cnd_PopUpDialog`.
     1. `STRING|Activator` Players by label to pop up the dialog for.
-    1. `INTEGER` The text resource ID for the header.
-    1. `INTEGER` The text resource ID for the content.
+    1. `INTEGER` The resource ID for the header.
+    1. `INTEGER` The resource ID for the content.
     1. `[Close|Yes|No|Later] :Close` The button to offer. Multiple subsequent entries possible.
 
 - `Act_RemoveCargo` Only for players. Removes cargo.

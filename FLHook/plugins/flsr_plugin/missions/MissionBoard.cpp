@@ -259,6 +259,7 @@ namespace MissionBoard
 		if (const auto& entry = offerIdsByBaseId.find(base); entry != offerIdsByBaseId.end())
 			offerIds.insert(entry->second.begin(), entry->second.end());
 
+		boardIndicesByClientId.erase(clientId);
 		for (const auto offerId : offerIds)
 		{
 			const auto& offer = offers.at(offerId);
@@ -270,7 +271,6 @@ namespace MissionBoard
 				continue;
 
 			const uint index = ++boardLastIndexByClient[clientId];
-			boardIndicesByClientId.erase(clientId);
 			boardIndicesByClientId[clientId].push_back({ index, offerId });
 			SendOfferToClient(clientId, offerId, offer, base, index);
 		}

@@ -65,7 +65,9 @@ namespace Missions
 						if (!solarFound)
 						{
 							playerData.exitedBase = 0;
+							playerData.vPosition.x = 0.0f;
 							playerData.vPosition.y = 20000.0f;
+							playerData.vPosition.z = 0.0f;
 						}
 					}
 				}

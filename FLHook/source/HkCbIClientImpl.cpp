@@ -1125,6 +1125,8 @@ bool HkIClientImpl::Startup(uint iDunno, uint iDunno2)
 		BASE_INFO bi;
 		bi.bDestroyed = false;
 		bi.iObjectID = base->lSpaceObjID;
+		if (!base->lSpaceObjID)
+			ConPrint(L"WARNING: Base " + stows(base->cNickname) + L" not linked with space object. An [Object] with same IDS Name and dock_with/base entry must exist! Should only happen for bases for dynamically spawned solars.\n");
 		const char* szBaseName = "";
 		__asm
 		{

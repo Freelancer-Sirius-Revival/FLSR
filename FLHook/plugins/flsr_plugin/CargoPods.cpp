@@ -85,7 +85,7 @@ namespace CargoPods
 			return;
 		}
 
-		std::unordered_map<uint, uint> countByPodId;
+		std::unordered_map<uint, float> volumeByPodId;
 		const auto& equipDescList = Players[clientId].equipDescList;
 		for (const auto& equip : equipDescList.equip)
 		{
@@ -97,16 +97,16 @@ namespace CargoPods
 					const auto& archetype = static_cast<Archetype::Commodity*>(equipment);
 					if (!archetype->podAppearance)
 						continue;
-					if (auto entry = countByPodId.find(archetype->podAppearance->iArchID); entry != countByPodId.end())
-						entry->second++;
+					if (auto entry = volumeByPodId.find(archetype->podAppearance->iArchID); entry != volumeByPodId.end())
+						entry->second += archetype->fVolume * equip.iCount;
 					else
-						countByPodId.insert({ archetype->podAppearance->iArchID, 1 });
+						volumeByPodId.insert({ archetype->podAppearance->iArchID, archetype->fVolume * equip.iCount });
 				}
 			}
 		}
 
-		std::pair<uint, uint> mostUsedCargoPodId({ defaultCargoPod, 0 });
-		for (const auto& entry : countByPodId)
+		std::pair<uint, float> mostUsedCargoPodId({ defaultCargoPod, 0 });
+		for (const auto& entry : volumeByPodId)
 		{
 			if (entry.second > mostUsedCargoPodId.second)
 				mostUsedCargoPodId = entry;

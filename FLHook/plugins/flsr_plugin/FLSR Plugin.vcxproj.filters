@@ -375,6 +375,9 @@
     <ClCompile Include="missions\conditions\CndPopUpDialog.cpp">
       <Filter>Missions\Conditions</Filter>
     </ClCompile>
+    <ClCompile Include="bugfixes\ShieldSync.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -771,6 +774,9 @@
     <ClInclude Include="missions\actions\ActLockDock.h" />
     <ClInclude Include="missions\conditions\CndPopUpDialog.h">
       <Filter>Missions\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="bugfixes\ShieldSync.h">
+      <Filter>Bugfixes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

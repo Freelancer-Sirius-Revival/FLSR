@@ -25,6 +25,7 @@
 #include "bugfixes/EngineThrottleSyncFix.h"
 #include "bugfixes/JumpDockCruiseFix.h"
 #include "bugfixes/MissionAbortFix.h"
+#include "bugfixes/ShieldSync.h"
 #include "Missions/ShipSpawning.h"
 #include "Missions/Formations.h"
 #include "Missions/NpcAppearances.h"
@@ -171,6 +172,9 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Send_FLPACKET_SERVER_CREATESOLAR_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, 0));
+
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShieldSync::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShieldSync::Send_FLPACKET_SERVER_CREATESOLAR_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, 0));
     
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::Initialize, PLUGIN_HkTimerCheckKick, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&CounterMeasuresRecharge::FireWeapon, PLUGIN_HkIServerImpl_FireWeapon, 0));

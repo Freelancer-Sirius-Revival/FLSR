@@ -3,8 +3,6 @@
 
 namespace NpcCloaking
 {
-	const ushort SHIELD_SLOT_ID = 65521;
-
 	struct CloakForObjArchetypeDefinition
 	{
 		uint cloakingDeviceArchId = 0;
@@ -114,7 +112,7 @@ namespace NpcCloaking
 			else if (proxyArchetypeIds.contains(entry.iArchID))
 				data.proxyEquip = (object->equip_manager.FindByID(entry.sID));
 		}
-		data.shield = dynamic_cast<CEShield*>(object->equip_manager.FindByID(SHIELD_SLOT_ID));
+		data.shield = dynamic_cast<CEShield*>(object->equip_manager.FindFirst(EquipmentClass::Shield));
 
 		if (data.instantCloak && data.mainCloak && data.proxyEquip && data.systemId)
 			objData.insert({ objId, data });
@@ -168,12 +166,12 @@ namespace NpcCloaking
 			if (currentCloakPercentage == 1.0f)
 			{
 				objEntry->second.instantCloak->Activate(true);
-				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.instantCloak->GetID(), true);
+				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.instantCloak->iSubObjId, true);
 			}
 			else if (currentCloakPercentage == 0.0f)
 			{
 				objEntry->second.instantCloak->Activate(false);
-				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.instantCloak->GetID(), false);
+				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.instantCloak->iSubObjId, false);
 			}
 
 			// Full cloak desired and reached
@@ -190,7 +188,7 @@ namespace NpcCloaking
 				if (objEntry->second.shield)
 				{
 					objEntry->second.shield->Activate(true);
-					BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, SHIELD_SLOT_ID, true);
+					BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.shield->iSubObjId, true);
 				}
 				continue;
 			}
@@ -207,11 +205,11 @@ namespace NpcCloaking
 					inspect->light_fuse(0, &cloakFuseId, 0, 0.0f, 0.0f);
 				}
 				objEntry->second.mainCloak->Activate(true);
-				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.mainCloak->GetID(), true);
+				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.mainCloak->iSubObjId, true);
 				if (objEntry->second.shield)
 				{
 					objEntry->second.shield->Activate(false);
-					BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, SHIELD_SLOT_ID, false);
+					BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.shield->iSubObjId, false);
 				}
 			}
 			// Full uncloak desired but just reached full cloak
@@ -226,7 +224,7 @@ namespace NpcCloaking
 					inspect->light_fuse(0, &uncloakFuseId, 0, 0.0f, 0.0f);
 				}
 				objEntry->second.mainCloak->Activate(false);
-				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.mainCloak->GetID(), false);
+				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.mainCloak->iSubObjId, false);
 			}
 			transitionIt++;
 		}
@@ -266,15 +264,6 @@ namespace NpcCloaking
 		returncode = DEFAULT_RETURNCODE;
 	}
 
-	static void SendEquipmentActivationState(const uint clientId, const uint objId, const uint subObjId, const bool active)
-	{
-		XActivateEquip activateEquipment;
-		activateEquipment.iSpaceID = objId;
-		activateEquipment.sID = subObjId;
-		activateEquipment.bActivate = active;
-		GetClientInterface()->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
-	}
-
 	static void SendCloakingDeviceState(const uint clientId, const uint objId, const EquipDescVector& equipList)
 	{
 		IObjRW* inspect;
@@ -290,36 +279,20 @@ namespace NpcCloaking
 
 			const auto& equip = object->equip_manager.FindByID(entry.sID);
 			if (equip->CEquipType == EquipmentClass::CloakingDevice && !equip->IsActive())
-				SendEquipmentActivationState(clientId, objId, entry.sID, equip->IsActive());
+			{
+				XActivateEquip activateEquipment;
+				activateEquipment.iSpaceID = objId;
+				activateEquipment.sID = entry.sID;
+				activateEquipment.bActivate = equip->IsActive();
+				GetClientInterface()->Send_FLPACKET_COMMON_ACTIVATEEQUIP(clientId, activateEquipment);
+			}
 		}
-	}
-
-	static void SendShieldState(const uint clientId, const uint objId)
-	{
-		float currentShieldCapacity;
-		float maxShieldCapacity;
-		bool shieldsUp;
-		pub::SpaceObj::GetShieldHealth(objId, currentShieldCapacity, maxShieldCapacity, shieldsUp);
-		if (maxShieldCapacity <= 0.0f)
-			return;
-
-		IObjRW* inspect;
-		StarSystem* system;
-		if (!GetShipInspect(objId, inspect, system) || !(inspect->cobj->objectClass & CObject::CEQOBJ_MASK))
-			return;
-		const auto& object = dynamic_cast<CEqObj*>(inspect->cobj);
-		const auto& equip = object->equip_manager.FindByID(SHIELD_SLOT_ID);
-		if (equip && !equip->IsActive())
-			SendEquipmentActivationState(clientId, objId, SHIELD_SLOT_ID, equip->IsActive());
 	}
 
 	bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& packet)
 	{
 		if (!packet.clientId)
-		{
 			SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
-			SendShieldState(clientId, packet.iSpaceID);
-		}
 		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}
@@ -327,7 +300,6 @@ namespace NpcCloaking
 	bool Send_FLPACKET_SERVER_CREATESOLAR_AFTER(uint clientId, FLPACKET_CREATESOLAR& packet)
 	{
 		SendCloakingDeviceState(clientId, packet.iSpaceID, packet.equip);
-		SendShieldState(clientId, packet.iSpaceID);
 		returncode = DEFAULT_RETURNCODE;
 		return true;
 	}

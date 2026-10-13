@@ -43,8 +43,8 @@ namespace RandomMissions
 		std::unordered_set<uint> receiverBases;
 		std::unordered_set<uint> offerFactions;
 		std::unordered_set<uint> allowedShips;
-		uint moneyPerJump = 0;
-		float reputationPerJump = 0.0f;
+		uint moneyPerSystem = 0;
+		float reputationPerSystem = 0.0f;
 		uint minJumpDistance = 0;
 	};
 
@@ -57,7 +57,7 @@ namespace RandomMissions
 	{
 		INI_Reader ini;
 
-		if (ini.open("..\\DATA\\RANDOMMISSIONS\\tradeCommodities.ini", false))
+		if (ini.open("..\\DATA\\RANDOMMISSIONS\\trade_routes.ini", false))
 		{
 			while (ini.read_header())
 			{
@@ -86,13 +86,13 @@ namespace RandomMissions
 						{
 							commodity.allowedShips.insert(CreateID(ini.get_value_string(0)));
 						}
-						else if (ini.is_value("credits_per_jump"))
+						else if (ini.is_value("credits_per_system"))
 						{
-							commodity.moneyPerJump = ini.get_value_int(0);
+							commodity.moneyPerSystem = ini.get_value_int(0);
 						}
-						else if (ini.is_value("reputation_per_jump"))
+						else if (ini.is_value("reputation_per_system"))
 						{
-							commodity.reputationPerJump = ini.get_value_float(0);
+							commodity.reputationPerSystem = ini.get_value_float(0);
 						}
 						else if (ini.is_value("min_jumps"))
 						{
@@ -174,7 +174,7 @@ namespace RandomMissions
 		uint targetBaseId;
 		uint targetObjId;
 		Vector targetPosition;
-		uint jumpDistance;
+		uint systemsToTraverse;
 		uint offerFactionId;
 	};
 
@@ -299,6 +299,7 @@ namespace RandomMissions
 					if (hostileFactionIds.contains(owningFactionByBaseId[targetBaseId]))
 						continue;
 
+					// -1 because the start system is always included in the list.
 					if (shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size() - 1 < commodity->minJumpDistance)
 						continue;
 
@@ -318,7 +319,7 @@ namespace RandomMissions
 					result.targetObjId = dockable->id;
 					result.targetBaseId = targetBaseId;
 					result.targetPosition = dockable->get_position();
-					result.jumpDistance = shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size();
+					result.systemsToTraverse = shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size();
 					result.offerFactionId = faction.factionId;
 					return result;
 				}
@@ -353,7 +354,7 @@ namespace RandomMissions
 
 		const Commodity& commodity = *destination.commodity;
 		const auto& offerFaction = factionById.at(destination.offerFactionId);
-		const float reputation = destination.jumpDistance * commodity.reputationPerJump + commodity.reputationPerJump;
+		const float reputation = destination.systemsToTraverse * commodity.reputationPerSystem;
 
 		Missions::Mission& mission = result.first->second;
 		mission.offer.type = pub::GF::MissionType::RetrieveContraband;
@@ -366,7 +367,7 @@ namespace RandomMissions
 		mission.offer.description.append_system(destination.targetSystemId);
 		mission.offer.description.append_rep_group(mission.offer.group);
 		mission.offer.description.append_int(reputation * 100.0f);
-		mission.offer.reward = destination.jumpDistance * commodity.moneyPerJump + commodity.moneyPerJump;
+		mission.offer.reward = destination.systemsToTraverse * commodity.moneyPerSystem;
 		mission.offer.shipArchetypeIds = commodity.allowedShips;
 		mission.offer.baseIds = {};
 		mission.offer.reofferCondition = Missions::MissionReofferCondition::Never;

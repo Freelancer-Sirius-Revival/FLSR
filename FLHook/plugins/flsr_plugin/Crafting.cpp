@@ -36,7 +36,7 @@ namespace Crafting
 		bool ship = false;
 		int minCount = 1;
 		int maxCount = 1;
-		int weight = 0;
+		float weight = 0.0f;
 		int shipArchetypeId = 0;
 	};
 
@@ -177,7 +177,7 @@ namespace Crafting
 								if (ini.get_num_parameters() > 2)
 									product.maxCount = std::max<int>(product.minCount, ini.get_value_int(2));
 								if (ini.get_num_parameters() > 3)
-									product.weight = ini.get_value_int(3);
+									product.weight = ini.get_value_float(3);
 								if (ini.get_num_parameters() > 4)
 									product.shipArchetypeId = CreateID(ini.get_value_string(4));
 
@@ -566,7 +566,7 @@ namespace Crafting
 			return false;
 		// Instead of using the original vector, make a new one. This is to be entirely sure weights with any numbers will not suddenly allow products that should never be chosen.
 		std::vector<int> eligibleProductIndices;
-		std::vector<int> productWeights;
+		std::vector<float> productWeights;
 		for (int index = 0, length = recipe.products.size(); index < length; index++)
 		{
 			const Product& product = recipe.products.at(index);
@@ -576,7 +576,7 @@ namespace Crafting
 				productWeights.push_back(product.weight);
 			}
 		}
-		std::discrete_distribution<int> productDistribution({ productWeights.begin(), productWeights.end() });
+		std::discrete_distribution productDistribution({ productWeights.begin(), productWeights.end() });
 
 		// Finally roll the dice to get the actual crafted item.
 		// First collect all items to add to cargo. Otherwise too many packages are sent and cause lags!

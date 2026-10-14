@@ -67,7 +67,8 @@ namespace IFF
 
     static std::wstring GetCharacterName(const uint clientId)
     {
-        return (wchar_t*)Players.GetActiveCharacterName(clientId);
+        wchar_t* charname = (wchar_t*)Players.GetActiveCharacterName(clientId);
+        return charname ? std::wstring(charname) : L"";
     }
 
     static void UpdateAttitude(const uint clientId, const uint otherClientId)
@@ -155,15 +156,6 @@ namespace IFF
             IniDelete(GetPlayerAttitudesFilePath(), sourceCharacterFileName, targetCharacterFileName);
     }
 
-    static uint GetClientId(const std::wstring& characterName)
-    {
-        uint clientId = -1;
-        bool idStringType = false;
-        if (HkGetClientID(idStringType, clientId, characterName) == HKE_OK)
-            return clientId;
-        return -1;
-    }
-
     static std::wstring GetCharacterNameByTarget(const uint targettingClientId)
     {
         uint shipId;
@@ -203,7 +195,7 @@ namespace IFF
             return attitudeChange;
         }
 
-        const uint targetClientId = GetClientId(targetCharacterName);
+        const uint targetClientId = HkGetClientIdFromCharname(targetCharacterName);
         if (!HkIsValidClientID(targetClientId))
         {
             PrintUserCmdText(currentClientId, L"Character '" + targetCharacterName + L"' is not logged in.");
@@ -234,8 +226,9 @@ namespace IFF
         if (attitudeChange.first != attitudeChange.second)
         {
             PrintUserCmdText(clientId, L"You declared hostility towards " + targetCharacterName);
-            const uint targetClientId = GetClientId(targetCharacterName);
-            PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" declared hostility.");
+            const uint targetClientId = HkGetClientIdFromCharname(targetCharacterName);
+            if (HkIsValidClientID(targetClientId))
+                PrintUserCmdText(targetClientId, GetCharacterName(clientId) + L" declared hostility.");
         }
     }
 
@@ -250,7 +243,9 @@ namespace IFF
         if (attitudeChange.first == attitudeChange.second)
             return;
 
-        const uint targetClientId = GetClientId(targetCharacterName);
+        const uint targetClientId = HkGetClientIdFromCharname(targetCharacterName);
+        if (!HkIsValidClientID(targetClientId))
+            return;
         if (attitudeChange.first == Attitude::Hostile)
         {
             PrintUserCmdText(clientId, L"You gave up hostility towards " + targetCharacterName);
@@ -271,7 +266,9 @@ namespace IFF
         const auto& attitudeChange = TrySetAttitudeTowardsTarget(clientId, targetCharacterName, Attitude::Allied);
         if (attitudeChange.first != attitudeChange.second)
         {
-            const uint targetClientId = GetClientId(targetCharacterName);
+            const uint targetClientId = HkGetClientIdFromCharname(targetCharacterName);
+            if (!HkIsValidClientID(targetClientId))
+                return;
             const std::wstring& currentCharacterName = GetCharacterName(clientId);
             const auto currentAttitude = GetAttitudeTowards({ currentCharacterName, targetCharacterName });
             if (currentAttitude.second != Attitude::Allied)
@@ -317,7 +314,7 @@ namespace IFF
             return;
         }
 
-        if (HkIsValidClientID(GetClientId(targetCharacterName)))
+        if (HkIsValidClientID(HkGetClientIdFromCharname(targetCharacterName)))
         {
             const auto& attitude = GetAttitudeTowards({ GetCharacterName(clientId), targetCharacterName });
             PrintUserCmdText(clientId, L"You are " + GetAttitudeDisplayString(attitude.first) + L" towards " + targetCharacterName + L", and they are " + GetAttitudeDisplayString(attitude.second) + L" towards you.");

@@ -29,19 +29,36 @@
 #include "../../Plugin.h"
 #include <random>
 
+/**
+* Reads from \DATA\RANDOMMISSIONS\trade_routes.ini
+*
+* [TradeRoutes]
+* commodity = good_nickname
+* offer_base = base_nickname, weightedChance
+* ...
+* receiver_base = base_nickname, weightedChance
+* ...
+* faction = faction_nickname
+* ...
+* allowed_ship = shiparch_nickname
+* ...
+* credits_per_system = credits
+* reputation_per_system = fractional value
+* min_jumps = integer
+*/
+
 namespace RandomMissions
 {
 	const uint desiredMissionCount = 3;
 
-	static std::random_device rd;
-	static std::mt19937 gen(rd());
+	std::mt19937 randomizer(std::random_device{}());
 
 	struct Commodity
 	{
 		uint id = 0;
-		std::unordered_set<uint> offerBases;
-		std::unordered_set<uint> receiverBases;
-		std::unordered_set<uint> offerFactions;
+		std::unordered_map<uint, int> offerWeightedBases;
+		std::unordered_map<uint, int> receiverWeightedBases;
+		std::unordered_set<uint> factionIds;
 		std::unordered_set<uint> allowedShips;
 		uint moneyPerSystem = 0;
 		float reputationPerSystem = 0.0f;
@@ -49,7 +66,6 @@ namespace RandomMissions
 	};
 
 	std::vector<Commodity> commodities;
-	std::unordered_map<uint, std::vector<size_t>> commoditiesPerBase;
 	std::unordered_map<uint, std::unordered_map<uint, std::vector<uint>>> shortestSystemPathToTargets;
 	std::unordered_map<uint, std::unordered_set<uint>> missionIdsByClientId;
 
@@ -72,15 +88,15 @@ namespace RandomMissions
 						}
 						else if (ini.is_value("offer_base"))
 						{
-							commodity.offerBases.insert(CreateID(ini.get_value_string(0)));
+							commodity.offerWeightedBases.insert({ CreateID(ini.get_value_string(0)), ini.get_num_parameters() > 1 ? ini.get_value_int(1) : 0 });
 						}
 						else if (ini.is_value("receiver_base"))
 						{
-							commodity.receiverBases.insert(CreateID(ini.get_value_string(0)));
+							commodity.receiverWeightedBases.insert({ CreateID(ini.get_value_string(0)), ini.get_num_parameters() > 1 ? ini.get_value_int(1) : 0 });
 						}
 						else if (ini.is_value("faction"))
 						{
-							commodity.offerFactions.insert(CreateID(ini.get_value_string(0)));
+							commodity.factionIds.insert(CreateID(ini.get_value_string(0)));
 						}
 						else if (ini.is_value("allowed_ship"))
 						{
@@ -96,15 +112,11 @@ namespace RandomMissions
 						}
 						else if (ini.is_value("min_jumps"))
 						{
-							commodity.minJumpDistance = ini.get_value_int(0);
+							commodity.minJumpDistance = max(0, ini.get_value_int(0));
 						}
 					}
-					if (commodity.id && !commodity.offerBases.empty() && !commodity.receiverBases.empty())
-					{
+					if (commodity.id && !commodity.offerWeightedBases.empty() && !commodity.receiverWeightedBases.empty() && !commodity.factionIds.empty())
 						commodities.push_back(commodity);
-						for (const auto& baseId : commodity.offerBases)
-							commoditiesPerBase[baseId].push_back(commodities.size() - 1);
-					}
 				}
 			}
 			ini.close();
@@ -166,18 +178,6 @@ namespace RandomMissions
 		}
 	}
 
-	struct RandomDestination
-	{
-		Commodity* commodity = nullptr;
-		uint startSystemId;
-		uint targetSystemId;
-		uint targetBaseId;
-		uint targetObjId;
-		Vector targetPosition;
-		uint systemsToTraverse;
-		uint offerFactionId;
-	};
-
 	#define ADDR_CONTENT_GETMISSIONPROPERTIES 0xB87D0
 	typedef bool(__cdecl* _GetMissionProperties)(uint shipId, st6::vector<uint>& missionProps);
 
@@ -219,110 +219,170 @@ namespace RandomMissions
 		return false;
 	}
 
+	// From Stack Overflow user Bob__ on https://stackoverflow.com/a/50223540
+	template <class D, class W, class URBG>
+	void weighted_shuffle(D first, D last, W first_weight, W last_weight, URBG&& g)
+	{
+		while (first != last && first_weight != last_weight)
+		{
+			const auto i = std::discrete_distribution(first_weight, last_weight)(g);
+			if (i)
+			{
+				std::iter_swap(first, std::next(first, i));
+				std::iter_swap(first_weight, std::next(first_weight, i));
+			}
+			++first;
+			++first_weight;
+		}
+	}
+
+	static std::vector<uint> FindEligibleShuffledBaseMissionFactionIds(const uint baseId, const int reputationId)
+	{
+		std::vector<float> weights;
+		std::vector<uint> factionIds;
+		for (const auto& offer : offersByBaseId.at(baseId))
+		{
+			float feelings = -1.0f;
+			pub::Reputation::GetGroupFeelingsTowards(reputationId, factionById.at(offer.factionId).groupId, feelings);
+			if (feelings <= RandomMissions::minRequiredReputationForMissions)
+				continue;
+			weights.push_back(offer.weight);
+			factionIds.push_back(offer.factionId);
+		}
+		weighted_shuffle(factionIds.begin(), factionIds.end(), weights.begin(), weights.end(), randomizer);
+		return factionIds;
+	}
+
+	static std::vector<const Commodity*> FindEligibleShuffledBaseFactionCommodities(const uint baseId, const uint factionId, const uint shipArchetypeId)
+	{
+		std::vector<float> weights;
+		std::vector<const Commodity*> filteredCommodities;
+		for (const auto& commodity : commodities)
+		{
+			if (!commodity.factionIds.contains(factionId) || !commodity.offerWeightedBases.contains(baseId))
+				continue;
+			if (!commodity.allowedShips.empty() && !commodity.allowedShips.contains(shipArchetypeId))
+				continue;
+
+			weights.push_back(commodity.offerWeightedBases.at(baseId));
+			filteredCommodities.push_back(&commodity);
+		}
+		weighted_shuffle(filteredCommodities.begin(), filteredCommodities.end(), weights.begin(), weights.end(), randomizer);
+		return filteredCommodities;
+	}
+
+	static CSolar* FindDockableSolar(const uint baseId, const std::unordered_set<uint> shipMissionProps)
+	{
+		const auto& dockablesEntry = dockablesByBaseId.find(baseId);
+		if (dockablesEntry == dockablesByBaseId.end())
+			return nullptr;
+		for (const auto& dockableObj : dockablesEntry->second)
+		{
+			if (CanDock(static_cast<Archetype::Solar*>(dockableObj->archetype)->dockInfo, shipMissionProps))
+				return dockableObj;
+		}
+		return nullptr;
+	}
+
+	struct RandomDestination
+	{
+		const Commodity* commodity = nullptr;
+		uint startSystemId = 0;
+		uint targetSystemId = 0;
+		uint targetBaseId = 0;
+		uint targetObjId = 0;
+		Vector targetPosition;
+		uint systemsToTraverse = 0;
+		uint offerFactionId = 0;
+	};
+
+	static RandomDestination FindAccessibleRandomDestination(const uint baseId, const uint factionId, const Commodity& commodity, const int reputationId, const std::unordered_set<uint> shipMissionProps)
+	{
+		RandomDestination result = {};
+
+		const uint startSystemId = Universe::get_base(baseId)->iSystemID;
+		if (!startSystemId)
+			return result;
+
+		std::vector<float> weights;
+		std::vector<uint> shuffledReceiverBaseIds;
+		for (const auto& [receiverBaseId, weight] : commodity.receiverWeightedBases)
+		{
+			weights.push_back(weight);
+			shuffledReceiverBaseIds.push_back(receiverBaseId);
+		}
+		weighted_shuffle(shuffledReceiverBaseIds.begin(), shuffledReceiverBaseIds.end(), weights.begin(), weights.end(), randomizer);
+
+		for (const auto& receiverBaseId : shuffledReceiverBaseIds)
+		{
+			if (baseId == receiverBaseId)
+				continue;
+
+			const uint targetSystemId = Universe::get_base(receiverBaseId)->iSystemID;
+			// -1 because the start system is always included in the list.
+			if (!targetSystemId || (shortestSystemPathToTargets.at(startSystemId).at(targetSystemId).size() - 1 < commodity.minJumpDistance))
+				continue;
+
+			if (factionById.at(factionId).hostileFactionIds.contains(owningFactionByBaseId.at(receiverBaseId)))
+				continue;
+
+			const CSolar* dockable = FindDockableSolar(receiverBaseId, shipMissionProps);
+			if (!dockable)
+				continue;
+
+			if (dockable->system != targetSystemId)
+				ConPrint(L"WARNING: Base System and Object System do not match: " + stows(Universe::get_base(receiverBaseId)->cNickname) + L" : " + std::to_wstring(dockable->id) + L"\n");
+
+			uint affiliationId;
+			pub::Reputation::GetAffiliation(dockable->id, affiliationId);
+			if (affiliationId)
+			{
+				float feelings = -1.0f;
+				pub::Reputation::GetGroupFeelingsTowards(reputationId, affiliationId, feelings);
+				if (feelings <= hostileDockingThreshold)
+					continue;
+			}
+
+			result.commodity = &commodity;
+			result.startSystemId = startSystemId;
+			result.targetSystemId = dockable->system;
+			result.targetBaseId = receiverBaseId;
+			result.targetObjId = dockable->id;
+			result.targetPosition = dockable->get_position();
+			result.systemsToTraverse = shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size();
+			result.offerFactionId = factionId;
+			return result;
+		}
+
+		return result;
+	}
+
 	static RandomDestination GetRandomDestination(const uint clientId, const uint startBaseId, const uint shipArchetypeId)
 	{
 		RandomDestination result = {};
+
+		const uint startSystemId = Universe::get_base(startBaseId)->iSystemID;
+		if (!startSystemId)
+			return result;
 
 		int clientRep = 0;
 		pub::Player::GetRep(clientId, clientRep);
 		if (!clientRep)
 			return result;
 
-		if (!commoditiesPerBase.contains(startBaseId) || commoditiesPerBase.at(startBaseId).empty())
-			return result;
-
-		uint startSystemId = 0;
-		for (const auto& base : lstBases)
-		{
-			if (base.iBaseID == startBaseId)
-			{
-				startSystemId = base.iSystemID;
-				break;
-			}
-		}
-		if (!startSystemId)
-			return result;
-
-		_GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
+		const _GetMissionProperties GetMissionProperties = (_GetMissionProperties)CONTENT_ADDR(ADDR_CONTENT_GETMISSIONPROPERTIES);
 		st6::vector<uint> missionPropsResult;
 		if (!GetMissionProperties(shipArchetypeId, missionPropsResult) || missionPropsResult.empty())
 			return result;
 		const std::unordered_set<uint> missionProps(missionPropsResult.begin(), missionPropsResult.end());
 
-		std::vector<size_t> shuffledCommodityIndices = commoditiesPerBase[startBaseId];
-		std::ranges::shuffle(shuffledCommodityIndices, rd);
-		std::vector<Commodity*> shuffledCommodities;
-		for (const auto& commodityIndex : shuffledCommodityIndices)
-			shuffledCommodities.push_back(&commodities.at(commodityIndex));
-
-		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId.at(startBaseId));
-		std::ranges::shuffle(shuffledBaseFactions, rd);
-		for (const auto& faction : shuffledBaseFactions)
+		for (const auto& baseFactionId : FindEligibleShuffledBaseMissionFactionIds(startBaseId, clientRep))
 		{
-			float feelings = -1.0f;
-			pub::Reputation::GetGroupFeelingsTowards(clientRep, factionById.at(faction.factionId).groupId, feelings);
-			if (feelings <= RandomMissions::minRequiredReputationForMissions)
-				continue;
-
-			const auto& hostileFactionIds = factionById.at(faction.factionId).hostileFactionIds;
-			for (const auto& commodity : shuffledCommodities)
+			for (const auto& commodity : FindEligibleShuffledBaseFactionCommodities(startBaseId, baseFactionId, shipArchetypeId))
 			{
-				if (!commodity->offerFactions.contains(faction.factionId))
-					continue;
-
-				if (!commodity->allowedShips.empty() && !commodity->allowedShips.contains(shipArchetypeId))
-					continue;
-
-				std::vector<uint> shuffledBaseIds(commodity->receiverBases.begin(), commodity->receiverBases.end());
-				std::ranges::shuffle(shuffledBaseIds, rd);
-				for (const uint targetBaseId : shuffledBaseIds)
-				{
-					if (startBaseId == targetBaseId)
-						continue;
-
-					const auto& dockablesEntry = dockablesByBaseId.find(targetBaseId);
-					if (dockablesEntry == dockablesByBaseId.end())
-						continue;
-
-					CSolar* dockable = nullptr;
-					for (const auto& dockableObj : dockablesEntry->second)
-					{
-						if (CanDock(static_cast<Archetype::Solar*>(dockableObj->archetype)->dockInfo, missionProps))
-						{
-							dockable = dockableObj;
-							break;
-						}
-					}
-					if (!dockable)
-						continue;
-					
-					if (hostileFactionIds.contains(owningFactionByBaseId[targetBaseId]))
-						continue;
-
-					// -1 because the start system is always included in the list.
-					if (shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size() - 1 < commodity->minJumpDistance)
-						continue;
-
-					uint affiliationId;
-					pub::Reputation::GetAffiliation(dockable->id, affiliationId);
-					if (affiliationId)
-					{
-						float feelings = -1.0f;
-						pub::Reputation::GetGroupFeelingsTowards(clientRep, affiliationId, feelings);
-						if (feelings <= hostileDockingThreshold)
-							continue;
-					}
-
-					result.commodity = commodity;
-					result.startSystemId = startSystemId;
-					result.targetSystemId = dockable->system;
-					result.targetObjId = dockable->id;
-					result.targetBaseId = targetBaseId;
-					result.targetPosition = dockable->get_position();
-					result.systemsToTraverse = shortestSystemPathToTargets.at(startSystemId).at(dockable->system).size();
-					result.offerFactionId = faction.factionId;
-					return result;
-				}
+				const auto& destination = FindAccessibleRandomDestination(startBaseId, baseFactionId, *commodity, clientRep, missionProps);
+				if (destination.commodity)
+					return destination;
 			}
 		}
 		return result;
@@ -338,10 +398,8 @@ namespace RandomMissions
 		const auto& baseOffers = offersByBaseId.find(startBaseId);
 		if (baseOffers == offersByBaseId.end())
 			return 0;
-		std::vector<BaseOffer> shuffledBaseFactions(offersByBaseId.at(startBaseId));
-		std::ranges::shuffle(shuffledBaseFactions, rd);
 
-		const RandomDestination& destination = GetRandomDestination(clientId, startBaseId, shipArchetypeId);
+		const RandomDestination destination = GetRandomDestination(clientId, startBaseId, shipArchetypeId);
 		if (!destination.commodity)
 			return 0;
 

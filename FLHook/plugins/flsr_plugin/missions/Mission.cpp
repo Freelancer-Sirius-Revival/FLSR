@@ -64,7 +64,7 @@ namespace Missions
 			if (const auto& markEntry = markedObjIdsByClientId.find(clientId); markEntry != markedObjIdsByClientId.end())
 			{
 				for (const uint objId : markEntry->second)
-					Mark::UnmarkObject(markEntry->first, objId);
+					Mark::Unmark(markEntry->first, objId);
 			}
 
 			uint msnId;
@@ -331,7 +331,7 @@ namespace Missions
 		if (const auto& markEntry = markedObjIdsByClientId.find(clientId); markEntry != markedObjIdsByClientId.end())
 		{
 			for (const uint objId : markEntry->second)
-				Mark::UnmarkObject(markEntry->first, objId);
+				Mark::Unmark(markEntry->first, objId);
 		}
 		markedObjIdsByClientId.erase(clientId);
 		lockedDocksByClientId.erase(clientId);

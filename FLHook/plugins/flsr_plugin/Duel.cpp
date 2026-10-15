@@ -101,8 +101,8 @@ namespace Duel
 		pub::Player::GetShip(duel->guestClientId, shipIdB);
 		if (shipIdA && shipIdB)
 		{
-			Mark::UnmarkObject(duel->hostClientId, shipIdB);
-			Mark::UnmarkObject(duel->guestClientId, shipIdA);
+			Mark::Unmark(duel->hostClientId, shipIdB);
+			Mark::Unmark(duel->guestClientId, shipIdA);
 		}
 		DeathPenalty::RemovePvPExclusion(duel->hostClientId, duel->guestClientId);
 		IFF::SetAttitude(duel->hostClientId, duel->guestClientId, duel->initialAttitude.first);
@@ -312,8 +312,8 @@ namespace Duel
 					pub::Player::GetShip(duel->guestClientId, shipIdB);
 					if (shipIdA && shipIdB)
 					{
-						Mark::MarkObject(duel->hostClientId, shipIdB);
-						Mark::MarkObject(duel->guestClientId, shipIdA);
+						Mark::Mark(duel->hostClientId, shipIdB);
+						Mark::Mark(duel->guestClientId, shipIdA);
 					}
 
 					returncode = SKIPPLUGINS_NOFUNCTIONCALL;

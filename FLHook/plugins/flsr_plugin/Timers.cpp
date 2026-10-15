@@ -1,13 +1,11 @@
 #include "Main.h"
 #include "Cloak.h"
-#include "Mark.h"
 #include "SpawnProtection.h"
 
 namespace Timers {
 
     TIMER Timers[] = {
         { Cloak::UpdateCloakClients, Cloak::TIMER_INTERVAL, 0 },
-        { Mark::RotateClearNonExistingTargetIds, Mark::CLEAR_ROTATION_TIMER_INTERVAL, 0 },
         { SpawnProtection::UpdateSpawnProtectionValidity, SpawnProtection::TIMER_INTERVAL, 0 },
     };
 

@@ -5,13 +5,13 @@ namespace Missions
 {
 	static void Mark(const uint clientId, const uint targetObjId, Mission& mission)
 	{
-		if (Mark::MarkObject(clientId, targetObjId))
-			mission.markedObjIdsByClientId[clientId].insert(targetObjId);
+		Mark::Mark(clientId, targetObjId);
+		mission.markedObjIdsByClientId[clientId].insert(targetObjId);
 	}
 
 	static void Unmark(const uint clientId, const uint targetObjId, Mission& mission)
 	{
-		Mark::UnmarkObject(clientId, targetObjId);
+		Mark::Unmark(clientId, targetObjId);
 		const auto& entry = mission.markedObjIdsByClientId.find(clientId);
 		if (entry != mission.markedObjIdsByClientId.end())
 		{

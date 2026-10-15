@@ -375,16 +375,16 @@ bool HkIClientImpl::Send_FLPACKET_SERVER_CREATEGUIDED(uint& iClientID, FLPACKET_
 /**************************************************************************************************************
 **************************************************************************************************************/
 
-bool HkIClientImpl::Send_FLPACKET_SERVER_CREATELOOT(uint iClientID, FLPACKET_UNKNOWN& pDunno)
+bool HkIClientImpl::Send_FLPACKET_SERVER_CREATELOOT(uint iClientID, FLPACKET_CREATELOOT& pLoot)
 {
 	ISERVER_LOG();
 	ISERVER_LOGARG_UI(iClientID);
 
-	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATELOOT, bool, __stdcall, (uint, FLPACKET_UNKNOWN&), (iClientID, pDunno));
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATELOOT, bool, __stdcall, (uint, FLPACKET_CREATELOOT&), (iClientID, pLoot));
 
-	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_CREATELOOT(iClientID, pDunno));
+	CALL_CLIENT_METHOD(Send_FLPACKET_SERVER_CREATELOOT(iClientID, pLoot));
 
-	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATELOOT_AFTER, bool, __stdcall, (uint, FLPACKET_UNKNOWN&), (iClientID, pDunno));
+	CALL_PLUGINS(PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATELOOT_AFTER, bool, __stdcall, (uint, FLPACKET_CREATELOOT&), (iClientID, pLoot));
 
 	return reinterpret_cast<bool>(vRet);
 }

@@ -1,4 +1,5 @@
 #include "NpcCloaking.h"
+#include "Mark.h"
 #include "plugin.h"
 
 namespace NpcCloaking
@@ -177,6 +178,7 @@ namespace NpcCloaking
 			// Full cloak desired and reached
 			if (cloakedStateTargetted && currentCloakPercentage == 1.0f)
 			{
+				Mark::AddInvisibleObject(transitionIt->first);
 				transitionIt = objIdsToTransition.erase(transitionIt);
 				continue;
 			}
@@ -193,7 +195,7 @@ namespace NpcCloaking
 				continue;
 			}
 
-			// Full cloak desired but just reached full uncloak
+			// Full cloak desired and full uncloak reached
 			if (cloakedStateTargetted && currentCloakPercentage == 0.0f)
 			{
 				IObjRW* inspect;
@@ -212,7 +214,7 @@ namespace NpcCloaking
 					BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.shield->iSubObjId, false);
 				}
 			}
-			// Full uncloak desired but just reached full cloak
+			// Full uncloak desired and full cloak reached
 			else if (!cloakedStateTargetted && currentCloakPercentage == 1.0f)
 			{
 				IObjRW* inspect;
@@ -225,6 +227,7 @@ namespace NpcCloaking
 				}
 				objEntry->second.mainCloak->Activate(false);
 				BroadcastEquipmentActivationState(objEntry->second.systemId, objEntry->first, objEntry->second.mainCloak->iSubObjId, false);
+				Mark::RemoveInvisibleObject(objEntry->first);
 			}
 			transitionIt++;
 		}

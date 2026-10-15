@@ -253,6 +253,8 @@ HK_ERROR HkGetCharFileName(const std::wstring &wscCharname,
     szBuf.reserve(1024);
 
     HK_GET_CLIENTID_OR_LOGGED_OUT(iClientID, wscCharname);
+    if (HkIsInCharSelectMenu(iClientID))
+        return HKE_NO_CHAR_SELECTED;
     if (iClientID != -1) {
         GetFLName(szBuf.data(),
                   (const wchar_t *)Players.GetActiveCharacterName(iClientID));

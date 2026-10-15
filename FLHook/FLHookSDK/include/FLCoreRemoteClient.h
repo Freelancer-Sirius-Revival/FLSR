@@ -165,6 +165,23 @@ struct FLPACKET_CREATESOLAR
 	bool isDestructible;
 };
 
+struct FLPACKET_CREATELOOT
+{
+	uint ownerSpaceObjId;
+	uint unk1[22];
+	uint spaceObjId;
+	uint lootArchId;
+	uint lootHitPoints;
+	uint quantity;
+	uint crateArchId;
+	uint crateHitPoints;
+	uint unk2;
+	Vector position;
+	Quaternion orientation;
+	Vector initialVelocity;
+	uint unk3[128];
+};
+
 struct FLPACKET_LAND
 {
 	uint iShip;
@@ -225,7 +242,7 @@ public:
 	virtual bool Send_FLPACKET_SERVER_GFCOMPLETENEWSBROADCASTLIST(uint iClientID, uint iDunno);
 	virtual bool Send_FLPACKET_SERVER_CREATESOLAR(uint iClientID, FLPACKET_CREATESOLAR& pSolar);
 	virtual bool Send_FLPACKET_SERVER_CREATESHIP(uint iClientID, FLPACKET_CREATESHIP& pShip);
-	virtual bool Send_FLPACKET_SERVER_CREATELOOT(uint iClientID, FLPACKET_UNKNOWN& pDunno);
+	virtual bool Send_FLPACKET_SERVER_CREATELOOT(uint iClientID, FLPACKET_CREATELOOT& pLoot);
 	virtual bool Send_FLPACKET_SERVER_CREATEMINE(uint iClientID, FLPACKET_UNKNOWN& pDunno);
 	virtual bool Send_FLPACKET_SERVER_CREATEGUIDED(uint& iClientID, FLPACKET_CREATEGUIDED& pDunno);
 	virtual bool Send_FLPACKET_SERVER_CREATECOUNTER(uint iClientID, FLPACKET_UNKNOWN& pDunno);

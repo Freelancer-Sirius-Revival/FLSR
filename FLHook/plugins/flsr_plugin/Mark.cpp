@@ -1,328 +1,232 @@
 #include "Mark.h"
 #include <queue>
 #include "Plugin.h"
-
-/**
-* Mark 1 -> requires Client and Target to be in same system
-* Mark 0 -> requires the Client to have it on its Mark list
-* Mark list on the client is cleared when leaving server/character
-*/
-
+#include <ranges>
 
 namespace Mark
 {
-    const uint CLEAR_ROTATION_TIMER_INTERVAL = 500;
-
-    // Contains a set of currently market targets (the current system's) per client id.
-    std::unordered_map<uint, std::set<uint>> currentlyMarkedObjectsPerClient;
-
-    // Contains a set of marked targets per system per character file name.
-    std::unordered_map<std::wstring, std::unordered_map<uint, std::set<uint>>> markedObjectsPerCharacter;
-    std::unordered_map<std::wstring, std::set<std::wstring>> markedCharactersPerCharacter;
-
-    std::set<std::wstring> cloakedCharacterFileNames;
-
     const uint UI_SELECT_ID = CreateID("ui_select_add");
     const uint UI_UNSELECT_ID = CreateID("ui_select_remove");
 
-    bool MarkObject(const uint clientId, const uint targetId)
+    struct Marker
     {
-        uint shipId;
-        pub::Player::GetShip(clientId, shipId);
-        if (shipId && targetId && (shipId != targetId) && !currentlyMarkedObjectsPerClient[clientId].contains(targetId))
-        {
-            currentlyMarkedObjectsPerClient[clientId].insert(targetId);
-            pub::Player::MarkObj(clientId, targetId, 1);
-            return true;
-        }
-        return false;
-    }
+        std::unordered_map<uint, std::unordered_set<uint>> objectIdsBySystemId;
+        std::unordered_set<std::wstring> charFileNames;
+    };
+    std::unordered_map<std::wstring, Marker> markersByCharFileName;
+    std::unordered_set<uint> invisibleObjectIds;
 
-    bool UnmarkObject(const uint clientId, const uint targetId)
+    static uint FindClientIdByCharFileName(const std::wstring& characterFileName)
     {
-        if (clientId && targetId && currentlyMarkedObjectsPerClient[clientId].contains(targetId))
-        {
-            currentlyMarkedObjectsPerClient[clientId].erase(targetId);
-            pub::Player::MarkObj(clientId, targetId, 0);
-            return true;
-        }
-        return false;
-    }
-
-    static uint FindClientIdByCharacterFileName(const std::wstring& characterFileName)
-    {
-        PlayerData* playerData = 0;
+        PlayerData* playerData = nullptr;
         while (playerData = Players.traverse_active(playerData))
         {
-            const uint clientId = HkGetClientIdFromPD(playerData);
             std::wstring otherCharacterFileName;
-            if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), otherCharacterFileName) != HKE_OK)
-                continue;
-            if (otherCharacterFileName.compare(characterFileName) == 0)
-                return clientId;
+            if (HkGetCharFileName(ARG_CLIENTID(playerData->iOnlineID), otherCharacterFileName) == HKE_OK && otherCharacterFileName.compare(characterFileName) == 0)
+                return playerData->iOnlineID;
         }
-        return 0;
+        return -1;
     }
 
-    static void ClearNonExistingTargetIds(const std::wstring& characterFileName)
+    static std::wstring GetCharFileName(const uint clientId)
     {
-        std::set<uint> deletedIds;
-        std::vector<uint> emptySystemIds;
-        for (auto& markedObjectIdsPerSystemId : markedObjectsPerCharacter[characterFileName])
-        {
-            std::vector<uint> deletedIdsInSystem;
-            for (const uint targetId : markedObjectIdsPerSystemId.second)
-            {
-                if (pub::SpaceObj::ExistsAndAlive(targetId) != 0) // 0 -> true
-                    deletedIdsInSystem.push_back(targetId);
-            }
-
-            for (const uint objectId : deletedIdsInSystem)
-            {
-                markedObjectIdsPerSystemId.second.erase(objectId);
-                deletedIds.insert(objectId);
-            }
-
-            if (markedObjectIdsPerSystemId.second.empty())
-                emptySystemIds.push_back(markedObjectIdsPerSystemId.first);
-        }
-
-        for (const uint systemId : emptySystemIds)
-            markedObjectsPerCharacter[characterFileName].erase(systemId);
-
-        if (markedObjectsPerCharacter[characterFileName].empty())
-            markedObjectsPerCharacter.erase(characterFileName);
-
-        const uint clientId = FindClientIdByCharacterFileName(characterFileName);
-        if (!clientId)
-            return; 
-
-        // Copy target IDs because UnmarkObject erases them and this breaks the iterator.
-        const std::set<uint> targetIds = std::set(currentlyMarkedObjectsPerClient[clientId]);
-        for (const uint targetId : targetIds)
-        {
-            if (deletedIds.contains(targetId))
-                UnmarkObject(clientId, targetId);
-        }
-
-        if (currentlyMarkedObjectsPerClient[clientId].empty())
-            currentlyMarkedObjectsPerClient.erase(clientId);
-    }
-
-    std::queue<std::wstring> characterNamesForClearingRotation;
-
-    void RotateClearNonExistingTargetIds()
-    {
-        if (characterNamesForClearingRotation.empty())
-        {
-            for (const auto& objectsPerCharacterName : markedObjectsPerCharacter)
-                characterNamesForClearingRotation.push(objectsPerCharacterName.first);
-        }
-
-        if (!characterNamesForClearingRotation.empty())
-        {
-            ClearNonExistingTargetIds(characterNamesForClearingRotation.front());
-            characterNamesForClearingRotation.pop();
-        }
-    }
-
-    static bool IsMarkedObject(const uint clientId, const uint targetId)
-    {
-        return currentlyMarkedObjectsPerClient[clientId].contains(targetId);
-    }
-
-    static void UnmarkEverywhere(const uint targetId)
-    {
-        for (const auto& markedObjectsPerClient : currentlyMarkedObjectsPerClient)
-            UnmarkObject(markedObjectsPerClient.first, targetId);
-
-        for (auto& markedObjectsPerCharacter : markedObjectsPerCharacter)
-        {
-            for (auto& markedObjectsPerSystemId : markedObjectsPerCharacter.second)
-                markedObjectsPerSystemId.second.erase(targetId);
-        }
-    }
-
-    static void DisposeCharacterEverywhere(const std::wstring& characterFileName)
-    {
-        for (auto& charactersPerCharacter : markedCharactersPerCharacter)
-            charactersPerCharacter.second.erase(characterFileName);
-
-        cloakedCharacterFileNames.erase(characterFileName);
-    }
-
-    static void RefreshMarksForCurrentSystem(const uint clientId)
-    {
-        uint clientSystemId;
-        pub::Player::GetSystem(clientId, clientSystemId);
-        if (!clientSystemId)
-            return;
-
         std::wstring characterFileName;
-        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
-            return;
-
-        // Mark static objects or NPCs
-        if (markedObjectsPerCharacter.contains(characterFileName) && markedObjectsPerCharacter[characterFileName].contains(clientSystemId))
-        {
-            for (const uint targetId : markedObjectsPerCharacter[characterFileName][clientSystemId])
-                MarkObject(clientId, targetId);
-        }
-
-        // Marked players will be refreshed by CreateShip package checks.
+        if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+            return L"";
+        return characterFileName;
     }
 
-    static void Mark(const uint clientId, const uint targetId)
+    void Mark(const uint clientId, const uint targetId)
     {
-        uint shipId;
+        IObjRW* targetInspect = nullptr;
+        StarSystem* system;
+        if (!GetShipInspect(targetId, targetInspect, system) || !targetInspect)
+            return;
+
+        // Only allow ships, solars,and loot. The rest is not supported by the client itself.
+        if (!(targetInspect->cobj->objectClass & CObject::CEQOBJ_MASK) || !(targetInspect->cobj->objectClass & CObject::CLOOT_OBJECT))
+            return;
+
+        auto& marker = markersByCharFileName[GetCharFileName(clientId)];
+        const bool newlyInserted = targetInspect->is_player()
+                                        ? marker.charFileNames.insert(GetCharFileName(targetInspect->cobj->ownerPlayer)).second
+                                        : marker.objectIdsBySystemId[targetInspect->cobj->system].insert(targetId).second;
+
+        if (invisibleObjectIds.contains(targetId))
+            return;
+        uint shipId, systemId;
         pub::Player::GetShip(clientId, shipId);
-        if (shipId == targetId)
+        if (!shipId)
             return;
-
-        std::wstring characterFileName;
-        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
-            return;
-
-        uint targetSystemId;
-        pub::SpaceObj::GetSystem(targetId, targetSystemId);
-        if (!targetSystemId)
-            return;
-
-        const uint targetClientId = HkGetClientIDByShip(targetId);
-        if (targetClientId)
+        pub::Player::GetSystem(clientId, systemId);
+        if (targetInspect->cobj->system == systemId)
         {
-            std::wstring targetCharacterFileName;
-            if (HkGetCharFileName(ARG_CLIENTID(targetClientId), targetCharacterFileName) != HKE_OK)
-                return;
-            markedCharactersPerCharacter[characterFileName].insert(targetCharacterFileName);
-            if (cloakedCharacterFileNames.contains(targetCharacterFileName))
-                return;
+            pub::Player::MarkObj(clientId, targetId, 1);
+            if (newlyInserted)
+                pub::Audio::PlaySoundEffect(clientId, UI_SELECT_ID);
         }
-        else
-        {
-            markedObjectsPerCharacter[characterFileName][targetSystemId].insert(targetId);
-        }
-
-        uint clientSystemId;
-        pub::Player::GetSystem(clientId, clientSystemId);
-        if (clientSystemId != targetSystemId)
-            return;
-
-        if (MarkObject(clientId, targetId))
-            pub::Audio::PlaySoundEffect(clientId, UI_SELECT_ID);
     }
 
-    static void Unmark(const uint clientId, const uint targetId)
+    static void Unmark(const std::wstring charFileName, const uint targetId)
     {
-        std::wstring characterFileName;
-        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        const auto& markerEntry = markersByCharFileName.find(charFileName);
+        if (markerEntry == markersByCharFileName.end())
             return;
 
-        const uint targetClientId = HkGetClientIDByShip(targetId);
-        if (targetClientId)
-        {
-            std::wstring targetCharacterFileName;
-            if (HkGetCharFileName(ARG_CLIENTID(targetClientId), targetCharacterFileName) != HKE_OK)
-                return;
-            markedCharactersPerCharacter[characterFileName].erase(targetCharacterFileName);
-        }
-        else
-        {
-            for (auto& markedObjectsPerSystemId : markedObjectsPerCharacter[characterFileName])
-                markedObjectsPerSystemId.second.erase(targetId);
-        }
+        IObjRW* targetInspect = nullptr;
+        StarSystem* system;
+        if (!GetShipInspect(targetId, targetInspect, system) || !targetInspect)
+            return;
 
-        if (UnmarkObject(clientId, targetId))
+        bool removed = false;
+        if (targetInspect->is_player())
+            removed = markerEntry->second.charFileNames.erase(GetCharFileName(targetInspect->cobj->ownerPlayer)) > 0;
+        else if (const auto& objectIdsBySystem = markerEntry->second.objectIdsBySystemId.find(targetInspect->cobj->system); objectIdsBySystem != markerEntry->second.objectIdsBySystemId.end())
+            removed = objectIdsBySystem->second.erase(targetId) > 0;
+        if (!removed)
+            return;
+
+        if (markerEntry->second.charFileNames.empty() && markerEntry->second.objectIdsBySystemId.empty())
+            markersByCharFileName.erase(markerEntry);
+
+        const uint clientId = FindClientIdByCharFileName(charFileName);
+        if (!HkIsValidClientID(clientId))
+            return;
+        uint shipId, systemId;
+        pub::Player::GetShip(clientId, shipId);
+        if (!shipId)
+            return;
+        pub::Player::GetSystem(clientId, systemId);
+        if (targetInspect->cobj->system == systemId)
+        {
+            pub::Player::MarkObj(clientId, targetId, 0);
             pub::Audio::PlaySoundEffect(clientId, UI_UNSELECT_ID);
+        }
+    }
+
+    void Unmark(const uint clientId, const uint targetId)
+    {
+        Unmark(GetCharFileName(clientId), targetId);
     }
 
     static void UnmarkAll(const uint clientId)
     {
-        std::wstring characterFileName;
-        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
+        const auto& markerEntry = markersByCharFileName.find(GetCharFileName(clientId));
+        if (markerEntry == markersByCharFileName.end())
             return;
 
-        markedCharactersPerCharacter[characterFileName].clear();
-        markedObjectsPerCharacter[characterFileName].clear();
-
-        if (currentlyMarkedObjectsPerClient[clientId].size() > 0)
+        uint shipId, systemId;
+        pub::Player::GetShip(clientId, shipId);
+        pub::Player::GetSystem(clientId, systemId);
+        if (shipId && systemId)
         {
-            pub::Audio::PlaySoundEffect(clientId, UI_UNSELECT_ID);
-            for (const uint targetId : currentlyMarkedObjectsPerClient[clientId])
-                pub::Player::MarkObj(clientId, targetId, 0);
+            bool unmarked = false;
+            for (const auto& charFileName : markerEntry->second.charFileNames)
+            {
+                const uint targetClientId = FindClientIdByCharFileName(charFileName);
+                if (!HkIsValidClientID(targetClientId))
+                    continue;
+                uint targetShipId, targetSystemId;
+                pub::Player::GetShip(targetClientId, targetShipId);
+                if (!targetShipId)
+                    continue;
+                pub::Player::GetSystem(targetClientId, targetSystemId);
+                if (targetSystemId == systemId)
+                {
+                    unmarked = true;
+                    pub::Player::MarkObj(clientId, targetShipId, 0);
+                }
+            }
+            if (const auto& objectIdsBySystem = markerEntry->second.objectIdsBySystemId.find(systemId); objectIdsBySystem != markerEntry->second.objectIdsBySystemId.end())
+            {
+                for (const auto& objectId : objectIdsBySystem->second)
+                {
+                    unmarked = true;
+                    pub::Player::MarkObj(clientId, objectId, 0);
+                }
+            }
+            if (unmarked)
+                pub::Audio::PlaySoundEffect(clientId, UI_UNSELECT_ID);
         }
-        currentlyMarkedObjectsPerClient.erase(clientId);
+
+        markersByCharFileName.erase(markerEntry);
     }
 
-    static void AddClientToEveryonesCurrentlyMarkedObjects(const uint clientId)
+    static void UnmarkEverywhere(const uint objectId)
     {
-        uint targetId;
-        pub::Player::GetShip(clientId, targetId);
-        if (!targetId)
-            return;
+        const auto ks = std::views::keys(markersByCharFileName);
+        const std::vector<std::wstring> keys{ ks.begin(), ks.end() };
+        for (const auto& characterName : keys)
+            Unmark(characterName, objectId);
+    }
 
-        uint targetSystemId;
-        pub::Player::GetSystem(clientId, targetSystemId);
-        if (!targetSystemId)
-            return;
+    static bool IsMarked(const uint clientId, const uint targetId)
+    {
+        const auto& markerEntry = markersByCharFileName.find(GetCharFileName(clientId));
+        if (markerEntry == markersByCharFileName.end())
+            return false;
 
-        std::wstring targetCharacterFileName;
-        if (HkGetCharFileName(ARG_CLIENTID(clientId), targetCharacterFileName) != HKE_OK)
-            return;
+        IObjRW* targetInspect = nullptr;
+        StarSystem* system;
+        if (!GetShipInspect(targetId, targetInspect, system) || !targetInspect)
+            return false;
 
-        for (const auto& charactersPerCharacter : markedCharactersPerCharacter)
+        bool marked = false;
+        if (targetInspect->is_player())
+            marked = markerEntry->second.charFileNames.contains(GetCharFileName(targetInspect->cobj->ownerPlayer));
+        else if (const auto& objectIdsBySystem = markerEntry->second.objectIdsBySystemId.find(targetInspect->cobj->system); objectIdsBySystem != markerEntry->second.objectIdsBySystemId.end())
+            marked = objectIdsBySystem->second.contains(targetId);
+        return marked;
+    }
+
+    static void MarkForCurrentSystem(const uint clientId)
+    {
+        uint systemId;
+        pub::Player::GetSystem(clientId, systemId);
+        if (const auto& entry = markersByCharFileName.find(GetCharFileName(clientId)); entry != markersByCharFileName.end())
         {
-            if (charactersPerCharacter.second.contains(targetCharacterFileName))
+            // All ships will be dealt with by Send_FLPACKET_SERVER_CREATESHIP_AFTER
+            if (const auto& objectIdsBySystem = entry->second.objectIdsBySystemId.find(systemId); objectIdsBySystem != entry->second.objectIdsBySystemId.end())
             {
-                const uint otherClientId = FindClientIdByCharacterFileName(charactersPerCharacter.first);
-                if (!otherClientId)
-                    continue;
-                uint otherShipId;
-                pub::Player::GetShip(otherClientId, otherShipId);
-                if (!otherShipId)
-                    continue;
-
-                uint otherSystemId;
-                pub::Player::GetSystem(otherClientId, otherSystemId);
-                if (otherSystemId != targetSystemId)
-                    continue;
-
-                MarkObject(otherClientId, targetId);
+                for (const auto& objectId : objectIdsBySystem->second)
+                    if (!invisibleObjectIds.contains(objectId))
+                        pub::Player::MarkObj(clientId, objectId, 1);
             }
         }
     }
 
-    static void RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(const uint targetId)
+    static void RefreshInvisibleObject(const uint objectId)
     {
-        for (const auto& markedObjectsPerClientId : currentlyMarkedObjectsPerClient)
-            UnmarkObject(markedObjectsPerClientId.first, targetId);
+        IObjRW* targetInspect = nullptr;
+        StarSystem* system;
+        if (!GetShipInspect(objectId, targetInspect, system) || !targetInspect)
+            return;
+        for (const auto& charFileEntry : markersByCharFileName)
+        {
+            const uint clientId = FindClientIdByCharFileName(charFileEntry.first);
+            if (HkIsValidClientID(clientId) && IsMarked(clientId, objectId))
+            {
+                uint shipId, systemId;
+                pub::Player::GetShip(clientId, shipId);
+                if (!shipId)
+                    continue;
+                pub::Player::GetSystem(clientId, systemId);
+                if (targetInspect->cobj->system == systemId)
+                    pub::Player::MarkObj(clientId, objectId, invisibleObjectIds.contains(objectId) ? 0 : 1);
+            }
+        }
     }
 
-    void AddCloakedPlayer(const uint clientId)
+    void AddInvisibleObject(const uint objectId)
     {
-        std::wstring characterFileName;
-        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
-            return;
-
-        cloakedCharacterFileNames.insert(characterFileName);
-
-        uint shipId;
-        pub::Player::GetShip(clientId, shipId);
-        if (!shipId)
-            return;
-
-        RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(shipId);
+        invisibleObjectIds.insert(objectId);
+        RefreshInvisibleObject(objectId);
     }
 
-    void RemoveCloakedPlayer(const uint clientId)
+    void RemoveInvisibleObject(const uint objectId)
     {
-        std::wstring characterFileName;
-        if (!HkIsValidClientID(clientId) || HkIsInCharSelectMenu(clientId) || HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
-            return;
-
-        cloakedCharacterFileNames.erase(characterFileName);
-
-        AddClientToEveryonesCurrentlyMarkedObjects(clientId);
+        invisibleObjectIds.erase(objectId);
+        RefreshInvisibleObject(objectId);
     }
 
     static std::list<GROUP_MEMBER> GetGroupMemberClientIds(const uint clientId)
@@ -345,10 +249,7 @@ namespace Mark
         if (!targetId)
             return;
 
-        if (!IsMarkedObject(clientId, targetId))
-            Mark(clientId, targetId);
-        else
-            Unmark(clientId, targetId);
+        IsMarked(clientId, targetId) ? Unmark(clientId, targetId) : Mark(clientId, targetId);
     }
 
     void UserCmd_UnMark(const uint clientId, const std::wstring& wscParam)
@@ -360,6 +261,7 @@ namespace Mark
         pub::SpaceObj::GetTarget(shipId, targetId);
         if (!targetId)
             return;
+
         Unmark(clientId, targetId);
     }
 
@@ -373,12 +275,9 @@ namespace Mark
         if (!targetId)
             return;
 
-        const bool alreadyMarkedBefore = IsMarkedObject(clientId, targetId);
         const auto groupMembers = GetGroupMemberClientIds(clientId);
         for (const auto& member : groupMembers)
             Mark(member.iClientID, targetId);
-        if (alreadyMarkedBefore && groupMembers.size() > 1)
-            pub::Audio::PlaySoundEffect(clientId, UI_SELECT_ID);
     }
 
     void UserCmd_UnGroupMark(const uint clientId, const std::wstring& wscParam)
@@ -391,12 +290,9 @@ namespace Mark
         if (!targetId)
             return;
 
-        const bool alreadyUnmarkedBefore = !IsMarkedObject(clientId, targetId);
         const auto groupMembers = GetGroupMemberClientIds(clientId);
         for (const auto& member : groupMembers)
             Unmark(member.iClientID, targetId);
-        if (alreadyUnmarkedBefore && groupMembers.size() > 1)
-            pub::Audio::PlaySoundEffect(clientId, UI_UNSELECT_ID);
     }
 
     void UserCmd_UnMarkAll(const uint clientId, const std::wstring& wscParam)
@@ -406,172 +302,112 @@ namespace Mark
 
     void __stdcall SystemSwitchOutComplete_After(unsigned int shipId, unsigned int clientId)
     {
-        currentlyMarkedObjectsPerClient.erase(clientId);
-        RefreshMarksForCurrentSystem(clientId);
+        MarkForCurrentSystem(clientId);
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId)
     {
-        currentlyMarkedObjectsPerClient.erase(clientId);
-        RefreshMarksForCurrentSystem(clientId);
-        returncode = DEFAULT_RETURNCODE;
-    }
-
-    void __stdcall BaseEnter_After(unsigned int baseId, unsigned int clientId)
-    {
-        currentlyMarkedObjectsPerClient.erase(clientId);
+        MarkForCurrentSystem(clientId);
         returncode = DEFAULT_RETURNCODE;
     }
 
     bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& ship)
     {
-        if (clientId && ship.clientId)
+        if (const auto& entry = markersByCharFileName.find(GetCharFileName(clientId)); entry != markersByCharFileName.end())
         {
-            std::wstring currentCharacterFileName;
-            if (HkGetCharFileName(ARG_CLIENTID(clientId), currentCharacterFileName) != HKE_OK ||
-                !markedCharactersPerCharacter.contains(currentCharacterFileName)
-            )
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return true;
-            }
-
-            std::wstring targetCharacterFileName;
-            if (HkGetCharFileName(ARG_CLIENTID(ship.clientId), targetCharacterFileName) != HKE_OK ||
-                !markedCharactersPerCharacter[currentCharacterFileName].contains(targetCharacterFileName) ||
-                cloakedCharacterFileNames.contains(targetCharacterFileName)
-            )
-            {
-                returncode = DEFAULT_RETURNCODE;
-                return true;
-            }
-
-            MarkObject(clientId, ship.iSpaceID);
+            if (IsMarked(clientId, ship.iSpaceID))
+                Mark(clientId, ship.iSpaceID);
         }
-
         returncode = DEFAULT_RETURNCODE;
         return true;
     }
 
-    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state)
+    bool Send_FLPACKET_SERVER_CREATESOLAR_AFTER(uint clientId, FLPACKET_CREATESOLAR& solar)
     {
-        currentlyMarkedObjectsPerClient.erase(clientId);
+        if (const auto& entry = markersByCharFileName.find(GetCharFileName(clientId)); entry != markersByCharFileName.end())
+        {
+            if (IsMarked(clientId, solar.iSpaceID))
+                Mark(clientId, solar.iSpaceID);
+        }
         returncode = DEFAULT_RETURNCODE;
+        return true;
     }
 
     void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
+        invisibleObjectIds.erase(killedObject->get_id());
         UnmarkEverywhere(killedObject->cobj->get_id());
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId)
     {
-        const CSimple* obj = killedObject->cobj;
-        if (!killed) // Despawned
-        {
-            const uint clientId = obj->GetOwnerPlayer();
-            if (clientId)
-            {
-                RemoveTargetIdFromEveryonesCurrentlyMarkedObjects(obj->get_id());
-                std::wstring characterFileName;
-                if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) == HKE_OK)
-                    cloakedCharacterFileNames.erase(characterFileName);
-            }
-            else
-            {
-                // Remove despawned NPCs
-                UnmarkEverywhere(obj->get_id());
-            }
-        }
-        else
-        {
-            UnmarkEverywhere(obj->get_id());
-
-            const uint clientId = obj->GetOwnerPlayer();
-            if (clientId)
-            {
-                std::wstring characterFileName;
-                if (HkGetCharFileName(ARG_CLIENTID(clientId), characterFileName) != HKE_OK)
-                {
-                    returncode = DEFAULT_RETURNCODE;
-                    return;
-                }
-                DisposeCharacterEverywhere(characterFileName);
-            }
-        }
+        invisibleObjectIds.erase(killedObject->get_id());
+        if (killed || !killedObject->is_player())
+            UnmarkEverywhere(killedObject->cobj->get_id());
         returncode = DEFAULT_RETURNCODE;
     }
 
-    static void ClearCharacteData(const std::wstring characterFileName)
+    void __stdcall LootDestroyed(const IObjRW* killedObject)
     {
-        if (markedObjectsPerCharacter.contains(characterFileName))
-            markedObjectsPerCharacter.erase(characterFileName);
-        if (markedCharactersPerCharacter.contains(characterFileName))
-            markedCharactersPerCharacter.erase(characterFileName);
-        cloakedCharacterFileNames.erase(characterFileName);
+        UnmarkEverywhere(killedObject->cobj->get_id());
+        returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
-        std::wstring characterFileName;
-        if (HkGetCharFileName(info.wszCharname, characterFileName) != HKE_OK)
+        if (std::wstring charFileName; HkGetCharFileName(info.wszCharname, charFileName) == HKE_OK)
         {
-            returncode = DEFAULT_RETURNCODE;
-            return;
+            markersByCharFileName.erase(charFileName);
+            for (auto& entry : markersByCharFileName)
+                entry.second.charFileNames.erase(charFileName);
         }
-        DisposeCharacterEverywhere(characterFileName);
-        ClearCharacteData(characterFileName);
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        const std::wstring characterFileName = stows(std::string(characterId.charFilename).substr(0, 11));
-        DisposeCharacterEverywhere(characterFileName);
-        ClearCharacteData(characterFileName);
+        const std::wstring charFileName = stows(std::string(characterId.charFilename).substr(0, 11));
+        markersByCharFileName.erase(charFileName);
+        for (auto& entry : markersByCharFileName)
+            entry.second.charFileNames.erase(charFileName);
         returncode = DEFAULT_RETURNCODE;
     }
 
-    std::wstring oldCharacterFileName = L"";
+    std::wstring oldCharFileName = L"";
 
     HK_ERROR HkRename(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        std::wstring output = L"";
-        oldCharacterFileName = HkGetCharFileName(charname, output) == HKE_OK ? output : L"";
+        oldCharFileName = L"";
+        HkGetCharFileName(charname, oldCharFileName);
         returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }
 
     HK_ERROR HkRename_After(const std::wstring& charname, const std::wstring& newCharname, bool onlyDelete)
     {
-        if (!oldCharacterFileName.empty())
+        if (!oldCharFileName.empty())
         {
-            std::wstring characterFileName;
-            if (HkGetCharFileName(newCharname, characterFileName) == HKE_OK)
+            std::wstring newCharFileName;
+            if (HkGetCharFileName(newCharname, newCharFileName) == HKE_OK)
             {
-                if (markedObjectsPerCharacter.contains(oldCharacterFileName))
+                if (const auto& markerByCharFileNameEntry = markersByCharFileName.find(oldCharFileName); markerByCharFileNameEntry != markersByCharFileName.end())
                 {
-                    markedObjectsPerCharacter[characterFileName] = markedObjectsPerCharacter[oldCharacterFileName];
-                    markedObjectsPerCharacter.erase(oldCharacterFileName);
+                    markersByCharFileName[newCharFileName] = markerByCharFileNameEntry->second;
+                    markersByCharFileName.erase(markerByCharFileNameEntry);
                 }
-                if (markedCharactersPerCharacter.contains(oldCharacterFileName))
+                for (auto& markerByCharFileNameEntry : markersByCharFileName)
                 {
-                    markedCharactersPerCharacter[characterFileName] = markedCharactersPerCharacter[oldCharacterFileName];
-                    markedCharactersPerCharacter.erase(oldCharacterFileName);
-                }
-                for (auto& otherCharacter : markedCharactersPerCharacter)
-                {
-                    if (otherCharacter.second.contains(oldCharacterFileName))
+                    if (const auto& charFileNameEntry = markerByCharFileNameEntry.second.charFileNames.find(oldCharFileName); charFileNameEntry != markerByCharFileNameEntry.second.charFileNames.end())
                     {
-                        otherCharacter.second.erase(oldCharacterFileName);
-                        otherCharacter.second.insert(characterFileName);
+                        markerByCharFileNameEntry.second.charFileNames.insert(newCharFileName);
+                        markerByCharFileNameEntry.second.charFileNames.erase(charFileNameEntry);
                     }
                 }
             }
         }
-        oldCharacterFileName = L"";
+        oldCharFileName = L"";
         returncode = DEFAULT_RETURNCODE;
         return HKE_OK;
     }

@@ -189,6 +189,7 @@ enum PLUGIN_CALLBACKS
 	PLUGIN_SolarColGrpDmg,
 	PLUGIN_GuidedDestroyed,
 	PLUGIN_MineDestroyed,
+	PLUGIN_LootDestroyed,
 	PLUGIN_AddGroupMember,
 	PLUGIN_AddGroupMember_AFTER,
 	PLUGIN_DelGroupMember,

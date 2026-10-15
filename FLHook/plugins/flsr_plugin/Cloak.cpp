@@ -244,7 +244,6 @@ namespace Cloak
 
 	static void ClearClientData(const uint clientId)
 	{
-		Mark::RemoveCloakedPlayer(clientId);
 		clientCloakStats.erase(clientId);
 		clientIdsRequestingUncloak.erase(clientId);
 	}
@@ -882,10 +881,15 @@ namespace Cloak
 			// Make sure to remove this player from everyone's mark list when the cloak state changed.
 			if (previousCloakStates[clientId] != cloakState)
 			{
-				if (cloakState == CloakState::Cloaked)
-					Mark::AddCloakedPlayer(clientId);
-				else
-					Mark::RemoveCloakedPlayer(clientId);
+				uint shipId;
+				pub::Player::GetShip(clientId, shipId);
+				if (shipId)
+				{
+					if (cloakState == CloakState::Cloaked)
+						Mark::AddInvisibleObject(shipId);
+					else
+						Mark::RemoveInvisibleObject(shipId);
+				}
 			}
 			previousCloakStates[clientId] = cloakState;
 		}

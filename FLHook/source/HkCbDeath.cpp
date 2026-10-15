@@ -367,6 +367,9 @@ __declspec(naked) void GuidedDestroyedNaked()
 
 void __stdcall LootDestroyed(IObjRW* iobj)
 {
+    TRY_HOOK
+    CALL_PLUGINS_V(PLUGIN_LootDestroyed, __stdcall, (IObjRW*), (iobj));
+    CATCH_HOOK({})
 }
 
 FARPROC LootDestroyedOrigFunc;

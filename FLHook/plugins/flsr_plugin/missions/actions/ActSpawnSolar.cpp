@@ -2,7 +2,6 @@
 #include "../MsnSolar.h"
 #include "../SolarDocking.h"
 #include "../../../../Pilots.h"
-#include "../../../../NpcCloaking.h"
 #include "../../../../Cloak.h"
 
 namespace Missions
@@ -146,7 +145,7 @@ namespace Missions
 		mission.AddObject(objId, solar.id, solar.labels);
 		if (solarInfo.baseId)
 			RegisterDockableSolar(objId, solarInfo.baseId);
-		Cloak::TryRegisterNoCloakSolar(mission.name + ':' + solar.name, objId);
-		NpcCloaking::RegisterObject(objId);
+		Cloak::RegisterNoCloakSolar(mission.name + ':' + solar.name, objId);
+		Cloak::RegisterObject(objId);
 	}
 }

@@ -1,11 +1,9 @@
 #include "Main.h"
-#include "Cloak.h"
 #include "SpawnProtection.h"
 
 namespace Timers {
 
     TIMER Timers[] = {
-        { Cloak::UpdateCloakClients, Cloak::TIMER_INTERVAL, 0 },
         { SpawnProtection::UpdateSpawnProtectionValidity, SpawnProtection::TIMER_INTERVAL, 0 },
     };
 

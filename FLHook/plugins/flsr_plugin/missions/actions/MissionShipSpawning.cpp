@@ -1,6 +1,6 @@
 #include "MissionShipSpawning.h"
 #include "../ShipSpawning.h"
-#include "../../NpcCloaking.h"
+#include "../../Cloak.h"
 
 namespace Missions
 {
@@ -55,7 +55,7 @@ namespace Missions
 		if (objId)
 		{
 			mission.AddObject(objId, msnNpcId, msnNpcEntry->second.labels);
-			NpcCloaking::RegisterObject(objId);
+			Cloak::RegisterObject(objId);
 		}
 		else
 			ConPrint(L"ERROR: MSN NPC " + std::to_wstring(msnNpc.id) + L" in system " + std::to_wstring(params.systemId) + L" at position " + std::to_wstring(params.position.x) + L", " + std::to_wstring(params.position.y) + L", " + std::to_wstring(params.position.z) + L"\n");

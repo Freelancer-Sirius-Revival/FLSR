@@ -3,33 +3,25 @@
 
 namespace Cloak
 {
-    enum class CloakState
-    {
-        Uncloaked,
-        Cloaking,
-        Cloaked,
-        Uncloaking
-    };
-
     void InitializeWithGameData();
-    void UpdateCloakClients();
-    CloakState GetClientCloakState(uint clientId);
-    bool TryRegisterNoCloakSolar(const std::string& nickname, uint objectId);
-    extern const uint TIMER_INTERVAL;
-    void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
+    bool RegisterNoCloakSolar(const std::string& nickname, const uint objectId);
+    bool RegisterObject(const uint objId);
+    void SetTargetCloakState(const uint objId, const bool cloaked);
+    bool IsFullyUncloaked(const uint objId);
+    void __stdcall Elapse_Time_AFTER(float seconds);
+    void GuidedInit(CGuided* guided, CGuided::CreateParms& parms);
+    void __stdcall ShipAndSolarDestroyed(IObjRW* killedObj, bool killed, uint killerObjId);
+    void __stdcall ShipAndSolarEquipDestroyed(IObjRW* obj, CEquip* equip, DamageEntry::SubObjFate fate, DamageList* dmgList);
+    void __stdcall RequestCreateShip_After(unsigned int clientId);
+    void __stdcall PlayerLaunch_After(unsigned int shipId, unsigned int clientId);
+    bool Send_FLPACKET_SERVER_CREATESHIP_AFTER(uint clientId, FLPACKET_CREATESHIP& packet);
+    bool Send_FLPACKET_SERVER_CREATESOLAR_AFTER(uint clientId, FLPACKET_CREATESOLAR& packet);
+    int __cdecl Dock_Call(unsigned int const& shipId, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
     void __stdcall JumpInComplete(unsigned int systemId, unsigned int shipId);
-    void __stdcall PlayerLaunch_After(unsigned int ship, unsigned int clientId);
     void __stdcall GoTradelane(unsigned int clientId, struct XGoTradelane const& goToTradelane);
-    int __cdecl Dock_Call(unsigned int const& ship, unsigned int const& dockTargetId, int dockPortIndex, enum DOCK_HOST_RESPONSE response);
-    void __stdcall BaseEnter(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseEnter_AFTER(unsigned int baseId, unsigned int clientId);
     void __stdcall BaseExit(unsigned int baseId, unsigned int clientId);
-    void __stdcall SPObjUpdate(SSPObjUpdateInfo const& updateInfo, unsigned int clientId);
-    void __stdcall DisConnect(unsigned int clientId, enum EFLConnection state);
-    void __stdcall ShipEquipDestroyed(const IObjRW* object, const CEquip* equip, const DamageEntry::SubObjFate fate, const DamageList* damageList);
-    void __stdcall SolarDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void __stdcall ShipDestroyed(const IObjRW* killedObject, const bool killed, const uint killerShipId);
-    void GuidedInit(CGuided* guided, CGuided::CreateParms& parms);
+    void __stdcall ActivateEquip(unsigned int clientId, XActivateEquip const& activateEquip);
     void UserCmd_CLOAK(uint clientId, const std::wstring& wscParam);
     void UserCmd_UNCLOAK(uint clientId, const std::wstring& wscParam);
 }

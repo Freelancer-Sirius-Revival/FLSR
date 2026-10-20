@@ -16,7 +16,6 @@
 #include "Insurance.h"
 #include "Mark.h"
 #include "NameLimiter.h"
-#include "NpcCloaking.h"
 #include "Pilots.h"
 #include "PlayerLootSpawning.h"
 #include "SpawnProtection.h"
@@ -73,7 +72,6 @@ void LoadSettings() {
     Formations::ReadFiles();
     NpcShipArchetypes::ReadFiles();
     BestPath::ReadFiles();
-    NpcCloaking::ReadFiles();
     EquipWhiteList::ReadFiles();
     SpawnProtection::LoadSettings();
 
@@ -150,28 +148,22 @@ EXPORT PLUGIN_INFO *Get_PluginInfo()
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&IFF::HkRename_After, PLUGIN_HkCb_Rename_AFTER, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::InitializeWithGameData, PLUGIN_HkTimerCheckKick, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ActivateEquip, PLUGIN_HkIServerImpl_ActivateEquip, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GuidedInit, PLUGIN_HkIEngine_CGuided_init, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipAndSolarDestroyed, PLUGIN_ShipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipAndSolarEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipAndSolarDestroyed, PLUGIN_SolarDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipAndSolarEquipDestroyed, PLUGIN_SolarEquipDestroyed, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::RequestCreateShip_After, PLUGIN_HkIServerImpl_RequestCreateShip_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::PlayerLaunch_After, PLUGIN_HkIServerImpl_PlayerLaunch_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GoTradelane, PLUGIN_HkIServerImpl_GoTradelane, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::Send_FLPACKET_SERVER_CREATESOLAR_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::Dock_Call, PLUGIN_HkCb_Dock_Call, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::BaseEnter, PLUGIN_HkIServerImpl_BaseEnter, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::JumpInComplete, PLUGIN_HkIServerImpl_JumpInComplete, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GoTradelane, PLUGIN_HkIServerImpl_GoTradelane, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::BaseEnter_AFTER, PLUGIN_HkIServerImpl_BaseEnter_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::BaseExit, PLUGIN_HkIServerImpl_BaseExit, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::SPObjUpdate, PLUGIN_HkIServerImpl_SPObjUpdate, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::DisConnect, PLUGIN_HkIServerImpl_DisConnect, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipEquipDestroyed, PLUGIN_ShipEquipDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::SolarDestroyed, PLUGIN_SolarDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ShipDestroyed, PLUGIN_ShipDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::GuidedInit, PLUGIN_HkIEngine_CGuided_init, 0));
-
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::ShipAndSolarDestroyed, PLUGIN_ShipDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::ShipAndSolarEquipDestroyedHook, PLUGIN_ShipEquipDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::ShipAndSolarDestroyed, PLUGIN_SolarDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::ShipAndSolarEquipDestroyedHook, PLUGIN_SolarEquipDestroyed, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Elapse_Time_AFTER, PLUGIN_HkCb_Elapse_Time_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
-    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&NpcCloaking::Send_FLPACKET_SERVER_CREATESOLAR_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, 0));
+    p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&Cloak::ActivateEquip, PLUGIN_HkIServerImpl_ActivateEquip, 0));
 
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShieldSync::Send_FLPACKET_SERVER_CREATESHIP_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESHIP_AFTER, 0));
     p_PI->lstHooks.push_back(PLUGIN_HOOKINFO((FARPROC *)&ShieldSync::Send_FLPACKET_SERVER_CREATESOLAR_AFTER, PLUGIN_HkIClientImpl_Send_FLPACKET_SERVER_CREATESOLAR_AFTER, 0));

@@ -130,7 +130,7 @@ namespace ExplosionDamage
 
 	static bool DealShieldDamage(IObjRW* iobj, const ExplosionDamageEvent* explosion, const float minFullDamageDistance, DamageList* dmg)
 	{
-		CEShield* shield = reinterpret_cast<CEShield*>(reinterpret_cast<CEqObj*>(iobj->cobj)->equip_manager.FindFirst(Shield));
+		CEShield* shield = reinterpret_cast<CEShield*>(reinterpret_cast<CEqObj*>(iobj->cobj)->equip_manager.FindFirst(EquipmentClass::Shield));
 		if (!shield || shield->currShieldHitPoints <= 0.0f || !shield->IsFunctioning() || !shield->IsActive())
 			return false;
 

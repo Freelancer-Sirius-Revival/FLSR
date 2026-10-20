@@ -495,7 +495,7 @@ namespace Carrier
             return;
         }
 
-        if (Cloak::GetClientCloakState(clientId) != Cloak::CloakState::Uncloaked)
+        if (!Cloak::IsFullyUncloaked(shipId))
         {
             PrintUserCmdText(clientId, L"Docking with activated cloak not possible!");
             pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
@@ -509,7 +509,7 @@ namespace Carrier
             return;
         }
 
-        if (Cloak::GetClientCloakState(targetClientId) != Cloak::CloakState::Uncloaked)
+        if (!Cloak::IsFullyUncloaked(targetId))
         {
             PrintUserCmdText(clientId, L"The carrier must be fully uncloaked to dock!");
             pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
@@ -586,7 +586,7 @@ namespace Carrier
         pub::Player::GetShip(carrierId, carrierShipId);
         if (carrierShipId)
         {
-            if (Cloak::GetClientCloakState(carrierId) != Cloak::CloakState::Uncloaked)
+            if (!Cloak::IsFullyUncloaked(carrierShipId))
             {
                 PrintUserCmdText(clientId, L"Carrier is cloaked. Cannot undock.");
                 pub::Player::SendNNMessage(clientId, pub::GetNicknameId("launch_to_space"));

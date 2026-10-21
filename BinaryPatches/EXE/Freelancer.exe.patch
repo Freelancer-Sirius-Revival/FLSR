@@ -249,6 +249,11 @@ File: EXE\Freelancer.exe
 # Rendering
 ##########################################
 
+# Allocate higher resolution texture for font rendering, fixing invisible text on large screen resolutions. - BC46 & Claude AI
+12675: 04	[ 01 ]
+1267C: 20	[ 02 ]
+126CB: 20	[ 02 ]
+
 # Prevents intentional framerate drops to 25 from occurring during cutscenes. - BC46
 158A10: C0	[ BC ]
 

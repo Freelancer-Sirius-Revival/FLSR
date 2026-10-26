@@ -777,7 +777,7 @@ namespace Crafting
 	{
 		if (const auto& entry = currentShipCraftingPopups.find(clientId); entry != currentShipCraftingPopups.end())
 		{
-			if (buttonClicked == PopupDialogButton::LEFT_YES)
+			if (buttonClicked & PopupDialogButton::LEFT_YES)
 				Craft(clientId, ToLower(wstos(entry->second)), RecipeType::Any, 1);
 			else
 				currentShipCraftingPopups.erase(entry);

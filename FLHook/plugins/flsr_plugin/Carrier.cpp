@@ -46,7 +46,7 @@ namespace Carrier
         uint slots = 0;
         std::wstring baseNickname = L"";
         uint baseId = 0;
-        float dockOffset[3] = { 0,0,0 };
+        Vector dockOffset = { 0,0,0 };
     };
     std::unordered_map<uint, CarrierDefinition> carrierDefinitionByShipArchetypeId;
 
@@ -169,7 +169,7 @@ namespace Carrier
     {
         if (IsCarrierBase(baseId))
             return;
-        const std::wstring baseName = HkGetBaseNickByID(baseId);
+        const std::wstring& baseName = HkGetBaseNickByID(baseId);
         lastRegularBaseNameByCharacterFileNameId[CreateID(characterFileName.c_str())] = baseName;
         IniWrite(GetCarrierMapFilePath(), characterFileName, "last_regular_base", wstos(baseName));
     }
@@ -305,9 +305,7 @@ namespace Carrier
                         }
                         else if (ini.is_value("dock_offset"))
                         {
-                            definition.dockOffset[0] = ini.get_value_float(0);
-                            definition.dockOffset[1] = ini.get_value_float(1);
-                            definition.dockOffset[2] = ini.get_value_float(2);
+                            definition.dockOffset = ini.get_vector();
                         }
                     }
                     if (definition.shipArchetypeId && ((definition.slots > 0 && !definition.baseNickname.empty()) || definition.slots == 0))
@@ -445,7 +443,8 @@ namespace Carrier
         if (!shiparchId)
             return false;
 
-        return carrierDefinitionByShipArchetypeId.contains(shiparchId) && carrierDefinitionByShipArchetypeId.at(shiparchId).slots > 0;
+        const auto& entry = carrierDefinitionByShipArchetypeId.find(shiparchId);
+        return entry != carrierDefinitionByShipArchetypeId.end() && entry->second.slots > 0;
     }
 
     static void TryDock(const uint clientId)
@@ -481,7 +480,6 @@ namespace Carrier
         const std::string& targetFileName = GetCharacterFileName(targetClientId);
         if (targetFileName.empty())
             return;
-        const uint targetFileNameId = CreateID(targetFileName.c_str());
 
         if (!IsCarrier(targetClientId))
             return;
@@ -491,31 +489,32 @@ namespace Carrier
         if (carrierDefinitionByShipArchetypeId.contains(clientShiparchId))
         {
             PrintUserCmdText(clientId, L"Your ship is too big for carriers!");
-            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+            pub::Player::SendNNMessage(clientId, CreateID("cannot_dock"));
             return;
         }
 
         if (Cloak::GetClientCloakState(clientId) != Cloak::CloakState::Uncloaked)
         {
             PrintUserCmdText(clientId, L"Docking with activated cloak not possible!");
-            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+            pub::Player::SendNNMessage(clientId, CreateID("cannot_dock"));
             return;
         }
 
         if (!AreInSameGroup(clientId, targetClientId))
         {
             PrintUserCmdText(clientId, L"The carrier must be in the same group as yours!");
-            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("dock_disallowed"));
+            pub::Player::SendNNMessage(clientId, CreateID("dock_disallowed"));
             return;
         }
 
         if (Cloak::GetClientCloakState(targetClientId) != Cloak::CloakState::Uncloaked)
         {
             PrintUserCmdText(clientId, L"The carrier must be fully uncloaked to dock!");
-            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+            pub::Player::SendNNMessage(clientId, CreateID("cannot_dock"));
             return;
         }
 
+        //const uint targetFileNameId = CreateID(targetFileName.c_str());
         //uint filledSlots = 0;
         //for (const auto& assignment : carrierAssignmentByCharacterFileNameId)
         //{
@@ -528,7 +527,7 @@ namespace Carrier
         //if (filledSlots >= carrierDefinition.slots)
         //{
         //    PrintUserCmdText(clientId, L"The carrier is already full!");
-        //    pub::Player::SendNNMessage(clientId, pub::GetNicknameId("cannot_dock"));
+        //    pub::Player::SendNNMessage(clientId, CreateID("cannot_dock"));
         //    return;
         //}
 
@@ -538,13 +537,13 @@ namespace Carrier
         Vector targetVector;
         Matrix targetRotation;
         pub::SpaceObj::GetLocation(targetId, targetVector, targetRotation);
-        TranslateY(targetVector, targetRotation, carrierDefinition.dockOffset[0]);
-        TranslateZ(targetVector, targetRotation, carrierDefinition.dockOffset[1]);
-        TranslateX(targetVector, targetRotation, carrierDefinition.dockOffset[2]);
+        TranslateY(targetVector, targetRotation, carrierDefinition.dockOffset.x);
+        TranslateZ(targetVector, targetRotation, carrierDefinition.dockOffset.y);
+        TranslateX(targetVector, targetRotation, carrierDefinition.dockOffset.z);
         if (HkDistance3D(shipVector, targetVector) > dockRadius)
         {
             PrintUserCmdText(clientId, L"Too far away from carrier's dock!");
-            pub::Player::SendNNMessage(clientId, pub::GetNicknameId("nnv_dock_too_far"));
+            pub::Player::SendNNMessage(clientId, CreateID("nnv_dock_too_far"));
             return;
         }
 
@@ -615,7 +614,7 @@ namespace Carrier
         return false;
     }
 
-    const enum JumpState
+    enum class JumpState
     {
         NoJumpPath,
         DestinationReached,
@@ -629,7 +628,7 @@ namespace Carrier
         if (foundEntry == undockPathByClientId.end())
             return JumpState::NoJumpPath;
 
-        if (foundEntry->second.remainingJumpPath.size() == 0)
+        if (foundEntry->second.remainingJumpPath.empty())
             return JumpState::DestinationReached;
 
         uint shipId;
@@ -645,9 +644,6 @@ namespace Carrier
 
     static void TryReachCarrier(const uint clientId)
     {
-        if (!HkIsValidClientID(clientId))
-            return;
-
         const std::string& clientFileName = GetCharacterFileName(clientId);
         if (clientFileName.empty())
             return;
@@ -717,19 +713,21 @@ namespace Carrier
             // The player reached the destination system and should now be moved to the carrier.
             case JumpState::DestinationReached:
             {
-                uint carrierShiparchId;
+                uint carrierShiparchId, carrierShipId;
                 pub::Player::GetShipID(carrierId, carrierShiparchId);
-                uint carrierShipId;
                 pub::Player::GetShip(carrierId, carrierShipId);
-                if (!carrierShiparchId || !carrierShipId || !carrierDefinitionByShipArchetypeId.contains(carrierShiparchId))
+                if (!carrierShiparchId || !carrierShipId)
+                    return;
+                const auto& carrierDefinitionEntry = carrierDefinitionByShipArchetypeId.find(carrierShiparchId);
+                if (carrierDefinitionEntry == carrierDefinitionByShipArchetypeId.end())
                     return;
                 Vector carrierVector;
                 Matrix carrierRotation;
                 pub::SpaceObj::GetLocation(carrierShipId, carrierVector, carrierRotation);
-                const auto& dockOffset = carrierDefinitionByShipArchetypeId.at(carrierShiparchId).dockOffset;
-                TranslateY(carrierVector, carrierRotation, dockOffset[0]);
-                TranslateZ(carrierVector, carrierRotation, dockOffset[1]);
-                TranslateX(carrierVector, carrierRotation, dockOffset[2]);
+                const auto& dockOffset = carrierDefinitionEntry->second.dockOffset;
+                TranslateY(carrierVector, carrierRotation, dockOffset.x);
+                TranslateZ(carrierVector, carrierRotation, dockOffset.y);
+                TranslateX(carrierVector, carrierRotation, dockOffset.z);
                 HkRelocateClient(clientId, carrierVector, carrierRotation);
                 undockPathByClientId.erase(clientId);
                 if (carrierAssignmentByCharacterFileNameId.at(clientFileNameId).assigned)
@@ -953,7 +951,7 @@ namespace Carrier
         returncode = DEFAULT_RETURNCODE;
     }
 
-    static void ClearCarrier(const std::string carrierFileName)
+    static void ClearCarrier(const std::string& carrierFileName)
     {
         const uint carrierFileNameId = CreateID(carrierFileName.c_str());
         std::vector<std::string> characterFileNamesToRemove;
@@ -962,7 +960,7 @@ namespace Carrier
             if (!assignment.second.carrierFileName.empty() && CreateID(assignment.second.carrierFileName.c_str()) == carrierFileNameId)
                 characterFileNamesToRemove.push_back(assignment.second.characterFileName);
         }
-        for (const std::string& characterFileName : characterFileNamesToRemove)
+        for (const auto& characterFileName : characterFileNamesToRemove)
             RemoveCharacterFromCarrier(characterFileName);
     }
 
@@ -986,27 +984,20 @@ namespace Carrier
         dockLocationByCharacterFileNameIds.erase(characterFileNameId);
         lastRegularBaseNameByCharacterFileNameId.erase(characterFileNameId);
         IniDelSection(GetCarrierMapFilePath(), characterFileName);
-
-        // Throw off every character that is docked here.
         ClearCarrier(characterFileName);
     }
 
     void __stdcall CreateNewCharacter_After(SCreateCharacterInfo const& info, unsigned int clientId)
     {
         std::wstring characterFileNameWS;
-        if (HkGetCharFileName(info.wszCharname, characterFileNameWS) != HKE_OK)
-        {
-            returncode = DEFAULT_RETURNCODE;
-            return;
-        }
-        DeleteCharacterFromRecords(wstos(characterFileNameWS));
+        if (HkGetCharFileName(info.wszCharname, characterFileNameWS) == HKE_OK)
+            DeleteCharacterFromRecords(wstos(characterFileNameWS));
         returncode = DEFAULT_RETURNCODE;
     }
 
     void __stdcall DestroyCharacter_After(CHARACTER_ID const& characterId, unsigned int clientId)
     {
-        const std::string characterFileName = std::string(characterId.charFilename).substr(0, 11);
-        DeleteCharacterFromRecords(characterFileName);
+        DeleteCharacterFromRecords(std::string(characterId.charFilename).substr(0, 11));
         returncode = DEFAULT_RETURNCODE;
     }
 
@@ -1024,20 +1015,20 @@ namespace Carrier
 
         if (dockLocationByCharacterFileNameIds.contains(oldCharacterFileNameId))
         {
-            dockLocationByCharacterFileNameIds[newCharacterFileNameId] = dockLocationByCharacterFileNameIds[oldCharacterFileNameId];
+            dockLocationByCharacterFileNameIds[newCharacterFileNameId] = dockLocationByCharacterFileNameIds.at(oldCharacterFileNameId);
             dockLocationByCharacterFileNameIds.erase(oldCharacterFileNameId);
         }
 
         if (lastRegularBaseNameByCharacterFileNameId.contains(oldCharacterFileNameId))
         {
-            lastRegularBaseNameByCharacterFileNameId[newCharacterFileNameId] = lastRegularBaseNameByCharacterFileNameId[oldCharacterFileNameId];
+            lastRegularBaseNameByCharacterFileNameId[newCharacterFileNameId] = lastRegularBaseNameByCharacterFileNameId.at(oldCharacterFileNameId);
             lastRegularBaseNameByCharacterFileNameId.erase(oldCharacterFileNameId);
         }
 
-        const std::string carrierFilePath = GetCarrierMapFilePath();
+        const std::string& carrierFilePath = GetCarrierMapFilePath();
         std::list<INISECTIONVALUE> keyValues;
         IniGetSection(carrierFilePath, oldCharacterFileName, keyValues);
-        for (const INISECTIONVALUE keyValue : keyValues)
+        for (const auto& keyValue : keyValues)
             IniWrite(carrierFilePath, newCharacterFileName, keyValue.scKey, keyValue.scValue);
         IniDelSection(carrierFilePath, oldCharacterFileName);
 
